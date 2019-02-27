@@ -20,7 +20,7 @@
                     {"group": "viewed", "value": 0},
                     {"group": "unviewed", "value": 1}
                 ],
-                "mediaURL": "46"
+                "mediaURL": "http://localhost:8888/tapestry/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=1"
             },
             "fx": 800,
             "fy": 470
