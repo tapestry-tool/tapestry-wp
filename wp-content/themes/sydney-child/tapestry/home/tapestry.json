@@ -1,0 +1,31 @@
+{
+    "rootId": 1,
+    "settings": {
+        "saveProgressToCookie": false,
+        "zoom": 1
+    },
+    "nodes": [
+        {
+            "id": 1,
+            "nodeType": "",
+            "title": "H5P Test Node",
+            "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/intercultural-understanding-resized.png",
+            "mediaType": "video",
+            "mediaFormat": "h5p",
+            "mediaDuration": 65,
+            "typeId": 1,
+            "group": 1,
+            "typeData": {
+                "progress": [
+                    {"group": "viewed", "value": 0},
+                    {"group": "unviewed", "value": 1}
+                ],
+                "mediaURL": "46"
+            },
+            "fx": 800,
+            "fy": 470
+        }
+    ],
+    "links": [
+    ]
+}

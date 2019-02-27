@@ -1,0 +1,3 @@
+[submodule "wp-content/themes/sydney-child/tapestry/tapestry-d3"]
+	path = wp-content/themes/sydney-child/tapestry/tapestry-d3
+	url = https://github.com/wynnset/tapestry-d3

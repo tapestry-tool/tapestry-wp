@@ -1,0 +1,31 @@
+{
+  "semantics": [
+    {
+      "label": "Titolo"
+    },
+    {
+      "fields": [
+        {
+          "label": "Protocollo",
+          "options": [
+            {
+              "label": "http://"
+            },
+            {
+              "label": "https://"
+            },
+            {
+              "label": "(root relative)"
+            },
+            {
+              "label": "other"
+            }
+          ]
+        },
+        {
+          "label": "URL"
+        }
+      ]
+    }
+  ]
+}

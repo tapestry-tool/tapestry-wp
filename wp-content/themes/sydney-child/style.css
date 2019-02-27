@@ -1,0 +1,82 @@
+/*
+Theme Name: Sydney Child
+Theme URI: https://athemes.com/theme/sydney
+Template: sydney
+Author: aThemes
+Author URI: https://athemes.com
+Description: Sydney is a powerful business theme that provides a fast way for companies or freelancers to create an awesome online presence. As well as being fully compatible with Elementor, Sydney brings plenty of customization possibilities like access to all Google Fonts, full color control, layout control, logo upload, full screen slider, header image, sticky navigation and much more. Also, Sydney provides all the construction blocks you need to rapidly create an engaging front page.
+Tags: two-columns,right-sidebar,custom-colors,custom-background,custom-header,custom-menu,featured-images,sticky-post,theme-options,threaded-comments,translation-ready
+Version: 1.53.1548399666
+Updated: 2019-01-25 07:01:06
+
+*/
+
+/* hide footer content */
+[class="site-info container"]{
+	display:none;
+}
+
+/* Style popup-title */
+div [class="popup-title"] {
+	height:90px;
+	background-color: #3e5966;
+	margin-bottom:30px;
+	position:relative;
+}
+
+[class="popup-title"] > p {
+	font-size:42px;
+	color:#bdd6e0;
+	margin: 0;
+    line-height: 1em;
+  	position: absolute;
+  	top: 50%;
+  	left: 50%;
+  	-ms-transform: translate(-50%, -50%);
+  	transform: translate(-50%, -50%);
+}
+
+body.home header#masthead {
+    display: none;
+}
+
+body.home div#content {
+    padding: 0;
+}
+
+body.home div#content > .container {
+	min-height: calc(100vh - 100px);
+}
+
+body.home article#post-2 {
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.page .page-wrap .content-wrapper{
+	padding:0px;
+}
+
+.page-wrap .content-wrapper{
+	padding-top:0px;
+	padding-bottom:0px;
+	background-color: #F3F3F3;
+}
+
+.content-area .post-wrap {
+	padding-right: 0px;
+}
+
+.site-footer{
+	display:none;
+}
+
+#tapestry {
+	background-color: #F3F3F3;
+}
+
+#page{
+	background-color: #F3F3F3;
+}

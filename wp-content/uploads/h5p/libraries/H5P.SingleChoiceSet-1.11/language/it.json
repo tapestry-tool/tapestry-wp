@@ -1,0 +1,134 @@
+{
+  "semantics": [
+    {
+      "label": "Elenco domande",
+      "entity": "domanda",
+      "widgets": [
+        {
+          "label": "Default"
+        },
+        {
+          "label": "Textual"
+        }
+      ],
+      "field": {
+        "label": "Domande & alternative",
+        "fields": [
+          {
+            "label": "Domanda"
+          },
+          {
+            "label": "Alternative - La prima alternativa è quella giusta.",
+            "entity": "risposta",
+            "field": {
+              "label": "Alternativa"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "Feedback generale",
+      "fields": [
+        {
+          "widgets": [
+            {
+              "label": "Predefinito"
+            }
+          ],
+          "label": "Definisci un feedback personalizzato per ogni intervallo di punteggio",
+          "description": "Click the \"Add range\" button to add as many ranges as you need. Example: 0-20% Bad score, 21-91% Average Score, 91-100% Great Score!",
+          "entity": "Intervallo",
+          "field": {
+            "fields": [
+              {
+                "label": "Intervallo di punteggio"
+              },
+              {},
+              {
+                "label": "Feedback per un intervallo di punteggio definito",
+                "placeholder": "Compila il feedback"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "Impostazioni esecuzione",
+      "fields": [
+        {
+          "label": "Auto continue",
+          "description": "Automatically go to next question when alternative is selected"
+        },
+        {
+          "label": "Timeout sulle risposte corrette",
+          "description": "Valore in millisecondi"
+        },
+        {
+          "label": "Timeout sulle risposte errarte",
+          "description": "Valore in millisecondi"
+        },
+        {
+          "label": "Abilita effetti sonori"
+        },
+        {
+          "label": "Abilita pulsante Riprova"
+        },
+        {
+          "label": "Abilita pulsante Mostra soluzione"
+        },
+        {
+          "label": "Percentuale di superamento della prova",
+          "description": "Percentuale del punteggio totale richiesto per passare il quiz."
+        }
+      ]
+    },
+    {
+      "label": "Localizza set scelta singola",
+      "fields": [
+        {
+          "label": "Label for the \"Next\" button",
+          "default": "Next question"
+        },
+        {
+          "label": "Etichetta pulsante \"Mostra soluzione\"",
+          "default": "Mostra la soluzione"
+        },
+        {
+          "label": "Etichetta pulsante \"Riprova\"",
+          "default": "Riprova"
+        },
+        {
+          "label": "Titolo per visualizzare Mostra soluzione",
+          "default": "Soluzione"
+        },
+        {
+          "label": "Testo ReadSpeaker per la risposta corretta",
+          "default": "Corretta!"
+        },
+        {
+          "label": "Testo ReadSpeaker per risposta errata",
+          "default": "Non corretta"
+        },
+        {
+          "label": "Etichetta per il pulsante \"mute \", disabilitare il suono di retroazione",
+          "default": "Suono di feedback Muto"
+        },
+        {
+          "label": "Etichetta pulsante \"Vicino\"",
+          "default": "Vicino"
+        },
+        {
+          "label": "Testo Numero diapositiva",
+          "description": "Announces current slide and total number of slides, variables are :num and :total",
+          "default": ":num diapositiva del :total"
+        },
+        {
+          "label": "Textual representation of the score bar for those using a readspeaker",
+          "default": "You got :num out of :total points"
+        }
+      ]
+    }
+  ]
+}

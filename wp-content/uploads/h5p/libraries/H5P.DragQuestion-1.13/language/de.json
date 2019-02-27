@@ -1,0 +1,259 @@
+{
+  "semantics": [
+    {
+      "label": "Beschriftung für den \"Überprüfen\"-Button",
+      "default": "Überprüfen"
+    },
+    {
+      "label": "Beschriftung für den \"Wiederholen\"-Button",
+      "default": "Wiederholen"
+    },
+    {
+      "label": "Erklärung für die Punkte",
+      "default": "Richtige Antworten geben +1 Punkte. Bei falschen Antworten gibt es -1 Punkt. Die kleinstmögliche Punktzahl ist 0."
+    },
+    {
+      "fields": [
+        {
+          "label": "Einstellungen",
+          "fields": [
+            {
+              "label": "Hintergrundbild",
+              "description": "Optional. Wähle ein Hintergrundbild für die Aufgabe aus."
+            },
+            {
+              "label": "Aufgabengröße",
+              "description": "Gib an, wie breit (in px) das Feld sein soll."
+            }
+          ]
+        },
+        {
+          "label": "Aufgabe",
+          "description": "Starte, indem du deine Ablagezonen platzierst.<br/>Als nächstes platziere die verschiebbaren Elemente und wähle die zugehörigen Ablagezonen an.<br/>Zum Schluss wähle in den Ablagezonen die für sie korrekten Elemente aus.",
+          "fields": [
+            {
+              "label": "Elemente",
+              "entity": "Element",
+              "field": {
+                "label": "Element",
+                "fields": [
+                  {
+                    "description": "Wähle den Inhaltstyp, den du hinzufügen möchtest."
+                  },
+                  {},
+                  {},
+                  {},
+                  {},
+                  {
+                    "label": "Wähle die Ablagezonen"
+                  },
+                  {
+                    "label": "Hintergrunddeckkraft"
+                  },
+                  {
+                    "label": "Unbegrenzte Anzahl an Element-Instanzen",
+                    "description": "Klont dieses Element, so dass es beliebig oft in verschiedene Ablagezonen gezogen werden kann."
+                  }
+                ]
+              }
+            },
+            {
+              "label": "Ablagezone",
+              "entity": "Ablagezone",
+              "field": {
+                "label": "Ablagezone",
+                "fields": [
+                  {
+                    "label": "Beschriftung"
+                  },
+                  {
+                    "label": "Zeige Beschriftung"
+                  },
+                  {},
+                  {},
+                  {},
+                  {},
+                  {
+                    "label": "Wähle korrekte Elemente"
+                  },
+                  {
+                    "label": "Hintergrunddeckkraft"
+                  },
+                  {
+                    "label": "Tipps und Rückmeldung",
+                    "fields": [
+                      {
+                        "label": "Tipp-Text"
+                      },
+                      {
+                        "label": "Meldung auf korrekte Übereinstimmung",
+                        "description": "Meldung erscheint unterhalb der Aufgabe, wenn überprüft wird, ob die die Elemente richtig zugeordnet wurden."
+                      },
+                      {
+                        "label": "Meldung auf korrekte Übereinstimmung",
+                        "description": "Nachricht wird unter der Antwort nach Klick auf \"Überprüfen\" angezeigt, wenn die Antwort nicht gewählt wurde."
+                      }
+                    ]
+                  },
+                  {
+                    "label": "Diese Ablagezone kann nur ein Element beinhalten",
+                    "description": "Stelle sicher, dass es nur eine richtige Antwort für diese Ablagezone gibt"
+                  },
+                  {
+                    "label": "Auto-Anordnen einschalten",
+                    "description": "Ordnet alle beweglichen Elemente automatisch innerhalb der Ablagezone an."
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Allgemeine Rückmeldung",
+      "fields": [
+        {
+          "widgets": [
+            {
+              "label": "Vorgabe"
+            }
+          ],
+          "label": "Lege Rückmeldungen für einzelne Punktebereiche fest",
+          "description": "Klicke auf den \"Bereich hinzufügen\"-Button, um so viele Bereiche hinzuzufügen, wie du brauchst. Beispiel: 0-20% Schlechte Punktzahl, 21-91% Durchschnittliche Punktzahl, 91-100% Großartige Punktzahl!",
+          "entity": "Bereich",
+          "field": {
+            "fields": [
+              {
+                "label": "Punktebereich"
+              },
+              {},
+              {
+                "label": "Rückmeldung für festgelegte Punktebereiche",
+                "placeholder": "Trage die Rückmeldung ein"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "Verhaltenseinstellungen",
+      "description": "Diese Optionen legen fest, wie die Aufgabe auf Eingaben reagiert.",
+      "fields": [
+        {
+          "label": "\"Wiederholen\" zulassen"
+        },
+        {
+          "label": "Enable \"Check\" button"
+        },
+        {
+          "label": "Benutzereingabe erforderlich machen, bevor die Antwort angesehen werden kann"
+        },
+        {
+          "label": "Einen Punkt für die ganze Aufgabe vergeben",
+          "description": "Deaktivieren, um für jedes richtig zugeordnete Element einen Punkt zu geben."
+        },
+        {
+          "label": "Strafpunkte vergeben",
+          "description": "Vergibt Strafpunkte für Elemente, die in einer falschen Ablagezone abgelegt werden. Diese Option muss aktiviert werden, wenn verschiedene Elemente in mehrere Ablagezonen gelegt werden können oder es nur eine Ablagezone gibt. Ist dies nicht aktiviert, können Lernende alle Elemente in allen Ablagezonen platzieren und so volle Punktzahl erreichen."
+        },
+        {
+          "label": "Erklärung für die Punkte einschalten",
+          "description": "Zeige eine Erklärung für die Punkte an, wenn die Lernenden ihre Antworten prüfen (falls \"Strafpunkte vergeben\" aktiviert ist)."
+        },
+        {
+          "label": "Hintergrunddeckkraft für bewegliche Elemente",
+          "description": "Wenn dieses Feld gesetzt ist, wird dadurch die Hintergrunddeckkraft für.alle beweglichen Elemente überschrieben. Es sollte eine Zahl zwischen 0 und 100 sein, wobei 0 für vollständige Transparenz steht und 100 für keine Transparenz."
+        },
+        {
+          "label": "Ablagezonen aufleuchten lassen",
+          "description": "Wähle, wann die Ablagezonen aufleuchten sollen.",
+          "options": [
+            {
+              "label": "Beim Ziehen"
+            },
+            {
+              "label": "Immer"
+            },
+            {
+              "label": "Nie"
+            }
+          ]
+        },
+        {
+          "label": "Abstand für das Auto-Anordnen (in px)"
+        },
+        {
+          "label": "Vollbild ermöglichen",
+          "description": "Wähle diese Option an, um einen Vollbild-Button anzuzeigen."
+        },
+        {
+          "label": "Zeige erreichte Punkte an",
+          "description": "Zeige die erreichten Punkte für jede Antwort an. Nicht verfügbar, wenn die Option \"Einen Punkt für die ganze Aufgabe vergeben\" aktiviert ist."
+        },
+        {
+          "label": "Titel anzeigen",
+          "description": "Deaktiviere diese Option, falls du nicht möchtest, dass der Titel angezeigt wird. Der Titel wird nur in der Zusammenfassung und in Statistiken eingeblendet."
+        }
+      ]
+    },
+    {
+      "label": "Sprache anpassen",
+      "fields": [
+        {
+          "label": "Beschriftung für \"Vollbild\"",
+          "default": "Vollbild"
+        },
+        {
+          "label": "Beschriftung für \"Vollbild beenden\"",
+          "default": "Vollbild beenden"
+        }
+      ]
+    },
+    {
+      "label": "Greifbares Element Präfix",
+      "default": "Greifbares Element {num} von {total}."
+    },
+    {
+      "label": "Greifbares Element Suffix",
+      "default": "Abgelegt in Ablagezone {num}."
+    },
+    {
+      "label": "Ablagezone Präfix",
+      "default": "Ablagezone {num} von {total}."
+    },
+    {
+      "label": "Beschriftung für \"Keine Ablagezone\"",
+      "default": "Keine Ablagezone."
+    },
+    {
+      "label": "Beschriftung für \"Hinweis zeigen\"-Button",
+      "default": "Hinweis zeigen"
+    },
+    {
+      "label": "Beschriftung für \"Tipp verfügbar\"",
+      "default": "Tipp verfügbar"
+    },
+    {
+      "label": "Beschriftung für \"Richtige Antwort\"",
+      "default": "Richtige Antwort"
+    },
+    {
+      "label": "Beschriftung für \"Falsche Antwort\"",
+      "default": "Falsche Antwort"
+    },
+    {
+      "label": "Kopfzeile für den Abschnitt, der die Rückmeldungen für richtige/falsche Antworten enthält",
+      "default": "Rückmeldung"
+    },
+    {
+      "label": "Textliche Repräsentation der Punkteleiste für diejenigen, die Readspeaker benutzen",
+      "default": "Du hast :num von :total Punkten erreicht."
+    },
+    {
+      "label": "Textliche Repräsentation des \"Punkte erklären\"-Buttons",
+      "default": "Zeige Erklärung für die Punkte an."
+    }
+  ]
+}

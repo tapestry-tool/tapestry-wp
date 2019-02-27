@@ -1,0 +1,134 @@
+{
+  "semantics": [
+    {
+      "label": "Set pitanja",
+      "entity": "Pitanje",
+      "widgets": [
+        {
+          "label": "Default"
+        },
+        {
+          "label": "Textual"
+        }
+      ],
+      "field": {
+        "label": "Pitanja & Mogući odgovori",
+        "fields": [
+          {
+            "label": "Pitanje"
+          },
+          {
+            "label": "Odgovor - prvi ponuđeni odgovor je tačan.",
+            "entity": "odgovor",
+            "field": {
+              "label": "Mogući odgovor"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "Pozadinska zamućenost za elemente za uzimanje",
+      "fields": [
+        {
+          "widgets": [
+            {
+              "label": "Standard"
+            }
+          ],
+          "label": "Define custom feedback for any score range",
+          "description": "Click the \"Add range\" button to add as many ranges as you need. Example: 0-20% Bad score, 21-91% Average Score, 91-100% Great Score!",
+          "entity": "range",
+          "field": {
+            "fields": [
+              {
+                "label": "Score Range"
+              },
+              {},
+              {
+                "label": "Feedback for defined score range",
+                "placeholder": "Fill in the feedback"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "Interaktionseinstellungen",
+      "fields": [
+        {
+          "label": "Auto continue",
+          "description": "Automatically go to next question when alternative is selected"
+        },
+        {
+          "label": "Vrijeme za tačan odgovor",
+          "description": "Vrijednost u milisekundama"
+        },
+        {
+          "label": "Vrijeme za pogrešan odgovor",
+          "description": "Vrijednost u milisekundama"
+        },
+        {
+          "label": "Uključi zvučni signal"
+        },
+        {
+          "label": "Prikaži dugme \"Ponovi\""
+        },
+        {
+          "label": "Prikaži dugme \"Prikaži rješenje\""
+        },
+        {
+          "label": "Minimalno procenata za prolaz",
+          "description": "Minimalno osvojenih procenata da bi se kviz smatrao uspješno prođenim."
+        }
+      ]
+    },
+    {
+      "label": "Podešavanja za Set pitanja",
+      "fields": [
+        {
+          "label": "Label for the \"Next\" button",
+          "default": "Next question"
+        },
+        {
+          "label": "Oznaka za dugme \"Prikaži rješenje\" ",
+          "default": "Prikaži rješenje"
+        },
+        {
+          "label": "Oznaka za dugme \"Ponovi\" ",
+          "default": "Ponovi"
+        },
+        {
+          "label": "Naslov kod prikaza rješenja",
+          "default": "Rješenje"
+        },
+        {
+          "label": "\"Readspeaker\" tekst za tačan odgovor",
+          "default": "Tačno!!"
+        },
+        {
+          "label": "\"Readspeaker\" tekst za netačan odgovor",
+          "default": "Netačno!!"
+        },
+        {
+          "label": "Oznaka za dugme \"Isključi zvuk\" ",
+          "default": "Isključi zvuk"
+        },
+        {
+          "label": "Oznaka za dugme \"Zatvori\" ",
+          "default": "Zatvori"
+        },
+        {
+          "label": "Tekst za broj slajda",
+          "description": "Announces current slide and total number of slides, variables are :num and :total",
+          "default": "Slajd :num od :total"
+        },
+        {
+          "label": "Textual representation of the score bar for those using a readspeaker",
+          "default": "You got :num out of :total points"
+        }
+      ]
+    }
+  ]
+}
