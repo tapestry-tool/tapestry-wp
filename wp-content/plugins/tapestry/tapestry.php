@@ -10,11 +10,11 @@
 function create_tapestry_type()
 {
 	$labels = array(
-		"name" => __("Tapestry", "custom-post-type-ui"),
-		"singular_name" => __("Tapestry", "custom-post-type-ui"),
+		"name" => __("Tapestry"),
+		"singular_name" => __("Tapestry"),
 	);
 	$args = array(
-		"label" => __("tapestry", "custom-post-type-ui"),
+		"label" => __("tapestry"),
 		"labels" => $labels,
 		"description" => "",
 		"public" => true,
