@@ -40,4 +40,3 @@ function create_tapestry_node_type()
 }
 
 add_action('init', 'create_tapestry_node_type');
-add_action('pre_get_posts', 'add_my_post_node_type_to_query');
