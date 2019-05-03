@@ -14,7 +14,7 @@ class TapestryController {
     }
 
     public function getTapestryPost($postId) {
-        $this->getTapestry($postId);
+        return $this->getTapestry($postId);
     }
 
     private function updateTapestry($post, $postId) {
@@ -22,15 +22,18 @@ class TapestryController {
     }
 
     private function updateNodes($nodes, $postId) {
-        foreach ($nodes as $node) {
+        foreach ($nodes as $node) 
             update_post_meta($postId, 'node_'.$node['id'], $node);
-        }
     }
     
     private function getTapestry($postId) {
-        $post = get_post($postId);
-        $postMeta = get_post_meta($postId, 'tapestry');
-        return array('post' => $post, 'post_meta' => $postMeta);
+        $post = get_post_meta($postId, 'tapestry', true);
+        $nodes = array_map(function($nodeId) use ($postId) {
+            return get_post_meta($postId, 'node_'.$nodeId, true);
+        }, $post['nodes']);
+
+        $post['nodes'] = $nodes;
+        return $post;
     }
 
     private function getNodeIds($nodes) {
