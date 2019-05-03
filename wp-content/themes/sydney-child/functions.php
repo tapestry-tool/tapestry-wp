@@ -43,6 +43,8 @@ add_action( 'widgets_init', 'wpb_widgets_init' );
 
 // END ENQUEUE PARENT ACTION
 
+// Custom Endpoints
+// Dummy function to test
 add_action( 'rest_api_init', function () {
     register_rest_route( 'myplugin/v1', '/author/(?P<id>\d+)', array(
       'methods' => 'GET',
@@ -62,3 +64,19 @@ function my_awesome_func( $data ) {
     return $posts[0]->post_title;
 }
 
+// Get current userId
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'myplugin/v1', '/getcurrentuserid', array(
+      'methods' => 'GET',
+      'callback' => 'rest_get_current_user_id',
+    ) );
+});
+
+function rest_get_current_user_id($data) {
+    $user = apply_filters('determine_current_user', false);
+    if (is_null($user)) {
+        echo("No user found");
+    } else {
+        return $user;
+    }
+}
