@@ -1,13 +1,13 @@
 <?php
 class TapestryController {
-    public function updateTapestryPost($post, $postId) {
-        if (empty($postId)) $postId = $this->insertPost($post);
-        $post->nodes = $this->getNodeIds($post->nodes);
+    public function updateTapestryPost($post, $postId = null) {
+        if (is_null($postId)) $postId = $this->insertPost($post);
+        $post['nodes'] = $this->getNodeIds($post['nodes']);
         return $this->updateTapestry($post, $postId);
     }
 
-    public function updateTapestryNode($node, $postId) {
-        if (empty($postId)) throw new Exception('postId is invalid');
+    public function updateTapestryNode($node, $postId = null) {
+        if (is_null($postId)) throw new Exception('postId is invalid');
         return $this->updateNode($node, $postId);
     }
 
@@ -20,7 +20,7 @@ class TapestryController {
     }
 
     private function updateNode($node, $postId) {
-        return update_post_meta($postId, 'node'.$node->id, $node);
+        return update_post_meta($postId, 'node'.$node['id'], $node);
     }
     
     private function getTapestry($postId) {
@@ -31,7 +31,7 @@ class TapestryController {
 
     private function getNodeIds($nodes) {
         return array_map(function($node) {
-            return $node->id;
+            return $node['id'];
         }, $nodes);
     }
 
@@ -39,7 +39,8 @@ class TapestryController {
         return wp_insert_post(array(
             'post_type' => 'tapestry',
             'post_status' => 'publish',
-            'post_title' => $post->settings->tapestrySlug
+            'post_content' => '',
+            'post_title' => $post['settings']['tapestrySlug']
         ));
     }
 }
