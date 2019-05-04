@@ -44,6 +44,8 @@ add_action( 'widgets_init', 'wpb_widgets_init' );
 // END ENQUEUE PARENT ACTION
 
 // Custom Endpoints
+require __DIR__ . '/../../plugins/tapestry/class.tapestry-controller.php';
+
 // Dummy function to test
 add_action( 'rest_api_init', function () {
     register_rest_route( 'myplugin/v1', '/author/(?P<id>\d+)', array(
@@ -74,9 +76,30 @@ add_action( 'rest_api_init', function () {
 
 function rest_get_current_user_id($data) {
     $user = apply_filters('determine_current_user', false);
+    $tapestryController = new TapestryController;
+    $testPost = '{"settings": {
+        "tapestrySlug": "intercultural-understanding",
+        "saveProgressToCookie": false,
+        "zoom": 1
+    }}';
+
+    echo(json_decode($testPost)->settings->tapestrySlug);
+
+    $tapestryController->insertPost($testPost);
     if (is_null($user)) {
         echo("No user found");
     } else {
         return $user;
     }
+}
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'myplugin/v1', '/posts/updatenodes', array(
+      'methods' => 'POST',
+      'callback' => 'createnodes',
+    ) );
+});
+
+function createnodes() {
+    
 }

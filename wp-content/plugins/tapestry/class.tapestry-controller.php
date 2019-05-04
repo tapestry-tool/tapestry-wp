@@ -66,12 +66,14 @@ class TapestryController {
         }, $nodes);
     }
 
-    private function insertPost($post) {
+    //TODO change back to private
+    public function insertPost($post) {
+        $post = json_decode($post);
         return wp_insert_post(array(
             'post_type' => 'tapestry',
             'post_status' => 'publish',
             'post_content' => '',
-            'post_title' => $post['settings']['tapestrySlug']
+            'post_title' => $post->settings->tapestrySlug //need to change this back
         ));
     }
 }
