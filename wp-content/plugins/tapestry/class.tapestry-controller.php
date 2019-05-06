@@ -67,7 +67,6 @@ class TapestryController {
     }
 
     private function insertPost($post) {
-        $post = json_decode($post);
         return wp_insert_post(array(
             'post_type' => 'tapestry',
             'post_status' => 'publish',
