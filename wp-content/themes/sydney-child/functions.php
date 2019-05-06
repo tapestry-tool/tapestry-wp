@@ -74,18 +74,10 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
+// Determines current user ID
 function rest_get_current_user_id($data) {
     $user = apply_filters('determine_current_user', false);
-    $tapestryController = new TapestryController;
-    $testPost = '{"settings": {
-        "tapestrySlug": "intercultural-understanding",
-        "saveProgressToCookie": false,
-        "zoom": 1
-    }}';
 
-    echo(json_decode($testPost)->settings->tapestrySlug);
-
-    $tapestryController->insertPost($testPost);
     if (is_null($user)) {
         echo("No user found");
     } else {
@@ -100,6 +92,16 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
+// Create tapestry Nodes
 function createnodes() {
-    
+    $tapestryController = new TapestryController;
+    $testPost = '{"settings": {
+        "tapestrySlug": "intercultural-understanding",
+        "saveProgressToCookie": false,
+        "zoom": 1
+    }}';
+
+    echo(json_decode($testPost)->settings->tapestrySlug);
+
+    $tapestryController->insertPost($testPost);
 }

@@ -66,8 +66,7 @@ class TapestryController {
         }, $nodes);
     }
 
-    //TODO change back to private
-    public function insertPost($post) {
+    private function insertPost($post) {
         $post = json_decode($post);
         return wp_insert_post(array(
             'post_type' => 'tapestry',
