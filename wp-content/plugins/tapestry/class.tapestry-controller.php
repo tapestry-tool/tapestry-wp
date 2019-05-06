@@ -11,12 +11,13 @@ class TapestryController {
      * @param type @post The post data
      * @param type @postId The post ID associated with the post data (optional)
      */
-    public function updateTapestryPost($post, $postId = null) {
-        if (is_null($postId)) $postId = $this->insertPost($post);
-        $this->updateNodes($post->nodes, $postId);
+    public function updateTapestryPost($post) {
+        if (is_null($post->rootId))
+            $post->rootId = $this->insertPost($post);
+        $this->updateNodes($post->nodes, $post->rootId);
 
         $post->nodes = $this->getNodeIds($post->nodes);
-        $this->updateTapestry($post, $postId);
+        $this->updateTapestry($post, $post->rootId);
     }
 
     /**
@@ -46,8 +47,11 @@ class TapestryController {
     }
 
     private function updateNodes($nodes, $postId) {
-        foreach ($nodes as $node) 
+        foreach ($nodes as $node) {
+            if (is_null($node->id))
+                $node->id = update_post_meta($postId, '', $node);
             update_post_meta($postId, 'node_'.$node->id, $node);
+        }
     }
     
     private function getTapestry($postId) {
