@@ -68,7 +68,7 @@ function my_awesome_func( $data ) {
 
 // Get current userId
 add_action( 'rest_api_init', function () {
-    register_rest_route( 'myplugin/v1', '/getcurrentuserid', array(
+    register_rest_route( 'myplugin/v1', '/users/getcurrentuserid', array(
       'methods' => 'GET',
       'callback' => 'rest_get_current_user_id',
     ) );
