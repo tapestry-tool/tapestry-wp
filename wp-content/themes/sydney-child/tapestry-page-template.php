@@ -35,7 +35,9 @@ get_header(); ?>
 			<script src="<?php echo get_site_url(); ?>/wp-content/themes/sydney-child/tapestry/tapestry-d3/libs/h5p-resizer.min.js" charset="UTF-8"></script>
 
             <script>
-            	var jsonUrl = "<?php echo get_site_url(); ?>/wp-content/themes/sydney-child/tapestry/tapestry-d3/tapestry.json";
+				var jsonUrl = "<?php echo get_site_url(); ?>/wp-content/themes/sydney-child/tapestry/tapestry-d3/tapestry.json";
+				var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false);?>";
+				var tapestryWpPostId = "<?php echo get_the_ID();?>";
             </script>
             <script src="<?php echo get_site_url(); ?>/wp-content/themes/sydney-child/tapestry/tapestry-d3/tapestry.js"></script>
 
