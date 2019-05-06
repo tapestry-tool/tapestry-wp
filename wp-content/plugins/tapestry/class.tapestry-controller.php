@@ -49,9 +49,9 @@ class TapestryController {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
                 $node->id = add_post_meta($postId, 'node', $node);
-                var_dump($node->id);
+                $this->updateMetaKey($node->id, 'node', 'node_'.$node->id);
             }
-            $this->updateMetaKey($node->id, 'node', 'node_'.$node->id);
+            update_post_meta($postId, 'node_'.$node->id, $node);
         }
     }
     
