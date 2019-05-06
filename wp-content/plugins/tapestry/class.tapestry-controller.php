@@ -9,7 +9,6 @@ class TapestryController {
      * Otherwise, a new post will be created
      * 
      * @param type @post The post data
-     * @param type @postId The post ID associated with the post data (optional)
      */
     public function updateTapestryPost($post) {
         if (is_null($post->rootId))
