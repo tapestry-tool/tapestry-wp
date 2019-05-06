@@ -11,7 +11,7 @@ class TapestryController {
      * @param type @post The post data
      */
     public function updateTapestryPost($post) {
-        if (is_null($post->rootId))
+        if (!isset($post->rootId))
             $post->rootId = $this->insertPost($post);
         $this->updateNodes($post->nodes, $post->rootId);
 
@@ -47,9 +47,11 @@ class TapestryController {
 
     private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
-            if (is_null($node->id))
-                $node->id = update_post_meta($postId, '', $node);
-            update_post_meta($postId, 'node_'.$node->id, $node);
+            if (!isset($node->id)) {
+                $node->id = add_post_meta($postId, 'node', $node);
+                var_dump($node->id);
+            }
+            $this->updateMetaKey($node->id, 'node', 'node_'.$node->id);
         }
     }
     
@@ -76,5 +78,12 @@ class TapestryController {
             'post_content' => '',
             'post_title' => $post->settings->tapestrySlug
         ));
+    }
+
+    private function updateMetaKey($metaId, $oldKey = null, $newKey = null) {
+        global $wpdb;
+        $query = "UPDATE ".$wpdb->prefix."postmeta SET meta_key = '".$newKey."' 
+            WHERE meta_id = '".$metaId."' AND meta_key = '".$oldKey."'";
+        $wpdb->query($query);
     }
 }
