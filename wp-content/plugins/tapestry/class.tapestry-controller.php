@@ -12,7 +12,7 @@ class TapestryController {
      */
     public function updateTapestryPost($post) {
         if (!isset($post->rootId))
-            $post->rootId = $this->insertPost($post);
+        $post->rootId = $this->insertPost($post);
         $this->updateNodes($post->nodes, $post->rootId);
 
         $post->nodes = $this->getNodeIds($post->nodes);
@@ -62,6 +62,9 @@ class TapestryController {
         }, $post->nodes);
 
         $post->nodes = $nodes;
+
+        // TODO: delete the below
+        $post->links = $this->getNewLinks($post->links, $nodes);
         return $post;
     }
 
@@ -85,5 +88,30 @@ class TapestryController {
         $query = "UPDATE ".$wpdb->prefix."postmeta SET meta_key = '".$newKey."' 
             WHERE meta_id = '".$metaId."' AND meta_key = '".$oldKey."'";
         $wpdb->query($query);
+    }
+
+    // TODO: Remove this when done
+    // HACK - create a new links array that works with new IDs
+    private function getNewLinks($oldLinks, $nodes) {
+        $mappings = array(
+            1 => $nodes[0]->id,
+            2 => $nodes[1]->id,
+            3 => $nodes[2]->id,
+            4 => $nodes[3]->id,
+            5 => $nodes[4]->id,
+            6 => $nodes[5]->id,
+            8 => $nodes[6]->id,
+            9 => $nodes[7]->id,
+            7 => $nodes[8]->id,
+            10 => $nodes[9]->id
+        );
+        $newLinks = array_map(function($link) use ($mappings) {
+            $link->source = $mappings[$link->source];
+            $link->target = $mappings[$link->target];
+            $link->value = $mappings[$link->value];
+            return $link;
+        }, $oldLinks);
+
+        return $newLinks;
     }
 }
