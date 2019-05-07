@@ -4,8 +4,9 @@
  * 
  */
 class UserController {
-    public function updateProgress($userId) {
+    public function updateProgress($userId, $progressData) {
         if (is_null($userId)) throw new Exception('userId is invalid');
+        $this->updateUserProgress($userId, $progressData);
     }
 
     public function getProgress($userId) {
@@ -17,6 +18,7 @@ class UserController {
     }
 
     private function getUserProgress($userId) {
-
+        $progress = get_user_meta($userId, 'progress', true);
+        return $progress;
     }
 }
