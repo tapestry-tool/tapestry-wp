@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: Tapestry
+ * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
  * Version: 1.0
  * Author: Andrew Bui
