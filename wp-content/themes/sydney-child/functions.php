@@ -94,7 +94,7 @@ add_action( 'rest_api_init', function () {
 
 function getnodes() {
     $tapestryController = new TapestryController;
-    $postId = 28; //arbitrary for my db
+    $postId = 42; //arbitrary for my db
     $result = $tapestryController->getTapestryPost($postId);
     return $result;
 }
