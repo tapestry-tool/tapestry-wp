@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/tapestrytool/app.tapestry-tool.com
-    - /bin/cp -R * $DEPLOYPATH/ui
