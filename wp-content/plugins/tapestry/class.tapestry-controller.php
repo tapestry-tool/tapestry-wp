@@ -10,6 +10,7 @@ class TapestryController {
     );
 
     /**
+     * Update Tapestry nodes first then
      * Update the existing Tapestry post if the postId is provided
      * Otherwise, a new post will be created
      * 
@@ -17,11 +18,14 @@ class TapestryController {
      * @param type @postId The postId of the Tapestry
      */
     public function updateTapestryPost($post, $postId = null) {
-        if (!isset($postId))
-            $postId = $this->insertPost($post, 'tapestry');
         $this->updateNodes($post->nodes);
-
         $post->nodes = $this->getNodeIds($post->nodes);
+
+        if (!isset($postId)) {
+            $post->groups = [];
+            $post->rootId = $post->nodes[0];
+            $postId = $this->insertPost($post, 'tapestry');
+        }
         $this->updateTapestry($post, $postId);
     }
 
