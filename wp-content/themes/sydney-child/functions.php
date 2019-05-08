@@ -114,11 +114,15 @@ function createnodes() {
         "settings": {
             "tapestrySlug": "intercultural-understanding",
             "saveProgressToCookie": false,
-            "zoom": 1
+            "zoom": 1,
+            "type": "tapestry",
+            "title": "Intercultural Understanding",
+            "status": "published"
         },
         "nodes": [
             {
-                "nodeType": "",
+                "type": "tapestry_node",
+                "status": "published",
                 "title": "Intercultural Understanding",
                 "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/intercultural-understanding-resized.png",
                 "mediaType": "video",
@@ -139,6 +143,8 @@ function createnodes() {
                 "fy": 470
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Segregation and Homophily",
                 "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/segregation-homophily-resized.png",
@@ -159,6 +165,8 @@ function createnodes() {
                 "fy": 150
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Contact and Minorities",
                 "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/contact-and-minorities-resized.png",
@@ -179,6 +187,8 @@ function createnodes() {
                 "fy": 700
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "What is a Minority?",
                 "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/minority-resized.png",
@@ -199,6 +209,8 @@ function createnodes() {
                 "fy": 470
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Contact Theory",
                 "imageURL": "https://beta.tapestry-tool.com/wp-content/uploads/2018/10/ct0-resized.png",
@@ -219,6 +231,8 @@ function createnodes() {
                 "fy": 470
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Colourblind / Race-acknowledgement",
                 "imageURL": "https://tapestry-vid.sfo2.cdn.digitaloceanspaces.com/ICUS/thumbs/CLRBLND-RACE.png",
@@ -239,6 +253,8 @@ function createnodes() {
                 "fy": 150
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Structured Conversations",
                 "imageURL": "https://tapestry-vid.sfo2.cdn.digitaloceanspaces.com/ICUS/thumbs/STRUCTURED-CONV.png",
@@ -259,6 +275,8 @@ function createnodes() {
                 "fy": 470
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "How It Works",
                 "imageURL": "https://tapestry-vid.sfo2.cdn.digitaloceanspaces.com/ICUS/thumbs/HOW-IT-WORKS.png",
@@ -279,6 +297,8 @@ function createnodes() {
                 "fy": 700
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Perspective-Taking / Empathy",
                 "imageURL": "https://tapestry-vid.sfo2.cdn.digitaloceanspaces.com/ICUS/thumbs/PERSP-TAKING-EMPATHY.png",
@@ -299,6 +319,8 @@ function createnodes() {
                 "fy": 700
             },
             {
+                "type": "tapestry_node",
+                "status": "published",
                 "nodeType": "",
                 "title": "Perspective-Taking and Contact Theory",
                 "imageURL": "https://tapestry-vid.sfo2.cdn.digitaloceanspaces.com/ICUS/thumbs/PT-AND-CT.png",

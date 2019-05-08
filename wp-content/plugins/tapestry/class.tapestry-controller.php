@@ -4,19 +4,29 @@
  * 
  */
 class TapestryController {
+    const POST_TYPES = array(
+        'TAPESTRY' => 'tapestry',
+        'TAPESTRY_NODE' => 'tapestry_node'
+    );
+
     /**
+     * Update Tapestry nodes first then
      * Update the existing Tapestry post if the postId is provided
      * Otherwise, a new post will be created
      * 
      * @param type @post The post data
+     * @param type @postId The postId of the Tapestry
      */
-    public function updateTapestryPost($post) {
-        if (!isset($post->rootId))
-        $post->rootId = $this->insertPost($post);
-        $this->updateNodes($post->nodes, $post->rootId);
-
+    public function updateTapestryPost($post, $postId = null) {
+        $this->updateNodes($post->nodes);
         $post->nodes = $this->getNodeIds($post->nodes);
-        $this->updateTapestry($post, $post->rootId);
+
+        if (!isset($postId)) {
+            $post->groups = [];
+            $post->rootId = $post->nodes[0];
+            $postId = $this->insertPost($post, 'tapestry');
+        }
+        $this->updateTapestry($post, $postId);
     }
 
     /**
@@ -27,7 +37,8 @@ class TapestryController {
      * @throws Exception if postId is invalid
      */
     public function updateTapestryNodes($nodes, $postId = null) {
-        if (is_null($postId)) throw new Exception('postId is invalid');
+        if (is_null($postId))
+            throw new Exception('postId is invalid');
         $this->updateNodes($nodes, $postId);
     }
 
@@ -45,20 +56,18 @@ class TapestryController {
         update_post_meta($postId, 'tapestry', $post);
     }
 
-    private function updateNodes($nodes, $postId) {
+    private function updateNodes($nodes) {
         foreach ($nodes as $node) {
-            if (!isset($node->id)) {
-                $node->id = add_post_meta($postId, 'node', $node);
-                $this->updateMetaKey($node->id, 'node', 'node_'.$node->id);
-            }
-            update_post_meta($postId, 'node_'.$node->id, $node);
+            if (!isset($node->id))
+                $node->id = $this->insertPost($node, 'tapestry_node');
+            update_post_meta($node->id, 'tapestry_node', $node);
         }
     }
     
     private function getTapestry($postId) {
         $post = get_post_meta($postId, 'tapestry', true);
-        $nodes = array_map(function($nodeId) use ($postId) {
-            return get_post_meta($postId, 'node_'.$nodeId, true);
+        $nodes = array_map(function($nodeId) {
+            return get_post_meta($nodeId, 'tapestry_node', true);
         }, $post->nodes);
 
         $post->nodes = $nodes;
@@ -74,20 +83,25 @@ class TapestryController {
         }, $nodes);
     }
 
-    private function insertPost($post) {
+    private function insertPost($post, $type) {
+        switch($type) {
+            case self::POST_TYPES['TAPESTRY_NODE']:
+                $postType = $post->type;
+                $postTitle = $post->title;
+                $postStatus = $post->status;
+                break;
+            case self::POST_TYPES['TAPESTRY']:
+            default:
+                $postType = $post->settings->type;
+                $postTitle = $post->settings->title;
+                $postStatus = $post->settings->status;
+                break;
+        }
         return wp_insert_post(array(
-            'post_type' => 'tapestry',
-            'post_status' => 'publish',
-            'post_content' => '',
-            'post_title' => $post->settings->tapestrySlug
+            'post_type' => $postType,
+            'post_status' => $postStatus,
+            'post_title' => $postTitle
         ));
-    }
-
-    private function updateMetaKey($metaId, $oldKey = null, $newKey = null) {
-        global $wpdb;
-        $query = "UPDATE ".$wpdb->prefix."postmeta SET meta_key = '".$newKey."' 
-            WHERE meta_id = '".$metaId."' AND meta_key = '".$oldKey."'";
-        $wpdb->query($query);
     }
 
     // TODO: Remove this when done
