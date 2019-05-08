@@ -89,13 +89,12 @@ add_action('pre_get_posts', 'add_my_post_types_to_query');
 /**
  * Filter the template for Tapestry post
  */
-function load_tapestry_template($single) {
-    global $post;
-    if ( $post->post_type == 'tapestry' ) {
+function load_tapestry_template($templatePath) {
+    if (is_singular('tapestry') ) {
         if (file_exists(plugin_dir_path( __FILE__ ).'/templates/single-tapestry.php' )) {
             return plugin_dir_path( __FILE__ ).'/templates/single-tapestry.php';
         }
     }
-    return $single;
+    return $templatePath;
 }
 add_filter('single_template', 'load_tapestry_template');
