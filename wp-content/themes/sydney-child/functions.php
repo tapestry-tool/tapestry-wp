@@ -69,20 +69,21 @@ function my_awesome_func( $data ) {
 
 // User endpoints
 
-// Get current userId
-///users/progress/(?P<userid>\d)/(?P<postid>\d)
+// Get user's progress
 add_action( 'rest_api_init', function () {
-    register_rest_route( 'myplugin/v1', '/users/progress/', array(
+    register_rest_route( 'myplugin/v1', 'users/progress/', array(
       'methods' => 'GET',
       'callback' => 'get_user_progress_by_post_id',
     ) );
 });
 
-// Get user progress on a tapestry page by user id and post id
-function get_user_progress_by_post_id(WP_REST_Request $request) {
-    // var_dump($data["userid"]);
-    // var_dump($data["postid"]);
-    echo($request['userid']);
+// Get user progress on a tapestry page by user id and post id. Will need to pass these as query parameters
+// Example: http://localhost:8888/tapestry-wp/wp-json/myplugin/v1/users/progress?userid=1&postid=42
+function get_user_progress_by_post_id($data) {
+    $userId = $data['userid'];
+    $postId = $data['postid'];
+    $userController = new UserController;
+    return $userController->getProgress($userId, $postId);
 }
 
 add_action( 'rest_api_init', function () {
@@ -93,7 +94,6 @@ add_action( 'rest_api_init', function () {
 });
 
 function update_user_progress_by_post_id() {
-    echo("test post progress");
     $userController = new UserController;
     $userId = 1;
     $postId = 42;
