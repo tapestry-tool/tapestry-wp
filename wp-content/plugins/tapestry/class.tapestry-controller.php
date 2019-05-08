@@ -18,14 +18,17 @@ class TapestryController {
      * @param type @postId The postId of the Tapestry
      */
     public function updateTapestryPost($post, $postId = null) {
-        $this->updateNodes($post->nodes);
-        $post->nodes = $this->getNodeIds($post->nodes);
-
-        if (!isset($postId)) {
-            $post->groups = [];
-            $post->rootId = $post->nodes[0];
+        if (!isset($postId))
             $postId = $this->insertPost($post, 'tapestry');
-        }
+        $this->updateNodes($post->nodes, $postId);
+
+        if (!isset($post->groups))
+            $post->groups = [];
+
+        if (!isset($post->rootId))
+            $post->rootId = $post->nodes[0]->id;
+
+        $post->nodes = $this->getNodeIds($post->nodes);
         $this->updateTapestry($post, $postId);
     }
 
@@ -56,18 +59,18 @@ class TapestryController {
         update_post_meta($postId, 'tapestry', $post);
     }
 
-    private function updateNodes($nodes) {
+    private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id))
                 $node->id = $this->insertPost($node, 'tapestry_node');
-            update_post_meta($node->id, 'tapestry_node', $node);
+            update_post_meta($node->id, 'tapestry_node_'.$postId, $node);
         }
     }
     
     private function getTapestry($postId) {
         $post = get_post_meta($postId, 'tapestry', true);
-        $nodes = array_map(function($nodeId) {
-            return get_post_meta($nodeId, 'tapestry_node', true);
+        $nodes = array_map(function($nodeId) use($postId) {
+            return get_post_meta($nodeId, 'tapestry_node_'.$postId, true);
         }, $post->nodes);
 
         $post->nodes = $nodes;
