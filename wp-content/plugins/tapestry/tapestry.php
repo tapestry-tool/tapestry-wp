@@ -1,13 +1,11 @@
 <?php
 /**
  * Plugin Name: Tapestry
+ * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
  * Version: 1.0
  * Author: Andrew Bui
  * Author URI: https://www.andrewbui.ca
- */
- /**
- * Register Tapestry type post on initialization
  */
 
 /**
@@ -88,3 +86,15 @@ function add_my_post_types_to_query($query) {
     return $query;
 }
 add_action('pre_get_posts', 'add_my_post_types_to_query');
+
+/**
+ * Filter the template for Tapestry post
+ */
+function load_tapestry_template($singleTemplate) {
+    global $post;
+    if ($post->post_type === 'tapestry') {
+        $singleTemplate = dirname( __FILE__ ) . '/templates/single-tapestry.php';
+    }
+    return $singleTemplate;
+}
+add_filter('single_template', 'load_tapestry_template');
