@@ -93,12 +93,13 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-function update_user_progress_by_post_id() {
+// Example: http://localhost:8888/tapestry-wp/wp-json/myplugin/v1/users/progress?userid=1&postid=44&json={"32":0.5,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}
+function update_user_progress_by_post_id($data) {
     $userController = new UserController;
-    $userId = 1;
-    $postId = 42;
-    $testProgress = json_decode('{"32":0.9644611867154382,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}');
-    $userController->updateProgress($userId, $postId, $testProgress);
+    $userId = $data['userid'];
+    $postId = $data['postid'];
+    $json = $data['json'];
+    $userController->updateProgress($userId, $postId, $json);
 }
 
 // Tapestry Endpoints
