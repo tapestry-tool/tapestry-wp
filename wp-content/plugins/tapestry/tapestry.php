@@ -6,9 +6,8 @@
  * Author: Andrew Bui
  * Author URI: https://www.andrewbui.ca
  */
- /**
- * Register Tapestry type post on initialization
- */
+
+const PATH = './wp-content/plugins/tapestry/templates';
 
 /**
  * Register Tapestry type on initialization
@@ -88,3 +87,17 @@ function add_my_post_types_to_query($query) {
     return $query;
 }
 add_action('pre_get_posts', 'add_my_post_types_to_query');
+
+/**
+ * Filter the template for Tapestry post
+ */
+function load_tapestry_template($single) {
+    global $post;
+    if ( $post->post_type == 'tapestry' ) {
+        if ( file_exists(PATH.'/single-tapestry.php' ) ) {
+            return PATH.'/single-tapestry.php';
+        }
+    }
+    return $single;
+}
+add_filter('single_template', 'load_tapestry_template');
