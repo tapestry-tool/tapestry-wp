@@ -66,8 +66,8 @@ class TapestryController {
     
     private function getTapestry($postId) {
         $post = get_post_meta($postId, 'tapestry', true);
-        $nodes = array_map(function($nodeId) use ($postId) {
-            return get_post_meta($postId, 'node_'.$nodeId, true);
+        $nodes = array_map(function($nodeId) {
+            return get_post_meta($nodeId, 'tapestry_node', true);
         }, $post->nodes);
 
         $post->nodes = $nodes;
