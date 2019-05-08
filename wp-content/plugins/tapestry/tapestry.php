@@ -7,8 +7,6 @@
  * Author URI: https://www.andrewbui.ca
  */
 
-const PATH = './wp-content/plugins/tapestry/templates';
-
 /**
  * Register Tapestry type on initialization
  */
@@ -94,8 +92,8 @@ add_action('pre_get_posts', 'add_my_post_types_to_query');
 function load_tapestry_template($single) {
     global $post;
     if ( $post->post_type == 'tapestry' ) {
-        if ( file_exists(PATH.'/single-tapestry.php' ) ) {
-            return PATH.'/single-tapestry.php';
+        if (file_exists(plugin_dir_path( __FILE__ ).'/templates/single-tapestry.php' )) {
+            return plugin_dir_path( __FILE__ ).'/templates/single-tapestry.php';
         }
     }
     return $single;
