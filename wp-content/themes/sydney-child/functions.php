@@ -45,6 +45,7 @@ add_action( 'widgets_init', 'wpb_widgets_init' );
 
 // Custom Endpoints
 require __DIR__ . '/../../plugins/tapestry/class.tapestry-controller.php';
+require __DIR__ . '/../../plugins/tapestry/class.user-controller.php';
 
 // Dummy function to test
 add_action( 'rest_api_init', function () {
@@ -66,24 +67,41 @@ function my_awesome_func( $data ) {
     return $posts[0]->post_title;
 }
 
+// User endpoints
+
 // Get current userId
+///users/progress/(?P<userid>\d)/(?P<postid>\d)
 add_action( 'rest_api_init', function () {
-    register_rest_route( 'myplugin/v1', '/users/getcurrentuserid', array(
+    register_rest_route( 'myplugin/v1', '/users/progress/', array(
       'methods' => 'GET',
-      'callback' => 'rest_get_current_user_id',
+      'callback' => 'get_user_progress_by_post_id',
     ) );
 });
 
-// Determines current user ID
-function rest_get_current_user_id($data) {
-    $user = apply_filters('determine_current_user', false);
-
-    if (is_null($user)) {
-        echo("No user found");
-    } else {
-        return $user;
-    }
+// Get user progress on a tapestry page by user id and post id
+function get_user_progress_by_post_id(WP_REST_Request $request) {
+    // var_dump($data["userid"]);
+    // var_dump($data["postid"]);
+    echo($request['userid']);
 }
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'myplugin/v1', '/users/progress/', array(
+      'methods' => 'POST',
+      'callback' => 'update_user_progress_by_post_id',
+    ) );
+});
+
+function update_user_progress_by_post_id() {
+    echo("test post progress");
+    $userController = new UserController;
+    $userId = 1;
+    $postId = 42;
+    $testProgress = json_decode('{"32":0.9644611867154382,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}');
+    $userController->updateProgress($userId, $postId, $testProgress);
+}
+
+// Tapestry Endpoints
 
 add_action( 'rest_api_init', function () {
     register_rest_route( 'myplugin/v1', '/posts/getnodes', array(
