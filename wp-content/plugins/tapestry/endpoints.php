@@ -17,9 +17,10 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-function getnodes() {
+function getnodes($data) {
+    $userId = $data['userid'];
+    $postId = $data['postid'];
     $tapestryController = new TapestryController;
-    $postId = 44; //arbitrary for my db
     $result = $tapestryController->getTapestryPost($postId);
     return $result;
 }
