@@ -98,3 +98,8 @@ function load_tapestry_template($singleTemplate) {
     return $singleTemplate;
 }
 add_filter('single_template', 'load_tapestry_template');
+
+/**
+ * Register endpoints
+ */
+require_once(dirname(__FILE__).'/endpoints.php');
