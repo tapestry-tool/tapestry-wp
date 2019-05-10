@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: Tapestry
+ * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
  * Version: 1.0
  * Author: Andrew Bui
@@ -8,7 +9,7 @@
  */
 
 /**
- * Register Tapestry type post on initialization
+ * Register Tapestry type on initialization
  */
 function create_tapestry_type() {
     $labels = array(
@@ -37,8 +38,7 @@ function create_tapestry_type() {
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
-
-    register_post_type('tapestry', $args);
+     register_post_type('tapestry', $args);
 }
 add_action('init', 'create_tapestry_type');
 
@@ -72,8 +72,7 @@ function create_tapestry_node_type() {
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
-
-    register_post_type('tapestry-node', $args);
+     register_post_type('tapestry-node', $args);
 }
 add_action('init', 'create_tapestry_node_type');
 
@@ -87,3 +86,15 @@ function add_my_post_types_to_query($query) {
     return $query;
 }
 add_action('pre_get_posts', 'add_my_post_types_to_query');
+
+/**
+ * Filter the template for Tapestry post
+ */
+function load_tapestry_template($singleTemplate) {
+    global $post;
+    if ($post->post_type === 'tapestry') {
+        $singleTemplate = dirname( __FILE__ ) . '/templates/single-tapestry.php';
+    }
+    return $singleTemplate;
+}
+add_filter('single_template', 'load_tapestry_template');
