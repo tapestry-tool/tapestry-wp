@@ -4,6 +4,13 @@
  * 
  */
 class UserController {
+
+    /** 
+     * Update User's video progress for a tapestry post
+     * @param type @userId the user's id
+     * @param type @postId the post's ID
+     * @param type @progressData json data for progress of each node
+    */
     public function updateProgress($userId, $postId, $progressData) {
         $this->checkUserAndPostId($userId, $postId);  
 
@@ -16,23 +23,38 @@ class UserController {
         $this->updateUserProgress($userId, $postId, $progressData);
     }
 
+    /** 
+     * Get User's video progress for a tapestry post
+     * @param type @userId the user's id
+     * @param type @postId the post's ID
+    */
     public function getProgress($userId, $postId) {
         $this->checkUserAndPostId($userId, $postId);  
         return $this->getUserProgress($userId, $postId);
     }
 
-    public function updateH5PSetting($userId, $postId, $progressData) {
+    /** 
+     * Update User's h5p video setting for a tapestry post
+     * @param type @userId the user's id
+     * @param type @postId the post's ID
+    */
+    public function updateH5PSetting($userId, $postId, $h5pSettingsData) {
         $this->checkUserAndPostId($userId, $postId);  
 
-        if ($this->isJson($progressData)) {
-            $progressData = json_decode($progressData);
+        if ($this->isJson($h5pSettingsData)) {
+            $h5pSettingsData = json_decode($h5pSettingsData);
         } else {
             throw new Exception('Invalid json');
         }
 
-        $this->updateUserH5PSetting($userId, $postId, $progressData);
+        $this->updateUserH5PSetting($userId, $postId, $h5pSettingsData);
     }
 
+    /** 
+     * Get User's h5p video setting for a tapestry post
+     * @param type @userId the user's id
+     * @param type @postId the post's ID
+    */
     public function getH5PSetting($userId, $postId) {
         $this->checkUserAndPostId($userId, $postId);  
         return $this->getUserH5PSetting($userId, $postId);
@@ -47,13 +69,13 @@ class UserController {
         return $progress;
     }
 
-    private function updateUserH5PSetting($userId, $postId, $progressData) {
-        update_user_meta($userId, 'h5p_setting_' . $postId, $progressData);
+    private function updateUserH5PSetting($userId, $postId, $h5pSettingsData) {
+        update_user_meta($userId, 'h5p_setting_' . $postId, $h5pSettingsData);
     }
 
     private function getUserH5PSetting($userId, $postId) {
-        $progress = get_user_meta($userId, 'h5p_setting_' . $postId, true);
-        return $progress;
+        $settings = get_user_meta($userId, 'h5p_setting_' . $postId, true);
+        return $settings;
     }
 
     // Helpers

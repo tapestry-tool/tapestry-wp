@@ -65,6 +65,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
+// CHANGE example to include correct json
 // Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?userid=1&postid=44&json={"32":0.5,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}
 function update_user_h5p_settings_by_post_id($data) {
     $userController = new UserController;
