@@ -13,18 +13,6 @@ add_action('rest_api_init', function () {
     ));
 });
 
-function updateTapestry($request) {
-    $data = json_decode($request->get_body());
-    $tapestryController = new TapestryController;
-    return $tapestryController->updateTapestry($data, $data->postId);
-}
-
-function updateTapestryNodes($request) {
-    $data = json_decode($request->get_body());
-    $tapestryController = new TapestryController;
-    return $tapestryController->updateTapestryNodes($data, $data->postId);
-}
-
 function loadTapestry($request) {
     $postId = $request['id'];
     $tapestryController = new TapestryController;
