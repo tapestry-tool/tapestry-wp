@@ -21,12 +21,38 @@ class UserController {
         return $this->getUserProgress($userId, $postId);
     }
 
+    public function updateH5PSetting($userId, $postId, $progressData) {
+        $this->checkUserAndPostId($userId, $postId);  
+
+        if ($this->isJson($progressData)) {
+            $progressData = json_decode($progressData);
+        } else {
+            throw new Exception('Invalid json');
+        }
+
+        $this->updateUserH5PSetting($userId, $postId, $progressData);
+    }
+
+    public function getH5PSetting($userId, $postId) {
+        $this->checkUserAndPostId($userId, $postId);  
+        return $this->getUserH5PSetting($userId, $postId);
+    }
+
     private function updateUserProgress($userId, $postId, $progressData) {
         update_user_meta($userId, 'progress_data_' . $postId, $progressData);
     }
 
     private function getUserProgress($userId, $postId) {
         $progress = get_user_meta($userId, 'progress_data_' . $postId, true);
+        return $progress;
+    }
+
+    private function updateUserH5PSetting($userId, $postId, $progressData) {
+        update_user_meta($userId, 'h5p_setting_' . $postId, $progressData);
+    }
+
+    private function getUserH5PSetting($userId, $postId) {
+        $progress = get_user_meta($userId, 'h5p_setting_' . $postId, true);
         return $progress;
     }
 
