@@ -17,19 +17,19 @@ class TapestryController {
      * @param type @post The post data
      * @param type @postId The postId of the Tapestry
      */
-    public function updateTapestry($post, $postId = null) {
+    public function updateTapestry($tapestry, $postId = null) {
         if (!isset($postId))
-            $postId = $this->insertPost($post, 'tapestry');
-        $this->updateNodes($post->nodes, $postId);
+            $postId = $this->insertPost($tapestry, 'tapestry');
+        $this->updateNodes($tapestry->nodes, $postId);
 
         // TODO: Groups and Permisisons data could be added here later
 
-        if (!isset($post->rootId))
-            $post->rootId = $post->nodes[0]->id;
+        if (!isset($tapestry->rootId))
+            $tapestry->rootId = $tapestry->nodes[0]->id;
 
-        $post->nodes = $this->getNodeIds($post->nodes);
-        update_post_meta($postId, 'tapestry', $post);
-        return $post;
+        $tapestry->nodes = $this->getNodeIds($tapestry->nodes);
+        update_post_meta($postId, 'tapestry', $tapestry);
+        return $tapestry;
     }
 
     /**
@@ -52,8 +52,11 @@ class TapestryController {
      * @param type @postId The postId to be retrieved
      * @return type Tapestry post data
      */
-    public function getTapestryPost($postId) {
-        return $this->getTapestry($postId);
+    public function getTapestry($postId) {
+        if (is_null($postId))
+            throw new Exception('postId is invalid');
+        $tapestry = $this->getTapestryById($postId);
+        return $tapestry;
     }
 
     private function updateNodes($nodes, $postId) {
@@ -81,29 +84,30 @@ class TapestryController {
         );
     }
     
-    private function getTapestry($postId) {
-        $post = get_post_meta($postId, 'tapestry', true);
+    private function getTapestryById($postId) {
+        $tapestry = get_post_meta($postId, 'tapestry', true);
         $metadatas = array_map(function($nodeId) {
-            return get_metadata_by_mid('post', $nodeId)->meta_value;
-        }, $post->nodes);
+            return get_metadata_by_mid('post', $nodeId);
+        }, $tapestry->nodes);
         $nodeDatas = array_map(function($metadata) {
-            $nodeData = get_post_meta($metadata->post_id, 'tapestry_node_data', true);
+            $nodeData = get_post_meta($metadata->meta_value->post_id, 'tapestry_node_data', true);
             return $this->updateNodeData($nodeData, $metadata);
         }, $metadatas);
 
-        $post->nodes = $nodeDatas;
+        $tapestry->nodes = $nodeDatas;
 
         // TODO: delete the below when being able to create tapestry from scratch
-        $post->links = $this->getNewLinks($post->links, $nodeDatas);
-        return $post;
+        $tapestry->links = $this->getNewLinks($tapestry->links, $nodeDatas);
+        return $tapestry;
     }
 
     private function updateNodeData($nodeData, $metadata) {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
-        $nodeData->title = $metadata->title;
-        $nodeData->fx = $metadata->coordinates->x;
-        $nodeData->fy = $metadata->coordinates->y;
+        $nodeData->id = (int) $metadata->meta_id;
+        $nodeData->title = $metadata->meta_value->title;
+        $nodeData->fx = $metadata->meta_value->coordinates->x;
+        $nodeData->fy = $metadata->meta_value->coordinates->y;
         return $nodeData;
     }
 
