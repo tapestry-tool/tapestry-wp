@@ -53,19 +53,6 @@ class TapestryController {
         return $nodes;
     }
 
-    /**
-     * Retrieve Tapestry post
-     * 
-     * @param type @postId The postId to be retrieved
-     * @return type Tapestry post data
-     */
-    public function getTapestry($postId = null) {
-        if (is_null($postId))
-            return $this->throwError('INVALID_POST_ID');
-        $tapestry = $this->getTapestryById($postId);
-        return $tapestry;
-    }
-
     private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
@@ -89,23 +76,6 @@ class TapestryController {
                 'y' => $node->fy
             )
         );
-    }
-    
-    private function getTapestryById($postId) {
-        $tapestry = get_post_meta($postId, 'tapestry', true);
-        $metadatas = array_map(function($nodeId) {
-            return get_metadata_by_mid('post', $nodeId);
-        }, $tapestry->nodes);
-        $nodeDatas = array_map(function($metadata) {
-            $nodeData = get_post_meta($metadata->meta_value->post_id, 'tapestry_node_data', true);
-            return $this->updateNodeData($nodeData, $metadata);
-        }, $metadatas);
-
-        $tapestry->nodes = $nodeDatas;
-
-        // TODO: delete the below when being able to create tapestry from scratch
-        $tapestry->links = $this->getNewLinks($tapestry->links, $nodeDatas);
-        return $tapestry;
     }
 
     private function updateNodeData($nodeData, $metadata) {
@@ -148,30 +118,5 @@ class TapestryController {
     private function throwError($code) {
         $ERROR = (object) self::ERRORS[$code];
         return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
-    }
-
-    // TODO: Remove this when we can build a tapestry from scratch
-    // HACK - create a new links array that works with new IDs
-    private function getNewLinks($oldLinks, $nodes) {
-        $mappings = array(
-            1 => $nodes[0]->id,
-            2 => $nodes[1]->id,
-            3 => $nodes[2]->id,
-            4 => $nodes[3]->id,
-            5 => $nodes[4]->id,
-            6 => $nodes[5]->id,
-            8 => $nodes[6]->id,
-            9 => $nodes[7]->id,
-            7 => $nodes[8]->id,
-            10 => $nodes[9]->id
-        );
-        $newLinks = array_map(function($link) use ($mappings) {
-            $link->source = $mappings[$link->source];
-            $link->target = $mappings[$link->target];
-            $link->value = $mappings[$link->value];
-            return $link;
-        }, $oldLinks);
-
-        return $newLinks;
     }
 }
