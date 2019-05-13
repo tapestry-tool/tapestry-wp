@@ -78,16 +78,6 @@ class TapestryController {
         );
     }
 
-    private function updateNodeData($nodeData, $metadata) {
-        // Update node data here to match its own version
-        // This enables the same node to have multiple versions
-        $nodeData->id = (int) $metadata->meta_id;
-        $nodeData->title = $metadata->meta_value->title;
-        $nodeData->fx = $metadata->meta_value->coordinates->x;
-        $nodeData->fy = $metadata->meta_value->coordinates->y;
-        return $nodeData;
-    }
-
     private function getNodeIds($nodes) {
         return array_map(function($node) {
             return $node->id;
