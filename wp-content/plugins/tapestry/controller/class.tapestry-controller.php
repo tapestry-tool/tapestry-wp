@@ -29,6 +29,7 @@ class TapestryController {
 
         $post->nodes = $this->getNodeIds($post->nodes);
         $this->updateTapestry($post, $postId);
+        return $post;
     }
 
     /**
@@ -42,6 +43,7 @@ class TapestryController {
         if (is_null($postId))
             throw new Exception('postId is invalid');
         $this->updateNodes($nodes, $postId);
+        return $nodes;
     }
 
     /**
@@ -133,7 +135,7 @@ class TapestryController {
             'post_type' => $postType,
             'post_status' => $postStatus,
             'post_title' => $postTitle
-        ));
+        ), true);
     }
 
     // TODO: Remove this when we can build a tapestry from scratch
