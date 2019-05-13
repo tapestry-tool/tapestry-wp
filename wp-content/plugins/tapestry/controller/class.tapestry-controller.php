@@ -3,11 +3,18 @@
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
+
 class TapestryController {
-    const POST_TYPES = array(
+    const POST_TYPES = [
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node'
-    );
+    ];
+    const ERRORS = [
+        'INVALID_POST_ID' => [
+            'MESSAGE' => 'PostID is invalid',
+            'STATUS' => ['status' => 404]
+        ]
+    ];
 
     /**
      * Update Tapestry nodes first then
@@ -37,11 +44,11 @@ class TapestryController {
      * 
      * @param type @nodes An array of child nodes to be updated
      * @param type @postId The post ID to which the nodes belong
-     * @throws Exception if postId is invalid
+     * @return WP_Error if postId is invalid
      */
     public function updateTapestryNodes($nodes, $postId = null) {
         if (is_null($postId))
-            throw new Exception('postId is invalid');
+            return $this->throwError('INVALID_POST_ID');
         $this->updateNodes($nodes, $postId);
         return $nodes;
     }
@@ -52,9 +59,9 @@ class TapestryController {
      * @param type @postId The postId to be retrieved
      * @return type Tapestry post data
      */
-    public function getTapestry($postId) {
+    public function getTapestry($postId = null) {
         if (is_null($postId))
-            throw new Exception('postId is invalid');
+            return $this->throwError('INVALID_POST_ID');
         $tapestry = $this->getTapestryById($postId);
         return $tapestry;
     }
@@ -136,6 +143,11 @@ class TapestryController {
             'post_status' => $postStatus,
             'post_title' => $postTitle
         ), true);
+    }
+
+    private function throwError($code) {
+        $ERROR = (object) self::ERRORS[$code];
+        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
     }
 
     // TODO: Remove this when we can build a tapestry from scratch
