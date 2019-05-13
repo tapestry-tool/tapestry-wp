@@ -55,7 +55,7 @@ function get_user_h5p_settings_by_post_id($data) {
     $userId = $data['userid'];
     $postId = $data['postid'];
     $userController = new UserController;
-    return $userController->getProgress($userId, $postId);
+    return $userController->getH5PSetting($userId, $postId);
 }
 
 add_action( 'rest_api_init', function () {
@@ -65,12 +65,11 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// CHANGE example to include correct json
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?userid=1&postid=44&json={"32":0.5,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?userid=1&postid=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
 function update_user_h5p_settings_by_post_id($data) {
     $userController = new UserController;
     $userId = $data['userid'];
     $postId = $data['postid'];
     $json = $data['json'];
-    $userController->updateProgress($userId, $postId, $json);
+    $userController->updateH5PSetting($userId, $postId, $json);
 }
