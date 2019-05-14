@@ -47,7 +47,7 @@ class TapestryController {
      * @return WP_Error if postId is invalid
      */
     public function updateTapestryNodes($nodes, $postId = null) {
-        if (is_null($postId))
+        if (!isset($postId))
             return $this->throwError('INVALID_POST_ID');
         $this->updateNodes($nodes, $postId);
         return $nodes;
