@@ -48,9 +48,31 @@ class TapestryController {
      */
     public function updateTapestryNodes($nodes, $postId = null) {
         if (!isset($postId))
-            return $this->throwError('INVALID_POST_ID');
+            return $this->throwsError('INVALID_POST_ID');
         $this->updateNodes($nodes, $postId);
         return $nodes;
+    }
+
+    private function throwsError($code) {
+        $ERROR = (object) self::ERRORS[$code];
+        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
+    }
+
+    private function getNodeIds($nodes) {
+        return array_map(function($node) {
+            return $node->id;
+        }, $nodes);
+    }
+
+    private function makeMetadata($node, $nodePostId) {
+        return (object) array(
+            'post_id' => $nodePostId,
+            'title' => $node->title,
+            'coordinates' => (object) array(
+                'x' => $node->fx,
+                'y' => $node->fy
+            )
+        );
     }
 
     private function updateNodes($nodes, $postId) {
@@ -65,23 +87,6 @@ class TapestryController {
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
-    }
-
-    private function makeMetadata($node, $nodePostId) {
-        return (object) array(
-            'post_id' => $nodePostId,
-            'title' => $node->title,
-            'coordinates' => (object) array(
-                'x' => $node->fx,
-                'y' => $node->fy
-            )
-        );
-    }
-
-    private function getNodeIds($nodes) {
-        return array_map(function($node) {
-            return $node->id;
-        }, $nodes);
     }
 
     private function insertPost($post, $type) {
@@ -103,10 +108,5 @@ class TapestryController {
             'post_status' => $postStatus,
             'post_title' => $postTitle
         ), true);
-    }
-
-    private function throwError($code) {
-        $ERROR = (object) self::ERRORS[$code];
-        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
     }
 }
