@@ -3,7 +3,7 @@
  * Add/update/retrieve User progress
  * 
  */
-class UserController {
+class TapestryUserController {
 
     /** 
      * Update User's video progress for a tapestry post
@@ -96,7 +96,7 @@ class UserController {
 
     private function isJson($string) {
         $test_json = json_decode($string);
-        if ($test_json) {
+        if ($test_json !== NULL) {
             return true;
         } else {
             return false;
