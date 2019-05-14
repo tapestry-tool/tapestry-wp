@@ -25,15 +25,16 @@ class TapestryController {
      * @param type @postId The postId of the Tapestry
      */
     public function updateTapestry($tapestry, $postId = null) {
-        if (!isset($postId))
+        if (!isset($postId)) {
             $postId = $this->insertPost($tapestry, 'tapestry');
+        }
         $this->updateNodes($tapestry->nodes, $postId);
 
         // TODO: Groups and Permisisons data could be added here later
 
-        if (!isset($tapestry->rootId))
+        if (!isset($tapestry->rootId)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
-
+        }
         $tapestry->nodes = $this->getNodeIds($tapestry->nodes);
         update_post_meta($postId, 'tapestry', $tapestry);
         return $tapestry;
@@ -47,8 +48,9 @@ class TapestryController {
      * @return WP_Error if postId is invalid
      */
     public function updateTapestryNodes($nodes, $postId = null) {
-        if (!isset($postId))
+        if (!isset($postId)) {
             return $this->throwsError('INVALID_POST_ID');
+        }
         $this->updateNodes($nodes, $postId);
         return $nodes;
     }
