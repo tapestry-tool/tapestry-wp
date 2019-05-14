@@ -92,6 +92,10 @@ class TapestryUserController {
         if (!isset($postId)) {
             throw new Exception('postId is invalid');
         }
+
+        if (!get_post_type($postId) == "tapestry") {
+            throw new Exception('post type is invalid');
+        }
     }
 
     private function isJson($string) {
