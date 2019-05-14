@@ -17,7 +17,7 @@ add_action( 'rest_api_init', function () {
 });
 
 // Get user progress on a tapestry page by user id and post id. Will need to pass these as query parameters
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?userid=1&postid=42
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?user_id=1&post_id=42
 function tapestry_get_user_progress_by_post_id($data) {
     $userId = $data['user_id'];
     $postId = $data['post_id'];
@@ -32,7 +32,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?userid=1&postid=44&json={"32":0.5,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?user_id=1&post_id=44&json={"32":0.5,"33":0,"34":0,"35":0,"36":0,"37":0,"38":0,"39":0,"40":0,"41":0}
 function tapestry_update_user_progress_by_post_id($data) {
     $userController = new TapestryUserController;
     $userId = $data['user_id'];
@@ -50,7 +50,7 @@ add_action( 'rest_api_init', function () {
 });
 
 // Get user h5p video setting on a tapestry page by user id and post id. Will need to pass these as query parameters
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?userid=1&postid=42
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?user_id=1&post_id=42
 function tapestry_get_user_h5p_settings_by_post_id($data) {
     $userId = $data['user_id'];
     $postId = $data['post_id'];
@@ -65,7 +65,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?userid=1&postid=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?user_id=1&post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
 function tapestry_update_user_h5p_settings_by_post_id($data) {
     $userController = new TapestryUserController;
     $userId = $data['user_id'];
