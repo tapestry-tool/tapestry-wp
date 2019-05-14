@@ -29,11 +29,7 @@ class TapestryUserController {
      * @param type @postId the post's ID
     */
     public function getProgress($userId, $postId) {
-        // Checks if post exists by id
-        if (!get_permalink($postId)) {
-            throw new Exception('post id does not exist');
-        }
-
+        $this->postExists($postId);
         $this->checkUserAndPostId($userId, $postId);  
         return $this->getUserProgress($userId, $postId);
     }
@@ -61,11 +57,7 @@ class TapestryUserController {
      * @param type @postId the post's ID
     */
     public function getH5PSetting($userId, $postId) {
-        // Checks if post exists by id
-        if (!get_permalink($postId)) {
-            throw new Exception('post id does not exist');
-        }
-
+        $this->postExists($postId);
         $this->checkUserAndPostId($userId, $postId);  
         return $this->getUserH5PSetting($userId, $postId);
     }
@@ -105,6 +97,13 @@ class TapestryUserController {
 
         if (!get_post_type($postId) == "tapestry") {
             throw new Exception('post type is invalid');
+        }
+    }
+
+    // Checks if post exists in database by id
+    private function postExists ($postId) {
+        if (!get_permalink($postId)) {
+            throw new Exception('post id does not exist');
         }
     }
 
