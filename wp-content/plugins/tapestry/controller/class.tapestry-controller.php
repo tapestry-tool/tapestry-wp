@@ -7,9 +7,9 @@ class TapestryController {
     /**
      * Update Tapestry settings
      * 
-     * @param type @settings The updated Tapestry settings
-     * @param type @postId The postId of the Tapestry
-     * @return type updated Tapestry settings
+     * @param  Object @settings - New Tapestry settings
+     * @param  Number @postId   - The Tapestry postId
+     * @return Object New Tapestry settings
      */
     public function updateTapestrySettings($settings, $postId = null) {
         // TODO: use isValidPostID() utlility function
