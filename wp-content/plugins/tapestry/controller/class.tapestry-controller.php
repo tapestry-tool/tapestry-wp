@@ -28,7 +28,7 @@ class TapestryController {
         // TODO: check if $tapestry param is a valid JSON
         // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
-            $postId = $this->insertPost($tapestry, 'tapestry');
+            $postId = $this->updatePost($tapestry, 'tapestry');
         }
         $this->updateNodes($tapestry->nodes, $postId);
 
@@ -62,7 +62,7 @@ class TapestryController {
     private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
-                $nodePostId = $this->insertPost($node, 'tapestry_node');
+                $nodePostId = $this->updatePost($node, 'tapestry_node');
                 $metadata = $this->makeMetadata($node, $nodePostId);
                 $node->id = add_post_meta($postId, 'tapestry_node', $metadata);
             } else {
@@ -73,7 +73,7 @@ class TapestryController {
         }
     }
 
-    private function insertPost($post, $type) {
+    private function updatePost($post, $type, $postId = null) {
         switch($type) {
             case self::POST_TYPES['TAPESTRY_NODE']:
                 $postType = $post->type;
@@ -86,6 +86,14 @@ class TapestryController {
                 $postTitle = $post->settings->title;
                 $postStatus = $post->settings->status;
                 break;
+        }
+        if (isset($postId)) {
+            return wp_update_post(array(
+                'ID' => $postId,
+                'post_type' => $postType,
+                'post_status' => $postStatus,
+                'post_title' => $postTitle
+            ), true);
         }
         return wp_insert_post(array(
             'post_type' => $postType,
