@@ -12,7 +12,6 @@ class TapestryController {
      * @return WP_Error if postId is invalid	
      */	
     public function updateTapestryNodes($nodes, $postId = null) {	
-        // TODO: check if $nodes param is a valid JSON	
         // TODO: use isValidPostID() utlility function
         /*
         if (!isset($postId)) {	
