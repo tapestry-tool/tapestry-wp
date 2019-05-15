@@ -31,8 +31,6 @@ class TapestryController {
         }
         $this->updateNodes($tapestry->nodes, $postId);
 
-        // TODO: Groups and Permisisons data could be added here later
-
         if (!isset($tapestry->rootId)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
