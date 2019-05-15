@@ -1,4 +1,5 @@
 <?php
+// TODO Change exceptions to using an ERROR class
 /**
  * Add/update/retrieve User progress
  * 
