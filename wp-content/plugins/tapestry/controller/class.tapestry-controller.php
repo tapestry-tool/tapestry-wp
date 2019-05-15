@@ -57,17 +57,6 @@ class TapestryController {
         return $nodes;
     }
 
-    private function makeMetadata($node, $nodePostId) {
-        return (object) array(
-            'post_id' => $nodePostId,
-            'title' => $node->title,
-            'coordinates' => (object) array(
-                'x' => $node->fx,
-                'y' => $node->fy
-            )
-        );
-    }
-
     private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
@@ -112,5 +101,16 @@ class TapestryController {
         return array_map(function($node) {
             return $node->id;
         }, $nodes);
+    }
+
+    private function makeMetadata($node, $nodePostId) {
+        return (object) array(
+            'post_id' => $nodePostId,
+            'title' => $node->title,
+            'coordinates' => (object) array(
+                'x' => $node->fx,
+                'y' => $node->fy
+            )
+        );
     }
 }
