@@ -13,8 +13,11 @@ class TapestryController {
     public function getTapestry($postId = null) {
         // TODO: uncomment the two lines below for error handling
         // after the PR for saving tapestry is merged.
-        // if (!$this->isValidPostId($postId))
-            // return $this->throwsError('INVALID_POST_ID');
+        /*
+        if (!$this->isValidPostId($postId)) {
+            return $this->throwsError('INVALID_POST_ID');
+        }
+        */
         $tapestry = $this->getTapestryById($postId);
         return $tapestry;
     }
@@ -35,10 +38,6 @@ class TapestryController {
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->getNewLinks($tapestry->links, $nodeDatas);
         return $tapestry;
-    }
-
-    private function isValidPostId($postId) {
-        return isset($postId) && get_post_status($postId) != false;
     }
 
     private function updateNodeData($nodeData, $metadata) {
@@ -74,5 +73,10 @@ class TapestryController {
         }, $oldLinks);
 
         return $newLinks;
+    }
+
+    // TODO: this function could be used as a utility function
+    private function isValidPostId($postId) {
+        return isset($postId) && get_post_status($postId) != false;
     }
 }
