@@ -110,7 +110,7 @@ class TapestryUserController {
     // Helpers
     private function _checkUserAndPostId( $userId, $postId) {
         // User not logged in or userId is not set. Comment out when testing on Postman
-        if (!isset($userId) || $userId == NULL) {
+        if (!isset($userId) || empty($userId)) {
             throw new Exception('userId is invalid');
         }
 
