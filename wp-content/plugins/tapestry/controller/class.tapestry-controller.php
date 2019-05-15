@@ -5,10 +5,10 @@
  */
 class TapestryController {
     /**
-     * Retrieve Tapestry post
+     * Retrieve a Tapestry post
      * 
-     * @param type @postId The postId to be retrieved
-     * @return type Tapestry post data
+     * @param  Number @postId The Tapestry postId
+     * @return Object Tapestry
      */
     public function getTapestry($postId = null) {
         // TODO: uncomment the two lines below for error handling
