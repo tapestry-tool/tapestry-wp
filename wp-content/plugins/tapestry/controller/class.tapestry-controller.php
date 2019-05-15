@@ -28,7 +28,7 @@ class TapestryController {
     public function updateTapestry($tapestry, $postId = null) {
         // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
-            $postId = $this->updatePost($tapestry, 'tapestry');
+            $postId = $this->updateWordPressPost($tapestry, 'tapestry');
         }
         $this->updateNodes($tapestry->nodes, $postId);
 
@@ -44,7 +44,7 @@ class TapestryController {
     private function updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
-                $nodePostId = $this->updatePost($node, 'tapestry_node');
+                $nodePostId = $this->updateWordPressPost($node, 'tapestry_node');
                 $metadata = $this->makeMetadata($node, $nodePostId);
                 $node->id = add_post_meta($postId, 'tapestry_node', $metadata);
             } else {
@@ -55,7 +55,7 @@ class TapestryController {
         }
     }
 
-    private function updatePost($post, $type, $postId = null) {
+    private function updateWordPressPost($post, $type, $postId = null) {
         switch($type) {
             case self::POST_TYPES['TAPESTRY_NODE']:
                 $postType = $post->type;
