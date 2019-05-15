@@ -26,6 +26,7 @@ class TapestryController {
      */
     public function updateTapestry($tapestry, $postId = null) {
         // TODO: check if $tapestry param is a valid JSON
+        // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
             $postId = $this->insertPost($tapestry, 'tapestry');
         }
@@ -50,6 +51,7 @@ class TapestryController {
      */
     public function updateTapestryNodes($nodes, $postId = null) {
         // TODO: check if $nodes param is a valid JSON
+        // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
             return $this->throwsError('INVALID_POST_ID');
         }
