@@ -11,10 +11,14 @@ class TapestryController {
      * @param type @postId The postId of the Tapestry
      * @return type updated Tapestry settings
      */
-    public function updateTapestrySettings($settings, $postId) {
-        // 1. get Tapestry with postId
-        // 2. update settings
-        // 3. return the updated settings
-        return $settings;
+    public function updateTapestrySettings($settings, $postId = null) {
+        // TODO: check if $settings param is a valid JSON
+        // TODO: use isValidPostID() utlility function
+        $tapestry = get_post_meta($postId, 'tapestry', true);
+        
+        $tapestry->settings = $settings;
+        update_post_meta($postId, 'tapestry', $tapestry);
+
+        return $tapestry->settings;
     }
 }
