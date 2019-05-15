@@ -16,7 +16,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// Get user progress on a tapestry page by user id and post id. Will need to pass these as query parameters
+// Get user progress on a tapestry page by post id, list of node ids for a tapestry. Will need to pass these as query parameters
 // Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id_arr=[1,2,3,4,5,6]
 function tapestry_get_user_progress_by_post_id($data) {
     $postId = $data['post_id'];
@@ -32,6 +32,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
+// Update a single node progress by passing in node id, post id and progress value
 // Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
 function tapestry_update_user_progress_by_node_id($data) {
     $userController = new TapestryUserController;
@@ -49,7 +50,7 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// Get user h5p video setting on a tapestry page by user id and post id. Will need to pass these as query parameters
+// Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
 // Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
 function tapestry_get_user_h5p_settings_by_post_id($data) {
     $postId = $data['post_id'];

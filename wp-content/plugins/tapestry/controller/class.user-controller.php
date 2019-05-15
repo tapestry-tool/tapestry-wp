@@ -14,7 +14,7 @@ class TapestryUserController {
     */
     public function updateProgress($postId, $nodeId, $progressValue) {
         $userId = apply_filters('determine_current_user', false);
-        $this->checkUserAndPostId($userId, $postId);
+        $this->_checkUserAndPostId($userId, $postId);
 
         if ($progressValue !== NULL) {
             $progressValue = json_decode($progressValue);
@@ -25,7 +25,7 @@ class TapestryUserController {
             throw new Exception('Invalid progress value');
         }
 
-        $this->updateUserProgress($userId, $postId, $nodeId, $progressValue);
+        $this->_updateUserProgress($userId, $postId, $nodeId, $progressValue);
     }
 
     /** 
@@ -35,16 +35,16 @@ class TapestryUserController {
     */
     public function getProgress($postId, $nodeIdArr) {
         $userId = apply_filters('determine_current_user', false);
-        $this->isPostValid($postId);
-        $this->checkUserAndPostId($userId, $postId);
+        $this->_isValidTapestryPost($postId);
+        $this->_checkUserAndPostId($userId, $postId);
 
-        if ($this->isJson($nodeIdArr)) {
+        if ($this->_isJson($nodeIdArr)) {
             $nodeIdArr = json_decode($nodeIdArr);
         } else {
             throw new Exception('Invalid json');
         }
 
-        return $this->getUserProgress($userId, $postId, $nodeIdArr);
+        return $this->_getUserProgress($userId, $postId, $nodeIdArr);
     }
 
     /** 
@@ -56,13 +56,13 @@ class TapestryUserController {
         $userId = apply_filters('determine_current_user', false);
         $this->checkUserAndPostId($userId, $postId);  
 
-        if ($this->isJson($h5pSettingsData)) {
+        if ($this->_isJson($h5pSettingsData)) {
             $h5pSettingsData = json_decode($h5pSettingsData);
         } else {
             throw new Exception('Invalid json');
         }
 
-        $this->updateUserH5PSetting($userId, $postId, $h5pSettingsData);
+        $this->_updateUserH5PSetting($userId, $postId, $h5pSettingsData);
     }
 
     /** 
@@ -71,16 +71,16 @@ class TapestryUserController {
     */
     public function getH5PSetting($postId) {
         $userId = apply_filters('determine_current_user', false);
-        $this->isPostValid($postId);
-        $this->checkUserAndPostId($userId, $postId);  
-        return $this->getUserH5PSetting($userId, $postId);
+        $this->_isValidTapestryPost($postId);
+        $this->_checkUserAndPostId($userId, $postId);
+        return $this->_getUserH5PSetting($userId, $postId);
     }
 
-    private function updateUserProgress($userId, $postId, $nodeId, $progressValue) {
+    private function _updateUserProgress($userId, $postId, $nodeId, $progressValue) {
         update_user_meta($userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
-    private function getUserProgress($userId, $postId, $nodeIdArr) {
+    private function _getUserProgress($userId, $postId, $nodeIdArr) {
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
@@ -96,17 +96,17 @@ class TapestryUserController {
         return json_encode($progress);
     }
 
-    private function updateUserH5PSetting($userId, $postId, $h5pSettingsData) {
+    private function _updateUserH5PSetting($userId, $postId, $h5pSettingsData) {
         update_user_meta($userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
-    private function getUserH5PSetting($userId, $postId) {
+    private function _getUserH5PSetting($userId, $postId) {
         $settings = get_user_meta($userId, 'tapestry_h5p_setting_' . $postId, true);
         return json_encode($settings);
     }
 
     // Helpers
-    private function checkUserAndPostId( $userId, $postId) {
+    private function _checkUserAndPostId( $userId, $postId) {
         // User not logged in or userId is not set. Comment out when testing on Postman
         if (!isset($userId)) {
             throw new Exception('userId is invalid');
@@ -118,7 +118,7 @@ class TapestryUserController {
 
     }
 
-    private function isPostValid ($postId) {
+    private function _isValidTapestryPost ($postId) {
         // post ID exists in db
         if (!get_permalink($postId)) {
             throw new Exception('post id does not exist');
@@ -130,7 +130,7 @@ class TapestryUserController {
         }
     }
 
-    private function isJson($string) {
+    private function _isJson($string) {
         $test_json = json_decode($string);
         if ($test_json !== NULL) {
             return true;
