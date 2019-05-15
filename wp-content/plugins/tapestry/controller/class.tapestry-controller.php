@@ -15,8 +15,10 @@ class TapestryController {
         // TODO: check if $settings param is a valid JSON
         // TODO: use isValidPostID() utlility function
         $tapestry = get_post_meta($postId, 'tapestry', true);
-        
         $tapestry->settings = $settings;
+
+        // TODO: uncomment the line below when saving tapestry is merged
+        // $this->updatePost($tapestry, 'tapestry', $postId);
         update_post_meta($postId, 'tapestry', $tapestry);
 
         return $tapestry->settings;
