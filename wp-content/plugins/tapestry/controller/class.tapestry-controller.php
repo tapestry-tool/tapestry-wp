@@ -7,9 +7,10 @@ class TapestryController {
     /**	
      * Update Tapestry post's child nodes	
      * 	
-     * @param type @nodes An array of child nodes to be updated/added
-     * @param type @postId The post ID to which the nodes belong	
-     * @return WP_Error if postId is invalid	
+     * @param  Array  @nodes  An array of child nodes
+     * @param  Number @postId The Tapestry postId
+     * @return Array  @nodes
+     * @throws WP_Error
      */	
     public function updateTapestryNodes($nodes, $postId = null) {	
         // TODO: use isValidPostID() utlility function
