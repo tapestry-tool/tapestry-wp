@@ -6,6 +6,12 @@
  */
 class TapestryUserController {
 
+    private $userId = NULL;
+
+    public function __construct() {
+        $this->userId = apply_filters('determine_current_user', false); 
+    }
+
     /** 
      * Update User's video progress for a tapestry post
      * @param type @postId the post's ID
@@ -13,8 +19,7 @@ class TapestryUserController {
      * @param type @progressValue is how much the video was viewed, value should be between >= 0 and <= 1
     */
     public function updateProgress($postId, $nodeId, $progressValue) {
-        $userId = apply_filters('determine_current_user', false);
-        $this->_checkUserAndPostId($userId, $postId);
+        $this->_checkUserAndPostId($this->userId, $postId);
 
         if ($progressValue !== NULL) {
             $progressValue = json_decode($progressValue);
@@ -25,7 +30,7 @@ class TapestryUserController {
             throw new Exception('Invalid progress value');
         }
 
-        $this->_updateUserProgress($userId, $postId, $nodeId, $progressValue);
+        $this->_updateUserProgress($this->userId, $postId, $nodeId, $progressValue);
     }
 
     /** 
@@ -34,9 +39,8 @@ class TapestryUserController {
      * @param type @nodeIdArr is a list of ids currently in the tapestry
     */
     public function getProgress($postId, $nodeIdArr) {
-        $userId = apply_filters('determine_current_user', false);
         $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($userId, $postId);
+        $this->_checkUserAndPostId($this->userId, $postId);
 
         if ($this->_isJson($nodeIdArr)) {
             $nodeIdArr = json_decode($nodeIdArr);
@@ -44,7 +48,7 @@ class TapestryUserController {
             throw new Exception('Invalid json');
         }
 
-        return $this->_getUserProgress($userId, $postId, $nodeIdArr);
+        return $this->_getUserProgress($this->userId, $postId, $nodeIdArr);
     }
 
     /** 
@@ -53,8 +57,7 @@ class TapestryUserController {
      * @param type @h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
     public function updateH5PSetting($postId, $h5pSettingsData) {
-        $userId = apply_filters('determine_current_user', false);
-        $this->checkUserAndPostId($userId, $postId);  
+        $this->_checkUserAndPostId($this->userId, $postId);  
 
         if ($this->_isJson($h5pSettingsData)) {
             $h5pSettingsData = json_decode($h5pSettingsData);
@@ -62,7 +65,7 @@ class TapestryUserController {
             throw new Exception('Invalid json');
         }
 
-        $this->_updateUserH5PSetting($userId, $postId, $h5pSettingsData);
+        $this->_updateUserH5PSetting($this->userId, $postId, $h5pSettingsData);
     }
 
     /** 
@@ -70,10 +73,9 @@ class TapestryUserController {
      * @param type @postId the post's Id
     */
     public function getH5PSetting($postId) {
-        $userId = apply_filters('determine_current_user', false);
         $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($userId, $postId);
-        return $this->_getUserH5PSetting($userId, $postId);
+        $this->_checkUserAndPostId($this->userId, $postId);
+        return $this->_getUserH5PSetting($this->userId, $postId);
     }
 
     private function _updateUserProgress($userId, $postId, $nodeId, $progressValue) {
