@@ -18,11 +18,12 @@ class TapestryController {
 
     /**
      * Update Tapestry nodes first then
-     * Update the existing Tapestry post if the postId is provided
-     * Otherwise, a new post will be created
+     * Update the existing Tapestry if the postId is provided
+     * Otherwise, a new Tapestry will be created
      * 
-     * @param type @post The post data
-     * @param type @postId The postId of the Tapestry
+     * @param  Object @tapestry The Tapestry data
+     * @param  Number @postId The postId of the Tapestry
+     * @return Object @tapestry
      */
     public function updateTapestry($tapestry, $postId = null) {
         // TODO: use isValidPostID() utlility function
