@@ -25,7 +25,6 @@ class TapestryController {
      * @param type @postId The postId of the Tapestry
      */
     public function updateTapestry($tapestry, $postId = null) {
-        // TODO: check if $tapestry param is a valid JSON
         // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
             $postId = $this->updatePost($tapestry, 'tapestry');
@@ -38,6 +37,7 @@ class TapestryController {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
         $tapestry->nodes = $this->getNodeIds($tapestry->nodes);
+
         update_post_meta($postId, 'tapestry', $tapestry);
         return $tapestry;
     }

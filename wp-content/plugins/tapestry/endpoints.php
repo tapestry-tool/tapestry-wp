@@ -17,6 +17,7 @@ add_action( 'rest_api_init', function () {
 
 function updateTapestry($request) {
     $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
     $tapestryController = new TapestryController;
     return $tapestryController->updateTapestry($data, $data->postId);
 }
