@@ -55,17 +55,6 @@ class TapestryController {
         return $nodes;
     }
 
-    private function throwsError($code) {
-        $ERROR = (object) self::ERRORS[$code];
-        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
-    }
-
-    private function getNodeIds($nodes) {
-        return array_map(function($node) {
-            return $node->id;
-        }, $nodes);
-    }
-
     private function makeMetadata($node, $nodePostId) {
         return (object) array(
             'post_id' => $nodePostId,
@@ -110,5 +99,16 @@ class TapestryController {
             'post_status' => $postStatus,
             'post_title' => $postTitle
         ), true);
+    }
+
+    private function throwsError($code) {
+        $ERROR = (object) self::ERRORS[$code];
+        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
+    }
+
+    private function getNodeIds($nodes) {
+        return array_map(function($node) {
+            return $node->id;
+        }, $nodes);
     }
 }
