@@ -47,7 +47,6 @@ class TapestryController {
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
-
         return $tapestry;
     }
 

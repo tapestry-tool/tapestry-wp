@@ -11,7 +11,7 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/tapestries', array(
         'methods' => 'POST',
         'callback' => 'updateTapestry',
-        'permission_callback' => 'TapestryPermissions::postTapestryPermissions'
+        'permission_callback' => 'TapestryPermissions::postTapestry'
     ));
 });
 

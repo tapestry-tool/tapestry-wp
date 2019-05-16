@@ -4,7 +4,7 @@
  *
  */
 class TapestryPermissions {
-    static function postTapestryPermissions($request) {
+    static function postTapestry($request) {
         $data = json_decode($request->get_body());
         if (isset($data->postId)) {
             return current_user_can('edit', $data->postId);
