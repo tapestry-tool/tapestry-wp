@@ -64,16 +64,14 @@ class TapestryController {
         }
     }
 
-    private function _updatePost($post, $type, $postId = null) {
-        switch($type) {
+    private function _updatePost($post, $postType = 'tapestry', $postId = null) {
+        switch($postType) {
             case self::POST_TYPES['TAPESTRY_NODE']:
-                $postType = $post->type;
                 $postTitle = $post->title;
                 $postStatus = $post->status;
                 break;
             case self::POST_TYPES['TAPESTRY']:
             default:
-                $postType = $post->settings->type;
                 $postTitle = $post->settings->title;
                 $postStatus = $post->settings->status;
                 break;
