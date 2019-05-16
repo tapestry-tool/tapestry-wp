@@ -37,14 +37,17 @@ class TapestryController {
         if (!isset($this->postId)) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
+
         $this->_updateNodes($tapestry->nodes, $this->postId);
 
         if (!isset($tapestry->rootId)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
+
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
         return $tapestry;
     }
 
