@@ -28,24 +28,24 @@ class TapestryController {
     public function updateTapestry($tapestry, $postId = null) {
         // TODO: use isValidPostID() utlility function
         if (!isset($postId)) {
-            $postId = $this->updateWordPressPost($tapestry, 'tapestry');
+            $postId = $this->_updatePost($tapestry, 'tapestry');
         }
-        $this->updateNodes($tapestry->nodes, $postId);
+        $this->_updateNodes($tapestry->nodes, $postId);
 
         if (!isset($tapestry->rootId)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
-        $tapestry->nodes = $this->getNodeIds($tapestry->nodes);
+        $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
 
         update_post_meta($postId, 'tapestry', $tapestry);
         return $tapestry;
     }
 
-    private function updateNodes($nodes, $postId) {
+    private function _updateNodes($nodes, $postId) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
-                $nodePostId = $this->updateWordPressPost($node, 'tapestry_node');
-                $metadata = $this->makeMetadata($node, $nodePostId);
+                $nodePostId = $this->_updatePost($node, 'tapestry_node');
+                $metadata = $this->_makeMetadata($node, $nodePostId);
                 $node->id = add_post_meta($postId, 'tapestry_node', $metadata);
             } else {
                 $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
@@ -55,7 +55,7 @@ class TapestryController {
         }
     }
 
-    private function updateWordPressPost($post, $type, $postId = null) {
+    private function _updatePost($post, $type, $postId = null) {
         switch($type) {
             case self::POST_TYPES['TAPESTRY_NODE']:
                 $postType = $post->type;
@@ -84,18 +84,18 @@ class TapestryController {
         ), true);
     }
 
-    private function throwsError($code) {
+    private function _throwsError($code) {
         $ERROR = (object) self::ERRORS[$code];
         return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
     }
 
-    private function getNodeIds($nodes) {
+    private function _getNodeIds($nodes) {
         return array_map(function($node) {
             return $node->id;
         }, $nodes);
     }
 
-    private function makeMetadata($node, $nodePostId) {
+    private function _makeMetadata($node, $nodePostId) {
         return (object) array(
             'post_id' => $nodePostId,
             'title' => $node->title,
