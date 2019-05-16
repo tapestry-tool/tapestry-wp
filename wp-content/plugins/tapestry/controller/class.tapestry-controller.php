@@ -11,6 +11,7 @@ class TapestryController {
      * @return Object Tapestry
      */
     public function getTapestry($postId = null) {
+        // TODO: Use $this->postId that's passed in the constructor
         // TODO: uncomment the two lines below for error handling
         // after the PR for saving tapestry is merged.
         /*
@@ -23,10 +24,12 @@ class TapestryController {
     }
 
     private function _getTapestryById($postId) {
-        $tapestry = get_post_meta($postId, 'tapestry', true); 
+        $tapestry = get_post_meta($postId, 'tapestry', true);
+
         $metadatas = array_map(function($nodeId) {
             return get_metadata_by_mid('post', $nodeId);
         }, $tapestry->nodes);
+
         $nodeDatas = array_map(function($metadata) {
             $postId = $metadata->meta_value->post_id;
             $nodeData = get_post_meta($postId, 'tapestry_node_data', true);
