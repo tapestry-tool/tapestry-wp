@@ -12,6 +12,7 @@ class TapestryController {
      * @return Object New Tapestry settings
      */
     public function updateTapestrySettings($settings, $postId = null) {
+        // TODO: Use $this->postId that's passed in the constructor
         // TODO: use isValidPostID() utlility function
         $tapestry = get_post_meta($postId, 'tapestry', true);
         $tapestry->settings = $settings;
