@@ -15,6 +15,14 @@ class TapestryController {
             'STATUS' => ['status' => 404]
         ]
     ];
+    private $postId;
+
+    /**
+     * Constructor
+     */
+    public function __construct($postId) {
+        $this->postId = $postId;
+    }
 
     /**
      * Update Tapestry nodes first then
@@ -22,22 +30,21 @@ class TapestryController {
      * Otherwise, a new Tapestry will be created
      * 
      * @param  Object @tapestry The Tapestry data
-     * @param  Number @postId The postId of the Tapestry
      * @return Object @tapestry
      */
-    public function updateTapestry($tapestry, $postId = null) {
+    public function updateTapestry($tapestry) {
         // TODO: use isValidPostID() utlility function
-        if (!isset($postId)) {
-            $postId = $this->_updatePost($tapestry, 'tapestry');
+        if (!isset($this->postId)) {
+            $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
-        $this->_updateNodes($tapestry->nodes, $postId);
+        $this->_updateNodes($tapestry->nodes, $this->postId);
 
         if (!isset($tapestry->rootId)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
 
-        update_post_meta($postId, 'tapestry', $tapestry);
+        update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
     }
 
@@ -69,15 +76,8 @@ class TapestryController {
                 $postStatus = $post->settings->status;
                 break;
         }
-        if (isset($postId)) {
-            return wp_update_post(array(
-                'ID' => $postId,
-                'post_type' => $postType,
-                'post_status' => $postStatus,
-                'post_title' => $postTitle
-            ), true);
-        }
         return wp_insert_post(array(
+            'ID' => $postId,
             'post_type' => $postType,
             'post_status' => $postStatus,
             'post_title' => $postTitle
