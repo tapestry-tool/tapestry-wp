@@ -19,7 +19,7 @@ class TapestryUserController {
      * @param type @progressValue is how much the video was viewed, value should be between >= 0 and <= 1
     */
     public function updateProgress($postId, $nodeId, $progressValue) {
-        $this->_checkUserAndPostId($this->userId, $postId);
+        $this->_checkPostId($postId);
 
         if ($progressValue !== NULL) {
             $progressValue = floatval($progressValue);
@@ -30,7 +30,7 @@ class TapestryUserController {
             throw new Exception('Invalid progress value');
         }
 
-        $this->_updateUserProgress($this->userId, $postId, $nodeId, $progressValue);
+        $this->_updateUserProgress($postId, $nodeId, $progressValue);
     }
 
     /** 
@@ -40,7 +40,7 @@ class TapestryUserController {
     */
     public function getProgress($postId, $nodeIdArr) {
         $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($this->userId, $postId);
+        $this->_checkPostId($postId);
 
         if ($this->_isJson($nodeIdArr)) {
             $nodeIdArr = json_decode($nodeIdArr);
@@ -48,7 +48,7 @@ class TapestryUserController {
             throw new Exception('Invalid json');
         }
 
-        return $this->_getUserProgress($this->userId, $postId, $nodeIdArr);
+        return $this->_getUserProgress($postId, $nodeIdArr);
     }
 
     /** 
@@ -57,7 +57,7 @@ class TapestryUserController {
      * @param type @h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
     public function updateH5PSettings($postId, $h5pSettingsData) {
-        $this->_checkUserAndPostId($this->userId, $postId);  
+        $this->_checkPostId($postId);
 
         if ($this->_isJson($h5pSettingsData)) {
             $h5pSettingsData = json_decode($h5pSettingsData);
@@ -65,24 +65,26 @@ class TapestryUserController {
             throw new Exception('Invalid json');
         }
 
-        $this->_updateUserH5PSettings($this->userId, $postId, $h5pSettingsData);
+        $this->_updateUserH5PSettings($postId, $h5pSettingsData);
     }
 
     /** 
      * Get User's h5p video setting for a tapestry post
      * @param type @postId the post's Id
     */
-    public function getH5PSetting($postId) {
+    public function getH5PSettings($postId) {
         $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($this->userId, $postId);
-        return $this->_getUserH5PSetting($this->userId, $postId);
+        $this->_checkPostId($postId);
+        return $this->_getUserH5PSettings($postId);
     }
 
-    private function _updateUserProgress($userId, $postId, $nodeId, $progressValue) {
+    private function _updateUserProgress($postId, $nodeId, $progressValue) {
+        $userId = $this->userId;
         update_user_meta($userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
-    private function _getUserProgress($userId, $postId, $nodeIdArr) {
+    private function _getUserProgress($postId, $nodeIdArr) {
+        $userId = $this->userId;
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
@@ -98,22 +100,19 @@ class TapestryUserController {
         return json_encode($progress);
     }
 
-    private function _updateUserH5PSettings($userId, $postId, $h5pSettingsData) {
+    private function _updateUserH5PSettings($postId, $h5pSettingsData) {
+        $userId = $this->userId;
         update_user_meta($userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
-    private function _getUserH5PSetting($userId, $postId) {
+    private function _getUserH5PSettings($postId) {
+        $userId = $this->userId;
         $settings = get_user_meta($userId, 'tapestry_h5p_setting_' . $postId, true);
         return json_encode($settings);
     }
 
     // Helpers
-    private function _checkUserAndPostId( $userId, $postId) {
-        // User not logged in or userId is not set. Comment out when testing on Postman
-        if (!isset($userId) || empty($userId)) {
-            throw new Exception('userId is invalid');
-        }
-
+    private function _checkPostId($postId) {
         if (!isset($postId)) {
             throw new Exception('postId is invalid');
         }

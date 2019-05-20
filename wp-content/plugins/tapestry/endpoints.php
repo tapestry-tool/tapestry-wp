@@ -55,7 +55,7 @@ add_action( 'rest_api_init', function () {
 function tapestry_get_user_h5p_settings_by_post_id($data) {
     $postId = $data['post_id'];
     $userController = new TapestryUserController;
-    return $userController->getH5PSetting($postId);
+    return $userController->getH5PSettings($postId);
 }
 
 add_action( 'rest_api_init', function () {
