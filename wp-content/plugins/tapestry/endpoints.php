@@ -70,5 +70,5 @@ function tapestry_update_user_h5p_settings_by_post_id($data) {
     $userController = new TapestryUserController;
     $postId = $data['post_id'];
     $json = $data['json'];
-    $userController->updateH5PSetting($postId, $json);
+    $userController->updateH5PSettings($postId, $json);
 }

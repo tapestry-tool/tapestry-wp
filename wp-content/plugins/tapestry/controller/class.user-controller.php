@@ -56,7 +56,7 @@ class TapestryUserController {
      * @param type @postId the post's ID
      * @param type @h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
-    public function updateH5PSetting($postId, $h5pSettingsData) {
+    public function updateH5PSettings($postId, $h5pSettingsData) {
         $this->_checkUserAndPostId($this->userId, $postId);  
 
         if ($this->_isJson($h5pSettingsData)) {
@@ -65,7 +65,7 @@ class TapestryUserController {
             throw new Exception('Invalid json');
         }
 
-        $this->_updateUserH5PSetting($this->userId, $postId, $h5pSettingsData);
+        $this->_updateUserH5PSettings($this->userId, $postId, $h5pSettingsData);
     }
 
     /** 
@@ -98,7 +98,7 @@ class TapestryUserController {
         return json_encode($progress);
     }
 
-    private function _updateUserH5PSetting($userId, $postId, $h5pSettingsData) {
+    private function _updateUserH5PSettings($userId, $postId, $h5pSettingsData) {
         update_user_meta($userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
