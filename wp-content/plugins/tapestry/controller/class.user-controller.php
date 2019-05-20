@@ -19,7 +19,7 @@ class TapestryUserController {
      * @param type @progressValue is how much the video was viewed, value should be between >= 0 and <= 1
     */
     public function updateProgress($postId, $nodeId, $progressValue) {
-        $this->_checkPostId($postId);
+        $this->_checkUserAndPostId($postId);
 
         if ($progressValue !== NULL) {
             $progressValue = floatval($progressValue);
@@ -40,7 +40,7 @@ class TapestryUserController {
     */
     public function getProgress($postId, $nodeIdArr) {
         $this->_isValidTapestryPost($postId);
-        $this->_checkPostId($postId);
+        $this->_checkUserAndPostId($postId);
 
         if ($this->_isJson($nodeIdArr)) {
             $nodeIdArr = json_decode($nodeIdArr);
@@ -57,7 +57,7 @@ class TapestryUserController {
      * @param type @h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
     public function updateH5PSettings($postId, $h5pSettingsData) {
-        $this->_checkPostId($postId);
+        $this->_checkUserAndPostId($postId);
 
         if ($this->_isJson($h5pSettingsData)) {
             $h5pSettingsData = json_decode($h5pSettingsData);
@@ -74,7 +74,7 @@ class TapestryUserController {
     */
     public function getH5PSettings($postId) {
         $this->_isValidTapestryPost($postId);
-        $this->_checkPostId($postId);
+        $this->_checkUserAndPostId($postId);
         return $this->_getUserH5PSettings($postId);
     }
 
@@ -112,7 +112,11 @@ class TapestryUserController {
     }
 
     // Helpers
-    private function _checkPostId($postId) {
+    private function _checkUserAndPostId($postId) {
+        if (!isset($this->userId)) {
+            throw new Exception('postId is invalid');
+        }
+
         if (!isset($postId)) {
             throw new Exception('postId is invalid');
         }
