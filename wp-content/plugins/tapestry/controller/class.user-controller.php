@@ -22,7 +22,7 @@ class TapestryUserController {
         $this->_checkUserAndPostId($this->userId, $postId);
 
         if ($progressValue !== NULL) {
-            $progressValue = json_decode($progressValue);
+            $progressValue = floatval($progressValue);
         }
 
         // Value should be between 0 and 1
