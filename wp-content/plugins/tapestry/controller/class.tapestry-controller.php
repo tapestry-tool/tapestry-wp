@@ -20,7 +20,12 @@ class TapestryController {
     /**
      * Constructor
      */
-    public function __construct($postId) {
+    public function __construct($postId = 0) {
+        if ($postId != 0 && is_numeric($postId)) {
+            if (get_post_type($postId) != 'tapestry') {
+                return $this->_throwsError('INVALID_POST_ID');
+            }
+        }
         $this->postId = $postId;
     }
 
@@ -38,9 +43,9 @@ class TapestryController {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
 
-        $this->_updateNodes($tapestry->nodes, $this->postId);
+        $this->_updateNodes($tapestry->nodes);
 
-        if (!isset($tapestry->rootId)) {
+        if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
 
@@ -50,12 +55,12 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function _updateNodes($nodes, $postId) {
+    private function _updateNodes($nodes) {
         foreach ($nodes as $node) {
             if (!isset($node->id)) {
                 $nodePostId = $this->_updatePost($node, 'tapestry_node');
                 $metadata = $this->_makeMetadata($node, $nodePostId);
-                $node->id = add_post_meta($postId, 'tapestry_node', $metadata);
+                $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
             } else {
                 $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
                 $nodePostId = $metadata->post_id;
@@ -72,6 +77,7 @@ class TapestryController {
                 break;
             case self::POST_TYPES['TAPESTRY']:
             default:
+                $postId = $this->postId;
                 $postTitle = $post->settings->title;
                 $postStatus = $post->settings->status;
                 break;
