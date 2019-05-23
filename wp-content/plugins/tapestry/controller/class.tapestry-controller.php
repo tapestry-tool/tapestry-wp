@@ -67,17 +67,12 @@ class TapestryController {
     private function _getTapestryById($postId) {
         $tapestry = get_post_meta($postId, 'tapestry', true);
 
-        $metadatas = array_map(function($nodeMetaId) {
-            return get_metadata_by_mid('post', $nodeMetaId);
-        }, $tapestry->nodes);
-
-        $nodeDatas = array_map(function($metadata) {
+        $tapestry->nodes = array_map(function($nodeMetaId) {
+            $metadata = get_metadata_by_mid('post', $nodeMetaId);
             $postId = $metadata->meta_value->post_id;
             $nodeData = get_post_meta($postId, 'tapestry_node_data', true);
             return $this->_formNodeData($nodeData, $metadata);
-        }, $metadatas);
-
-        $tapestry->nodes = $nodeDatas;
+        }, $tapestry->nodes);
 
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->_getNewLinks($tapestry->links, $nodeDatas);
