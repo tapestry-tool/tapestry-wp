@@ -21,10 +21,10 @@ class TapestryController {
      * Constructor
      */
     public function __construct($postId = 0) {
-        if ($postId != 0 && !$this->_isValidTapestry($postId)) {
+        if ($postId && !$this->_isValidTapestry($postId)) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-        $this->postId = $postId;
+        $this->postId = (int) $postId;
     }
 
     /**
@@ -36,8 +36,7 @@ class TapestryController {
      * @return Object @tapestry
      */
     public function updateTapestry($tapestry) {
-        // TODO: use isValidPostID() utlility function
-        if (!isset($this->postId)) {
+        if (!$this->postId) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
 
@@ -59,8 +58,8 @@ class TapestryController {
      * @return Object Tapestry
      */
     public function getTapestry() {
-        if ($this->postId == 0) {
-            return $this->throwsError('INVALID_POST_ID');
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
         }
         return $this->_getTapestryById($postId);
     }
