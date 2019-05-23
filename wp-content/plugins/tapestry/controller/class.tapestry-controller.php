@@ -21,10 +21,8 @@ class TapestryController {
      * Constructor
      */
     public function __construct($postId = 0) {
-        if ($postId != 0 && is_numeric($postId)) {
-            if (get_post_type($postId) != 'tapestry') {
-                return $this->_throwsError('INVALID_POST_ID');
-            }
+        if ($postId != 0 && !$this->_isValidTapestry($postId)) {
+            return $this->_throwsError('INVALID_POST_ID');
         }
         $this->postId = $postId;
     }
@@ -58,20 +56,13 @@ class TapestryController {
     /**
      * Retrieve a Tapestry post
      * 
-     * @param  Number @postId The Tapestry postId
      * @return Object Tapestry
      */
-    public function getTapestry($postId = null) {
-        // TODO: Use $this->postId that's passed in the constructor
-        // TODO: uncomment the two lines below for error handling
-        // after the PR for saving tapestry is merged.
-        /*
-        if (!$this->_isValidPostId($postId)) {
+    public function getTapestry() {
+        if ($this->postId == 0) {
             return $this->throwsError('INVALID_POST_ID');
         }
-        */
-        $tapestry = $this->_getTapestryById($postId);
-        return $tapestry;
+        return $this->_getTapestryById($postId);
     }
 
     private function _getTapestryById($postId) {
@@ -130,8 +121,8 @@ class TapestryController {
     }
 
     // TODO: this function could be used as a utility function
-    private function _isValidPostId($postId) {
-        return isset($postId) && get_post_status($postId) != false;
+    private function _isValidTapestry($postId) {
+        return is_numeric($postId) && get_post_status($postId) == 'tapestry';
     }
 
     private function _updateNodes($nodes) {
