@@ -31,7 +31,6 @@ add_action('rest_api_init', function () {
 
 function loadTapestry($request) {
     $postId = $request['id'];
-    // TODO: pass postId to the TapestryController constructor
-    $tapestryController = new TapestryController;
-    return $tapestryController->getTapestry($postId);
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->getTapestry();
 }
