@@ -67,8 +67,8 @@ class TapestryController {
     private function _getTapestryById($postId) {
         $tapestry = get_post_meta($postId, 'tapestry', true);
 
-        $metadatas = array_map(function($nodeId) {
-            return get_metadata_by_mid('post', $nodeId);
+        $metadatas = array_map(function($nodeMetaId) {
+            return get_metadata_by_mid('post', $nodeMetaId);
         }, $tapestry->nodes);
 
         $nodeDatas = array_map(function($metadata) {
