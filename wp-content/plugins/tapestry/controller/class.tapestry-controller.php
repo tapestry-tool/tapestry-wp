@@ -58,9 +58,8 @@ class TapestryController {
     /**
      * Update Tapestry settings
      * 
-     * @param  Object @settings - New Tapestry settings
-     * @param  Number @postId   - The Tapestry postId
-     * @return Object New Tapestry settings
+     * @param  Object @settings
+     * @return Object Tapestry settings
      */
     public function updateTapestrySettings($settings) {
         if (!$this->postId) {
