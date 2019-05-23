@@ -84,7 +84,7 @@ class TapestryController {
         $nodeDatas = array_map(function($metadata) {
             $postId = $metadata->meta_value->post_id;
             $nodeData = get_post_meta($postId, 'tapestry_node_data', true);
-            return $this->_updateNodeData($nodeData, $metadata);
+            return $this->_formNodeData($nodeData, $metadata);
         }, $metadatas);
 
         $tapestry->nodes = $nodeDatas;
@@ -94,7 +94,7 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function _updateNodeData($nodeData, $metadata) {
+    private function _formNodeData($nodeData, $metadata) {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
         $nodeData->id = (int) $metadata->meta_id;
