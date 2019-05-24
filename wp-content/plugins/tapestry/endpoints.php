@@ -21,3 +21,16 @@ function updateTapestry($request) {
     $tapestryController = new TapestryController($data->postId);
     return $tapestryController->updateTapestry($data);
 }
+
+add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)', array(
+        'methods' => 'GET',
+        'callback' => 'loadTapestry'
+    ));
+});
+
+function loadTapestry($request) {
+    $postId = $request['id'];
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->getTapestry();
+}
