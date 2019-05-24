@@ -61,7 +61,7 @@ class TapestryController {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-        return $this->_getTapestryById($postId);
+        return $this->_getTapestryById($this->postId);
     }
 
     private function _getTapestryById($postId) {
@@ -69,13 +69,13 @@ class TapestryController {
 
         $tapestry->nodes = array_map(function($nodeMetaId) {
             $metadata = get_metadata_by_mid('post', $nodeMetaId);
-            $postId = $metadata->meta_value->post_id;
-            $nodeData = get_post_meta($postId, 'tapestry_node_data', true);
+            $nodePostId = $metadata->meta_value->post_id;
+            $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
             return $this->_formNodeData($nodeData, $metadata);
         }, $tapestry->nodes);
 
         // TODO: delete the below when being able to create tapestry from scratch
-        $tapestry->links = $this->_getNewLinks($tapestry->links, $nodeDatas);
+        $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
         return $tapestry;
     }
 
@@ -116,7 +116,7 @@ class TapestryController {
 
     // TODO: this function could be used as a utility function
     private function _isValidTapestry($postId) {
-        return is_numeric($postId) && get_post_status($postId) == 'tapestry';
+        return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
 
     private function _updateNodes($nodes) {
