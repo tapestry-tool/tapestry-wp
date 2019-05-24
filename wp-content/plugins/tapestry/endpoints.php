@@ -25,8 +25,8 @@ function updateTapestry($request) {
 add_action('rest_api_init', function () {
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)/settings', array(
         'methods' => 'PUT',
-        'callback' => 'updateTapestrySettings'
-        // TODO: Add permissions here later, when saving tapestry PR is merged
+        'callback' => 'updateTapestrySettings',
+        'permission_callback' => 'TapestryPermissions::putTapestrySettings'
     ));
 });
 
