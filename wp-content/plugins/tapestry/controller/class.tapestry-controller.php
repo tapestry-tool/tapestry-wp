@@ -61,11 +61,8 @@ class TapestryController {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-        return $this->_getTapestryById($this->postId);
-    }
 
-    private function _getTapestryById($postId) {
-        $tapestry = get_post_meta($postId, 'tapestry', true);
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         $tapestry->nodes = array_map(function($nodeMetaId) {
             $metadata = get_metadata_by_mid('post', $nodeMetaId);
