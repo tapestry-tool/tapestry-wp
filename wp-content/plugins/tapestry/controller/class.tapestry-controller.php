@@ -96,39 +96,39 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function _formNodeData($nodeData, $metadata) {	
-        // Update node data here to match its own version	
-        // This enables the same node to have multiple versions	
-        $nodeData->id = (int) $metadata->meta_id;	
-        $nodeData->title = $metadata->meta_value->title;	
-        $nodeData->fx = $metadata->meta_value->coordinates->x;	
-        $nodeData->fy = $metadata->meta_value->coordinates->y;	
-        return $nodeData;	
+    private function _formNodeData($nodeData, $metadata) {
+        // Update node data here to match its own version
+        // This enables the same node to have multiple versions
+        $nodeData->id = (int) $metadata->meta_id;
+        $nodeData->title = $metadata->meta_value->title;
+        $nodeData->fx = $metadata->meta_value->coordinates->x;
+        $nodeData->fy = $metadata->meta_value->coordinates->y;
+        return $nodeData;
     }
 
-    // TODO: Remove this when we can build a tapestry from scratch	
-    // HACK - create a new links array that works with new IDs	
-    private function _getNewLinks($oldLinks, $nodes) {	
-        $mappings = array(	
-            1 => $nodes[0]->id,	
-            2 => $nodes[1]->id,	
-            3 => $nodes[2]->id,	
-            4 => $nodes[3]->id,	
-            5 => $nodes[4]->id,	
-            6 => $nodes[5]->id,	
-            8 => $nodes[6]->id,	
-            9 => $nodes[7]->id,	
-            7 => $nodes[8]->id,	
-            10 => $nodes[9]->id	
-        );	
-        $newLinks = array_map(function($link) use ($mappings) {	
-            $link->source = $mappings[$link->source];	
-            $link->target = $mappings[$link->target];	
-            $link->value = $mappings[$link->value];	
-            return $link;	
+    // TODO: Remove this when we can build a tapestry from scratch
+    // HACK - create a new links array that works with new IDs
+    private function _getNewLinks($oldLinks, $nodes) {
+        $mappings = array(
+            1 => $nodes[0]->id,
+            2 => $nodes[1]->id,
+            3 => $nodes[2]->id,
+            4 => $nodes[3]->id,
+            5 => $nodes[4]->id,
+            6 => $nodes[5]->id,
+            8 => $nodes[6]->id,
+            9 => $nodes[7]->id,
+            7 => $nodes[8]->id,
+            10 => $nodes[9]->id
+        );
+        $newLinks = array_map(function($link) use ($mappings) {
+            $link->source = $mappings[$link->source];
+            $link->target = $mappings[$link->target];
+            $link->value = $mappings[$link->value];
+            return $link;
         }, $oldLinks);
 
-        return $newLinks;	
+        return $newLinks;
     }
 
     // TODO: this function could be used as a utility function
