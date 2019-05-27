@@ -63,6 +63,8 @@ class TapestryController {
             return $this->_throwsError('INVALID_POST_ID');
         }
 
+        // TODO: add validation for the $settings
+
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         $tapestry->settings = $settings;
 
