@@ -76,6 +76,19 @@ class TapestryController {
         return $tapestry;
     }
 
+    /**
+     * Retrieve all node ids associated to a tapestry
+     *
+     */
+    public function getTapestryNodeIds() {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        return $tapestry->nodes;
+    }
+
     private function _formNodeData($nodeData, $metadata) {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions

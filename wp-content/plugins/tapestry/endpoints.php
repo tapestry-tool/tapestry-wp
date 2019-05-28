@@ -18,11 +18,13 @@ add_action( 'rest_api_init', function () {
     ) );
 });
 
-// Get user progress on a tapestry page by post id, list of node ids for a tapestry. Will need to pass these as query parameters
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id_arr=[1,2,3,4,5,6]
+// Get user progress on a tapestry page by post id. 
+// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44
 function tapestry_get_user_progress_by_post_id($data) {
     $postId = $data['post_id'];
-    $nodeIdArr = $data['node_id_arr'];
+    $tapestryController = new TapestryController($postId);
+    $nodeIdArr = $tapestryController->getTapestryNodeIds();
+
     $userController = new TapestryUserController;
     return $userController->getProgress($postId, $nodeIdArr);
 }

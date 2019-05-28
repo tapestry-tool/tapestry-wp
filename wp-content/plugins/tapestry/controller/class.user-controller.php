@@ -42,12 +42,6 @@ class TapestryUserController {
         $this->_isValidTapestryPost($postId);
         $this->_checkUserAndPostId($postId);
 
-        if ($this->_isJson($nodeIdArr)) {
-            $nodeIdArr = json_decode($nodeIdArr);
-        } else {
-            throw new Exception('Invalid json');
-        }
-
         return $this->_getUserProgress($postId, $nodeIdArr);
     }
 
