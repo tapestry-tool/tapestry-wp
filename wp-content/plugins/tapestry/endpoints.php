@@ -4,6 +4,8 @@
  *
  */
 
+require __DIR__ . '/controller/class.tapestry-permissions.php';
+require __DIR__ . '/controller/class.tapestry-controller.php';
 require __DIR__ . '/controller/class.user-controller.php';
 
  // User endpoints
@@ -71,4 +73,32 @@ function tapestry_update_user_h5p_settings_by_post_id($data) {
     $postId = $data['post_id'];
     $json = $data['json'];
     $userController->updateH5PSettings($postId, $json);
+}
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'tapestry-tool/v1', '/tapestries', array(
+        'methods' => 'POST',
+        'callback' => 'updateTapestry',
+        'permission_callback' => 'TapestryPermissions::postTapestry'
+    ));
+});
+
+function updateTapestry($request) {
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    $tapestryController = new TapestryController($data->postId);
+    return $tapestryController->updateTapestry($data);
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)', array(
+        'methods' => 'GET',
+        'callback' => 'loadTapestry'
+    ));
+});
+
+function loadTapestry($request) {
+    $postId = $request['id'];
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->getTapestry();
 }

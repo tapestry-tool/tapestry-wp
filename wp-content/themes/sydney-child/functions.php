@@ -41,4 +41,11 @@ function wpb_widgets_init() {
 }
 add_action( 'widgets_init', 'wpb_widgets_init' );
 
+add_action('wp_head', 'tapestry_tool_ajaxurl');
+function tapestry_tool_ajaxurl() {
+    echo '<script type="text/javascript">
+           var ajaxurl = "' . admin_url('admin-ajax.php') . '";
+         </script>';
+}
+
 // END ENQUEUE PARENT ACTION
