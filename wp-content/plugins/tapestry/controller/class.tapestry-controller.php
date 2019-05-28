@@ -116,9 +116,9 @@ class TapestryController {
 
     private function addGroup($group) {
         if (!isset($group->id)) {
-            $group->id = add_post_meta($this->postId, 'group_'.$this->postId, $group);
+            $group->id = add_post_meta($this->postId, 'group', $group);
         }
-        return $this->_update_post_meta_by_mid($group->id, $group);
+        return $this->_update_post_meta_by_mid($group->id, $group, 'group_'.$group->id);
     }
 
     private function _formNodeData($nodeData, $metadata) {
@@ -207,16 +207,16 @@ class TapestryController {
         }, $nodes);
     }
 
-    private function _update_post_meta_by_mid($metaId, $metadata) {
+    private function _update_post_meta_by_mid($metaId, $metaValue, $metaKey = '') {
         global $wpdb;
 
-        if(!is_serialized($metadata)) { 
-            $metadata = maybe_serialize($metadata);
+        if(!is_serialized($metaValue)) { 
+            $metaValue = maybe_serialize($metaValue);
         }
 
         $queryString = "
             UPDATE $wpdb->postmeta
-            SET meta_value = '$metadata', meta_key = 'group_$metaId'
+            SET meta_value = '$metaValue', meta_key = '$metaKey'
             WHERE $wpdb->postmeta.meta_id = $metaId;
         ";
 
@@ -226,7 +226,7 @@ class TapestryController {
             return $this->_throwsError('INVALID_META_ID');
         }
 
-        return $metadata;
+        return $metaValue;
     }
 
     private function _makeMetadata($node, $nodePostId) {
