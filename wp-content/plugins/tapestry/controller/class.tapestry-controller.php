@@ -12,7 +12,11 @@ class TapestryController {
     const ERRORS = [
         'INVALID_POST_ID' => [
             'MESSAGE' => 'PostID is invalid',
-            'STATUS' => ['status' => 404]
+            'STATUS' => ['status' => 400]
+        ],
+        'INVALID_META_ID' => [
+            'MESSAGE' => 'MetaID is invalid',
+            'STATUS' => ['status' => 400]
         ]
     ];
     private $postId;
@@ -42,6 +46,10 @@ class TapestryController {
 
         $this->_updateNodes($tapestry->nodes);
 
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
+        }
+
         if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
@@ -50,6 +58,36 @@ class TapestryController {
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
+    }
+
+    /**
+     * Add a new Tapestry group
+     * 
+     * @param Object $group
+     * @return Object Tapestry group
+     */
+    public function addTapestryGroup($group) {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $result = $this->addGroup($group);
+
+        if (is_wp_error($result)) {
+            return $result;
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
+        }
+
+        array_push($tapestry->groups, $group->id);
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $group;
     }
 
     /**
@@ -74,6 +112,13 @@ class TapestryController {
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
         return $tapestry;
+    }
+
+    private function addGroup($group) {
+        if (!isset($group->id)) {
+            $group->id = add_post_meta($this->postId, 'group_'.$this->postId, $group);
+        }
+        return $this->_update_post_meta_by_mid($group->id, $group);
     }
 
     private function _formNodeData($nodeData, $metadata) {
@@ -160,6 +205,28 @@ class TapestryController {
         return array_map(function($node) {
             return $node->id;
         }, $nodes);
+    }
+
+    private function _update_post_meta_by_mid($metaId, $metadata) {
+        global $wpdb;
+
+        if(!is_serialized($metadata)) { 
+            $metadata = maybe_serialize($metadata);
+        }
+
+        $queryString = "
+            UPDATE $wpdb->postmeta
+            SET meta_value = '$metadata', meta_key = 'group_$metaId'
+            WHERE $wpdb->postmeta.meta_id = $metaId;
+        ";
+
+        $result = $wpdb->query($queryString);
+
+        if ($result === 0 || $result === false) {
+            return $this->_throwsError('INVALID_META_ID');
+        }
+
+        return $metadata;
     }
 
     private function _makeMetadata($node, $nodePostId) {
