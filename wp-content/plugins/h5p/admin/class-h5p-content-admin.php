@@ -523,6 +523,11 @@ class H5PContentAdmin {
       $core->h5pF->setErrorMessage(__('Invalid library.', $this->plugin_slug));
       return FALSE;
     }
+    if ($core->h5pF->libraryHasUpgrade($content['library'])) {
+      // We do not allow storing old content due to security concerns
+      $core->h5pF->setErrorMessage(__('Something unexpected happened. We were unable to save this content.', $this->plugin_slug));
+      return FALSE;
+    }
 
     // Check if library exists.
     $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
@@ -560,8 +565,14 @@ class H5PContentAdmin {
     // Set disabled features
     $this->get_disabled_content_features($core, $content);
 
-    // Save new content
-    $content['id'] = $core->saveContent($content);
+    try {
+      // Save new content
+      $content['id'] = $core->saveContent($content);
+    }
+    catch (Exception $e) {
+      H5P_Plugin_Admin::set_error($e->getMessage());
+      return;
+    }
 
     // Move images and find all content dependencies
     $editor = $this->get_h5peditor_instance();
@@ -976,7 +987,8 @@ class H5PContentAdmin {
       'metadataSemantics' => $content_validator->getMetadataSemantics(),
       'assets' => $assets,
       'deleteMessage' => __('Are you sure you wish to delete this content?', $this->plugin_slug),
-      'apiVersion' => H5PCore::$coreApi
+      'apiVersion' => H5PCore::$coreApi,
+      'language' => $language
     );
 
     if ($id !== NULL) {
@@ -1030,7 +1042,7 @@ class H5PContentAdmin {
 
       $editor->ajax->action(H5PEditorEndpoints::SINGLE_LIBRARY, $name,
         $major_version, $minor_version, $plugin->get_language(), '',
-        $plugin->get_h5p_path()
+        $plugin->get_h5p_path(), filter_input(INPUT_GET, 'default-language')
       );
 
       // Log library load
@@ -1053,6 +1065,17 @@ class H5PContentAdmin {
 
     $editor = $this->get_h5peditor_instance();
     $editor->ajax->action(H5PEditorEndpoints::CONTENT_TYPE_CACHE, $token);
+    exit;
+  }
+
+  /**
+   * Get translations
+   */
+  public function ajax_translations() {
+    $language = filter_input(INPUT_GET, 'language', FILTER_SANITIZE_STRING);
+
+    $editor = $this->get_h5peditor_instance();
+    $editor->ajax->action(H5PEditorEndpoints::TRANSLATIONS, $language);
     exit;
   }
 

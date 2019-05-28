@@ -698,6 +698,7 @@ class H5PWordPress implements H5PFrameworkInterface {
               , hc.license_extras AS licenseExtras
               , hc.author_comments AS authorComments
               , hc.changes AS changes
+              , hc.default_language AS defaultLanguage
         FROM {$wpdb->prefix}h5p_contents hc
         JOIN {$wpdb->prefix}h5p_libraries hl ON hl.id = hc.library_id
         WHERE hc.id = %d",
@@ -706,7 +707,7 @@ class H5PWordPress implements H5PFrameworkInterface {
       );
 
     $content['metadata'] = array();
-    $metadata_structure = array('title', 'authors', 'source', 'yearFrom', 'yearTo', 'license', 'licenseVersion', 'licenseExtras', 'authorComments', 'changes');
+    $metadata_structure = array('title', 'authors', 'source', 'yearFrom', 'yearTo', 'license', 'licenseVersion', 'licenseExtras', 'authorComments', 'changes', 'defaultLanguage');
     foreach ($metadata_structure as $property) {
       if (!empty($content[$property])) {
         if ($property === 'authors' || $property === 'changes') {
@@ -845,13 +846,15 @@ class H5PWordPress implements H5PFrameworkInterface {
   /**
    * Implements getNumContent().
    */
-  public function getNumContent($library_id) {
+  public function getNumContent($library_id, $skip = NULL) {
     global $wpdb;
+    $skip_query = empty($skip) ? '' : " AND id NOT IN ($skip)";
 
     return (int) $wpdb->get_var($wpdb->prepare(
       "SELECT COUNT(id)
-        FROM {$wpdb->prefix}h5p_contents
-        WHERE library_id = %d",
+         FROM {$wpdb->prefix}h5p_contents
+        WHERE library_id = %d
+              {$skip_query}",
       $library_id
     ));
   }
@@ -1124,6 +1127,7 @@ class H5PWordPress implements H5PFrameworkInterface {
     switch ($permission) {
       case H5PPermission::DOWNLOAD_H5P:
       case H5PPermission::EMBED_H5P:
+      case H5PPermission::COPY_H5P:
         return self::currentUserCanEdit($contentUserId);
 
       case H5PPermission::CREATE_RESTRICTED:
@@ -1231,6 +1235,9 @@ class H5PWordPress implements H5PFrameworkInterface {
                l1.minor_version < l2.minor_version))
         WHERE l1.add_to IS NOT NULL AND l2.name IS NULL", ARRAY_A
     );
+
+    // NOTE: These are treated as library objects but are missing the following properties:
+    // title, embed_types, drop_library_css, fullscreen, runnable, semantics, has_icon
   }
 
   /**
@@ -1241,5 +1248,25 @@ class H5PWordPress implements H5PFrameworkInterface {
    */
   public function getLibraryConfig($libraries = NULL) {
      return defined('H5P_LIBRARY_CONFIG') ? H5P_LIBRARY_CONFIG : NULL;
+  }
+
+  /**
+   * Implements libraryHasUpgrade
+   */
+  public function libraryHasUpgrade($library) {
+    global $wpdb;
+
+    return $wpdb->get_var($wpdb->prepare(
+        "SELECT id
+          FROM {$wpdb->prefix}h5p_libraries
+          WHERE name = '%s'
+          AND (major_version > %d
+           OR (major_version = %d AND minor_version > %d))
+        LIMIT 1",
+        $library['machineName'],
+        $library['majorVersion'],
+        $library['majorVersion'],
+        $library['minorVersion']
+    )) !== NULL;
   }
 }
