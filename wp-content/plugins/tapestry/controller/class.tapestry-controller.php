@@ -109,8 +109,14 @@ class TapestryController {
             return $this->_formNodeData($nodeData, $metadata);
         }, $tapestry->nodes);
 
+        $tapestry->groups = array_map(function($groupMetaId) {
+            $metadata = get_metadata_by_mid('post', $groupMetaId);
+            return $metadata->meta_value;
+        }, $tapestry->groups);
+
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
+
         return $tapestry;
     }
 
