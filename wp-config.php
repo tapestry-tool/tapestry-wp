@@ -20,7 +20,7 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'tapestry_test' );
+define( 'DB_NAME', 'tapestry_wp' );
 
 /** MySQL database username */
 define( 'DB_USER', 'root' );
@@ -46,14 +46,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         '(7eyY|<.YSt7ZsQ?WVa/rO?klOz@7.;WZ_#F,rk?,zG/c>X9[qeMjaHLs)0{K[L<' );
-define( 'SECURE_AUTH_KEY',  'T:P|AO,yZn&qT+`4]0~CJOv|B6v%$ 9rq(/VYT g%iEDr&gc7xiz_e?3$etc;X3!' );
-define( 'LOGGED_IN_KEY',    '+<h(a~T]-USSCx)tBz3:S.+8 U7pyyQT rWli!X?5^V982b/}4R=0P;sl_o:vM6P' );
-define( 'NONCE_KEY',        'd+v{BM mSTw,unG<nMoiOTXF[~dL4ho{oWCTR=z0b-:%Z@`oS|9KH?4T+qN.&DTC' );
-define( 'AUTH_SALT',        'sv=4m`AH=A(08~GI_*#gX4gcuQTqP2$RNLuJ}kfphs(`mJ)y3$?sxlH.rl<jqn#r' );
-define( 'SECURE_AUTH_SALT', '}m82T$x=RQu$Q)-*e~7Oq| X1UT(N;r)n;U9X?R1h|iL5wV[|S~g<G0bgoT/.zkD' );
-define( 'LOGGED_IN_SALT',   'JdheCP!hFfXz@,nw[@{*x~dKMDR7N@N?1d)iQK9gP4Posl8DqXNq.?/0Z1dbaqP9' );
-define( 'NONCE_SALT',       'Dq.JwVo2=~Y7XIg(v;*-}!=6~J/MbGH,H{y-~65{  :Wrox[>]As;}5&_HnQ,vum' );
+define( 'AUTH_KEY',         '$wA_yXKg>K1S3d&$>XWnArYjCy1o1]@`E)Y(xVAWVjt.}4b!qAR51OM{$ +CDcV*' );
+define( 'SECURE_AUTH_KEY',  ',^wrhwYoURPY2s!Zw}*;r!H+V?5PuaUo!~mHR`?n9L~0Ron~p)[gn7Uuxh4jgG${' );
+define( 'LOGGED_IN_KEY',    'g`K}JGE##_;#(1&*.;*O7`` )p4Jv~Ut,4e@YkiwkiR>J.3_/O`Us&G<-4<A:)1>' );
+define( 'NONCE_KEY',        '6JZVQ%k.1*&)G$/ikIW8S[N x+_VMmzK556WufrTz,//5Ss]JBqy>`#=!Y>+imfo' );
+define( 'AUTH_SALT',        'Bu@mI$s:<Q7xQ;bjGffE`kFcTz:9&hUIP&uR1x<?Q;oZd;Ig(M4NSdyjej1(G(Re' );
+define( 'SECURE_AUTH_SALT', 'y0his;3q ;JL)pq7D9%GErY;~C,OKiVgBp+zj5p|Xd@vk-R>,|wC{PUCCyRMf=tS' );
+define( 'LOGGED_IN_SALT',   '-~f-0~[9PkF8)d[iM!7 ._.X-3$71g^MfF/`DOf?t$HhwZHj!pe;`6D|XDgl]}5I' );
+define( 'NONCE_SALT',       'PG(ypNtu@0/fP1:_31z<uT;t/6z]m;`YIJ*Ys3bZ~:>/x-`X*JWFxZ/3Iz~2.8gS' );
 
 /**#@-*/
 
@@ -78,6 +78,9 @@ $table_prefix = 'wp_';
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
 define( 'WP_DEBUG', false );
+
+define( 'WP_HOME', 'http://localhost:8888' );
+define( 'WP_SITEURL', 'http://localhost:8888' );
 
 /* That's all, stop editing! Happy publishing. */
 
