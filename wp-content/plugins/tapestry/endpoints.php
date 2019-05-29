@@ -8,19 +8,21 @@ require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 
 add_action( 'rest_api_init', function () {	
-    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryId>[\d]+)/nodes', array(	
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)/nodes', array(	
         'methods' => 'POST',	
-        'callback' => 'updateTapestryNodes',	
-        // TODO: Add permission here
+        'callback' => 'addTapestryNode',	
+        'permission_callback' => 'TapestryPermissions::postTapestryNode'
     ));	
 });
 
-function updateTapestryNodes($request) {
-    $postId = $request['tapestryId'];
+function addTapestryNode($request) {
+    $postId = $request['id'];
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
-    $tapestryController = new TapestryController;	
-    return $tapestryController->updateTapestryNodes($data, $postId);
+    // make sure that we can only accept one node object at a time
+    // adding multiple nodes would require multiple requests from the client
+    $tapestryController = new TapestryController($postId);	
+    return $tapestryController->addTapestryNode($data);
 }
 
 add_action( 'rest_api_init', function () {

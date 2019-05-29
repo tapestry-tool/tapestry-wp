@@ -53,19 +53,17 @@ class TapestryController {
     }
 
     /**	
-     * Update Tapestry post's child nodes	
-     * 	
-     * @param  Array  @nodes  An array of child nodes
-     * @param  Number @postId The Tapestry postId
-     * @return Array  @nodes
-     * @throws WP_Error
+     * Add a Tapestry node
+     *
+     * @param  Object  @node
+     * @return Object  @node
      */	
-    public function updateTapestryNodes($nodes, $postId = null) {	
-        if (!$this->postId) {	
+    public function addTapestryNode($node) {	
+        if (!$this->postId) {
             return $this->throwsError('INVALID_POST_ID');	
         }
-        $this->_updateNodes($nodes, $postId);
-        return $nodes;
+        $this->_updateNodes([$node]);
+        return $node;
     }
 
     /**
@@ -166,6 +164,7 @@ class TapestryController {
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
+        return $nodes;
     }
 
     private function _updatePost($post, $postType = 'tapestry', $postId = null) {
