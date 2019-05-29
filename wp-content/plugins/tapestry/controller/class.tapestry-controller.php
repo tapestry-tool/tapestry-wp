@@ -164,7 +164,6 @@ class TapestryController {
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
-        return $nodes;
     }
 
     private function _updatePost($post, $postType = 'tapestry', $postId = null) {
