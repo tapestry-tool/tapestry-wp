@@ -46,6 +46,11 @@ body.home div#content {
 
 body.home div#content > .container {
 	min-height: calc(100vh - 100px);
+	width: 100% !important;
+}
+
+body.home main#main > article {
+	display: none;
 }
 
 body.home article#post-2 {
