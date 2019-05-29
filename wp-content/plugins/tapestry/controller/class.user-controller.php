@@ -73,17 +73,15 @@ class TapestryUserController {
     }
 
     private function _updateUserProgress($postId, $nodeId, $progressValue) {
-        $userId = $this->userId;
-        update_user_meta($userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
+        update_user_meta($this->userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
     private function _getUserProgress($postId, $nodeIdArr) {
-        $userId = $this->userId;
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodeIdArr as $nodeId) {
-            $progress_value = get_user_meta($userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, true);
+            $progress_value = get_user_meta($this->userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, true);
             if ($progress_value !== NULL) {
                 $progress->$nodeId = $progress_value;
             } else {
@@ -95,13 +93,11 @@ class TapestryUserController {
     }
 
     private function _updateUserH5PSettings($postId, $h5pSettingsData) {
-        $userId = $this->userId;
-        update_user_meta($userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
+        update_user_meta($this->userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
     private function _getUserH5PSettings($postId) {
-        $userId = $this->userId;
-        $settings = get_user_meta($userId, 'tapestry_h5p_setting_' . $postId, true);
+        $settings = get_user_meta($this->userId, 'tapestry_h5p_setting_' . $postId, true);
         return json_encode($settings);
     }
 
