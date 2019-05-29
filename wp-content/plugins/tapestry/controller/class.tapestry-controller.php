@@ -53,6 +53,28 @@ class TapestryController {
     }
 
     /**
+     * Update Tapestry settings
+     * 
+     * @param  Object @settings
+     * @return Object Tapestry settings
+     */
+    public function updateTapestrySettings($settings) {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        // TODO: add validation for the $settings
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        $tapestry->settings = $settings;
+
+        $this->_updatePost($tapestry, 'tapestry');
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+        return $tapestry->settings;
+    }
+
+    /**
      * Retrieve a Tapestry post
      * 
      * @return Object Tapestry
