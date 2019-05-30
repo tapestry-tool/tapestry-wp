@@ -18,10 +18,6 @@ class TapestryController {
             'MESSAGE' => 'Group already exists',
             'STATUS' => ['status' => 400]
         ],
-        'SAVE_TO_DATABASE_FAILED' => [
-            'MESSAGE' => 'Save to database failed',
-            'STATUS' => ['status' => 500]
-        ],
         'NODE_ALREADY_EXISTS' => [
             'MESSAGE' => 'Node already exists in the database',
             'STATUS' => ['status' => 400]
@@ -54,11 +50,15 @@ class TapestryController {
 
         $this->_updateNodes($tapestry->nodes);
 
+        $this->_updateGroups($tapestry->groups);
+
         if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
 
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
+
+        $tapestry->groups = $this->_getGroupIds($tapestry->groups);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
@@ -105,11 +105,7 @@ class TapestryController {
             return $this->_throwsError('GROUP_ALREADY_EXISTS');
         }
 
-        $result = $this->updateGroup($group);
-
-        if (is_wp_error($result)) {
-            return $result;
-        }
+        $this->_updateGroups([$group]);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         
@@ -176,17 +172,6 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function updateGroup($group) {
-        if (!$this->_isValidTapestryGroup($group->id)) {
-            $group->id = add_post_meta($this->postId, 'group', $group);
-        }
-
-        // TODO: handle the local nodes logic here
-        // At the moment, we put everything in the post meta
-
-        return $this->_update_post_meta_by_mid($group->id, $group, 'group_'.$group->id);
-    }
-
     private function _formNodeData($nodeData, $metadata) {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
@@ -223,12 +208,6 @@ class TapestryController {
     }
 
     // TODO: this function could be used as a utility function
-    private function _isValidTapestryGroup($groupMetaId) {
-        return is_numeric($groupMetaId) &&
-            metadata_exists('post', $this->postId, 'group_'.$groupMetaId);
-    }
-
-    // TODO: this function could be used as a utility function
     private function _isValidTapestry($postId) {
         return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
@@ -239,6 +218,16 @@ class TapestryController {
             $metadata = get_metadata_by_mid('post', $nodeMetaId);
             $nodePostId = $metadata->meta_value->post_id;
             return get_post_type($nodePostId) == 'tapestry_node';
+        }
+        return false;
+    }
+
+    // TODO: this function could be used as a utility function
+    private function _isValidTapestryGroup($groupMetaId) {
+        if (is_numeric($groupMetaId)) {
+            $metadata = get_metadata_by_mid('post', $groupMetaId);
+            return is_object($metadata->meta_value)
+                && $metadata->meta_value->type == 'tapestry_group';
         }
         return false;
     }
@@ -254,6 +243,19 @@ class TapestryController {
                 $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
+        }
+    }
+
+    private function _updateGroups($groups) {
+        foreach ($groups as $group) {
+            if (!$this->_isValidTapestryGroup($group->id)) {
+                $group->id = add_post_meta($this->postId, 'group', $group);
+            }
+
+            // TODO: handle the local nodes logic here
+            // At the moment, we put everything in the post meta
+
+            update_metadata_by_mid('post', $group->id, $group);
         }
     }
 
@@ -289,26 +291,10 @@ class TapestryController {
         }, $nodes);
     }
 
-    private function _update_post_meta_by_mid($metaId, $metaValue, $metaKey = '') {
-        global $wpdb;
-        
-        if(!is_serialized($metaValue)) { 
-            $metaValue = maybe_serialize($metaValue);
-        }
-
-        $queryString = "
-            UPDATE $wpdb->postmeta
-            SET meta_value = '$metaValue', meta_key = '$metaKey'
-            WHERE $wpdb->postmeta.meta_id = $metaId;
-        ";
-
-        $result = $wpdb->query($queryString);
-
-        if ($result === 0 || $result === false) {
-            return $this->_throwsError('SAVE_TO_DATABASE_FAILED');
-        }
-
-        return $metaValue;
+    private function _getGroupIds($groups) {
+        return array_map(function($group) {
+            return $group->id;
+        }, $groups);
     }
 
     private function _makeMetadata($node, $nodePostId) {

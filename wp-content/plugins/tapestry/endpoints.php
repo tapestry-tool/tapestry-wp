@@ -81,7 +81,7 @@ function addTapestryGroup($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
-    // make sure data is an array of groups
+    // make sure the type of the group body exists and is 'tapestry_group'
     $tapestryController = new TapestryController($postId);
     return $tapestryController->addTapestryGroup($data);
 }
