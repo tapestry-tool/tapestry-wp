@@ -15,7 +15,7 @@ class TapestryController {
             'STATUS' => ['status' => 400]
         ],
         'GROUP_ALREADY_EXISTS' => [
-            'MESSAGE' => 'Group already exists',
+            'MESSAGE' => 'Group already exists in the database',
             'STATUS' => ['status' => 400]
         ],
         'NODE_ALREADY_EXISTS' => [
