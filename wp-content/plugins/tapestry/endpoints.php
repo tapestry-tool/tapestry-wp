@@ -23,6 +23,22 @@ function updateTapestry($request) {
 }
 
 add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)/settings', array(
+        'methods' => 'PUT',
+        'callback' => 'updateTapestrySettings',
+        'permission_callback' => 'TapestryPermissions::putTapestrySettings'
+    ));
+});
+
+function updateTapestrySettings($request) {
+    $postId = $request['id'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestrySettings($data);
+}
+
+add_action('rest_api_init', function () {
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)', array(
         'methods' => 'GET',
         'callback' => 'loadTapestry'

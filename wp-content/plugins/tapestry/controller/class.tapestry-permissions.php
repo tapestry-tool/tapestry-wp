@@ -18,4 +18,11 @@ class TapestryPermissions {
         }
         return false;
     }
+    static function putTapestrySettings($request) {
+        $postId = $request['id'];
+        if (isset($postId)) {
+            return current_user_can('edit', $postId);
+        }
+        return current_user_can('publish_posts');
+    }
 }
