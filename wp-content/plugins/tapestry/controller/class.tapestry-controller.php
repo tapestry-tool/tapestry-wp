@@ -21,6 +21,10 @@ class TapestryController {
         'SAVE_TO_DATABASE_FAILED' => [
             'MESSAGE' => 'Save to database failed',
             'STATUS' => ['status' => 500]
+        ],
+        'NODE_ALREADY_EXISTS' => [
+            'MESSAGE' => 'Node already exists in the database',
+            'STATUS' => ['status' => 400]
         ]
     ];
     private $postId;
@@ -58,6 +62,32 @@ class TapestryController {
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
+    }
+
+    /**	
+     * Add a Tapestry node
+     *
+     * @param  Object  @node
+     * @return Object  @node
+     */	
+    public function addTapestryNode($node) {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        if ($this->_isValidTapestryNode($node->id)) {
+            return $this->_throwsError('NODE_ALREADY_EXISTS');
+        }
+
+        $this->_updateNodes([$node]);
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        array_push($tapestry->nodes, $node->id);
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $node;
     }
 
     /**
@@ -203,15 +233,25 @@ class TapestryController {
         return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
 
+    // TODO: this function could be used as a utility function
+    private function _isValidTapestryNode($nodeMetaId) {
+        if (is_numeric($nodeMetaId)) {
+            $metadata = get_metadata_by_mid('post', $nodeMetaId);
+            $nodePostId = $metadata->meta_value->post_id;
+            return get_post_type($nodePostId) == 'tapestry_node';
+        }
+        return false;
+    }
+
     private function _updateNodes($nodes) {
         foreach ($nodes as $node) {
-            if (!isset($node->id)) {
+            if ($this->_isValidTapestryNode($node->id)) {
+                $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
+                $nodePostId = $metadata->post_id;
+            } else {
                 $nodePostId = $this->_updatePost($node, 'tapestry_node');
                 $metadata = $this->_makeMetadata($node, $nodePostId);
                 $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
-            } else {
-                $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
-                $nodePostId = $metadata->post_id;
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
