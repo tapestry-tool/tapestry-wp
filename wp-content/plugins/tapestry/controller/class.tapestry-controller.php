@@ -46,10 +46,6 @@ class TapestryController {
 
         $this->_updateNodes($tapestry->nodes);
 
-        if (!isset($tapestry->groups)) {
-            $tapestry->groups = [];
-        }
-
         if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
@@ -124,6 +120,10 @@ class TapestryController {
         if (!isset($group->id)) {
             $group->id = add_post_meta($this->postId, 'group', $group);
         }
+
+        // TODO: handle the local nodes logic here
+        // At the moment, we put everything in the post meta
+
         return $this->_update_post_meta_by_mid($group->id, $group, 'group_'.$group->id);
     }
 
