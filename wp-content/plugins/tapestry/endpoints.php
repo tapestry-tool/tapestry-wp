@@ -36,7 +36,7 @@ function loadTapestry($request) {
 }
 
 add_action('rest_api_init', function () {
-    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)/groups', array(
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/groups', array(
         'methods' => 'POST',
         'callback' => 'addTapestryGroup',
         'permission_callback' => 'TapestryPermissions::postTapestryGroup'
@@ -44,7 +44,7 @@ add_action('rest_api_init', function () {
 });
 
 function addTapestryGroup($request) {
-    $postId = $request['id'];
+    $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure data is an array of groups
