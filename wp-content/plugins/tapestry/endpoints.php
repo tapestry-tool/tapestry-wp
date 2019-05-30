@@ -11,7 +11,7 @@ require __DIR__ . '/controller/class.user-controller.php';
  // User endpoints
 
 // Get user progress on a tapestry page by post id. 
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44
+// Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', 'users/progress/', array(
       'methods' => 'GET',
@@ -28,7 +28,7 @@ function tapestry_get_user_progress_by_post_id($data) {
 }
 
 // Update a single node progress by passing in node id, post id and progress value
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
+// Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/users/progress/', array(
       'methods' => 'POST',
@@ -44,7 +44,7 @@ function tapestry_update_user_progress_by_node_id($data) {
 }
 
 // Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
+// Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', 'users/h5psettings/', array(
       'methods' => 'GET',
@@ -58,7 +58,7 @@ function tapestry_get_user_h5p_settings_by_post_id($data) {
 }
 
 // Get the user h5p settings by post id
-// Example: http://localhost:8888/tapestry-wp/wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
+// Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/users/h5psettings/', array(
       'methods' => 'POST',
@@ -70,6 +70,24 @@ function tapestry_update_user_h5p_settings_by_post_id($data) {
     $postId = $data['post_id'];
     $json = $data['json'];
     $userController->updateH5PSettings($postId, $json);
+}
+
+add_action( 'rest_api_init', function () {	
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/nodes', array(	
+        'methods' => 'POST',	
+        'callback' => 'addTapestryNode',	
+        'permission_callback' => 'TapestryPermissions::postTapestryNode'
+    ));	
+});
+
+function addTapestryNode($request) {
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure that we can only accept one node object at a time
+    // adding multiple nodes would require multiple requests from the client
+    $tapestryController = new TapestryController($postId);	
+    return $tapestryController->addTapestryNode($data);
 }
 
 add_action( 'rest_api_init', function () {
@@ -88,14 +106,30 @@ function updateTapestry($request) {
 }
 
 add_action('rest_api_init', function () {
-    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<id>[\d]+)', array(
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/settings', array(
+        'methods' => 'PUT',
+        'callback' => 'updateTapestrySettings',
+        'permission_callback' => 'TapestryPermissions::putTapestrySettings'
+    ));
+});
+
+function updateTapestrySettings($request) {
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestrySettings($data);
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)', array(
         'methods' => 'GET',
         'callback' => 'loadTapestry'
     ));
 });
 
 function loadTapestry($request) {
-    $postId = $request['id'];
+    $postId = $request['tapestryPostId'];
     $tapestryController = new TapestryController($postId);
     return $tapestryController->getTapestry();
 }
