@@ -1,7 +1,0 @@
-{
-  "libraryStrings": {
-    "helpText": "Create blocks of question and answers, where each block is separated by an empty line. In each block the first line is the question, the other lines contains the answers. The first answer is the correct one",
-    "example": "2 + 2 = ?\n4\n6\n8\n\n3 + 3= ?\n6\n9\n0\n\n",
-    "warning": "Warning! If you change the tasks in the textual editor all rich text formatting(incl. line breaks) will be removed."
-  }
-}
