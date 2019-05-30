@@ -14,9 +14,13 @@ class TapestryController {
             'MESSAGE' => 'PostID is invalid',
             'STATUS' => ['status' => 400]
         ],
-        'INVALID_META_ID' => [
-            'MESSAGE' => 'MetaID is invalid',
+        'GROUP_ALREADY_EXISTS' => [
+            'MESSAGE' => 'Group already exists',
             'STATUS' => ['status' => 400]
+        ],
+        'SAVE_TO_DATABASE_FAILED' => [
+            'MESSAGE' => 'Save to database failed',
+            'STATUS' => ['status' => 500]
         ]
     ];
     private $postId;
@@ -67,7 +71,11 @@ class TapestryController {
             return $this->_throwsError('INVALID_POST_ID');
         }
 
-        $result = $this->addGroup($group);
+        if ($this->_isValidTapestryGroup($group->id)) {
+            return $this->_throwsError('GROUP_ALREADY_EXISTS');
+        }
+
+        $result = $this->updateGroup($group);
 
         if (is_wp_error($result)) {
             return $result;
@@ -116,8 +124,8 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function addGroup($group) {
-        if (!isset($group->id)) {
+    private function updateGroup($group) {
+        if (!$this->_isValidTapestryGroup($group->id)) {
             $group->id = add_post_meta($this->postId, 'group', $group);
         }
 
@@ -160,6 +168,12 @@ class TapestryController {
         }, $oldLinks);
 
         return $newLinks;
+    }
+
+    // TODO: this function could be used as a utility function
+    private function _isValidTapestryGroup($groupMetaId) {
+        return is_numeric($groupMetaId) &&
+            metadata_exists('post', $this->postId, 'group_'.$groupMetaId);
     }
 
     // TODO: this function could be used as a utility function
@@ -229,7 +243,7 @@ class TapestryController {
         $result = $wpdb->query($queryString);
 
         if ($result === 0 || $result === false) {
-            return $this->_throwsError('INVALID_META_ID');
+            return $this->_throwsError('SAVE_TO_DATABASE_FAILED');
         }
 
         return $metaValue;
