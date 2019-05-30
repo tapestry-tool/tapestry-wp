@@ -216,6 +216,10 @@ class TapestryController {
     private function _update_post_meta_by_mid($metaId, $metaValue, $metaKey = '') {
         global $wpdb;
 
+        if(!isset($metaId)) {
+            return $this->_throwsError('INVALID_META_ID');
+        }
+
         if(!is_serialized($metaValue)) { 
             $metaValue = maybe_serialize($metaValue);
         }
@@ -226,11 +230,7 @@ class TapestryController {
             WHERE $wpdb->postmeta.meta_id = $metaId;
         ";
 
-        $result = $wpdb->query($queryString);
-
-        if ($result === 0 || $result === false) {
-            return $this->_throwsError('INVALID_META_ID');
-        }
+        $wpdb->query($queryString);
 
         return $metaValue;
     }
