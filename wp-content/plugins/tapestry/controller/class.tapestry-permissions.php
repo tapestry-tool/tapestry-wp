@@ -11,6 +11,7 @@ class TapestryPermissions {
         }
         return current_user_can('publish_posts');
     }
+
     static function postTapestryGroup($request) {
         $postId = $request['tapestryPostId'];
         if (isset($data->postId)) {
@@ -18,6 +19,7 @@ class TapestryPermissions {
         }
         return false;
     }
+
     static function putTapestrySettings($request) {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
