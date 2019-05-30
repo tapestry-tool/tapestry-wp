@@ -68,3 +68,20 @@ function loadTapestry($request) {
     $tapestryController = new TapestryController($postId);
     return $tapestryController->getTapestry();
 }
+
+add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/groups', array(
+        'methods' => 'POST',
+        'callback' => 'addTapestryGroup',
+        'permission_callback' => 'TapestryPermissions::postTapestryGroup'
+    ));
+});
+
+function addTapestryGroup($request) {
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the type of the group body exists and is 'tapestry_group'
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addTapestryGroup($data);
+}

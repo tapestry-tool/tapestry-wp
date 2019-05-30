@@ -12,7 +12,11 @@ class TapestryController {
     const ERRORS = [
         'INVALID_POST_ID' => [
             'MESSAGE' => 'PostID is invalid',
-            'STATUS' => ['status' => 404]
+            'STATUS' => ['status' => 400]
+        ],
+        'GROUP_ALREADY_EXISTS' => [
+            'MESSAGE' => 'Group already exists in the database',
+            'STATUS' => ['status' => 400]
         ],
         'NODE_ALREADY_EXISTS' => [
             'MESSAGE' => 'Node already exists in the database',
@@ -46,11 +50,15 @@ class TapestryController {
 
         $this->_updateNodes($tapestry->nodes);
 
+        $this->_updateGroups($tapestry->groups);
+
         if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
 
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
+
+        $tapestry->groups = $this->_getGroupIds($tapestry->groups);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
@@ -80,6 +88,36 @@ class TapestryController {
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $node;
+    }
+
+    /**
+     * Add a new Tapestry group
+     * 
+     * @param Object $group
+     * @return Object Tapestry group
+     */
+    public function addTapestryGroup($group) {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        if ($this->_isValidTapestryGroup($group->id)) {
+            return $this->_throwsError('GROUP_ALREADY_EXISTS');
+        }
+
+        $this->_updateGroups([$group]);
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
+        }
+
+        array_push($tapestry->groups, $group->id);
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $group;
     }
 
     /**
@@ -122,6 +160,11 @@ class TapestryController {
             $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
             return $this->_formNodeData($nodeData, $metadata);
         }, $tapestry->nodes);
+
+        $tapestry->groups = array_map(function($groupMetaId) {
+            $metadata = get_metadata_by_mid('post', $groupMetaId);
+            return $metadata->meta_value;
+        }, $tapestry->groups);
 
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
@@ -178,6 +221,16 @@ class TapestryController {
         return false;
     }
 
+    // TODO: this function could be used as a utility function
+    private function _isValidTapestryGroup($groupMetaId) {
+        if (is_numeric($groupMetaId)) {
+            $metadata = get_metadata_by_mid('post', $groupMetaId);
+            return is_object($metadata->meta_value)
+                && $metadata->meta_value->type == 'tapestry_group';
+        }
+        return false;
+    }
+
     private function _updateNodes($nodes) {
         foreach ($nodes as $node) {
             if ($this->_isValidTapestryNode($node->id)) {
@@ -189,6 +242,19 @@ class TapestryController {
                 $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
+        }
+    }
+
+    private function _updateGroups($groups) {
+        foreach ($groups as $group) {
+            if (!$this->_isValidTapestryGroup($group->id)) {
+                $group->id = add_post_meta($this->postId, 'group', $group);
+            }
+
+            // TODO: handle the local nodes logic here
+            // At the moment, we put everything in the post meta
+
+            update_metadata_by_mid('post', $group->id, $group);
         }
     }
 
@@ -222,6 +288,12 @@ class TapestryController {
         return array_map(function($node) {
             return $node->id;
         }, $nodes);
+    }
+
+    private function _getGroupIds($groups) {
+        return array_map(function($group) {
+            return $group->id;
+        }, $groups);
     }
 
     private function _makeMetadata($node, $nodePostId) {
