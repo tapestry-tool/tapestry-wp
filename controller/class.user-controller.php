@@ -13,10 +13,10 @@ class TapestryUserController {
     }
 
     /**
-     * Update User's video progress for a tapestry post
-     * @param Integer @postId the post's ID
-     * @param Integer @nodeId the current node being viewed
-     * @param Float @progressValue is how much the video was viewed, value should be between >= 0 and <= 1
+      * Update User's video progress for a tapestry post
+      * @param Integer @postId the post's ID
+      * @param Integer @nodeId the current node being viewed
+      * @param Float @progressValue is how much the video was viewed, value should be between >= 0 and <= 1
     */
     public function updateProgress($postId, $nodeId, $progressValue) {
         $this->_checkUserAndPostId($postId);
@@ -34,10 +34,10 @@ class TapestryUserController {
     }
 
     /**
-     * Get User's video progress for a tapestry post
-     * @param Integer @postId the post's ID
-     * @param Array @nodeIdArr is a list of ids currently in the tapestry
-     * @return String progress of each node in json format
+      * Get User's video progress for a tapestry post
+      * @param Integer @postId the post's ID
+      * @param Array @nodeIdArr is a list of ids currently in the tapestry
+      * @return String progress of each node in json format
     */
     public function getProgress($postId, $nodeIdArr) {
         $this->_isValidTapestryPost($postId);
@@ -47,9 +47,9 @@ class TapestryUserController {
     }
 
     /**
-     * Update User's h5p video setting for a tapestry post
-     * @param Integer @postId the post's ID
-     * @param String @h5pSettingsData stores volume, playbackRate, quality of h5p video
+      * Update User's h5p video setting for a tapestry post
+      * @param Integer @postId the post's ID
+      * @param String @h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
     public function updateH5PSettings($postId, $h5pSettingsData) {
         $this->_checkUserAndPostId($postId);
@@ -64,9 +64,9 @@ class TapestryUserController {
     }
 
     /**
-     * Get User's h5p video setting for a tapestry post
-     * @param Integer @postId the post's Id
-     * @return String h5p setting
+      * Get User's h5p video setting for a tapestry post
+      * @param Integer @postId the post's Id
+      * @return String h5p setting
     */
     public function getH5PSettings($postId) {
         $this->_isValidTapestryPost($postId);
@@ -75,20 +75,20 @@ class TapestryUserController {
     }
 
     /**
-     * Set User's progress for a particular node
-     * @param Integer @postId the post's Id
-     * @param Integer @nodeId the node's Id
-     * @param Float @progressValue value of the progress
+      * Set User's progress for a particular node
+      * @param Integer @postId the post's Id
+      * @param Integer @nodeId the node's Id
+      * @param Float @progressValue value of the progress
     */
     private function _updateUserProgress($postId, $nodeId, $progressValue) {
         update_user_meta($this->userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
     /**
-     * Get User's video progress for a tapestry post
-     * @param Integer @postId the post's ID
-     * @param Array @nodeIdArr is a list of ids currently in the tapestry
-     * @return String progress of each node in json format
+      * Get User's video progress for a tapestry post
+      * @param Integer @postId the post's ID
+      * @param Array @nodeIdArr is a list of ids currently in the tapestry
+      * @return String progress of each node in json format
     */
     private function _getUserProgress($postId, $nodeIdArr) {
         $progress = new stdClass();
@@ -107,18 +107,18 @@ class TapestryUserController {
     }
 
     /**
-     * Update User's h5p video settings for a tapestry post
-     * @param Integer @postId the post's ID
-     * @param Object @h5pSettingsData h5p video settings
+      * Update User's h5p video settings for a tapestry post
+      * @param Integer @postId the post's ID
+      * @param Object @h5pSettingsData h5p video settings
     */
     private function _updateUserH5PSettings($postId, $h5pSettingsData) {
         update_user_meta($this->userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
     /**
-     * Get User's h5p video setting for a tapestry post
-     * @param Integer @postId the post's ID
-     * @return String @h5pSettingsData h5p video settings
+      * Get User's h5p video setting for a tapestry post
+      * @param Integer @postId the post's ID
+      * @return String @h5pSettingsData h5p video settings
     */
     private function _getUserH5PSettings($postId) {
         $settings = get_user_meta($this->userId, 'tapestry_h5p_setting_' . $postId, true);
@@ -128,8 +128,8 @@ class TapestryUserController {
     // Helpers
 
     /**
-     * Validates user and post ids
-     * @param Integer @postId the post's Id
+      * Validates user and post ids
+      * @param Integer @postId the post's Id
     */
     private function _checkUserAndPostId($postId) {
         if (!isset($this->userId)) {
@@ -143,8 +143,8 @@ class TapestryUserController {
     }
 
     /**
-     * Validates if post id exists and has post type tapestry
-     * @param Integer @postId the post's Id
+      * Validates if post id exists and has post type tapestry
+      * @param Integer @postId the post's Id
     */
     private function _isValidTapestryPost($postId) {
         // post ID exists in db
@@ -159,8 +159,8 @@ class TapestryUserController {
     }
 
     /**
-     * Validates if a string has JSON format
-     * @param String JSON string
+      * Validates if a string has JSON format
+      * @param String JSON string
     */
     private function _isJson($string) {
         $test_json = json_decode($string);
