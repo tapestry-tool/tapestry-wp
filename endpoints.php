@@ -15,6 +15,11 @@ add_action( 'rest_api_init', function () {
     ));	
 });
 
+/**
+ * Add a tapestry node
+ * @param Object $request
+ * @return Object response 
+ */
 function addTapestryNode($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
@@ -33,6 +38,11 @@ add_action( 'rest_api_init', function () {
     ));
 });
 
+/**
+ * Update/Add a tapestry
+ * @param Object $request
+ * @return Object response 
+ */
 function updateTapestry($request) {
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
@@ -48,6 +58,11 @@ add_action('rest_api_init', function () {
     ));
 });
 
+/**
+ * Update tapestry settings
+ * @param Object $request
+ * @return Object response 
+ */
 function updateTapestrySettings($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
@@ -63,6 +78,11 @@ add_action('rest_api_init', function () {
     ));
 });
 
+/**
+ * Load a tapestry
+ * @param Object $request
+ * @return Object response 
+ */
 function loadTapestry($request) {
     $postId = $request['tapestryPostId'];
     $tapestryController = new TapestryController($postId);
@@ -77,6 +97,11 @@ add_action('rest_api_init', function () {
     ));
 });
 
+/**
+ * Add tapestry group
+ * @param Object $request
+ * @return Object response 
+ */
 function addTapestryGroup($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
