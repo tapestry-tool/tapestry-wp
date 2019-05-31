@@ -4,7 +4,8 @@
  * 
  */
 
-class TapestryController {
+class TapestryController
+{
     const POST_TYPES = [
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node'
@@ -28,11 +29,12 @@ class TapestryController {
     /**
      * Constructor
      */
-    public function __construct($postId = 0) {
+    public function __construct($postId = 0)
+    {
         if ($postId && !$this->_isValidTapestry($postId)) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-        $this->postId = (int) $postId;
+        $this->postId = (int)$postId;
     }
 
     /**
@@ -43,7 +45,8 @@ class TapestryController {
      * @param  Object @tapestry The Tapestry data
      * @return Object @tapestry
      */
-    public function updateTapestry($tapestry) {
+    public function updateTapestry($tapestry)
+    {
         if (!$this->postId) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
@@ -69,8 +72,9 @@ class TapestryController {
      *
      * @param  Object  @node
      * @return Object  @node
-     */	
-    public function addTapestryNode($node) {
+     */
+    public function addTapestryNode($node)
+    {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
@@ -96,7 +100,8 @@ class TapestryController {
      * @param Object $group
      * @return Object Tapestry group
      */
-    public function addTapestryGroup($group) {
+    public function addTapestryGroup($group)
+    {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
@@ -108,7 +113,7 @@ class TapestryController {
         $this->_updateGroups([$group]);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
-        
+
         if (!isset($tapestry->groups)) {
             $tapestry->groups = [];
         }
@@ -126,7 +131,8 @@ class TapestryController {
      * @param  Object @settings
      * @return Object Tapestry settings
      */
-    public function updateTapestrySettings($settings) {
+    public function updateTapestrySettings($settings)
+    {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
@@ -147,21 +153,22 @@ class TapestryController {
      * 
      * @return Object Tapestry
      */
-    public function getTapestry() {
+    public function getTapestry()
+    {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        $tapestry->nodes = array_map(function($nodeMetaId) {
+        $tapestry->nodes = array_map(function ($nodeMetaId) {
             $metadata = get_metadata_by_mid('post', $nodeMetaId);
             $nodePostId = $metadata->meta_value->post_id;
             $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
             return $this->_formNodeData($nodeData, $metadata);
         }, $tapestry->nodes);
 
-        $tapestry->groups = array_map(function($groupMetaId) {
+        $tapestry->groups = array_map(function ($groupMetaId) {
             $metadata = get_metadata_by_mid('post', $groupMetaId);
             return $metadata->meta_value;
         }, $tapestry->groups);
@@ -171,10 +178,11 @@ class TapestryController {
         return $tapestry;
     }
 
-    private function _formNodeData($nodeData, $metadata) {
+    private function _formNodeData($nodeData, $metadata)
+    {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
-        $nodeData->id = (int) $metadata->meta_id;
+        $nodeData->id = (int)$metadata->meta_id;
         $nodeData->title = $metadata->meta_value->title;
         $nodeData->fx = $metadata->meta_value->coordinates->x;
         $nodeData->fy = $metadata->meta_value->coordinates->y;
@@ -183,7 +191,8 @@ class TapestryController {
 
     // TODO: Remove this when we can build a tapestry from scratch
     // HACK - create a new links array that works with new IDs
-    private function _getNewLinks($oldLinks, $nodes) {
+    private function _getNewLinks($oldLinks, $nodes)
+    {
         $mappings = array(
             1 => $nodes[0]->id,
             2 => $nodes[1]->id,
@@ -196,7 +205,7 @@ class TapestryController {
             7 => $nodes[8]->id,
             10 => $nodes[9]->id
         );
-        $newLinks = array_map(function($link) use ($mappings) {
+        $newLinks = array_map(function ($link) use ($mappings) {
             $link->source = $mappings[$link->source];
             $link->target = $mappings[$link->target];
             $link->value = $mappings[$link->value];
@@ -207,12 +216,14 @@ class TapestryController {
     }
 
     // TODO: this function could be used as a utility function
-    private function _isValidTapestry($postId) {
+    private function _isValidTapestry($postId)
+    {
         return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
 
     // TODO: this function could be used as a utility function
-    private function _isValidTapestryNode($nodeMetaId) {
+    private function _isValidTapestryNode($nodeMetaId)
+    {
         if (is_numeric($nodeMetaId)) {
             $metadata = get_metadata_by_mid('post', $nodeMetaId);
             $nodePostId = $metadata->meta_value->post_id;
@@ -222,7 +233,8 @@ class TapestryController {
     }
 
     // TODO: this function could be used as a utility function
-    private function _isValidTapestryGroup($groupMetaId) {
+    private function _isValidTapestryGroup($groupMetaId)
+    {
         if (is_numeric($groupMetaId)) {
             $metadata = get_metadata_by_mid('post', $groupMetaId);
             return is_object($metadata->meta_value)
@@ -231,7 +243,8 @@ class TapestryController {
         return false;
     }
 
-    private function _updateNodes($nodes) {
+    private function _updateNodes($nodes)
+    {
         foreach ($nodes as $node) {
             if ($this->_isValidTapestryNode($node->id)) {
                 $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
@@ -245,7 +258,8 @@ class TapestryController {
         }
     }
 
-    private function _updateGroups($groups) {
+    private function _updateGroups($groups)
+    {
         foreach ($groups as $group) {
             if (!$this->_isValidTapestryGroup($group->id)) {
                 $group->id = add_post_meta($this->postId, 'group', $group);
@@ -258,8 +272,9 @@ class TapestryController {
         }
     }
 
-    private function _updatePost($post, $postType = 'tapestry', $postId = null) {
-        switch($postType) {
+    private function _updatePost($post, $postType = 'tapestry', $postId = null)
+    {
+        switch ($postType) {
             case self::POST_TYPES['TAPESTRY_NODE']:
                 $postTitle = $post->title;
                 $postStatus = $post->status;
@@ -279,28 +294,32 @@ class TapestryController {
         ), true);
     }
 
-    private function _throwsError($code) {
-        $ERROR = (object) self::ERRORS[$code];
+    private function _throwsError($code)
+    {
+        $ERROR = (object)self::ERRORS[$code];
         return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
     }
 
-    private function _getNodeIds($nodes) {
-        return array_map(function($node) {
+    private function _getNodeIds($nodes)
+    {
+        return array_map(function ($node) {
             return $node->id;
         }, $nodes);
     }
 
-    private function _getGroupIds($groups) {
-        return array_map(function($group) {
+    private function _getGroupIds($groups)
+    {
+        return array_map(function ($group) {
             return $group->id;
         }, $groups);
     }
 
-    private function _makeMetadata($node, $nodePostId) {
-        return (object) array(
+    private function _makeMetadata($node, $nodePostId)
+    {
+        return (object)array(
             'post_id' => $nodePostId,
             'title' => $node->title,
-            'coordinates' => (object) array(
+            'coordinates' => (object)array(
                 'x' => $node->fx,
                 'y' => $node->fy
             )
