@@ -201,7 +201,8 @@ class TapestryController
         return $tapestry->nodes;
     }
 
-    private function _formNodeData($nodeData, $metadata) {
+    private function _formNodeData($nodeData, $metadata) 
+    {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
         $nodeData->id = (int)$metadata->meta_id;
