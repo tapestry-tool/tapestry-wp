@@ -8,9 +8,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Permission
      * 
-     * @param $request request
+     * @param Object $request request
      *
-     * @return $permission permission
+     * @return Object $permission permission
      */
     static function postTapestry($request)
     {
@@ -24,9 +24,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Group
      * 
-     * @param $request request
+     * @param Object $request request
      * 
-     * @return $permission permission
+     * @return Object $permission permission
      */
     static function postTapestryGroup($request)
     {
@@ -40,9 +40,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Settings
      * 
-     * @param $request request
+     * @param Object $request request
      * 
-     * @return $permission permission
+     * @return Object $permission permission
      */
     static function putTapestrySettings($request)
     {
@@ -56,9 +56,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Node
      * 
-     * @param $request request
+     * @param Object $request request
      * 
-     * @return $permission permission
+     * @return Object $permission permission
      */
     static function postTapestryNode($request)
     {
