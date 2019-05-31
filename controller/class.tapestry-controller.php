@@ -42,9 +42,9 @@ class TapestryController
      * Update the existing Tapestry if the postId is provided
      * Otherwise, a new Tapestry will be created
      * 
-     * @param  Object @tapestry The Tapestry data
+     * @param  Object $tapestry Tapestry
      * 
-     * @return Object @tapestry
+     * @return Object $tapestry
      */
     public function updateTapestry($tapestry)
     {
@@ -71,9 +71,9 @@ class TapestryController
     /**	
      * Add a Tapestry node
      *
-     * @param  Object  @node
+     * @param  Object  $node Tapestry node
      * 
-     * @return Object  @node
+     * @return Object  $node
      */
     public function addTapestryNode($node)
     {
@@ -99,9 +99,9 @@ class TapestryController
     /**
      * Add a new Tapestry group
      * 
-     * @param Object $group
+     * @param Object $group Tapestry group
      * 
-     * @return Object Tapestry group
+     * @return Object $group
      */
     public function addTapestryGroup($group)
     {
@@ -131,9 +131,9 @@ class TapestryController
     /**
      * Update Tapestry settings
      * 
-     * @param  Object @settings
+     * @param  Object $settings Tapestry settings
      * 
-     * @return Object Tapestry settings
+     * @return Object $settings 
      */
     public function updateTapestrySettings($settings)
     {
@@ -155,7 +155,7 @@ class TapestryController
     /**
      * Retrieve a Tapestry post
      * 
-     * @return Object Tapestry
+     * @return Object $tapestry
      */
     public function getTapestry()
     {
