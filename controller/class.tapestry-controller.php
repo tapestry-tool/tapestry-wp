@@ -12,7 +12,7 @@ class TapestryController {
     const ERRORS = [
         'INVALID_POST_ID' => [
             'MESSAGE' => 'PostID is invalid',
-            'STATUS' => ['status' => 400]
+            'STATUS' => ['status' => 404]
         ],
         'GROUP_ALREADY_EXISTS' => [
             'MESSAGE' => 'Group already exists in the database',
