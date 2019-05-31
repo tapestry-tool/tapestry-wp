@@ -192,7 +192,8 @@ class TapestryController
      * Retrieve all node ids associated to a tapestry
      *
      */
-    public function getTapestryNodeIds() {
+    public function getTapestryNodeIds() 
+    {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
