@@ -161,17 +161,23 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        $tapestry->nodes = array_map(function ($nodeMetaId) {
-            $metadata = get_metadata_by_mid('post', $nodeMetaId);
-            $nodePostId = $metadata->meta_value->post_id;
-            $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
-            return $this->_formNodeData($nodeData, $metadata);
-        }, $tapestry->nodes);
+        $tapestry->nodes = array_map(
+            function ($nodeMetaId) {
+                $metadata = get_metadata_by_mid('post', $nodeMetaId);
+                $nodePostId = $metadata->meta_value->post_id;
+                $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+                return $this->_formNodeData($nodeData, $metadata);
+            },
+            $tapestry->nodes
+        );
 
-        $tapestry->groups = array_map(function ($groupMetaId) {
-            $metadata = get_metadata_by_mid('post', $groupMetaId);
-            return $metadata->meta_value;
-        }, $tapestry->groups);
+        $tapestry->groups = array_map(
+            function ($groupMetaId) {
+                $metadata = get_metadata_by_mid('post', $groupMetaId);
+                return $metadata->meta_value;
+            },
+            $tapestry->groups
+        );
 
         // TODO: delete the below when being able to create tapestry from scratch
         $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
