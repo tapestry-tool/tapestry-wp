@@ -43,6 +43,7 @@ class TapestryController
      * Otherwise, a new Tapestry will be created
      * 
      * @param  Object @tapestry The Tapestry data
+     * 
      * @return Object @tapestry
      */
     public function updateTapestry($tapestry)
@@ -71,6 +72,7 @@ class TapestryController
      * Add a Tapestry node
      *
      * @param  Object  @node
+     * 
      * @return Object  @node
      */
     public function addTapestryNode($node)
@@ -98,6 +100,7 @@ class TapestryController
      * Add a new Tapestry group
      * 
      * @param Object $group
+     * 
      * @return Object Tapestry group
      */
     public function addTapestryGroup($group)
@@ -129,6 +132,7 @@ class TapestryController
      * Update Tapestry settings
      * 
      * @param  Object @settings
+     * 
      * @return Object Tapestry settings
      */
     public function updateTapestrySettings($settings)

@@ -7,6 +7,13 @@
 require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 
+/**
+ * Add a tapestry node
+ * 
+ * @param Object $request
+ * 
+ * @return Object response 
+ */
 add_action( 'rest_api_init', function () {	
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/nodes', array(	
         'methods' => 'POST',	
@@ -14,12 +21,6 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => 'TapestryPermissions::postTapestryNode'
     ));	
 });
-
-/**
- * Add a tapestry node
- * @param Object $request
- * @return Object response 
- */
 function addTapestryNode($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
@@ -30,6 +31,13 @@ function addTapestryNode($request) {
     return $tapestryController->addTapestryNode($data);
 }
 
+/**
+ * Update/Add a tapestry
+ * 
+ * @param Object $request
+ * 
+ * @return Object response 
+ */
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/tapestries', array(
         'methods' => 'POST',
@@ -37,12 +45,6 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => 'TapestryPermissions::postTapestry'
     ));
 });
-
-/**
- * Update/Add a tapestry
- * @param Object $request
- * @return Object response 
- */
 function updateTapestry($request) {
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
@@ -50,6 +52,13 @@ function updateTapestry($request) {
     return $tapestryController->updateTapestry($data);
 }
 
+/**
+ * Update tapestry settings
+ * 
+ * @param Object $request
+ * 
+ * @return Object response 
+ */
 add_action('rest_api_init', function () {
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/settings', array(
         'methods' => 'PUT',
@@ -57,12 +66,6 @@ add_action('rest_api_init', function () {
         'permission_callback' => 'TapestryPermissions::putTapestrySettings'
     ));
 });
-
-/**
- * Update tapestry settings
- * @param Object $request
- * @return Object response 
- */
 function updateTapestrySettings($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
@@ -71,24 +74,33 @@ function updateTapestrySettings($request) {
     return $tapestryController->updateTapestrySettings($data);
 }
 
+/**
+ * Load a tapestry
+ * 
+ * @param Object $request
+ * 
+ * @return Object response 
+ */
 add_action('rest_api_init', function () {
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)', array(
         'methods' => 'GET',
         'callback' => 'loadTapestry'
     ));
 });
-
-/**
- * Load a tapestry
- * @param Object $request
- * @return Object response 
- */
 function loadTapestry($request) {
     $postId = $request['tapestryPostId'];
     $tapestryController = new TapestryController($postId);
     return $tapestryController->getTapestry();
 }
 
+/**
+ * Add tapestry group
+ * 
+ * 
+ * @param Object $request
+ * 
+ * @return Object response 
+ */
 add_action('rest_api_init', function () {
     register_rest_route('tapestry-tool/v1', '/tapestries/(?P<tapestryPostId>[\d]+)/groups', array(
         'methods' => 'POST',
@@ -96,12 +108,6 @@ add_action('rest_api_init', function () {
         'permission_callback' => 'TapestryPermissions::postTapestryGroup'
     ));
 });
-
-/**
- * Add tapestry group
- * @param Object $request
- * @return Object response 
- */
 function addTapestryGroup($request) {
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
