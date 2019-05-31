@@ -14,9 +14,10 @@ require __DIR__ . '/controller/class.user-controller.php';
 // Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', 'users/progress/', array(
-      'methods' => 'GET',
-      'callback' => 'tapestry_get_user_progress_by_post_id',
-    ) );
+        'methods' => 'GET',
+        'callback' => 'tapestry_get_user_progress_by_post_id',
+    )
+    );
 });
 function tapestry_get_user_progress_by_post_id($data) {
     $postId = $data['post_id'];
@@ -31,9 +32,10 @@ function tapestry_get_user_progress_by_post_id($data) {
 // Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/users/progress/', array(
-      'methods' => 'POST',
-      'callback' => 'tapestry_update_user_progress_by_node_id',
-    ) );
+        'methods' => 'POST',
+        'callback' => 'tapestry_update_user_progress_by_node_id',
+    )
+    );
 });
 function tapestry_update_user_progress_by_node_id($data) {
     $userController = new TapestryUserController;
@@ -47,9 +49,10 @@ function tapestry_update_user_progress_by_node_id($data) {
 // Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', 'users/h5psettings/', array(
-      'methods' => 'GET',
-      'callback' => 'tapestry_get_user_h5p_settings_by_post_id',
-    ) );
+        'methods' => 'GET',
+        'callback' => 'tapestry_get_user_h5p_settings_by_post_id',
+    )
+    );
 });
 function tapestry_get_user_h5p_settings_by_post_id($data) {
     $postId = $data['post_id'];
@@ -61,9 +64,10 @@ function tapestry_get_user_h5p_settings_by_post_id($data) {
 // Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
 add_action( 'rest_api_init', function () {
     register_rest_route( 'tapestry-tool/v1', '/users/h5psettings/', array(
-      'methods' => 'POST',
-      'callback' => 'tapestry_update_user_h5p_settings_by_post_id',
-    ) );
+        'methods' => 'POST',
+        'callback' => 'tapestry_update_user_h5p_settings_by_post_id',
+    )
+    );
 });
 function tapestry_update_user_h5p_settings_by_post_id($data) {
     $userController = new TapestryUserController;
@@ -77,7 +81,8 @@ add_action( 'rest_api_init', function () {
         'methods' => 'POST',	
         'callback' => 'addTapestryNode',	
         'permission_callback' => 'TapestryPermissions::postTapestryNode'
-    ));	
+    )
+    );	
 });
 
 function addTapestryNode($request) {
@@ -95,7 +100,8 @@ add_action( 'rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'updateTapestry',
         'permission_callback' => 'TapestryPermissions::postTapestry'
-    ));
+    )
+    );
 });
 
 function updateTapestry($request) {
