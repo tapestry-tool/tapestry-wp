@@ -189,8 +189,10 @@ class TapestryController
         return $nodeData;
     }
 
-    // TODO: Remove this when we can build a tapestry from scratch
-    // HACK - create a new links array that works with new IDs
+    /**
+     * TODO: Remove this when we can build a tapestry from scratch
+     * HACK - create a new links array that works with new IDs
+     */
     private function _getNewLinks($oldLinks, $nodes)
     {
         $mappings = array(
@@ -215,13 +217,17 @@ class TapestryController
         return $newLinks;
     }
 
-    // TODO: this function could be used as a utility function
+    /**
+     * TODO: this function could be used as a utility function
+     */
     private function _isValidTapestry($postId)
     {
         return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
 
-    // TODO: this function could be used as a utility function
+    /**
+     * TODO: this function could be used as a utility function
+     */
     private function _isValidTapestryNode($nodeMetaId)
     {
         if (is_numeric($nodeMetaId)) {
@@ -232,7 +238,9 @@ class TapestryController
         return false;
     }
 
-    // TODO: this function could be used as a utility function
+    /**
+     * TODO: this function could be used as a utility function
+     */
     private function _isValidTapestryGroup($groupMetaId)
     {
         if (is_numeric($groupMetaId)) {
