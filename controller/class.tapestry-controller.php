@@ -190,7 +190,8 @@ class TapestryController
 
     /**
      * Retrieve all node ids associated to a tapestry
-     *
+     * 
+     * @return Array list of node ids for a tapestry
      */
     public function getTapestryNodeIds() 
     {
