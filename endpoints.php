@@ -96,7 +96,6 @@ function loadTapestry($request) {
 /**
  * Add tapestry group
  * 
- * 
  * @param Object $request
  * 
  * @return Object response 
