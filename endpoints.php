@@ -97,7 +97,7 @@ function loadTapestry($request) {
  * Add tapestry group
  * 
  * @param Object $request
- * 
+ *
  * @return Object response 
  */
 add_action('rest_api_init', function () {

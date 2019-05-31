@@ -42,7 +42,7 @@ class TapestryController
      * Update the existing Tapestry if the postId is provided
      * Otherwise, a new Tapestry will be created
      * 
-     * @param  Object $tapestry Tapestry
+     * @param Object $tapestry Tapestry
      * 
      * @return Object $tapestry
      */
@@ -71,7 +71,7 @@ class TapestryController
     /**	
      * Add a Tapestry node
      *
-     * @param  Object  $node Tapestry node
+     * @param Object  $node Tapestry node
      * 
      * @return Object  $node
      */
@@ -131,7 +131,7 @@ class TapestryController
     /**
      * Update Tapestry settings
      * 
-     * @param  Object $settings Tapestry settings
+     * @param Object $settings Tapestry settings
      * 
      * @return Object $settings 
      */
