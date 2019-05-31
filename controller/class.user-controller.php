@@ -10,7 +10,8 @@ class TapestryUserController
 
     private $_userId = null;
 
-    public function __construct() {
+    public function __construct() 
+    {
         $this->_userId = apply_filters('determine_current_user', false); 
     }
 
@@ -21,7 +22,8 @@ class TapestryUserController
      * @param Integer $nodeId the current node being viewed
      * @param Float $progressValue is how much the video was viewed, value should be between >= 0 and <= 1
     */
-    public function updateProgress($postId, $nodeId, $progressValue) {
+    public function updateProgress($postId, $nodeId, $progressValue) 
+    {
         $this->_checkUserAndPostId($postId);
 
         if ($progressValue !== null) {
@@ -44,7 +46,8 @@ class TapestryUserController
      *
      * @return String progress of each node in json format
     */
-    public function getProgress($postId, $nodeIdArr) {
+    public function getProgress($postId, $nodeIdArr) 
+    {
         $this->_isValidTapestryPost($postId);
         $this->_checkUserAndPostId($postId);
 
@@ -57,7 +60,8 @@ class TapestryUserController
      * @param Integer $postId the post's ID
      * @param String $h5pSettingsData stores volume, playbackRate, quality of h5p video
     */
-    public function updateH5PSettings($postId, $h5pSettingsData) {
+    public function updateH5PSettings($postId, $h5pSettingsData) 
+    {
         $this->_checkUserAndPostId($postId);
 
         if ($this->_isJson($h5pSettingsData)) {
@@ -76,7 +80,8 @@ class TapestryUserController
      *
      * @return String h5p setting
     */
-    public function getH5PSettings($postId) {
+    public function getH5PSettings($postId) 
+    {
         $this->_isValidTapestryPost($postId);
         $this->_checkUserAndPostId($postId);
         return $this->_getUserH5PSettings($postId);
@@ -89,7 +94,8 @@ class TapestryUserController
      * @param Integer $nodeId the node's Id
      * @param Float $progressValue value of the progress
     */
-    private function _updateUserProgress($postId, $nodeId, $progressValue) {
+    private function _updateUserProgress($postId, $nodeId, $progressValue) 
+    {
         update_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
@@ -101,7 +107,8 @@ class TapestryUserController
      *
      * @return String progress of each node in json format
     */
-    private function _getUserProgress($postId, $nodeIdArr) {
+    private function _getUserProgress($postId, $nodeIdArr) 
+    {
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
@@ -123,7 +130,8 @@ class TapestryUserController
      * @param Integer $postId the post's ID
      * @param Object $h5pSettingsData h5p video settings
     */
-    private function _updateUserH5PSettings($postId, $h5pSettingsData) {
+    private function _updateUserH5PSettings($postId, $h5pSettingsData) 
+    {
         update_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
@@ -134,7 +142,8 @@ class TapestryUserController
      *
      * @return String $h5pSettingsData h5p video settings
     */
-    private function _getUserH5PSettings($postId) {
+    private function _getUserH5PSettings($postId) 
+    {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, true);
         return json_encode($settings);
     }
@@ -146,7 +155,8 @@ class TapestryUserController
      *
      * @param Integer $postId the post's Id
     */
-    private function _checkUserAndPostId($postId) {
+    private function _checkUserAndPostId($postId) 
+    {
         if (!isset($this->_userId)) {
             throw new Exception('postId is invalid');
         }
@@ -162,7 +172,8 @@ class TapestryUserController
      *
      * @param Integer $postId the post's Id
     */
-    private function _isValidTapestryPost($postId) {
+    private function _isValidTapestryPost($postId) 
+    {
         // post ID exists in db
         if (!get_permalink($postId)) {
             throw new Exception('post id does not exist');
@@ -179,7 +190,8 @@ class TapestryUserController
      *
      * @param String $string JSON string
     */
-    private function _isJson($string) {
+    private function _isJson($string) 
+    {
         $test_json = json_decode($string);
         if ($test_json !== null) {
             return true;
