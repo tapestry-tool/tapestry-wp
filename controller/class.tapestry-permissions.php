@@ -3,8 +3,17 @@
  * Tapestry Endpoint Permissions
  *
  */
-class TapestryPermissions {
-    static function postTapestry($request) {
+class TapestryPermissions
+{
+    /**
+     * Post Tapestry Permission
+     * 
+     * @param $request request
+     *
+     * @return $permission permission
+     */
+    static function postTapestry($request)
+    {
         $data = json_decode($request->get_body());
         if (isset($data->postId)) {
             return current_user_can('edit', $data->postId);
@@ -12,15 +21,31 @@ class TapestryPermissions {
         return current_user_can('publish_posts');
     }
 
-    static function postTapestryGroup($request) {
+    /**
+     * Post Tapestry Group
+     * 
+     * @param $request request
+     * 
+     * @return $permission permission
+     */
+    static function postTapestryGroup($request)
+    {
         $postId = $request['tapestryPostId'];
-        if (isset($data->postId)) {
-            return current_user_can('edit', $data->postId);
+        if (isset($postId)) {
+            return current_user_can('edit', $postId);
         }
         return false;
     }
 
-    static function putTapestrySettings($request) {
+    /**
+     * Post Tapestry Settings
+     * 
+     * @param $request request
+     * 
+     * @return $permission permission
+     */
+    static function putTapestrySettings($request)
+    {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
             return current_user_can('edit', $postId);
@@ -28,7 +53,15 @@ class TapestryPermissions {
         return current_user_can('publish_posts');
     }
 
-    static function postTapestryNode($request) {
+    /**
+     * Post Tapestry Node
+     * 
+     * @param $request request
+     * 
+     * @return $permission permission
+     */
+    static function postTapestryNode($request)
+    {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
             return current_user_can('edit', $postId);
