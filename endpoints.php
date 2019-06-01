@@ -7,6 +7,70 @@
 require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 
+$REST_API = (object)[
+    'NAMESPACE' => 'tapestry-tool/v1',
+    'POST_TAPESTRY_NODE' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ARGUMENTS' => [
+            'methods' => 'POST',
+            'callback' => 'addTapestryNode',
+            'permission_callback' => 'TapestryPermissions::postTapestryNode'
+        ]
+    ],
+    'POST_TAPESTRY' => (object)[
+        'ROUTE' => '/tapestries',
+        'ARGUMENTS' => [
+            'methods' => 'POST',
+            'callback' => 'updateTapestry',
+            'permission_callback' => 'TapestryPermissions::postTapestry'
+        ]
+    ],
+    'PUT_TAPESTRY_SETTINGS' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
+        'ARGUMENTS' => [
+            'methods' => 'PUT',
+            'callback' => 'updateTapestrySettings',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings'
+        ]
+    ],
+    'GET_TAPESTRY' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods' => 'GET',
+            'callback' => 'getTapestry'
+        ]
+    ],
+    'POST_TAPESTRY_GROUP' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
+        'ARGUMENTS' => [
+            'methods' => 'POST',
+            'callback' => 'addTapestryGroup',
+            'permission_callback' => 'TapestryPermissions::postTapestryGroup'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_PERMISSIONS' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
+        'ARGUMENTS' => [
+            'methods' => 'PUT',
+            'callback' => 'updateTapestryNodePermissions',
+            'permission_callback' => 'TapestryPermissions::putTapestryNodePermissions'
+        ]
+    ]
+];
+
+/**
+ * POST_TAPESTRY_NODE
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->POST_TAPESTRY_NODE->ROUTE,
+            $REST_API->POST_TAPESTRY_NODE->ARGUMENTS
+        );
+    }
+);
 /**
  * Add a tapestry node
  * 
@@ -14,17 +78,6 @@ require __DIR__ . '/controller/class.tapestry-controller.php';
  * 
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
-        array(
-            'methods' => 'POST',
-            'callback' => 'addTapestryNode',
-            'permission_callback' => 'TapestryPermissions::postTapestryNode'
-        )
-    );
-});
 function addTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
@@ -37,23 +90,25 @@ function addTapestryNode($request)
 }
 
 /**
+ * POST_TAPESTRY
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->POST_TAPESTRY->ROUTE,
+            $REST_API->POST_TAPESTRY->ARGUMENTS
+        );
+    }
+);
+/**
  * Update/Add a tapestry
  * 
  * @param Object $request
  * 
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries',
-        array(
-            'methods' => 'POST',
-            'callback' => 'updateTapestry',
-            'permission_callback' => 'TapestryPermissions::postTapestry'
-        )
-    );
-});
 function updateTapestry($request)
 {
     $data = json_decode($request->get_body());
@@ -63,23 +118,25 @@ function updateTapestry($request)
 }
 
 /**
- * Update tapestry settings
+ * PUT_TAPESTRY_SETTINGS
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->PUT_TAPESTRY_SETTINGS->ROUTE,
+            $REST_API->PUT_TAPESTRY_SETTINGS->ARGUMENTS
+        );
+    }
+);
+/**
+ * Update Tapestry Settings
  * 
  * @param Object $request
  * 
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
-        array(
-            'methods' => 'PUT',
-            'callback' => 'updateTapestrySettings',
-            'permission_callback' => 'TapestryPermissions::putTapestrySettings'
-        )
-    );
-});
 function updateTapestrySettings($request)
 {
     $postId = $request['tapestryPostId'];
@@ -90,23 +147,26 @@ function updateTapestrySettings($request)
 }
 
 /**
- * Load a tapestry
+ * GET_TAPESTRY
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->GET_TAPESTRY->ROUTE,
+            $REST_API->GET_TAPESTRY->ARGUMENTS
+        );
+    }
+);
+/**
+ * Get a Tapestry
  * 
  * @param Object $request
  * 
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries/(?P<tapestryPostId>[\d]+)',
-        array(
-            'methods' => 'GET',
-            'callback' => 'loadTapestry'
-        )
-    );
-});
-function loadTapestry($request)
+function getTapestry($request)
 {
     $postId = $request['tapestryPostId'];
     $tapestryController = new TapestryController($postId);
@@ -114,23 +174,25 @@ function loadTapestry($request)
 }
 
 /**
- * Add tapestry group
+ * POST_TAPESTRY_GROUP
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->POST_TAPESTRY_GROUP->ROUTE,
+            $REST_API->POST_TAPESTRY_GROUP->ARGUMENTS
+        );
+    }
+);
+/**
+ * Add a Tapestry Group
  * 
  * @param Object $request
  *
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
-        array(
-            'methods' => 'POST',
-            'callback' => 'addTapestryGroup',
-            'permission_callback' => 'TapestryPermissions::postTapestryGroup'
-        )
-    );
-});
 function addTapestryGroup($request)
 {
     $postId = $request['tapestryPostId'];
@@ -142,23 +204,25 @@ function addTapestryGroup($request)
 }
 
 /**
+ * PUT_TAPESTRY_NODE_PERMISSIONS
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->PUT_TAPESTRY_NODE_PERMISSIONS->ROUTE,
+            $REST_API->PUT_TAPESTRY_NODE_PERMISSIONS->ARGUMENTS
+        );
+    }
+);
+/**
  * Update Tapestry Node Permissions
  * 
  * @param Object $request
  *
  * @return Object response 
  */
-add_action('rest_api_init', function () {
-    register_rest_route(
-        'tapestry-tool/v1',
-        '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
-        array(
-            'methods' => 'PUT',
-            'callback' => 'updateTapestryNodePermissions',
-            'permission_callback' => 'TapestryPermissions::putTapestryNodePermissions'
-        )
-    );
-});
 function updateTapestryNodePermissions($request)
 {
     $postId = $request['tapestryPostId'];
