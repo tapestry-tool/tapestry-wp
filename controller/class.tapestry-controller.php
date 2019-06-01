@@ -134,7 +134,6 @@ class TapestryController
      * Update Tapestry Node Permissions
      * 
      * @param Integer $nodeMetaId Node meta id
-     * 
      * @param Object $permissions Node permissions
      *
      * @return Object $permissions

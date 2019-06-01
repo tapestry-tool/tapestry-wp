@@ -74,9 +74,9 @@ add_action(
 /**
  * Add a tapestry node
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  * 
- * @return Object response 
+ * @return Object HTTP response 
  */
 function addTapestryNode($request)
 {
@@ -105,9 +105,9 @@ add_action(
 /**
  * Update/Add a tapestry
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  * 
- * @return Object response 
+ * @return Object HTTP response 
  */
 function updateTapestry($request)
 {
@@ -133,9 +133,9 @@ add_action(
 /**
  * Update Tapestry Settings
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  * 
- * @return Object response 
+ * @return Object HTTP response 
  */
 function updateTapestrySettings($request)
 {
@@ -162,9 +162,9 @@ add_action(
 /**
  * Get a Tapestry
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  * 
- * @return Object response 
+ * @return Object HTTP response 
  */
 function getTapestry($request)
 {
@@ -189,9 +189,9 @@ add_action(
 /**
  * Add a Tapestry Group
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  *
- * @return Object response 
+ * @return Object HTTP response 
  */
 function addTapestryGroup($request)
 {
@@ -219,9 +219,9 @@ add_action(
 /**
  * Update Tapestry Node Permissions
  * 
- * @param Object $request
+ * @param Object $request HTTP request
  *
- * @return Object response 
+ * @return Object HTTP response
  */
 function updateTapestryNodePermissions($request)
 {
