@@ -57,7 +57,7 @@ class TapestryController
      * Update the existing Tapestry if the postId is provided
      * Otherwise, a new Tapestry will be created
      * 
-     * @param Object $tapestry Tapestry
+     * @param Object $tapestry  Tapestry
      * 
      * @return Object $tapestry
      */
@@ -101,9 +101,9 @@ class TapestryController
     /**	
      * Add a Tapestry node
      *
-     * @param Object  $node Tapestry node
+     * @param Object $node  Tapestry node
      * 
-     * @return Object  $node
+     * @return Object $node
      */
     public function addTapestryNode($node)
     {
@@ -133,8 +133,8 @@ class TapestryController
     /**
      * Update Tapestry Node Permissions
      * 
-     * @param Integer $nodeMetaId Node meta id
-     * @param Object $permissions Node permissions
+     * @param Integer $nodeMetaId  Node meta id
+     * @param Object $permissions  Node permissions
      *
      * @return Object $permissions
      */
@@ -162,7 +162,7 @@ class TapestryController
     /**
      * Add a new Tapestry group
      * 
-     * @param Object $group Tapestry group
+     * @param Object $group  Tapestry group
      * 
      * @return Object $group
      */
@@ -194,7 +194,7 @@ class TapestryController
     /**
      * Update Tapestry settings
      * 
-     * @param Object $settings Tapestry settings
+     * @param Object $settings  Tapestry settings
      * 
      * @return Object $settings 
      */
