@@ -10,9 +10,24 @@ class TapestryController
         'TAPESTRY' => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
+    const NODE_PERMISSIONS = [
+        'DEFAULT' => [
+            'public' => 'read'
+        ],
+        'OPTIONS' => [
+            'READ_NODE' => 'read',
+            'EDIT_SUBMIT_NODE' => 'edit_submit',
+            'ADD_SUBMIT_NODE' => 'add_submit',
+            'DELETE_NODE' => 'delete'
+        ]
+    ];
     const ERRORS = [
         'INVALID_POST_ID' => [
             'MESSAGE' => 'PostID is invalid',
+            'STATUS' => ['status' => 404]
+        ],
+        'INVALID_NODE_META_ID' => [
+            'MESSAGE' => 'NodeMetaId is invalid',
             'STATUS' => ['status' => 404]
         ],
         'GROUP_ALREADY_EXISTS' => [
@@ -52,6 +67,20 @@ class TapestryController
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
 
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
+        }
+
+        foreach ($tapestry->nodes as $node) {
+            if (!isset($node->permissions)) {
+                $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
+            }
+        }
+
         $this->_updateNodes($tapestry->nodes);
 
         $this->_updateGroups($tapestry->groups);
@@ -65,6 +94,7 @@ class TapestryController
         $tapestry->groups = $this->_getGroupIds($tapestry->groups);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
         return $tapestry;
     }
 
@@ -85,6 +115,10 @@ class TapestryController
             return $this->_throwsError('NODE_ALREADY_EXISTS');
         }
 
+        if (!isset($node->permissions)) {
+            $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
+        }
+
         $this->_updateNodes([$node]);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
@@ -94,6 +128,33 @@ class TapestryController
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $node;
+    }
+
+    /**
+     * Update Tapestry Node Permissions
+     * 
+     * @param Object $permissions Node permissions
+     * @return Object $permissions
+     */
+    public function updateTapestryNodePermissions($nodeMetaId, $permissions)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+
+        // TODO: validate that $permissions has appropriate/valid info
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+
+        $nodeMetadata->permissions = $permissions;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $nodeMetadata->permissions;
     }
 
     /**
@@ -167,18 +228,18 @@ class TapestryController
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
-                $metadata = get_metadata_by_mid('post', $nodeMetaId);
-                $nodePostId = $metadata->meta_value->post_id;
+                $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
+                $nodePostId = $nodeMetadata->meta_value->post_id;
                 $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
-                return $this->_formNodeData($nodeData, $metadata);
+                return $this->_formNodeData($nodeData, $nodeMetadata);
             },
             $tapestry->nodes
         );
 
         $tapestry->groups = array_map(
             function ($groupMetaId) {
-                $metadata = get_metadata_by_mid('post', $groupMetaId);
-                return $metadata->meta_value;
+                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+                return $groupMetadata->meta_value;
             },
             $tapestry->groups
         );
@@ -188,14 +249,15 @@ class TapestryController
         return $tapestry;
     }
 
-    private function _formNodeData($nodeData, $metadata)
+    private function _formNodeData($nodeData, $nodeMetadata)
     {
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
-        $nodeData->id = (int)$metadata->meta_id;
-        $nodeData->title = $metadata->meta_value->title;
-        $nodeData->fx = $metadata->meta_value->coordinates->x;
-        $nodeData->fy = $metadata->meta_value->coordinates->y;
+        $nodeData->id = (int)$nodeMetadata->meta_id;
+        $nodeData->title = $nodeMetadata->meta_value->title;
+        $nodeData->fx = $nodeMetadata->meta_value->coordinates->x;
+        $nodeData->fy = $nodeMetadata->meta_value->coordinates->y;
+        $nodeData->permissions = $nodeMetadata->meta_value->permissions;
         return $nodeData;
     }
 
@@ -241,8 +303,8 @@ class TapestryController
     private function _isValidTapestryNode($nodeMetaId)
     {
         if (is_numeric($nodeMetaId)) {
-            $metadata = get_metadata_by_mid('post', $nodeMetaId);
-            $nodePostId = $metadata->meta_value->post_id;
+            $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
+            $nodePostId = $nodeMetadata->meta_value->post_id;
             return get_post_type($nodePostId) == 'tapestry_node';
         }
         return false;
@@ -254,9 +316,9 @@ class TapestryController
     private function _isValidTapestryGroup($groupMetaId)
     {
         if (is_numeric($groupMetaId)) {
-            $metadata = get_metadata_by_mid('post', $groupMetaId);
-            return is_object($metadata->meta_value)
-                && $metadata->meta_value->type == 'tapestry_group';
+            $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+            return is_object($groupMetadata->meta_value)
+                && $groupMetadata->meta_value->type == 'tapestry_group';
         }
         return false;
     }
@@ -265,12 +327,12 @@ class TapestryController
     {
         foreach ($nodes as $node) {
             if ($this->_isValidTapestryNode($node->id)) {
-                $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
-                $nodePostId = $metadata->post_id;
+                $nodeMetadata = get_metadata_by_mid('post', $node->id)->meta_value;
+                $nodePostId = $nodeMetadata->post_id;
             } else {
                 $nodePostId = $this->_updatePost($node, 'tapestry_node');
-                $metadata = $this->_makeMetadata($node, $nodePostId);
-                $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
+                $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
+                $node->id = add_post_meta($this->postId, 'tapestry_node', $nodeMetadata);
             }
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
@@ -337,6 +399,7 @@ class TapestryController
         return (object)array(
             'post_id' => $nodePostId,
             'title' => $node->title,
+            'permissions' => $node->permissions,
             'coordinates' => (object)array(
                 'x' => $node->fx,
                 'y' => $node->fy
