@@ -6,6 +6,7 @@
 
 require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
+// require __DIR__ . '/controller/class.tapestry-test-data.php';
 
 /**
  * Add a tapestry node
@@ -114,4 +115,22 @@ function addTapestryGroup($request) {
     // make sure the type of the group body exists and is 'tapestry_group'
     $tapestryController = new TapestryController($postId);
     return $tapestryController->addTapestryGroup($data);
+}
+
+/**
+ * Add tapestry test data
+ * 
+ * @return Object response 
+ */
+add_action('rest_api_init', function () {
+    register_rest_route('tapestry-tool/v1/tapestries/testdata', array(
+        'methods' => 'POST',
+        'callback' => 'addTestData',
+        // 'permission_callback' => 'TapestryPermissions::postTapestry'
+    ));
+});
+function addTestData() {
+    echo("hello");
+    // $tapestryTest = new TapestryTestData();
+    // return $tapestryTest->addSeedData();
 }
