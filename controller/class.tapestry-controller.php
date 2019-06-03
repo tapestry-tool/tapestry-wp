@@ -37,6 +37,10 @@ class TapestryController
         'NODE_ALREADY_EXISTS' => [
             'MESSAGE' => 'Node already exists in the database',
             'STATUS' => ['status' => 400]
+        ],
+        'INVALID_CHILD_NODE' => [
+            'MESSAGE' => 'Node is not a child of the tapestry',
+            'STATUS' => ['status' => 400]
         ]
     ];
     private $postId;
@@ -146,6 +150,10 @@ class TapestryController
 
         if (!$this->_isValidTapestryNode($nodeMetaId)) {
             return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
         }
 
         // TODO: validate that $permissions has appropriate/valid info
@@ -308,6 +316,15 @@ class TapestryController
             $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
             $nodePostId = $nodeMetadata->meta_value->post_id;
             return get_post_type($nodePostId) == 'tapestry_node';
+        }
+        return false;
+    }
+
+    private function _isChildNodeOfTapestry($nodeMetaId)
+    {
+        if (is_numeric($nodeMetaId) && $this->_isValidTapestry($this->postId)) {
+            $tapestry = get_post_meta($this->postId, 'tapestry', true);
+            return in_array($nodeMetaId, $tapestry->nodes);
         }
         return false;
     }
