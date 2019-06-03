@@ -8,10 +8,10 @@
         <div class="modal-body" id="editNodeModalBody">
             <div>Test modal</div>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel-edit-node">Close</button>
-        <button type="button" class="btn btn-primary" id="submit-edit-node">Submit</button>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel-edit-node">Close</button>
+            <button type="button" class="btn btn-primary" id="submit-edit-node">Submit</button>
+        </div>
     </div>
     </div>
 </div>
