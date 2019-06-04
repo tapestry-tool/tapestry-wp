@@ -115,7 +115,7 @@ class TapestryUserController
         foreach ($nodeIdArr as $nodeId) {
             $progress_value = get_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, true);
             if ($progress_value !== null) {
-                $progress->$nodeId = $progress_value;
+                $progress->$nodeId = (float) $progress_value;
             } else {
                 $progress->$nodeId = 0.0;
             }
