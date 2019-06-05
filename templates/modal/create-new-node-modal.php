@@ -17,7 +17,7 @@
                         <div class="dropdown">
                         <select id="mediaType" name="mediaType">
                             <option value="default">Select type:</option>
-                            <option value="video">video</option>
+                            <option value="video">Video</option>
                             <!--<option value="image">image</option>-->
                         </select>
                         </div>
