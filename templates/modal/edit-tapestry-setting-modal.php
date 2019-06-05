@@ -8,10 +8,7 @@
         <div class="modal-body" id="editTapestrySettingModalBody">
             <form class="form-container">
                 <label>Title
-                    <input name="title" type="text" placeholder="Enter the topic title" required >
-                </label>
-                <label>Thumbnail
-                    <input name="imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
+                    <input name="title" type="text" placeholder="Enter the tapestry title" required >
                 </label>
             </form>
         </div>
