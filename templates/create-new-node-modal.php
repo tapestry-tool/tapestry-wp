@@ -3,11 +3,10 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createNewNodeModalLabel">Create New Node</h5>
+                <h4 class="modal-title" id="createNewNodeModalLabel"></h4>
             </div>
             <div class="modal-body" id="createNewNodeModalBody">
                 <form class="form-container">
-                    <h2 id="formTitle"></h2>
                     <label>Title
                         <input name="title" type="text" placeholder="Enter the topic title" required >
                     </label>
@@ -57,41 +56,11 @@
                         </label>
                         </div>
                     </div>
-                    <div>
-                        <h3>User Types:</h3>
-                        <label>Admin
-                        <div class="dropdown">
-                            <select id="admin" name="admin">
-                            <option value="normal">Normal</option>
-                            <option value="optional">Optional</option>
-                            <option value="hidden">Hidden</option>
-                            </select>
-                        </div>
-                        </label>
-                        <label>Consumer
-                        <div class="dropdown">
-                            <select id="consumer" name="consumer">
-                            <option value="normal">Normal</option>
-                            <option value="optional">Optional</option>
-                            <option value="hidden">Hidden</option>
-                            </select>
-                        </div>
-                        </label>
-                        <label>Editor
-                        <div class="dropdown">
-                            <select id="editor" name="editor">
-                            <option value="normal">Normal</option>
-                            <option value="optional">Optional</option>
-                            <option value="hidden">Hidden</option>
-                            </select>
-                        </div>
-                        </label>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-                <button type="button" class="btn btn-primary" id="submit-add-new-node">Submit</button>
+                <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
+                <button type="button" class="btn" id="submit-add-new-node">Submit</button>
             </div>
         </div>
     </div>
