@@ -3,10 +3,17 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="editNodeModalLabel">Create New Node</h5>
+            <h4 class="modal-title" id="editNodeModalLabel"></h4>
         </div>
         <div class="modal-body" id="editNodeModalBody">
-            <div>Test modal</div>
+            <form class="form-container">
+                <label>Title
+                    <input name="title" type="text" placeholder="Enter the topic title" required >
+                </label>
+                <label>Thumbnail
+                    <input name="imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
+                </label>
+            </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel-edit-node">Close</button>
