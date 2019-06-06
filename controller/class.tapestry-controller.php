@@ -44,7 +44,7 @@ class TapestryController
             'MESSAGE'   => 'Node is not a child of the tapestry',
             'STATUS'    => ['status' => 400]
         ],
-        'INVALID_TAPESTRY_DATA' => [
+        'INVALID_TAPESTRY' => [
             'MESSAGE'   => 'Tapestry should have at max one root node when being created',
             'STATUS'    => ['status' => 400]
         ]
@@ -75,7 +75,7 @@ class TapestryController
     public function addTapestry($tapestry)
     {
         if (isset($tapestry->links) || count($tapestry->nodes) > 1) {
-            return $this->_throwsError('INVALID_TAPESTRY_DATA');
+            return $this->_throwsError('INVALID_TAPESTRY');
         }
         if (!$this->postId) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
@@ -94,7 +94,7 @@ class TapestryController
         }
 
         $this->_addNodes($tapestry->nodes);
-        $this->_updateGroups($tapestry->groups);
+        $this->_addGroups($tapestry->groups);
 
         if (!empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
@@ -185,7 +185,7 @@ class TapestryController
             return $this->_throwsError('GROUP_ALREADY_EXISTS');
         }
 
-        $this->_updateGroups([$group]);
+        $this->_addGroups([$group]);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
@@ -349,17 +349,13 @@ class TapestryController
         }
     }
 
-    private function _updateGroups($groups)
+    private function _addGroups($groups)
     {
         foreach ($groups as $group) {
-            if (!$this->_isValidTapestryGroup($group->id)) {
-                $group->id = add_post_meta($this->postId, 'group', $group);
-            }
+            $group->id = add_post_meta($this->postId, 'group', $group);
 
             // TODO: handle the local nodes logic here
             // At the moment, we put everything in the post meta
-
-            update_metadata_by_mid('post', $group->id, $group);
         }
     }
 
