@@ -52,7 +52,13 @@ class TapestryController
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
 
-        $this->_updateNodes($tapestry->nodes);
+        if (isset($tapestry->nodes) && isset($tapestry->links)) {
+            $oldNodeIds = array_map(function ($node) {
+                return $node->id;
+            }, $tapestry->nodes);
+        }
+
+        $this->_addNodes($tapestry->nodes);
 
         $this->_updateGroups($tapestry->groups);
 
@@ -63,6 +69,8 @@ class TapestryController
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
 
         $tapestry->groups = $this->_getGroupIds($tapestry->groups);
+
+        $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes, $oldNodeIds);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
@@ -85,7 +93,7 @@ class TapestryController
             return $this->_throwsError('NODE_ALREADY_EXISTS');
         }
 
-        $this->_updateNodes([$node]);
+        $this->_addNodes([$node]);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
@@ -153,6 +161,32 @@ class TapestryController
     }
 
     /**
+     * Add A Tapestry Link
+     * 
+     * @param Object $link Tapestry link
+     * 
+     * @return Object $link 
+     */
+    public function addTapestryLink($link)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!is_array($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
+        array_push($tapestry->links, $link);
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $tapestry->links;
+    }
+
+    /**
      * Retrieve a Tapestry post
      * 
      * @return Object $tapestry
@@ -183,8 +217,6 @@ class TapestryController
             $tapestry->groups
         );
 
-        // TODO: delete the below when being able to create tapestry from scratch
-        $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes);
         return $tapestry;
     }
 
@@ -200,23 +232,18 @@ class TapestryController
     }
 
     /**
-     * TODO: Remove this when we can build a tapestry from scratch
      * HACK - create a new links array that works with new IDs
      */
-    private function _getNewLinks($oldLinks, $nodes)
+    private function _getNewLinks($oldLinks, $newNodeIds, $oldNodeIds)
     {
-        $mappings = array(
-            1 => $nodes[0]->id,
-            2 => $nodes[1]->id,
-            3 => $nodes[2]->id,
-            4 => $nodes[3]->id,
-            5 => $nodes[4]->id,
-            6 => $nodes[5]->id,
-            8 => $nodes[6]->id,
-            9 => $nodes[7]->id,
-            7 => $nodes[8]->id,
-            10 => $nodes[9]->id
-        );
+        if (!isset($oldNodeIds)) {
+            return [];
+        }
+
+        foreach ($oldNodeIds as $index => $oldNodeId) {
+            $mappings[$oldNodeId] = $newNodeIds[$index];
+        }
+
         $newLinks = array_map(function ($link) use ($mappings) {
             $link->source = $mappings[$link->source];
             $link->target = $mappings[$link->target];
@@ -261,17 +288,12 @@ class TapestryController
         return false;
     }
 
-    private function _updateNodes($nodes)
+    private function _addNodes($nodes)
     {
         foreach ($nodes as $node) {
-            if ($this->_isValidTapestryNode($node->id)) {
-                $metadata = get_metadata_by_mid('post', $node->id)->meta_value;
-                $nodePostId = $metadata->post_id;
-            } else {
-                $nodePostId = $this->_updatePost($node, 'tapestry_node');
-                $metadata = $this->_makeMetadata($node, $nodePostId);
-                $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
-            }
+            $nodePostId = $this->_updatePost($node, 'tapestry_node');
+            $metadata = $this->_makeMetadata($node, $nodePostId);
+            $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
             update_post_meta($nodePostId, 'tapestry_node_data', $node);
         }
     }

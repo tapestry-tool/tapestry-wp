@@ -7,6 +7,18 @@
 require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 
+$REST_API = (object)[
+    'NAMESPACE' => 'tapestry-tool/v1',
+    'POST_TAPESTRY_LINK' => (object)[
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
+        'ARGUMENTS' => [
+            'methods' => 'POST',
+            'callback' => 'addTapestryLink',
+            'permission_callback' => 'TapestryPermissions::postTapestryLink'
+        ]
+    ]
+];
+
 /**
  * Add a tapestry node
  * 
@@ -114,4 +126,34 @@ function addTapestryGroup($request) {
     // make sure the type of the group body exists and is 'tapestry_group'
     $tapestryController = new TapestryController($postId);
     return $tapestryController->addTapestryGroup($data);
+}
+
+/**
+ * POST_TAPESTRY_LINK
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->POST_TAPESTRY_LINK->ROUTE,
+            $REST_API->POST_TAPESTRY_LINK->ARGUMENTS
+        );
+    }
+);
+/**
+ * Add A Tapestry Link
+ * 
+ * @param Object $request HTTP request
+ *
+ * @return Object HTTP response
+ */
+function addTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the link object has all required attibutes - src, target etc.
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addTapestryLink($data);
 }

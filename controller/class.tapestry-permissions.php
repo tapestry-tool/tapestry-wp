@@ -8,16 +8,10 @@ class TapestryPermissions
     /**
      * Post Tapestry Permission
      * 
-     * @param Object $request request
-     *
      * @return Object $permission permission
      */
-    static function postTapestry($request)
+    static function postTapestry()
     {
-        $data = json_decode($request->get_body());
-        if (isset($data->postId)) {
-            return current_user_can('edit', $data->postId);
-        }
         return current_user_can('publish_posts');
     }
 
@@ -61,6 +55,22 @@ class TapestryPermissions
      * @return Object $permission permission
      */
     static function postTapestryNode($request)
+    {
+        $postId = $request['tapestryPostId'];
+        if (isset($postId)) {
+            return current_user_can('edit', $postId);
+        }
+        return false;
+    }
+
+    /**
+     * Post Tapestry Link Permission
+     *
+     * @param Object $request request
+     *
+     * @return Object $permission permission
+     */
+    static function postTapestryLink($request)
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
