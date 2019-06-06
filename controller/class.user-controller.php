@@ -21,7 +21,9 @@ class TapestryUserController
      * @param Integer $postId        the post's ID
      * @param Integer $nodeId        the current node being viewed
      * @param Float   $progressValue how much the video was viewed, value should be between >= 0 and <= 1
-    */
+     *
+     * @return Null
+     */
     public function updateProgress($postId, $nodeId, $progressValue) 
     {
         $this->_checkUserAndPostId($postId);
