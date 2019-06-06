@@ -65,7 +65,7 @@ class TapestryController
 
         $this->_updateGroups($tapestry->groups);
 
-        if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
+        if (!empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
         }
 
