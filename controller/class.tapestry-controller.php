@@ -53,9 +53,12 @@ class TapestryController
         }
 
         if (isset($tapestry->nodes) && isset($tapestry->links)) {
-            $oldNodeIds = array_map(function ($node) {
-                return $node->id;
-            }, $tapestry->nodes);
+            $oldNodeIds = array_map(
+                function ($node) {
+                    return $node->id;
+                },
+                $tapestry->nodes
+            );
         }
 
         $this->_addNodes($tapestry->nodes);
@@ -70,7 +73,11 @@ class TapestryController
 
         $tapestry->groups = $this->_getGroupIds($tapestry->groups);
 
-        $tapestry->links = $this->_getNewLinks($tapestry->links, $tapestry->nodes, $oldNodeIds);
+        $tapestry->links = $this->_getNewLinks(
+            $tapestry->links,
+            $tapestry->nodes,
+            $oldNodeIds
+        );
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $tapestry;
