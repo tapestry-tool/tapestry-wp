@@ -61,24 +61,21 @@ class TapestryController
      * Update the existing Tapestry if the postId is provided
      * Otherwise, a new Tapestry will be created
      * 
-     * @param Object $tapestry Tapestry
+     * @param   Object  $tapestry   Tapestry
      * 
-     * @return Object $tapestry
+     * @return  Object  $tapestry
      */
     public function updateTapestry($tapestry)
     {
         if (!$this->postId) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');
         }
-
         if (!isset($tapestry->nodes)) {
             $tapestry->nodes = [];
         }
-
         if (!isset($tapestry->groups)) {
             $tapestry->groups = [];
         }
-
         foreach ($tapestry->nodes as $node) {
             if (!isset($node->permissions)) {
                 $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
@@ -86,7 +83,6 @@ class TapestryController
         }
 
         $this->_updateNodes($tapestry->nodes);
-
         $this->_updateGroups($tapestry->groups);
 
         if (!isset($tapestry->rootId) && !empty($tapestry->nodes)) {
@@ -94,7 +90,6 @@ class TapestryController
         }
 
         $tapestry->nodes = $this->_getNodeIds($tapestry->nodes);
-
         $tapestry->groups = $this->_getGroupIds($tapestry->groups);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
@@ -105,20 +100,18 @@ class TapestryController
     /**	
      * Add a Tapestry node
      *
-     * @param Object $node Tapestry node
+     * @param   Object  $node   Tapestry node
      * 
-     * @return Object $node
+     * @return  Object  $node
      */
     public function addTapestryNode($node)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-
         if ($this->_isValidTapestryNode($node->id)) {
             return $this->_throwsError('NODE_ALREADY_EXISTS');
         }
-
         if (!isset($node->permissions)) {
             $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
         }
@@ -137,21 +130,19 @@ class TapestryController
     /**
      * Update Tapestry Node Permissions
      * 
-     * @param Integer $nodeMetaId Node meta id
-     * @param Object $permissions Node permissions
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   Object  $permissions    Node permissions
      *
-     * @return Object $permissions
+     * @return  Object  $permissions
      */
     public function updateTapestryNodePermissions($nodeMetaId, $permissions)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-
         if (!$this->_isValidTapestryNode($nodeMetaId)) {
             return $this->_throwsError('INVALID_NODE_META_ID');
         }
-
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
@@ -159,7 +150,6 @@ class TapestryController
         // TODO: validate that $permissions has appropriate/valid info
 
         $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-
         $nodeMetadata->permissions = $permissions;
 
         update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
@@ -170,16 +160,15 @@ class TapestryController
     /**
      * Add a new Tapestry group
      * 
-     * @param Object $group Tapestry group
+     * @param   Object  $group  Tapestry group
      * 
-     * @return Object $group
+     * @return  Object  $group
      */
     public function addTapestryGroup($group)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-
         if ($this->_isValidTapestryGroup($group->id)) {
             return $this->_throwsError('GROUP_ALREADY_EXISTS');
         }
@@ -202,9 +191,9 @@ class TapestryController
     /**
      * Update Tapestry settings
      * 
-     * @param Object $settings Tapestry settings
+     * @param   Object  $settings   Tapestry settings
      * 
-     * @return Object $settings 
+     * @return  Object  $settings 
      */
     public function updateTapestrySettings($settings)
     {
@@ -226,7 +215,7 @@ class TapestryController
     /**
      * Retrieve a Tapestry post
      * 
-     * @return Object $tapestry
+     * @return  Object  $tapestry
      */
     public function getTapestry()
     {
@@ -416,10 +405,10 @@ class TapestryController
     private function _makeMetadata($node, $nodePostId)
     {
         return (object)array(
-            'post_id' => $nodePostId,
-            'title' => $node->title,
-            'permissions' => $node->permissions,
-            'coordinates' => (object)array(
+            'post_id'       => $nodePostId,
+            'title'         => $node->title,
+            'permissions'   => $node->permissions,
+            'coordinates'   => (object)array(
                 'x' => $node->fx,
                 'y' => $node->fy
             )
