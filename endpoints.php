@@ -10,50 +10,50 @@ require __DIR__ . '/controller/class.tapestry-controller.php';
 $REST_API = (object)[
     'NAMESPACE' => 'tapestry-tool/v1',
     'POST_TAPESTRY_NODE' => (object)[
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
-            'methods' => 'POST',
-            'callback' => 'addTapestryNode',
-            'permission_callback' => 'TapestryPermissions::postTapestryNode'
+            'methods'               => 'POST',
+            'callback'              => 'addTapestryNode',
+            'permission_callback'   => 'TapestryPermissions::postTapestryNode'
         ]
     ],
     'POST_TAPESTRY' => (object)[
-        'ROUTE' => '/tapestries',
+        'ROUTE'     => '/tapestries',
         'ARGUMENTS' => [
-            'methods' => 'POST',
-            'callback' => 'updateTapestry',
-            'permission_callback' => 'TapestryPermissions::postTapestry'
+            'methods'               => 'POST',
+            'callback'              => 'updateTapestry',
+            'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
     ],
     'PUT_TAPESTRY_SETTINGS' => (object)[
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
         'ARGUMENTS' => [
-            'methods' => 'PUT',
-            'callback' => 'updateTapestrySettings',
-            'permission_callback' => 'TapestryPermissions::putTapestrySettings'
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestrySettings',
+            'permission_callback'   => 'TapestryPermissions::putTapestrySettings'
         ]
     ],
     'GET_TAPESTRY' => (object)[
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods' => 'GET',
-            'callback' => 'getTapestry'
+            'methods'   => 'GET',
+            'callback'  => 'getTapestry'
         ]
     ],
     'POST_TAPESTRY_GROUP' => (object)[
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
         'ARGUMENTS' => [
-            'methods' => 'POST',
-            'callback' => 'addTapestryGroup',
-            'permission_callback' => 'TapestryPermissions::postTapestryGroup'
+            'methods'               => 'POST',
+            'callback'              => 'addTapestryGroup',
+            'permission_callback'   => 'TapestryPermissions::postTapestryGroup'
         ]
     ],
     'PUT_TAPESTRY_NODE_PERMISSIONS' => (object)[
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
-            'methods' => 'PUT',
-            'callback' => 'updateTapestryNodePermissions',
-            'permission_callback' => 'TapestryPermissions::putTapestryNodePermissions'
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodePermissions',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodePermissions'
         ]
     ]
 ];
