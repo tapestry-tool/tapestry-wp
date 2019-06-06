@@ -45,7 +45,7 @@ class TapestryController
             'STATUS'    => ['status' => 400]
         ],
         'INVALID_TAPESTRY_DATA' => [
-            'MESSAGE'   => 'Tapestry should only have one root node when being created',
+            'MESSAGE'   => 'Tapestry should have at max one root node when being created',
             'STATUS'    => ['status' => 400]
         ]
     ];
@@ -63,18 +63,19 @@ class TapestryController
     }
 
     /**
-     * Update Tapestry nodes first then
-     * Update the existing Tapestry if the postId is provided
-     * Otherwise, a new Tapestry will be created
+     * Add A Tapestry
+     * 
+     * Note: the Tapestry should have at max one root node
+     * There should not be any links available at this moment
      * 
      * @param   Object  $tapestry   Tapestry
      * 
      * @return  Object  $tapestry
      */
-    public function updateTapestry($tapestry)
+    public function addTapestry($tapestry)
     {
         if (isset($tapestry->links) || count($tapestry->nodes) > 1) {
-            $this->_throwsError('INVALID_TAPESTRY_DATA');
+            return $this->_throwsError('INVALID_TAPESTRY_DATA');
         }
         if (!$this->postId) {
             $this->postId = $this->_updatePost($tapestry, 'tapestry');

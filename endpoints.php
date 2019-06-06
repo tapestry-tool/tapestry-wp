@@ -21,7 +21,7 @@ $REST_API = (object)[
         'ROUTE'     => '/tapestries',
         'ARGUMENTS' => [
             'methods'               => 'POST',
-            'callback'              => 'updateTapestry',
+            'callback'              => 'addTapestry',
             'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
     ],
@@ -111,18 +111,18 @@ add_action(
     }
 );
 /**
- * Update/Add a tapestry
+ * Add a tapestry
  * 
  * @param   Object  $request    HTTP request
  * 
  * @return  Object  $response   HTTP response
  */
-function updateTapestry($request)
+function addTapestry($request)
 {
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     $tapestryController = new TapestryController($data->postId);
-    return $tapestryController->updateTapestry($data);
+    return $tapestryController->addTapestry($data);
 }
 
 /**
