@@ -12,13 +12,15 @@ class TapestryController
     ];
     const NODE_PERMISSIONS = [
         'DEFAULT' => [
-            'public' => 'read'
+            'public' => ['read']
         ],
         'OPTIONS' => [
-            'READ_NODE' => 'read',
-            'EDIT_SUBMIT_NODE' => 'edit_submit',
-            'ADD_SUBMIT_NODE' => 'add_submit',
-            'DELETE_NODE' => 'delete'
+            'ADD' => 'add',
+            'READ' => 'read',
+            'EDIT' => 'edit',
+            'APPROVE' => 'approve',
+            'EDIT_SUBMIT' => 'edit_submit',
+            'ADD_SUBMIT' => 'add_submit',
         ]
     ];
     const ERRORS = [
