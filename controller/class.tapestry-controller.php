@@ -7,7 +7,7 @@
 class TapestryController
 {
     const POST_TYPES = [
-        'TAPESTRY' => 'tapestry',
+        'TAPESTRY'      => 'tapestry',
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
     const NODE_PERMISSIONS = [
@@ -15,34 +15,34 @@ class TapestryController
             'public' => ['read']
         ],
         'OPTIONS' => [
-            'ADD' => 'add',
-            'READ' => 'read',
-            'EDIT' => 'edit',
-            'APPROVE' => 'approve',
-            'EDIT_SUBMIT' => 'edit_submit',
-            'ADD_SUBMIT' => 'add_submit',
+            'ADD'           => 'add',
+            'READ'          => 'read',
+            'EDIT'          => 'edit',
+            'APPROVE'       => 'approve',
+            'EDIT_SUBMIT'   => 'edit_submit',
+            'ADD_SUBMIT'    => 'add_submit',
         ]
     ];
     const ERRORS = [
         'INVALID_POST_ID' => [
-            'MESSAGE' => 'PostID is invalid',
-            'STATUS' => ['status' => 404]
+            'MESSAGE'   => 'PostID is invalid',
+            'STATUS'    => ['status' => 404]
         ],
         'INVALID_NODE_META_ID' => [
-            'MESSAGE' => 'NodeMetaId is invalid',
-            'STATUS' => ['status' => 404]
+            'MESSAGE'   => 'NodeMetaId is invalid',
+            'STATUS'    => ['status' => 404]
         ],
         'GROUP_ALREADY_EXISTS' => [
-            'MESSAGE' => 'Group already exists in the database',
-            'STATUS' => ['status' => 400]
+            'MESSAGE'   => 'Group already exists in the database',
+            'STATUS'    => ['status' => 400]
         ],
         'NODE_ALREADY_EXISTS' => [
-            'MESSAGE' => 'Node already exists in the database',
-            'STATUS' => ['status' => 400]
+            'MESSAGE'   => 'Node already exists in the database',
+            'STATUS'    => ['status' => 400]
         ],
         'INVALID_CHILD_NODE' => [
-            'MESSAGE' => 'Node is not a child of the tapestry',
-            'STATUS' => ['status' => 400]
+            'MESSAGE'   => 'Node is not a child of the tapestry',
+            'STATUS'    => ['status' => 400]
         ]
     ];
     private $postId;
