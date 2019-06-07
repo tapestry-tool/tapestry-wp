@@ -260,10 +260,6 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        if (!is_array($tapestry->links)) {
-            $tapestry->links = [];
-        }
-
         array_push($tapestry->links, $link);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
