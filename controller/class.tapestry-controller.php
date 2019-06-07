@@ -62,12 +62,13 @@ class TapestryController
     /**
      * Constructor
      */
-    public function __construct($postId = 0)
+    public function __construct($postId)
     {
-        if ($postId && !$this->_isValidTapestry($postId)) {
-            return $this->_throwsError('INVALID_POST_ID');
+        if ($postId && $this->_isValidTapestry($postId)) {
+            $this->postId = (int)$postId;
+        } else {
+            $this->postId = null;
         }
-        $this->postId = (int)$postId;
     }
 
     /**
@@ -82,7 +83,7 @@ class TapestryController
      */
     public function addTapestry($tapestry)
     {
-        if ($this->postId != 0) {
+        if ($this->postId) {
             return $this->_throwsError('POST_ID_ALREADY_SET');
         }
         if (isset($tapestry->links) || count($tapestry->nodes) > 1) {
