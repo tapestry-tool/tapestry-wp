@@ -166,7 +166,7 @@ class TapestryController
 
         update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
 
-        return $nodeMetadata->permissions;
+        return $permissions;
     }
 
     /**
@@ -221,7 +221,8 @@ class TapestryController
         $this->_updatePost($tapestry, 'tapestry');
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
-        return $tapestry->settings;
+
+        return $settings;
     }
 
     /**
@@ -247,7 +248,7 @@ class TapestryController
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
-        return $tapestry->links;
+        return $link;
     }
 
     /**
