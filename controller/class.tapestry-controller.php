@@ -364,8 +364,9 @@ class TapestryController
     private function _addNode($node)
     {
         $nodePostId = $this->_updatePost($node, 'tapestry_node');
-        $metadata = $this->_makeMetadata($node, $nodePostId);
-        $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
+        $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
+        $node->id = add_post_meta($this->postId, 'tapestry_node', $nodeMetadata);
+
         update_post_meta($nodePostId, 'tapestry_node_data', $node);
     }
 
