@@ -8,25 +8,19 @@ class TapestryPermissions
     /**
      * Post Tapestry Permission
      * 
-     * @param Object $request request
-     *
-     * @return Object $permission permission
+     * @return  Object  $permission permission
      */
-    static function postTapestry($request)
+    static function postTapestry()
     {
-        $data = json_decode($request->get_body());
-        if (isset($data->postId)) {
-            return current_user_can('edit', $data->postId);
-        }
         return current_user_can('publish_posts');
     }
 
     /**
      * Post Tapestry Group
      * 
-     * @param Object $request request
+     * @param   Object  $request    request
      * 
-     * @return Object $permission permission
+     * @return  Object  $permission permission
      */
     static function postTapestryGroup($request)
     {
@@ -40,9 +34,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Settings
      * 
-     * @param Object $request request
+     * @param   Object  $request    request
      * 
-     * @return Object $permission permission
+     * @return  Object  $permission permission
      */
     static function putTapestrySettings($request)
     {
@@ -56,9 +50,9 @@ class TapestryPermissions
     /**
      * Post Tapestry Node
      * 
-     * @param Object $request request
+     * @param   Object  $request    request
      * 
-     * @return Object $permission permission
+     * @return  Object  $permission permission
      */
     static function postTapestryNode($request)
     {
@@ -72,11 +66,27 @@ class TapestryPermissions
     /**
      * Put Tapestry Node Permissions
      * 
-     * @param Object $request request
+     * @param   Object  $request    request
      * 
-     * @return Object $permission permission
+     * @return  Object  $permission permission
      */
     static function putTapestryNodePermissions($request)
+    {
+        $postId = $request['tapestryPostId'];
+        if (isset($postId)) {
+            return current_user_can('edit', $postId);
+        }
+        return false;
+    }
+
+    /**
+     * Post Tapestry Link Permission
+     *
+     * @param   Object  $request    request
+     *
+     * @return  Object  $permission permission
+     */
+    static function postTapestryLink($request)
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {

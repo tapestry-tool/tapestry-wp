@@ -21,7 +21,7 @@ $REST_API = (object)[
         'ROUTE'     => '/tapestries',
         'ARGUMENTS' => [
             'methods'               => 'POST',
-            'callback'              => 'updateTapestry',
+            'callback'              => 'addTapestry',
             'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
     ],
@@ -55,6 +55,14 @@ $REST_API = (object)[
             'callback'              => 'updateTapestryNodePermissions',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodePermissions'
         ]
+    ],
+    'POST_TAPESTRY_LINK' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'addTapestryLink',
+            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+        ]
     ]
 ];
 
@@ -74,9 +82,9 @@ add_action(
 /**
  * Add a tapestry node
  * 
- * @param Object $request HTTP request
+ * @param   Object  $request    HTTP request
  * 
- * @return Object HTTP response 
+ * @return  Object  HTTP response 
  */
 function addTapestryNode($request)
 {
@@ -103,18 +111,18 @@ add_action(
     }
 );
 /**
- * Update/Add a tapestry
+ * Add a tapestry
  * 
- * @param Object $request HTTP request
+ * @param   Object  $request    HTTP request
  * 
- * @return Object HTTP response 
+ * @return  Object  $response   HTTP response
  */
-function updateTapestry($request)
+function addTapestry($request)
 {
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
-    $tapestryController = new TapestryController($data->postId);
-    return $tapestryController->updateTapestry($data);
+    $tapestryController = new TapestryController();
+    return $tapestryController->addTapestry($data);
 }
 
 /**
@@ -133,9 +141,9 @@ add_action(
 /**
  * Update Tapestry Settings
  * 
- * @param Object $request HTTP request
+ * @param   Object  $request    HTTP request
  * 
- * @return Object HTTP response 
+ * @return  Object  $response   HTTP response 
  */
 function updateTapestrySettings($request)
 {
@@ -162,9 +170,9 @@ add_action(
 /**
  * Get a Tapestry
  * 
- * @param Object $request HTTP request
+ * @param   Object  $request    HTTP request
  * 
- * @return Object HTTP response 
+ * @return  Object  $response   HTTP response
  */
 function getTapestry($request)
 {
@@ -189,9 +197,9 @@ add_action(
 /**
  * Add a Tapestry Group
  * 
- * @param Object $request HTTP request
- *
- * @return Object HTTP response 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
  */
 function addTapestryGroup($request)
 {
@@ -219,9 +227,9 @@ add_action(
 /**
  * Update Tapestry Node Permissions
  * 
- * @param Object $request HTTP request
- *
- * @return Object HTTP response
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
  */
 function updateTapestryNodePermissions($request)
 {
@@ -232,4 +240,34 @@ function updateTapestryNodePermissions($request)
     // make sure the permissions body exists and not null
     $tapestryController = new TapestryController($postId);
     return $tapestryController->updateTapestryNodePermissions($nodeMetaId, $data);
+}
+
+/**
+ * POST_TAPESTRY_LINK
+ */
+add_action(
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->POST_TAPESTRY_LINK->ROUTE,
+            $REST_API->POST_TAPESTRY_LINK->ARGUMENTS
+        );
+    }
+);
+/**
+ * Add A Tapestry Link
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function addTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the link object has all required attibutes - src, target etc.
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addTapestryLink($data);
 }
