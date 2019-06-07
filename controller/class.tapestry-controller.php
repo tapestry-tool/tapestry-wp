@@ -45,7 +45,7 @@ class TapestryController
             'STATUS'    => ['status' => 400]
         ],
         'INVALID_NEW_TAPESTRY' => [
-            'MESSAGE'   => 'Tapestry should have at max one root node when being created',
+            'MESSAGE'   => 'Settings do not exist when creating a new Tapestry',
             'STATUS'    => ['status' => 400]
         ],
         'INVALID_NEW_LINK' => [
@@ -94,6 +94,9 @@ class TapestryController
     {
         if ($this->postId) {
             return $this->_throwsError('POST_ID_ALREADY_SET');
+        }
+        if (empty($tapestry->settings)) {
+            return $this->_throwsError('INVALID_NEW_TAPESTRY');
         }
         if (!empty($tapestry->nodes)) {
             return $this->_throwsError('NODES_EXIST_IN_NEW_TAPESTRY');
