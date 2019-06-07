@@ -44,9 +44,17 @@ class TapestryController
             'MESSAGE'   => 'Node is not a child of the tapestry',
             'STATUS'    => ['status' => 400]
         ],
-        'INVALID_TAPESTRY' => [
+        'INVALID_NEW_TAPESTRY' => [
             'MESSAGE'   => 'Tapestry should have at max one root node when being created',
             'STATUS'    => ['status' => 400]
+        ],
+        'INVALID_NEW_LINK' => [
+            'MESSAGE'   => 'New Tapestry link is invalid',
+            'STATUS'    => ['status' => 400]
+        ],
+        'POST_ID_ALREADY_SET' => [
+            'MESSAGE'   => 'PostID is set when creating a new Tapestry',
+            'STATUS'    => ['status' => 500]
         ]
     ];
     private $postId;
@@ -74,11 +82,11 @@ class TapestryController
      */
     public function addTapestry($tapestry)
     {
-        if (isset($tapestry->links) || count($tapestry->nodes) > 1) {
-            return $this->_throwsError('INVALID_TAPESTRY');
+        if ($this->postId != 0) {
+            return $this->_throwsError('POST_ID_ALREADY_SET');
         }
-        if (!$this->postId) {
-            $this->postId = $this->_updatePost($tapestry, 'tapestry');
+        if (isset($tapestry->links) || count($tapestry->nodes) > 1) {
+            return $this->_throwsError('INVALID_NEW_TAPESTRY');
         }
         if (!isset($tapestry->nodes)) {
             $tapestry->nodes = [];
@@ -87,14 +95,20 @@ class TapestryController
             $tapestry->groups = [];
         }
 
+        $this->postId = $this->_updatePost($tapestry, 'tapestry');
+
         foreach ($tapestry->nodes as $node) {
             if (!isset($node->permissions)) {
                 $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
             }
         }
 
-        $this->_addNodes($tapestry->nodes);
-        $this->_addGroups($tapestry->groups);
+        foreach ($tapestry->nodes as $node) {
+            $this->_addNode($node);
+        }
+        foreach ($tapestry->groups as $group) {
+            $this->_addGroup($group);
+        }
 
         if (!empty($tapestry->nodes)) {
             $tapestry->rootId = $tapestry->nodes[0]->id;
@@ -128,7 +142,7 @@ class TapestryController
             $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
         }
 
-        $this->_addNodes([$node]);
+        $this->_addNode($node);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
@@ -185,7 +199,7 @@ class TapestryController
             return $this->_throwsError('GROUP_ALREADY_EXISTS');
         }
 
-        $this->_addGroups([$group]);
+        $this->_addGroup($group);
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
@@ -236,6 +250,12 @@ class TapestryController
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$link->source || !$link->target) {
+            return $this->_throwsError('INVALID_NEW_LINK');
+        }
+        if (!$this->_isChildNodeOfTapestry($link->source) || !$this->_isChildNodeOfTapestry($link->target)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
         }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
@@ -340,24 +360,22 @@ class TapestryController
         return false;
     }
 
-    private function _addNodes($nodes)
+    private function _addNode($node)
     {
-        foreach ($nodes as $node) {
-            $nodePostId = $this->_updatePost($node, 'tapestry_node');
-            $metadata = $this->_makeMetadata($node, $nodePostId);
-            $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
-            update_post_meta($nodePostId, 'tapestry_node_data', $node);
-        }
+        $nodePostId = $this->_updatePost($node, 'tapestry_node');
+        $metadata = $this->_makeMetadata($node, $nodePostId);
+        $node->id = add_post_meta($this->postId, 'tapestry_node', $metadata);
+        update_post_meta($nodePostId, 'tapestry_node_data', $node);
     }
 
-    private function _addGroups($groups)
+    private function _addGroup($group)
     {
-        foreach ($groups as $group) {
-            $group->id = add_post_meta($this->postId, 'group', $group);
+        $group->id = add_post_meta($this->postId, 'group', $group);
 
-            // TODO: handle the local nodes logic here
-            // At the moment, we put everything in the post meta
-        }
+        // TODO: handle the local nodes logic here
+        // At the moment, we put everything in the post meta
+
+        update_metadata_by_mid('post', $group->id, $group);
     }
 
     private function _updatePost($post, $postType = 'tapestry', $postId = null)

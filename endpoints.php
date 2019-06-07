@@ -121,7 +121,7 @@ function addTapestry($request)
 {
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
-    $tapestryController = new TapestryController($data->postId);
+    $tapestryController = new TapestryController();
     return $tapestryController->addTapestry($data);
 }
 
