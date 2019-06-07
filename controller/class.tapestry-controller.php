@@ -153,36 +153,6 @@ class TapestryController
     }
 
     /**
-     * Update Tapestry Node Permissions
-     * 
-     * @param   Integer $nodeMetaId     Node meta id
-     * @param   Object  $permissions    Node permissions
-     *
-     * @return  Object  $permissions
-     */
-    public function updateTapestryNodePermissions($nodeMetaId, $permissions)
-    {
-        if (!$this->postId) {
-            return $this->_throwsError('INVALID_POST_ID');
-        }
-        if (!$this->_isValidTapestryNode($nodeMetaId)) {
-            return $this->_throwsError('INVALID_NODE_META_ID');
-        }
-        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
-            return $this->_throwsError('INVALID_CHILD_NODE');
-        }
-
-        // TODO: validate that $permissions has appropriate/valid info
-
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->permissions = $permissions;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $permissions;
-    }
-
-    /**
      * Add a new Tapestry group
      * 
      * @param   Object  $group  Tapestry group
@@ -239,6 +209,36 @@ class TapestryController
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $link;
+    }
+
+    /**
+     * Update Tapestry Node Permissions
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   Object  $permissions    Node permissions
+     *
+     * @return  Object  $permissions
+     */
+    public function updateTapestryNodePermissions($nodeMetaId, $permissions)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: validate that $permissions has appropriate/valid info
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->permissions = $permissions;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $permissions;
     }
 
     /**
