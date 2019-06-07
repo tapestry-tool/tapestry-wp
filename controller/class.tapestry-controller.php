@@ -105,9 +105,16 @@ class TapestryController
         }
 
         foreach ($tapestry->nodes as $node) {
+            if ($this->_isValidTapestryNode($node->id)) {
+                return $this->_throwsError('NODE_ALREADY_EXISTS');
+            }
             $this->_addNode($node);
         }
+
         foreach ($tapestry->groups as $group) {
+            if ($this->_isValidTapestryGroup($group->id)) {
+                return $this->_throwsError('GROUP_ALREADY_EXISTS');
+            }
             $this->_addGroup($group);
         }
 
