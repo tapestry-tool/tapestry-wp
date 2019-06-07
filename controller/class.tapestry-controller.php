@@ -380,6 +380,7 @@ class TapestryController
     private function _addGroup($group)
     {
         $group->id = add_post_meta($this->postId, 'group', $group);
+        $group->type = 'tapestry_group';
 
         // TODO: handle the local nodes logic here
         // At the moment, we put everything in the post meta
