@@ -65,7 +65,7 @@ class TapestryController
             'STATUS'    => ['status' => 400]
         ],
         'POST_ID_ALREADY_SET' => [
-            'MESSAGE'   => 'PostID is set when creating a new Tapestry',
+            'MESSAGE'   => 'PostID should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 500]
         ]
     ];
