@@ -86,9 +86,6 @@ class TapestryController
     /**
      * Add A Tapestry
      * 
-     * Note: the Tapestry should have at max one root node
-     * There should not be any links available at this moment
-     * 
      * @param   Object  $tapestry   Tapestry
      * 
      * @return  Object  $tapestry
@@ -143,6 +140,10 @@ class TapestryController
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         array_push($tapestry->nodes, $node->id);
+
+        if (empty($tapestry->rootId)) {
+            $tapestry->rootId = $tapestry->nodes[0];
+        }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
