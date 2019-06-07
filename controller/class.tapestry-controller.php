@@ -44,8 +44,8 @@ class TapestryController
             'MESSAGE'   => 'Node is not a child of the tapestry',
             'STATUS'    => ['status' => 400]
         ],
-        'INVALID_NEW_TAPESTRY' => [
-            'MESSAGE'   => 'Settings do not exist when creating a new Tapestry',
+        'SETTINGS_MISSING_IN_NEW_TAPESTRY' => [
+            'MESSAGE'   => 'Settings are required to create a new Tapestry',
             'STATUS'    => ['status' => 400]
         ],
         'INVALID_NEW_LINK' => [
@@ -53,15 +53,15 @@ class TapestryController
             'STATUS'    => ['status' => 400]
         ],
         'NODES_EXIST_IN_NEW_TAPESTRY' => [
-            'MESSAGE'   => 'Nodes exist when creating a new Tapestry',
+            'MESSAGE'   => 'Nodes should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 400]
         ],
         'GROUPS_EXIST_IN_NEW_TAPESTRY' => [
-            'MESSAGE'   => 'Groups exist when creating a new Tapestry',
+            'MESSAGE'   => 'Groups should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 400]
         ],
         'LINKS_EXIST_IN_NEW_TAPESTRY' => [
-            'MESSAGE'   => 'Links exist when creating a new Tapestry',
+            'MESSAGE'   => 'Links should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 400]
         ],
         'POST_ID_ALREADY_SET' => [
@@ -74,13 +74,12 @@ class TapestryController
     /**
      * Constructor
      */
-    public function __construct($postId = null)
+    public function __construct($postId = 0)
     {
-        if ($postId && $this->_isValidTapestry($postId)) {
-            $this->postId = (int)$postId;
-        } else {
-            $this->postId = null;
+        if ($postId && !$this->_isValidTapestry($postId)) {
+            return $this->_throwsError('INVALID_POST_ID');
         }
+        $this->postId = (int)$postId;
     }
 
     /**
@@ -96,7 +95,7 @@ class TapestryController
             return $this->_throwsError('POST_ID_ALREADY_SET');
         }
         if (empty($tapestry->settings)) {
-            return $this->_throwsError('INVALID_NEW_TAPESTRY');
+            return $this->_throwsError('SETTINGS_MISSING_IN_NEW_TAPESTRY');
         }
         if (!empty($tapestry->nodes)) {
             return $this->_throwsError('NODES_EXIST_IN_NEW_TAPESTRY');
@@ -215,31 +214,6 @@ class TapestryController
     }
 
     /**
-     * Update Tapestry settings
-     * 
-     * @param   Object  $settings   Tapestry settings
-     * 
-     * @return  Object  $settings 
-     */
-    public function updateTapestrySettings($settings)
-    {
-        if (!$this->postId) {
-            return $this->_throwsError('INVALID_POST_ID');
-        }
-
-        // TODO: add validation for the $settings
-
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-        $tapestry->settings = $settings;
-
-        $this->_updatePost($tapestry, 'tapestry');
-
-        update_post_meta($this->postId, 'tapestry', $tapestry);
-
-        return $settings;
-    }
-
-    /**
      * Add A Tapestry Link
      * 
      * @param   Object  $link   Tapestry link
@@ -265,6 +239,31 @@ class TapestryController
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $link;
+    }
+
+    /**
+     * Update Tapestry settings
+     * 
+     * @param   Object  $settings   Tapestry settings
+     * 
+     * @return  Object  $settings 
+     */
+    public function updateTapestrySettings($settings)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        // TODO: add validation for the $settings
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        $tapestry->settings = $settings;
+
+        $this->_updatePost($tapestry, 'tapestry');
+
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $settings;
     }
 
     /**
