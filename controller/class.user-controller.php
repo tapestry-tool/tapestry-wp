@@ -78,9 +78,9 @@ class TapestryUserController
     /**
      * Get User's h5p video setting for a tapestry post
      * 
-     * @param Integer  $postId the post's Id
+     * @param Integer $postId the post's Id
      *
-     * @return String  h5p     setting
+     * @return String h5p     setting
     */
     public function getH5PSettings($postId) 
     {
