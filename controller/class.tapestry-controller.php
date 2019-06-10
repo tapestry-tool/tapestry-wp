@@ -130,8 +130,10 @@ class TapestryController
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
         }
-        if ($this->_isValidTapestryNode($node->id)) {
-            return $this->_throwsError('NODE_ALREADY_EXISTS');
+        if (isset($node->id)) {
+            if ($this->_isValidTapestryNode($node->id)) {
+                return $this->_throwsError('NODE_ALREADY_EXISTS');
+            }
         }
         if (!isset($node->permissions)) {
             $node->permissions = (object)self::NODE_PERMISSIONS['DEFAULT'];
