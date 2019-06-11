@@ -321,9 +321,9 @@ add_action(
  * Get user progress on a tapestry page by post id. 
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
  * 
- * @param   Object  $request    HTTP request
+ * @param Object $request HTTP request
  * 
- * @return  Object  $response   HTTP response
+ * @return Object $response HTTP response
  */
 function getUserProgressByPostId($request) 
 {
@@ -354,7 +354,7 @@ add_action(
  * Update a single node progress by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
  * 
- * @param   Object  $request    HTTP request
+ * @param Object $request HTTP request
  * 
  */
 function updateProgressByNodeId($request) 
@@ -384,9 +384,9 @@ add_action(
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
  * 
- * @param   Object  $request    HTTP request
+ * @param Object $request HTTP request
  * 
- * @return  Object  $response   HTTP response
+ * @return Object $response HTTP response
  */
 function getUserU5PSettingsByPostId($request) 
 {
@@ -413,7 +413,7 @@ add_action(
  * Update the user's h5p settings by post id
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
  * 
- * @param   Object  $request    HTTP request
+ * @param Object $request HTTP request
  * 
  */
 function updateUserH5PSettingsByPostId($request) 
