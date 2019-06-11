@@ -1,6 +1,15 @@
 <?php
+/**
+ * Tapestry User Roles
+ * 
+ */
 class TapestryUserRoles
 {
+    /**
+     * Check if the current user is an administrator
+     * 
+     * @return Boolean
+     */
     static function isAdministrator()
     {
         return in_array(
@@ -9,6 +18,11 @@ class TapestryUserRoles
         );
     }
 
+    /**
+     * Check if the current user is an editor
+     * 
+     * @return Boolean
+     */
     static function isEditor()
     {
         return in_array(
@@ -17,6 +31,11 @@ class TapestryUserRoles
         );
     }
 
+    /**
+     * Check if the current user is an author
+     * 
+     * @return Boolean
+     */
     static function isAuthor()
     {
         return in_array(
@@ -25,6 +44,11 @@ class TapestryUserRoles
         );
     }
 
+    /**
+     * Check if the current user is a subscriber
+     * 
+     * @return Boolean
+     */
     static function isSubscriber()
     {
         return in_array(
