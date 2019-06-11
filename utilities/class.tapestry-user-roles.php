@@ -1,7 +1,6 @@
 <?php
 /**
  * Tapestry User Roles
- * 
  */
 class TapestryUserRoles
 {
