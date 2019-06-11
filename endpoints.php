@@ -325,8 +325,9 @@ add_action(
  * 
  * @return  Object  $response   HTTP response
  */
-function getUserProgressByPostId($data) {
-    $postId = $data['post_id'];
+function getUserProgressByPostId($request) 
+{
+    $postId = $request['post_id'];
     $tapestryController = new TapestryController($postId);
     $nodeIdArr = $tapestryController->getTapestryNodeIds();
 
@@ -356,11 +357,12 @@ add_action(
  * @param   Object  $request    HTTP request
  * 
  */
-function updateProgressByNodeId($data) {
+function updateProgressByNodeId($request) 
+{
     $userController = new TapestryUserController;
-    $postId = $data['post_id'];
-    $nodeId = $data['node_id'];
-    $progressValue = $data['progress_value'];
+    $postId = $request['post_id'];
+    $nodeId = $request['node_id'];
+    $progressValue = $request['progress_value'];
     $userController->updateProgress($postId, $nodeId, $progressValue);
 }
 
@@ -386,8 +388,9 @@ add_action(
  * 
  * @return  Object  $response   HTTP response
  */
-function getUserU5PSettingsByPostId($data) {
-    $postId = $data['post_id'];
+function getUserU5PSettingsByPostId($request) 
+{
+    $postId = $request['post_id'];
     $userController = new TapestryUserController;
     return $userController->getH5PSettings($postId);
 }
@@ -413,9 +416,10 @@ add_action(
  * @param   Object  $request    HTTP request
  * 
  */
-function updateUserH5PSettingsByPostId($data) {
+function updateUserH5PSettingsByPostId($request) 
+{
     $userController = new TapestryUserController;
-    $postId = $data['post_id'];
-    $json = $data['json'];
+    $postId = $request['post_id'];
+    $json = $request['json'];
     $userController->updateH5PSettings($postId, $json);
 }
