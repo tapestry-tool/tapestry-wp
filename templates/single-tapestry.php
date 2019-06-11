@@ -21,7 +21,7 @@ get_header(); ?>
 
 			<?php endwhile; // end of the loop. ?>
 
-			<div id="root-node-btn"><i class="fas fa-plus"></i></div>
+			<div id="root-node-btn"><i class="fas fa-plus fa-3x"></i></div>
 			<div id="tapestry"></div>
 			
 			<?php include("modal/create-new-node-modal.php");?>

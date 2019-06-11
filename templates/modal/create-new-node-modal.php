@@ -60,6 +60,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
+                <button type="button" class="btn" id="submit-add-root-node">Submit</button>
                 <button type="button" class="btn" id="submit-add-new-node">Submit</button>
             </div>
         </div>
