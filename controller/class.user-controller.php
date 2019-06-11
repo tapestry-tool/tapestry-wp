@@ -47,7 +47,7 @@ class TapestryUserController
      * @param Array   $nodeIdArr is a list of ids currently in the tapestry
      *
      * @return String progress   of each node in json format
-    */
+     */
     public function getProgress($postId, $nodeIdArr) 
     {
         $this->_isValidTapestryPost($postId);
@@ -61,7 +61,7 @@ class TapestryUserController
      *
      * @param Integer $postId          the post's ID
      * @param String  $h5pSettingsData stores volume, playbackRate, quality of h5p video
-    */
+     */
     public function updateH5PSettings($postId, $h5pSettingsData) 
     {
         $this->_checkUserAndPostId($postId);
@@ -81,7 +81,7 @@ class TapestryUserController
      * @param Integer $postId the post's Id
      *
      * @return String h5p     setting
-    */
+     */
     public function getH5PSettings($postId) 
     {
         $this->_isValidTapestryPost($postId);
@@ -122,7 +122,7 @@ class TapestryUserController
         return json_encode($settings);
     }
 
-    // Helpers
+    /* Helpers */
 
     private function _checkUserAndPostId($postId) 
     {
