@@ -8,70 +8,6 @@ require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 require __DIR__ . '/controller/class.user-controller.php';
 
- // User endpoints
-
-// Get user progress on a tapestry page by post id. 
-// Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'tapestry-tool/v1', 'users/progress/', array(
-        'methods' => 'GET',
-        'callback' => 'tapestry_get_user_progress_by_post_id',
-    ));
-});
-function tapestry_get_user_progress_by_post_id($data) {
-    $postId = $data['post_id'];
-    $tapestryController = new TapestryController($postId);
-    $nodeIdArr = $tapestryController->getTapestryNodeIds();
-
-    $userController = new TapestryUserController;
-    return $userController->getProgress($postId, $nodeIdArr);
-}
-
-// Update a single node progress by passing in node id, post id and progress value
-// Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'tapestry-tool/v1', '/users/progress/', array(
-        'methods' => 'POST',
-        'callback' => 'tapestry_update_user_progress_by_node_id',
-    ));
-});
-function tapestry_update_user_progress_by_node_id($data) {
-    $userController = new TapestryUserController;
-    $postId = $data['post_id'];
-    $nodeId = $data['node_id'];
-    $progressValue = $data['progress_value'];
-    $userController->updateProgress($postId, $nodeId, $progressValue);
-}
-
-// Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
-// Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'tapestry-tool/v1', 'users/h5psettings/', array(
-        'methods' => 'GET',
-        'callback' => 'tapestry_get_user_h5p_settings_by_post_id',
-    ));
-});
-function tapestry_get_user_h5p_settings_by_post_id($data) {
-    $postId = $data['post_id'];
-    $userController = new TapestryUserController;
-    return $userController->getH5PSettings($postId);
-}
-
-// Get the user h5p settings by post id
-// Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'tapestry-tool/v1', '/users/h5psettings/', array(
-        'methods' => 'POST',
-        'callback' => 'tapestry_update_user_h5p_settings_by_post_id',
-    ));
-});
-function tapestry_update_user_h5p_settings_by_post_id($data) {
-    $userController = new TapestryUserController;
-    $postId = $data['post_id'];
-    $json = $data['json'];
-    $userController->updateH5PSettings($postId, $json);
-}
-
 $REST_API = (object)[
     'NAMESPACE' => 'tapestry-tool/v1',
     'POST_TAPESTRY_NODE' => (object)[
@@ -128,7 +64,35 @@ $REST_API = (object)[
             'callback'              => 'addTapestryLink',
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
-    ]
+    ],
+    'GET_TAPESTRY_PROGRESS' => (object)[
+        'ROUTE'     => 'users/progress',
+        'ARGUMENTS' => [
+            'methods'               => 'GET',
+            'callback'              => 'getUserProgressByPostId',
+        ]
+    ],
+    'UPDATE_TAPESTRY_PROGRESS' => (object)[
+        'ROUTE'     => 'users/progress',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'updateProgressByNodeId',
+        ]
+    ],
+    'GET_H5P_SETTING' => (object)[
+        'ROUTE'     => 'users/h5psettings',
+        'ARGUMENTS' => [
+            'methods'               => 'GET',
+            'callback'              => 'getUserU5PSettingsByPostId',
+        ]
+    ],
+    'UPDATE_H5P_SETTING' => (object)[
+        'ROUTE'     => 'users/h5psettings',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'updateUserH5PSettingsByPostId',
+        ]
+    ],
 ];
 
 /**
@@ -335,4 +299,123 @@ function addTapestryLink($request)
     // make sure the link object has all required attibutes - src, target etc.
     $tapestryController = new TapestryController($postId);
     return $tapestryController->addTapestryLink($data);
+}
+
+/* User endpoints */
+
+/**
+ * GET_TAPESTRY_PROGRESS
+ */
+add_action( 
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->GET_TAPESTRY_PROGRESS->ROUTE,
+            $REST_API->GET_TAPESTRY_PROGRESS->ARGUMENTS
+        );
+    }
+);
+
+/**
+ * Get user progress on a tapestry page by post id. 
+ * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function getUserProgressByPostId($data) {
+    $postId = $data['post_id'];
+    $tapestryController = new TapestryController($postId);
+    $nodeIdArr = $tapestryController->getTapestryNodeIds();
+
+    $userController = new TapestryUserController;
+    return $userController->getProgress($postId, $nodeIdArr);
+}
+
+/**
+ * UPDATE_TAPESTRY_PROGRESS
+ */
+add_action( 
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->UPDATE_TAPESTRY_PROGRESS->ROUTE,
+            $REST_API->UPDATE_TAPESTRY_PROGRESS->ARGUMENTS
+        );
+    }
+);
+
+
+/**
+ * Update a single node progress by passing in node id, post id and progress value
+ * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ */
+function updateProgressByNodeId($data) {
+    $userController = new TapestryUserController;
+    $postId = $data['post_id'];
+    $nodeId = $data['node_id'];
+    $progressValue = $data['progress_value'];
+    $userController->updateProgress($postId, $nodeId, $progressValue);
+}
+
+/**
+ * GET_H5P_SETTING
+ */
+add_action( 
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->GET_H5P_SETTING->ROUTE,
+            $REST_API->GET_H5P_SETTING->ARGUMENTS
+        );
+    }
+);
+
+/**
+ * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
+ * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function getUserU5PSettingsByPostId($data) {
+    $postId = $data['post_id'];
+    $userController = new TapestryUserController;
+    return $userController->getH5PSettings($postId);
+}
+
+/**
+ * UPDATE_H5P_SETTING
+ */
+add_action( 
+    'rest_api_init',
+    function () use ($REST_API) {
+        register_rest_route(
+            $REST_API->NAMESPACE,
+            $REST_API->UPDATE_H5P_SETTING->ROUTE,
+            $REST_API->UPDATE_H5P_SETTING->ARGUMENTS
+        );
+    }
+);
+
+/**
+ * Update the user's h5p settings by post id
+ * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ */
+function updateUserH5PSettingsByPostId($data) {
+    $userController = new TapestryUserController;
+    $postId = $data['post_id'];
+    $json = $data['json'];
+    $userController->updateH5PSettings($postId, $json);
 }
