@@ -6,6 +6,7 @@
                 <h4 class="modal-title" id="createNewNodeModalLabel"></h4>
             </div>
             <div class="modal-body" id="createNewNodeModalBody">
+                <div id="add-node-error-msg"></div>
                 <form class="form-container">
                     <label>Title
                         <input name="title" type="text" placeholder="Enter the topic title" required >
