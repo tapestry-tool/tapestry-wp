@@ -5,7 +5,7 @@
  */
 
 get_header(); ?>
-    <?php include("utility/utility.php");?>
+    <?php require "utility/utility.php";?>
     <div id="primary" class="content-area col-md-12">
         <main id="main" class="post-wrap" role="main">
             <?php while ( have_posts() ) : the_post(); ?>
@@ -21,12 +21,12 @@ get_header(); ?>
 
             <?php endwhile; // end of the loop. ?>
             <!-- Don't render add root button when there's nodes -->
-            <?php if(!doesTapestryHaveNodes(get_the_ID())): ?>
+            <?php if(!doesTapestryHaveNodes(get_the_ID())) : ?>
                 <div id="root-node-btn"><i class="fas fa-plus fa-3x"></i></div>
             <?php endif; ?>
             <div id="tapestry"></div>
             
-            <?php include("modal/create-new-node-modal.php");?>
+            <?php require "modal/create-new-node-modal.php";?>
 
             <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
             <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.css" rel="stylesheet" />
