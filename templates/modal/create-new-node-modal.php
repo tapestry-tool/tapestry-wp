@@ -51,18 +51,23 @@
                             <input name="h5p-mediaDuration" type="text" placeholder="Enter URL for MP4 Video" >
                         </label>
                         </div>
+                        <?php if(doesTapestryHaveNodes(get_the_ID())): ?>
                         <div>
                         <label>Appears at:
                             <input name="appearsAt" type="text" placeholder="Enter time the media gets unlocked" >
                         </label>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-                <button type="button" class="btn" id="submit-add-root-node">Submit</button>
-                <button type="button" class="btn" id="submit-add-new-node">Submit</button>
+                <?php if(doesTapestryHaveNodes(get_the_ID())): ?>
+                    <button type="button" class="btn" id="submit-add-new-node">Submit</button>
+                <?php else: ?>
+                    <button type="button" class="btn" id="submit-add-root-node">Submit</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
