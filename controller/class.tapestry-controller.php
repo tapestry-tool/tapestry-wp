@@ -4,6 +4,8 @@
  * 
  */
 
+include(dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php");
+
 class TapestryController
 {
     const POST_TYPES = [
@@ -279,6 +281,8 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
+        $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
+
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
                 $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
@@ -289,13 +293,19 @@ class TapestryController
             $tapestry->nodes
         );
 
-        $tapestry->groups = array_map(
-            function ($groupMetaId) {
-                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
-                return $groupMetadata->meta_value;
-            },
-            $tapestry->groups
-        );
+        if (
+            TapestryUserRoles::isAuthor() ||
+            TapestryUserRoles::isEditor() ||
+            TapestryUserRoles::isAdministrator()
+        ) {
+            $tapestry->groups = array_map(
+                function ($groupMetaId) {
+                    $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+                    return $groupMetadata->meta_value;
+                },
+                $tapestry->groups
+            );
+        }
 
         return $tapestry;
     }
@@ -415,6 +425,48 @@ class TapestryController
         return array_map(function ($group) {
             return $group->id;
         }, $groups);
+    }
+
+    private function _getUserGroupIds($userId)
+    {
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        return array_map(
+            function ($groupMetaId) use ($userId) {
+                $groupMetadata = get_metadata_by_mid('post', $groupMetaId)->meta_value;
+                if (in_array($userId, $groupMetadata->members)) {
+                    return $groupMetadata->id;
+                }
+            },
+            $tapestry->groups
+        );
+    }
+
+    private function _filterNodeMetaIdsByPermissions($nodeMetaIds)
+    {
+        $newNodeMetaIds = [];
+        $options = self::NODE_PERMISSIONS['OPTIONS'];
+        $userId = 'user-' . (string)wp_get_current_user()->ID;
+        $userGroupIds = $this->_getUserGroupIds($userId);
+
+        foreach ($nodeMetaIds as $nodeMetaId) {
+            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+
+            if (
+                in_array($options['READ'], $nodePermissions->public) ||
+                in_array($options['READ'], $nodePermissions->$userId)
+            ) {
+                array_push($newNodeMetaIds, $nodeMetaId);
+            } else {
+                foreach ($userGroupIds as $userGroupId) {
+                    $userGroupId = 'group-' . (string)$userGroupId;
+                    if (in_array($options['READ'], $nodePermissions->$userGroupId)) {
+                        array_push($newNodeMetaIds, $nodeMetaId);
+                    }
+                }
+            }
+        }
+
+        return $newNodeMetaIds;
     }
 
     private function _makeMetadata($node, $nodePostId)
