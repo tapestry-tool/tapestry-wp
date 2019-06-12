@@ -310,6 +310,22 @@ class TapestryController
         return $tapestry;
     }
 
+
+    /**
+     * Retrieve all node ids associated to a tapestry
+     * 
+     * @return Array list of node ids for a tapestry
+     */
+    public function getTapestryNodeIds() 
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        return $tapestry->nodes;
+    }
+
     private function _formNodeData($nodeData, $nodeMetadata)
     {
         // Update node data here to match its own version
