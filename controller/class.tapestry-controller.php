@@ -295,9 +295,9 @@ class TapestryController
             $tapestry->nodes
         );
 
-        if (TapestryUserRoles::isAuthor() ||
-            TapestryUserRoles::isEditor() ||
-            TapestryUserRoles::isAdministrator()
+        if (TapestryUserRoles::isAuthor() 
+            || TapestryUserRoles::isEditor()
+            || TapestryUserRoles::isAdministrator()
         ) {
             $tapestry->groups = array_map(
                 function ($groupMetaId) {
@@ -468,8 +468,8 @@ class TapestryController
         foreach ($nodeMetaIds as $nodeMetaId) {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
 
-            if (in_array($options['READ'], $nodePermissions->public) ||
-                in_array($options['READ'], $nodePermissions->$userId)
+            if (in_array($options['READ'], $nodePermissions->public)
+                || in_array($options['READ'], $nodePermissions->$userId)
             ) {
                 array_push($newNodeMetaIds, $nodeMetaId);
             } else {
@@ -489,8 +489,8 @@ class TapestryController
     {
         $newLinks = [];
         foreach ($links as $link) {
-            if (in_array($link->source, $nodeMetaIds) &&
-                in_array($link->target, $nodeMetaIds)
+            if (in_array($link->source, $nodeMetaIds)
+                && in_array($link->target, $nodeMetaIds)
             ) {
                 array_push($newLinks, $link);
             }
