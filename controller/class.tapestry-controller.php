@@ -4,7 +4,7 @@
  * 
  */
 
-include(dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php");
+require(dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php");
 
 class TapestryController
 {
@@ -316,7 +316,7 @@ class TapestryController
      * 
      * @return Array list of node ids for a tapestry
      */
-    public function getTapestryNodeIds() 
+    public function getTapestryNodeIds()
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
@@ -443,7 +443,7 @@ class TapestryController
         }, $groups);
     }
 
-    private function _getUserGroupIds($userId)
+    private function _getGroupIdsOfUser($userId)
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         return array_map(
@@ -462,7 +462,7 @@ class TapestryController
         $newNodeMetaIds = [];
         $options = self::NODE_PERMISSIONS['OPTIONS'];
         $userId = 'user-' . (string)wp_get_current_user()->ID;
-        $userGroupIds = $this->_getUserGroupIds($userId);
+        $groupIds = $this->_getGroupIdsOfUser($userId);
 
         foreach ($nodeMetaIds as $nodeMetaId) {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
@@ -473,9 +473,9 @@ class TapestryController
             ) {
                 array_push($newNodeMetaIds, $nodeMetaId);
             } else {
-                foreach ($userGroupIds as $userGroupId) {
-                    $userGroupId = 'group-' . (string)$userGroupId;
-                    if (in_array($options['READ'], $nodePermissions->$userGroupId)) {
+                foreach ($groupIds as $groupId) {
+                    $groupId = 'group-' . (string)$groupId;
+                    if (in_array($options['READ'], $nodePermissions->$groupId)) {
                         array_push($newNodeMetaIds, $nodeMetaId);
                     }
                 }
