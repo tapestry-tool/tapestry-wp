@@ -283,6 +283,8 @@ class TapestryController
 
         $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
 
+        $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
                 $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
@@ -481,6 +483,19 @@ class TapestryController
         }
 
         return $newNodeMetaIds;
+    }
+
+    private function _filterLinksByNodeMetaIds($links, $nodeMetaIds)
+    {
+        $newLinks = [];
+        foreach ($links as $link) {
+            if (in_array($link->source, $nodeMetaIds) &&
+                in_array($link->target, $nodeMetaIds)
+            ) {
+                array_push($newLinks, $link);
+            }
+        }
+        return $newLinks;
     }
 
     private function _makeMetadata($node, $nodePostId)
