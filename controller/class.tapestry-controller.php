@@ -293,8 +293,7 @@ class TapestryController
             $tapestry->nodes
         );
 
-        if (
-            TapestryUserRoles::isAuthor() ||
+        if (TapestryUserRoles::isAuthor() ||
             TapestryUserRoles::isEditor() ||
             TapestryUserRoles::isAdministrator()
         ) {
@@ -467,8 +466,7 @@ class TapestryController
         foreach ($nodeMetaIds as $nodeMetaId) {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
 
-            if (
-                in_array($options['READ'], $nodePermissions->public) ||
+            if (in_array($options['READ'], $nodePermissions->public) ||
                 in_array($options['READ'], $nodePermissions->$userId)
             ) {
                 array_push($newNodeMetaIds, $nodeMetaId);
