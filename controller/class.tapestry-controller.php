@@ -281,9 +281,7 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
-
-        $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+        $tapestry = $this->_filterTapestry($tapestry);
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
@@ -295,20 +293,13 @@ class TapestryController
             $tapestry->nodes
         );
 
-        if ((TapestryUserRoles::isAuthor())
-            || (TapestryUserRoles::isEditor())
-            || (TapestryUserRoles::isAdministrator())
-        ) {
-            $tapestry->groups = array_map(
-                function ($groupMetaId) {
-                    $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
-                    return $groupMetadata->meta_value;
-                },
-                $tapestry->groups
-            );
-        } else {
-            $tapestry->groups = [];
-        }
+        $tapestry->groups = array_map(
+            function ($groupMetaId) {
+                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+                return $groupMetadata->meta_value;
+            },
+            $tapestry->groups
+        );
 
         return $tapestry;
     }
@@ -459,6 +450,20 @@ class TapestryController
         }
 
         return $groupIds;
+    }
+
+    private function _filterTapestry($tapestry)
+    {
+        if ((!TapestryUserRoles::isAuthor())
+            && (!TapestryUserRoles::isEditor())
+            && (!TapestryUserRoles::isAdministrator())
+        ) {
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
+            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+            $tapestry->groups = $this->_getGroupIdsOfUser(wp_get_current_user()->ID);
+        }
+
+        return $tapestry;
     }
 
     private function _filterNodeMetaIdsByPermissions($nodeMetaIds)
