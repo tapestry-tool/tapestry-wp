@@ -4,6 +4,27 @@
  Template Name: Tapestry Page Template
  */
 
+/**
+ * Register Script with Nonce
+ */
+function add_nonce_to_script()
+{
+    $params = array(
+        'nonce'  => wp_create_nonce('wp_rest')
+    );
+
+	wp_register_script(
+		'wp_api_script',
+		plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry.js',
+		array('jquery'),
+		false,
+		true
+	);
+    wp_localize_script('wp_api_script', 'wpApiSettings', $params);
+    wp_enqueue_script('wp_api_script');
+}
+add_action('wp_enqueue_scripts', 'add_nonce_to_script');
+
 get_header(); ?>
 
     <div id="primary" class="content-area col-md-12">
@@ -40,7 +61,6 @@ get_header(); ?>
                 var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false);?>";
                 var tapestryWpPostId = "<?php echo get_the_ID();?>";
             </script>
-            <script src="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.js"></script>
 
         </main><!-- #main -->
     </div><!-- #primary -->
