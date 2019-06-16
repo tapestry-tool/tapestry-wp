@@ -295,9 +295,9 @@ class TapestryController
             $tapestry->nodes
         );
 
-        if (TapestryUserRoles::isAuthor() 
-            || TapestryUserRoles::isEditor()
-            || TapestryUserRoles::isAdministrator()
+        if ((TapestryUserRoles::isAuthor())
+            || (TapestryUserRoles::isEditor())
+            || (TapestryUserRoles::isAdministrator())
         ) {
             $tapestry->groups = array_map(
                 function ($groupMetaId) {
@@ -306,6 +306,8 @@ class TapestryController
                 },
                 $tapestry->groups
             );
+        } else {
+            $tapestry->groups = [];
         }
 
         return $tapestry;
@@ -446,36 +448,40 @@ class TapestryController
 
     private function _getGroupIdsOfUser($userId)
     {
+        $groupIds = [];
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
-        return array_map(
-            function ($groupMetaId) use ($userId) {
-                $groupMetadata = get_metadata_by_mid('post', $groupMetaId)->meta_value;
-                if (in_array($userId, $groupMetadata->members)) {
-                    return $groupMetadata->id;
-                }
-            },
-            $tapestry->groups
-        );
+
+        foreach ($tapestry->groups as $groupId) {
+            $groupMetadata = get_metadata_by_mid('post', $groupId)->meta_value;
+            if (in_array($userId, $groupMetadata->members)) {
+                array_push($groupIds, $groupId);
+            }
+        }
+
+        return $groupIds;
     }
 
     private function _filterNodeMetaIdsByPermissions($nodeMetaIds)
     {
         $newNodeMetaIds = [];
         $options = self::NODE_PERMISSIONS['OPTIONS'];
-        $userId = 'user-' . (string)wp_get_current_user()->ID;
+        $userId = wp_get_current_user()->ID;
         $groupIds = $this->_getGroupIdsOfUser($userId);
 
         foreach ($nodeMetaIds as $nodeMetaId) {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
 
-            if (in_array($options['READ'], $nodePermissions->public)
-                || in_array($options['READ'], $nodePermissions->$userId)
+            if ((property_exists($nodePermissions, 'public')
+                    && in_array($options['READ'], $nodePermissions->public))
+                || (property_exists($nodePermissions, 'user-' . $userId)
+                    && in_array($options['READ'], $nodePermissions->{'user-' . $userId}))
             ) {
                 array_push($newNodeMetaIds, $nodeMetaId);
             } else {
                 foreach ($groupIds as $groupId) {
-                    $groupId = 'group-' . (string)$groupId;
-                    if (in_array($options['READ'], $nodePermissions->$groupId)) {
+                    if ((property_exists($nodePermissions, 'group-' . $groupId))
+                        && (in_array($options['READ'], $nodePermissions->{'group-' . $groupId}))
+                    ) {
                         array_push($newNodeMetaIds, $nodeMetaId);
                     }
                 }
@@ -488,13 +494,15 @@ class TapestryController
     private function _filterLinksByNodeMetaIds($links, $nodeMetaIds)
     {
         $newLinks = [];
+
         foreach ($links as $link) {
-            if (in_array($link->source, $nodeMetaIds)
-                && in_array($link->target, $nodeMetaIds)
+            if ((in_array($link->source, $nodeMetaIds))
+                && (in_array($link->target, $nodeMetaIds))
             ) {
                 array_push($newLinks, $link);
             }
         }
+
         return $newLinks;
     }
 
