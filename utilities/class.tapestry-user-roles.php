@@ -44,6 +44,19 @@ class TapestryUserRoles
     }
 
     /**
+     * Check if the current user is an author of a post
+     * 
+     * @param   Integer $postId
+     *
+     * @return  Boolean
+     */
+    static function isAuthorOfThePost($postId)
+    {
+        return wp_get_current_user()->ID
+            == get_post($postId)->post_author;
+    }
+
+    /**
      * Check if the current user is a subscriber
      * 
      * @return Boolean
