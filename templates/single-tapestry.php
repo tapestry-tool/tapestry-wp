@@ -6,8 +6,10 @@
 
 /**
  * Register Script with Nonce
+ * 
+ * @return Object null
  */
-function add_nonce_to_script()
+function addNonceToScript()
 {
     $params = array(
         'nonce'  => wp_create_nonce('wp_rest')
@@ -23,7 +25,7 @@ function add_nonce_to_script()
     wp_localize_script('wp_api_script', 'wpApiSettings', $params);
     wp_enqueue_script('wp_api_script');
 }
-add_action('wp_enqueue_scripts', 'add_nonce_to_script');
+add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 get_header(); ?>
 
