@@ -46,7 +46,7 @@ class TapestryUserRoles
     /**
      * Check if the current user is an author of a post
      * 
-     * @param   Integer $postId
+     * @param   Integer $postId post ID
      *
      * @return  Boolean
      */
