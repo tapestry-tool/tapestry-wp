@@ -8,10 +8,10 @@
         <div class="modal-body" id="editNodeModalBody">
             <form class="form-container">
                 <label>Title
-                    <input name="title" type="text" placeholder="Enter the topic title" required >
+                    <input name="edit-node-title" type="text" placeholder="Enter the topic title" required >
                 </label>
                 <label>Thumbnail
-                    <input name="imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
+                    <input name="edit-node-imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
                 </label>
             </form>
         </div>
