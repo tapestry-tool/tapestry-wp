@@ -57,6 +57,18 @@
                         </label>
                         </div>
                     </div>
+                    <!-- <div id="permissions-details">
+                        <div class="row">
+                            <div>
+                                Permissions
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div>
+                                Public
+                            </div>
+                        </div>
+                    </div> -->
                 </form>
             </div>
             <div class="modal-footer">
