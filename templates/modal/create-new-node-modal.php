@@ -58,35 +58,29 @@
                         </div>
                     </div>
                     <div id="permissions-details">
-                        <div class="row">
-                            <div>
-                                Permissions
-                            </div>
-                            <div>
-                                <div>read</div>
-                                <div>add</div>
-                                <div>edit</div>
-                                <div>add-submit</div>
-                                <div>edit-submit</div>
-                                <div>approve</div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div>
-                                Public
-                            </div>
-                            <div>
-                                <div><input name="read" type="checkbox"></div>
-                                <div><input name="add" type="checkbox"></div>
-                                <div><input name="edit" type="checkbox"></div>
-                                <div><input name="add-submit" type="checkbox"></div>
-                                <div><input name="edit-submit" type="checkbox"></div>
-                                <div><input name="approve" type="checkbox"></div>
-                            </div>
-                        </div>
-                        <div>  
-                            <button type="button" class="btn" id="user-permissions-btn">User Permissions</button>
-                            <button type="button" class="btn" id="group-permissions-btn">Group Permissions</button>
+                        <table id="permissions-table">
+                        <tr>
+                            <td>Permissions</td>
+                            <td>read</td>
+                            <td>add</td>
+                            <td>edit</td>
+                            <td>add-submit</td>
+                            <td>edit-submit</td>
+                            <td>approve</td>
+                        </tr>
+                        <tr>
+                            <td>Public</td>
+                            <td><input name="read" type="checkbox"></td>
+                            <td><input name="add" type="checkbox"></td>
+                            <td><input name="edit" type="checkbox"></td>
+                            <td><input name="add-submit" type="checkbox"></td>
+                            <td><input name="edit-submit" type="checkbox"></td>
+                            <td><input name="approve" type="checkbox"></td>
+                        </tr>
+                        </table>
+                        <div class="permissions-btn-panel">  
+                            <button type="button" id="user-permissions-btn"><span class="fas fa-plus permissions-plus"></span>User</button>
+                            <button type="button" id="group-permissions-btn"><span class="fas fa-plus permissions-plus"></span>Group</button>
                         </div>
                     </div>
                 </form>
