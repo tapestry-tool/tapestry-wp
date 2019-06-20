@@ -70,16 +70,18 @@
                         </tr>
                         <tr>
                             <td>Public</td>
-                            <td><input name="read" type="checkbox"></td>
-                            <td><input name="add" type="checkbox"></td>
-                            <td><input name="edit" type="checkbox"></td>
-                            <td><input name="add-submit" type="checkbox"></td>
-                            <td><input name="edit-submit" type="checkbox"></td>
-                            <td><input name="approve" type="checkbox"></td>
+                            <td><input class="public-checkbox" id="public-read-checkbox" name="read" type="checkbox"></td>
+                            <td><input class="public-checkbox" id="public-add-checkbox" name="add" type="checkbox" disabled></td>
+                            <td><input class="public-checkbox" id="public-edit-checkbox" name="edit" type="checkbox" disabled></td>
+                            <td><input class="public-checkbox" id="public-add-sub-checkbox" name="add_submit" type="checkbox" disabled></td>
+                            <td><input class="public-checkbox" id="public-edit-sub-checkbox" name="edit_submit" type="checkbox" disabled></td>
+                            <td><input class="public-checkbox" id="public-approve-checkbox" name="approve" type="checkbox" disabled></td>
                         </tr>
                         </table>
                         <div class="permissions-btn-panel">  
+                            <input id="user-number-input" type="number" placeholder="123" >
                             <button type="button" id="user-permissions-btn"><span class="fas fa-plus permissions-plus"></span>User</button>
+                            <input id="group-number-input" type="number" placeholder="123" >
                             <button type="button" id="group-permissions-btn"><span class="fas fa-plus permissions-plus"></span>Group</button>
                         </div>
                     </div>
