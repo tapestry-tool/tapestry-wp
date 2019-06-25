@@ -258,7 +258,7 @@ class TapestryController
      * 
      * @return  Object  $settings 
      */
-    public function updateTapestrySettings($settings, $updateTapestryPost)
+    public function updateTapestrySettings($settings, $updateTapestryPost = true)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
@@ -268,7 +268,7 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        if (empty($tapestry)) {
+        if (!isset($tapestry)) {
             $tapestry =  (object)array();
         }
 
