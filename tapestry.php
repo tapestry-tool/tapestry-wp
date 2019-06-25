@@ -116,7 +116,7 @@ add_filter('single_template', 'load_tapestry_template');
  *
  * @return  Object  Null
  */
-function add_tapestry_post_meta($postId, $post, $update)
+function add_tapestry_post_meta_on_publish($postId, $post, $update)
 {
     if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
         return;
@@ -139,4 +139,4 @@ function add_tapestry_post_meta($postId, $post, $update)
 
     $tapestryController->updateTapestrySettings($settings, false);
 }
-add_action('publish_tapestry', 'add_tapestry_post_meta', 10, 3);
+add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
