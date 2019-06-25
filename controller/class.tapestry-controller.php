@@ -298,23 +298,31 @@ class TapestryController
 
         $tapestry = $this->_filterTapestry($tapestry);
 
-        $tapestry->nodes = array_map(
-            function ($nodeMetaId) {
-                $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
-                $nodePostId = $nodeMetadata->meta_value->post_id;
-                $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
-                return $this->_formNodeData($nodeData, $nodeMetadata);
-            },
-            $tapestry->nodes
-        );
+        if(isset($tapestry->nodes)) {
+            $tapestry->nodes = array_map(
+                function ($nodeMetaId) {
+                    $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
+                    $nodePostId = $nodeMetadata->meta_value->post_id;
+                    $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+                    return $this->_formNodeData($nodeData, $nodeMetadata);
+                },
+                $tapestry->nodes
+            );
+        } else {
+            $tapestry->nodes = [];
+        }
 
-        $tapestry->groups = array_map(
-            function ($groupMetaId) {
-                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
-                return $groupMetadata->meta_value;
-            },
-            $tapestry->groups
-        );
+        if(isset($tapestry->groups)) {
+            $tapestry->groups = array_map(
+                function ($groupMetaId) {
+                    $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+                    return $groupMetadata->meta_value;
+                },
+                $tapestry->groups
+            );
+        } else {
+            $tapestry->groups = [];
+        }
 
         return $tapestry;
     }
