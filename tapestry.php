@@ -86,14 +86,14 @@ add_action('init', 'create_tapestry_node_type');
 /**
  * Show posts of Tapestry type on the home page
  */
-function add_my_post_types_to_query($query)
+function add_tapestry_post_types_to_query($query)
 {
     if (is_home() && $query->is_main_query()) {
         $query->set('post_type', array('post', 'tapestry', 'tapestry-node'));
     }
     return $query;
 }
-add_action('pre_get_posts', 'add_my_post_types_to_query');
+add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 
 /**
  * Filter the template for Tapestry post
@@ -123,10 +123,9 @@ function add_tapestry_post_meta($postId, $post, $update)
     }
 
     $tapestryController = new TapestryController($postId);
-    $tapestry = get_post_meta($postId, 'tapestry', true);
+    $settings = $tapestryController->getTapestrySettings();
 
-    if ($update && $tapestry && $tapestry->settings) {
-        $settings = $tapestry->settings;
+    if ($update && !empty($settings)) {
         $settings->tapestrySlug = $post->post_name;
         $settings->title = $post->post_title;
         $settings->status = $post->post_status;
@@ -137,6 +136,7 @@ function add_tapestry_post_meta($postId, $post, $update)
             'status'        => $post->post_status
         );
     }
+
     $tapestryController->updateTapestrySettings($settings, false);
 }
 add_action('publish_tapestry', 'add_tapestry_post_meta', 10, 3);
