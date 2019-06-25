@@ -18,8 +18,9 @@ require_once(dirname(__FILE__) . '/endpoints.php');
  */
 function create_tapestry_type() {
     $labels = array(
-        "name" => __("Tapestry"),
+        "name" => __("Tapestries"),
         "singular_name" => __("Tapestry"),
+        "all_items" => __("All Tapestries")
     );
     $args = array(
         "label" => __("tapestry"),
@@ -52,8 +53,9 @@ add_action('init', 'create_tapestry_type');
  */
 function create_tapestry_node_type() {
     $labels = array(
-        "name" => __("Tapestry Node"),
+        "name" => __("Tapestry Nodes"),
         "singular_name" => __("Tapestry Node"),
+        "all_items" => __("All Tapestry Nodes")
     );
     $args = array(
         "label" => __("tapestry-node"),
