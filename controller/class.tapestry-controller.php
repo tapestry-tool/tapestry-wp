@@ -143,6 +143,10 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
         array_push($tapestry->nodes, $node->id);
 
         if (empty($tapestry->rootId)) {
@@ -206,6 +210,10 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
+        if (!isset($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
         array_push($tapestry->links, $link);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
@@ -250,7 +258,7 @@ class TapestryController
      * 
      * @return  Object  $settings 
      */
-    public function updateTapestrySettings($settings)
+    public function updateTapestrySettings($settings, $updateTapestryPost)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
@@ -269,7 +277,7 @@ class TapestryController
         $tapestry->settings;
 
         if ($updateTapestryPost) {
-        $this->_updatePost($tapestry, 'tapestry');
+            $this->_updatePost($tapestry, 'tapestry');
         }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
@@ -465,7 +473,7 @@ class TapestryController
     {
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
