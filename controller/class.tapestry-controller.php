@@ -257,9 +257,18 @@ class TapestryController
         // TODO: add validation for the $settings
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (empty($tapestry)) {
+            $tapestry =  (object)array();
+        }
+
         $tapestry->settings = $settings;
 
+        $tapestry->settings;
+
+        if ($updateTapestryPost) {
         $this->_updatePost($tapestry, 'tapestry');
+        }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 

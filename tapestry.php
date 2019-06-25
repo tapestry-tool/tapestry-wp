@@ -9,6 +9,11 @@
  */
 
 /**
+ * Register endpoints
+ */
+require_once(dirname(__FILE__) . '/endpoints.php');
+
+/**
  * Register Tapestry type on initialization
  */
 function create_tapestry_type() {
@@ -38,7 +43,7 @@ function create_tapestry_type() {
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
-     register_post_type('tapestry', $args);
+    register_post_type('tapestry', $args);
 }
 add_action('init', 'create_tapestry_type');
 
@@ -72,14 +77,15 @@ function create_tapestry_node_type() {
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
-     register_post_type('tapestry-node', $args);
+    register_post_type('tapestry-node', $args);
 }
 add_action('init', 'create_tapestry_node_type');
 
 /**
  * Show posts of Tapestry type on the home page
  */
-function add_my_post_types_to_query($query) {
+function add_my_post_types_to_query($query)
+{
     if (is_home() && $query->is_main_query()) {
         $query->set('post_type', array('post', 'tapestry', 'tapestry-node'));
     }
@@ -100,6 +106,35 @@ function load_tapestry_template($singleTemplate) {
 add_filter('single_template', 'load_tapestry_template');
 
 /**
- * Register endpoints
+ * Set Up Tapestry Post Upon Insertion
+ *
+ * @param   Integer $postId Post ID
+ * @param   Object  $post   Post Object
+ * @param   Boolean $update Post Object
+ *
+ * @return  Object  Null
  */
-require_once(dirname(__FILE__).'/endpoints.php');
+function set_up_tapestry_post($postId, $post, $update)
+{
+    if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
+        return;
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $tapestry = get_post_meta($postId, 'tapestry', true);
+
+    if ($update && $tapestry && $tapestry->settings) {
+        $settings = $tapestry->settings;
+        $settings->tapestrySlug = $post->post_name;
+        $settings->title = $post->post_title;
+        $settings->status = $post->post_status;
+    } else {
+        $settings = (object)array(
+            'tapestrySlug'  => $post->post_name,
+            'title'         => $post->post_title,
+            'status'         => $post->post_status
+        );
+    }
+    $tapestryController->updateTapestrySettings($settings, false);
+}
+add_action('publish_tapestry', 'set_up_tapestry_post', 10, 3);
