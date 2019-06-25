@@ -69,6 +69,7 @@ get_header(); ?>
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var tapestryWpPostId = "<?php echo get_the_ID(); ?>";
+            var tapestryWpIsAdmin = "<?php echo current_user_can('administrator'); ?>";
         </script>
 
         </main><!-- #main -->
