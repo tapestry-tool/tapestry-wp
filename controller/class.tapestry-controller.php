@@ -298,31 +298,23 @@ class TapestryController
 
         $tapestry = $this->_filterTapestry($tapestry);
 
-        if(isset($tapestry->nodes)) {
-            $tapestry->nodes = array_map(
-                function ($nodeMetaId) {
-                    $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
-                    $nodePostId = $nodeMetadata->meta_value->post_id;
-                    $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
-                    return $this->_formNodeData($nodeData, $nodeMetadata);
-                },
-                $tapestry->nodes
-            );
-        } else {
-            $tapestry->nodes = [];
-        }
+        $tapestry->nodes = array_map(
+            function ($nodeMetaId) {
+                $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
+                $nodePostId = $nodeMetadata->meta_value->post_id;
+                $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+                return $this->_formNodeData($nodeData, $nodeMetadata);
+            },
+            $tapestry->nodes
+        );
 
-        if(isset($tapestry->groups)) {
-            $tapestry->groups = array_map(
-                function ($groupMetaId) {
-                    $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
-                    return $groupMetadata->meta_value;
-                },
-                $tapestry->groups
-            );
-        } else {
-            $tapestry->groups = [];
-        }
+        $tapestry->groups = array_map(
+            function ($groupMetaId) {
+                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+                return $groupMetadata->meta_value;
+            },
+            $tapestry->groups
+        );
 
         return $tapestry;
     }
@@ -479,11 +471,23 @@ class TapestryController
     {
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = $this->_getGroupIdsOfUser(wp_get_current_user()->ID);
+        }
+
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
+        if (!isset($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
         }
 
         return $tapestry;
