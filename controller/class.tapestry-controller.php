@@ -473,7 +473,7 @@ class TapestryController
     {
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
-                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+            && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
