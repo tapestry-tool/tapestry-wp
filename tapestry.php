@@ -134,7 +134,7 @@ function add_tapestry_post_meta($postId, $post, $update)
         $settings = (object)array(
             'tapestrySlug'  => $post->post_name,
             'title'         => $post->post_title,
-            'status'         => $post->post_status
+            'status'        => $post->post_status
         );
     }
     $tapestryController->updateTapestrySettings($settings, false);
