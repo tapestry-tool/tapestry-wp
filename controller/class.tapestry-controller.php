@@ -319,6 +319,31 @@ class TapestryController
         return $tapestry;
     }
 
+    /**
+     * Retrieve tapestry settings
+     * 
+     * @return Object Settings
+     */
+    public function getTapestrySettings()
+    {
+        // This could be used as an endpoint if needed
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry)) {
+            $tapestry = (object)array(
+                'settings' => (object)array()
+            );
+        } else if (!isset($tapestry->settings)) {
+            $tapestry->settings = (object)array();
+        }
+
+        return $tapestry->settings;
+    }
+
 
     /**
      * Retrieve all node ids associated to a tapestry
@@ -471,7 +496,7 @@ class TapestryController
     {
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
