@@ -274,8 +274,6 @@ class TapestryController
 
         $tapestry->settings = $settings;
 
-        $tapestry->settings;
-
         if ($updateTapestryPost) {
             $this->_updatePost($tapestry, 'tapestry');
         }
