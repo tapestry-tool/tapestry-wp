@@ -145,6 +145,10 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
         array_push($tapestry->nodes, $node->id);
 
         if (empty($tapestry->rootId)) {
@@ -208,6 +212,10 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
+        if (!isset($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
         array_push($tapestry->links, $link);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
@@ -252,7 +260,7 @@ class TapestryController
      * 
      * @return  Object  $settings 
      */
-    public function updateTapestrySettings($settings)
+    public function updateTapestrySettings($settings, $updateTapestryPost = true)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');
@@ -261,9 +269,16 @@ class TapestryController
         // TODO: add validation for the $settings
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry)) {
+            $tapestry =  (object)array();
+        }
+
         $tapestry->settings = $settings;
 
-        $this->_updatePost($tapestry, 'tapestry');
+        if ($updateTapestryPost) {
+            $this->_updatePost($tapestry, 'tapestry');
+        }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
@@ -304,6 +319,31 @@ class TapestryController
         );
 
         return $tapestry;
+    }
+
+    /**
+     * Retrieve tapestry settings
+     * 
+     * @return Object Settings
+     */
+    public function getTapestrySettings()
+    {
+        // This could be used as an endpoint if needed
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry)) {
+            $tapestry = (object)array(
+                'settings' => (object)array()
+            );
+        } else if (!isset($tapestry->settings)) {
+            $tapestry->settings = (object)array();
+        }
+
+        return $tapestry->settings;
     }
 
 
@@ -458,11 +498,23 @@ class TapestryController
     {
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = $this->_getGroupIdsOfUser(wp_get_current_user()->ID);
+        }
+
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
+        if (!isset($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
         }
 
         return $tapestry;
