@@ -11,7 +11,7 @@
 /**
  * Register endpoints
  */
-require_once(dirname(__FILE__) . '/endpoints.php');
+require_once dirname(__FILE__) . '/endpoints.php';
 
 /**
  * Register Tapestry type on initialization
