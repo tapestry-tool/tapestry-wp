@@ -357,6 +357,11 @@ class TapestryController
         }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry->nodes)) {
+            return [];
+        }
+
         return $tapestry->nodes;
     }
 
@@ -494,15 +499,6 @@ class TapestryController
 
     private function _filterTapestry($tapestry)
     {
-        if ((!TapestryUserRoles::isEditor())
-            && (!TapestryUserRoles::isAdministrator()
-                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
-        ) {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
-            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
-            $tapestry->groups = $this->_getGroupIdsOfUser(wp_get_current_user()->ID);
-        }
-
         if (!isset($tapestry->nodes)) {
             $tapestry->nodes = [];
         }
@@ -513,6 +509,15 @@ class TapestryController
 
         if (!isset($tapestry->groups)) {
             $tapestry->groups = [];
+        }
+
+        if ((!TapestryUserRoles::isEditor())
+            && (!TapestryUserRoles::isAdministrator()
+                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+        ) {
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
+            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+            $tapestry->groups = $this->_getGroupIdsOfUser(wp_get_current_user()->ID);
         }
 
         return $tapestry;
