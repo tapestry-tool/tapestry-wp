@@ -270,7 +270,6 @@ class TapestryController
 
         if (empty($tapestry)) {
             $tapestry =  (object)array(
-                'settings'  => $settings,
                 'nodes'     => [],
                 'groups'    => [],
                 'links'     => []
