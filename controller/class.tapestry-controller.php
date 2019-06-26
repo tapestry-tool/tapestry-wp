@@ -359,6 +359,11 @@ class TapestryController
         }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry->nodes)) {
+            return [];
+        }
+
         return $tapestry->nodes;
     }
 
@@ -496,6 +501,18 @@ class TapestryController
 
     private function _filterTapestry($tapestry)
     {
+        if (!isset($tapestry->nodes)) {
+            $tapestry->nodes = [];
+        }
+
+        if (!isset($tapestry->links)) {
+            $tapestry->links = [];
+        }
+
+        if (!isset($tapestry->groups)) {
+            $tapestry->groups = [];
+        }
+
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator()
                 && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
