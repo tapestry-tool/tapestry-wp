@@ -268,8 +268,12 @@ class TapestryController
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
-        if (!isset($tapestry)) {
-            $tapestry =  (object)array();
+        if (empty($tapestry)) {
+            $tapestry =  (object)array(
+                'nodes'     => [],
+                'groups'    => [],
+                'links'     => []
+            );
         }
 
         $tapestry->settings = $settings;
