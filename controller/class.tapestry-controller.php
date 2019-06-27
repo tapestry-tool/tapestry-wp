@@ -361,7 +361,8 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
 
-        // TODO: Verify that this is a valid number
+        // TODO: Verify that this is a valid object with property x and y
+        // round up the numbers before saving.
 
         $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
         $nodeMetadata->coordinates = $coordinates;
