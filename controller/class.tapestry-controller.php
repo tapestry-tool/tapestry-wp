@@ -259,7 +259,7 @@ class TapestryController
      *
      * @return  String  $imageURL
      */
-    public function updateTapestryNodeImageUrl($nodeMetaId, $imageURL)
+    public function updateTapestryNodeImageURL($nodeMetaId, $imageURL)
     {
         if (!$this->postId) {
             return $this->_throwsError('INVALID_POST_ID');

@@ -69,7 +69,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
-            'callback'              => 'updateTapestryNodeImageUrl',
+            'callback'              => 'updateTapestryNodeImageURL',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
@@ -274,7 +274,7 @@ function updateTapestryNodeTitle($request)
  * 
  * @return  Object  $response   HTTP response
  */
-function updateTapestryNodeImageUrl($request)
+function updateTapestryNodeImageURL($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
@@ -282,7 +282,7 @@ function updateTapestryNodeImageUrl($request)
     // TODO: JSON validations should happen here
     // make sure the image url exists and not null
     $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeImageUrl($nodeMetaId, $data);
+    return $tapestryController->updateTapestryNodeImageURL($nodeMetaId, $data);
 }
 
 /**
