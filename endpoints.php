@@ -54,7 +54,47 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => 'PUT',
             'callback'              => 'updateTapestryNodePermissions',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodePermissions'
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_TITLE' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeTitle',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_IMAGE_URL' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeImageUrl',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_UNLOCKED_STATUS' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/unlocked',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeUnlockedStatus',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_TYPE_DATA' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeTypeData',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_COORDINATES' => (object)[
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeCoordinates',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
     'POST_TAPESTRY_LINK' => (object)[
@@ -207,6 +247,96 @@ function updateTapestryNodePermissions($request)
     // make sure the permissions body exists and not null
     $tapestryController = new TapestryController($postId);
     return $tapestryController->updateTapestryNodePermissions($nodeMetaId, $data);
+}
+
+/**
+ * Update Tapestry Node Title
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeTitle($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the title exists and not null
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestryNodeTitle($nodeMetaId, $data);
+}
+
+/**
+ * Update Tapestry Node Image Url
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeImageUrl($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the image url exists and not null
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestryNodeImageUrl($nodeMetaId, $data);
+}
+
+/**
+ * Update Tapestry Node Unlocked Status
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeUnlockedStatus($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the unlocked status exists and not null
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestryNodeUnlockedStatus($nodeMetaId, $data);
+}
+
+/**
+ * Update Tapestry Node Type Data
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeTypeData($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the type data exists and not null
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestryNodeTypeData($nodeMetaId, $data);
+}
+
+/**
+ * Update Tapestry Node Coordinates
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeCoordinates($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $data = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the coordinates exists and not null
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->updateTapestryNodeCoordinates($nodeMetaId, $data);
 }
 
 /**
