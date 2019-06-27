@@ -40,7 +40,7 @@
                             <input name="mp4-mediaURL" type="url" placeholder="Enter URL for MP4 Video" >
                         </label>
                         <label>Video Duration
-                            <input name="mp4-mediaDuration" type="text" placeholder="Enter URL for MP4 Video" >
+                            <input name="mp4-mediaDuration" type="text" placeholder="Enter duration (in seconds)" >
                         </label>
                         </div>
                         <div id="h5p-content" class="h5p-content">
@@ -48,12 +48,12 @@
                             <input name="h5p-mediaURL" type="url" placeholder="Enter H5P Embed Link" >
                         </label>
                         <label>H5P Content Duration
-                            <input name="h5p-mediaDuration" type="text" placeholder="Enter URL for MP4 Video" >
+                            <input name="h5p-mediaDuration" type="text" placeholder="Enter duration (in seconds)" >
                         </label>
                         </div>
                         <div id="appearsat-section">
                         <label>Appears at:
-                            <input name="appearsAt" type="text" placeholder="Enter time the media gets unlocked" >
+                            <input name="appearsAt" type="text" placeholder="Enter time (in seconds) the media gets unlocked" >
                         </label>
                         </div>
                     </div>
