@@ -8,8 +8,8 @@ require __DIR__ . '/controller/class.tapestry-permissions.php';
 require __DIR__ . '/controller/class.tapestry-controller.php';
 require __DIR__ . '/controller/class.user-controller.php';
 
-$REST_API = (object)[
-    'NAMESPACE' => 'tapestry-tool/v1',
+$REST_API_NAMESPACE = 'tapestry-tool/v1';
+$REST_API_ENDPOINTS = [
     'POST_TAPESTRY_NODE' => (object)[
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
@@ -96,18 +96,21 @@ $REST_API = (object)[
 ];
 
 /**
- * POST_TAPESTRY_NODE
+ * REGISTER API ENDPOINTS
  */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->POST_TAPESTRY_NODE->ROUTE,
-            $REST_API->POST_TAPESTRY_NODE->ARGUMENTS
-        );
-    }
-);
+foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
+    add_action(
+        'rest_api_init',
+        function () use ($ENDPOINT, $REST_API_NAMESPACE) {
+            register_rest_route(
+                $REST_API_NAMESPACE,
+                $ENDPOINT->ROUTE,
+                $ENDPOINT->ARGUMENTS
+            );
+        }
+    );
+}
+
 /**
  * Add a tapestry node
  * 
@@ -127,19 +130,6 @@ function addTapestryNode($request)
 }
 
 /**
- * POST_TAPESTRY
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->POST_TAPESTRY->ROUTE,
-            $REST_API->POST_TAPESTRY->ARGUMENTS
-        );
-    }
-);
-/**
  * Add a tapestry
  * 
  * @param   Object  $request    HTTP request
@@ -154,19 +144,6 @@ function addTapestry($request)
     return $tapestryController->addTapestry($data);
 }
 
-/**
- * PUT_TAPESTRY_SETTINGS
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->PUT_TAPESTRY_SETTINGS->ROUTE,
-            $REST_API->PUT_TAPESTRY_SETTINGS->ARGUMENTS
-        );
-    }
-);
 /**
  * Update Tapestry Settings
  * 
@@ -184,19 +161,6 @@ function updateTapestrySettings($request)
 }
 
 /**
- * GET_TAPESTRY
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->GET_TAPESTRY->ROUTE,
-            $REST_API->GET_TAPESTRY->ARGUMENTS
-        );
-    }
-);
-/**
  * Get a Tapestry
  * 
  * @param   Object  $request    HTTP request
@@ -210,19 +174,6 @@ function getTapestry($request)
     return $tapestryController->getTapestry();
 }
 
-/**
- * POST_TAPESTRY_GROUP
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->POST_TAPESTRY_GROUP->ROUTE,
-            $REST_API->POST_TAPESTRY_GROUP->ARGUMENTS
-        );
-    }
-);
 /**
  * Add a Tapestry Group
  * 
@@ -240,19 +191,6 @@ function addTapestryGroup($request)
     return $tapestryController->addTapestryGroup($data);
 }
 
-/**
- * PUT_TAPESTRY_NODE_PERMISSIONS
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->PUT_TAPESTRY_NODE_PERMISSIONS->ROUTE,
-            $REST_API->PUT_TAPESTRY_NODE_PERMISSIONS->ARGUMENTS
-        );
-    }
-);
 /**
  * Update Tapestry Node Permissions
  * 
@@ -272,19 +210,6 @@ function updateTapestryNodePermissions($request)
 }
 
 /**
- * POST_TAPESTRY_LINK
- */
-add_action(
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->POST_TAPESTRY_LINK->ROUTE,
-            $REST_API->POST_TAPESTRY_LINK->ARGUMENTS
-        );
-    }
-);
-/**
  * Add A Tapestry Link
  * 
  * @param   Object  $request    HTTP request
@@ -301,22 +226,6 @@ function addTapestryLink($request)
     return $tapestryController->addTapestryLink($data);
 }
 
-/* User endpoints */
-
-/**
- * GET_TAPESTRY_PROGRESS
- */
-add_action( 
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->GET_TAPESTRY_PROGRESS->ROUTE,
-            $REST_API->GET_TAPESTRY_PROGRESS->ARGUMENTS
-        );
-    }
-);
-
 /**
  * Get user progress on a tapestry page by post id. 
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
@@ -325,7 +234,7 @@ add_action(
  * 
  * @return Object $response HTTP response
  */
-function getUserProgressByPostId($request) 
+function getUserProgressByPostId($request)
 {
     $postId = $request['post_id'];
     $tapestryController = new TapestryController($postId);
@@ -336,28 +245,13 @@ function getUserProgressByPostId($request)
 }
 
 /**
- * UPDATE_TAPESTRY_PROGRESS
- */
-add_action( 
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->UPDATE_TAPESTRY_PROGRESS->ROUTE,
-            $REST_API->UPDATE_TAPESTRY_PROGRESS->ARGUMENTS
-        );
-    }
-);
-
-
-/**
  * Update a single node progress by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
  * 
  * @param Object $request HTTP request
  * 
  */
-function updateProgressByNodeId($request) 
+function updateProgressByNodeId($request)
 {
     $userController = new TapestryUserController;
     $postId = $request['post_id'];
@@ -367,20 +261,6 @@ function updateProgressByNodeId($request)
 }
 
 /**
- * GET_H5P_SETTING
- */
-add_action( 
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->GET_H5P_SETTING->ROUTE,
-            $REST_API->GET_H5P_SETTING->ARGUMENTS
-        );
-    }
-);
-
-/**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
  * 
@@ -388,26 +268,12 @@ add_action(
  * 
  * @return Object $response HTTP response
  */
-function getUserU5PSettingsByPostId($request) 
+function getUserU5PSettingsByPostId($request)
 {
     $postId = $request['post_id'];
     $userController = new TapestryUserController;
     return $userController->getH5PSettings($postId);
 }
-
-/**
- * UPDATE_H5P_SETTING
- */
-add_action( 
-    'rest_api_init',
-    function () use ($REST_API) {
-        register_rest_route(
-            $REST_API->NAMESPACE,
-            $REST_API->UPDATE_H5P_SETTING->ROUTE,
-            $REST_API->UPDATE_H5P_SETTING->ARGUMENTS
-        );
-    }
-);
 
 /**
  * Update the user's h5p settings by post id
@@ -416,7 +282,7 @@ add_action(
  * @param Object $request HTTP request
  * 
  */
-function updateUserH5PSettingsByPostId($request) 
+function updateUserH5PSettingsByPostId($request)
 {
     $userController = new TapestryUserController;
     $postId = $request['post_id'];
