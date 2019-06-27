@@ -224,6 +224,157 @@ class TapestryController
     }
 
     /**
+     * Update Tapestry Node Title
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   String  $title          Node title
+     *
+     * @return  String  $title
+     */
+    public function updateTapestryNodeTitle($nodeMetaId, $title)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: Verify that this is a string
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->title = $title;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $title;
+    }
+
+    /**
+     * Update Tapestry Node Image URL
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   String  $imageURL       Node image url
+     *
+     * @return  String  $imageURL
+     */
+    public function updateTapestryNodeImageURL($nodeMetaId, $imageURL)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: Verify that this is a string
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->imageURL = $imageURL;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $imageURL;
+    }
+
+    /**
+     * Update Tapestry Node Unlocked Status
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   Boolean $unlocked       Node unlocked status
+     *
+     * @return  Boolean $unlocked
+     */
+    public function updateTapestryNodeUnlockedStatus($nodeMetaId, $unlocked)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: Verify that this is a boolean
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->unlocked = $unlocked;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $unlocked;
+    }
+
+    /**
+     * Update Tapestry Node Type Data
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   Object  $typeData       Node type data
+     *
+     * @return  Object  $typeData
+     */
+    public function updateTapestryNodeTypeData($nodeMetaId, $typeData)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: Verify that this is a valid object
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->typeData = $typeData;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $typeData;
+    }
+
+    /**
+     * Update Tapestry Node Coordinates
+     * 
+     * @param   Integer $nodeMetaId     Node meta id
+     * @param   Number  $coordinates    Node coordinates
+     *
+     * @return  Number  $coordinates
+     */
+    public function updateTapestryNodeCoordinates($nodeMetaId, $coordinates)
+    {
+        if (!$this->postId) {
+            return $this->_throwsError('INVALID_POST_ID');
+        }
+        if (!$this->_isValidTapestryNode($nodeMetaId)) {
+            return $this->_throwsError('INVALID_NODE_META_ID');
+        }
+        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
+            return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+
+        // TODO: Verify that this is a valid object with property x and y
+        // round up the numbers before saving.
+
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->coordinates = $coordinates;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $coordinates;
+    }
+
+    /**
      * Update Tapestry Node Permissions
      * 
      * @param   Integer $nodeMetaId     Node meta id
@@ -376,10 +527,27 @@ class TapestryController
         // Update node data here to match its own version
         // This enables the same node to have multiple versions
         $nodeData->id = (int)$nodeMetadata->meta_id;
-        $nodeData->title = $nodeMetadata->meta_value->title;
-        $nodeData->fx = $nodeMetadata->meta_value->coordinates->x;
-        $nodeData->fy = $nodeMetadata->meta_value->coordinates->y;
-        $nodeData->permissions = $nodeMetadata->meta_value->permissions;
+        if (isset($nodeMetadata->meta_value->title)) {
+            $nodeData->title = $nodeMetadata->meta_value->title;
+        }
+        if (isset($nodeMetadata->meta_value->coordinates->x)) {
+            $nodeData->fx = $nodeMetadata->meta_value->coordinates->x;
+        }
+        if (isset($nodeMetadata->meta_value->coordinates->y)) {
+            $nodeData->fy = $nodeMetadata->meta_value->coordinates->y;
+        }
+        if (isset($nodeMetadata->meta_value->permissions)) {
+            $nodeData->permissions = $nodeMetadata->meta_value->permissions;
+        }
+        if (isset($nodeMetadata->meta_value->typeData)) {
+            $nodeData->typeData = $nodeMetadata->meta_value->typeData;
+        }
+        if (isset($nodeMetadata->meta_value->imageURL)) {
+            $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
+        }
+        if (isset($nodeMetadata->meta_value->unlocked)) {
+            $nodeData->unlocked = $nodeMetadata->meta_value->unlocked;
+        }
         return $nodeData;
     }
 
