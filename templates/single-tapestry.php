@@ -29,22 +29,22 @@ add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 get_header(); ?>
 
-<?php require "utility/utility.php";?>
+<?php require "utility.php";?>
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="post-wrap" role="main">
-        <?php while ( have_posts() ) : the_post(); ?>
+            <?php while ( have_posts() ) : the_post(); ?>
 
 
-        <?php get_template_part('content', 'page'); ?>
+            <?php get_template_part('content', 'page'); ?>
 
-        <?php
-        // If comments are open or we have at least one comment, load up the comment template
-        if (comments_open() || get_comments_number()) :
-            comments_template();
-        endif;
-        ?>
+            <?php
+            // If comments are open or we have at least one comment, load up the comment template
+            if (comments_open() || get_comments_number()) :
+                comments_template();
+            endif;
+            ?>
         
-        <?php endwhile; // end of the loop. ?>
+            <?php endwhile; // end of the loop. ?>
 
         <div id="tapestry">
             <!-- Don't render add root button when there's nodes -->
