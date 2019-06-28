@@ -32,7 +32,7 @@ get_header(); ?>
 <?php require "utility.php";?>
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="post-wrap" role="main">
-            <?php while ( have_posts() ) : the_post(); ?>
+        <?php while ( have_posts() ) : the_post(); ?>
 
 
             <?php get_template_part('content', 'page'); ?>
@@ -44,12 +44,13 @@ get_header(); ?>
             endif;
             ?>
         
-            <?php endwhile; // end of the loop. ?>
+        <?php endwhile; // end of the loop. ?>
 
         <div id="tapestry">
             <!-- Don't render add root button when there's nodes -->
             <?php if(!doesTapestryHaveNodes(get_the_ID())) : ?>
                 <div id="root-node-btn"><i class="fas fa-plus-circle fa-5x"></i></div>
+                <div id="root-node-label" style="text-align: center; font-size: 1.5em;">Add Root Node</div>
             <?php endif; ?>
         </div>
         
