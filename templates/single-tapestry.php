@@ -29,7 +29,6 @@ add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 get_header(); ?>
 
-<?php require "utility.php";?>
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="post-wrap" role="main">
         <?php while ( have_posts() ) : the_post(); ?>
