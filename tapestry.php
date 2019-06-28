@@ -116,7 +116,7 @@ add_filter('single_template', 'load_tapestry_template');
  *
  * @return  Object  Null
  */
-function add_tapestry_post_meta_on_publish($postId, $post, $update)
+function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
 {
     if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
         return;
