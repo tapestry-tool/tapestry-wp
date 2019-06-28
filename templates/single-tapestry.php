@@ -49,8 +49,10 @@ get_header(); ?>
         <div id="tapestry">
             <!-- Don't render add root button when there's nodes -->
             <?php if(!doesTapestryHaveNodes(get_the_ID())) : ?>
-                <div id="root-node-btn"><i class="fas fa-plus-circle fa-5x"></i></div>
-                <div id="root-node-label" style="text-align: center; font-size: 1.5em;">Add Root Node</div>
+                <div id="root-node-container">
+                    <div id="root-node-btn"><i class="fas fa-plus-circle fa-5x"></i></div>
+                    <div id="root-node-label">Add Root Node</div>
+                <div>
             <?php endif; ?>
         </div>
         
