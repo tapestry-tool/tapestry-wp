@@ -26,7 +26,7 @@ class TapestryPermissions
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
-            return current_user_can('edit', $postId);
+            return current_user_can('edit_post', $postId);
         }
         return false;
     }
@@ -42,7 +42,7 @@ class TapestryPermissions
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
-            return current_user_can('edit', $postId);
+            return current_user_can('edit_post', $postId);
         }
         return current_user_can('publish_posts');
     }
@@ -58,7 +58,7 @@ class TapestryPermissions
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
-            return current_user_can('edit', $postId);
+            return current_user_can('edit_post', $postId);
         }
         return false;
     }
@@ -90,7 +90,7 @@ class TapestryPermissions
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
-            return current_user_can('edit', $postId);
+            return current_user_can('edit_post', $postId);
         }
         return false;
     }

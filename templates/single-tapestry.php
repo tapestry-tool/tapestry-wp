@@ -19,7 +19,7 @@ function addNonceToScript()
         'wp_api_script',
         plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry.js',
         array('jquery'),
-        false,
+        null,
         true
     );
     wp_localize_script('wp_api_script', 'wpApiSettings', $params);
