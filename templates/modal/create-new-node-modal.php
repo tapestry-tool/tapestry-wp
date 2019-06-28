@@ -81,8 +81,8 @@
                         <div class="permissions-btn-panel">  
                             <input id="user-number-input" type="number" placeholder="123" >
                             <button type="button" id="user-permissions-btn"><span class="fas fa-plus permissions-plus"></span>User</button>
-                            <input id="group-number-input" type="number" placeholder="123" >
-                            <button type="button" id="group-permissions-btn"><span class="fas fa-plus permissions-plus"></span>Group</button>
+                            <!-- <input id="group-number-input" type="number" placeholder="123" >
+                            <button type="button" id="group-permissions-btn"><span class="fas fa-plus permissions-plus"></span>Group</button> -->
                         </div>
                     </div>
                 </form>
