@@ -31,6 +31,9 @@ get_header(); ?>
 
 <div id="primary" class="content-area col-md-12">
     <main id="main" class="post-wrap" role="main">
+
+        <div id="tapestry"></div>
+
         <?php while (have_posts()) : the_post(); ?>
 
             <?php get_template_part('content', 'page'); ?>
@@ -41,11 +44,8 @@ get_header(); ?>
                 comments_template();
             endif;
             ?>
-
-        <?php endwhile;
-    ?>
-
-        <div id="tapestry"></div>
+        
+        <?php endwhile; // end of the loop. ?>
 
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.css" rel="stylesheet" />
@@ -63,6 +63,7 @@ get_header(); ?>
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var tapestryWpPostId = "<?php echo get_the_ID(); ?>";
+            var addNodeModalUrl = "<?php echo plugin_dir_url( __FILE__ ); ?>modal-add-node.html";
         </script>
 
     </main><!-- #main -->
