@@ -13,9 +13,7 @@ class TapestryController
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
     const NODE_PERMISSIONS = [
-        'DEFAULT' => [
-            'public' => ['read']
-        ],
+        'DEFAULT' => [],
         'OPTIONS' => [
             'ADD'           => 'add',
             'READ'          => 'read',
@@ -216,7 +214,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('ADD', $link->target)) {
-            return $this->_throwsError('ADD_PERMISSION_DENIED');
+            return $this->_throwsError('ADD_NODE_PERMISSION_DENIED');
         }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
@@ -252,7 +250,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a string
@@ -285,7 +283,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a string
@@ -318,7 +316,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a boolean
@@ -351,7 +349,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a valid object
@@ -384,7 +382,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a valid object with property x and y
@@ -418,7 +416,7 @@ class TapestryController
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
         if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_PERMISSION_DENIED');
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: validate that $permissions has appropriate/valid info
