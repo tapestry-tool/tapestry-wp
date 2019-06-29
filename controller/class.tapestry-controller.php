@@ -627,9 +627,9 @@ class TapestryController
         $userId = wp_get_current_user()->ID;
         $groupIds = $this->_getGroupIdsOfUser($userId);
 
-        if ((TapestryUserRoles::isEditor())
-            && (TapestryUserRoles::isAdministrator())
-            && (TapestryUserRoles::isAuthorOfThePost($this->postId))
+        if ((TapestryUserRoles::isEditor()) ||
+            (TapestryUserRoles::isAdministrator()) ||
+            (TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
             return true;
         } else {
