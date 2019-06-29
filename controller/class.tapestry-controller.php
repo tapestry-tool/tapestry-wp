@@ -13,9 +13,7 @@ class TapestryController
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
     const NODE_PERMISSIONS = [
-        'DEFAULT' => [
-            'public' => ['read']
-        ],
+        'DEFAULT' => [],
         'OPTIONS' => [
             'ADD'           => 'add',
             'READ'          => 'read',
@@ -65,6 +63,14 @@ class TapestryController
         'LINKS_EXIST_IN_NEW_TAPESTRY' => [
             'MESSAGE'   => 'Links should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 400]
+        ],
+        'ADD_NODE_PERMISSION_DENIED' => [
+            'MESSAGE'   => 'You are not permitted to add child nodes to this node',
+            'STATUS'    => ['status' => 403]
+        ],
+        'EDIT_NODE_PERMISSION_DENIED' => [
+            'MESSAGE'   => 'You are not permitted to edit this node',
+            'STATUS'    => ['status' => 403]
         ],
         'POST_ID_ALREADY_SET' => [
             'MESSAGE'   => 'PostID should not be passed in when creating a new Tapestry',
@@ -209,6 +215,9 @@ class TapestryController
         if (!$this->_isChildNodeOfTapestry($link->source) || !$this->_isChildNodeOfTapestry($link->target)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
+        if (!$this->_currentUserIsAllowed('ADD', $link->target)) {
+            return $this->_throwsError('ADD_NODE_PERMISSION_DENIED');
+        }
 
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
@@ -242,6 +251,9 @@ class TapestryController
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
+        }
 
         // TODO: Verify that this is a string
 
@@ -271,6 +283,9 @@ class TapestryController
         }
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a string
@@ -302,6 +317,9 @@ class TapestryController
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
+        }
 
         // TODO: Verify that this is a boolean
 
@@ -331,6 +349,9 @@ class TapestryController
         }
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: Verify that this is a valid object
@@ -362,6 +383,9 @@ class TapestryController
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
         }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
+        }
 
         // TODO: Verify that this is a valid object with property x and y
         // round up the numbers before saving.
@@ -392,6 +416,9 @@ class TapestryController
         }
         if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
             return $this->_throwsError('INVALID_CHILD_NODE');
+        }
+        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
+            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
         }
 
         // TODO: validate that $permissions has appropriate/valid info
@@ -594,6 +621,38 @@ class TapestryController
         return false;
     }
 
+    private function _currentUserIsAllowed($action, $nodeMetaId)
+    {
+        $options = self::NODE_PERMISSIONS['OPTIONS'];
+        $userId = wp_get_current_user()->ID;
+        $groupIds = $this->_getGroupIdsOfUser($userId);
+
+        if ((TapestryUserRoles::isEditor()) ||
+            (TapestryUserRoles::isAdministrator()) ||
+            (TapestryUserRoles::isAuthorOfThePost($this->postId))
+        ) {
+            return true;
+        } else {
+            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
+            if ((property_exists($nodePermissions, 'public')
+                    && in_array($options[$action], $nodePermissions->public))
+                || (property_exists($nodePermissions, 'user-' . $userId)
+                    && in_array($options[$action], $nodePermissions->{'user-' . $userId}))
+            ) {
+                return true;
+            } else {
+                foreach ($groupIds as $groupId) {
+                    if ((property_exists($nodePermissions, 'group-' . $groupId))
+                        && (in_array($options[$action], $nodePermissions->{'group-' . $groupId}))
+                    ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private function _addNode($node)
     {
         $nodePostId = $this->_updatePost($node, 'tapestry_node');
@@ -686,8 +745,8 @@ class TapestryController
         }
 
         if ((!TapestryUserRoles::isEditor())
-            && (!TapestryUserRoles::isAdministrator()
-                && (!TapestryUserRoles::isAuthorOfThePost($this->postId)))
+            && (!TapestryUserRoles::isAdministrator())
+            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
