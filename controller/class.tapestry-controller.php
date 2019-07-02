@@ -13,7 +13,9 @@ class TapestryController
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
     const NODE_PERMISSIONS = [
-        'DEFAULT' => [],
+        'DEFAULT' => [
+            'public' => ['read']
+        ],
         'OPTIONS' => [
             'ADD'           => 'add',
             'READ'          => 'read',
