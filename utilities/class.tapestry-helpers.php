@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . "/class.tapestry-node-permissions.php";
 
 class TapestryHelpers
 {
@@ -80,7 +81,7 @@ class TapestryHelpers
 
     static function currentUserIsAllowed($action, $nodeMetaId, $tapestryPostId)
     {
-        $options = self::NODE_PERMISSIONS['OPTIONS'];
+        $options = TapestryNodePermissions::getNodePermissions();
         $userId = wp_get_current_user()->ID;
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
 

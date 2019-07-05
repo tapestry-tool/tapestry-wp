@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
  * 
  */
 
-class TapestrySettingsController
+class TapestrySettingController
 {
     private $postId;
 

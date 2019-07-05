@@ -3,7 +3,7 @@
 /**
  * Tapestry Errors
  */
-class TapestryErrorsadasd
+class TapestryErrors
 {
     const ERRORS = [
         'INVALID_POST_ID' => [

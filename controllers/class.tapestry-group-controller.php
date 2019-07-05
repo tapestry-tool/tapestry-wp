@@ -34,7 +34,7 @@ class TapestryGroupController
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
         }
-        if (TapestryHelpers::isValidTapestryGroup($group->id)) {
+        if (isset($group->id) && TapestryHelpers::isValidTapestryGroup($group->id)) {
             return TapestryErrors::throwsError('GROUP_ALREADY_EXISTS');
         }
 
