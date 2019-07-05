@@ -37,6 +37,26 @@ class TapestrySettingController
 
         // TODO: add validation for the $settings
 
+        return $this->_updateTapestrySettings($settings, $updateTapestryPost);
+    }
+
+    /**
+     * Retrieve tapestry settings
+     * 
+     * @return Object Settings
+     */
+    public function getTapestrySettings()
+    {
+        // This could be used as an endpoint if needed
+        if (!$this->postId) {
+            return TapestryErrors::throwsError('INVALID_POST_ID');
+        }
+
+        return $this->_getTapestrySettings();
+    }
+
+    private function _updateTapestrySettings($settings, $updateTapestryPost)
+    {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         if (empty($tapestry)) {
@@ -58,18 +78,8 @@ class TapestrySettingController
         return $settings;
     }
 
-    /**
-     * Retrieve tapestry settings
-     * 
-     * @return Object Settings
-     */
-    public function getTapestrySettings()
+    private function _getTapestrySettings()
     {
-        // This could be used as an endpoint if needed
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         if (!isset($tapestry)) {

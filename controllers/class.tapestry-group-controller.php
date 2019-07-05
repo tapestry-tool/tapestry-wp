@@ -38,9 +38,7 @@ class TapestryGroupController
             return TapestryErrors::throwsError('GROUP_ALREADY_EXISTS');
         }
 
-        $this->_addGroup($group);
-
-        return $group;
+        return $this->_addGroup($group);
     }
 
     private function _addGroup($group)
@@ -62,5 +60,7 @@ class TapestryGroupController
         array_push($tapestry->groups, $group->id);
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $group;
     }
 }

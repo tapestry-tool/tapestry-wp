@@ -42,9 +42,7 @@ class TapestryNodeController
             $node->permissions = (object) TapestryNodePermissions::getDefaultNodePermissions();
         }
 
-        $this->_addNode($node);
-
-        return $node;
+        return $this->_addNode($node);
     }
 
     /**
@@ -72,12 +70,7 @@ class TapestryNodeController
 
         // TODO: Verify that this is a string
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->title = $title;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $title;
+        return $this->_updateNodeProperty($nodeMetaId, 'title', $title);
     }
 
     /**
@@ -105,12 +98,7 @@ class TapestryNodeController
 
         // TODO: Verify that this is a string
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->imageURL = $imageURL;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $imageURL;
+        return $this->_updateNodeProperty($nodeMetaId, 'imageURL', $imageURL);
     }
 
     /**
@@ -138,12 +126,7 @@ class TapestryNodeController
 
         // TODO: Verify that this is a boolean
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->unlocked = $unlocked;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $unlocked;
+        return $this->_updateNodeProperty($nodeMetaId, 'unlocked', $unlocked);
     }
 
     /**
@@ -171,12 +154,7 @@ class TapestryNodeController
 
         // TODO: Verify that this is a valid object
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->typeData = $typeData;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $typeData;
+        return $this->_updateNodeProperty($nodeMetaId, 'typeData', $typeData);
     }
 
     /**
@@ -205,12 +183,7 @@ class TapestryNodeController
         // TODO: Verify that this is a valid object with property x and y
         // round up the numbers before saving.
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->coordinates = $coordinates;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $coordinates;
+        return $this->_updateNodeProperty($nodeMetaId, 'coordinates', $coordinates);
     }
 
     /**
@@ -238,12 +211,7 @@ class TapestryNodeController
 
         // TODO: validate that $permissions has appropriate/valid info
 
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->permissions = $permissions;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $permissions;
+        return $this->_updateNodeProperty($nodeMetaId, 'permissions', $permissions);
     }
 
     private function _addNode($node)
@@ -267,6 +235,18 @@ class TapestryNodeController
         }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $node;
+    }
+
+    private function _updateNodeProperty($nodeMetaId, $property, $newPropertyValue)
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata->{$property} = $newPropertyValue;
+
+        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+
+        return $newPropertyValue;
     }
 
     private function _makeMetadata($node, $nodePostId)

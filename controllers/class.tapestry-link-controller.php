@@ -45,6 +45,11 @@ class TapestryLinkController
             return TapestryErrors::throwsError('ADD_NODE_PERMISSION_DENIED');
         }
 
+        return $this->_addTapestryLink($link);
+    }
+
+    private function _addTapestryLink($link)
+    {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         if (!isset($tapestry->links)) {
