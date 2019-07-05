@@ -90,11 +90,11 @@ class TapestrySettingController
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
 
         if (!isset($tapestry)) {
-            $tapestry = (object) array(
-                'settings' => (object) array()
-            );
+            $tapestry = (object) [
+                'settings' => (object) []
+            ];
         } else if (!isset($tapestry->settings)) {
-            $tapestry->settings = (object) array();
+            $tapestry->settings = (object) [];
         }
 
         return $tapestry->settings;

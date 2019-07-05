@@ -47,10 +47,12 @@ class TapestryHelpers
         $groupIds = [];
         $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
 
-        foreach ($tapestry->groups as $groupId) {
-            $groupMetadata = get_metadata_by_mid('post', $groupId)->meta_value;
-            if (in_array($userId, $groupMetadata->members)) {
-                array_push($groupIds, $groupId);
+        if (!empty($tapestry->groups)) {
+            foreach ($tapestry->groups as $groupId) {
+                $groupMetadata = get_metadata_by_mid('post', $groupId)->meta_value;
+                if (in_array($userId, $groupMetadata->members)) {
+                    array_push($groupIds, $groupId);
+                }
             }
         }
 
