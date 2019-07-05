@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
+require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
@@ -36,6 +36,12 @@ class TapestryGroupController
         }
         if (isset($group->id) && TapestryHelpers::isValidTapestryGroup($group->id)) {
             return TapestryErrors::throwsError('GROUP_ALREADY_EXISTS');
+        }
+        if ((!TapestryUserRoles::isEditor())
+            || (!TapestryUserRoles::isAdministrator())
+            || (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+        ) {
+            return TapestryErrors::throwsError('EDIT_TAPESTRY_PERMISSION_DENIED');
         }
 
         return $this->_addGroup($group);

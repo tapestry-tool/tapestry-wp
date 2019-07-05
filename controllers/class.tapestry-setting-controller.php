@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
+require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 
 /**
  * Update tapestry settings
@@ -33,6 +34,12 @@ class TapestrySettingController
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
+        }
+        if ((!TapestryUserRoles::isEditor())
+            || (!TapestryUserRoles::isAdministrator())
+            || (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+        ) {
+            return TapestryErrors::throwsError('EDIT_TAPESTRY_PERMISSION_DENIED');
         }
 
         // TODO: add validation for the $settings
