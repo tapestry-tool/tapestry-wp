@@ -356,11 +356,12 @@ function updateTapestryNodeCoordinates($request)
  */
 function updateProgressByNodeId($request)
 {
-    $userController = new TapestryUserProgressController;
     $postId = $request['post_id'];
-    $nodeId = $request['node_id'];
+    $nodeMetaId = $request['node_id'];
     $progressValue = $request['progress_value'];
-    $userController->save($postId, $nodeId, $progressValue);
+
+    $userController = new TapestryUserProgressController($postId, $nodeMetaId);
+    $userController->save($progressValue);
 }
 
 /**
@@ -374,8 +375,9 @@ function updateProgressByNodeId($request)
 function getUserU5PSettingsByPostId($request)
 {
     $postId = $request['post_id'];
-    $userController = new TapestryUserProgressController;
-    return $userController->getH5PSettings($postId);
+
+    $userController = new TapestryUserProgressController($postId);
+    return $userController->getH5PSettings();
 }
 
 /**
@@ -387,10 +389,11 @@ function getUserU5PSettingsByPostId($request)
  */
 function updateUserH5PSettingsByPostId($request)
 {
-    $userController = new TapestryUserProgressController;
     $postId = $request['post_id'];
-    $json = $request['json'];
-    $userController->updateH5PSettings($postId, $json);
+    $h5pSettingsData = $request['json'];
+
+    $userController = new TapestryUserProgressController($postId);
+    $userController->updateH5PSettings($h5pSettingsData);
 }
 
 /**
@@ -418,9 +421,7 @@ function getTapestry($request)
 function getUserProgressByPostId($request)
 {
     $postId = $request['post_id'];
-    $tapestryNodeController = new TapestryNodeController($postId);
-    $nodeIdArr = $tapestryNodeController->get();
 
-    $userController = new TapestryUserProgressController;
-    return $userController->get($postId, $nodeIdArr);
+    $userProgressController = new TapestryUserProgressController($postId);
+    return $userProgressController->get();
 }

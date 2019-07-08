@@ -10,24 +10,26 @@ class TapestryUserProgressController implements iTapestryUserProgressController
 {
 
     private $_userId = null;
+    private $postId;
+    private $nodeMetaId;
 
-    public function __construct()
+    public function __construct($postId = null, $nodeMetaId = null)
     {
         $this->_userId = apply_filters('determine_current_user', false);
+        $this->postId = $postId;
+        $this->nodeMetaId = $nodeMetaId;
     }
 
     /**
      * Update User's video progress for a tapestry post
      *
-     * @param Integer $postId        the post's ID
-     * @param Integer $nodeId        the current node being viewed
      * @param Float   $progressValue how much the video was viewed, value should be between >= 0 and <= 1
      *
      * @return Null
      */
-    public function save($postId, $nodeId, $progressValue)
+    public function save($progressValue)
     {
-        $this->_checkUserAndPostId($postId);
+        $this->_checkUserAndPostId();
 
         if ($progressValue !== null) {
             $progressValue = floatval($progressValue);
@@ -38,34 +40,33 @@ class TapestryUserProgressController implements iTapestryUserProgressController
             throw new Exception('Invalid progress value');
         }
 
-        $this->_updateUserProgress($postId, $nodeId, $progressValue);
+        $this->_updateUserProgress($progressValue);
     }
 
     /**
      * Get User's video progress for a tapestry post
      *
-     * @param Integer $postId    the post's ID
-     * @param Array   $nodeIdArr is a list of ids currently in the tapestry
-     *
      * @return String progress   of each node in json format
      */
-    public function get($postId, $nodeIdArr)
+    public function get()
     {
-        $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($postId);
+        $this->_isValidTapestryPost();
+        $this->_checkUserAndPostId();
 
-        return $this->_getUserProgress($postId, $nodeIdArr);
+        $tapestryNodeController = new TapestryNodeController($this->postId);
+        $nodeIdArr = $tapestryNodeController->get();
+
+        return $this->_getUserProgress($nodeIdArr);
     }
 
     /**
      * Update User's h5p video setting for a tapestry post
      *
-     * @param Integer $postId          the post's ID
      * @param String  $h5pSettingsData stores volume, playbackRate, quality of h5p video
      */
-    public function updateH5PSettings($postId, $h5pSettingsData)
+    public function updateH5PSettings($h5pSettingsData)
     {
-        $this->_checkUserAndPostId($postId);
+        $this->_checkUserAndPostId();
 
         if ($this->_isJson($h5pSettingsData)) {
             $h5pSettingsData = json_decode($h5pSettingsData);
@@ -73,35 +74,33 @@ class TapestryUserProgressController implements iTapestryUserProgressController
             throw new Exception('Invalid json');
         }
 
-        $this->_updateUserH5PSettings($postId, $h5pSettingsData);
+        $this->_updateUserH5PSettings($h5pSettingsData);
     }
 
     /**
      * Get User's h5p video setting for a tapestry post
      * 
-     * @param Integer $postId the post's Id
-     *
      * @return String h5p     setting
      */
-    public function getH5PSettings($postId)
+    public function getH5PSettings()
     {
-        $this->_isValidTapestryPost($postId);
-        $this->_checkUserAndPostId($postId);
-        return $this->_getUserH5PSettings($postId);
+        $this->_isValidTapestryPost();
+        $this->_checkUserAndPostId();
+        return $this->_getUserH5PSettings();
     }
 
-    private function _updateUserProgress($postId, $nodeId, $progressValue)
+    private function _updateUserProgress($progressValue)
     {
-        update_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeId, $progressValue);
     }
 
-    private function _getUserProgress($postId, $nodeIdArr)
+    private function _getUserProgress($nodeIdArr)
     {
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodeIdArr as $nodeId) {
-            $progress_value = get_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, true);
+            $progress_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
             if ($progress_value !== null) {
                 $progress->$nodeId = (float) $progress_value;
             } else {
@@ -112,39 +111,39 @@ class TapestryUserProgressController implements iTapestryUserProgressController
         return json_encode($progress);
     }
 
-    private function _updateUserH5PSettings($postId, $h5pSettingsData)
+    private function _updateUserH5PSettings($h5pSettingsData)
     {
-        update_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
+        update_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, $h5pSettingsData);
     }
 
-    private function _getUserH5PSettings($postId)
+    private function _getUserH5PSettings()
     {
-        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, true);
+        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
         return json_encode($settings);
     }
 
     /* Helpers */
 
-    private function _checkUserAndPostId($postId)
+    private function _checkUserAndPostId()
     {
         if (!isset($this->_userId)) {
             throw new Exception('postId is invalid');
         }
 
-        if (!isset($postId)) {
+        if (!isset($this->postId)) {
             throw new Exception('postId is invalid');
         }
     }
 
-    private function _isValidTapestryPost($postId)
+    private function _isValidTapestryPost()
     {
         // post ID exists in db
-        if (!get_permalink($postId)) {
+        if (!get_permalink($this->postId)) {
             throw new Exception('post id does not exist');
         }
 
         // Post type is correct
-        if (get_post_type($postId) != "tapestry") {
+        if (get_post_type($this->postId) != "tapestry") {
             throw new Exception('post type is invalid');
         }
     }
