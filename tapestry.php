@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
@@ -17,7 +18,8 @@ require_once dirname(__FILE__) . '/controllers/class.tapestry-setting-controller
 /**
  * Register Tapestry type on initialization
  */
-function create_tapestry_type() {
+function create_tapestry_type()
+{
     $labels = array(
         "name" => __("Tapestries"),
         "singular_name" => __("Tapestry"),
@@ -52,7 +54,8 @@ add_action('init', 'create_tapestry_type');
 /**
  * Register Tapestry Node type on initialization
  */
-function create_tapestry_node_type() {
+function create_tapestry_node_type()
+{
     $labels = array(
         "name" => __("Tapestry Nodes"),
         "singular_name" => __("Tapestry Node"),
@@ -99,10 +102,11 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 /**
  * Filter the template for Tapestry post
  */
-function load_tapestry_template($singleTemplate) {
+function load_tapestry_template($singleTemplate)
+{
     global $post;
     if ($post->post_type === 'tapestry') {
-        $singleTemplate = dirname( __FILE__ ) . '/templates/single-tapestry.php';
+        $singleTemplate = dirname(__FILE__) . '/templates/single-tapestry.php';
     }
     return $singleTemplate;
 }
@@ -131,7 +135,7 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
         $settings->title = $post->post_title;
         $settings->status = $post->post_status;
     } else {
-        $settings = (object)array(
+        $settings = (object) array(
             'tapestrySlug'  => $post->post_name,
             'title'         => $post->post_title,
             'status'        => $post->post_status

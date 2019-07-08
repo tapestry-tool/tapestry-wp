@@ -37,8 +37,8 @@ class TapestrySettingController implements iTapestrySettingController
             return TapestryErrors::throwsError('INVALID_POST_ID');
         }
         if ((!TapestryUserRoles::isEditor())
-            || (!TapestryUserRoles::isAdministrator())
-            || (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+            && (!TapestryUserRoles::isAdministrator())
+            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
             return TapestryErrors::throwsError('EDIT_TAPESTRY_PERMISSION_DENIED');
         }
