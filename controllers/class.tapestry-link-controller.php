@@ -28,7 +28,7 @@ class TapestryLinkController
      * 
      * @return  Object  $link 
      */
-    public function addTapestryLink($link)
+    public function save($link)
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');

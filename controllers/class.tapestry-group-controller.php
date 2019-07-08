@@ -29,7 +29,7 @@ class TapestryGroupController
      * 
      * @return  Object  $group
      */
-    public function addTapestryGroup($group)
+    public function save($group)
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
