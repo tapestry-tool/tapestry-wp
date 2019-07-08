@@ -5,9 +5,9 @@
  *
  */
 
-require_once __DIR__ . '/controllers/class.user-controller.php';
+require_once __DIR__ . '/controllers/class.tapestry-user-progress-controller.php';
 require_once __DIR__ . '/controllers/class.tapestry-controller.php';
-require_once __DIR__ . '/controllers/class.tapestry-permissions.php';
+require_once __DIR__ . '/utilities/class.tapestry-permissions.php';
 require_once __DIR__ . '/controllers/class.tapestry-node-controller.php';
 require_once __DIR__ . '/controllers/class.tapestry-link-controller.php';
 require_once __DIR__ . '/controllers/class.tapestry-group-controller.php';
@@ -168,7 +168,7 @@ function addTapestry($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     $tapestryController = new TapestryController();
-    return $tapestryController->addTapestry($data);
+    return $tapestryController->save($data);
 }
 
 /**
@@ -186,7 +186,7 @@ function addTapestryNode($request)
     // make sure that we can only accept one node object at a time
     // adding multiple nodes would require multiple requests from the client
     $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->addTapestryNode($data);
+    return $tapestryNodeController->save($data);
 }
 
 /**
@@ -203,7 +203,7 @@ function addTapestryGroup($request)
     // TODO: JSON validations should happen here
     // make sure the type of the group body exists and is 'tapestry_group'
     $tapestryGroupController = new TapestryGroupController($postId);
-    return $tapestryGroupController->addTapestryGroup($data);
+    return $tapestryGroupController->save($data);
 }
 
 /**
@@ -220,7 +220,7 @@ function addTapestryLink($request)
     // TODO: JSON validations should happen here
     // make sure the link object has all required attibutes - src, target etc.
     $tapestryLinkController = new TapestryLinkController($postId);
-    return $tapestryLinkController->addTapestryLink($data);
+    return $tapestryLinkController->save($data);
 }
 
 /**
@@ -236,7 +236,7 @@ function updateTapestrySettings($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     $tapestrySettingController = new TapestrySettingController($postId);
-    return $tapestrySettingController->updateTapestrySettings($data);
+    return $tapestrySettingController->save($data);
 }
 
 /**
@@ -356,11 +356,11 @@ function updateTapestryNodeCoordinates($request)
  */
 function updateProgressByNodeId($request)
 {
-    $userController = new TapestryUserController;
+    $userController = new TapestryUserProgressController;
     $postId = $request['post_id'];
     $nodeId = $request['node_id'];
     $progressValue = $request['progress_value'];
-    $userController->updateProgress($postId, $nodeId, $progressValue);
+    $userController->save($postId, $nodeId, $progressValue);
 }
 
 /**
@@ -374,7 +374,7 @@ function updateProgressByNodeId($request)
 function getUserU5PSettingsByPostId($request)
 {
     $postId = $request['post_id'];
-    $userController = new TapestryUserController;
+    $userController = new TapestryUserProgressController;
     return $userController->getH5PSettings($postId);
 }
 
@@ -387,7 +387,7 @@ function getUserU5PSettingsByPostId($request)
  */
 function updateUserH5PSettingsByPostId($request)
 {
-    $userController = new TapestryUserController;
+    $userController = new TapestryUserProgressController;
     $postId = $request['post_id'];
     $json = $request['json'];
     $userController->updateH5PSettings($postId, $json);
@@ -404,7 +404,7 @@ function getTapestry($request)
 {
     $postId = $request['tapestryPostId'];
     $tapestryController = new TapestryController($postId);
-    return $tapestryController->getTapestry();
+    return $tapestryController->get();
 }
 
 /**
@@ -418,9 +418,9 @@ function getTapestry($request)
 function getUserProgressByPostId($request)
 {
     $postId = $request['post_id'];
-    $tapestryController = new TapestryController($postId);
-    $nodeIdArr = $tapestryController->getTapestryNodeIds();
+    $tapestryNodeController = new TapestryNodeController($postId);
+    $nodeIdArr = $tapestryNodeController->get();
 
-    $userController = new TapestryUserController;
-    return $userController->getProgress($postId, $nodeIdArr);
+    $userController = new TapestryUserProgressController;
+    return $userController->get($postId, $nodeIdArr);
 }

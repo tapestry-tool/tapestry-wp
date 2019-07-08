@@ -124,7 +124,7 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
     }
 
     $tapestrySettingController = new TapestrySettingController($postId);
-    $settings = $tapestrySettingController->getTapestrySettings();
+    $settings = $tapestrySettingController->get();
 
     if ($update && !empty($settings)) {
         $settings->tapestrySlug = $post->post_name;
@@ -138,6 +138,6 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
         );
     }
 
-    $tapestrySettingController->updateTapestrySettings($settings, false);
+    $tapestrySettingController->save($settings, false);
 }
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);

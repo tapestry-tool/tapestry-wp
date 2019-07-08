@@ -2,13 +2,14 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-setting-controller.php";
 
 /**
  * Update tapestry settings
  * 
  */
 
-class TapestrySettingController
+class TapestrySettingController implements iTapestrySettingController
 {
     private $postId;
 
@@ -30,7 +31,7 @@ class TapestrySettingController
      * 
      * @return  Object  $settings 
      */
-    public function updateTapestrySettings($settings, $updateTapestryPost = true)
+    public function save($settings, $updateTapestryPost = true)
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
@@ -52,7 +53,7 @@ class TapestrySettingController
      * 
      * @return Object Settings
      */
-    public function getTapestrySettings()
+    public function get()
     {
         // This could be used as an endpoint if needed
         if (!$this->postId) {

@@ -1,12 +1,13 @@
 <?php
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node-controller.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryNodeController
+class TapestryNodeController implements iTapestryNodeController
 {
     private $postId;
 
@@ -28,7 +29,7 @@ class TapestryNodeController
      * 
      * @return  Object  $node
      */
-    public function addTapestryNode($node)
+    public function save($node)
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
@@ -43,6 +44,26 @@ class TapestryNodeController
         }
 
         return $this->_addNode($node);
+    }
+
+    /**
+     * Retrieve all node ids associated to a tapestry
+     * 
+     * @return Array list of node ids for a tapestry
+     */
+    public function get()
+    {
+        if (!$this->postId) {
+            return TapestryErrors::throwsError('INVALID_POST_ID');
+        }
+
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+
+        if (!isset($tapestry->nodes)) {
+            return [];
+        }
+
+        return $tapestry->nodes;
     }
 
     /**

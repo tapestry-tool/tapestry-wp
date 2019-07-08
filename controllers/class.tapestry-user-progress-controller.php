@@ -1,18 +1,19 @@
 <?php
 // TODO Change exceptions to using an ERROR class
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress-controller.php";
 
 /**
  * Add/update/retrieve User progress
  * 
  */
-class TapestryUserController 
+class TapestryUserProgressController implements iTapestryUserProgressController
 {
 
     private $_userId = null;
 
-    public function __construct() 
+    public function __construct()
     {
-        $this->_userId = apply_filters('determine_current_user', false); 
+        $this->_userId = apply_filters('determine_current_user', false);
     }
 
     /**
@@ -24,7 +25,7 @@ class TapestryUserController
      *
      * @return Null
      */
-    public function updateProgress($postId, $nodeId, $progressValue) 
+    public function save($postId, $nodeId, $progressValue)
     {
         $this->_checkUserAndPostId($postId);
 
@@ -48,7 +49,7 @@ class TapestryUserController
      *
      * @return String progress   of each node in json format
      */
-    public function getProgress($postId, $nodeIdArr) 
+    public function get($postId, $nodeIdArr)
     {
         $this->_isValidTapestryPost($postId);
         $this->_checkUserAndPostId($postId);
@@ -62,7 +63,7 @@ class TapestryUserController
      * @param Integer $postId          the post's ID
      * @param String  $h5pSettingsData stores volume, playbackRate, quality of h5p video
      */
-    public function updateH5PSettings($postId, $h5pSettingsData) 
+    public function updateH5PSettings($postId, $h5pSettingsData)
     {
         $this->_checkUserAndPostId($postId);
 
@@ -82,19 +83,19 @@ class TapestryUserController
      *
      * @return String h5p     setting
      */
-    public function getH5PSettings($postId) 
+    public function getH5PSettings($postId)
     {
         $this->_isValidTapestryPost($postId);
         $this->_checkUserAndPostId($postId);
         return $this->_getUserH5PSettings($postId);
     }
 
-    private function _updateUserProgress($postId, $nodeId, $progressValue) 
+    private function _updateUserProgress($postId, $nodeId, $progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
-    private function _getUserProgress($postId, $nodeIdArr) 
+    private function _getUserProgress($postId, $nodeIdArr)
     {
         $progress = new stdClass();
 
@@ -111,12 +112,12 @@ class TapestryUserController
         return json_encode($progress);
     }
 
-    private function _updateUserH5PSettings($postId, $h5pSettingsData) 
+    private function _updateUserH5PSettings($postId, $h5pSettingsData)
     {
         update_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, $h5pSettingsData);
     }
 
-    private function _getUserH5PSettings($postId) 
+    private function _getUserH5PSettings($postId)
     {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $postId, true);
         return json_encode($settings);
@@ -124,7 +125,7 @@ class TapestryUserController
 
     /* Helpers */
 
-    private function _checkUserAndPostId($postId) 
+    private function _checkUserAndPostId($postId)
     {
         if (!isset($this->_userId)) {
             throw new Exception('postId is invalid');
@@ -133,10 +134,9 @@ class TapestryUserController
         if (!isset($postId)) {
             throw new Exception('postId is invalid');
         }
-
     }
 
-    private function _isValidTapestryPost($postId) 
+    private function _isValidTapestryPost($postId)
     {
         // post ID exists in db
         if (!get_permalink($postId)) {
@@ -149,7 +149,7 @@ class TapestryUserController
         }
     }
 
-    private function _isJson($string) 
+    private function _isJson($string)
     {
         $test_json = json_decode($string);
         if ($test_json !== null) {

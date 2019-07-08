@@ -2,12 +2,13 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-group-controller.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryGroupController
+class TapestryGroupController implements iTapestryGroupController
 {
     private $postId;
 
@@ -45,6 +46,16 @@ class TapestryGroupController
         }
 
         return $this->_addGroup($group);
+    }
+
+    /**
+     * Retrive a Tapestry group
+     * 
+     * @return  Object  $group
+     */
+    public function get()
+    {
+        // TODO: TO BE IMPLEMENTED
     }
 
     private function _addGroup($group)

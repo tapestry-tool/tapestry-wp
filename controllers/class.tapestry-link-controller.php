@@ -1,12 +1,13 @@
 <?php
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-link-controller.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryLinkController
+class TapestryLinkController implements iTapestryLinkController
 {
     private $postId;
 
@@ -46,6 +47,16 @@ class TapestryLinkController
         }
 
         return $this->_addTapestryLink($link);
+    }
+
+    /**
+     * Retrive the Tapestry Links
+     * 
+     * @return  Object  $links
+     */
+    public function get()
+    {
+        // TODO: TO BE IMPLEMENTED
     }
 
     private function _addTapestryLink($link)

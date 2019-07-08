@@ -3,12 +3,13 @@ require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-node-permissions.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-controller.php";
 
 /**
  * Add/update/retrieve a Tapestry
  * 
  */
-class TapestryController
+class TapestryController implements iTapestryController
 {
     private $postId;
 
@@ -30,7 +31,7 @@ class TapestryController
      * 
      * @return  Object  $tapestry
      */
-    public function addTapestry($tapestry)
+    public function save($tapestry)
     {
         if ($this->postId) {
             return TapestryErrors::throwsError('POST_ID_ALREADY_SET');
@@ -56,33 +57,13 @@ class TapestryController
      * 
      * @return  Object  $tapestry
      */
-    public function getTapestry()
+    public function get()
     {
         if (!$this->postId) {
             return TapestryErrors::throwsError('INVALID_POST_ID');
         }
 
         return $this->_getTapestry();
-    }
-
-    /**
-     * Retrieve all node ids associated to a tapestry
-     * 
-     * @return Array list of node ids for a tapestry
-     */
-    public function getTapestryNodeIds()
-    {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->nodes)) {
-            return [];
-        }
-
-        return $tapestry->nodes;
     }
 
     private function _addTapestry($tapestry)
