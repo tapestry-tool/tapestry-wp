@@ -11,7 +11,7 @@ class TapestryHelpers
     /**
      * Check if tapestry is valid
      * 
-     * @param   Number  $postId
+     * @param   Number  $postId postID
      * 
      * @return  Boolean
      */
@@ -23,7 +23,7 @@ class TapestryHelpers
     /**
      * Check if tapestry node is valid
      * 
-     * @param   Number  $nodeMetaId
+     * @param   Number  $nodeMetaId node meta ID
      * 
      * @return  Boolean
      */
@@ -44,7 +44,7 @@ class TapestryHelpers
     /**
      * Check if tapestry group is valid
      * 
-     * @param   Number  $groupMetaId
+     * @param   Number  $groupMetaId    group meta ID
      * 
      * @return  Boolean
      */
@@ -61,8 +61,8 @@ class TapestryHelpers
     /**
      * Check if the node is a child of a tapestry
      * 
-     * @param   Number  $nodeMetaId
-     * @param   Number  $tapestryPostId
+     * @param   Number  $nodeMetaId         node meta ID
+     * @param   Number  $tapestryPostId     post ID
      * 
      * @return  Boolean
      */
@@ -78,8 +78,8 @@ class TapestryHelpers
     /**
      * Get all group ids of a user
      * 
-     * @param   Number  $userId
-     * @param   Number  $tapestryPostId
+     * @param   Number  $userId             user ID
+     * @param   Number  $tapestryPostId     post ID
      * 
      * @return  Array   $groupIds
      */
@@ -103,9 +103,9 @@ class TapestryHelpers
     /**
      * Update post
      * 
-     * @param   Object  $post
-     * @param   String  $postType
-     * @param   Number  $postId
+     * @param   Object  $post       post object
+     * @param   String  $postType   post type
+     * @param   Number  $postId     post ID
      * 
      * @return  Number  $postId
      */
@@ -134,9 +134,9 @@ class TapestryHelpers
     /**
      * Check if the current user is allowed to an action
      * 
-     * @param   String  $action
-     * @param   Number  $nodeMetaId
-     * @param   Number  $tapestryPostId
+     * @param   String  $action             action to be performed
+     * @param   Number  $nodeMetaId         node meta ID
+     * @param   Number  $tapestryPostId     post ID
      * 
      * @return  Boolean
      */
