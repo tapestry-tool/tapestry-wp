@@ -64,7 +64,6 @@ get_header(); ?>
             var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var tapestryWpPostId = "<?php echo get_the_ID(); ?>";
             var addNodeModalUrl = "<?php echo plugin_dir_url( __FILE__ ); ?>modal-add-node.html";
-            var editNodeModalUrl = "<?php echo plugin_dir_url( __FILE__ ); ?>modal-edit-node.html";
         </script>
 
     </main><!-- #main -->
