@@ -15,6 +15,10 @@ class TapestryController implements iTapestryController
 
     /**
      * Constructor
+     * 
+     * @param   Number  $postId post ID
+     * 
+     * @return  NULL
      */
     public function __construct($postId = 0)
     {

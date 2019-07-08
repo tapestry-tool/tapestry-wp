@@ -13,6 +13,14 @@ class TapestryUserProgressController implements iTapestryUserProgressController
     private $postId;
     private $nodeMetaId;
 
+    /**
+     * Constructor
+     * 
+     * @param   Number  $postId     post ID
+     * @param   Number  $nodeMetaId node meta ID
+     * 
+     * @return  NULL
+     */
     public function __construct($postId = null, $nodeMetaId = null)
     {
         $this->_userId = apply_filters('determine_current_user', false);
