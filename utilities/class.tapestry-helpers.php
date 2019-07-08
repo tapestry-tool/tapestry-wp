@@ -17,8 +17,12 @@ class TapestryHelpers
     {
         if (is_numeric($nodeMetaId)) {
             $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
-            $nodePostId = $nodeMetadata->meta_value->post_id;
-            return get_post_type($nodePostId) == 'tapestry_node';
+            if ((!empty($nodeMetadata->meta_value))
+                && (!empty($nodeMetadata->meta_value->post_id))
+            ) {
+                $nodePostId = $nodeMetadata->meta_value->post_id;
+                return get_post_type($nodePostId) == 'tapestry_node';
+            }
         }
         return false;
     }
