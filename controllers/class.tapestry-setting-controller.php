@@ -28,6 +28,7 @@ class TapestrySettingController implements iTapestrySettingController
      * Update Tapestry settings
      * 
      * @param   Object  $settings   Tapestry settings
+     * @param   Boolean $updateTapestryPost
      * 
      * @return  Object  $settings 
      */

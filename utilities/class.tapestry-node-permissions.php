@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Tapestry Node Permissions
+ *
+ */
 class TapestryNodePermissions
 {
+    /**
+     * Get Default Node Permissions
+     * 
+     * @return  Array   DefaultNodePermissions
+     */
     static function getDefaultNodePermissions()
     {
         return [
@@ -9,6 +18,11 @@ class TapestryNodePermissions
         ];
     }
 
+    /**
+     * Get All Node Permission Options
+     * 
+     * @return  Array   NodePermission
+     */
     static function getNodePermissions()
     {
         return [

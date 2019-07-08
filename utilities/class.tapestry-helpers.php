@@ -8,11 +8,25 @@ class TapestryHelpers
         'TAPESTRY_NODE' => 'tapestry_node'
     ];
 
+    /**
+     * Check if tapestry is valid
+     * 
+     * @param   Number  $postId
+     * 
+     * @return  Boolean
+     */
     static function isValidTapestry($postId)
     {
         return is_numeric($postId) && get_post_type($postId) == 'tapestry';
     }
 
+    /**
+     * Check if tapestry node is valid
+     * 
+     * @param   Number  $nodeMetaId
+     * 
+     * @return  Boolean
+     */
     static function isValidTapestryNode($nodeMetaId)
     {
         if (is_numeric($nodeMetaId)) {
@@ -27,6 +41,13 @@ class TapestryHelpers
         return false;
     }
 
+    /**
+     * Check if tapestry group is valid
+     * 
+     * @param   Number  $groupMetaId
+     * 
+     * @return  Boolean
+     */
     static function isValidTapestryGroup($groupMetaId)
     {
         if (is_numeric($groupMetaId)) {
@@ -37,6 +58,14 @@ class TapestryHelpers
         return false;
     }
 
+    /**
+     * Check if the node is a child of a tapestry
+     * 
+     * @param   Number  $nodeMetaId
+     * @param   Number  $tapestryPostId
+     * 
+     * @return  Boolean
+     */
     static function isChildNodeOfTapestry($nodeMetaId, $tapestryPostId)
     {
         if (is_numeric($nodeMetaId) && self::isValidTapestry($tapestryPostId)) {
@@ -46,6 +75,14 @@ class TapestryHelpers
         return false;
     }
 
+    /**
+     * Get all group ids of a user
+     * 
+     * @param   Number  $userId
+     * @param   Number  $tapestryPostId
+     * 
+     * @return  Array   $groupIds
+     */
     static function getGroupIdsOfUser($userId, $tapestryPostId)
     {
         $groupIds = [];
@@ -63,6 +100,15 @@ class TapestryHelpers
         return $groupIds;
     }
 
+    /**
+     * Update post
+     * 
+     * @param   Object  $post
+     * @param   String  $postType
+     * @param   Number  $postId
+     * 
+     * @return  Number  $postId
+     */
     static function updatePost($post, $postType = 'tapestry', $postId = null)
     {
         switch ($postType) {
@@ -85,6 +131,15 @@ class TapestryHelpers
         ), true);
     }
 
+    /**
+     * Check if the current user is allowed to an action
+     * 
+     * @param   String  $action
+     * @param   Number  $nodeMetaId
+     * @param   Number  $tapestryPostId
+     * 
+     * @return  Boolean
+     */
     static function currentUserIsAllowed($action, $nodeMetaId, $tapestryPostId)
     {
         $options = TapestryNodePermissions::getNodePermissions();
