@@ -48,9 +48,7 @@ class TapestryController
             return TapestryErrors::throwsError('LINKS_EXIST_IN_NEW_TAPESTRY');
         }
 
-        $this->_addTapestry($tapestry);
-
-        return $tapestry;
+        return $this->_addTapestry($tapestry);
     }
 
     /**
@@ -96,6 +94,8 @@ class TapestryController
         $tapestry->groups = [];
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
+        return $tapestry;
     }
 
     private function _formNodeData($nodeData, $nodeMetadata)
