@@ -39,8 +39,8 @@ class TapestryGroupController implements iTapestryGroupController
             return TapestryErrors::throwsError('GROUP_ALREADY_EXISTS');
         }
         if ((!TapestryUserRoles::isEditor())
-            || (!TapestryUserRoles::isAdministrator())
-            || (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+            && (!TapestryUserRoles::isAdministrator())
+            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
             return TapestryErrors::throwsError('EDIT_TAPESTRY_PERMISSION_DENIED');
         }
