@@ -64,6 +64,13 @@ class TapestryErrors
         ]
     ];
 
+    /**
+     * Throws custom error
+     * 
+     * @param   String  $code   error code
+     * 
+     * @return  WP_Error
+     */
     static function throwsError($code)
     {
         $ERROR = (object) self::ERRORS[$code];
