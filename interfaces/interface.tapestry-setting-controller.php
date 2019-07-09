@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
  * Tapestry Setting Controller Interface
  * 
  */
-interface iTapestrySettingController extends iTapestryController
+interface ITapestrySettingController extends ITapestryController
 {
     /**
      * Update Tapestry settings

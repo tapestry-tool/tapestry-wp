@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-setting-cont
  * 
  */
 
-class TapestrySettingController implements iTapestrySettingController
+class TapestrySettingController implements ITapestrySettingController
 {
     private $postId;
 

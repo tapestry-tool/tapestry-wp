@@ -4,7 +4,7 @@
  * Tapestry Controller Interface
  * 
  */
-interface iTapestryController
+interface ITapestryController
 {
     /**
      * Save data

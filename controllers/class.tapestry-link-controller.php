@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-link-control
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryLinkController implements iTapestryLinkController
+class TapestryLinkController implements ITapestryLinkController
 {
     private $postId;
 
