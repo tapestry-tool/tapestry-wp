@@ -9,16 +9,16 @@ interface ITapestryController
     /**
      * Save data
      * 
-     * @param   $data
+     * @param   Object  $data   data to be saved
      * 
-     * @return  $data
+     * @return  Object  $data
      */
     public function save($data);
 
     /**
      * Retrieve data
      * 
-     * @return  $data
+     * @return  Object  $data
      */
     public function get();
 }
