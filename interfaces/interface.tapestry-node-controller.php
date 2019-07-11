@@ -5,8 +5,24 @@ require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
  * Tapestry Node Controller Interface
  * 
  */
-interface ITapestryNodeController extends ITapestryController
+interface ITapestryNodeController
 {
+    /**
+     * Save data
+     * 
+     * @param   Object  $data   data to be saved
+     * 
+     * @return  Object  $data
+     */
+    public function save($data);
+
+    /**
+     * Retrieve data
+     * 
+     * @return  Object  $data
+     */
+    public function get();
+
     /**
      * Update Tapestry Node Title
      * 

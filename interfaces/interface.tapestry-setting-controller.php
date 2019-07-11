@@ -5,8 +5,15 @@ require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
  * Tapestry Setting Controller Interface
  * 
  */
-interface ITapestrySettingController extends ITapestryController
+interface ITapestrySettingController
 {
+    /**
+     * Retrieve data
+     * 
+     * @return  Object  $data
+     */
+    public function get();
+
     /**
      * Update Tapestry settings
      * 

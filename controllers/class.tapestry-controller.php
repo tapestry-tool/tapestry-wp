@@ -98,7 +98,7 @@ class TapestryController implements ITapestryController
     }
 
     /**
-     * Update a new link
+     * Add a new link
      * 
      * @param  Object   $link   Tapestry link
      * 
@@ -113,7 +113,7 @@ class TapestryController implements ITapestryController
     }
 
     /**
-     * Update a new group
+     * Add a new group
      * 
      * @param   Object  $group   Tapestry group
      * 

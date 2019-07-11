@@ -5,8 +5,24 @@ require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
  * Tapestry Controller Interface
  * 
  */
-interface ITapestryUserProgressController extends ITapestryController
+interface ITapestryUserProgressController
 {
+    /**
+     * Save data
+     * 
+     * @param   Object  $data   data to be saved
+     * 
+     * @return  Object  $data
+     */
+    public function save($data);
+
+    /**
+     * Retrieve data
+     * 
+     * @return  Object  $data
+     */
+    public function get();
+
     /**
      * Update User's h5p video setting for a tapestry post
      *
