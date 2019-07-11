@@ -72,16 +72,6 @@ class TapestryGroupController implements ITapestryGroupController
 
         update_metadata_by_mid('post', $group->id, $group);
 
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->groups)) {
-            $tapestry->groups = [];
-        }
-
-        array_push($tapestry->groups, $group->id);
-
-        update_post_meta($this->postId, 'tapestry', $tapestry);
-
         return $group;
     }
 }

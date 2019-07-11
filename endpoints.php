@@ -185,8 +185,11 @@ function addTapestryNode($request)
     // TODO: JSON validations should happen here
     // make sure that we can only accept one node object at a time
     // adding multiple nodes would require multiple requests from the client
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->save($data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addNode($data);
 }
 
 /**
@@ -202,8 +205,11 @@ function addTapestryGroup($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the type of the group body exists and is 'tapestry_group'
-    $tapestryGroupController = new TapestryGroupController($postId);
-    return $tapestryGroupController->save($data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addGroup($data);
 }
 
 /**
@@ -219,8 +225,14 @@ function addTapestryLink($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the link object has all required attibutes - src, target etc.
-    $tapestryLinkController = new TapestryLinkController($postId);
-    return $tapestryLinkController->save($data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('ADD', $data->target, $postId)) {
+        return TapestryErrors::throwsError('ADD_NODE_PERMISSION_DENIED');
+    }
+    $tapestryController = new TapestryController($postId);
+    return $tapestryController->addLink($data);
 }
 
 /**
@@ -235,8 +247,12 @@ function updateTapestrySettings($request)
     $postId = $request['tapestryPostId'];
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
-    $tapestrySettingController = new TapestrySettingController($postId);
-    return $tapestrySettingController->save($data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    $tapestryController = new TapestryController($postId);
+    $settings = $tapestryController->getSettings();
+    return $settings->save($data);
 }
 
 /**
@@ -253,8 +269,22 @@ function updateTapestryNodePermissions($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the permissions body exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodePermissions($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updatePermissions($data);
 }
 
 /**
@@ -271,8 +301,22 @@ function updateTapestryNodeTitle($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the title exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodeTitle($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updateTitle($data);
 }
 
 /**
@@ -289,8 +333,22 @@ function updateTapestryNodeImageURL($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the image url exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodeImageURL($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updateImageURL($data);
 }
 
 /**
@@ -307,8 +365,22 @@ function updateTapestryNodeUnlockedStatus($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the unlocked status exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodeUnlockedStatus($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updateUnlockedStatus($data);
 }
 
 /**
@@ -325,8 +397,22 @@ function updateTapestryNodeTypeData($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the type data exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodeTypeData($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updateTypeData($data);
 }
 
 /**
@@ -343,8 +429,22 @@ function updateTapestryNodeCoordinates($request)
     $data = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the coordinates exists and not null
-    $tapestryNodeController = new TapestryNodeController($postId);
-    return $tapestryNodeController->updateTapestryNodeCoordinates($nodeMetaId, $data);
+    if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        return TapestryErrors::throwsError('INVALID_POST_ID');
+    }
+    if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+        return TapestryErrors::throwsError('INVALID_NODE_META_ID');
+    }
+    if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
+    }
+    if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+        return TapestryErrors::throwsError('INVALID_CHILD_NODE');
+    }
+
+    $tapestryController = new TapestryController($postId);
+    $node = $tapestryController->getNode($nodeMetaId);
+    return $node->updateCoordinates($data);
 }
 
 /**

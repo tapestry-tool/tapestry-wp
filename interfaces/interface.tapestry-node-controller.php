@@ -10,60 +10,54 @@ interface ITapestryNodeController extends ITapestryController
     /**
      * Update Tapestry Node Title
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   String  $title          Node title
      *
      * @return  String  $title
      */
-    public function updateTapestryNodeTitle($nodeMetaId, $title);
+    public function updateTitle($title);
 
     /**
      * Update Tapestry Node Image URL
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   String  $imageURL       Node image url
      *
      * @return  String  $imageURL
      */
-    public function updateTapestryNodeImageURL($nodeMetaId, $imageURL);
+    public function updateImageURL($imageURL);
 
     /**
      * Update Tapestry Node Unlocked Status
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Boolean $unlocked       Node unlocked status
      *
      * @return  Boolean $unlocked
      */
-    public function updateTapestryNodeUnlockedStatus($nodeMetaId, $unlocked);
+    public function updateUnlockedStatus($unlocked);
 
     /**
      * Update Tapestry Node Type Data
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Object  $typeData       Node type data
      *
      * @return  Object  $typeData
      */
-    public function updateTapestryNodeTypeData($nodeMetaId, $typeData);
+    public function updateTypeData($typeData);
 
     /**
      * Update Tapestry Node Coordinates
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Number  $coordinates    Node coordinates
      *
      * @return  Number  $coordinates
      */
-    public function updateTapestryNodeCoordinates($nodeMetaId, $coordinates);
+    public function updateCoordinates($coordinates);
 
     /**
      * Update Tapestry Node Permissions
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Object  $permissions    Node permissions
      *
      * @return  Object  $permissions
      */
-    public function updateTapestryNodePermissions($nodeMetaId, $permissions);
+    public function updatePermissions($permissions);
 }

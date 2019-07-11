@@ -35,9 +35,6 @@ class TapestryLinkController implements ITapestryLinkController
      */
     public function save($link)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
         if (!$link->source || !$link->target) {
             return TapestryErrors::throwsError('INVALID_NEW_LINK');
         }
@@ -45,9 +42,6 @@ class TapestryLinkController implements ITapestryLinkController
             || (!TapestryHelpers::isChildNodeOfTapestry($link->target, $this->postId))
         ) {
             return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->target, $this->postId)) {
-            return TapestryErrors::throwsError('ADD_NODE_PERMISSION_DENIED');
         }
 
         return $this->_addTapestryLink($link);

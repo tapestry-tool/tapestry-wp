@@ -10,20 +10,20 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node-control
 class TapestryNodeController implements ITapestryNodeController
 {
     private $postId;
+    private $nodeMetaId;
 
     /**
      * Constructor
      * 
-     * @param   Number  $postId post ID
+     * @param   Number  $post post ID
+     * @param   Number  $nodeMetaId node meta ID
      * 
      * @return  NULL
      */
-    public function __construct($postId = 0)
+    public function __construct($postId = 0, $nodeMetaId = 0)
     {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
         $this->postId = (int) $postId;
+        $this->nodeMetaId = (int) $nodeMetaId;
     }
 
     /**	
@@ -35,9 +35,6 @@ class TapestryNodeController implements ITapestryNodeController
      */
     public function save($node)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
         if (isset($node->id)) {
             if (TapestryHelpers::isValidTapestryNode($node->id)) {
                 return TapestryErrors::throwsError('NODE_ALREADY_EXISTS');
@@ -73,170 +70,74 @@ class TapestryNodeController implements ITapestryNodeController
     /**
      * Update Tapestry Node Title
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   String  $title          Node title
      *
      * @return  String  $title
      */
-    public function updateTapestryNodeTitle($nodeMetaId, $title)
+    public function updateTitle($title)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a string
-
-        return $this->_updateNodeProperty($nodeMetaId, 'title', $title);
+        return $this->_updateNodeProperty('title', $title);
     }
 
     /**
      * Update Tapestry Node Image URL
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   String  $imageURL       Node image url
      *
      * @return  String  $imageURL
      */
-    public function updateTapestryNodeImageURL($nodeMetaId, $imageURL)
+    public function updateImageURL($imageURL)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a string
-
-        return $this->_updateNodeProperty($nodeMetaId, 'imageURL', $imageURL);
+        return $this->_updateNodeProperty('imageURL', $imageURL);
     }
 
     /**
      * Update Tapestry Node Unlocked Status
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Boolean $unlocked       Node unlocked status
      *
      * @return  Boolean $unlocked
      */
-    public function updateTapestryNodeUnlockedStatus($nodeMetaId, $unlocked)
+    public function updateUnlockedStatus($unlocked)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a boolean
-
-        return $this->_updateNodeProperty($nodeMetaId, 'unlocked', $unlocked);
+        return $this->_updateNodeProperty('unlocked', $unlocked);
     }
 
     /**
      * Update Tapestry Node Type Data
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Object  $typeData       Node type data
      *
      * @return  Object  $typeData
      */
-    public function updateTapestryNodeTypeData($nodeMetaId, $typeData)
+    public function updateTypeData($typeData)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a valid object
-
-        return $this->_updateNodeProperty($nodeMetaId, 'typeData', $typeData);
+        return $this->_updateNodeProperty('typeData', $typeData);
     }
 
     /**
      * Update Tapestry Node Coordinates
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Number  $coordinates    Node coordinates
      *
      * @return  Number  $coordinates
      */
-    public function updateTapestryNodeCoordinates($nodeMetaId, $coordinates)
+    public function updateCoordinates($coordinates)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a valid object with property x and y
-        // round up the numbers before saving.
-
-        return $this->_updateNodeProperty($nodeMetaId, 'coordinates', $coordinates);
+        return $this->_updateNodeProperty('coordinates', $coordinates);
     }
 
     /**
      * Update Tapestry Node Permissions
      * 
-     * @param   Integer $nodeMetaId     Node meta id
      * @param   Object  $permissions    Node permissions
      *
      * @return  Object  $permissions
      */
-    public function updateTapestryNodePermissions($nodeMetaId, $permissions)
+    public function updatePermissions($permissions)
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            return TapestryErrors::throwsError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('INVALID_CHILD_NODE');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $this->postId)) {
-            return TapestryErrors::throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
         // TODO: validate that $permissions has appropriate/valid info
-
-        return $this->_updateNodeProperty($nodeMetaId, 'permissions', $permissions);
+        return $this->_updateNodeProperty('permissions', $permissions);
     }
 
     private function _addNode($node)
@@ -247,29 +148,15 @@ class TapestryNodeController implements ITapestryNodeController
 
         update_post_meta($nodePostId, 'tapestry_node_data', $node);
 
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->nodes)) {
-            $tapestry->nodes = [];
-        }
-
-        array_push($tapestry->nodes, $node->id);
-
-        if (empty($tapestry->rootId)) {
-            $tapestry->rootId = $tapestry->nodes[0];
-        }
-
-        update_post_meta($this->postId, 'tapestry', $tapestry);
-
         return $node;
     }
 
-    private function _updateNodeProperty($nodeMetaId, $property, $newPropertyValue)
+    private function _updateNodeProperty($property, $newPropertyValue)
     {
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $nodeMetadata->{$property} = $newPropertyValue;
 
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
+        update_metadata_by_mid('post', $this->nodeMetaId, $nodeMetadata);
 
         return $newPropertyValue;
     }
