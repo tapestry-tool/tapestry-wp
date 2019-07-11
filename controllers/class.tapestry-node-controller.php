@@ -15,7 +15,7 @@ class TapestryNodeController implements ITapestryNodeController
     /**
      * Constructor
      * 
-     * @param   Number  $post post ID
+     * @param   Number  $postId post ID
      * @param   Number  $nodeMetaId node meta ID
      * 
      * @return  NULL
