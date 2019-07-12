@@ -41,6 +41,20 @@ class TapestryUserController
     }
 
     /**
+     * Set 'unlocked' status of a Tapestry Node for this User to true
+     *
+     * @param Integer $postId the post's ID
+     * @param Integer $nodeId the node's ID to be unlocked
+     *
+     * @return Null
+     */
+    public function unlockNode($postId, $nodeId) 
+    {
+        $this->_checkUserAndPostId($postId);
+        $this->_unlockNode($postId, $nodeId);
+    }
+
+    /**
      * Get User's video progress for a tapestry post
      *
      * @param Integer $postId    the post's ID
@@ -94,6 +108,11 @@ class TapestryUserController
         update_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, $progressValue);
     }
 
+    private function _unlockNode($postId, $nodeId) 
+    {
+        update_user_meta($this->_userId, 'tapestry_' . $postId . '_node_unlocked_' . $nodeId, true);
+    }
+
     private function _getUserProgress($postId, $nodeIdArr) 
     {
         $progress = new stdClass();
@@ -101,10 +120,20 @@ class TapestryUserController
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodeIdArr as $nodeId) {
             $progress_value = get_user_meta($this->_userId, 'tapestry_' . $postId . '_progress_node_' . $nodeId, true);
+            $progress->$nodeId = new stdClass();
             if ($progress_value !== null) {
-                $progress->$nodeId = (float) $progress_value;
+                $progress->$nodeId->progress = (float) $progress_value;
             } else {
-                $progress->$nodeId = 0.0;
+                $progress->$nodeId->progress = 0;
+            }
+
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            $default_unlocked_status = $nodeMetadata->unlocked ? true : false;
+            $unlocked_value = get_user_meta($this->_userId, 'tapestry_' . $postId . '_node_unlocked_' . $nodeId, true);
+            if ($unlocked_value !== null) {
+                $progress->$nodeId->$unlocked = $unlocked_value;
+            } else {
+                $progress->$nodeId->$unlocked = $default_unlocked_status;
             }
         }
 

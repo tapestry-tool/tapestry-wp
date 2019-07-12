@@ -73,14 +73,6 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_UNLOCKED_STATUS' => (object)[
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/unlocked',
-        'ARGUMENTS' => [
-            'methods'               => 'PUT',
-            'callback'              => 'updateTapestryNodeUnlockedStatus',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
-        ]
-    ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object)[
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
@@ -117,6 +109,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => 'POST',
             'callback'              => 'updateProgressByNodeId',
+        ]
+    ],
+    'UPDATE_TAPESTRY_UNLOCKED' => (object)[
+        'ROUTE'     => 'users/unlocked',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'unlockByNodeId',
         ]
     ],
     'GET_H5P_SETTING' => (object)[
@@ -286,24 +285,6 @@ function updateTapestryNodeImageURL($request)
 }
 
 /**
- * Update Tapestry Node Unlocked Status
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response
- */
-function updateTapestryNodeUnlockedStatus($request)
-{
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    // make sure the unlocked status exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeUnlockedStatus($nodeMetaId, $data);
-}
-
-/**
  * Update Tapestry Node Type Data
  * 
  * @param   Object  $request    HTTP request
@@ -388,6 +369,21 @@ function updateProgressByNodeId($request)
     $nodeId = $request['node_id'];
     $progressValue = $request['progress_value'];
     $userController->updateProgress($postId, $nodeId, $progressValue);
+}
+
+/**
+ * Set unlocked status of a single node to true by passing in node id and post id
+ * Example: /wp-json/tapestry-tool/v1/users/unlocked?post_id=44&node_id=1
+ * 
+ * @param Object $request HTTP request
+ * @return null
+ */
+function unlockByNodeId($request)
+{
+    $userController = new TapestryUserController;
+    $postId = $request['post_id'];
+    $nodeId = $request['node_id'];
+    $userController->unlockNode($postId, $nodeId);
 }
 
 /**

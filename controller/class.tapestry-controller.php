@@ -301,39 +301,6 @@ class TapestryController
     }
 
     /**
-     * Update Tapestry Node Unlocked Status
-     * 
-     * @param   Integer $nodeMetaId     Node meta id
-     * @param   Boolean $unlocked       Node unlocked status
-     *
-     * @return  Boolean $unlocked
-     */
-    public function updateTapestryNodeUnlockedStatus($nodeMetaId, $unlocked)
-    {
-        if (!$this->postId) {
-            return $this->_throwsError('INVALID_POST_ID');
-        }
-        if (!$this->_isValidTapestryNode($nodeMetaId)) {
-            return $this->_throwsError('INVALID_NODE_META_ID');
-        }
-        if (!$this->_isChildNodeOfTapestry($nodeMetaId)) {
-            return $this->_throwsError('INVALID_CHILD_NODE');
-        }
-        if (!$this->_currentUserIsAllowed('EDIT', $nodeMetaId)) {
-            return $this->_throwsError('EDIT_NODE_PERMISSION_DENIED');
-        }
-
-        // TODO: Verify that this is a boolean
-
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId)->meta_value;
-        $nodeMetadata->unlocked = $unlocked;
-
-        update_metadata_by_mid('post', $nodeMetaId, $nodeMetadata);
-
-        return $unlocked;
-    }
-
-    /**
      * Update Tapestry Node Type Data
      * 
      * @param   Integer $nodeMetaId     Node meta id
