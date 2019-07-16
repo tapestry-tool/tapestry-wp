@@ -243,7 +243,7 @@ class TapestryController implements ITapestryController
 
     private function _getTapestry()
     {
-        $tapestry = $this->_filterTapestry();
+        $tapestry = $this->_filterTapestry($this->_formTapestry());
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
@@ -264,10 +264,8 @@ class TapestryController implements ITapestryController
         return $tapestry;
     }
 
-    private function _filterTapestry()
+    private function _filterTapestry($tapestry)
     {
-        $tapestry = $this->_formTapestry();
-
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator())
             && (!TapestryUserRoles::isAuthorOfThePost($this->postId))

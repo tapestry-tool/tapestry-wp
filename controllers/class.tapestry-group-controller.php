@@ -33,10 +33,10 @@ class TapestryGroupController implements ITapestryGroupController
 
         if (TapestryHelpers::isValidTapestryGroup($this->groupMetaId)) {
             $group = $this->_loadFromDatabase();
-            $this->nodes = $group->nodes;
-            $this->members = $group->members;
             $this->name = $group->name;
             $this->type = $group->type;
+            $this->nodes = $group->nodes;
+            $this->members = $group->members;
         } else {
             $this->nodes = [];
             $this->members = [];
