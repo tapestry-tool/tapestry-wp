@@ -1,16 +1,19 @@
 <?php
+
 /**
  * Tapestry Endpoints
  *
  */
 
-require __DIR__ . '/controller/class.tapestry-permissions.php';
-require __DIR__ . '/controller/class.tapestry-controller.php';
-require __DIR__ . '/controller/class.user-controller.php';
+require_once __DIR__ . '/utilities/class.tapestry-permissions.php';
+require_once __DIR__ . '/classes/class.tapestry.php';
+require_once __DIR__ . '/classes/class.tapestry-node.php';
+require_once __DIR__ . '/classes/class.tapestry-group.php';
+require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 $REST_API_ENDPOINTS = [
-    'POST_TAPESTRY_NODE' => (object)[
+    'POST_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -18,7 +21,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestryNode'
         ]
     ],
-    'POST_TAPESTRY' => (object)[
+    'POST_TAPESTRY' => (object) [
         'ROUTE'     => '/tapestries',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -26,7 +29,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
     ],
-    'PUT_TAPESTRY_SETTINGS' => (object)[
+    'PUT_TAPESTRY_SETTINGS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -34,14 +37,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestrySettings'
         ]
     ],
-    'GET_TAPESTRY' => (object)[
+    'GET_TAPESTRY' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
             'methods'   => 'GET',
             'callback'  => 'getTapestry'
         ]
     ],
-    'POST_TAPESTRY_GROUP' => (object)[
+    'POST_TAPESTRY_GROUP' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -49,7 +52,15 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestryGroup'
         ]
     ],
-    'PUT_TAPESTRY_NODE_PERMISSIONS' => (object)[
+    'PUT_TAPESTRY_NODE' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNode',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
+    'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -57,7 +68,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_TITLE' => (object)[
+    'PUT_TAPESTRY_NODE_TITLE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -65,7 +76,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_IMAGE_URL' => (object)[
+    'PUT_TAPESTRY_NODE_IMAGE_URL' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -73,7 +84,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_UNLOCKED_STATUS' => (object)[
+    'PUT_TAPESTRY_NODE_UNLOCKED_STATUS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/unlocked',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -81,7 +92,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_TYPE_DATA' => (object)[
+    'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -89,7 +100,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_COORDINATES' => (object)[
+    'PUT_TAPESTRY_NODE_COORDINATES' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
         'ARGUMENTS' => [
             'methods'               => 'PUT',
@@ -97,7 +108,7 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'POST_TAPESTRY_LINK' => (object)[
+    'POST_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -105,28 +116,28 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
     ],
-    'GET_TAPESTRY_PROGRESS' => (object)[
+    'GET_TAPESTRY_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
             'methods'               => 'GET',
             'callback'              => 'getUserProgressByPostId',
         ]
     ],
-    'UPDATE_TAPESTRY_PROGRESS' => (object)[
+    'UPDATE_TAPESTRY_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
             'methods'               => 'POST',
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
-    'GET_H5P_SETTING' => (object)[
+    'GET_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
             'methods'               => 'GET',
             'callback'              => 'getUserU5PSettingsByPostId',
         ]
     ],
-    'UPDATE_H5P_SETTING' => (object)[
+    'UPDATE_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -152,6 +163,25 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 }
 
 /**
+ * Add a tapestry
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function addTapestry($request)
+{
+    $tapestryData = json_decode($request->get_body());
+    $tapestry = new Tapestry();
+    try {
+        $tapestry->set($tapestryData);
+        return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
  * Add a tapestry node
  * 
  * @param   Object  $request    HTTP request
@@ -161,57 +191,19 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function addTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
-    $data = json_decode($request->get_body());
+    $node = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure that we can only accept one node object at a time
     // adding multiple nodes would require multiple requests from the client
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->addTapestryNode($data);
-}
-
-/**
- * Add a tapestry
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response
- */
-function addTapestry($request)
-{
-    $data = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    $tapestryController = new TapestryController();
-    return $tapestryController->addTapestry($data);
-}
-
-/**
- * Update Tapestry Settings
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response 
- */
-function updateTapestrySettings($request)
-{
-    $postId = $request['tapestryPostId'];
-    $data = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestrySettings($data);
-}
-
-/**
- * Get a Tapestry
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response
- */
-function getTapestry($request)
-{
-    $postId = $request['tapestryPostId'];
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->getTapestry();
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addNode($node);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -224,11 +216,114 @@ function getTapestry($request)
 function addTapestryGroup($request)
 {
     $postId = $request['tapestryPostId'];
-    $data = json_decode($request->get_body());
+    $group = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the type of the group body exists and is 'tapestry_group'
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->addTapestryGroup($data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addGroup($group);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Add A Tapestry Link
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function addTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $link = json_decode($request->get_body());
+
+    try {
+        if (!$link->source || !$link->target) {
+            throw new TapestryError('INVALID_NEW_LINK');
+        }
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if ((!TapestryHelpers::isChildNodeOfTapestry($link->source, $postId))
+            || (!TapestryHelpers::isChildNodeOfTapestry($link->target, $postId))
+        ) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->target, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addLink($link);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry Settings
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response 
+ */
+function updateTapestrySettings($request)
+{
+    $postId = $request['tapestryPostId'];
+    $settings = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['settings' => $settings]);
+        return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry Node
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNode($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $nodeData = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the permissions body exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) $nodeData);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -242,11 +337,31 @@ function updateTapestryNodePermissions($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $permissions = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the permissions body exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodePermissions($nodeMetaId, $data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['permissions' => $permissions]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -260,11 +375,31 @@ function updateTapestryNodeTitle($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $title = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the title exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeTitle($nodeMetaId, $data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['title' => $title]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -278,11 +413,31 @@ function updateTapestryNodeImageURL($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $imageURL = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the image url exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeImageURL($nodeMetaId, $data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['imageURL' => $imageURL]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -296,11 +451,31 @@ function updateTapestryNodeUnlockedStatus($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $unlocked = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the unlocked status exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeUnlockedStatus($nodeMetaId, $data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['unlocked' => $unlocked]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -314,11 +489,31 @@ function updateTapestryNodeTypeData($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $typeData = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the type data exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeTypeData($nodeMetaId, $data);
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['typeData' => $typeData]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -332,46 +527,31 @@ function updateTapestryNodeCoordinates($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $data = json_decode($request->get_body());
+    $coordinates = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure the coordinates exists and not null
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->updateTapestryNodeCoordinates($nodeMetaId, $data);
-}
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
 
-/**
- * Add A Tapestry Link
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response
- */
-function addTapestryLink($request)
-{
-    $postId = $request['tapestryPostId'];
-    $data = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    // make sure the link object has all required attibutes - src, target etc.
-    $tapestryController = new TapestryController($postId);
-    return $tapestryController->addTapestryLink($data);
-}
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
-/**
- * Get user progress on a tapestry page by post id. 
- * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
- * 
- * @param Object $request HTTP request
- * 
- * @return Object $response HTTP response
- */
-function getUserProgressByPostId($request)
-{
-    $postId = $request['post_id'];
-    $tapestryController = new TapestryController($postId);
-    $nodeIdArr = $tapestryController->getTapestryNodeIds();
-
-    $userController = new TapestryUserController;
-    return $userController->getProgress($postId, $nodeIdArr);
+        $node->set((object) ['coordinates' => $coordinates]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -383,11 +563,16 @@ function getUserProgressByPostId($request)
  */
 function updateProgressByNodeId($request)
 {
-    $userController = new TapestryUserController;
     $postId = $request['post_id'];
-    $nodeId = $request['node_id'];
+    $nodeMetaId = $request['node_id'];
     $progressValue = $request['progress_value'];
-    $userController->updateProgress($postId, $nodeId, $progressValue);
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        $userProgress->save($progressValue);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -401,8 +586,13 @@ function updateProgressByNodeId($request)
 function getUserU5PSettingsByPostId($request)
 {
     $postId = $request['post_id'];
-    $userController = new TapestryUserController;
-    return $userController->getH5PSettings($postId);
+
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getH5PSettings();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -414,8 +604,50 @@ function getUserU5PSettingsByPostId($request)
  */
 function updateUserH5PSettingsByPostId($request)
 {
-    $userController = new TapestryUserController;
     $postId = $request['post_id'];
-    $json = $request['json'];
-    $userController->updateH5PSettings($postId, $json);
+    $h5pSettingsData = $request['json'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        $userProgress->updateH5PSettings($h5pSettingsData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get a Tapestry
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function getTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        $tapestry = new Tapestry($postId);
+        return $tapestry->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get user progress on a tapestry page by post id. 
+ * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getUserProgressByPostId($request)
+{
+    $postId = $request['post_id'];
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
