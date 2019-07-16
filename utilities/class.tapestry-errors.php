@@ -80,6 +80,11 @@ class TapestryError extends Error
         $this->status = $ERROR->STATUS;
     }
 
+    /**
+     * Get Error Status
+     * 
+     * @return  $status
+     */
     public function getStatus()
     {
         return $this->status;

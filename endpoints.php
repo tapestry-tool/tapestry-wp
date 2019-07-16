@@ -164,9 +164,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function addTapestry($request)
 {
     $tapestry = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
+    $tapestryController = new TapestryController();
     try {
-        $tapestryController = new TapestryController();
         $tapestryController->set($tapestry);
         return $tapestryController->save();
     } catch (TapestryError $e) {
@@ -599,7 +598,6 @@ function getTapestry($request)
 function getUserProgressByPostId($request)
 {
     $postId = $request['post_id'];
-
     try {
         $userProgressController = new TapestryUserProgressController($postId);
         return $userProgressController->get();

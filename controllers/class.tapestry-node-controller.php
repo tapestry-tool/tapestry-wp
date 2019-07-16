@@ -47,11 +47,11 @@ class TapestryNodeController implements ITapestryNodeController
             $this->title = $node->title;
             $this->status = $node->status;
             $this->imageURL = $node->imageURL;
+            $this->unlocked = $node->unlocked;
+            $this->typeData = $node->typeData;
             $this->mediaType = $node->mediaType;
             $this->mediaFormat = $node->mediaFormat;
-            $this->unlocked = $node->unlocked;
             $this->mediaDuration = $node->mediaDuration;
-            $this->typeData = $node->typeData;
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
         } else {
