@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Tapestry Group Controller Interface
+ * Tapestry Group Interface
  * 
  */
-interface ITapestryGroupController
+interface ITapestryGroup
 {
     /**
      * Save the Tapestry group

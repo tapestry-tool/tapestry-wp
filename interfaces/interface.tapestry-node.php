@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Tapestry Node Controller Interface
+ * Tapestry Node Interface
  * 
  */
-interface ITapestryNodeController
+interface ITapestryNode
 {
     /**	
      * Save the Tapestry node

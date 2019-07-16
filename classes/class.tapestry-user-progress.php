@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progres
  * Add/update/retrieve User progress
  * 
  */
-class TapestryUserProgressController implements ITapestryUserProgressController
+class TapestryUserProgress implements ITapestryUserProgress
 {
 
     private $_userId = null;
@@ -61,8 +61,8 @@ class TapestryUserProgressController implements ITapestryUserProgressController
         $this->_isValidTapestryPost();
         $this->_checkUserAndPostId();
 
-        $tapestryController = new TapestryController($this->postId);
-        $nodeIdArr = $tapestryController->getNodeIds();
+        $tapestry = new Tapestry($this->postId);
+        $nodeIdArr = $tapestry->getNodeIds();
 
         return $this->_getUserProgress($nodeIdArr);
     }

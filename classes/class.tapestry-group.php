@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-group.php";
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryGroupController implements ITapestryGroupController
+class TapestryGroup implements ITapestryGroup
 {
     private $postId;
     private $groupMetaId;

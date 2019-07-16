@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
  * Add/update/retrieve Tapestry post and its child nodes
  * 
  */
-class TapestryNodeController implements ITapestryNodeController
+class TapestryNode implements ITapestryNode
 {
     private $postId;
     private $nodeMetaId;

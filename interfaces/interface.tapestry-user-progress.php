@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Tapestry Controller Interface
+ * Tapestry Interface
  * 
  */
-interface ITapestryUserProgressController
+interface ITapestryUserProgress
 {
     /**
      * Save data

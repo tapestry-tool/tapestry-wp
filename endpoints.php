@@ -171,11 +171,11 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
  */
 function addTapestry($request)
 {
-    $tapestry = json_decode($request->get_body());
-    $tapestryController = new TapestryController();
+    $tapestryData = json_decode($request->get_body());
+    $tapestry = new Tapestry();
     try {
-        $tapestryController->set($tapestry);
-        return $tapestryController->save();
+        $tapestry->set($tapestryData);
+        return $tapestry->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -199,8 +199,8 @@ function addTapestryNode($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        $tapestryController = new TapestryController($postId);
-        return $tapestryController->addNode($node);
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addNode($node);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -223,8 +223,8 @@ function addTapestryGroup($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        $tapestryController = new TapestryController($postId);
-        return $tapestryController->addGroup($group);
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addGroup($group);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -257,8 +257,8 @@ function addTapestryLink($request)
         if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->target, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
-        $tapestryController = new TapestryController($postId);
-        return $tapestryController->addLink($link);
+        $tapestry = new Tapestry($postId);
+        return $tapestry->addLink($link);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -280,9 +280,9 @@ function updateTapestrySettings($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
-        $tapestryController = new TapestryController($postId);
-        $tapestryController->set((object) ['settings' => $settings]);
-        return $tapestryController->save();
+        $tapestry = new Tapestry($postId);
+        $tapestry->set((object) ['settings' => $settings]);
+        return $tapestry->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -316,8 +316,8 @@ function updateTapestryNode($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) $nodeData);
         return $node->save();
@@ -354,8 +354,8 @@ function updateTapestryNodePermissions($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['permissions' => $permissions]);
         return $node->save();
@@ -392,8 +392,8 @@ function updateTapestryNodeTitle($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['title' => $title]);
         return $node->save();
@@ -430,8 +430,8 @@ function updateTapestryNodeImageURL($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['imageURL' => $imageURL]);
         return $node->save();
@@ -468,8 +468,8 @@ function updateTapestryNodeUnlockedStatus($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['unlocked' => $unlocked]);
         return $node->save();
@@ -506,8 +506,8 @@ function updateTapestryNodeTypeData($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['typeData' => $typeData]);
         return $node->save();
@@ -544,8 +544,8 @@ function updateTapestryNodeCoordinates($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $tapestryController = new TapestryController($postId);
-        $node = $tapestryController->getNode($nodeMetaId);
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['coordinates' => $coordinates]);
         return $node->save();
@@ -568,8 +568,8 @@ function updateProgressByNodeId($request)
     $progressValue = $request['progress_value'];
 
     try {
-        $userController = new TapestryUserProgressController($postId, $nodeMetaId);
-        $userController->save($progressValue);
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        $userProgress->save($progressValue);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -588,8 +588,8 @@ function getUserU5PSettingsByPostId($request)
     $postId = $request['post_id'];
 
     try {
-        $userController = new TapestryUserProgressController($postId);
-        return $userController->getH5PSettings();
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getH5PSettings();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -608,8 +608,8 @@ function updateUserH5PSettingsByPostId($request)
     $h5pSettingsData = $request['json'];
 
     try {
-        $userController = new TapestryUserProgressController($postId);
-        $userController->updateH5PSettings($h5pSettingsData);
+        $userProgress = new TapestryUserProgress($postId);
+        $userProgress->updateH5PSettings($h5pSettingsData);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -626,8 +626,8 @@ function getTapestry($request)
 {
     $postId = $request['tapestryPostId'];
     try {
-        $tapestryController = new TapestryController($postId);
-        return $tapestryController->get();
+        $tapestry = new Tapestry($postId);
+        return $tapestry->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -645,8 +645,8 @@ function getUserProgressByPostId($request)
 {
     $postId = $request['post_id'];
     try {
-        $userProgressController = new TapestryUserProgressController($postId);
-        return $userProgressController->get();
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

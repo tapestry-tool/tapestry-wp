@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
  * Add/update/retrieve a Tapestry
  * 
  */
-class TapestryController implements ITapestryController
+class Tapestry implements ITapestry
 {
     private $postId;
 
@@ -132,9 +132,9 @@ class TapestryController implements ITapestryController
      */
     public function addNode($node)
     {
-        $tapestryNodeController = new TapestryNodeController($this->postId);
-        $tapestryNodeController->set($node);
-        $node = $tapestryNodeController->save($node);
+        $tapestryNode = new TapestryNode($this->postId);
+        $tapestryNode->set($node);
+        $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);
 
@@ -169,9 +169,9 @@ class TapestryController implements ITapestryController
      */
     public function addGroup($group)
     {
-        $tapestryGroupController = new TapestryGroupController($this->postId);
-        $tapestryGroupController->set($group);
-        $group = $tapestryGroupController->save();
+        $tapestryGroup = new TapestryGroup($this->postId);
+        $tapestryGroup->set($group);
+        $group = $tapestryGroup->save();
 
         array_push($this->groups, $group->id);
         $this->_saveToDatabase();
@@ -187,7 +187,7 @@ class TapestryController implements ITapestryController
      */
     public function getNode($nodeMetaId)
     {
-        return new TapestryNodeController($this->postId, $nodeMetaId);
+        return new TapestryNode($this->postId, $nodeMetaId);
     }
 
     /**
@@ -199,7 +199,7 @@ class TapestryController implements ITapestryController
      */
     public function getGroup($groupMetaId)
     {
-        return new TapestryNodeController($this->postId, $groupMetaId);
+        return new TapestryNode($this->postId, $groupMetaId);
     }
 
     private function _loadFromDatabase()
@@ -247,8 +247,8 @@ class TapestryController implements ITapestryController
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
-                $tapestryNodeController = new TapestryNodeController($this->postId, $nodeMetaId);
-                return $tapestryNodeController->get();
+                $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
+                return $tapestryNode->get();
             },
             $tapestry->nodes
         );

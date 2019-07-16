@@ -126,22 +126,22 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
         return;
     }
 
-    $tapestryController = new TapestryController($postId);
-    $tapestry = $tapestryController->get();
+    $tapestry = new Tapestry($postId);
+    $tapestryData = $tapestry->get();
 
-    if ($update && !empty($tapestry->settings)) {
-        $tapestry->settings->tapestrySlug = $post->post_name;
-        $tapestry->settings->title = $post->post_title;
-        $tapestry->settings->status = $post->post_status;
+    if ($update && !empty($tapestryData->settings)) {
+        $tapestryData->settings->tapestrySlug = $post->post_name;
+        $tapestryData->settings->title = $post->post_title;
+        $tapestryData->settings->status = $post->post_status;
     } else {
-        $tapestry->settings = (object) array(
+        $tapestryData->settings = (object) array(
             'tapestrySlug'  => $post->post_name,
             'title'         => $post->post_title,
             'status'        => $post->post_status
         );
     }
 
-    $tapestryController->set($tapestry);
-    $tapestryController->saveOnPublish();
+    $tapestry->set((object) ['settings' => $tapestryData->settings]);
+    $tapestry->saveOnPublish();
 }
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);

@@ -13,7 +13,7 @@ class TapestryNodePermissions
      */
     static function getDefaultNodePermissions()
     {
-        return [
+        return (object) [
             'public' => ['read']
         ];
     }
