@@ -72,6 +72,13 @@ class TapestryError extends Error
         ]
     ];
 
+    /**
+     * Constructor
+     * 
+     * @param   String  $code   error code
+     * 
+     * @return  NULL
+     */
     public function __construct($code)
     {
         $ERROR = (object) self::ERRORS[$code];
