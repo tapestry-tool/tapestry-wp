@@ -13,7 +13,6 @@
  * Register endpoints
  */
 require_once dirname(__FILE__) . '/endpoints.php';
-require_once dirname(__FILE__) . '/controllers/class.tapestry-setting-controller.php';
 
 /**
  * Register Tapestry type on initialization
@@ -127,21 +126,22 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
         return;
     }
 
-    $tapestrySettingController = new TapestrySettingController($postId);
-    $settings = $tapestrySettingController->get();
+    $tapestryController = new TapestryController($postId);
+    $tapestry = $tapestryController->get();
 
-    if ($update && !empty($settings)) {
-        $settings->tapestrySlug = $post->post_name;
-        $settings->title = $post->post_title;
-        $settings->status = $post->post_status;
+    if ($update && !empty($tapestry->settings)) {
+        $tapestry->settings->tapestrySlug = $post->post_name;
+        $tapestry->settings->title = $post->post_title;
+        $tapestry->settings->status = $post->post_status;
     } else {
-        $settings = (object) array(
+        $tapestry->settings = (object) array(
             'tapestrySlug'  => $post->post_name,
             'title'         => $post->post_title,
             'status'        => $post->post_status
         );
     }
 
-    $tapestrySettingController->save($settings, false);
+    $tapestryController->set($tapestry);
+    $tapestryController->saveOnPublish();
 }
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);

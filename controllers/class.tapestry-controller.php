@@ -13,6 +13,14 @@ class TapestryController implements ITapestryController
 {
     private $postId;
 
+    private $groups;
+    private $links;
+    private $settings;
+    private $rootId;
+    private $nodes;
+
+    private $updateTapestryPost = true;
+
     /**
      * Constructor
      * 
@@ -23,31 +31,69 @@ class TapestryController implements ITapestryController
     public function __construct($postId = 0)
     {
         $this->postId = (int) $postId;
+
+        if (TapestryHelpers::isValidTapestry($this->postId)) {
+            $tapestry = $this->_loadTapestry();
+            $this->nodes = $tapestry->nodes;
+            $this->links = $tapestry->links;
+            $this->groups = $tapestry->groups;
+            $this->rootId = $tapestry->rootId;
+            $this->settings = $tapestry->settings;
+        } else {
+            $this->nodes = [];
+            $this->links = [];
+            $this->groups = [];
+            $this->rootId = 0;
+            $this->settings = (object) [];
+        }
     }
 
     /**
-     * Add A Tapestry
-     * 
-     * @param   Object  $tapestry   Tapestry
+     * Save the Tapestry
      * 
      * @return  Object  $tapestry
      */
-    public function save($tapestry)
+    public function save()
     {
-        if (empty($tapestry->settings)) {
-            return TapestryErrors::throwsError('SETTINGS_MISSING_IN_NEW_TAPESTRY');
-        }
-        if (!empty($tapestry->nodes)) {
-            return TapestryErrors::throwsError('NODES_EXIST_IN_NEW_TAPESTRY');
-        }
-        if (!empty($tapestry->groups)) {
-            return TapestryErrors::throwsError('GROUPS_EXIST_IN_NEW_TAPESTRY');
-        }
-        if (!empty($tapestry->links)) {
-            return TapestryErrors::throwsError('LINKS_EXIST_IN_NEW_TAPESTRY');
-        }
+        $this->updateTapestryPost = true;
+        return $this->_saveToDatabase();
+    }
 
-        return $this->_addTapestry($tapestry);
+    /**
+     * Save the Tapestry automatically on publish
+     * 
+     * @return  Object  $tapestry
+     */
+    public function saveOnPublish()
+    {
+        $this->updateTapestryPost = false;
+        return $this->_saveToDatabase();
+    }
+
+    /**
+     * Set Tapestry
+     * 
+     * @param   Object  $tapestry  tapestry
+     *
+     * @return  NULL
+     */
+    public function set($tapestry)
+    {
+        if (isset($tapestry->rootId) && is_numeric($tapestry->rootId)) {
+            $this->rootId = $tapestry->rootId;
+        }
+        if (isset($tapestry->nodes) && is_array($tapestry->nodes)) {
+            $this->nodes = $tapestry->nodes;
+        }
+        if (isset($tapestry->groups) && is_array($tapestry->groups)) {
+            $this->groups = $tapestry->groups;
+        }
+        if (isset($tapestry->links) && is_array($tapestry->links)) {
+            $this->links = $tapestry->links;
+        }
+        if (isset($tapestry->settings) && is_object($tapestry->settings)) {
+            $this->settings = $tapestry->settings;
+        }
     }
 
     /**
@@ -58,11 +104,24 @@ class TapestryController implements ITapestryController
     public function get()
     {
         if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
+            throw new TapestryError('INVALID_POST_ID');
         }
-
         return $this->_getTapestry();
     }
+
+    /**
+     * Get node IDs
+     * 
+     * @return  Array  $nodes  node ids
+     */
+    public function getNodeIds()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        return $this->nodes;
+    }
+
 
     /**
      * Add a new node
@@ -74,26 +133,16 @@ class TapestryController implements ITapestryController
     public function addNode($node)
     {
         $tapestryNodeController = new TapestryNodeController($this->postId);
+        $tapestryNodeController->set($node);
         $node = $tapestryNodeController->save($node);
 
-        if (is_wp_error($node)) {
-            return $node;
+        array_push($this->nodes, $node->id);
+
+        if (empty($this->rootId)) {
+            $this->rootId = $this->nodes[0];
         }
 
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->nodes)) {
-            $tapestry->nodes = [];
-        }
-
-        array_push($tapestry->nodes, $node->id);
-
-        if (empty($tapestry->rootId)) {
-            $tapestry->rootId = $tapestry->nodes[0];
-        }
-
-        update_post_meta($this->postId, 'tapestry', $tapestry);
-
+        $this->_saveToDatabase();
         return $node;
     }
 
@@ -106,9 +155,8 @@ class TapestryController implements ITapestryController
      */
     public function addLink($link)
     {
-        $tapestryLinkController = new TapestryLinkController($this->postId);
-        $link = $tapestryLinkController->save($link);
-
+        array_push($this->links, $link);
+        $this->_saveToDatabase();
         return $link;
     }
 
@@ -122,22 +170,11 @@ class TapestryController implements ITapestryController
     public function addGroup($group)
     {
         $tapestryGroupController = new TapestryGroupController($this->postId);
-        $group = $tapestryGroupController->save($group);
+        $tapestryGroupController->set($group);
+        $group = $tapestryGroupController->save();
 
-        if (is_wp_error($group)) {
-            return $group;
-        }
-
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->groups)) {
-            $tapestry->groups = [];
-        }
-
-        array_push($tapestry->groups, $group->id);
-
-        update_post_meta($this->postId, 'tapestry', $tapestry);
-
+        array_push($this->groups, $group->id);
+        $this->_saveToDatabase();
         return $group;
     }
 
@@ -154,75 +191,54 @@ class TapestryController implements ITapestryController
     }
 
     /**
-     * Get the group controller
+     * Get the group controller with associated group meta ID
      * 
-     * @return  Object  $group  group controller
+     * @param   Number  $groupMetaId    group meta ID
+     *
+     * @return  Object  $group          group controller
      */
-    public function getGroups()
+    public function getGroup($groupMetaId)
     {
-        return new TapestryGroupController($this->postId);
+        return new TapestryNodeController($this->postId, $groupMetaId);
     }
 
-    /**
-     * Get the link controller
-     * 
-     * @return  Object  $link   link controller
-     */
-    public function getLinks()
+    private function _loadTapestry()
     {
-        return new TapestryLinkController($this->postId);
+        $tapestry = get_post_meta($this->postId, 'tapestry', true);
+        if (empty($tapestry)) {
+            return (object) [
+                'nodes' => [],
+                'links' => [],
+                'groups' => [],
+                'rootId' => 0,
+                'settings' => (object) []
+            ];
+        }
+        return $tapestry;
     }
 
-    /**
-     * Get the setting controller
-     * 
-     * @return  Object  $setting   setting controller
-     */
-    public function getSettings()
+    private function _formTapestry()
     {
-        return new TapestrySettingController($this->postId);
+        return (object) [
+            'nodes'     => $this->nodes,
+            'groups'    => $this->groups,
+            'links'     => $this->links,
+            'settings'  => $this->settings,
+            'rootId'    => $this->rootId
+        ];
     }
 
-    private function _addTapestry($tapestry)
+    private function _saveToDatabase()
     {
-        $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry');
+        $tapestry = $this->_formTapestry();
 
-        $tapestry->links = [];
-        $tapestry->nodes = [];
-        $tapestry->groups = [];
+        if ($this->updateTapestryPost) {
+            $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry', $this->postId);
+        }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $tapestry;
-    }
-
-    private function _formNodeData($nodeData, $nodeMetadata)
-    {
-        // Update node data here to match its own version
-        // This enables the same node to have multiple versions
-        $nodeData->id = (int) $nodeMetadata->meta_id;
-        if (isset($nodeMetadata->meta_value->title)) {
-            $nodeData->title = $nodeMetadata->meta_value->title;
-        }
-        if (isset($nodeMetadata->meta_value->coordinates->x)) {
-            $nodeData->fx = $nodeMetadata->meta_value->coordinates->x;
-        }
-        if (isset($nodeMetadata->meta_value->coordinates->y)) {
-            $nodeData->fy = $nodeMetadata->meta_value->coordinates->y;
-        }
-        if (isset($nodeMetadata->meta_value->permissions)) {
-            $nodeData->permissions = $nodeMetadata->meta_value->permissions;
-        }
-        if (isset($nodeMetadata->meta_value->typeData)) {
-            $nodeData->typeData = $nodeMetadata->meta_value->typeData;
-        }
-        if (isset($nodeMetadata->meta_value->imageURL)) {
-            $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
-        }
-        if (isset($nodeMetadata->meta_value->unlocked)) {
-            $nodeData->unlocked = $nodeMetadata->meta_value->unlocked;
-        }
-        return $nodeData;
     }
 
     private function _getTapestry()
@@ -233,10 +249,8 @@ class TapestryController implements ITapestryController
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
-                $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
-                $nodePostId = $nodeMetadata->meta_value->post_id;
-                $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
-                return $this->_formNodeData($nodeData, $nodeMetadata);
+                $tapestryNodeController = new TapestryNodeController($this->postId, $nodeMetaId);
+                return $tapestryNodeController->get();
             },
             $tapestry->nodes
         );

@@ -11,6 +11,17 @@ class TapestryNodeController implements ITapestryNodeController
 {
     private $postId;
     private $nodeMetaId;
+    private $type;
+    private $title;
+    private $status;
+    private $unlocked;
+    private $typeData;
+    private $imageURL;
+    private $mediaType;
+    private $mediaFormat;
+    private $mediaDuration;
+    private $coordinates;
+    private $permissions;
 
     /**
      * Constructor
@@ -24,141 +35,159 @@ class TapestryNodeController implements ITapestryNodeController
     {
         $this->postId = (int) $postId;
         $this->nodeMetaId = (int) $nodeMetaId;
+
+        if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
+            $node = $this->_loadNode();
+
+            if (empty($node)) {
+                throw new TapestryError('INVALID_NODE_META_ID');
+            }
+
+            $this->type = $node->type;
+            $this->title = $node->title;
+            $this->status = $node->status;
+            $this->imageURL = $node->imageURL;
+            $this->mediaType = $node->mediaType;
+            $this->mediaFormat = $node->mediaFormat;
+            $this->unlocked = $node->unlocked;
+            $this->mediaDuration = $node->mediaDuration;
+            $this->typeData = $node->typeData;
+            $this->coordinates = $node->coordinates;
+            $this->permissions = $node->permissions;
+        } else {
+            $this->title = '';
+            $this->status = '';
+            $this->imageURL = '';
+            $this->mediaType = '';
+            $this->mediaFormat = '';
+            $this->unlocked = false;
+            $this->mediaDuration = 0;
+            $this->type = 'tapestry_node';
+            $this->typeData = (object) [];
+            $this->coordinates = (object) [];
+            $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        }
     }
 
     /**	
-     * Add a Tapestry node
+     * Save the Tapestry node
      *
-     * @param   Object  $node   Tapestry node
-     * 
      * @return  Object  $node
      */
-    public function save($node)
+    public function save()
     {
-        if (isset($node->id)) {
-            if (TapestryHelpers::isValidTapestryNode($node->id)) {
-                return TapestryErrors::throwsError('NODE_ALREADY_EXISTS');
-            }
-        }
-        if (!isset($node->permissions)) {
-            $node->permissions = (object) TapestryNodePermissions::getDefaultNodePermissions();
-        }
-
-        return $this->_addNode($node);
+        return $this->_saveToDatabase();
     }
 
     /**
-     * Retrieve all node ids associated to a tapestry
+     * Set Node
      * 
-     * @return Array list of node ids for a tapestry
+     * @param   Object  $node  node
+     *
+     * @return  NULL
+     */
+    public function set($node)
+    {
+        if (isset($node->type) && is_string($node->type)) {
+            $this->type = $node->type;
+        }
+        if (isset($node->title) && is_string($node->title)) {
+            $this->title = $node->title;
+        }
+        if (isset($node->status) && is_string($node->status)) {
+            $this->status = $node->status;
+        }
+        if (isset($node->unlocked) && is_bool($node->unlocked)) {
+            $this->unlocked = $node->unlocked;
+        }
+        if (isset($node->typeData) && is_object($node->typeData)) {
+            $this->typeData = $node->typeData;
+        }
+        if (isset($node->imageURL) && is_string($node->imageURL)) {
+            $this->imageURL = $node->imageURL;
+        }
+        if (isset($node->mediaType) && is_string($node->mediaType)) {
+            $this->mediaType = $node->mediaType;
+        }
+        if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
+            $this->mediaFormat = $node->mediaFormat;
+        }
+        if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
+            $this->mediaDuration = $node->mediaDuration;
+        }
+        if (isset($node->coordinates) && is_object($node->coordinates)) {
+            $this->coordinates = $node->coordinates;
+        }
+        if (isset($node->permissions) && is_object($node->permissions)) {
+            $this->permissions = $node->permissions;
+        }
+    }
+
+    /**
+     * Get the node
+     * 
+     * @return  $node    node
      */
     public function get()
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
+        if (!$this->nodeMetaId) {
+            throw new TapestryError('INVALID_NODE_META_ID');
         }
-
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        if (!isset($tapestry->nodes)) {
-            return [];
-        }
-
-        return $tapestry->nodes;
+        return $this->_formNode();
     }
 
-    /**
-     * Update Tapestry Node Title
-     * 
-     * @param   String  $title          Node title
-     *
-     * @return  String  $title
-     */
-    public function updateTitle($title)
+    private function _saveToDatabase()
     {
-        return $this->_updateNodeProperty('title', $title);
-    }
+        $node = $this->_formNode();
 
-    /**
-     * Update Tapestry Node Image URL
-     * 
-     * @param   String  $imageURL       Node image url
-     *
-     * @return  String  $imageURL
-     */
-    public function updateImageURL($imageURL)
-    {
-        return $this->_updateNodeProperty('imageURL', $imageURL);
-    }
-
-    /**
-     * Update Tapestry Node Unlocked Status
-     * 
-     * @param   Boolean $unlocked       Node unlocked status
-     *
-     * @return  Boolean $unlocked
-     */
-    public function updateUnlockedStatus($unlocked)
-    {
-        return $this->_updateNodeProperty('unlocked', $unlocked);
-    }
-
-    /**
-     * Update Tapestry Node Type Data
-     * 
-     * @param   Object  $typeData       Node type data
-     *
-     * @return  Object  $typeData
-     */
-    public function updateTypeData($typeData)
-    {
-        return $this->_updateNodeProperty('typeData', $typeData);
-    }
-
-    /**
-     * Update Tapestry Node Coordinates
-     * 
-     * @param   Number  $coordinates    Node coordinates
-     *
-     * @return  Number  $coordinates
-     */
-    public function updateCoordinates($coordinates)
-    {
-        return $this->_updateNodeProperty('coordinates', $coordinates);
-    }
-
-    /**
-     * Update Tapestry Node Permissions
-     * 
-     * @param   Object  $permissions    Node permissions
-     *
-     * @return  Object  $permissions
-     */
-    public function updatePermissions($permissions)
-    {
-        // TODO: validate that $permissions has appropriate/valid info
-        return $this->_updateNodeProperty('permissions', $permissions);
-    }
-
-    private function _addNode($node)
-    {
         $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node');
-        $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
-        $node->id = add_post_meta($this->postId, 'tapestry_node', $nodeMetadata);
 
+        $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
+
+        if ($this->nodeMetaId) {
+            update_metadata_by_mid('post', $this->nodeMetaId, $nodeMetadata);
+        } else {
+            $this->nodeMetaId = add_post_meta($this->postId, 'tapestry_node', $nodeMetadata);
+            $node->id = $this->nodeMetaId;
+        }
+
+        // TODO: add a check permission to see if the user is allowed to edit
+        // the "original" node data
         update_post_meta($nodePostId, 'tapestry_node_data', $node);
 
         return $node;
     }
 
-    private function _updateNodeProperty($property, $newPropertyValue)
+    private function _loadNode()
     {
-        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $nodeMetadata->{$property} = $newPropertyValue;
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
 
-        update_metadata_by_mid('post', $this->nodeMetaId, $nodeMetadata);
+        if (empty($nodeMetadata)) {
+            return (object) [];
+        }
 
-        return $newPropertyValue;
+        $nodePostId = $nodeMetadata->meta_value->post_id;
+        $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+
+        return $this->_formNodeData($nodeData, $nodeMetadata);
+    }
+
+    private function _formNode()
+    {
+        return (object) [
+            'id'            => $this->nodeMetaId,
+            'type'          => $this->type,
+            'title'         => $this->title,
+            'status'        => $this->status,
+            'imageURL'      => $this->imageURL,
+            'mediaType'     => $this->mediaType,
+            'mediaFormat'   => $this->mediaFormat,
+            'unlocked'      => $this->unlocked,
+            'mediaDuration' => $this->mediaDuration,
+            'typeData'      => $this->typeData,
+            'coordinates'   => $this->coordinates,
+            'permissions'   => $this->permissions
+        ];
     }
 
     private function _makeMetadata($node, $nodePostId)
@@ -167,10 +196,36 @@ class TapestryNodeController implements ITapestryNodeController
             'post_id'       => $nodePostId,
             'title'         => $node->title,
             'permissions'   => $node->permissions,
-            'coordinates'   => (object) array(
-                'x' => $node->fx,
-                'y' => $node->fy
-            )
+            'coordinates'   => $node->coordinates
         );
+    }
+
+    private function _formNodeData($nodeData, $nodeMetadata)
+    {
+        // Update node data here to match its own version
+        // This enables the same node to have multiple versions
+        $nodeData->id = (int) $nodeMetadata->meta_id;
+        if (isset($nodeMetadata->meta_value->title)) {
+            $nodeData->title = $nodeMetadata->meta_value->title;
+        }
+        if (isset($nodeMetadata->meta_value->coordinates->x)) {
+            $nodeData->fx = $nodeMetadata->meta_value->coordinates->x;
+        }
+        if (isset($nodeMetadata->meta_value->coordinates->y)) {
+            $nodeData->fy = $nodeMetadata->meta_value->coordinates->y;
+        }
+        if (isset($nodeMetadata->meta_value->permissions)) {
+            $nodeData->permissions = $nodeMetadata->meta_value->permissions;
+        }
+        if (isset($nodeMetadata->meta_value->typeData)) {
+            $nodeData->typeData = $nodeMetadata->meta_value->typeData;
+        }
+        if (isset($nodeMetadata->meta_value->imageURL)) {
+            $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
+        }
+        if (isset($nodeMetadata->meta_value->unlocked)) {
+            $nodeData->unlocked = $nodeMetadata->meta_value->unlocked;
+        }
+        return $nodeData;
     }
 }

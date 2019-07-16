@@ -7,20 +7,41 @@
 interface ITapestryController
 {
     /**
-     * Save data
+     * Save the Tapestry
      * 
-     * @param   Object  $data   data to be saved
-     * 
-     * @return  Object  $data
+     * @return  Object  $tapestry
      */
-    public function save($data);
+    public function save();
 
     /**
-     * Retrieve data
+     * Save the Tapestry automatically on publish
      * 
-     * @return  Object  $data
+     * @return  Object  $tapestry
+     */
+    public function saveOnPublish();
+
+    /**
+     * Set Tapestry
+     * 
+     * @param   Object  $tapestry  tapestry
+     *
+     * @return  NULL
+     */
+    public function set($tapestry);
+
+    /**
+     * Retrieve a Tapestry post
+     * 
+     * @return  Object  $tapestry
      */
     public function get();
+
+    /**
+     * Get node IDs
+     * 
+     * @return  Array  $nodes  node ids
+     */
+    public function getNodeIds();
 
     /**
      * Add a new node
@@ -59,23 +80,11 @@ interface ITapestryController
     public function getNode($nodeMetaId);
 
     /**
-     * Get the group controller
+     * Get the group controller with associated group meta ID
      * 
-     * @return  Object  $group  group controller
+     * @param   Number  $groupMetaId    group meta ID
+     *
+     * @return  Object  $group          group controller
      */
-    public function getGroups();
-
-    /**
-     * Get the link controller
-     * 
-     * @return  Object  $link   link controller
-     */
-    public function getLinks();
-
-    /**
-     * Get the setting controller
-     * 
-     * @return  Object  $setting   setting controller
-     */
-    public function getSettings();
+    public function getGroup($groupMetaId);
 }

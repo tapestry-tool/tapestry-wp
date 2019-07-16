@@ -61,8 +61,8 @@ class TapestryUserProgressController implements ITapestryUserProgressController
         $this->_isValidTapestryPost();
         $this->_checkUserAndPostId();
 
-        $tapestryNodeController = new TapestryNodeController($this->postId);
-        $nodeIdArr = $tapestryNodeController->get();
+        $tapestryController = new TapestryController($this->postId);
+        $nodeIdArr = $tapestryController->getNodeIds();
 
         return $this->_getUserProgress($nodeIdArr);
     }

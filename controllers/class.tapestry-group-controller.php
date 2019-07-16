@@ -11,67 +11,118 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-group-contro
 class TapestryGroupController implements ITapestryGroupController
 {
     private $postId;
+    private $groupMetaId;
+
+    private $nodes;
+    private $members;
+    private $name;
+    private $type;
 
     /**
      * Constructor
      * 
      * @param   Number  $postId post ID
+     * @param   Number  $groupMetaId meta ID
      * 
      * @return  NULL
      */
-    public function __construct($postId = 0)
+    public function __construct($postId = 0, $groupMetaId = 0)
     {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
         $this->postId = (int) $postId;
+        $this->groupMetaId = (int) $groupMetaId;
+
+        if (TapestryHelpers::isValidTapestryGroup($this->groupMetaId)) {
+            $group = $this->_loadGroup();
+
+            if (empty($node)) {
+                throw new TapestryError('INVALID_GROUP_META_ID');
+            }
+
+            $this->nodes = $group->nodes;
+            $this->members = $group->members;
+            $this->name = $group->name;
+            $this->type = $group->type;
+        } else {
+            $this->nodes = [];
+            $this->members = [];
+            $this->name = '';
+            $this->type = 'tapestry_group';
+        }
     }
 
     /**
-     * Add a new Tapestry group
-     * 
-     * @param   Object  $group  Tapestry group
+     * Save the Tapestry group
      * 
      * @return  Object  $group
      */
-    public function save($group)
+    public function save()
     {
-        if (!$this->postId) {
-            return TapestryErrors::throwsError('INVALID_POST_ID');
-        }
-        if (isset($group->id) && TapestryHelpers::isValidTapestryGroup($group->id)) {
-            return TapestryErrors::throwsError('GROUP_ALREADY_EXISTS');
-        }
-        if ((!TapestryUserRoles::isEditor())
-            && (!TapestryUserRoles::isAdministrator())
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
-        ) {
-            return TapestryErrors::throwsError('EDIT_TAPESTRY_PERMISSION_DENIED');
-        }
-
-        return $this->_addGroup($group);
+        return $this->_saveToDatabase();
     }
 
     /**
-     * Retrive a Tapestry group
+     * Set Gode
+     * 
+     * @param   Object  $group  group
+     *
+     * @return  NULL
+     */
+    public function set($group)
+    {
+        if (isset($group->nodes) && is_array($group->nodes)) {
+            $this->nodes = $group->nodes;
+        }
+        if (isset($group->members) && is_array($group->members)) {
+            $this->members = $group->members;
+        }
+        if (isset($group->name) && is_string($group->name)) {
+            $this->name = $group->name;
+        }
+        if (isset($group->type) && is_string($group->type)) {
+            $this->type = $group->type;
+        }
+    }
+
+    /**
+     * Get the Tapestry group
      * 
      * @return  Object  $group
      */
     public function get()
     {
-        // TODO: TO BE IMPLEMENTED
+        if (!$this->nodeMetaId) {
+            throw new TapestryError('INVALID_GROUP_META_ID');
+        }
+        return $this->_formGroup();
     }
 
-    private function _addGroup($group)
+    private function _loadGroup()
     {
-        $group->id = add_post_meta($this->postId, 'group', $group);
-        $group->type = 'tapestry_group';
+        return get_metadata_by_mid('post', $this->groupMetaId);
+    }
 
-        // TODO: handle the local nodes logic here
-        // At the moment, we put everything in the post meta
+    private function _saveToDatabase()
+    {
+        $group = $this->_formGroup();
 
-        update_metadata_by_mid('post', $group->id, $group);
+        if (!$this->groupMetaId) {
+            $this->groupMetaId = add_post_meta($this->postId, 'group', $group);
+            $group->id = $this->groupMetaId;
+        }
+
+        update_metadata_by_mid('post', $this->groupMetaId, $group);
 
         return $group;
+    }
+
+    private function _formGroup()
+    {
+        return (object) [
+            'id'        => $this->groupMetaId,
+            'nodes'     => $this->nodes,
+            'members'   => $this->members,
+            'name'      => $this->name,
+            'type'      => $this->type
+        ];
     }
 }

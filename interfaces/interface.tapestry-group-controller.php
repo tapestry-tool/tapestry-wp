@@ -8,18 +8,16 @@ require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
 interface ITapestryGroupController
 {
     /**
-     * Save data
+     * Save the Tapestry group
      * 
-     * @param   Object  $data   data to be saved
-     * 
-     * @return  Object  $data
+     * @return  Object  $group
      */
-    public function save($data);
+    public function save();
 
     /**
-     * Retrieve data
+     * Get the Tapestry group
      * 
-     * @return  Object  $data
+     * @return  Object  $group
      */
     public function get();
 }

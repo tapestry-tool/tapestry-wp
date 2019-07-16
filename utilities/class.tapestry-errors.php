@@ -3,8 +3,12 @@
 /**
  * Tapestry Errors
  */
-class TapestryErrors
+class TapestryError extends Error
 {
+    protected $code;
+    protected $message;
+    protected $status;
+
     const ERRORS = [
         'INVALID_POST_ID' => [
             'MESSAGE'   => 'PostID is invalid',
@@ -12,6 +16,10 @@ class TapestryErrors
         ],
         'INVALID_NODE_META_ID' => [
             'MESSAGE'   => 'NodeMetaId is invalid',
+            'STATUS'    => ['status' => 404]
+        ],
+        'INVALID_GROUP_META_ID' => [
+            'MESSAGE'   => 'GroupMetaId is invalid',
             'STATUS'    => ['status' => 404]
         ],
         'GROUP_ALREADY_EXISTS' => [
@@ -64,16 +72,16 @@ class TapestryErrors
         ]
     ];
 
-    /**
-     * Throws custom error
-     * 
-     * @param   String  $code   error code
-     * 
-     * @return  WP_Error
-     */
-    static function throwsError($code)
+    public function __construct($code)
     {
         $ERROR = (object) self::ERRORS[$code];
-        return new WP_Error($code, $ERROR->MESSAGE, $ERROR->STATUS);
+        $this->code = $code;
+        $this->message = $ERROR->MESSAGE;
+        $this->status = $ERROR->STATUS;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
     }
 }
