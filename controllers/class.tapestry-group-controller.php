@@ -32,12 +32,7 @@ class TapestryGroupController implements ITapestryGroupController
         $this->groupMetaId = (int) $groupMetaId;
 
         if (TapestryHelpers::isValidTapestryGroup($this->groupMetaId)) {
-            $group = $this->_loadGroup();
-
-            if (empty($node)) {
-                throw new TapestryError('INVALID_GROUP_META_ID');
-            }
-
+            $group = $this->_loadFromDatabase();
             $this->nodes = $group->nodes;
             $this->members = $group->members;
             $this->name = $group->name;
@@ -96,7 +91,7 @@ class TapestryGroupController implements ITapestryGroupController
         return $this->_formGroup();
     }
 
-    private function _loadGroup()
+    private function _loadFromDatabase()
     {
         return get_metadata_by_mid('post', $this->groupMetaId);
     }

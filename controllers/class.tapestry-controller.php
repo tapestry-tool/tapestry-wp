@@ -33,7 +33,7 @@ class TapestryController implements ITapestryController
         $this->postId = (int) $postId;
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
-            $tapestry = $this->_loadTapestry();
+            $tapestry = $this->_loadFromDatabase();
             $this->nodes = $tapestry->nodes;
             $this->links = $tapestry->links;
             $this->groups = $tapestry->groups;
@@ -202,7 +202,7 @@ class TapestryController implements ITapestryController
         return new TapestryNodeController($this->postId, $groupMetaId);
     }
 
-    private function _loadTapestry()
+    private function _loadFromDatabase()
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         if (empty($tapestry)) {
@@ -243,9 +243,7 @@ class TapestryController implements ITapestryController
 
     private function _getTapestry()
     {
-        $tapestry = get_post_meta($this->postId, 'tapestry', true);
-
-        $tapestry = $this->_filterTapestry($tapestry);
+        $tapestry = $this->_filterTapestry();
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
@@ -266,19 +264,9 @@ class TapestryController implements ITapestryController
         return $tapestry;
     }
 
-    private function _filterTapestry($tapestry)
+    private function _filterTapestry()
     {
-        if (!isset($tapestry->nodes)) {
-            $tapestry->nodes = [];
-        }
-
-        if (!isset($tapestry->links)) {
-            $tapestry->links = [];
-        }
-
-        if (!isset($tapestry->groups)) {
-            $tapestry->groups = [];
-        }
+        $tapestry = $this->_formTapestry();
 
         if ((!TapestryUserRoles::isEditor())
             && (!TapestryUserRoles::isAdministrator())
@@ -287,18 +275,6 @@ class TapestryController implements ITapestryController
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
-        }
-
-        if (!isset($tapestry->nodes)) {
-            $tapestry->nodes = [];
-        }
-
-        if (!isset($tapestry->links)) {
-            $tapestry->links = [];
-        }
-
-        if (!isset($tapestry->groups)) {
-            $tapestry->groups = [];
         }
 
         return $tapestry;

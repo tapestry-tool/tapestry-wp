@@ -37,12 +37,7 @@ class TapestryNodeController implements ITapestryNodeController
         $this->nodeMetaId = (int) $nodeMetaId;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
-            $node = $this->_loadNode();
-
-            if (empty($node)) {
-                throw new TapestryError('INVALID_NODE_META_ID');
-            }
-
+            $node = $this->_loadFromDatabase();
             $this->type = $node->type;
             $this->title = $node->title;
             $this->status = $node->status;
@@ -158,7 +153,7 @@ class TapestryNodeController implements ITapestryNodeController
         return $node;
     }
 
-    private function _loadNode()
+    private function _loadFromDatabase()
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
 
