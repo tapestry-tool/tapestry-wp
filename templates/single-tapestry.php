@@ -34,10 +34,8 @@ get_header(); ?>
 
         <div id="tapestry"></div>
 
-        <?php while (have_posts()) : the_post(); ?>
-
+        <?php while ( have_posts() ) : the_post(); ?>
             <?php get_template_part('content', 'page'); ?>
-
             <?php
             // If comments are open or we have at least one comment, load up the comment template
             if (comments_open() || get_comments_number()) :
@@ -63,10 +61,11 @@ get_header(); ?>
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var tapestryWpPostId = "<?php echo get_the_ID(); ?>";
+            var tapestryWpIsAdmin = "<?php echo current_user_can('administrator'); ?>";
             var addNodeModalUrl = "<?php echo plugin_dir_url( __FILE__ ); ?>modal-add-node.html";
         </script>
 
-    </main><!-- #main -->
-</div><!-- #primary -->
+        </main><!-- #main -->
+    </div><!-- #primary -->
 
 <?php get_footer(); ?>
