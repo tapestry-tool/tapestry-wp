@@ -85,7 +85,7 @@ class TapestryGroup implements ITapestryGroup
      */
     public function get()
     {
-        if (!$this->nodeMetaId) {
+        if (!$this->groupMetaId) {
             throw new TapestryError('INVALID_GROUP_META_ID');
         }
         return $this->_formGroup();
@@ -93,7 +93,7 @@ class TapestryGroup implements ITapestryGroup
 
     private function _loadFromDatabase()
     {
-        return get_metadata_by_mid('post', $this->groupMetaId);
+        return get_metadata_by_mid('post', $this->groupMetaId)->meta_value;
     }
 
     private function _saveToDatabase()

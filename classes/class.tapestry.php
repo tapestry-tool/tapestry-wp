@@ -255,8 +255,8 @@ class Tapestry implements ITapestry
 
         $tapestry->groups = array_map(
             function ($groupMetaId) {
-                $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
-                return $groupMetadata->meta_value;
+                $tapestryGroup = new TapestryGroup($this->postId, $groupMetaId);
+                return $tapestryGroup->get();
             },
             $tapestry->groups
         );
