@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tapestry Endpoint Permissions
  *
