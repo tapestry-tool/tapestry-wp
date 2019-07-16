@@ -6,10 +6,10 @@
  */
 
 require_once __DIR__ . '/utilities/class.tapestry-permissions.php';
-require_once __DIR__ . '/controllers/class.tapestry-controller.php';
-require_once __DIR__ . '/controllers/class.tapestry-node-controller.php';
-require_once __DIR__ . '/controllers/class.tapestry-group-controller.php';
-require_once __DIR__ . '/controllers/class.tapestry-user-progress-controller.php';
+require_once __DIR__ . '/classes/class.tapestry.php';
+require_once __DIR__ . '/classes/class.tapestry-node.php';
+require_once __DIR__ . '/classes/class.tapestry-group.php';
+require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 $REST_API_ENDPOINTS = [

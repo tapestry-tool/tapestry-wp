@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__FILE__) . "/interface.tapestry-controller.php";
 
 /**
  * Tapestry Node Controller Interface

@@ -1,6 +1,6 @@
 <?php
 // TODO Change exceptions to using an ERROR class
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress-controller.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
 
 /**
  * Add/update/retrieve User progress

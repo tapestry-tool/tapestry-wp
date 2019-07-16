@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node-controller.php";
+require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
