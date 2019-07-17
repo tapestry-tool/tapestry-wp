@@ -60,9 +60,14 @@
                         </label>
                         </div>
                         <div id="appearsat-section">
-                        <label>Appears at:
-                            <input id="appears-at" name="appearsAt" type="text" placeholder="Enter time (in seconds) the media gets unlocked" >
-                        </label>
+                            <div id="locked-container">
+                            <input id="lock-node-checkbox" name="locked" type="checkbox" required>
+                                <label id="lock-node-label">Lock Node?</label>
+                            </input>
+                            </div>
+                            <label id ="appears-at-label" style="display: none">Appears at:
+                                <input id="appears-at" name="appearsAt" type="text" placeholder="Enter time (in seconds) the media gets unlocked" >
+                            </label>
                         </div>
                     </div>
                     <div id="permissions-details">
