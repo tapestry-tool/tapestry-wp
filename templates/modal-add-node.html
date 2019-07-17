@@ -24,6 +24,16 @@
                         </select>
                         </div>
                     </label>
+                    <div id="appearsat-section">
+                        <div id="locked-container">
+                        <input id="lock-node-checkbox" name="locked" type="checkbox" required>
+                            <label id="lock-node-label">Lock Node?</label>
+                        </input>
+                        </div>
+                        <label id ="appears-at-label" style="display: none">Appears at:
+                            <input id="appears-at" name="appearsAt" type="text" placeholder="Enter time (in seconds) the media gets unlocked" >
+                        </label>
+                    </div>
                     <div id="media-format-section" style="display: none">
                         <label id="media-format-label">Media Format
                             <div class="dropdown">
@@ -58,16 +68,6 @@
                         <label>H5P Content Duration
                             <input id="h5p-mediaDuration-input" name="h5p-mediaDuration" type="text" placeholder="Enter duration (in seconds)" >
                         </label>
-                        </div>
-                        <div id="appearsat-section">
-                            <div id="locked-container">
-                            <input id="lock-node-checkbox" name="locked" type="checkbox" required>
-                                <label id="lock-node-label">Lock Node?</label>
-                            </input>
-                            </div>
-                            <label id ="appears-at-label" style="display: none">Appears at:
-                                <input id="appears-at" name="appearsAt" type="text" placeholder="Enter time (in seconds) the media gets unlocked" >
-                            </label>
                         </div>
                     </div>
                     <div id="permissions-details">
