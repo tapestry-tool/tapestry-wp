@@ -131,9 +131,9 @@ class TapestryUserController
             $default_unlocked_status = $nodeMetadata->unlocked ? true : false;
             $unlocked_value = get_user_meta($this->_userId, 'tapestry_' . $postId . '_node_unlocked_' . $nodeId, true);
             if ($unlocked_value !== null) {
-                $progress->$nodeId->$unlocked = $unlocked_value;
+                $progress->$nodeId->unlocked = $unlocked_value;
             } else {
-                $progress->$nodeId->$unlocked = $default_unlocked_status;
+                $progress->$nodeId->unlocked = $default_unlocked_status;
             }
         }
 
