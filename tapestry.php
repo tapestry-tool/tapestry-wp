@@ -5,8 +5,7 @@
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
  * Version: 1.0
- * Author: Andrew Bui
- * Author URI: https://www.andrewbui.ca
+ * Author: Tapestry Team, University of British Coloumbia
  */
 
 /**
@@ -42,7 +41,7 @@ function create_tapestry_type()
         "capability_type" => "post",
         "map_meta_cap" => true,
         "hierarchical" => false,
-        "rewrite" => array("slug" => "tapestry_test", "with_front" => true),
+        "rewrite" => array("with_front" => true),
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
@@ -58,7 +57,7 @@ function create_tapestry_node_type()
     $labels = array(
         "name" => __("Tapestry Nodes"),
         "singular_name" => __("Tapestry Node"),
-        "all_items" => __("All Tapestry Nodes")
+        "all_items" => __("Tapestry Nodes")
     );
     $args = array(
         "label" => __("tapestry-node"),
@@ -72,13 +71,13 @@ function create_tapestry_node_type()
         "rest_base" => "",
         "rest_controller_class" => "WP_REST_Posts_Controller",
         "has_archive" => false,
-        "show_in_menu" => true,
-        "show_in_nav_menus" => true,
+        "show_in_menu" => 'edit.php?post_type=tapestry',
+        "show_in_nav_menus" => false,
         "exclude_from_search" => false,
         "capability_type" => "post",
         "map_meta_cap" => true,
         "hierarchical" => false,
-        "rewrite" => array("slug" => "tapestry_node_test", "with_front" => true),
+        "rewrite" => array("with_front" => true),
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
