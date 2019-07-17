@@ -20,6 +20,7 @@ class TapestryNode implements ITapestryNode
     private $mediaType;
     private $mediaFormat;
     private $mediaDuration;
+    private $description;
     private $coordinates;
     private $permissions;
 
@@ -47,6 +48,7 @@ class TapestryNode implements ITapestryNode
             $this->mediaType = $node->mediaType;
             $this->mediaFormat = $node->mediaFormat;
             $this->mediaDuration = $node->mediaDuration;
+            $this->description = $node->description;
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
         } else {
@@ -57,6 +59,7 @@ class TapestryNode implements ITapestryNode
             $this->mediaFormat = '';
             $this->unlocked = false;
             $this->mediaDuration = 0;
+            $this->description = '';
             $this->type = 'tapestry_node';
             $this->typeData = (object) [];
             $this->coordinates = (object) [];
@@ -109,6 +112,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mediaDuration) && is_numeric($node->mediaDuration)) {
             $this->mediaDuration = $node->mediaDuration;
+        }
+        if (isset($node->description) && is_string($node->description)) {
+            $this->description = $node->description;
         }
         if (isset($node->coordinates) && is_object($node->coordinates)) {
             $this->coordinates = $node->coordinates;
@@ -179,6 +185,7 @@ class TapestryNode implements ITapestryNode
             'mediaFormat'   => $this->mediaFormat,
             'unlocked'      => $this->unlocked,
             'mediaDuration' => $this->mediaDuration,
+            'description'   => $this->description,
             'typeData'      => $this->typeData,
             'coordinates'   => $this->coordinates,
             'permissions'   => $this->permissions
