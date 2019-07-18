@@ -84,12 +84,11 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'PUT_TAPESTRY_NODE_UNLOCKED_STATUS' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/unlocked',
+    'UPDATE_TAPESTRY_UNLOCKED' => (object)[
+        'ROUTE'     => 'users/unlocked',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
-            'callback'              => 'updateTapestryNodeUnlockedStatus',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'methods'               => 'POST',
+            'callback'              => 'unlockByNodeId'
         ]
     ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
@@ -441,44 +440,22 @@ function updateTapestryNodeImageURL($request)
 }
 
 /**
- * Update Tapestry Node Unlocked Status
+ * Set unlocked status of a single node to true by passing in node id and post id
+ * Example: /wp-json/tapestry-tool/v1/users/unlocked?post_id=44&node_id=1
  * 
- * @param   Object  $request    HTTP request
+ * @param Object $request HTTP request
  * 
- * @return  Object  $response   HTTP response
+ * @return null
  */
-function updateTapestryNodeUnlockedStatus($request)
+function unlockByNodeId($request)
 {
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $unlocked = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    // make sure the unlocked status exists and not null
-    try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-            throw new TapestryError('INVALID_CHILD_NODE');
-        }
-
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
-
-        $node->set((object) ['unlocked' => $unlocked]);
-        return $node->save();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
+    $userController = new TapestryUserController;
+    $postId = $request['post_id'];
+    $nodeId = $request['node_id'];
+    $userController->unlockNode($postId, $nodeId);
 }
 
-/**
+/** 
  * Update Tapestry Node Type Data
  * 
  * @param   Object  $request    HTTP request
