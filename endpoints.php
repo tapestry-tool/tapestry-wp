@@ -76,6 +76,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
+    'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryNodeDescription',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
     'PUT_TAPESTRY_NODE_TITLE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
@@ -404,6 +412,44 @@ function updateTapestryNodePermissions($request)
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['permissions' => $permissions]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update Tapestry Node Permissions
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeDescription($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $description = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the description body exists and is valid string
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+
+        $node->set((object) ['description' => $description]);
         return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
