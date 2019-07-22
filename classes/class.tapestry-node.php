@@ -12,6 +12,7 @@ class TapestryNode implements ITapestryNode
     private $postId;
     private $nodeMetaId;
     private $type;
+    private $size;
     private $title;
     private $status;
     private $unlocked;
@@ -39,6 +40,7 @@ class TapestryNode implements ITapestryNode
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->type = $node->type;
+            $this->size = $node->size;
             $this->title = $node->title;
             $this->status = $node->status;
             $this->imageURL = $node->imageURL;
@@ -50,6 +52,7 @@ class TapestryNode implements ITapestryNode
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
         } else {
+            $this->size = '';
             $this->title = '';
             $this->status = '';
             $this->imageURL = '';
@@ -85,6 +88,9 @@ class TapestryNode implements ITapestryNode
     {
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
+        }
+        if (isset($node->size) && is_string($node->size)) {
+            $this->size = $node->size;
         }
         if (isset($node->title) && is_string($node->title)) {
             $this->title = $node->title;
@@ -172,6 +178,7 @@ class TapestryNode implements ITapestryNode
         return (object) [
             'id'            => $this->nodeMetaId,
             'type'          => $this->type,
+            'size'          => $this->size,
             'title'         => $this->title,
             'status'        => $this->status,
             'imageURL'      => $this->imageURL,
