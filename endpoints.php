@@ -84,13 +84,6 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
-    'UPDATE_TAPESTRY_UNLOCKED' => (object)[
-        'ROUTE'     => 'users/unlocked',
-        'ARGUMENTS' => [
-            'methods'               => 'POST',
-            'callback'              => 'unlockByNodeId'
-        ]
-    ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
@@ -115,28 +108,35 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
     ],
-    'GET_TAPESTRY_PROGRESS' => (object) [
+    'GET_TAPESTRY_USER_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
             'methods'               => 'GET',
             'callback'              => 'getUserProgressByPostId',
         ]
     ],
-    'UPDATE_TAPESTRY_PROGRESS' => (object) [
+    'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
             'methods'               => 'POST',
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
-    'GET_H5P_SETTING' => (object) [
+    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object)[
+        'ROUTE'     => 'users/unlocked',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'unlockByNodeId'
+        ]
+    ],
+    'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
             'methods'               => 'GET',
             'callback'              => 'getUserU5PSettingsByPostId',
         ]
     ],
-    'UPDATE_H5P_SETTING' => (object) [
+    'UPDATE_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
             'methods'               => 'POST',
@@ -159,6 +159,24 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+/**
+ * Get a Tapestry
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        $tapestry = new Tapestry($postId);
+        return $tapestry->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -439,22 +457,6 @@ function updateTapestryNodeImageURL($request)
     }
 }
 
-/**
- * Set unlocked status of a single node to true by passing in node id and post id
- * Example: /wp-json/tapestry-tool/v1/users/unlocked?post_id=44&node_id=1
- * 
- * @param Object $request HTTP request
- * 
- * @return null
- */
-function unlockByNodeId($request)
-{
-    $userController = new TapestryUserController;
-    $postId = $request['post_id'];
-    $nodeId = $request['node_id'];
-    $userController->unlockNode($postId, $nodeId);
-}
-
 /** 
  * Update Tapestry Node Type Data
  * 
@@ -532,7 +534,7 @@ function updateTapestryNodeCoordinates($request)
 }
 
 /**
- * Update a single node progress by passing in node id, post id and progress value
+ * Update a single node progress for the current user by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
  * 
  * @param Object $request HTTP request
@@ -546,7 +548,28 @@ function updateProgressByNodeId($request)
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->save($progressValue);
+        $userProgress->updateUserProgress($progressValue);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Set unlocked status of a single node for the current user to true by passing in node id and post id
+ * Example: /wp-json/tapestry-tool/v1/users/unlocked?post_id=44&node_id=1
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return null
+ */
+function unlockByNodeId($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        $userProgress->unlockNode();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -587,24 +610,6 @@ function updateUserH5PSettingsByPostId($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
         $userProgress->updateH5PSettings($h5pSettingsData);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Get a Tapestry
- * 
- * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response
- */
-function getTapestry($request)
-{
-    $postId = $request['tapestryPostId'];
-    try {
-        $tapestry = new Tapestry($postId);
-        return $tapestry->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
