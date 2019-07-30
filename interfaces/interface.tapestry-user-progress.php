@@ -21,7 +21,7 @@ interface ITapestryUserProgress
      *
      * @return Null
      */
-    public function updateUserProgress($data);
+    public function updateUserProgress($progressValue);
     
     /**
      * Set 'unlocked' status of a Tapestry Node for this User to true
@@ -33,10 +33,10 @@ interface ITapestryUserProgress
     /**
      * Update User's h5p video setting for a tapestry post
      *
-     * @param   String  $h5pSettingsData stores volume,
+     * @param String $h5pSettingsData stores volume,
      * playbackRate, quality of h5p video
      * 
-     * @return  Null
+     * @return Null
      */
     public function updateH5PSettings($h5pSettingsData);
 
