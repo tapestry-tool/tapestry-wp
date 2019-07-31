@@ -161,6 +161,20 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Replace links array
+     * 
+     * @param  Object   $link   Tapestry link
+     * 
+     * @return  Object  $link   Tapestry link
+     */
+    public function updateLinks($links)
+    {
+        $this->links = $links;
+        $this->_saveToDatabase();
+        return $links;
+    }
+
+    /**
      * Add a new group
      * 
      * @param   Object  $group   Tapestry group

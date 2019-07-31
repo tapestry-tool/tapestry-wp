@@ -132,6 +132,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
     ],
+    'PUT_TAPESTRY_LINK' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
+        'ARGUMENTS' => [
+            'methods'               => 'PUT',
+            'callback'              => 'updateTapestryLink',
+            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+        ]
+    ],
     'GET_TAPESTRY_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
@@ -275,6 +283,41 @@ function addTapestryLink($request)
         }
         $tapestry = new Tapestry($postId);
         return $tapestry->addLink($link);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Add A Tapestry Link
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryLink($request)
+{
+    $postId = $request['tapestryPostId'];
+    $links = json_decode($request->get_body());
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        for ($i = 0; $i < count($links); $i++) {
+            if (!$links[$i]->source || !$links[$i]->target) {
+                throw new TapestryError('INVALID_NEW_LINK');
+            }
+            if ((!TapestryHelpers::isChildNodeOfTapestry($links[$i]->source->id, $postId))
+                || (!TapestryHelpers::isChildNodeOfTapestry($links[$i]->target->id, $postId))
+            ) {
+                throw new TapestryError('INVALID_CHILD_NODE');
+            }
+            if (!TapestryHelpers::currentUserIsAllowed('EDIT', $links[$i]->target->id, $postId) || !TapestryHelpers::currentUserIsAllowed('EDIT', $links[$i]->source->id, $postId)) {
+                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+            }
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->updateLinks($links);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
