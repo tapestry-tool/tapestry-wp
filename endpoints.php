@@ -422,7 +422,7 @@ function deleteTapestryNode($request)
         }
 
         $tapestry = new Tapestry($postId);
-        return $tapestry->deleteNode($nodeMetaId);
+        return $tapestry->deleteNodeFromTapestry($nodeMetaId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -153,7 +153,7 @@ class Tapestry implements ITapestry
      *
      * @return  Object  $Array   Tapestry nodes
      */
-    public function deleteNode($nodeId)
+    public function deleteNodeFromTapestry($nodeId)
     {
         // Remove the rootId field
         if ($nodeId == $this->rootId) {
@@ -168,8 +168,12 @@ class Tapestry implements ITapestry
         foreach($this->nodes as $elementId => $element) {
             if ($element == $nodeId) {
                 unset($this->nodes[$elementId]);
+                // Delete node from database
+                // $tapestryNode = new TapestryNode($this->postId, $nodeId);
+                // $tapestryNode->deleteNode();
             }
         }
+
         $this->_saveToDatabase();
         return $this->nodes;
     }
