@@ -60,6 +60,14 @@ $REST_API_ENDPOINTS = [
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
     ],
+    'DELETE_TAPESTRY_NODE' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => 'DELETE',
+            'callback'              => 'deleteTapestryNode',
+            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+        ]
+    ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
@@ -384,6 +392,42 @@ function updateTapestryNode($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
+/**
+ * Delete Tapestry Node
+ *
+ * @param   Object  $request    HTTP request
+ *
+ * @return  Object  $response   HTTP response
+ */
+function deleteTapestryNode($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+
+    // TODO: JSON validations should happen here
+    // make sure the permissions body exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        return $tapestry->deleteNode($nodeMetaId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 
 /**
  * Update Tapestry Node Size

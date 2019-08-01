@@ -147,6 +147,24 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Delete a node
+     *
+     * @param   Object  $nodeid   Tapestry node id
+     *
+     * @return  Object  $Array   Tapestry nodes
+     */
+    public function deleteNode($nodeId)
+    {
+        foreach($this->nodes as $elementId => $element) {
+            if ($element == $nodeId) {
+                unset($this->nodes[$elementId]);
+            }
+        }
+        $this->_saveToDatabase();
+        return $this->nodes;
+    }
+
+    /**
      * Add a new link
      * 
      * @param  Object   $link   Tapestry link
@@ -163,9 +181,9 @@ class Tapestry implements ITapestry
     /**
      * Replace links array
      * 
-     * @param  Object   $link   Tapestry link
+     * @param  Array   $links   Tapestry links
      * 
-     * @return  Object  $link   Tapestry link
+     * @return  Array  $links   Tapestry links
      */
     public function updateLinks($links)
     {
