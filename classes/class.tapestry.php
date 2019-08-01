@@ -155,6 +155,16 @@ class Tapestry implements ITapestry
      */
     public function deleteNode($nodeId)
     {
+        // Remove the rootId field
+        if ($nodeId == $this->rootId) {
+            if (count($this->nodes) > 1) {
+                throw new TapestryError('CANNOT_DELETE_ROOT');
+            } else {
+                $this->rootId = 0;
+            }
+        }
+
+        // Delete the element from nodes array
         foreach($this->nodes as $elementId => $element) {
             if ($element == $nodeId) {
                 unset($this->nodes[$elementId]);
