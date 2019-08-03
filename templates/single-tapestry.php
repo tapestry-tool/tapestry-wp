@@ -16,14 +16,34 @@ function addNonceToScript()
     );
 
     wp_register_script(
-        'wp_api_script',
+        'wp_tapestry_script',
         plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry.js',
         array('jquery'),
         null,
         true
     );
-    wp_localize_script('wp_api_script', 'wpApiSettings', $params);
-    wp_enqueue_script('wp_api_script');
+    wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
+    wp_enqueue_script('wp_tapestry_script');
+
+    wp_register_script(
+        'wp_tapestry_functions_script',
+        plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry-functions.js',
+        array('jquery', 'wp_tapestry_script'),
+        null,
+        true
+    );
+    wp_enqueue_script('wp_tapestry_functions_script');
+
+    wp_add_inline_script( 'wp_tapestry_script', "
+        var thisTapestryTool = new tapestryTool({
+            'containerId': 'tapestry',
+            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+            'wpUserId': '". apply_filters('determine_current_user', false) ."',
+            'wpPostId': '". get_the_ID() ."',
+            'wpIsAdmin': '". current_user_can('administrator') ."',
+            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
+        });
+    " );
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
@@ -58,11 +78,20 @@ get_header(); ?>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/libs/bootstrap.min.js" charset="UTF-8"></script>
 
         <script>
-            var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
-            var tapestryWpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
-            var tapestryWpPostId = "<?php echo get_the_ID(); ?>";
-            var tapestryWpIsAdmin = "<?php echo current_user_can('administrator'); ?>";
-            var addNodeModalUrl = "<?php echo plugin_dir_url( __FILE__ ); ?>modal-add-node.html";
+        // Capture click events anywhere inside or outside tapestry
+        $(document).ready(function(){
+            document.body.addEventListener('click', function(event) {
+                var x = event.clientX + $(window).scrollLeft();
+                var y = event.clientY + $(window).scrollTop();
+                recordAnalyticsEvent('user', 'click', 'screen', null, {'x': x, 'y': y});
+            }, true);
+
+            document.getElementById('tapestry').addEventListener('click', function(event) {
+                var x = event.clientX + $(window).scrollLeft();
+                var y = event.clientY + $(window).scrollTop();
+                recordAnalyticsEvent('user', 'click', 'tapestry', null, {'x': x, 'y': y});
+            }, true);
+        });
         </script>
 
         </main><!-- #main -->
