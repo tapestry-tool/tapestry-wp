@@ -192,10 +192,25 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-            <button type="button" class="btn" id="submit-add-new-node">Submit</button>
-            <button type="button" class="btn" id="submit-add-root-node">Submit</button>
-            <button type="button" class="btn" id="submit-edit-node">Submit</button>
+            <button
+              type="button"
+              class="btn"
+              data-dismiss="modal"
+              id="cancel-add-new-node"
+            >Close</button>
+            <button
+              type="button"
+              class="btn"
+              id="submit-add-new-node"
+              @click="submitAddNewNode"
+            >Submit</button>
+            <button
+              type="button"
+              class="btn"
+              id="submit-add-root-node"
+              @click="submitAddRootNode"
+            >Submit</button>
+            <button type="button" class="btn" id="submit-edit-node" @click="submitEditNode">Submit</button>
           </div>
         </div>
       </div>
@@ -204,14 +219,37 @@
 </template>
 
 <script>
+import Helpers from "../utils/Helpers"
+import TapestryAPI from "../services/TapestryAPI"
+
 export default {
-  name: 'node-modal',
+  name: "node-modal",
   data() {
     return {
-      selectedMediaFormat: '',
+      selectedMediaFormat: "",
       showMp4Content: false,
       showH5pContent: false,
       showContentDetails: false
+    }
+  },
+  props: {
+    tapestry: {
+      type: Object,
+      required: true
+    }
+  },
+  methods: {
+    submitAddNewNode() {
+      const formData = $("form").serializeArray();
+      this.$parent.$emit("tapestryAddNewNode", formData, false);
+    },
+    submitAddRootNode() {
+      const formData = $("form").serializeArray();
+      this.$parent.$emit("tapestryAddNewNode", formData, false, true);
+    },
+    submitEditNode() {
+      const formData = $("form").serializeArray();
+      this.$parent.$emit("tapestryAddNewNode", formData, true);
     }
   },
   watch: {

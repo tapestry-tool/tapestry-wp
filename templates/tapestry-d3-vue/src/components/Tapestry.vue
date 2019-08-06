@@ -1,13 +1,16 @@
 <template>
   <div id="tapestry">
     <RootNodeButton />
-    <NodeModal/>
+    <NodeModal :tapestry="this.tapestry" />
   </div>
 </template>
 
 <script>
+import Helpers from "../utils/Helpers"
 import NodeModal from './NodeModal'
 import RootNodeButton from './RootNodeButton'
+import TapestryAPI from '../services/TapestryAPI'
+import tapestryjs from '../utils/tapestry';
 
 export default {
   name: 'tapestry',
@@ -15,9 +18,282 @@ export default {
     NodeModal,
     RootNodeButton
   },
+  async mounted() {
+    this.TapestryAPI = new TapestryAPI(tapestryWpPostId);
+    this.tapestry = await this.TapestryAPI.getTapestry();
+    this.updateDataset();
+
+    this.$on('submitAddNewNode', this.submitAddNewNode)
+    this.$on('submitAddRootNode', this.submitAddRootNode)
+    this.$on('submitEditNode', this.submitEditNode)
+    this.$on('tapestryAddNewNode', this.tapestryAddNewNode)
+  },
   data() {
     return {
+      tapestry: {},
+      TapestryAPI: {},
       directoryUrl: wpData.directory_uri
+    }
+  },
+  methods: {
+    async tapestryAddNewNode(formData, isEdit, isRoot) {
+      var root;
+      if (typeof isRoot == 'undefined') {
+        isRoot = false;
+      }
+
+      var errorMsg = this.tapestryValidateNewNode(formData, isRoot);
+      if (errorMsg) {
+        alert(errorMsg);
+        return;
+      }
+
+      // Add the node data first
+      var newNodeEntry = {
+        "type": "tapestry_node",
+        "status": "publish",
+        "nodeType": "",
+        "title": "",
+        "imageURL": "",
+        "mediaType": "video",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "typeId": 1,
+        "group": 1,
+        "typeData": {
+          "progress": [
+            { "group": "viewed", "value": 0 },
+            { "group": "unviewed", "value": 1 }
+          ],
+          "mediaURL": "",
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P
+          "mediaHeight": 600,
+          "unlocked": true
+        },
+        "fx": Helpers.getBrowserWidth(),
+        "fy": Helpers.getBrowserHeight()
+      };
+
+      // Node ID exists, so edit case
+      if (isEdit) {
+        newNodeEntry.fx = this.tapestry.nodes[findNodeIndex(root)].fx;
+        newNodeEntry.fy = this.tapestry.nodes[findNodeIndex(root)].fy;
+      } else {
+        if (!isRoot) {
+          // Just put the node right under the current node
+          newNodeEntry.fx = this.tapestry.nodes[findNodeIndex(root)].fx;
+          newNodeEntry.fy = this.tapestry.nodes[findNodeIndex(root)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        }
+      }
+
+      var appearsAt = 0;
+      for (var i = 0; i < formData.length; i++) {
+        var fieldName = formData[i].name;
+        var fieldValue = formData[i].value;
+
+        switch (fieldName) {
+          case "title":
+            newNodeEntry[fieldName] = fieldValue;
+            break;
+          case "imageURL":
+            newNodeEntry[fieldName] = fieldValue;
+            break;
+          case "mediaType":
+            newNodeEntry[fieldName] = fieldValue;
+            break;
+          case "mediaFormat":
+            newNodeEntry[fieldName] = fieldValue;
+            break;
+          case "mp4-mediaURL":
+            if (fieldValue !== "") {
+              newNodeEntry.typeData.mediaURL = fieldValue;
+            }
+            break;
+          case "h5p-mediaURL":
+            if (fieldValue !== "") {
+              newNodeEntry.typeData.mediaURL = fieldValue;
+            }
+            break;
+          case "mp4-mediaDuration":
+            if (fieldValue !== "") {
+              newNodeEntry.mediaDuration = parseInt(fieldValue);
+            }
+            break;
+          case "h5p-mediaDuration":
+            if (fieldValue !== "") {
+              newNodeEntry.typeData.mediaDuration = parseInt(fieldValue);
+            }
+            break;
+          case "appearsAt":
+            appearsAt = parseInt(fieldValue);
+            newNodeEntry.typeData.unlocked = !appearsAt || isRoot;
+            break;
+          default:
+            break;
+        }
+      }
+
+      var permissionData = {
+        "public": []
+      };
+
+      $('.public-checkbox').each(function () {
+        if ($(this).is(":checked")) {
+          permissionData.public.push(this.name);
+        }
+      });
+
+      $('.user-checkbox').each(function () {
+        if ($(this).is(":checked")) {
+          var userId = extractDigitsFromString(this.id);
+          if (permissionData["user-" + userId]) {
+            permissionData["user-" + userId].push(this.name);
+          } else {
+            permissionData["user-" + userId] = [this.name];
+          }
+        }
+      });
+
+      $('.group-checkbox').each(function () {
+        if ($(this).is(":checked")) {
+          var groupId = extractDigitsFromString(this.id);
+          if (permissionData["group-" + groupId]) {
+            permissionData["group-" + groupId].push(this.name);
+          } else {
+            permissionData["group-" + groupId] = [this.name];
+          }
+        }
+      });
+
+      newNodeEntry.permissions = permissionData;
+
+      if (!isEdit) {
+        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
+        const result = response.data;
+
+        // Save to database, first save node then the link
+        // only add link if it's for adding new node and not root node
+        // Add new node to this.tapestry after getting the id
+        newNodeEntry.id = result.id;
+        this.tapestry.nodes.push(newNodeEntry);
+
+        if (!isRoot) {
+          // Get ID from callback and set it as target's id
+          const newLink = { "source": root, "target": result.id, "value": 1, "type": "", "appearsAt": appearsAt };
+
+          await this.TapestryAPI.addLink(JSON.stringify(newLink));
+
+          // Add the new link to the this.tapestry
+          this.tapestry.links.push(newLink);
+
+          this.tapestryHideAddNodeModal();
+          tapestryjs.redrawTapestryWithNewNode();
+        } else {
+          var newId = result.id;
+
+          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(permissionData));
+
+          this.tapestry.rootId = newId;
+
+          this.tapestryHideAddNodeModal();
+
+          root = this.tapestry.rootId; // need to set root to newly created node
+
+          tapestryjs.redrawTapestryWithNewNode(true);
+          $("#root-node-container").hide(); // hide the root node button after creating it.
+        }
+      } else {
+        // Call endpoint for editing node
+        result = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
+        newNodeEntry.id = result.id;
+
+        this.tapestry.nodes[findNodeIndex(root)] = newNodeEntry;
+        tapestryjs.redrawTapestryWithNewNode();
+        this.tapestryHideAddNodeModal();
+      }
+    },
+    tapestryValidateNewNode(formData, isRoot) {
+      if (typeof isRoot == 'undefined') {
+        isRoot = false;
+      }
+
+      var errMsg = "";
+
+      for (var i = 0; i < formData.length; i++) {
+        var fieldName = formData[i].name;
+        var fieldValue = formData[i].value;
+
+        switch (fieldName) {
+          case "title":
+            if (fieldValue === "") {
+              errMsg += "Please enter a title \n";
+            }
+            break;
+          case "imageURL":
+            if (fieldValue === "") {
+              errMsg += "Please enter a thumbnail URL \n";
+            }
+            break;
+          case "appearsAt":
+            if (fieldValue.length > 0 && !Helpers.onlyContainsDigits(fieldValue) && !isRoot) {
+              errMsg += "Please enter numeric value for Appears At (or leave empty to not lock) \n";
+            }
+            break;
+          default:
+            break;
+        }
+        if ($("#mediaFormat").val() === "mp4") {
+          switch (fieldName) {
+            case "mp4-mediaURL":
+              if (fieldValue === "") {
+                errMsg += "Please enter a MP4 video URL \n";
+              }
+              break;
+            case "mp4-mediaDuration":
+              if (!Helpers.onlyContainsDigits(fieldValue)) {
+                errMsg += "Please enter numeric value for media duration \n";
+              }
+              break;
+            default:
+              break;
+          }
+        } else if ($("#mediaFormat").val() === "h5p") {
+          switch (fieldName) {
+            case "h5p-mediaURL":
+              if (fieldValue === "") {
+                errMsg += "Please enter a H5P URL \n";
+              }
+              break;
+            case "h5p-mediaDuration":
+              if (!Helpers.onlyContainsDigits(fieldValue)) {
+                errMsg += "Please enter numeric value for media duration \n";
+              }
+              break;
+            default:
+              break;
+          }
+        } else {
+          errMsg += "Please enter correct media format \n";
+        }
+      }
+      return errMsg;
+    },
+    tapestryHideAddNodeModal() {
+      $("#createNewNodeModalBody input[type='text']").val("");
+      $("#createNewNodeModalBody input[type='url']").val("");
+      $(".permissions-dynamic-row").remove(); // remove the dynamically created permission rows
+      // Uncheck all public permissions except read
+      $('.public-checkbox').each(function () {
+        if ($(this).is(":checked") && this.name !== "read") {
+          $(this).prop('checked', false);
+        }
+      });
+      $("#createNewNodeModal").modal("hide");
+      $("#appearsat-section").show();
+    },
+    updateDataset() {
+      document.dataset = this.tapestry;
+      document.originalDataset = this.tapestry;
     }
   }
 }
