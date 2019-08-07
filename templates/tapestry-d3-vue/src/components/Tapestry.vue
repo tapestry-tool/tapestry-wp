@@ -23,7 +23,8 @@ export default {
     debugger
 
     thisTapestryTool.setDataset(this.tapestry);
-    thisTapestryTool.init();
+    thisTapestryTool.setOriginalDataset(this.tapestry);
+    thisTapestryTool.initialize();
     thisTapestryTool.redrawTapestryWithNewNode();
 
     this.$on('submitAddNewNode', this.submitAddNewNode)
@@ -41,7 +42,10 @@ export default {
   methods: {
     async tapestryAddNewNode(formData, isEdit, isRoot) {
       debugger
-      var root;
+      const NORMAL_RADIUS = 140;
+      const ROOT_RADIUS_DIFF = 70;
+      let root = this.tapestry.rootId;
+
       if (typeof isRoot == 'undefined') {
         isRoot = false;
       }
@@ -80,13 +84,13 @@ export default {
 
       // Node ID exists, so edit case
       if (isEdit) {
-        newNodeEntry.fx = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fx;
-        newNodeEntry.fy = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fy;
+        newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.x;
+        newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.y;
       } else {
         if (!isRoot) {
           // Just put the node right under the current node
-          newNodeEntry.fx = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fx;
-          newNodeEntry.fy = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+          newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.x;
+          newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.y + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
         }
       }
 
@@ -209,7 +213,7 @@ export default {
         result = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
         newNodeEntry.id = result.id;
 
-        this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)] = newNodeEntry;
+        this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
         tapestryHideAddNodeModal();
       }
 

@@ -31,4 +31,20 @@ export default class {
     static getBrowserHeight() {
         return Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     }
+
+    /**
+     * Finds the node index with node ID
+     * 
+     * @param  {Number} id          nodeMetaId
+     * @param  {Object} tapestry    tapestry
+     * 
+     * @return {Number}
+     */
+    static findNodeIndex(id, tapestry) {
+        function helper(obj) {
+            return obj.id == id;
+        }
+
+        return tapestry.nodes.findIndex(helper);
+    }
 }

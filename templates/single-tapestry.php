@@ -50,17 +50,8 @@ function addNonceToScript()
     );
 
     wp_register_script(
-        'wp_tapestry_functions_script',
-        plugin_dir_url(__FILE__) . 'libs/tapestry-functions.js',
-        array('jquery', 'wp_tapestry_script'),
-        null,
-        true
-    );
-    wp_enqueue_script('wp_tapestry_functions_script');
-
-    wp_register_script(
         'wp_tapestry_script',
-        plugin_dir_url(__FILE__) . 'libs/tapestry.js',
+        plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry.js',
         array('jquery'),
         null,
         true
