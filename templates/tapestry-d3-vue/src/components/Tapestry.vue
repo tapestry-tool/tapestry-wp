@@ -10,7 +10,6 @@ import Helpers from "../utils/Helpers"
 import NodeModal from './NodeModal'
 import RootNodeButton from './RootNodeButton'
 import TapestryAPI from '../services/TapestryAPI'
-import tapestryjs from '../utils/tapestry';
 
 export default {
   name: 'tapestry',
@@ -19,9 +18,8 @@ export default {
     RootNodeButton
   },
   async mounted() {
-    this.TapestryAPI = new TapestryAPI(tapestryWpPostId);
+    this.TapestryAPI = new TapestryAPI(wpPostId);
     this.tapestry = await this.TapestryAPI.getTapestry();
-    this.updateDataset();
 
     this.$on('submitAddNewNode', this.submitAddNewNode)
     this.$on('submitAddRootNode', this.submitAddRootNode)
@@ -37,12 +35,13 @@ export default {
   },
   methods: {
     async tapestryAddNewNode(formData, isEdit, isRoot) {
+      debugger
       var root;
       if (typeof isRoot == 'undefined') {
         isRoot = false;
       }
 
-      var errorMsg = this.tapestryValidateNewNode(formData, isRoot);
+      var errorMsg = tapestryValidateNewNode(formData, isRoot);
       if (errorMsg) {
         alert(errorMsg);
         return;
@@ -186,8 +185,8 @@ export default {
           // Add the new link to the this.tapestry
           this.tapestry.links.push(newLink);
 
-          this.tapestryHideAddNodeModal();
-          tapestryjs.redrawTapestryWithNewNode();
+          thisTapestryTool.tapestryHideAddNodeModal();
+          // tapestryjs.redrawTapestryWithNewNode();
         } else {
           var newId = result.id;
 
@@ -195,11 +194,11 @@ export default {
 
           this.tapestry.rootId = newId;
 
-          this.tapestryHideAddNodeModal();
+          thisTapestryTool.tapestryHideAddNodeModal();
 
           root = this.tapestry.rootId; // need to set root to newly created node
 
-          tapestryjs.redrawTapestryWithNewNode(true);
+          // tapestryjs.redrawTapestryWithNewNode(true);
           $("#root-node-container").hide(); // hide the root node button after creating it.
         }
       } else {
@@ -208,92 +207,9 @@ export default {
         newNodeEntry.id = result.id;
 
         this.tapestry.nodes[findNodeIndex(root)] = newNodeEntry;
-        tapestryjs.redrawTapestryWithNewNode();
-        this.tapestryHideAddNodeModal();
+        // tapestryjs.redrawTapestryWithNewNode();
+        thisTapestryTool.tapestryHideAddNodeModal();
       }
-    },
-    tapestryValidateNewNode(formData, isRoot) {
-      if (typeof isRoot == 'undefined') {
-        isRoot = false;
-      }
-
-      var errMsg = "";
-
-      for (var i = 0; i < formData.length; i++) {
-        var fieldName = formData[i].name;
-        var fieldValue = formData[i].value;
-
-        switch (fieldName) {
-          case "title":
-            if (fieldValue === "") {
-              errMsg += "Please enter a title \n";
-            }
-            break;
-          case "imageURL":
-            if (fieldValue === "") {
-              errMsg += "Please enter a thumbnail URL \n";
-            }
-            break;
-          case "appearsAt":
-            if (fieldValue.length > 0 && !Helpers.onlyContainsDigits(fieldValue) && !isRoot) {
-              errMsg += "Please enter numeric value for Appears At (or leave empty to not lock) \n";
-            }
-            break;
-          default:
-            break;
-        }
-        if ($("#mediaFormat").val() === "mp4") {
-          switch (fieldName) {
-            case "mp4-mediaURL":
-              if (fieldValue === "") {
-                errMsg += "Please enter a MP4 video URL \n";
-              }
-              break;
-            case "mp4-mediaDuration":
-              if (!Helpers.onlyContainsDigits(fieldValue)) {
-                errMsg += "Please enter numeric value for media duration \n";
-              }
-              break;
-            default:
-              break;
-          }
-        } else if ($("#mediaFormat").val() === "h5p") {
-          switch (fieldName) {
-            case "h5p-mediaURL":
-              if (fieldValue === "") {
-                errMsg += "Please enter a H5P URL \n";
-              }
-              break;
-            case "h5p-mediaDuration":
-              if (!Helpers.onlyContainsDigits(fieldValue)) {
-                errMsg += "Please enter numeric value for media duration \n";
-              }
-              break;
-            default:
-              break;
-          }
-        } else {
-          errMsg += "Please enter correct media format \n";
-        }
-      }
-      return errMsg;
-    },
-    tapestryHideAddNodeModal() {
-      $("#createNewNodeModalBody input[type='text']").val("");
-      $("#createNewNodeModalBody input[type='url']").val("");
-      $(".permissions-dynamic-row").remove(); // remove the dynamically created permission rows
-      // Uncheck all public permissions except read
-      $('.public-checkbox').each(function () {
-        if ($(this).is(":checked") && this.name !== "read") {
-          $(this).prop('checked', false);
-        }
-      });
-      $("#createNewNodeModal").modal("hide");
-      $("#appearsat-section").show();
-    },
-    updateDataset() {
-      document.dataset = this.tapestry;
-      document.originalDataset = this.tapestry;
     }
   }
 }

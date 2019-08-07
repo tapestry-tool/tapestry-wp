@@ -50,7 +50,7 @@
                 Media Format
                 <div class="dropdown">
                   <select id="mediaFormat" name="mediaFormat" v-model="selectedMediaFormat">
-                    <option value>Select format:</option>
+                    <option value="">Select format:</option>
                     <option value="mp4">MP4</option>
                     <option value="h5p">H5P</option>
                     <!--<option value="jpeg">JPEG</option>-->
@@ -61,10 +61,10 @@
                 id="contents-details"
                 class="content-details"
                 style="display: none"
-                v-show="showContentDetails"
+                v-show="selectedMediaFormat"
               >
                 <h3>Content Details</h3>
-                <div id="mp4-content" class="mp4-content" v-show="showMp4Content">
+                <div id="mp4-content" class="mp4-content" v-show="selectedMediaFormat == 'mp4'">
                   <label>
                     Video URL
                     <input
@@ -84,7 +84,7 @@
                     />
                   </label>
                 </div>
-                <div id="h5p-content" class="h5p-content" v-show="showH5pContent">
+                <div id="h5p-content" class="h5p-content" v-show="selectedMediaFormat == 'h5p'">
                   <label>
                     H5P Embed Link
                     <input
@@ -226,10 +226,7 @@ export default {
   name: "node-modal",
   data() {
     return {
-      selectedMediaFormat: "",
-      showMp4Content: false,
-      showH5pContent: false,
-      showContentDetails: false
+      selectedMediaFormat: ""
     }
   },
   props: {
@@ -240,37 +237,19 @@ export default {
   },
   methods: {
     submitAddNewNode() {
+      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, false);
     },
     submitAddRootNode() {
+      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, false, true);
     },
     submitEditNode() {
+      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, true);
-    }
-  },
-  watch: {
-    selectedMediaFormat(value) {
-      switch (value) {
-        case "mp4":
-          this.showContentDetails = true
-          this.showMp4Content = true
-          this.showH5pContent = false
-          break;
-        case "h5p":
-          this.showContentDetails = true
-          this.showMp4Content = false
-          this.showH5pContent = true
-          break;
-        default:
-          this.showContentDetails = false
-          this.showMp4Content = false
-          this.showH5pContent = false
-          break;
-      }
     }
   }
 }
