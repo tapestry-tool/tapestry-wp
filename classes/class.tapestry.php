@@ -169,8 +169,8 @@ class Tapestry implements ITapestry
             if ($element == $nodeId) {
                 array_splice($this->nodes, $elementId, 1);
                 // Delete node from database
-                // $tapestryNode = new TapestryNode($this->postId, $nodeId);
-                // $tapestryNode->deleteNode();
+                $tapestryNode = new TapestryNode($this->postId, $nodeId);
+                $tapestryNode->deleteNode();
             }
         }
 
