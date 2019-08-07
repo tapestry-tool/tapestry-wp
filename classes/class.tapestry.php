@@ -174,7 +174,8 @@ class Tapestry implements ITapestry
             }
         }
 
-        $this->_saveToDatabase();
+        $tapestry = $this->_formTapestry();
+        update_post_meta($this->postId, 'tapestry', $tapestry);
         return $this->nodes;
     }
 
