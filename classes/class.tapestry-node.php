@@ -161,7 +161,14 @@ class TapestryNode implements ITapestryNode
     {
         $node = $this->_formNode();
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node');
+        $nodePostId = 0;
+
+        if ($this->nodeMetaId) {
+            $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+            $nodePostId = $nodeMetadata->meta_value->post_id;
+        }
+
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId);
 
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
