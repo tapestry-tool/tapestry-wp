@@ -16,55 +16,66 @@
           <div class="modal-body" id="createNewNodeModalBody">
             <div id="add-node-error-msg"></div>
             <form class="form-container">
-              <label>
-                Title
-                <input
-                  id="add-node-title-input"
-                  name="title"
-                  type="text"
-                  placeholder="Enter the topic title"
-                  required
-                />
-              </label>
-              <label>
-                Thumbnail
-                <input
-                  id="add-node-thumbnail-input"
-                  name="imageURL"
-                  type="url"
-                  placeholder="Enter the URL for the thumbnail"
-                  required
-                />
-              </label>
-              <label>
-                Media Type
-                <div class="dropdown">
-                  <select id="mediaType" name="mediaType">
-                    <option value="default">Select type:</option>
-                    <option value="video" selected>Video</option>
-                    <!--<option value="image">image</option>-->
+              <div>
+                <label>
+                  Title
+                  <input
+                    id="add-node-title-input"
+                    name="title"
+                    type="text"
+                    placeholder="Enter the topic title"
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Thumbnail
+                  <input
+                    id="add-node-thumbnail-input"
+                    name="imageURL"
+                    type="url"
+                    placeholder="Enter the URL for the thumbnail"
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Media Type
+                  <div class="dropdown">
+                    <select id="mediaType" name="mediaType" v-model="selectedMediaType">
+                      <option value>Select type:</option>
+                      <option value="video" selected>Video</option>
+                      <!--<option value="image">image</option>-->
                   </select>
-                </div>
-              </label>
-              <label>
-                Media Format
-                <div class="dropdown">
-                  <select id="mediaFormat" name="mediaFormat" v-model="selectedMediaFormat">
-                    <option value="">Select format:</option>
-                    <option value="mp4">MP4</option>
-                    <option value="h5p">H5P</option>
-                    <!--<option value="jpeg">JPEG</option>-->
-                  </select>
-                </div>
-              </label>
+                  </div>
+                </label>
+              </div>
+              <div v-show="selectedMediaType">
+                <label>
+                  Media Format
+                  <div class="dropdown">
+                    <select id="mediaFormat" name="mediaFormat" v-model="selectedMediaFormat">
+                      <option value>Select format:</option>
+                      <option value="mp4">MP4</option>
+                      <option value="h5p">H5P</option>
+                    </select>
+                  </div>
+                </label>
+              </div>
               <div
                 id="contents-details"
                 class="content-details"
                 style="display: none"
-                v-show="selectedMediaFormat"
+                v-show="selectedMediaType && selectedMediaFormat"
               >
                 <h3>Content Details</h3>
-                <div id="mp4-content" class="mp4-content" v-show="selectedMediaFormat == 'mp4'">
+                <div
+                  id="mp4-content"
+                  class="mp4-content"
+                  v-show="selectedMediaFormat == 'mp4'"
+                >
                   <label>
                     Video URL
                     <input
@@ -84,7 +95,11 @@
                     />
                   </label>
                 </div>
-                <div id="h5p-content" class="h5p-content" v-show="selectedMediaFormat == 'h5p'">
+                <div
+                  id="h5p-content"
+                  class="h5p-content"
+                  v-show="selectedMediaFormat == 'h5p'"
+                >
                   <label>
                     H5P Embed Link
                     <input
@@ -104,7 +119,10 @@
                     />
                   </label>
                 </div>
-                <div id="appearsat-section" v-show="selectedMediaFormat">
+                <div
+                  id="appearsat-section"
+                  v-show="selectedMediaType=='video' && selectedMediaFormat"
+                >
                   <label>
                     Appears at:
                     <input
@@ -192,12 +210,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn"
-              data-dismiss="modal"
-              id="cancel-add-new-node"
-            >Close</button>
+            <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
             <button
               type="button"
               class="btn"
@@ -238,17 +251,14 @@ export default {
   },
   methods: {
     submitAddNewNode() {
-      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, false);
     },
     submitAddRootNode() {
-      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, false, true);
     },
     submitEditNode() {
-      debugger
       const formData = $("form").serializeArray();
       this.$parent.$emit("tapestryAddNewNode", formData, true);
     }
@@ -257,4 +267,30 @@ export default {
 </script>
 
 <style scoped>
+#createNewNodeModalBody {
+  text-align: left;
+}
+
+#createNewNodeModalBody label {
+  display: block;
+}
+
+#contents-details > #appearsat-section {
+  border: 1px solid #eee;
+  border-top: none;
+  margin-bottom: 20px;
+}
+
+#permissions-details {
+  margin-top: 20px;
+}
+
+#mp4-content,
+#h5p-content {
+  position: relative;
+  background: #fefefe;
+  border: 1px solid #eee;
+  border-bottom: none;
+  box-sizing: border-box;
+}
 </style>
