@@ -1,6 +1,6 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton />
+    <RootNodeButton v-show="!this.tapestry.rootId" />
     <NodeModal :tapestry="this.tapestry" />
   </div>
 </template>
@@ -20,6 +20,11 @@ export default {
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
     this.tapestry = await this.TapestryAPI.getTapestry();
+    debugger
+
+    thisTapestryTool.setDataset(this.tapestry);
+    thisTapestryTool.init();
+    thisTapestryTool.redrawTapestryWithNewNode();
 
     this.$on('submitAddNewNode', this.submitAddNewNode)
     this.$on('submitAddRootNode', this.submitAddRootNode)
@@ -75,13 +80,13 @@ export default {
 
       // Node ID exists, so edit case
       if (isEdit) {
-        newNodeEntry.fx = this.tapestry.nodes[findNodeIndex(root)].fx;
-        newNodeEntry.fy = this.tapestry.nodes[findNodeIndex(root)].fy;
+        newNodeEntry.fx = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fx;
+        newNodeEntry.fy = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fy;
       } else {
         if (!isRoot) {
           // Just put the node right under the current node
-          newNodeEntry.fx = this.tapestry.nodes[findNodeIndex(root)].fx;
-          newNodeEntry.fy = this.tapestry.nodes[findNodeIndex(root)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+          newNodeEntry.fx = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fx;
+          newNodeEntry.fy = this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
         }
       }
 
@@ -185,8 +190,7 @@ export default {
           // Add the new link to the this.tapestry
           this.tapestry.links.push(newLink);
 
-          thisTapestryTool.tapestryHideAddNodeModal();
-          // tapestryjs.redrawTapestryWithNewNode();
+          tapestryHideAddNodeModal();
         } else {
           var newId = result.id;
 
@@ -194,11 +198,10 @@ export default {
 
           this.tapestry.rootId = newId;
 
-          thisTapestryTool.tapestryHideAddNodeModal();
+          tapestryHideAddNodeModal();
 
           root = this.tapestry.rootId; // need to set root to newly created node
 
-          // tapestryjs.redrawTapestryWithNewNode(true);
           $("#root-node-container").hide(); // hide the root node button after creating it.
         }
       } else {
@@ -206,10 +209,12 @@ export default {
         result = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
         newNodeEntry.id = result.id;
 
-        this.tapestry.nodes[findNodeIndex(root)] = newNodeEntry;
-        // tapestryjs.redrawTapestryWithNewNode();
-        thisTapestryTool.tapestryHideAddNodeModal();
+        this.tapestry.nodes[thisTapestryTool.findNodeIndex(root)] = newNodeEntry;
+        tapestryHideAddNodeModal();
       }
+
+      thisTapestryTool.setDataset(this.tapestry);
+      thisTapestryTool.redrawTapestryWithNewNode();
     }
   }
 }

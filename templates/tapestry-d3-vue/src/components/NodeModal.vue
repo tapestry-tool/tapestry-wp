@@ -104,7 +104,7 @@
                     />
                   </label>
                 </div>
-                <div id="appearsat-section">
+                <div id="appearsat-section" v-show="selectedMediaFormat">
                   <label>
                     Appears at:
                     <input
@@ -226,7 +226,8 @@ export default {
   name: "node-modal",
   data() {
     return {
-      selectedMediaFormat: ""
+      selectedMediaFormat: "",
+      selectedMediaType: ""
     }
   },
   props: {

@@ -15,7 +15,6 @@ export default {
   },
   methods: {
     showModal() {
-      console.log('here')
       // Populate title
       $('#createNewNodeModalLabel').text("Add root node")
       $("#submit-add-new-node").hide()
