@@ -25,15 +25,6 @@ function addNonceToScript()
     wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
     wp_enqueue_script('wp_tapestry_script');
 
-    wp_register_script(
-        'wp_tapestry_functions_script',
-        plugin_dir_url(__FILE__) . 'tapestry-d3/tapestry-functions.js',
-        array('jquery', 'wp_tapestry_script'),
-        null,
-        true
-    );
-    wp_enqueue_script('wp_tapestry_functions_script');
-
     wp_add_inline_script( 'wp_tapestry_script', "
         var thisTapestryTool = new tapestryTool({
             'containerId': 'tapestry',
@@ -76,23 +67,6 @@ get_header(); ?>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/libs/h5p-resizer.min.js" charset="UTF-8"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/libs/bootstrap.min.js" charset="UTF-8"></script>
-
-        <script>
-        // Capture click events anywhere inside or outside tapestry
-        $(document).ready(function(){
-            document.body.addEventListener('click', function(event) {
-                var x = event.clientX + $(window).scrollLeft();
-                var y = event.clientY + $(window).scrollTop();
-                recordAnalyticsEvent('user', 'click', 'screen', null, {'x': x, 'y': y});
-            }, true);
-
-            document.getElementById('tapestry').addEventListener('click', function(event) {
-                var x = event.clientX + $(window).scrollLeft();
-                var y = event.clientY + $(window).scrollTop();
-                recordAnalyticsEvent('user', 'click', 'tapestry', null, {'x': x, 'y': y});
-            }, true);
-        });
-        </script>
 
         </main><!-- #main -->
     </div><!-- #primary -->
