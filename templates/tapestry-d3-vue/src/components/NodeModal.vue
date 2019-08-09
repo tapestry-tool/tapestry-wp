@@ -59,12 +59,12 @@
                         <label>Thumbnail
                             <input id="add-node-thumbnail-input" name="imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
                         </label>
-                        <input id="tapestry-lock-node-checkbox" name="locked" type="checkbox" required>
+                        <input id="tapestry-lock-node-checkbox" name="locked" type="checkbox" required v-model="lockNode">
                         <label id="tapestry-lock-node-label">Hide node until parent node is viewed</label>
                         <div id="appearsat-section">
                             <div id="locked-container">
                             </div>
-                            <label id ="appears-at-label" style="display: none">At which point in the video should this node appear?
+                            <label id ="appears-at-label" v-show="lockNode">At which point in the video should this node appear?
                                 <input id="appears-at" name="appearsAt" type="text" placeholder="Enter number of seconds" >
                             </label>
                         </div>
@@ -100,7 +100,7 @@
                                         <input id="user-number-input" type="number" placeholder="123" >
                                     </td>
                                     <td colspan="6">
-                                        <button type="button" id="user-permissions-btn"><span class="fas fa-plus permissions-plus"></span>User</button>
+                                        <button type="button" id="user-permissions-btn" @click="addUser"><span class="fas fa-plus permissions-plus"></span>User</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -110,9 +110,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-                <button type="button" class="btn" id="submit-add-new-node">Submit</button>
-                <button type="button" class="btn" id="submit-add-root-node">Submit</button>
-                <button type="button" class="btn" id="submit-edit-node">Submit</button>
+                <button type="button" class="btn" id="submit-add-new-node" @click="submitAddNewNode()">Submit</button>
+                <button type="button" class="btn" id="submit-add-root-node" @click="submitAddRootNode()">Submit</button>
+                <button type="button" class="btn" id="submit-edit-node" @click="submitEditNode()">Submit</button>
             </div>
         </div>
     </div>
@@ -129,7 +129,8 @@ export default {
   name: "node-modal",
   data() {
     return {
-      selectedMediaType: "default"
+        lockNode: false,
+        selectedMediaType: "default"
     }
   },
   props: {
@@ -140,16 +141,25 @@ export default {
   },
   methods: {
     submitAddNewNode() {
-      const formData = $("form").serializeArray();
-      this.$parent.$emit("tapestryAddNewNode", formData, false);
+        const formData = $("form").serializeArray();
+        this.$parent.$emit("tapestryAddNewNode", formData, false);
     },
     submitAddRootNode() {
-      const formData = $("form").serializeArray();
-      this.$parent.$emit("tapestryAddNewNode", formData, false, true);
+        const formData = $("form").serializeArray();
+        this.$parent.$emit("tapestryAddNewNode", formData, false, true);
     },
     submitEditNode() {
-      const formData = $("form").serializeArray();
-      this.$parent.$emit("tapestryAddNewNode", formData, true);
+        const formData = $("form").serializeArray();
+        this.$parent.$emit("tapestryAddNewNode", formData, true);
+    },
+    addUser() {
+        const userId = $("#user-number-input").val();
+        if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
+            appendPermissionsRow(userId, "user");
+            $("#user-number-input").val("");
+        } else {
+            alert("Enter valid user id");
+        }
     }
   }
 }
@@ -160,11 +170,4 @@ export default {
     text-align: left;
 }
 
-#createNewNodeModalBody label {
-    display: block;
-}
-
-#createNewNodeModalBody #tapestry-lock-node-label {
-    display: inline-block;
-}
 </style>

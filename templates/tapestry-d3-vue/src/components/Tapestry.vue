@@ -20,7 +20,6 @@ export default {
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
     this.tapestry = await this.TapestryAPI.getTapestry();
-    debugger
 
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
@@ -41,7 +40,6 @@ export default {
   },
   methods: {
     async tapestryAddNewNode(formData, isEdit, isRoot) {
-      debugger
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
       let root = this.tapestry.rootId;
@@ -59,11 +57,12 @@ export default {
       // Add the node data first
       var newNodeEntry = {
         "type": "tapestry_node",
+        "description": "",
         "status": "publish",
         "nodeType": "",
         "title": "",
         "imageURL": "",
-        "mediaType": "video",
+        "mediaType": "",
         "mediaFormat": "",
         "mediaDuration": 0,
         "typeId": 1,
@@ -74,23 +73,23 @@ export default {
             { "group": "unviewed", "value": 1 }
           ],
           "mediaURL": "",
-          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P
-          "mediaHeight": 600,
-          "unlocked": true
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
+          "mediaHeight": 600
         },
+        "unlocked": true,
         "fx": Helpers.getBrowserWidth(),
         "fy": Helpers.getBrowserHeight()
       };
 
       // Node ID exists, so edit case
       if (isEdit) {
-        newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.x;
-        newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.y;
+        newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
+        newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy;
       } else {
         if (!isRoot) {
           // Just put the node right under the current node
-          newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.x;
-          newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].coordinates.y + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+          newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
+          newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
         }
       }
 
@@ -107,10 +106,18 @@ export default {
             newNodeEntry[fieldName] = fieldValue;
             break;
           case "mediaType":
-            newNodeEntry[fieldName] = fieldValue;
-            break;
-          case "mediaFormat":
-            newNodeEntry[fieldName] = fieldValue;
+            if (fieldValue === "text") {
+              newNodeEntry[fieldName] = fieldValue;
+              newNodeEntry.typeData.textContent = $("#tapestry-node-text-area").val();
+            }
+            else if (fieldValue === "video") {
+              newNodeEntry["mediaType"] = "video";
+              newNodeEntry["mediaFormat"] = "mp4";
+            }
+            else if (fieldValue === "h5p") {
+              newNodeEntry["mediaType"] = "video";
+              newNodeEntry["mediaFormat"] = "h5p";
+            }
             break;
           case "mp4-mediaURL":
             if (fieldValue !== "") {
@@ -129,17 +136,20 @@ export default {
             break;
           case "h5p-mediaDuration":
             if (fieldValue !== "") {
-              newNodeEntry.typeData.mediaDuration = parseInt(fieldValue);
+              newNodeEntry.mediaDuration = parseInt(fieldValue);
             }
             break;
           case "appearsAt":
             appearsAt = parseInt(fieldValue);
-            newNodeEntry.typeData.unlocked = !appearsAt || isRoot;
+            newNodeEntry.unlocked = !appearsAt || isRoot;
             break;
           default:
             break;
         }
       }
+
+      // Add description to new node	
+      newNodeEntry.description = $("#tapestry-node-description-area").val();
 
       var permissionData = {
         "public": []
@@ -193,16 +203,12 @@ export default {
 
           // Add the new link to the this.tapestry
           this.tapestry.links.push(newLink);
-
-          tapestryHideAddNodeModal();
         } else {
-          var newId = result.id;
+          const newId = result.id;
 
           await this.TapestryAPI.updatePermissions(newId, JSON.stringify(permissionData));
 
           this.tapestry.rootId = newId;
-
-          tapestryHideAddNodeModal();
 
           root = this.tapestry.rootId; // need to set root to newly created node
 
@@ -210,15 +216,18 @@ export default {
         }
       } else {
         // Call endpoint for editing node
-        result = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
+        const response = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
+        const result = response.data;
+
         newNodeEntry.id = result.id;
 
         this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
-        tapestryHideAddNodeModal();
       }
 
+      tapestryHideAddNodeModal();
+
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.redrawTapestryWithNewNode();
+      thisTapestryTool.redraw(isRoot);
     }
   }
 }
