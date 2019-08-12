@@ -25,11 +25,13 @@ function enqueue_vue_app_build()
             'directory_uri' => plugin_dir_url(__FILE__) . 'tapestry-d3-vue/dist', // child theme directory path.
             'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
             'app_path' => $post->post_name, // page where the custom page template is loaded.
-            'post_categories' => get_terms(array(
-                'taxonomy' => 'category', // default post categories.
-                'hide_empty' => true,
-                'fields' => 'names',
-            )),
+            'post_categories' => get_terms(
+                array(
+                    'taxonomy' => 'category', // default post categories.
+                    'hide_empty' => true,
+                    'fields' => 'names',
+                )
+            ),
         )
     );
 
@@ -93,17 +95,17 @@ get_header(); ?>
         ?>
 
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
-        <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.css" rel="stylesheet" />        
+        <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.css" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.css" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>libs/bootstrap.min.css" rel="stylesheet" />
-        
+
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/h5p-resizer.min.js" charset="UTF-8"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/bootstrap.min.js" charset="UTF-8"></script>
-        
+
         <script>
             // EXAMPLE OF USAGE:
             // thisTapestryTool.setDataset({'abc':'123'});
