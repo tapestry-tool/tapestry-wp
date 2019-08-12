@@ -25,13 +25,11 @@ function enqueue_vue_app_build()
             'directory_uri' => plugin_dir_url(__FILE__) . 'tapestry-d3-vue/dist', // child theme directory path.
             'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
             'app_path' => $post->post_name, // page where the custom page template is loaded.
-            'post_categories' => get_terms(
-                array(
-                    'taxonomy' => 'category', // default post categories.
-                    'hide_empty' => true,
-                    'fields' => 'names',
-                )
-            ),
+            'post_categories' => get_terms(array(
+                'taxonomy' => 'category', // default post categories.
+                'hide_empty' => true,
+                'fields' => 'names',
+            )),
         )
     );
 
