@@ -200,11 +200,11 @@ class Tapestry implements ITapestry
      * 
      * @return  Array  $links   Tapestry links
      */
-    public function updateLinks($links)
+    public function removeLink($linkIndex)
     {
-        $this->links = $links;
+        array_splice($this->links, $linkIndex,1);
         $this->_saveToDatabase();
-        return $links;
+        return $this->links;
     }
 
     /**
