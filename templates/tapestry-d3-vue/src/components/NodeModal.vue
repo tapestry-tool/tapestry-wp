@@ -142,15 +142,15 @@ export default {
   methods: {
     submitAddNewNode() {
         const formData = $("form").serializeArray();
-        this.$parent.$emit("tapestryAddNewNode", formData, false);
+        this.$emit("tapestryAddNewNode", formData, false);
     },
     submitAddRootNode() {
         const formData = $("form").serializeArray();
-        this.$parent.$emit("tapestryAddNewNode", formData, false, true);
+        this.$emit("tapestryAddNewNode", formData, false, true);
     },
     submitEditNode() {
         const formData = $("form").serializeArray();
-        this.$parent.$emit("tapestryAddNewNode", formData, true);
+        this.$emit("tapestryAddNewNode", formData, true);
     },
     addUser() {
         const userId = $("#user-number-input").val();

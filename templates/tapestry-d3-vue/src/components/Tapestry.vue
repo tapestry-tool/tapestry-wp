@@ -1,7 +1,7 @@
 <template>
   <div id="tapestry">
     <RootNodeButton v-show="!this.tapestry.rootId" />
-    <NodeModal :tapestry="this.tapestry" />
+    <NodeModal :tapestry="this.tapestry" @tapestryAddNewNode="tapestryAddNewNode" />
   </div>
 </template>
 
@@ -25,11 +25,6 @@ export default {
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
     thisTapestryTool.redrawTapestryWithNewNode();
-
-    this.$on('submitAddNewNode', this.submitAddNewNode)
-    this.$on('submitAddRootNode', this.submitAddRootNode)
-    this.$on('submitEditNode', this.submitEditNode)
-    this.$on('tapestryAddNewNode', this.tapestryAddNewNode)
   },
   data() {
     return {
