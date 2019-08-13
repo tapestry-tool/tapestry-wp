@@ -29,29 +29,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Update User's video progress for a tapestry post
-     *
-     * @param Float   $progressValue how much the video was viewed, value should be between >= 0 and <= 1
-     *
-     * @return Null
-     */
-    public function save($progressValue)
-    {
-        $this->_checkUserAndPostId();
-
-        if ($progressValue !== null) {
-            $progressValue = floatval($progressValue);
-        }
-
-        // Value should be between 0 and 1
-        if ($progressValue < 0 || $progressValue > 1) {
-            throw new Exception('Invalid progress value');
-        }
-
-        $this->_updateUserProgress($progressValue);
-    }
-
-    /**
      * Get User's video progress for a tapestry post
      *
      * @return String progress   of each node in json format
@@ -68,12 +45,46 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Update User's video progress for a tapestry post
+     *
+     * @param Float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
+     *
+     * @return Null
+     */
+    public function updateUserProgress($progressValue)
+    {
+        $this->_checkUserAndPostId();
+
+        if ($progressValue !== null) {
+            $progressValue = floatval($progressValue);
+        }
+
+        // Value should be between 0 and 1
+        if ($progressValue < 0 || $progressValue > 1) {
+            throw new Exception('Invalid progress value');
+        }
+
+        $this->_updateUserProgress($progressValue);
+    }
+
+    /**
+     * Set 'unlocked' status of a Tapestry Node for this User to true
+     *
+     * @return Null
+     */
+    public function unlockNode() 
+    {
+        $this->_checkUserAndPostId();
+        $this->_unlockNode();
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param   String  $h5pSettingsData stores volume,
      * playbackRate, quality of h5p video
      * 
-     * @return  NULL
+     * @return  Null
      */
     public function updateH5PSettings($h5pSettingsData)
     {
@@ -91,7 +102,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     /**
      * Get User's h5p video setting for a tapestry post
      * 
-     * @return String h5p   $setting
+     * @return String h5p $setting
      */
     public function getH5PSettings()
     {
@@ -102,7 +113,12 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _updateUserProgress($progressValue)
     {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeId, $progressValue);
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
+    }
+
+    private function _unlockNode() 
+    {
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $this->nodeMetaId, true);
     }
 
     private function _getUserProgress($nodeIdArr)
@@ -112,11 +128,21 @@ class TapestryUserProgress implements ITapestryUserProgress
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodeIdArr as $nodeId) {
             $progress_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
+            $progress->$nodeId = new stdClass();
             if ($progress_value !== null) {
-                $progress->$nodeId = (float) $progress_value;
+                $progress->$nodeId->progress = (float) $progress_value;
             } else {
-                $progress->$nodeId = 0.0;
+                $progress->$nodeId->progress = 0;
             }
+
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            $default_unlocked_status = isset($nodeMetadata->unlocked) && $nodeMetadata->unlocked ? true : false;
+            $unlocked_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $nodeId, true);
+            if ($unlocked_value !== null) {
+                $progress->$nodeId->unlocked = $unlocked_value;
+            } else {
+                $progress->$nodeId->unlocked = $default_unlocked_status;
+            }            
         }
 
         return json_encode($progress);
