@@ -149,7 +149,7 @@ class Tapestry implements ITapestry
     /**
      * Delete a node
      *
-     * @param   Object  $nodeid   Tapestry node id
+     * @param   Object  $nodeId  Tapestry node id
      *
      * @return  Object  $Array   Tapestry nodes
      */
@@ -165,7 +165,7 @@ class Tapestry implements ITapestry
         }
 
         // Delete the element from nodes array
-        foreach($this->nodes as $elementId => $element) {
+        foreach ($this->nodes as $elementId => $element) {
             if ($element == $nodeId) {
                 array_splice($this->nodes, $elementId, 1);
                 // Delete node from database
@@ -194,15 +194,15 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Replace links array
+     * Delete a link from links array
      * 
-     * @param  Array   $links   Tapestry links
+     * @param  Integer $linkIndex Link Index
      * 
-     * @return  Array  $links   Tapestry links
+     * @return Array   $links     Tapestry links
      */
     public function removeLink($linkIndex)
     {
-        array_splice($this->links, $linkIndex,1);
+        array_splice($this->links, $linkIndex, 1);
         $this->_saveToDatabase();
         return $this->links;
     }

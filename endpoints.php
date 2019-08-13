@@ -297,7 +297,7 @@ function addTapestryLink($request)
 }
 
 /**
- * Add A Tapestry Link
+ * Delete A Tapestry Link
  * 
  * @param   Object  $request    HTTP request
  * 
