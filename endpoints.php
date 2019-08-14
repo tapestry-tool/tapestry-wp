@@ -746,6 +746,7 @@ function getUserProgressByPostId($request)
  *
  * @param Object $request HTTP request
  *
+ * @return NULL
  */
 function updateUserSettingsByPostId($request)
 {

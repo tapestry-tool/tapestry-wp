@@ -3,14 +3,14 @@
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-setting.php";
 
 /**
- * Add/update/retrieve User progress
+ * Add/update/retrieve User Tapestry Setting
  * 
  */
 class TapestryUserSetting implements ITapestryUserSetting
 {
 
     private $_userId = null;
-    private $postId;
+    private $_postId;
 
     /**
      * Constructor
@@ -23,14 +23,14 @@ class TapestryUserSetting implements ITapestryUserSetting
     public function __construct($postId = null, $nodeMetaId = null)
     {
         $this->_userId = apply_filters('determine_current_user', false);
-        $this->postId = $postId;
+        $this->_postId = $postId;
         $this->nodeMetaId = $nodeMetaId;
     }
 
     /**
-     * Get User's video progress for a tapestry post
+     * Get User's tapestry setting
      *
-     * @return Object settings  Tapestry settings for the user for a given post
+     * @return Object settings Tapestry settings for the user for a given post
      */
     public function get()
     {
@@ -51,13 +51,13 @@ class TapestryUserSetting implements ITapestryUserSetting
 
     private function _getUserSetting()
     {
-        $settings = get_user_meta($this->_userId, 'tapestry_setting_' . $this->postId, true);
+        $settings = get_user_meta($this->_userId, 'tapestry_setting_' . $this->_postId, true);
         return json_encode($settings);
     }
 
     private function _updateUserSetting($settingsData)
     {
-        update_user_meta($this->_userId, 'tapestry_setting_' . $this->postId, $settingsData);
+        update_user_meta($this->_userId, 'tapestry_setting_' . $this->_postId, $settingsData);
     }
 
 }
