@@ -1,7 +1,11 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton v-show="!this.tapestry.rootId" />
-    <NodeModal :tapestry="this.tapestry" @tapestryAddNewNode="tapestryAddNewNode" />
+    <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
+    <NodeModal
+      :tapestry="tapestry"
+      :modalType="modalType"
+      @tapestryAddNewNode="tapestryAddNewNode"
+    />
   </div>
 </template>
 
@@ -20,7 +24,6 @@ export default {
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
     this.tapestry = await this.TapestryAPI.getTapestry();
-
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
@@ -30,10 +33,16 @@ export default {
     return {
       tapestry: {},
       TapestryAPI: {},
-      directoryUrl: wpData.directory_uri
+      modalType: '',
+      showNodeModal: false
     }
   },
   methods: {
+    addRootNode() {
+      this.modalType = 'add-root-node';
+      // this.showNodeModal = true;
+      this.$bvModal.show('node-modal-container');
+    },
     async tapestryAddNewNode(formData, isEdit, isRoot) {
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
@@ -223,6 +232,9 @@ export default {
 
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.redraw(isRoot);
+
+      this.modalType = '';
+      this.showNodeModal = false;
     }
   }
 }
