@@ -25,6 +25,7 @@ class TapestryNode implements ITapestryNode
     private $coordinates;
     private $permissions;
     private $hideTitle;
+    private $hideProgress;
 
     /**
      * Constructor
@@ -55,6 +56,7 @@ class TapestryNode implements ITapestryNode
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
             $this->hideTitle = $node->hideTitle;
+            $this->hideProgress = $node->hideProgress;
         } else {
             $this->size = '';
             $this->title = '';
@@ -70,6 +72,7 @@ class TapestryNode implements ITapestryNode
             $this->coordinates = (object) [];
             $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
             $this->hideTitle = false;
+            $this->hideProgress = false;
         }
     }
 
@@ -133,6 +136,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->hideTitle) && is_bool($node->hideTitle)) {
             $this->hideTitle = $node->hideTitle;
+        }
+        if (isset($node->hideProgress) && is_bool($node->hideProgress)) {
+            $this->hideProgress = $node->hideProgress;
         }
     }
 
@@ -202,7 +208,8 @@ class TapestryNode implements ITapestryNode
             'typeData'      => $this->typeData,
             'coordinates'   => $this->coordinates,
             'permissions'   => $this->permissions,
-            'hideTitle'     => $this->hideTitle
+            'hideTitle'     => $this->hideTitle,
+            'hideProgress'  => $this->hideProgress
         ];
     }
 
