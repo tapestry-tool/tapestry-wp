@@ -10,6 +10,7 @@ require_once __DIR__ . '/classes/class.tapestry.php';
 require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/classes/class.tapestry-user-setting.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 $REST_API_ENDPOINTS = [
@@ -157,6 +158,20 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => 'POST',
             'callback'              => 'updateUserH5PSettingsByPostId',
+        ]
+    ],
+    'GET_TAPESTRY_USER_TAPESTRY_SETTING' => (object) [
+        'ROUTE'     => 'users/settings/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => 'GET',
+            'callback'              => 'getUserSettingsByPostId',
+        ]
+    ],
+    'UPDATE_TAPESTRY_USER_TAPESTRY_SETTING' => (object) [
+        'ROUTE'     => 'users/settings/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => 'POST',
+            'callback'              => 'updateUserSettingsByPostId',
         ]
     ],
 ];
@@ -721,6 +736,45 @@ function getUserProgressByPostId($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
         return $userProgress->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update the user's settings by post id
+ *
+ * @param Object $request HTTP request
+ *
+ * @return NULL
+ */
+function updateUserSettingsByPostId($request)
+{
+    $postId = $request['tapestryPostId'];
+    $settingsData = json_decode($request->get_body());
+
+    try {
+        $userSetting = new TapestryUserSetting($postId);
+        $userSetting->updateUserSetting($settingsData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get user progress on a tapestry page by post id.
+ *
+ * @param Object $request HTTP request
+ *
+ * @return Object $response HTTP response
+ */
+function getUserSettingsByPostId($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    try {
+        $userSetting = new TapestryUserSetting($postId);
+        return $userSetting->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
