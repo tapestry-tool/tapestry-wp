@@ -28,11 +28,13 @@ export default {
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
     thisTapestryTool.redrawTapestryWithNewNode();
+    this.getTapestrySetting();
   },
   data() {
     return {
       tapestry: {},
       TapestryAPI: {},
+      tapestrySettings: {},
       directoryUrl: wpData.directory_uri
     }
   },
@@ -228,15 +230,21 @@ export default {
       thisTapestryTool.redraw(isRoot);
     },
     async tapestrySubmitSettings(tapestrySettingsObj) {
-      console.log(tapestrySettingsObj);
       const response = await this.TapestryAPI.updateUserTapestrySetting(JSON.stringify(tapestrySettingsObj));
       const result = response.data;
-      console.log(result);
-    //   if (tapestrySettingsObj.background) {
-    //     setTapestryBackgroundImage(tapestrySettingsObj.background);
-    //   }
+      if (tapestrySettingsObj.background) {
+        thisTapestryTool.setBackground(this.tapestrySettings.background);     
+      }
       closeSettingModal();
-  },
+    },
+    async getTapestrySetting() {
+        const response = await this.TapestryAPI.getUserTapestrySetting();
+        const result = response.data;
+        this.tapestrySettings = JSON.parse(result);
+        if (this.tapestrySettings.background) {
+          thisTapestryTool.setBackground(this.tapestrySettings.background);     
+        }
+    }
   }
 }
 </script>
