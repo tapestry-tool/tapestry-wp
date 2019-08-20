@@ -54,3 +54,18 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+#tapestrySettingModal > div {
+    text-align: left;
+}
+
+#tapestry-submit-edit-setting {
+    color: white;
+}
+
+#tapestry-cancel-edit-setting {
+    color: white;
+    background-color: #dc3545;
+}
+</style>
