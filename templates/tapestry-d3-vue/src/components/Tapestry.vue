@@ -2,7 +2,7 @@
   <div id="tapestry">
     <RootNodeButton v-show="!this.tapestry.rootId" />
     <NodeModal :tapestry="this.tapestry" @tapestryAddNewNode="tapestryAddNewNode" />
-    <SettingsModal/>
+    <SettingsModal @tapestrySubmitSettings="tapestrySubmitSettings"/>
   </div>
 </template>
 
@@ -226,12 +226,15 @@ export default {
 
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.redraw(isRoot);
-    }
-  },
-  tapestrySubmitSettings(tapestrySettingsObj) {
+    },
+    async tapestrySubmitSettings(tapestrySettingsObj) {
       console.log(tapestrySettingsObj);
-
+      const response = await this.TapestryAPI.updateUserTapestrySetting(JSON.stringify(tapestrySettingsObj));
+      const result = response.data;
+      console.log(result);
+      closeSettingModal();
   },
+  }
 }
 </script>
 

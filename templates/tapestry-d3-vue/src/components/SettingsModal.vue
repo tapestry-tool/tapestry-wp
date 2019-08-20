@@ -28,8 +28,10 @@
 
 <script>
 
+import TapestryAPI from "../services/TapestryAPI"
 
 export default {
+    
   name: 'settings-modal',
   data() {
     return {}

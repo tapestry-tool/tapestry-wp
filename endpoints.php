@@ -170,7 +170,7 @@ $REST_API_ENDPOINTS = [
     'UPDATE_TAPESTRY_USER_TAPESTRY_SETTING' => (object) [
         'ROUTE'     => 'users/settings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => 'PUT',
             'callback'              => 'updateUserSettingsByPostId',
         ]
     ],

@@ -93,4 +93,21 @@ export default class {
             throw e;
         }
     }
+
+        /**
+     * Update User's Tapestry Setting
+     * 
+     * @param   {Object}    tapestrySettingsObj
+     * 
+     * @return  {Object}
+     */
+    async updateUserTapestrySetting(tapestrySettingsObj) {
+        try {
+            const url = `${apiUrl}/users/settings/${this.postId}`;
+            const response = await axios.put(url, tapestrySettingsObj);
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    }
 }
