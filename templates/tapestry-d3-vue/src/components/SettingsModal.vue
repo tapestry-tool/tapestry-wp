@@ -10,9 +10,9 @@
             <div class="modal-body" id="tapestrySettingModalBody">
                 <form class="form-container">
                     <label>Background Image
-                        <input id="tapestry-background-img-input" name="background-image" type="text" placeholder="Enter image URL" required >
+                        <input id="tapestry-background-img-input" name="background-image" type="text" placeholder="Enter image URL" v-bind:value="tapestrySettings.background" required >
                     </label>
-                    <input id="tapestry-auto-layout-checkbox" type="checkbox" required>
+                    <input id="tapestry-auto-layout-checkbox" type="checkbox" v-model="tapestrySettings.autolayout" required>
                     <label id="tapestry-auto-layout-label">Auto Layout</label>
                 </form>
             </div>
@@ -34,7 +34,14 @@ export default {
     
   name: 'settings-modal',
   data() {
-    return {}
+    return {
+        tapestrySettings: {},
+    }
+  },
+  async mounted () {
+    this.TapestryAPI = new TapestryAPI(wpPostId);
+
+    this.getSettings();
   },
   methods: {
     submitSettings() {
@@ -50,6 +57,11 @@ export default {
         }
         this.$emit("tapestrySubmitSettings", tapestrySettingsObj);
 
+    },
+    async getSettings() {
+        const response = await this.TapestryAPI.getUserTapestrySetting();
+        const result = response.data;
+        this.tapestrySettings = JSON.parse(result);
     }
   }
 }

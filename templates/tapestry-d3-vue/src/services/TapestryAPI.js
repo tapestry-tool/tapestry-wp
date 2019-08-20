@@ -94,7 +94,7 @@ export default class {
         }
     }
 
-        /**
+    /**
      * Update User's Tapestry Setting
      * 
      * @param   {Object}    tapestrySettingsObj
@@ -105,6 +105,21 @@ export default class {
         try {
             const url = `${apiUrl}/users/settings/${this.postId}`;
             const response = await axios.put(url, tapestrySettingsObj);
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Get User's Tapestry Setting
+     * 
+     * @return  {Object}
+     */
+    async getUserTapestrySetting() {
+        try {
+            const url = `${apiUrl}/users/settings/${this.postId}`;
+            const response = await axios.get(url);
             return response;
         } catch (e) {
             throw e;
