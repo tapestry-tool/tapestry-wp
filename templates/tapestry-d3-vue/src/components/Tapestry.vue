@@ -2,12 +2,14 @@
   <div id="tapestry">
     <RootNodeButton v-show="!this.tapestry.rootId" />
     <NodeModal :tapestry="this.tapestry" @tapestryAddNewNode="tapestryAddNewNode" />
+    <SettingsModal/>
   </div>
 </template>
 
 <script>
 import Helpers from "../utils/Helpers"
 import NodeModal from './NodeModal'
+import SettingsModal from './SettingsModal'
 import RootNodeButton from './RootNodeButton'
 import TapestryAPI from '../services/TapestryAPI'
 
@@ -15,7 +17,8 @@ export default {
   name: 'tapestry',
   components: {
     NodeModal,
-    RootNodeButton
+    RootNodeButton,
+    SettingsModal
   },
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
@@ -224,7 +227,11 @@ export default {
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.redraw(isRoot);
     }
-  }
+  },
+  tapestrySubmitSettings(tapestrySettingsObj) {
+      console.log(tapestrySettingsObj);
+
+  },
 }
 </script>
 
