@@ -233,7 +233,7 @@ export default {
       const response = await this.TapestryAPI.updateUserTapestrySetting(JSON.stringify(tapestrySettingsObj));
       const result = response.data;
       if (tapestrySettingsObj.background) {
-        thisTapestryTool.setBackground(this.tapestrySettings.background);     
+        thisTapestryTool.setBackground(tapestrySettingsObj.background);     
       }
       closeSettingModal();
     },
