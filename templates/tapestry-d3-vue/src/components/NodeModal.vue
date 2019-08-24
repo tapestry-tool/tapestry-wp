@@ -1,5 +1,11 @@
 <template>
-  <b-modal id="node-modal-container" size="lg" scrollable>
+  <b-modal
+    id="node-modal-container"
+    size="lg"
+    scrollable
+    :ok-title="okTitle"
+    :cancel-title="cancelTitle"
+  >
     <div class="d-block text-center" slot="modal-title">
       <h3>
         <strong>{{ modalTitle }}</strong>
@@ -59,26 +65,56 @@
         <h4>Permissions</h4>
       </b-row>
       <b-row>
-        <b-table class="text-center" :items="items" :fields="fields" responsive="sm">
-          <template slot="[read]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-          <template slot="[add]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-          <template slot="[edit]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-          <template slot="[add-submit]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-          <template slot="[edit-submit]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-          <template slot="[approve]">
-            <b-form-checkbox></b-form-checkbox>
-          </template>
-        </b-table>
+        <b-table-simple class="text-center" striped responsive>
+          <b-thead>
+            <b-tr>
+              <b-th></b-th>
+              <b-th>Read</b-th>
+              <b-th>Add</b-th>
+              <b-th>Edit</b-th>
+              <b-th>Add Submit</b-th>
+              <b-th>Edit Submit</b-th>
+              <b-th>Approve</b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody>
+            <b-tr>
+              <b-td>Public</b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox></b-form-checkbox>
+              </b-td>
+            </b-tr>
+            <b-tr>
+              <b-td colspan="7">
+                <b-row>
+                  <b-col cols="3">
+                    <b-form-input v-model="userId" placeholder="123"></b-form-input>
+                  </b-col>
+                  <b-col cols="3">
+                    <b-button variant="primary">
+                      <span class="fas fa-plus permissions-plus"></span> User
+                    </b-button>
+                  </b-col>
+                </b-row>
+              </b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
       </b-row>
     </b-container>
   </b-modal>
@@ -94,24 +130,15 @@ export default {
     return {
       lockNode: false,
       selectedMediaType: "default",
+      okTitle: "Submit",
+      cancelTitle: "Close",
       options: [
         { value: 'default', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
       ],
-      fields: [
-        { key: 'empty', label: '', thStyle: { 'word-break': 'unset' }, tdClass: 'cellTableStyles' },
-        { key: 'read', label: 'Read', thStyle: { 'word-break': 'unset' } },
-        { key: 'add', label: 'Add', thStyle: { 'word-break': 'unset' } },
-        { key: 'edit', label: 'Edit', thStyle: { 'word-break': 'unset' } },
-        { key: 'add-submit', label: 'Add Submit', thStyle: { 'word-break': 'unset' } },
-        { key: 'edit-submit', label: 'Edit Submit', thStyle: { 'word-break': 'unset' } },
-        { key: 'approve', label: 'Approve', thStyle: { 'word-break': 'unset' } }
-      ],
-      items: [
-        { empty: 'Public' }
-      ]
+      userId: null
     }
   },
   props: {
@@ -193,9 +220,7 @@ export default {
 #modal-content-details input,
 #modal-content-details textarea,
 #modal-appearance input,
-#modal-appearance textarea,
-#modal-permissions input,
-#modal-permissions textarea {
+#modal-appearance textarea {
   padding: 15px;
   margin: 5px 0 22px 0;
   border: none;
@@ -206,7 +231,8 @@ export default {
 
 <style>
 /* Use non-scoped styles to overwrite WP theme styles */
-.cellTableStyles {
+table th,
+table td {
   word-break: unset;
 }
 </style>
