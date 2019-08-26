@@ -61,6 +61,14 @@
                         </label>
                         <input id="tapestry-lock-node-checkbox" name="locked" type="checkbox" required v-model="lockNode">
                         <label id="tapestry-lock-node-label">Hide node until parent node is viewed</label>
+                        <div>
+                            <input id="tapestry-hide-title-checkbox" type="checkbox">
+                            <label id="tapestry-hide-title-label">Hide node title</label>
+                        </div>
+                        <div>
+                            <input id="tapestry-hide-progress-checkbox" type="checkbox">
+                            <label id="tapestry-hide-progress-label">Hide progress bar</label>
+                        </div>
                         <div id="appearsat-section">
                             <div id="locked-container">
                             </div>

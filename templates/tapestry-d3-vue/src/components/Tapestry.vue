@@ -72,6 +72,7 @@ export default {
           "mediaHeight": 600
         },
         "unlocked": true,
+        "hideTitle": $("#tapestry-hide-title-checkbox").is(":checked"),
         "fx": Helpers.getBrowserWidth(),
         "fy": Helpers.getBrowserHeight()
       };
