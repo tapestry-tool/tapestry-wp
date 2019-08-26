@@ -73,6 +73,7 @@ export default {
         },
         "unlocked": true,
         "hideTitle": $("#tapestry-hide-title-checkbox").is(":checked"),
+        "hideProgress": $("#tapestry-hide-progress-checkbox").is(":checked"),
         "fx": Helpers.getBrowserWidth(),
         "fy": Helpers.getBrowserHeight()
       };
