@@ -69,6 +69,10 @@
                             <input id="tapestry-hide-progress-checkbox" type="checkbox">
                             <label id="tapestry-hide-progress-label">Hide progress bar</label>
                         </div>
+                        <div>
+                            <input id="tapestry-hide-media-checkbox" type="checkbox">
+                            <label id="tapestry-hide-media-label">Hide media button</label>
+                        </div>
                         <div id="appearsat-section">
                             <div id="locked-container">
                             </div>
