@@ -170,7 +170,7 @@ export default {
         tapestryHideAddNodeModal();
     },
     deleteNode() {
-        tapestryDeleteNode();
+        thisTapestryTool.deleteNodeFromTapestry();
     }
   }
 }
