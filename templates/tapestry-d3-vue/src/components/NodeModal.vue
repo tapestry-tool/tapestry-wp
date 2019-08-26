@@ -109,10 +109,15 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-                <button type="button" class="btn" id="submit-add-new-node" @click="submitAddNewNode()">Submit</button>
-                <button type="button" class="btn" id="submit-add-root-node" @click="submitAddRootNode()">Submit</button>
-                <button type="button" class="btn" id="submit-edit-node" @click="submitEditNode()">Submit</button>
+                <div class="tapestry-delete-node-section">
+                    <button type="button" class="btn" id="tapestry-delete-node" @click="deleteNode()">Delete Current Node</button>
+                </div>
+                <div class="tapestry-submit-section">
+                    <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node" @click="cancelSubmitNode()">Close</button>
+                    <button type="button" class="btn" id="submit-add-new-node" @click="submitAddNewNode()">Submit</button>
+                    <button type="button" class="btn" id="submit-add-root-node" @click="submitAddRootNode()">Submit</button>
+                    <button type="button" class="btn" id="submit-edit-node" @click="submitEditNode()">Submit</button>
+                </div>
             </div>
         </div>
     </div>
@@ -160,6 +165,12 @@ export default {
         } else {
             alert("Enter valid user id");
         }
+    },
+    cancelSubmitNode() {
+        tapestryHideAddNodeModal();
+    },
+    deleteNode() {
+        tapestryDeleteNode();
     }
   }
 }
@@ -168,6 +179,15 @@ export default {
 <style scoped>
 #createNewNodeModalBody {
     text-align: left;
+}
+
+.tapestry-submit-section {
+    float: right;
+}
+
+ .tapestry-delete-node-section {
+    float:left;
+    display: none;
 }
 
 </style>
