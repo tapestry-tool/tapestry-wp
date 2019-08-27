@@ -15,9 +15,7 @@ export default {
   },
   methods: {
     showModal() {
-      // Populate title
       this.$emit('add-root-node');
-
     }
   }
 }

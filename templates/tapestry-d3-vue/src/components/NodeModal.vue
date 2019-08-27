@@ -1,27 +1,27 @@
 <template>
-  <b-modal
-    id="node-modal-container"
-    size="lg"
-    scrollable
-    :ok-title="okTitle"
-    :cancel-title="cancelTitle"
-  >
+  <b-modal id="node-modal-container" size="lg" scrollable>
     <div class="d-block text-center" slot="modal-title">
       <h3>
         <strong>{{ modalTitle }}</strong>
       </h3>
     </div>
     <b-container id="modal-content-details">
+      <div v-if="errors.length">
+        <b>Please correct the following error(s):</b>
+        <ul>
+          <div v-for:="error in errors">{{ error }}</div>
+        </ul>
+      </div>
       <b-row>
         <h4>Content Details</h4>
       </b-row>
       <b-row>
         <div>Title</div>
-        <input placeholder="Enter title" required />
+        <input placeholder="Enter title" v-model="title" required />
       </b-row>
       <b-row>
         <div>Description</div>
-        <textarea placeholder="Enter description"></textarea>
+        <textarea placeholder="Enter description" v-model="description"></textarea>
       </b-row>
       <b-row>
         <div>Content Type</div>
@@ -29,23 +29,23 @@
       </b-row>
       <b-row v-show="selectedMediaType === 'text'">
         <div>Text content</div>
-        <textarea id="tapestry-node-text-area" placeholder="Enter text here"></textarea>
+        <textarea id="tapestry-node-text-area" placeholder="Enter text here" v-model="textContent"></textarea>
       </b-row>
       <b-row v-show="selectedMediaType === 'video'">
         <div>Video URL</div>
-        <input placeholder="Enter URL for MP4 Video" required />
+        <input placeholder="Enter URL for MP4 Video" v-model="video.url" required />
       </b-row>
       <b-row v-show="selectedMediaType === 'video'">
         <div>Video Duration</div>
-        <input placeholder="Enter duration (in seconds)" required />
+        <input placeholder="Enter duration (in seconds)" v-model="video.duration" required />
       </b-row>
       <b-row v-show="selectedMediaType === 'h5p'">
         <div>H5P Embed Link</div>
-        <input placeholder="Enter H5P Embed Link" required />
+        <input placeholder="Enter H5P Embed Link" v-model="h5p.link" required />
       </b-row>
       <b-row v-show="selectedMediaType === 'h5p'">
         <div>H5P Video Duration (only if video)</div>
-        <input placeholder="Enter duration (in seconds)" required />
+        <input placeholder="Enter duration (in seconds)" v-model="h5p.duration" required />
       </b-row>
     </b-container>
     <b-container id="modal-appearance">
@@ -117,6 +117,10 @@
         </b-table-simple>
       </b-row>
     </b-container>
+    <template slot="modal-footer">
+      <b-button size="sm" variant="danger" @click="$bvModal.hide('node-modal-container')">Cancel</b-button>
+      <b-button size="sm" variant="success" @click="submitNode()">Submit</b-button>
+    </template>
   </b-modal>
 </template>
 
@@ -129,16 +133,26 @@ export default {
   data() {
     return {
       lockNode: false,
-      selectedMediaType: "default",
-      okTitle: "Submit",
-      cancelTitle: "Close",
+      userId: null,
+      errors: [],
+      title: '',
+      description: '',
+      textContent: '',
+      video: {
+        url: '',
+        duration: 0
+      },
+      h5p: {
+        link: '',
+        duration: 0
+      },
+      selectedMediaType: 'default',
       options: [
         { value: 'default', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
-      ],
-      userId: null
+      ]
     }
   },
   props: {
@@ -166,7 +180,8 @@ export default {
       } else {
         return '';
       }
-    }
+    },
+    
   },
   methods: {
     getCurrentRootNode() {
@@ -176,18 +191,29 @@ export default {
         });
       }
     },
-    submitAddNewNode() {
-      const formData = $("form").serializeArray();
-      this.$emit("tapestryAddNewNode", formData, false);
+    submitNode() {
+      if (this.modalType === 'add-root-node') {
+        this.$emit("tapestryAddNewNode", formData, false, true);
+      } else if (this.modalType === 'add-new-node') {
+        this.$emit("tapestryAddNewNode", formData, false);
+      } else if (this.modalType === 'edit-node') {
+        this.$emit("tapestryAddNewNode", formData, true);
+      } else {
+        console.error(`Undefined modalType: ${this.modalType}`)
+      }
     },
-    submitAddRootNode() {
-      const formData = $("form").serializeArray();
-      this.$emit("tapestryAddNewNode", formData, false, true);
-    },
-    submitEditNode() {
-      const formData = $("form").serializeArray();
-      this.$emit("tapestryAddNewNode", formData, true);
-    },
+    // submitAddNewNode() {
+    //   const formData = $("form").serializeArray();
+    //   this.$emit("tapestryAddNewNode", formData, false);
+    // },
+    // submitAddRootNode() {
+    //   const formData = $("form").serializeArray();
+    //   this.$emit("tapestryAddNewNode", formData, false, true);
+    // },
+    // submitEditNode() {
+    //   const formData = $("form").serializeArray();
+    //   this.$emit("tapestryAddNewNode", formData, true);
+    // },
     addUser() {
       const userId = $("#user-number-input").val();
       if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
