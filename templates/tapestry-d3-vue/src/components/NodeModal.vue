@@ -11,35 +11,39 @@
       </b-row>
       <b-row>
         <div>Title</div>
-        <input placeholder="Enter title" v-model="title" required />
+        <input placeholder="Enter title" v-model="node.title" required />
       </b-row>
       <b-row>
         <div>Description</div>
-        <textarea placeholder="Enter description" v-model="description"></textarea>
+        <textarea placeholder="Enter description" v-model="node.description"></textarea>
       </b-row>
       <b-row>
         <div>Content Type</div>
-        <b-form-select v-model="mediaType" :options="options"></b-form-select>
+        <b-form-select v-model="node.mediaType" :options="options"></b-form-select>
       </b-row>
-      <b-row v-show="mediaType === 'text'">
+      <b-row v-show="node.mediaType === 'text'">
         <div>Text content</div>
-        <textarea id="tapestry-node-text-area" placeholder="Enter text here" v-model="textContent"></textarea>
+        <textarea
+          id="tapestry-node-text-area"
+          placeholder="Enter text here"
+          v-model="node.typeData.textContent"
+        ></textarea>
       </b-row>
-      <b-row v-show="mediaType === 'video'">
+      <b-row v-show="node.mediaType === 'video'">
         <div>Video URL</div>
-        <input placeholder="Enter URL for MP4 Video" v-model="video.url" required />
+        <input placeholder="Enter URL for MP4 Video" v-model="node.typeData.mediaURL" required />
       </b-row>
-      <b-row v-show="mediaType === 'video'">
+      <b-row v-show="node.mediaType === 'video'">
         <div>Video Duration</div>
-        <input placeholder="Enter duration (in seconds)" v-model="video.duration" required />
+        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
       </b-row>
-      <b-row v-show="mediaType === 'h5p'">
+      <b-row v-show="node.mediaType === 'h5p'">
         <div>H5P Embed Link</div>
-        <input placeholder="Enter H5P Embed Link" v-model="h5p.url" required />
+        <input placeholder="Enter H5P Embed Link" v-model="node.typeData.mediaURL" required />
       </b-row>
-      <b-row v-show="mediaType === 'h5p'">
+      <b-row v-show="node.mediaType === 'h5p'">
         <div>H5P Video Duration (only if video)</div>
-        <input placeholder="Enter duration (in seconds)" v-model="h5p.duration" required />
+        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
       </b-row>
     </b-container>
     <b-container id="modal-appearance">
@@ -48,10 +52,10 @@
       </b-row>
       <b-row>
         <div>Thumbnail</div>
-        <input placeholder="Enter the URL for the thumbnail" required v-model="imageURL" />
+        <input placeholder="Enter the URL for the thumbnail" required v-model="node.imageURL" />
       </b-row>
       <b-row>
-        <b-form-checkbox v-model="locked">Hide node until parent node is viewed</b-form-checkbox>
+        <b-form-checkbox value="false" unchecked-value="true" v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
       </b-row>
     </b-container>
     <b-container id="modal-permissions">
@@ -72,25 +76,25 @@
             </b-tr>
           </b-thead>
           <b-tbody>
-            <b-tr v-for="(value, type) in permissions" :key="type" :value="value">
+            <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
               <b-td>{{type}}</b-td>
               <b-td>
-                <b-form-checkbox value="read" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox value="add" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox value="edit" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox value="add-submit" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox value="edit-submit" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox value="approve" v-model="permissions[type]"></b-form-checkbox>
+                <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
             </b-tr>
             <b-tr>
@@ -127,27 +131,12 @@ export default {
   data() {
     return {
       userId: null,
-      locked: this.modalType !== 'add-new-node' ? !this.node.unlocked : null,
-      title: this.modalType !== 'add-new-node' ? this.node.title : null,
-      description: this.modalType !== 'add-new-node' ? this.node.description : null,
-      textContent: this.modalType !== 'add-new-node' ? this.node.typeData && this.node.typeData.textContent : null,
-      video: {
-        url: this.modalType !== 'add-new-node' && this.node.mediaType === 'video' ? this.node.typeData && this.node.typeData.mediaURL : null,
-        duration: this.modalType !== 'add-new-node' && this.node.mediaType === 'video' ? this.node.mediaDuration : null
-      },
-      h5p: {
-        url: this.modalType !== 'add-new-node' && this.node.mediaType === 'h5p' ? this.node.typeData && this.node.typeData.mediaURL : null,
-        duration: this.modalType !== 'add-new-node' && this.node.mediaType === 'h5p' ? this.node.mediaDuration : null
-      },
-      imageURL: this.modalType !== 'add-new-node' ? this.node.imageURL : null,
-      mediaType: this.modalType !== 'add-new-node' ? this.node.mediaType : 'default',
       options: [
-        { value: 'default', text: 'Select content type' },
+        { value: '', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
-      ],
-      permissions: this.modalType !== 'add-new-node' ? this.node.permissions : { public: ['read'] }
+      ]
     }
   },
   props: {
@@ -161,14 +150,18 @@ export default {
       validator: function (value) {
         return ['add-new-node', 'edit-node', 'add-root-node', ''].indexOf(value) !== -1;
       }
+    },
+    rootNodeTitle: {
+      type: String,
+      required: false
     }
   },
   computed: {
     modalTitle() {
       if (this.modalType === 'add-new-node') {
-        return `Add new sub-topic to ${this.node.title}`;
+        return `Add new sub-topic to ${this.rootNodeTitle}`;
       } else if (this.modalType === 'edit-node') {
-        return `Edit node: ${this.node.title}`;
+        return `Edit node: ${this.rootNodeTitle}`;
       } else if (this.modalType === 'add-root-node') {
         return 'Add root node';
       } else {
@@ -177,16 +170,15 @@ export default {
     },
     nodeData() {
       return [
-        { name: 'title', value: this.title },
-        { name: 'mediaType', value: this.mediaType },
-        { name: 'mp4-mediaURL', value: this.video.url },
-        { name: 'mp4-mediaDuration', value: this.video.duration },
-        { name: 'h5p-mediaURL', value: this.h5p.url },
-        { name: 'h5p-mediaDuration', value: this.h5p.duration },
-        { name: 'imageURL', value: this.imageURL },
-        { name: 'unlocked', value: !this.locked },
-        { name: 'permissions', value: this.permissions },
-        { name: 'description', value: this.description }
+        { name: 'title', value: this.node.title },
+        { name: 'mediaType', value: this.node.mediaType },
+        { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
+        { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
+        { name: 'mediaDuration', value: this.node.mediaDuration },
+        { name: 'imageURL', value: this.node.imageURL },
+        { name: 'unlocked', value: this.node.unlocked },
+        { name: 'permissions', value: this.node.permissions },
+        { name: 'description', value: this.node.description },
       ]
     }
   },
@@ -200,11 +192,11 @@ export default {
     },
     submitNode() {
       if (this.modalType === 'add-root-node') {
-        this.$emit("tapestryAddNewNode", this.nodeData, false, true);
+        this.$emit("add-edit-node", this.nodeData, false, true);
       } else if (this.modalType === 'add-new-node') {
-        this.$emit("tapestryAddNewNode", this.nodeData, false);
+        this.$emit("add-edit-node", this.nodeData, false);
       } else if (this.modalType === 'edit-node') {
-        this.$emit("tapestryAddNewNode", this.nodeData, true);
+        this.$emit("add-edit-node", this.nodeData, true);
       } else {
         console.error(`Undefined modalType: ${this.modalType}`)
       }
@@ -212,7 +204,7 @@ export default {
     addUser() {
       const userId = this.userId;
       if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
-        this.$set(this.permissions, `user-${userId}`, [])
+        this.$set(this.node.permissions, `user-${userId}`, [])
         this.userId = null;
       } else {
         alert("Enter valid user id");

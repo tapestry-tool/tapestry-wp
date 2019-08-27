@@ -2,11 +2,11 @@
   <div id="tapestry">
     <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
     <NodeModal
-      v-if="showNodeModal"
-      :node="currentNode"
+      :node="populatedNode"
       :modalType="modalType"
+      :rootNodeTitle="getCurrentRootNode().title"
       @close-modal="closeModal"
-      @tapestryAddNewNode="tapestryAddNewNode"
+      @add-edit-node="addEditNode"
     />
   </div>
 </template>
@@ -42,47 +42,64 @@ export default {
       TapestryAPI: {},
       modalType: '',
       showNodeModal: false,
-      currentNode: {}
+      populatedNode: {
+        title: '',
+        mediaType: '',
+        typeData: {
+          mediaURL: '',
+          textContent: ''
+        },
+        mediaDuration: '',
+        imageURL: '',
+        unlocked: false,
+        permissions: { public: ['read'] },
+        description: ''
+      }
     }
   },
   methods: {
     getCurrentRootNode() {
-      if (this.tapestry && this.tapestry.nodes) {
+      if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
         return this.tapestry.nodes.find(node => {
           return node.id === this.tapestry.rootId;
         });
       }
+      return {};
     },
     addRootNode() {
-      debugger
       this.modalType = 'add-root-node';
-      this.showNodeModal = true;
       this.$bvModal.show('node-modal-container');
     },
     addNewNode() {
-      debugger
       this.modalType = 'add-new-node';
-      this.currentNode = this.getCurrentRootNode();
-      this.showNodeModal = true;
+      this.populatedNode = {
+        title: '',
+        mediaType: '',
+        typeData: {
+          mediaURL: '',
+          textContent: ''
+        },
+        mediaDuration: '',
+        imageURL: '',
+        unlocked: '',
+        permissions: { public: ['read'] },
+        description: ''
+      };
       this.$bvModal.show('node-modal-container');
     },
     editNode() {
-      debugger
       this.modalType = 'edit-node';
-      this.currentNode = this.getCurrentRootNode();
-      this.showNodeModal = true;
+      this.populatedNode = this.getCurrentRootNode();
       this.$bvModal.show('node-modal-container');
     },
     closeModal() {
-      debugger
-      this.showNodeModal = false;
+      this.modalType = '';
       this.$bvModal.hide('node-modal-container');
     },
     changeRootNode(event) {
-      debugger
       this.tapestry.rootId = event.detail;
     },
-    async tapestryAddNewNode(formData, isEdit, isRoot) {
+    async addEditNode(formData, isEdit, isRoot) {
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
       let root = this.tapestry.rootId;
@@ -150,8 +167,7 @@ export default {
             break;
           case "mediaType":
             if (fieldValue === "text") {
-              newNodeEntry[fieldName] = fieldValue;
-              newNodeEntry.typeData.textContent = $("#tapestry-node-text-area").val();
+              newNodeEntry["mediaType"] = "text";
             }
             else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video";
@@ -162,28 +178,23 @@ export default {
               newNodeEntry["mediaFormat"] = "h5p";
             }
             break;
-          case "mp4-mediaURL":
-            if (fieldValue !== "") {
+          case "textContent":
+            if (fieldValue) {
+              newNodeEntry.typeData.textContent = fieldValue;
+            }
+            break;
+          case "mediaURL":
+            if (fieldValue) {
               newNodeEntry.typeData.mediaURL = fieldValue;
             }
             break;
-          case "h5p-mediaURL":
-            if (fieldValue !== "") {
-              newNodeEntry.typeData.mediaURL = fieldValue;
-            }
-            break;
-          case "mp4-mediaDuration":
-            if (fieldValue !== "") {
-              newNodeEntry.mediaDuration = parseInt(fieldValue);
-            }
-            break;
-          case "h5p-mediaDuration":
-            if (fieldValue !== "") {
+          case "mediaDuration":
+            if (fieldValue) {
               newNodeEntry.mediaDuration = parseInt(fieldValue);
             }
             break;
           case "unlocked":
-            newNodeEntry.unlocked = fieldValue || isRoot;
+            newNodeEntry.unlocked = fieldValue === 'true' || isRoot;
             break;
           case "description":
             newNodeEntry.description = fieldValue;
@@ -222,8 +233,6 @@ export default {
           this.tapestry.rootId = newId;
 
           root = this.tapestry.rootId; // need to set root to newly created node
-
-          $("#root-node-container").hide(); // hide the root node button after creating it.
         }
       } else {
         // Call endpoint for editing node
@@ -235,13 +244,11 @@ export default {
         this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
       }
 
-      tapestryHideAddNodeModal();
-
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.redraw(isRoot);
 
       this.modalType = '';
-      this.showNodeModal = false;
+      this.$bvModal.hide('node-modal-container');
     }
   }
 }
