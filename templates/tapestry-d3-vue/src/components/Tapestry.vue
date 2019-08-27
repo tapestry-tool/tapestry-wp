@@ -2,8 +2,10 @@
   <div id="tapestry">
     <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
     <NodeModal
-      :tapestry="tapestry"
+      v-if="showNodeModal"
+      :node="currentNode"
       :modalType="modalType"
+      @close-modal="closeModal"
       @tapestryAddNewNode="tapestryAddNewNode"
     />
   </div>
@@ -29,7 +31,7 @@ export default {
     thisTapestryTool.initialize();
     thisTapestryTool.redrawTapestryWithNewNode();
 
-    // Set uo event listeners to communicate with D3 elements
+    // Set up event listeners to communicate with D3 elements
     window.addEventListener('change-root-node', this.changeRootNode)
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
@@ -39,23 +41,45 @@ export default {
       tapestry: {},
       TapestryAPI: {},
       modalType: '',
-      showNodeModal: false
+      showNodeModal: false,
+      currentNode: {}
     }
   },
   methods: {
+    getCurrentRootNode() {
+      if (this.tapestry && this.tapestry.nodes) {
+        return this.tapestry.nodes.find(node => {
+          return node.id === this.tapestry.rootId;
+        });
+      }
+    },
     addRootNode() {
+      debugger
       this.modalType = 'add-root-node';
+      this.showNodeModal = true;
       this.$bvModal.show('node-modal-container');
     },
     addNewNode() {
+      debugger
       this.modalType = 'add-new-node';
+      this.currentNode = this.getCurrentRootNode();
+      this.showNodeModal = true;
       this.$bvModal.show('node-modal-container');
     },
     editNode() {
+      debugger
       this.modalType = 'edit-node';
+      this.currentNode = this.getCurrentRootNode();
+      this.showNodeModal = true;
       this.$bvModal.show('node-modal-container');
     },
+    closeModal() {
+      debugger
+      this.showNodeModal = false;
+      this.$bvModal.hide('node-modal-container');
+    },
     changeRootNode(event) {
+      debugger
       this.tapestry.rootId = event.detail;
     },
     async tapestryAddNewNode(formData, isEdit, isRoot) {
@@ -134,7 +158,7 @@ export default {
               newNodeEntry["mediaFormat"] = "mp4";
             }
             else if (fieldValue === "h5p") {
-              newNodeEntry["mediaType"] = "video";
+              newNodeEntry["mediaType"] = "h5p";
               newNodeEntry["mediaFormat"] = "h5p";
             }
             break;
@@ -158,9 +182,8 @@ export default {
               newNodeEntry.mediaDuration = parseInt(fieldValue);
             }
             break;
-          case "appearsAt":
-            appearsAt = parseInt(fieldValue);
-            newNodeEntry.unlocked = !appearsAt || isRoot;
+          case "unlocked":
+            newNodeEntry.unlocked = fieldValue || isRoot;
             break;
           case "description":
             newNodeEntry.description = fieldValue;

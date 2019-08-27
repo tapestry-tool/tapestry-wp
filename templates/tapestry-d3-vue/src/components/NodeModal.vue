@@ -6,12 +6,6 @@
       </h3>
     </div>
     <b-container id="modal-content-details">
-      <div v-if="errors.length">
-        <b>Please correct the following error(s):</b>
-        <ul>
-          <div v-for:="error in errors">{{ error }}</div>
-        </ul>
-      </div>
       <b-row>
         <h4>Content Details</h4>
       </b-row>
@@ -57,7 +51,7 @@
         <input placeholder="Enter the URL for the thumbnail" required v-model="imageURL" />
       </b-row>
       <b-row>
-        <b-form-checkbox v-model="lockNode">Hide node until parent node is viewed</b-form-checkbox>
+        <b-form-checkbox v-model="locked">Hide node until parent node is viewed</b-form-checkbox>
       </b-row>
     </b-container>
     <b-container id="modal-permissions">
@@ -118,7 +112,7 @@
       </b-row>
     </b-container>
     <template slot="modal-footer">
-      <b-button size="sm" variant="danger" @click="$bvModal.hide('node-modal-container')">Cancel</b-button>
+      <b-button size="sm" variant="danger" @click="$emit('close-modal')">Cancel</b-button>
       <b-button size="sm" variant="success" @click="submitNode()">Submit</b-button>
     </template>
   </b-modal>
@@ -132,35 +126,32 @@ export default {
   name: "node-modal",
   data() {
     return {
-      lockNode: false,
       userId: null,
-      errors: [],
-      title: '',
-      description: '',
-      textContent: '',
+      locked: this.modalType !== 'add-new-node' ? !this.node.unlocked : null,
+      title: this.modalType !== 'add-new-node' ? this.node.title : null,
+      description: this.modalType !== 'add-new-node' ? this.node.description : null,
+      textContent: this.modalType !== 'add-new-node' ? this.node.typeData && this.node.typeData.textContent : null,
       video: {
-        url: '',
-        duration: null
+        url: this.modalType !== 'add-new-node' && this.node.mediaType === 'video' ? this.node.typeData && this.node.typeData.mediaURL : null,
+        duration: this.modalType !== 'add-new-node' && this.node.mediaType === 'video' ? this.node.mediaDuration : null
       },
       h5p: {
-        url: '',
-        duration: null
+        url: this.modalType !== 'add-new-node' && this.node.mediaType === 'h5p' ? this.node.typeData && this.node.typeData.mediaURL : null,
+        duration: this.modalType !== 'add-new-node' && this.node.mediaType === 'h5p' ? this.node.mediaDuration : null
       },
-      imageURL: '',
-      mediaType: 'default',
+      imageURL: this.modalType !== 'add-new-node' ? this.node.imageURL : null,
+      mediaType: this.modalType !== 'add-new-node' ? this.node.mediaType : 'default',
       options: [
         { value: 'default', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
       ],
-      permissions: {
-        public: ['read']
-      }
+      permissions: this.modalType !== 'add-new-node' ? this.node.permissions : { public: ['read'] }
     }
   },
   props: {
-    tapestry: {
+    node: {
       type: Object,
       required: false
     },
@@ -174,11 +165,10 @@ export default {
   },
   computed: {
     modalTitle() {
-      const rootNode = this.getCurrentRootNode();
       if (this.modalType === 'add-new-node') {
-        return `Add new sub-topic to ${rootNode.title}`;
+        return `Add new sub-topic to ${this.node.title}`;
       } else if (this.modalType === 'edit-node') {
-        return `Edit node: ${rootNode.title}`;
+        return `Edit node: ${this.node.title}`;
       } else if (this.modalType === 'add-root-node') {
         return 'Add root node';
       } else {
@@ -189,12 +179,12 @@ export default {
       return [
         { name: 'title', value: this.title },
         { name: 'mediaType', value: this.mediaType },
-        { name: 'mp4-mediaUrl', value: this.video.url },
+        { name: 'mp4-mediaURL', value: this.video.url },
         { name: 'mp4-mediaDuration', value: this.video.duration },
-        { name: 'h5p-mediaUrl', value: this.h5p.url },
+        { name: 'h5p-mediaURL', value: this.h5p.url },
         { name: 'h5p-mediaDuration', value: this.h5p.duration },
         { name: 'imageURL', value: this.imageURL },
-        { name: 'locked', value: this.lockNode },
+        { name: 'unlocked', value: !this.locked },
         { name: 'permissions', value: this.permissions },
         { name: 'description', value: this.description }
       ]
