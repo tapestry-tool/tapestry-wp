@@ -194,7 +194,7 @@ export default {
             }
             break;
           case "unlocked":
-            newNodeEntry.unlocked = fieldValue === 'true' || isRoot;
+            newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
             break;
           case "description":
             newNodeEntry.description = fieldValue;
