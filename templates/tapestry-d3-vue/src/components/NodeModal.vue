@@ -25,25 +25,25 @@
       </b-row>
       <b-row>
         <div>Content Type</div>
-        <b-form-select v-model="selectedMediaType" :options="options"></b-form-select>
+        <b-form-select v-model="mediaType" :options="options"></b-form-select>
       </b-row>
-      <b-row v-show="selectedMediaType === 'text'">
+      <b-row v-show="mediaType === 'text'">
         <div>Text content</div>
         <textarea id="tapestry-node-text-area" placeholder="Enter text here" v-model="textContent"></textarea>
       </b-row>
-      <b-row v-show="selectedMediaType === 'video'">
+      <b-row v-show="mediaType === 'video'">
         <div>Video URL</div>
         <input placeholder="Enter URL for MP4 Video" v-model="video.url" required />
       </b-row>
-      <b-row v-show="selectedMediaType === 'video'">
+      <b-row v-show="mediaType === 'video'">
         <div>Video Duration</div>
         <input placeholder="Enter duration (in seconds)" v-model="video.duration" required />
       </b-row>
-      <b-row v-show="selectedMediaType === 'h5p'">
+      <b-row v-show="mediaType === 'h5p'">
         <div>H5P Embed Link</div>
-        <input placeholder="Enter H5P Embed Link" v-model="h5p.link" required />
+        <input placeholder="Enter H5P Embed Link" v-model="h5p.url" required />
       </b-row>
-      <b-row v-show="selectedMediaType === 'h5p'">
+      <b-row v-show="mediaType === 'h5p'">
         <div>H5P Video Duration (only if video)</div>
         <input placeholder="Enter duration (in seconds)" v-model="h5p.duration" required />
       </b-row>
@@ -54,7 +54,7 @@
       </b-row>
       <b-row>
         <div>Thumbnail</div>
-        <input placeholder="Enter the URL for the thumbnail" required />
+        <input placeholder="Enter the URL for the thumbnail" required v-model="imageURL" />
       </b-row>
       <b-row>
         <b-form-checkbox v-model="lockNode">Hide node until parent node is viewed</b-form-checkbox>
@@ -78,25 +78,25 @@
             </b-tr>
           </b-thead>
           <b-tbody>
-            <b-tr>
-              <b-td>Public</b-td>
+            <b-tr v-for="(value, type) in permissions" :key="type" :value="value">
+              <b-td>{{type}}</b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="read" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="add" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="edit" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="add-submit" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="edit-submit" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
               <b-td>
-                <b-form-checkbox></b-form-checkbox>
+                <b-form-checkbox value="approve" v-model="permissions[type]"></b-form-checkbox>
               </b-td>
             </b-tr>
             <b-tr>
@@ -106,7 +106,7 @@
                     <b-form-input v-model="userId" placeholder="123"></b-form-input>
                   </b-col>
                   <b-col cols="3">
-                    <b-button variant="primary">
+                    <b-button variant="primary" @click="addUser()">
                       <span class="fas fa-plus permissions-plus"></span> User
                     </b-button>
                   </b-col>
@@ -140,19 +140,23 @@ export default {
       textContent: '',
       video: {
         url: '',
-        duration: 0
+        duration: null
       },
       h5p: {
-        link: '',
-        duration: 0
+        url: '',
+        duration: null
       },
-      selectedMediaType: 'default',
+      imageURL: '',
+      mediaType: 'default',
       options: [
         { value: 'default', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
-      ]
+      ],
+      permissions: {
+        public: ['read']
+      }
     }
   },
   props: {
@@ -181,7 +185,20 @@ export default {
         return '';
       }
     },
-    
+    nodeData() {
+      return [
+        { name: 'title', value: this.title },
+        { name: 'mediaType', value: this.mediaType },
+        { name: 'mp4-mediaUrl', value: this.video.url },
+        { name: 'mp4-mediaDuration', value: this.video.duration },
+        { name: 'h5p-mediaUrl', value: this.h5p.url },
+        { name: 'h5p-mediaDuration', value: this.h5p.duration },
+        { name: 'imageURL', value: this.imageURL },
+        { name: 'locked', value: this.lockNode },
+        { name: 'permissions', value: this.permissions },
+        { name: 'description', value: this.description }
+      ]
+    }
   },
   methods: {
     getCurrentRootNode() {
@@ -193,32 +210,20 @@ export default {
     },
     submitNode() {
       if (this.modalType === 'add-root-node') {
-        this.$emit("tapestryAddNewNode", formData, false, true);
+        this.$emit("tapestryAddNewNode", this.nodeData, false, true);
       } else if (this.modalType === 'add-new-node') {
-        this.$emit("tapestryAddNewNode", formData, false);
+        this.$emit("tapestryAddNewNode", this.nodeData, false);
       } else if (this.modalType === 'edit-node') {
-        this.$emit("tapestryAddNewNode", formData, true);
+        this.$emit("tapestryAddNewNode", this.nodeData, true);
       } else {
         console.error(`Undefined modalType: ${this.modalType}`)
       }
     },
-    // submitAddNewNode() {
-    //   const formData = $("form").serializeArray();
-    //   this.$emit("tapestryAddNewNode", formData, false);
-    // },
-    // submitAddRootNode() {
-    //   const formData = $("form").serializeArray();
-    //   this.$emit("tapestryAddNewNode", formData, false, true);
-    // },
-    // submitEditNode() {
-    //   const formData = $("form").serializeArray();
-    //   this.$emit("tapestryAddNewNode", formData, true);
-    // },
     addUser() {
-      const userId = $("#user-number-input").val();
+      const userId = this.userId;
       if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
-        appendPermissionsRow(userId, "user");
-        $("#user-number-input").val("");
+        this.$set(this.permissions, `user-${userId}`, [])
+        this.userId = null;
       } else {
         alert("Enter valid user id");
       }
