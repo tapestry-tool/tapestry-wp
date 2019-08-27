@@ -28,6 +28,11 @@ export default {
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
     thisTapestryTool.redrawTapestryWithNewNode();
+
+    // Set uo event listeners to communicate with D3 elements
+    window.addEventListener('change-root-node', this.changeRootNode)
+    window.addEventListener('add-new-node', this.addNewNode)
+    window.addEventListener('edit-node', this.editNode)
   },
   data() {
     return {
@@ -40,8 +45,18 @@ export default {
   methods: {
     addRootNode() {
       this.modalType = 'add-root-node';
-      // this.showNodeModal = true;
       this.$bvModal.show('node-modal-container');
+    },
+    addNewNode() {
+      this.modalType = 'add-new-node';
+      this.$bvModal.show('node-modal-container');
+    },
+    editNode() {
+      this.modalType = 'edit-node';
+      this.$bvModal.show('node-modal-container');
+    },
+    changeRootNode(event) {
+      this.tapestry.rootId = event.detail;
     },
     async tapestryAddNewNode(formData, isEdit, isRoot) {
       const NORMAL_RADIUS = 140;
@@ -147,47 +162,16 @@ export default {
             appearsAt = parseInt(fieldValue);
             newNodeEntry.unlocked = !appearsAt || isRoot;
             break;
+          case "description":
+            newNodeEntry.description = fieldValue;
+            break;
+          case "permissions":
+            newNodeEntry.permissions = fieldValue;
+            break;
           default:
             break;
         }
       }
-
-      // Add description to new node	
-      newNodeEntry.description = $("#tapestry-node-description-area").val();
-
-      var permissionData = {
-        "public": []
-      };
-
-      $('.public-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          permissionData.public.push(this.name);
-        }
-      });
-
-      $('.user-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          var userId = extractDigitsFromString(this.id);
-          if (permissionData["user-" + userId]) {
-            permissionData["user-" + userId].push(this.name);
-          } else {
-            permissionData["user-" + userId] = [this.name];
-          }
-        }
-      });
-
-      $('.group-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          var groupId = extractDigitsFromString(this.id);
-          if (permissionData["group-" + groupId]) {
-            permissionData["group-" + groupId].push(this.name);
-          } else {
-            permissionData["group-" + groupId] = [this.name];
-          }
-        }
-      });
-
-      newNodeEntry.permissions = permissionData;
 
       if (!isEdit) {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
@@ -210,7 +194,7 @@ export default {
         } else {
           const newId = result.id;
 
-          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(permissionData));
+          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(newNodeEntry.permissions));
 
           this.tapestry.rootId = newId;
 
