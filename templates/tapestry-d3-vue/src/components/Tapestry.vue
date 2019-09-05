@@ -99,14 +99,10 @@ export default {
     changeRootNode(event) {
       this.tapestry.rootId = event.detail;
     },
-    async addEditNode(formData, isEdit, isRoot) {
+    async addEditNode(formData, isEdit, isRoot = false) {
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
       let root = this.tapestry.rootId;
-
-      if (typeof isRoot == 'undefined') {
-        isRoot = false;
-      }
 
       var errorMsg = tapestryValidateNewNode(formData, isRoot);
       if (errorMsg) {

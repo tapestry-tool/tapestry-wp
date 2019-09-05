@@ -19,7 +19,7 @@
       </b-row>
       <b-row>
         <div>Content Type</div>
-        <b-form-select v-model="node.mediaType" :options="options"></b-form-select>
+        <b-form-select v-model="node.mediaType" :options="mediaTypes"></b-form-select>
       </b-row>
       <b-row v-show="node.mediaType === 'text'">
         <div>Text content</div>
@@ -131,7 +131,7 @@ export default {
   data() {
     return {
       userId: null,
-      options: [
+      mediaTypes: [
         { value: '', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
