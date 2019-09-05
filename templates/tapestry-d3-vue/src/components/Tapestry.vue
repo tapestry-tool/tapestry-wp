@@ -6,13 +6,13 @@
 </template>
 
 <script>
-import Helpers from "../utils/Helpers"
-import NodeModal from './NodeModal'
-import RootNodeButton from './RootNodeButton'
-import TapestryAPI from '../services/TapestryAPI'
+import Helpers from "../utils/Helpers";
+import NodeModal from "./NodeModal";
+import RootNodeButton from "./RootNodeButton";
+import TapestryAPI from "../services/TapestryAPI";
 
 export default {
-  name: 'tapestry',
+  name: "tapestry",
   components: {
     NodeModal,
     RootNodeButton
@@ -31,7 +31,7 @@ export default {
       tapestry: {},
       TapestryAPI: {},
       directoryUrl: wpData.directory_uri
-    }
+    };
   },
   methods: {
     async tapestryAddNewNode(formData, isEdit, isRoot) {
@@ -39,7 +39,7 @@ export default {
       const ROOT_RADIUS_DIFF = 70;
       let root = this.tapestry.rootId;
 
-      if (typeof isRoot == 'undefined') {
+      if (typeof isRoot == "undefined") {
         isRoot = false;
       }
 
@@ -51,40 +51,49 @@ export default {
 
       // Add the node data first
       var newNodeEntry = {
-        "type": "tapestry_node",
-        "description": "",
-        "status": "publish",
-        "nodeType": "",
-        "title": "",
-        "imageURL": "",
-        "mediaType": "",
-        "mediaFormat": "",
-        "mediaDuration": 0,
-        "typeId": 1,
-        "group": 1,
-        "typeData": {
-          "progress": [
-            { "group": "viewed", "value": 0 },
-            { "group": "unviewed", "value": 1 }
+        type: "tapestry_node",
+        description: "",
+        status: "publish",
+        nodeType: "",
+        title: "",
+        imageURL: "",
+        mediaType: "",
+        mediaFormat: "",
+        mediaDuration: 0,
+        typeId: 1,
+        group: 1,
+        typeData: {
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 }
           ],
-          "mediaURL": "",
-          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
-          "mediaHeight": 600
+          mediaURL: "",
+          mediaWidth: 960, //TODO: This needs to be flexible with H5P
+          mediaHeight: 600
         },
-        "unlocked": true,
-        "fx": Helpers.getBrowserWidth(),
-        "fy": Helpers.getBrowserHeight()
+        unlocked: true,
+        fx: Helpers.getBrowserWidth(),
+        fy: Helpers.getBrowserHeight()
       };
 
       // Node ID exists, so edit case
       if (isEdit) {
-        newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
-        newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy;
+        newNodeEntry.fx = this.tapestry.nodes[
+          Helpers.findNodeIndex(root, this.tapestry)
+        ].fx;
+        newNodeEntry.fy = this.tapestry.nodes[
+          Helpers.findNodeIndex(root, this.tapestry)
+        ].fy;
       } else {
         if (!isRoot) {
           // Just put the node right under the current node
-          newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
-          newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+          newNodeEntry.fx = this.tapestry.nodes[
+            Helpers.findNodeIndex(root, this.tapestry)
+          ].fx;
+          newNodeEntry.fy =
+            this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy +
+            (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 +
+            50;
         }
       }
 
@@ -98,18 +107,18 @@ export default {
             newNodeEntry[fieldName] = fieldValue;
             break;
           case "imageURL":
-            newNodeEntry[fieldName] = fieldValue;
+            newNodeEntry[fieldName] = fieldValue || "";
             break;
           case "mediaType":
             if (fieldValue === "text") {
               newNodeEntry[fieldName] = fieldValue;
-              newNodeEntry.typeData.textContent = $("#tapestry-node-text-area").val();
-            }
-            else if (fieldValue === "video") {
+              newNodeEntry.typeData.textContent = $(
+                "#tapestry-node-text-area"
+              ).val();
+            } else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "mp4";
-            }
-            else if (fieldValue === "h5p") {
+            } else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "h5p";
             }
@@ -143,20 +152,20 @@ export default {
         }
       }
 
-      // Add description to new node	
+      // Add description to new node
       newNodeEntry.description = $("#tapestry-node-description-area").val();
 
       var permissionData = {
-        "public": []
+        public: []
       };
 
-      $('.public-checkbox').each(function () {
+      $(".public-checkbox").each(function() {
         if ($(this).is(":checked")) {
           permissionData.public.push(this.name);
         }
       });
 
-      $('.user-checkbox').each(function () {
+      $(".user-checkbox").each(function() {
         if ($(this).is(":checked")) {
           var userId = extractDigitsFromString(this.id);
           if (permissionData["user-" + userId]) {
@@ -167,7 +176,7 @@ export default {
         }
       });
 
-      $('.group-checkbox').each(function () {
+      $(".group-checkbox").each(function() {
         if ($(this).is(":checked")) {
           var groupId = extractDigitsFromString(this.id);
           if (permissionData["group-" + groupId]) {
@@ -181,7 +190,9 @@ export default {
       newNodeEntry.permissions = permissionData;
 
       if (!isEdit) {
-        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
+        const response = await this.TapestryAPI.addNode(
+          JSON.stringify(newNodeEntry)
+        );
         const result = response.data;
 
         // Save to database, first save node then the link
@@ -192,7 +203,13 @@ export default {
 
         if (!isRoot) {
           // Get ID from callback and set it as target's id
-          const newLink = { "source": root, "target": result.id, "value": 1, "type": "", "appearsAt": appearsAt };
+          const newLink = {
+            source: root,
+            target: result.id,
+            value: 1,
+            type: "",
+            appearsAt: appearsAt
+          };
 
           await this.TapestryAPI.addLink(JSON.stringify(newLink));
 
@@ -201,7 +218,10 @@ export default {
         } else {
           const newId = result.id;
 
-          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(permissionData));
+          await this.TapestryAPI.updatePermissions(
+            newId,
+            JSON.stringify(permissionData)
+          );
 
           this.tapestry.rootId = newId;
 
@@ -211,12 +231,17 @@ export default {
         }
       } else {
         // Call endpoint for editing node
-        const response = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
+        const response = await this.TapestryAPI.updateNode(
+          root,
+          JSON.stringify(newNodeEntry)
+        );
         const result = response.data;
 
         newNodeEntry.id = result.id;
 
-        this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
+        this.tapestry.nodes[
+          Helpers.findNodeIndex(root, this.tapestry)
+        ] = newNodeEntry;
       }
 
       tapestryHideAddNodeModal();
@@ -225,7 +250,7 @@ export default {
       thisTapestryTool.redraw(isRoot);
     }
   }
-}
+};
 </script>
 
 <style scoped>
