@@ -60,17 +60,16 @@ function addNonceToScript()
     wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
     wp_enqueue_script('wp_tapestry_script');
 
-
-    wp_add_inline_script('wp_tapestry_script', "
+    wp_add_inline_script( 'wp_tapestry_script', "
         var thisTapestryTool = new tapestryTool({
             'containerId': 'tapestry',
-            'apiUrl': '" . get_rest_url(null, 'tapestry-tool/v1') . "',
-            'wpUserId': '" . apply_filters('determine_current_user', false) . "',
-            'wpPostId': '" . get_the_ID() . "',
-            'wpIsAdmin': '" . current_user_can('administrator') . "',
-            'addNodeModalUrl': '" . plugin_dir_url(__FILE__) . "modal-add-node.html',
+            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+            'wpUserId': '". apply_filters('determine_current_user', false) ."',
+            'wpPostId': '". get_the_ID() ."',
+            'wpIsAdmin': '". current_user_can('administrator') ."',
+            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
         });
-    ");
+    " );
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
