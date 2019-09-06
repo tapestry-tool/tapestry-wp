@@ -113,7 +113,7 @@ class TapestryHelpers
      * 
      * @return  Number  $postId
      */
-    static function updatePost($post, $postType = 'tapestry', $postId = null)
+    static function updatePost($post, $postType = 'tapestry', $postId = 0)
     {
         switch ($postType) {
             case self::POST_TYPES['TAPESTRY_NODE']:

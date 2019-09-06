@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+axios.defaults.headers.common['X-WP-Nonce'] = wpData.nonce;
+
 export default class {
     /**
      * 
