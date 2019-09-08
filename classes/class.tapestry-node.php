@@ -9,7 +9,8 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
  */
 class TapestryNode implements ITapestryNode
 {
-    private $postId;
+    private $tapestryPostId;
+    private $nodePostId;
     private $nodeMetaId;
     private $type;
     private $size;
@@ -31,14 +32,15 @@ class TapestryNode implements ITapestryNode
     /**
      * Constructor
      * 
-     * @param   Number  $postId post ID
+     * @param   Number  $tapestryPostId tapestry post ID
      * @param   Number  $nodeMetaId node meta ID
      * 
      * @return  NULL
      */
-    public function __construct($postId = 0, $nodeMetaId = 0)
+    public function __construct($tapestryPostId = 0, $nodeMetaId = 0)
     {
-        $this->postId = (int) $postId;
+        $this->tapestryPostId = (int) $tapestryPostId;
+        $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
@@ -165,14 +167,13 @@ class TapestryNode implements ITapestryNode
     {
         $node = $this->_formNode();
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node');
-
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $this->nodePostId);
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
         if ($this->nodeMetaId) {
             update_metadata_by_mid('post', $this->nodeMetaId, $nodeMetadata);
         } else {
-            $this->nodeMetaId = add_post_meta($this->postId, 'tapestry_node', $nodeMetadata);
+            $this->nodeMetaId = add_post_meta($this->tapestryPostId, 'tapestry_node', $nodeMetadata);
             $node->id = $this->nodeMetaId;
         }
 
@@ -192,8 +193,9 @@ class TapestryNode implements ITapestryNode
         }
 
         $nodePostId = $nodeMetadata->meta_value->post_id;
-        $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+        $this->nodePostId = $nodePostId;
 
+        $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
         return $this->_formNodeData($nodeData, $nodeMetadata);
     }
 

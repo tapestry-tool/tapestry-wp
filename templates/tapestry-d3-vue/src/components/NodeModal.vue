@@ -1,138 +1,134 @@
 <template>
-  <div id="node-modal-container">
-    <!-- Modal -->
-<div class="modal fade" id="createNewNodeModal" tabindex="-1" role="dialog" aria-labelledby="createNewNodeModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="createNewNodeModalLabel"></h3>
-            </div>
-            <div class="modal-body" id="createNewNodeModalBody">
-                <div id="add-node-error-msg"></div>
-                <form class="form-container" style="margin-bottom: -18px; padding-bottom: 0;">
-                    <h4 style="margin-top: -1rem; margin-bottom: 2rem;">Content Details</h4>
-                    <label>Title
-                        <input id="add-node-title-input" name="title" type="text" placeholder="Enter title" required >
-                    </label>
-                    <div id="tapestry-node-description-container">
-                        <label id="tapestry-node-description">Description
-                            <textarea id="tapestry-node-description-area" placeholder="Enter description"></textarea>
-                        </label>
-                    </div>
-                    <label>Content Type
-                        <div class="dropdown">
-                            <select id="mediaType" name="mediaType" v-model="selectedMediaType">
-                                <option value="default" selected>Select content type:</option>
-                                <option value="text">Text</option>
-                                <option value="video">Video</option>
-                                <option value="h5p">H5P</option>
-                                <!--<option value="image">image</option>-->
-                            </select>
-                            <input type="hidden" id="hiddenMediaType" name="mediaType" disabled="disabled">
-                        </div>
-                    </label>
-                    <div id="contents-details">
-                        <div id="mp4-content" v-show="selectedMediaType == 'video'">
-                            <label>Video URL
-                                <input id="mp4-mediaURL-input" name="mp4-mediaURL" type="url" placeholder="Enter URL for MP4 Video" >
-                            </label>
-                            <label>Video Duration
-                                <input id="mp4-mediaDuration-input" name="mp4-mediaDuration" type="text" placeholder="Enter duration (in seconds)" >
-                            </label>
-                        </div>
-                        <div id="h5p-content" v-show="selectedMediaType == 'h5p'">
-                            <label>H5P Embed Link
-                                <input id="h5p-mediaURL-input" name="h5p-mediaURL" type="url" placeholder="Enter H5P Embed Link" >
-                            </label>
-                            <label>H5P Video Duration (only if video)
-                                <input id="h5p-mediaDuration-input" name="h5p-mediaDuration" type="text" placeholder="Enter duration (in seconds)" >
-                            </label>
-                        </div>
-                        <div id="tapestry-text-content" v-show="selectedMediaType != 'default'">
-                            <label>Text content
-                                <textarea id="tapestry-node-text-area" placeholder="Enter text here"></textarea>
-                            </label>
-                        </div>
-                    </div>
-                    <div id="appearance-details" class="lightbox-form-section">
-                        <h4>Appearance</h4>
-                        <label>Thumbnail
-                            <input id="add-node-thumbnail-input" name="imageURL" type="url" placeholder="Enter the URL for the thumbnail" required>
-                        </label>
-                        <div>
-                            <input id="tapestry-lock-node-checkbox" name="locked" type="checkbox" required v-model="lockNode">
-                            <label id="tapestry-lock-node-label">Hide node until parent node is viewed</label>
-                        </div>
-                        <div>
-                            <input id="tapestry-hide-title-checkbox" type="checkbox">
-                            <label id="tapestry-hide-title-label">Hide node title</label>
-                        </div>
-                        <div>
-                            <input id="tapestry-hide-progress-checkbox" type="checkbox">
-                            <label id="tapestry-hide-progress-label">Hide progress bar</label>
-                        </div>
-                        <div>
-                            <input id="tapestry-hide-media-checkbox" type="checkbox">
-                            <label id="tapestry-hide-media-label">Hide media button</label>
-                        </div>
-                        <div id="appearsat-section">
-                            <div id="locked-container">
-                            </div>
-                            <label id ="appears-at-label" v-show="lockNode">At which point in the video should this node appear?
-                                <input id="appears-at" name="appearsAt" type="text" placeholder="Enter number of seconds" >
-                            </label>
-                        </div>
-                    </div>
-                    <div id="permissions-details" class="lightbox-form-section">
-                        <h4>Permissions</h4>
-                        <table id="permissions-table">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>read</th>
-                                    <th>add</th>
-                                    <th>edit</th>
-                                    <th>add-submit</th>
-                                    <th>edit-submit</th>
-                                    <th>approve</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Public</td>
-                                    <td><input class="public-checkbox" id="public-read-checkbox" name="read" type="checkbox" checked></td>
-                                    <td><input class="public-checkbox" id="public-add-checkbox" name="add" type="checkbox"></td>
-                                    <td><input class="public-checkbox" id="public-edit-checkbox" name="edit" type="checkbox"></td>
-                                    <td><input class="public-checkbox" id="public-add-submit-checkbox" name="add_submit" type="checkbox"></td>
-                                    <td><input class="public-checkbox" id="public-edit-submit-checkbox" name="edit_submit" type="checkbox"></td>
-                                    <td><input class="public-checkbox" id="public-approve-checkbox" name="approve" type="checkbox"></td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td>
-                                        <input id="user-number-input" type="number" placeholder="123" >
-                                    </td>
-                                    <td colspan="6">
-                                        <button type="button" id="user-permissions-btn" @click="addUser"><span class="fas fa-plus permissions-plus"></span>User</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" id="cancel-add-new-node">Close</button>
-                <button type="button" class="btn" id="submit-add-new-node" @click="submitAddNewNode()">Submit</button>
-                <button type="button" class="btn" id="submit-add-root-node" @click="submitAddRootNode()">Submit</button>
-                <button type="button" class="btn" id="submit-edit-node" @click="submitEditNode()">Submit</button>
-            </div>
-        </div>
+  <b-modal id="node-modal-container" size="lg" scrollable>
+    <div class="d-block text-center" slot="modal-title">
+      <h3>
+        <strong>{{ modalTitle }}</strong>
+      </h3>
     </div>
-</div>
-
-  </div>
+    <b-container id="modal-content-details">
+      <b-row>
+        <h4>Content Details</h4>
+      </b-row>
+      <b-row>
+        <div>Title</div>
+        <input placeholder="Enter title" v-model="node.title" required />
+      </b-row>
+      <b-row>
+        <div>Description</div>
+        <textarea placeholder="Enter description" v-model="node.description"></textarea>
+      </b-row>
+      <b-row>
+        <div>Content Type</div>
+        <b-form-select v-model="node.mediaType" :options="mediaTypes"></b-form-select>
+      </b-row>
+      <b-row v-show="node.mediaType === 'text'">
+        <div>Text content</div>
+        <textarea
+          id="tapestry-node-text-area"
+          placeholder="Enter text here"
+          v-model="node.typeData.textContent"
+        ></textarea>
+      </b-row>
+      <b-row v-show="node.mediaType === 'video'">
+        <div>Video URL</div>
+        <input placeholder="Enter URL for MP4 Video" v-model="node.typeData.mediaURL" required />
+      </b-row>
+      <b-row v-show="node.mediaType === 'video'">
+        <div>Video Duration</div>
+        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
+      </b-row>
+      <b-row v-show="node.mediaType === 'h5p'">
+        <div>H5P Embed Link</div>
+        <input placeholder="Enter H5P Embed Link" v-model="node.typeData.mediaURL" required />
+      </b-row>
+      <b-row v-show="node.mediaType === 'h5p'">
+        <div>H5P Video Duration (only if video)</div>
+        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
+      </b-row>
+    </b-container>
+    <b-container id="modal-appearance">
+      <b-row>
+        <h4>Appearance</h4>
+      </b-row>
+      <b-row>
+        <div>Thumbnail</div>
+        <input placeholder="Enter the URL for the thumbnail" required v-model="node.imageURL" />
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
+      </b-row>
+    </b-container>
+    <b-container id="modal-permissions">
+      <b-row>
+        <h4>Permissions</h4>
+      </b-row>
+      <b-row>
+        <b-table-simple class="text-center" striped responsive>
+          <b-thead>
+            <b-tr>
+              <b-th></b-th>
+              <b-th>Read</b-th>
+              <b-th>Add</b-th>
+              <b-th>Edit</b-th>
+              <b-th>Add Submit</b-th>
+              <b-th>Edit Submit</b-th>
+              <b-th>Approve</b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody>
+            <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
+              <b-td>{{type}}</b-td>
+              <b-td>
+                <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+              <b-td>
+                <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
+              </b-td>
+            </b-tr>
+            <b-tr>
+              <b-td colspan="7">
+                <b-row>
+                  <b-col cols="3">
+                    <b-form-input v-model="userId" placeholder="123"></b-form-input>
+                  </b-col>
+                  <b-col cols="3">
+                    <b-button variant="primary" @click="addUser()">
+                      <span class="fas fa-plus permissions-plus"></span> User
+                    </b-button>
+                  </b-col>
+                </b-row>
+              </b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
+      </b-row>
+    </b-container>
+    <template slot="modal-footer">
+      <b-button size="sm" variant="danger" @click="$emit('close-modal')">Cancel</b-button>
+      <b-button size="sm" variant="success" @click="submitNode()">Submit</b-button>
+    </template>
+  </b-modal>
 </template>
 
 <script>
@@ -143,37 +139,87 @@ export default {
   name: "node-modal",
   data() {
     return {
-        lockNode: false,
-        selectedMediaType: "default"
+      userId: null,
+      mediaTypes: [
+        { value: '', text: 'Select content type' },
+        { value: 'text', text: 'Text' },
+        { value: 'video', text: 'Video' },
+        { value: 'h5p', text: 'H5P' }
+      ]
     }
   },
   props: {
-    tapestry: {
+    node: {
       type: Object,
-      required: true
+      required: false
+    },
+    modalType: {
+      type: String,
+      required: true,
+      validator: function (value) {
+        return ['add-new-node', 'edit-node', 'add-root-node', ''].indexOf(value) !== -1;
+      }
+    },
+    rootNodeTitle: {
+      type: String,
+      required: false
+    }
+  },
+  computed: {
+    modalTitle() {
+      if (this.modalType === 'add-new-node') {
+        return `Add new sub-topic to ${this.rootNodeTitle}`;
+      } else if (this.modalType === 'edit-node') {
+        return `Edit node: ${this.rootNodeTitle}`;
+      } else if (this.modalType === 'add-root-node') {
+        return 'Add root node';
+      } else {
+        return '';
+      }
+    },
+    nodeData() {
+      return [
+        { name: 'title', value: this.node.title },
+        { name: 'mediaType', value: this.node.mediaType },
+        { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
+        { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
+        { name: 'mediaDuration', value: this.node.mediaDuration },
+        { name: 'imageURL', value: this.node.imageURL },
+        { name: 'unlocked', value: this.node.unlocked },
+        { name: 'permissions', value: this.node.permissions },
+        { name: 'hideTitle', value: this.node.hideTitle },
+        { name: 'hideProgress', value: this.node.hideProgress },
+        { name: 'hideMedia', value: this.node.hideMedia }
+      ]
     }
   },
   methods: {
-    submitAddNewNode() {
-        const formData = $("form").serializeArray();
-        this.$emit("tapestryAddNewNode", formData, false);
+    getCurrentRootNode() {
+      if (this.tapestry && this.tapestry.nodes) {
+        return this.tapestry.nodes.find(node => {
+          return node.id = this.tapestry.rootId;
+        });
+      }
     },
-    submitAddRootNode() {
-        const formData = $("form").serializeArray();
-        this.$emit("tapestryAddNewNode", formData, false, true);
-    },
-    submitEditNode() {
-        const formData = $("form").serializeArray();
-        this.$emit("tapestryAddNewNode", formData, true);
+    submitNode() {
+      if (this.modalType === 'add-root-node') {
+        this.$emit("add-edit-node", this.nodeData, false, true);
+      } else if (this.modalType === 'add-new-node') {
+        this.$emit("add-edit-node", this.nodeData, false);
+      } else if (this.modalType === 'edit-node') {
+        this.$emit("add-edit-node", this.nodeData, true);
+      } else {
+        console.error(`Undefined modalType: ${this.modalType}`)
+      }
     },
     addUser() {
-        const userId = $("#user-number-input").val();
-        if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
-            appendPermissionsRow(userId, "user");
-            $("#user-number-input").val("");
-        } else {
-            alert("Enter valid user id");
-        }
+      const userId = this.userId;
+      if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
+        this.$set(this.node.permissions, `user-${userId}`, [])
+        this.userId = null;
+      } else {
+        alert("Enter valid user id");
+      }
     }
   }
 }
@@ -181,7 +227,37 @@ export default {
 
 <style scoped>
 #createNewNodeModalBody {
-    text-align: left;
+  text-align: left;
 }
 
+#modal-content-details > div:nth-child(4) {
+  margin-bottom: 20px;
+}
+
+#modal-content-details,
+#modal-appearance,
+#modal-permissions {
+  padding: 20px;
+  /* border-bottom: 1px solid #ddd; */
+}
+
+#modal-content-details input,
+#modal-content-details textarea,
+#modal-appearance input,
+#modal-appearance textarea {
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+  width: 100%;
+}
 </style>
+
+<style>
+/* Use non-scoped styles to overwrite WP theme styles */
+table th,
+table td {
+  word-break: unset;
+}
+</style>
+
