@@ -15,15 +15,7 @@ export default {
   },
   methods: {
     showModal() {
-      // Populate title
-      $('#createNewNodeModalLabel').text("Add root node")
-      $("#submit-add-new-node").hide()
-      $("#submit-edit-node").hide()
-      $("#submit-add-root-node").show()
-      $("#appearsat-section").hide()
-
-      // Show the modal
-      $("#createNewNodeModal").modal()
+      this.$emit('add-root-node');
     }
   }
 }

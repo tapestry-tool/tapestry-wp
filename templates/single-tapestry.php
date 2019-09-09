@@ -30,6 +30,7 @@ function enqueue_vue_app_build()
                 'hide_empty' => true,
                 'fields' => 'names',
             )),
+            'nonce' => wp_create_nonce('wp_rest'),
         )
     );
 
@@ -59,17 +60,16 @@ function addNonceToScript()
     wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
     wp_enqueue_script('wp_tapestry_script');
 
-
-    wp_add_inline_script('wp_tapestry_script', "
+    wp_add_inline_script( 'wp_tapestry_script', "
         var thisTapestryTool = new tapestryTool({
             'containerId': 'tapestry',
-            'apiUrl': '" . get_rest_url(null, 'tapestry-tool/v1') . "',
-            'wpUserId': '" . apply_filters('determine_current_user', false) . "',
-            'wpPostId': '" . get_the_ID() . "',
-            'wpIsAdmin': '" . current_user_can('administrator') . "',
-            'addNodeModalUrl': '" . plugin_dir_url(__FILE__) . "modal-add-node.html',
+            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+            'wpUserId': '". apply_filters('determine_current_user', false) ."',
+            'wpPostId': '". get_the_ID() ."',
+            'wpIsAdmin': '". current_user_can('administrator') ."',
+            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
         });
-    ");
+    " );
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
@@ -95,14 +95,12 @@ get_header(); ?>
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry-d3/tapestry.css" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.css" rel="stylesheet" />
-        <link href="<?php echo plugin_dir_url(__FILE__) ?>libs/bootstrap.min.css" rel="stylesheet" />
 
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/h5p-resizer.min.js" charset="UTF-8"></script>
-        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/bootstrap.min.js" charset="UTF-8"></script>
 
         <script>
             // EXAMPLE OF USAGE:

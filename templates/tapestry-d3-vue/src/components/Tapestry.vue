@@ -1,7 +1,14 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton v-show="!this.tapestry.rootId" />
-    <NodeModal :tapestry="this.tapestry" @tapestryAddNewNode="tapestryAddNewNode" />
+    <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
+    <NodeModal
+      :node="populatedNode"
+      :modalType="modalType"
+      :rootNodeTitle="getCurrentRootNode().title"
+      @close-modal="closeModal"
+      @add-edit-node="addEditNode"
+      @delete-node="deleteNode"
+    />
   </div>
 </template>
 
@@ -20,28 +27,98 @@ export default {
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
     this.tapestry = await this.TapestryAPI.getTapestry();
-
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
-    thisTapestryTool.initialize();
-    thisTapestryTool.redrawTapestryWithNewNode();
+    thisTapestryTool.initialize(true);
+
+    // Set up event listeners to communicate with D3 elements
+    window.addEventListener('change-root-node', this.changeRootNode)
+    window.addEventListener('add-new-node', this.addNewNode)
+    window.addEventListener('edit-node', this.editNode)
   },
   data() {
     return {
       tapestry: {},
       TapestryAPI: {},
-      directoryUrl: wpData.directory_uri
+      modalType: '',
+      showNodeModal: false,
+      populatedNode: {
+        title: '',
+        mediaType: '',
+        typeData: {
+          mediaURL: '',
+          textContent: ''
+        },
+        mediaDuration: '',
+        imageURL: '',
+        unlocked: false,
+        permissions: { public: ['read'] },
+        description: ''
+      }
     }
   },
+  computed: {
+    xORfx: function () {
+      return this.tapestry.settings.autoLayout ? 'x' : 'fx';
+    },
+    yORfy: function () {
+      return this.tapestry.settings.autoLayout ? 'y' : 'fy';
+    },
+  },
   methods: {
-    async tapestryAddNewNode(formData, isEdit, isRoot) {
+    getCurrentRootNode() {
+      if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
+        return this.tapestry.nodes.find(node => {
+          return node.id === this.tapestry.rootId;
+        });
+      }
+      return {};
+    },
+    getEmptyNode() {
+      return {
+        title: '',
+        mediaType: '',
+        typeData: {
+          mediaURL: '',
+          textContent: ''
+        },
+        mediaDuration: '',
+        imageURL: '',
+        unlocked: '',
+        permissions: { public: ['read'] },
+        description: ''
+      };
+    },
+    addRootNode() {
+      this.modalType = 'add-root-node';
+      this.populatedNode = this.getEmptyNode();
+      this.$bvModal.show('node-modal-container');
+    },
+    addNewNode() {
+      this.modalType = 'add-new-node';
+      this.populatedNode = this.getEmptyNode();
+      this.$bvModal.show('node-modal-container');
+    },
+    editNode() {
+      this.modalType = 'edit-node';
+      this.populatedNode = this.getCurrentRootNode();
+      this.$bvModal.show('node-modal-container');
+    },
+    deleteNode() {
+      thisTapestryTool.deleteNodeFromTapestry();
+      this.closeModal();
+    },
+    closeModal() {
+      this.modalType = '';
+      this.$bvModal.hide('node-modal-container');
+    },
+    changeRootNode(event) {
+      this.tapestry.rootId = event.detail;
+    },
+    async addEditNode(formData, isEdit, isRoot = false) {
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
       let root = this.tapestry.rootId;
-
-      if (typeof isRoot == 'undefined') {
-        isRoot = false;
-      }
 
       var errorMsg = tapestryValidateNewNode(formData, isRoot);
       if (errorMsg) {
@@ -57,7 +134,7 @@ export default {
         "nodeType": "",
         "title": "",
         "imageURL": "",
-        "mediaType": "",
+        "mediaType": "video",
         "mediaFormat": "",
         "mediaDuration": 0,
         "typeId": 1,
@@ -76,16 +153,14 @@ export default {
         "fy": Helpers.getBrowserHeight()
       };
 
-      // Node ID exists, so edit case
       if (isEdit) {
-        newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
-        newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy;
-      } else {
-        if (!isRoot) {
-          // Just put the node right under the current node
-          newNodeEntry.fx = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fx;
-          newNodeEntry.fy = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].fy + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
-        }
+        // If just editing, set the node coordinates to its current location
+        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
+        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+      } else if (!isRoot) {
+        // If adding a new node, add it to the right of the existing node
+        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       }
 
       var appearsAt = 0;
@@ -102,8 +177,7 @@ export default {
             break;
           case "mediaType":
             if (fieldValue === "text") {
-              newNodeEntry[fieldName] = fieldValue;
-              newNodeEntry.typeData.textContent = $("#tapestry-node-text-area").val();
+              newNodeEntry["mediaType"] = "text";
             }
             else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video";
@@ -114,71 +188,34 @@ export default {
               newNodeEntry["mediaFormat"] = "h5p";
             }
             break;
-          case "mp4-mediaURL":
-            if (fieldValue !== "") {
+          case "textContent":
+            if (fieldValue) {
+              newNodeEntry.typeData.textContent = fieldValue;
+            }
+            break;
+          case "mediaURL":
+            if (fieldValue) {
               newNodeEntry.typeData.mediaURL = fieldValue;
             }
             break;
-          case "h5p-mediaURL":
-            if (fieldValue !== "") {
-              newNodeEntry.typeData.mediaURL = fieldValue;
-            }
-            break;
-          case "mp4-mediaDuration":
-            if (fieldValue !== "") {
+          case "mediaDuration":
+            if (fieldValue) {
               newNodeEntry.mediaDuration = parseInt(fieldValue);
             }
             break;
-          case "h5p-mediaDuration":
-            if (fieldValue !== "") {
-              newNodeEntry.mediaDuration = parseInt(fieldValue);
-            }
+          case "unlocked":
+            newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
             break;
-          case "appearsAt":
-            appearsAt = parseInt(fieldValue);
-            newNodeEntry.unlocked = !appearsAt || isRoot;
+          case "description":
+            newNodeEntry.description = fieldValue;
+            break;
+          case "permissions":
+            newNodeEntry.permissions = fieldValue;
             break;
           default:
             break;
         }
       }
-
-      // Add description to new node	
-      newNodeEntry.description = $("#tapestry-node-description-area").val();
-
-      var permissionData = {
-        "public": []
-      };
-
-      $('.public-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          permissionData.public.push(this.name);
-        }
-      });
-
-      $('.user-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          var userId = extractDigitsFromString(this.id);
-          if (permissionData["user-" + userId]) {
-            permissionData["user-" + userId].push(this.name);
-          } else {
-            permissionData["user-" + userId] = [this.name];
-          }
-        }
-      });
-
-      $('.group-checkbox').each(function () {
-        if ($(this).is(":checked")) {
-          var groupId = extractDigitsFromString(this.id);
-          if (permissionData["group-" + groupId]) {
-            permissionData["group-" + groupId].push(this.name);
-          } else {
-            permissionData["group-" + groupId] = [this.name];
-          }
-        }
-      });
-
-      newNodeEntry.permissions = permissionData;
 
       if (!isEdit) {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
@@ -201,13 +238,11 @@ export default {
         } else {
           const newId = result.id;
 
-          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(permissionData));
+          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(newNodeEntry.permissions));
 
           this.tapestry.rootId = newId;
 
           root = this.tapestry.rootId; // need to set root to newly created node
-
-          $("#root-node-container").hide(); // hide the root node button after creating it.
         }
       } else {
         // Call endpoint for editing node
@@ -219,10 +254,10 @@ export default {
         this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
       }
 
-      tapestryHideAddNodeModal();
-
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.redraw(isRoot);
+
+      this.closeModal();
     }
   }
 }
