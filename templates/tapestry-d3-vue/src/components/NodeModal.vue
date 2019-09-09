@@ -241,11 +241,7 @@ export default {
   background: #f1f1f1;
   width: 100%;
 }
-.tapestry-submit-section {
-  float: right;
-}
 </style>
-
 
 <style>
 /* Use non-scoped styles to overwrite WP theme styles */
