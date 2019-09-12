@@ -1,66 +1,107 @@
 <template>
-  <b-modal id="node-modal-container" size="lg" scrollable>
-    <div class="d-block text-center" slot="modal-title">
-      <h3>
-        <strong>{{ modalTitle }}</strong>
-      </h3>
-    </div>
-    <b-container id="modal-content-details">
+  <b-modal id="node-modal-container" size="lg" scrollable v-bind:title="modalTitle">
+    <b-container class="modal__section" id="modal-content-details">
       <b-row>
-        <h4>Content Details</h4>
+        <h4 class="modal__section__title">Content Details</h4>
       </b-row>
       <b-row>
-        <div>Title</div>
-        <input placeholder="Enter title" v-model="node.title" required />
+        <label for="node__title">Title</label>
+        <input
+          id="node__title"
+          class="modal__form-text-input"
+          placeholder="Enter title"
+          v-model="node.title"
+          required
+        />
       </b-row>
       <b-row>
-        <div>Description</div>
-        <textarea placeholder="Enter description" v-model="node.description"></textarea>
+        <label for="node__description">Description</label>
+        <textarea
+          id="node__description"
+          class="modal__form-text-input"
+          placeholder="Enter description"
+          v-model="node.description"
+        ></textarea>
       </b-row>
       <b-row>
-        <div>Content Type</div>
-        <b-form-select v-model="node.mediaType" :options="mediaTypes"></b-form-select>
+        <label for="node__media-type">Content Type</label>
+        <b-form-select id="node__media-type" v-model="node.mediaType" :options="mediaTypes"></b-form-select>
       </b-row>
       <b-row v-show="node.mediaType === 'text'">
-        <div>Text content</div>
+        <label for="node__text-content">Text content</label>
         <textarea
-          id="tapestry-node-text-area"
+          id="node__text-content"
+          class="modal__form-text-input"
           placeholder="Enter text here"
           v-model="node.typeData.textContent"
         ></textarea>
       </b-row>
       <b-row v-show="node.mediaType === 'video'">
-        <div>Video URL</div>
-        <input placeholder="Enter URL for MP4 Video" v-model="node.typeData.mediaURL" required />
+        <label for="node__video__media-url">Video URL</label>
+        <input
+          id="node__video__media-url"
+          class="modal__form-text-input"
+          placeholder="Enter URL for MP4 Video"
+          v-model="node.typeData.mediaURL"
+          required
+        />
       </b-row>
       <b-row v-show="node.mediaType === 'video'">
-        <div>Video Duration</div>
-        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
+        <label for="node__video__media-duration">Video Duration</label>
+        <input
+          id="node__video__media-duration"
+          class="modal__form-text-input"
+          placeholder="Enter duration (in seconds)"
+          v-model="node.mediaDuration"
+          required
+        />
       </b-row>
       <b-row v-show="node.mediaType === 'h5p'">
-        <div>H5P Embed Link</div>
-        <input placeholder="Enter H5P Embed Link" v-model="node.typeData.mediaURL" required />
+        <label for="node__h5p__media-url">H5P Embed Link</label>
+        <input
+          id="node__h5p__media-url"
+          class="modal__form-text-input"
+          placeholder="Enter H5P Embed Link"
+          v-model="node.typeData.mediaURL"
+          required
+        />
       </b-row>
       <b-row v-show="node.mediaType === 'h5p'">
-        <div>H5P Video Duration (only if video)</div>
-        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
+        <label for="node__h5p__media-duration">H5P Video Duration (only if video)</label>
+        <input
+          id="node__h5p__media-duration"
+          class="modal__form-text-input"
+          placeholder="Enter duration (in seconds)"
+          v-model="node.mediaDuration"
+          required
+        />
       </b-row>
     </b-container>
-    <b-container id="modal-appearance">
+    <b-container id="modal-appearance" class="modal__section">
       <b-row>
-        <h4>Appearance</h4>
+        <h4 class="modal__section__title">Appearance</h4>
       </b-row>
       <b-row>
-        <div>Thumbnail</div>
-        <input placeholder="Enter the URL for the thumbnail" required v-model="node.imageURL" />
+        <label for="node__image-url">Thumbnail</label>
+        <input
+          id="node__image-url"
+          class="modal__form-text-input"
+          placeholder="Enter the URL for the thumbnail"
+          required
+          v-model="node.imageURL"
+        />
       </b-row>
       <b-row>
-        <b-form-checkbox value="false" unchecked-value="true" v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
+        <b-form-checkbox
+          value="false"
+          unchecked-value="true"
+          v-model="node.unlocked"
+        >Hide node until parent node is viewed</b-form-checkbox>
       </b-row>
     </b-container>
-    <b-container id="modal-permissions">
+    <b-container id="modal-permissions" class="modal__section">
       <b-row>
-        <h4>Permissions</h4>
+        <h4 class="modal__section__title">Permissions</h4>
       </b-row>
       <b-row>
         <b-table-simple class="text-center" striped responsive>
@@ -123,8 +164,8 @@
 </template>
 
 <script>
-import Helpers from "../utils/Helpers"
-import TapestryAPI from "../services/TapestryAPI"
+import Helpers from "../utils/Helpers";
+import TapestryAPI from "../services/TapestryAPI";
 
 export default {
   name: "node-modal",
@@ -132,12 +173,12 @@ export default {
     return {
       userId: null,
       mediaTypes: [
-        { value: '', text: 'Select content type' },
-        { value: 'text', text: 'Text' },
-        { value: 'video', text: 'Video' },
-        { value: 'h5p', text: 'H5P' }
+        { value: "", text: "Select content type" },
+        { value: "text", text: "Text" },
+        { value: "video", text: "Video" },
+        { value: "h5p", text: "H5P" }
       ]
-    }
+    };
   },
   props: {
     node: {
@@ -147,8 +188,11 @@ export default {
     modalType: {
       type: String,
       required: true,
-      validator: function (value) {
-        return ['add-new-node', 'edit-node', 'add-root-node', ''].indexOf(value) !== -1;
+      validator: function(value) {
+        return (
+          ["add-new-node", "edit-node", "add-root-node", ""].indexOf(value) !==
+          -1
+        );
       }
     },
     rootNodeTitle: {
@@ -158,87 +202,100 @@ export default {
   },
   computed: {
     modalTitle() {
-      if (this.modalType === 'add-new-node') {
+      if (this.modalType === "add-new-node") {
         return `Add new sub-topic to ${this.rootNodeTitle}`;
-      } else if (this.modalType === 'edit-node') {
+      } else if (this.modalType === "edit-node") {
         return `Edit node: ${this.rootNodeTitle}`;
-      } else if (this.modalType === 'add-root-node') {
-        return 'Add root node';
+      } else if (this.modalType === "add-root-node") {
+        return "Add root node";
       } else {
-        return '';
+        return "";
       }
     },
     nodeData() {
       return [
-        { name: 'title', value: this.node.title },
-        { name: 'mediaType', value: this.node.mediaType },
-        { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
-        { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
-        { name: 'mediaDuration', value: this.node.mediaDuration },
-        { name: 'imageURL', value: this.node.imageURL },
-        { name: 'unlocked', value: this.node.unlocked },
-        { name: 'permissions', value: this.node.permissions },
-        { name: 'description', value: this.node.description },
-      ]
+        { name: "title", value: this.node.title },
+        { name: "mediaType", value: this.node.mediaType },
+        {
+          name: "mediaURL",
+          value: this.node.typeData && this.node.typeData.mediaURL
+        },
+        {
+          name: "textContent",
+          value: this.node.typeData && this.node.typeData.textContent
+        },
+        { name: "mediaDuration", value: this.node.mediaDuration },
+        { name: "imageURL", value: this.node.imageURL },
+        { name: "unlocked", value: this.node.unlocked },
+        { name: "permissions", value: this.node.permissions },
+        { name: "description", value: this.node.description }
+      ];
     }
   },
   methods: {
     getCurrentRootNode() {
       if (this.tapestry && this.tapestry.nodes) {
         return this.tapestry.nodes.find(node => {
-          return node.id = this.tapestry.rootId;
+          return (node.id = this.tapestry.rootId);
         });
       }
     },
     submitNode() {
-      if (this.modalType === 'add-root-node') {
+      if (this.modalType === "add-root-node") {
         this.$emit("add-edit-node", this.nodeData, false, true);
-      } else if (this.modalType === 'add-new-node') {
+      } else if (this.modalType === "add-new-node") {
         this.$emit("add-edit-node", this.nodeData, false);
-      } else if (this.modalType === 'edit-node') {
+      } else if (this.modalType === "edit-node") {
         this.$emit("add-edit-node", this.nodeData, true);
       } else {
-        console.error(`Undefined modalType: ${this.modalType}`)
+        console.error(`Undefined modalType: ${this.modalType}`);
       }
     },
     addUser() {
       const userId = this.userId;
-      if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
-        this.$set(this.node.permissions, `user-${userId}`, [])
+      if (
+        userId &&
+        onlyContainsDigits(userId) &&
+        $("#user-" + userId + "-editcell").val() != ""
+      ) {
+        this.$set(this.node.permissions, `user-${userId}`, []);
         this.userId = null;
       } else {
         alert("Enter valid user id");
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-#createNewNodeModalBody {
-  text-align: left;
-}
-
-#modal-content-details > div:nth-child(4) {
+.modal__section {
   margin-bottom: 20px;
 }
 
-#modal-content-details,
-#modal-appearance,
-#modal-permissions {
-  padding: 20px;
-  /* border-bottom: 1px solid #ddd; */
+.modal__section:last-child {
+  margin-bottom: 0;
 }
 
-#modal-content-details input,
-#modal-content-details textarea,
-#modal-appearance input,
-#modal-appearance textarea {
+.modal__section > * {
+  margin-bottom: 16px;
+}
+
+.modal__section__title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.modal__form-text-input {
   padding: 15px;
-  margin: 5px 0 22px 0;
   border: none;
   background: #f1f1f1;
   width: 100%;
+}
+
+#createNewNodeModalBody {
+  text-align: left;
 }
 </style>
 
@@ -247,6 +304,25 @@ export default {
 table th,
 table td {
   word-break: unset;
+  border: none;
+}
+
+table {
+  border: 1px solid #dee2e6;
+}
+
+/* overwrite bootstrap styles */
+.modal-header {
+  padding: 16px 24px;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 32px 24px;
 }
 </style>
 
