@@ -1,6 +1,6 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
+    <RootNodeButton v-show="!tapestry.rootId" @add-root-node="addRootNode" />
     <NodeModal
       :node="populatedNode"
       :modalType="modalType"
@@ -35,13 +35,13 @@ export default {
     window.addEventListener('change-root-node', this.changeRootNode)
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
+    window.addEventListener('tapestry-updated', this.tapestryUpdated)
   },
   data() {
     return {
       tapestry: {},
       TapestryAPI: {},
       modalType: '',
-      showNodeModal: false,
       populatedNode: {
         title: '',
         mediaType: '',
@@ -66,6 +66,9 @@ export default {
     },
   },
   methods: {
+    tapestryUpdated(event) {
+      this.tapestry = event.detail.dataset;
+    },
     getCurrentRootNode() {
       if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
         return this.tapestry.nodes.find(node => {
@@ -255,7 +258,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.initialize(true);
+      thisTapestryTool.initialize(!isRoot);
 
       this.closeModal();
     }
