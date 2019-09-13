@@ -29,7 +29,7 @@ export default {
     this.tapestry = await this.TapestryAPI.getTapestry();
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
-    thisTapestryTool.initialize(true);
+    thisTapestryTool.initialize();
 
     // Set up event listeners to communicate with D3 elements
     window.addEventListener('change-root-node', this.changeRootNode)
@@ -255,7 +255,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.redraw(isRoot);
+      thisTapestryTool.initialize(true);
 
       this.closeModal();
     }
