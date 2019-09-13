@@ -261,7 +261,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.redraw(isRoot);
+      thisTapestryTool.initialize(true);
 
       this.modalType = '';
       this.$bvModal.hide('node-modal-container');
