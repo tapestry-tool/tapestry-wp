@@ -32,9 +32,9 @@ export default {
     thisTapestryTool.initialize(true);
 
     // Set up event listeners to communicate with D3 elements
-    window.addEventListener('change-root-node', this.changeRootNode);
-    window.addEventListener('add-new-node', this.addNewNode);
-    window.addEventListener('edit-node', this.editNode);
+    window.addEventListener('change-root-node', this.changeRootNode)
+    window.addEventListener('add-new-node', this.addNewNode)
+    window.addEventListener('edit-node', this.editNode)
   },
   data() {
     return {
