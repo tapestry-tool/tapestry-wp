@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import Helpers from "../utils/Helpers";
-import NodeModal from "./NodeModal";
-import RootNodeButton from "./RootNodeButton";
-import TapestryAPI from "../services/TapestryAPI";
+import Helpers from "../utils/Helpers"
+import NodeModal from './NodeModal'
+import RootNodeButton from './RootNodeButton'
+import TapestryAPI from '../services/TapestryAPI'
 
 export default {
-  name: "tapestry",
+  name: 'tapestry',
   components: {
     NodeModal,
     RootNodeButton
@@ -32,38 +32,38 @@ export default {
     thisTapestryTool.initialize(true);
 
     // Set up event listeners to communicate with D3 elements
-    window.addEventListener("change-root-node", this.changeRootNode);
-    window.addEventListener("add-new-node", this.addNewNode);
-    window.addEventListener("edit-node", this.editNode);
+    window.addEventListener('change-root-node', this.changeRootNode);
+    window.addEventListener('add-new-node', this.addNewNode);
+    window.addEventListener('edit-node', this.editNode);
   },
   data() {
     return {
       tapestry: {},
       TapestryAPI: {},
-      modalType: "",
+      modalType: '',
       showNodeModal: false,
       populatedNode: {
-        title: "",
-        mediaType: "",
+        title: '',
+        mediaType: '',
         typeData: {
-          mediaURL: "",
-          textContent: ""
+          mediaURL: '',
+          textContent: ''
         },
-        mediaDuration: "",
-        imageURL: "",
+        mediaDuration: '',
+        imageURL: '',
         unlocked: false,
-        permissions: { public: ["read"] },
-        description: ""
+        permissions: { public: ['read'] },
+        description: ''
       }
-    };
+    }
   },
   computed: {
-    xORfx: function() {
-      return this.tapestry.settings.autoLayout ? "x" : "fx";
-    },
-    yORfy: function() {
-      return this.tapestry.settings.autoLayout ? "y" : "fy";
-    }
+      xORfx: function () {
+          return this.tapestry.settings.autoLayout ? 'x' : 'fx';
+      },
+      yORfy: function () {
+          return this.tapestry.settings.autoLayout ? 'y' : 'fy';
+      },
   },
   methods: {
     getCurrentRootNode() {
@@ -75,34 +75,34 @@ export default {
       return {};
     },
     addRootNode() {
-      this.modalType = "add-root-node";
-      this.$bvModal.show("node-modal-container");
+      this.modalType = 'add-root-node';
+      this.$bvModal.show('node-modal-container');
     },
     addNewNode() {
-      this.modalType = "add-new-node";
+      this.modalType = 'add-new-node';
       this.populatedNode = {
-        title: "",
-        mediaType: "",
+        title: '',
+        mediaType: '',
         typeData: {
-          mediaURL: "",
-          textContent: ""
+          mediaURL: '',
+          textContent: ''
         },
-        mediaDuration: "",
-        imageURL: "",
-        unlocked: "",
-        permissions: { public: ["read"] },
-        description: ""
+        mediaDuration: '',
+        imageURL: '',
+        unlocked: '',
+        permissions: { public: ['read'] },
+        description: ''
       };
-      this.$bvModal.show("node-modal-container");
+      this.$bvModal.show('node-modal-container');
     },
     editNode() {
-      this.modalType = "edit-node";
+      this.modalType = 'edit-node';
       this.populatedNode = this.getCurrentRootNode();
-      this.$bvModal.show("node-modal-container");
+      this.$bvModal.show('node-modal-container');
     },
     closeModal() {
-      this.modalType = "";
-      this.$bvModal.hide("node-modal-container");
+      this.modalType = '';
+      this.$bvModal.hide('node-modal-container');
     },
     changeRootNode(event) {
       this.tapestry.rootId = event.detail;
@@ -120,48 +120,39 @@ export default {
 
       // Add the node data first
       var newNodeEntry = {
-        type: "tapestry_node",
-        description: "",
-        status: "publish",
-        nodeType: "",
-        title: "",
-        imageURL: "",
-        mediaType: "video",
-        mediaFormat: "",
-        mediaDuration: 0,
-        typeId: 1,
-        group: 1,
-        typeData: {
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 }
+        "type": "tapestry_node",
+        "description": "",
+        "status": "publish",
+        "nodeType": "",
+        "title": "",
+        "imageURL": "",
+        "mediaType": "video",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "typeId": 1,
+        "group": 1,
+        "typeData": {
+          "progress": [
+            { "group": "viewed", "value": 0 },
+            { "group": "unviewed", "value": 1 }
           ],
-          mediaURL: "",
-          mediaWidth: 960, //TODO: This needs to be flexible with H5P
-          mediaHeight: 600
+          "mediaURL": "",
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
+          "mediaHeight": 600
         },
-        unlocked: true,
-        fx: Helpers.getBrowserWidth(),
-        fy: Helpers.getBrowserHeight()
+        "unlocked": true,
+        "fx": Helpers.getBrowserWidth(),
+        "fy": Helpers.getBrowserHeight()
       };
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry[this.xOrfx] = this.tapestry.nodes[
-          Helpers.findNodeIndex(root, this.tapestry)
-        ].x;
-        newNodeEntry[this.yOrfy] = this.tapestry.nodes[
-          Helpers.findNodeIndex(root, this.tapestry)
-        ].y;
+        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
+        newNodeEntry[this.yOrfy]= this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
-        newNodeEntry[this.xOrfx] =
-          this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x +
-          (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 +
-          50;
-        newNodeEntry[this.yOrfy] = this.tapestry.nodes[
-          Helpers.findNodeIndex(root, this.tapestry)
-        ].y;
+        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       }
 
       var appearsAt = 0;
@@ -179,10 +170,12 @@ export default {
           case "mediaType":
             if (fieldValue === "text") {
               newNodeEntry["mediaType"] = "text";
-            } else if (fieldValue === "video") {
+            } 
+            else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "mp4";
-            } else if (fieldValue === "h5p") {
+            } 
+            else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "h5p";
             }
@@ -203,7 +196,7 @@ export default {
             }
             break;
           case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot;
+            newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
             break;
           case "description":
             newNodeEntry.description = fieldValue;
@@ -217,9 +210,7 @@ export default {
       }
 
       if (!isEdit) {
-        const response = await this.TapestryAPI.addNode(
-          JSON.stringify(newNodeEntry)
-        );
+        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
         const result = response.data;
 
         // Save to database, first save node then the link
@@ -230,13 +221,7 @@ export default {
 
         if (!isRoot) {
           // Get ID from callback and set it as target's id
-          const newLink = {
-            source: root,
-            target: result.id,
-            value: 1,
-            type: "",
-            appearsAt: appearsAt
-          };
+          const newLink = { "source": root, "target": result.id, "value": 1, "type": "", "appearsAt": appearsAt };
 
           await this.TapestryAPI.addLink(JSON.stringify(newLink));
 
@@ -245,10 +230,7 @@ export default {
         } else {
           const newId = result.id;
 
-          await this.TapestryAPI.updatePermissions(
-            newId,
-            JSON.stringify(newNodeEntry.permissions)
-          );
+          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(newNodeEntry.permissions));
 
           this.tapestry.rootId = newId;
 
@@ -256,27 +238,22 @@ export default {
         }
       } else {
         // Call endpoint for editing node
-        const response = await this.TapestryAPI.updateNode(
-          root,
-          JSON.stringify(newNodeEntry)
-        );
+        const response = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
         const result = response.data;
 
         newNodeEntry.id = result.id;
 
-        this.tapestry.nodes[
-          Helpers.findNodeIndex(root, this.tapestry)
-        ] = newNodeEntry;
+        this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
       }
 
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.initialize(true);
 
-      this.modalType = "";
-      this.$bvModal.hide("node-modal-container");
+      this.modalType = '';
+      this.$bvModal.hide('node-modal-container');
     }
   }
-};
+}
 </script>
 
 <style scoped>

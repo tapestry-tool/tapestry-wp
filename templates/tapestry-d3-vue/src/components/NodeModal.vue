@@ -123,8 +123,8 @@
 </template>
 
 <script>
-import Helpers from "../utils/Helpers";
-import TapestryAPI from "../services/TapestryAPI";
+import Helpers from "../utils/Helpers"
+import TapestryAPI from "../services/TapestryAPI"
 
 export default {
   name: "node-modal",
@@ -211,7 +211,7 @@ export default {
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
