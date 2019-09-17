@@ -45,6 +45,10 @@
         <div>H5P Video Duration (only if video)</div>
         <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
       </b-row>
+      <b-row v-show="node.mediaType === 'url-embed'">
+        <div>Embed Link</div>
+        <input placeholder="Enter Embed Link" v-model="node.typeData.mediaURL" required />
+      </b-row>
     </b-container>
     <b-container id="modal-appearance">
       <b-row>

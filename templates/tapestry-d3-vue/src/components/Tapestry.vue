@@ -178,6 +178,9 @@ export default {
             else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "h5p";
+            } else if (fieldValue === "url-embed") {
+              newNodeEntry["mediaType"] = "url-embed";
+              newNodeEntry["mediaFormat"] = "embed";
             }
             break;
           case "textContent":
