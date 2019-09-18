@@ -1,13 +1,12 @@
 import axios from 'axios'
 
-axios.defaults.headers.common['X-WP-Nonce'] = wpData.nonce;
-
 export default class {
     /**
      * 
      * @param {Number} postId 
      */
     constructor(postId) {
+        axios.defaults.headers.common['X-WP-Nonce'] = wpData.nonce;
         this.postId = postId
     }
 
