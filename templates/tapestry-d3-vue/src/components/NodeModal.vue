@@ -70,14 +70,16 @@
               <b-th>Read</b-th>
               <b-th>Add</b-th>
               <b-th>Edit</b-th>
+              <!--
               <b-th>Add Submit</b-th>
               <b-th>Edit Submit</b-th>
               <b-th>Approve</b-th>
+              -->
             </b-tr>
           </b-thead>
           <b-tbody>
             <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
-              <b-td>{{type}}</b-td>
+              <b-th>{{type}}</b-th>
               <b-td>
                 <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
@@ -87,6 +89,7 @@
               <b-td>
                 <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
+              <!--
               <b-td>
                 <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
@@ -96,19 +99,18 @@
               <b-td>
                 <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
+              -->
             </b-tr>
             <b-tr>
-              <b-td colspan="7">
-                <b-row>
-                  <b-col cols="3">
-                    <b-form-input v-model="userId" placeholder="123"></b-form-input>
-                  </b-col>
-                  <b-col cols="3">
-                    <b-button variant="primary" @click="addUser()">
+              <b-td colspan="4">
+                <b-input-group>
+                  <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
+                  <b-input-group-append>
+                    <b-button variant="secondary" @click="addUser()">
                       <span class="fas fa-plus permissions-plus"></span> User
                     </b-button>
-                  </b-col>
-                </b-row>
+                  </b-input-group-append>
+                </b-input-group>
               </b-td>
             </b-tr>
           </b-tbody>
@@ -116,9 +118,10 @@
       </b-row>
     </b-container>
     <template slot="modal-footer">
-      <b-button v-show="modalType === 'edit-node'" size="sm" variant="danger" @click="$emit('delete-node')">Delete Current Node</b-button>
-      <b-button size="sm" variant="danger" @click="$emit('close-modal')">Cancel</b-button>
-      <b-button size="sm" variant="success" @click="submitNode()">Submit</b-button>
+      <b-button v-show="modalType === 'edit-node'" size="sm" variant="danger" @click="$emit('delete-node')">Delete Node</b-button>
+      <span style="flex-grow:1;"></span>
+      <b-button size="sm" variant="secondary" @click="$emit('close-modal')">Cancel</b-button>
+      <b-button size="sm" variant="primary" @click="submitNode()">Submit</b-button>
     </template>
   </b-modal>
 </template>
