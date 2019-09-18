@@ -26,7 +26,6 @@ export default {
   },
   async mounted() {
     this.TapestryAPI = new TapestryAPI(wpPostId);
-    this.tapestry = await this.TapestryAPI.getTapestry();
 
     // Set up event listeners to communicate with D3 elements
     window.addEventListener('change-root-node', this.changeRootNode)
