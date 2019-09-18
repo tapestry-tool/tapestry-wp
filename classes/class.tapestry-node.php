@@ -163,11 +163,33 @@ class TapestryNode implements ITapestryNode
         return $this->_formNode();
     }
 
+    /**
+     * Delete a node
+     *
+     * @return NULL
+     */
+    public function deleteNode()
+    {
+        if (!$this->nodeMetaId) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+
+        $this->_deleteNodeFromDatabase();
+    }
+
     private function _saveToDatabase()
     {
         $node = $this->_formNode();
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $this->nodePostId);
+        $nodePostId = 0;
+
+        if ($this->nodeMetaId) {
+            $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+            $nodePostId = $nodeMetadata->meta_value->post_id;
+        }
+
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId);
+
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
         if ($this->nodeMetaId) {
@@ -197,6 +219,16 @@ class TapestryNode implements ITapestryNode
 
         $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
         return $this->_formNodeData($nodeData, $nodeMetadata);
+    }
+
+    private function _deleteNodeFromDatabase()
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+        if (empty($nodeMetadata)) {
+            return;
+        }
+        $nodePostId = $nodeMetadata->meta_value->post_id;
+        delete_post_meta($nodePostId, 'tapestry_node_data');
     }
 
     private function _formNode()
