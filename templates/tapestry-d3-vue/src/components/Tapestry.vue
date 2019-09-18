@@ -29,7 +29,6 @@ export default {
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
-    thisTapestryTool.initialize(true);
 
     // Set up event listeners to communicate with D3 elements
     window.addEventListener('change-root-node', this.changeRootNode)
@@ -90,6 +89,9 @@ export default {
         mediaDuration: '',
         imageURL: '',
         unlocked: '',
+        hideTitle: false,
+        hideProgress: false,
+        hideMedia: false,
         permissions: { public: ['read'] },
         description: ''
       };
@@ -141,6 +143,9 @@ export default {
           "mediaHeight": 600
         },
         "unlocked": true,
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
         "fx": Helpers.getBrowserWidth(),
         "fy": Helpers.getBrowserHeight()
       };
@@ -197,6 +202,15 @@ export default {
             break;
           case "unlocked":
             newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
+            break;
+          case "hideTitle":
+            newNodeEntry.hideTitle = fieldValue;
+            break;
+          case "hideProgress":
+            newNodeEntry.hideProgress = fieldValue;
+            break;
+          case "hideMedia":
+            newNodeEntry.hideMedia = fieldValue;
             break;
           case "description":
             newNodeEntry.description = fieldValue;
