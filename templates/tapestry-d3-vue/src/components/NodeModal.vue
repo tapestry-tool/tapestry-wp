@@ -51,11 +51,20 @@
         <h4>Appearance</h4>
       </b-row>
       <b-row>
-        <div>Thumbnail</div>
+        <div>Thumbnail (optional)</div>
         <input placeholder="Enter the URL for the thumbnail" v-model="node.imageURL" />
       </b-row>
       <b-row>
         <b-form-checkbox value="false" unchecked-value="true" v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
       </b-row>
     </b-container>
     <b-container id="modal-permissions">
@@ -182,7 +191,9 @@ export default {
         { name: 'imageURL', value: this.node.imageURL },
         { name: 'unlocked', value: this.node.unlocked },
         { name: 'permissions', value: this.node.permissions },
-        { name: 'description', value: this.node.description },
+        { name: 'hideTitle', value: this.node.hideTitle },
+        { name: 'hideProgress', value: this.node.hideProgress },
+        { name: 'hideMedia', value: this.node.hideMedia }
       ]
     }
   },
