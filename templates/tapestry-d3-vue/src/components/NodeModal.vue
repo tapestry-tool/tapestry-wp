@@ -3,7 +3,7 @@
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
-          <div id="modal-content-details" class="px-3">
+          <div id="modal-content-details">
             <b-form-group label="Title">
               <b-form-input
                 id="node-title"
@@ -61,10 +61,18 @@
                 required
               />
             </b-form-group>
+            <b-form-group label="Embed Link" v-show="node.mediaType === 'url-embed'">
+              <b-form-input
+                id="node-embed-media-duration"
+                placeholder="Enter embed link (starting with http)"
+                v-model="node.typeData.mediaURL"
+                required
+              />
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Appearance">
-          <div id="modal-appearance" class="px-3">
+          <div id="modal-appearance">
             <b-form-group>
               <b-form-checkbox
                 v-model="addThumbnail"
@@ -97,61 +105,59 @@
           </div>
         </b-tab>
         <b-tab title="Permissions">
-          <div id="modal-permissions" class="px-3">
-            <b-row>
-              <b-table-simple class="text-center" striped responsive>
-                <b-thead>
-                  <b-tr>
-                    <b-th></b-th>
-                    <b-th>Read</b-th>
-                    <b-th>Add</b-th>
-                    <b-th>Edit</b-th>
-                    <!--
-                    <b-th>Add Submit</b-th>
-                    <b-th>Edit Submit</b-th>
-                    <b-th>Approve</b-th>
-                    -->
-                  </b-tr>
-                </b-thead>
-                <b-tbody>
-                  <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
-                    <b-th>{{type}}</b-th>
-                    <b-td>
-                      <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    <b-td>
-                      <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    <b-td>
-                      <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    <!--
-                    <b-td>
-                      <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    <b-td>
-                      <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    <b-td>
-                      <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
-                    </b-td>
-                    -->
-                  </b-tr>
-                  <b-tr>
-                    <b-td colspan="4">
-                      <b-input-group>
-                        <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
-                        <b-input-group-append>
-                          <b-button variant="secondary" @click="addUser()">
-                            <span class="fas fa-plus permissions-plus"></span> User
-                          </b-button>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-td>
-                  </b-tr>
-                </b-tbody>
-              </b-table-simple>
-            </b-row>
+          <div id="modal-permissions">
+            <b-table-simple class="text-center" striped responsive>
+              <b-thead>
+                <b-tr>
+                  <b-th></b-th>
+                  <b-th>Read</b-th>
+                  <b-th>Add</b-th>
+                  <b-th>Edit</b-th>
+                  <!--
+                  <b-th>Add Submit</b-th>
+                  <b-th>Edit Submit</b-th>
+                  <b-th>Approve</b-th>
+                  -->
+                </b-tr>
+              </b-thead>
+              <b-tbody>
+                <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
+                  <b-th>{{type}}</b-th>
+                  <b-td>
+                    <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  <b-td>
+                    <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  <b-td>
+                    <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  <!--
+                  <b-td>
+                    <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  <b-td>
+                    <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  <b-td>
+                    <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
+                  </b-td>
+                  -->
+                </b-tr>
+                <b-tr>
+                  <b-td colspan="4">
+                    <b-input-group>
+                      <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
+                      <b-input-group-append>
+                        <b-button variant="secondary" @click="addUser()">
+                          <span class="fas fa-plus permissions-plus"></span> User
+                        </b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
           </div>
         </b-tab>
       </b-tabs>
@@ -178,7 +184,8 @@ export default {
         { value: '', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
-        { value: 'h5p', text: 'H5P' }
+        { value: 'h5p', text: 'H5P' },
+        { value: 'url-embed', text: 'URL Embed' },
       ],
       addThumbnail: true
     }
@@ -278,6 +285,10 @@ table {
   padding: 16px 24px;
 }
 
+.modal-body {
+  padding: 0;
+}
+
 .modal-title {
   font-size: 2rem;
   font-weight: 600;
@@ -291,9 +302,6 @@ table {
   padding: 15px;
   border: none;
   background: #f1f1f1;
-}
-.modal-body {
-  padding: 0;
 }
 
 </style>
