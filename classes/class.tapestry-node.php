@@ -25,6 +25,9 @@ class TapestryNode implements ITapestryNode
     private $description;
     private $coordinates;
     private $permissions;
+    private $hideTitle;
+    private $hideProgress;
+    private $hideMedia;
 
     /**
      * Constructor
@@ -55,6 +58,9 @@ class TapestryNode implements ITapestryNode
             $this->description = $node->description;
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
+            $this->hideTitle = $node->hideTitle;
+            $this->hideProgress = $node->hideProgress;
+            $this->hideMedia = $node->hideMedia;
         } else {
             $this->size = '';
             $this->title = '';
@@ -69,6 +75,9 @@ class TapestryNode implements ITapestryNode
             $this->typeData = (object) [];
             $this->coordinates = (object) [];
             $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+            $this->hideTitle = false;
+            $this->hideProgress = false;
+            $this->hideMedia = false;
         }
     }
 
@@ -130,6 +139,15 @@ class TapestryNode implements ITapestryNode
         if (isset($node->permissions) && is_object($node->permissions)) {
             $this->permissions = $node->permissions;
         }
+        if (isset($node->hideTitle) && is_bool($node->hideTitle)) {
+            $this->hideTitle = $node->hideTitle;
+        }
+        if (isset($node->hideProgress) && is_bool($node->hideProgress)) {
+            $this->hideProgress = $node->hideProgress;
+        }
+        if (isset($node->hideMedia) && is_bool($node->hideMedia)) {
+            $this->hideMedia = $node->hideMedia;
+        }
     }
 
     /**
@@ -145,11 +163,33 @@ class TapestryNode implements ITapestryNode
         return $this->_formNode();
     }
 
+    /**
+     * Delete a node
+     *
+     * @return NULL
+     */
+    public function deleteNode()
+    {
+        if (!$this->nodeMetaId) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+
+        $this->_deleteNodeFromDatabase();
+    }
+
     private function _saveToDatabase()
     {
         $node = $this->_formNode();
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $this->nodePostId);
+        $nodePostId = 0;
+
+        if ($this->nodeMetaId) {
+            $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+            $nodePostId = $nodeMetadata->meta_value->post_id;
+        }
+
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId);
+
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
         if ($this->nodeMetaId) {
@@ -181,6 +221,16 @@ class TapestryNode implements ITapestryNode
         return $this->_formNodeData($nodeData, $nodeMetadata);
     }
 
+    private function _deleteNodeFromDatabase()
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId);
+        if (empty($nodeMetadata)) {
+            return;
+        }
+        $nodePostId = $nodeMetadata->meta_value->post_id;
+        delete_post_meta($nodePostId, 'tapestry_node_data');
+    }
+
     private function _formNode()
     {
         return (object) [
@@ -197,7 +247,10 @@ class TapestryNode implements ITapestryNode
             'description'   => $this->description,
             'typeData'      => $this->typeData,
             'coordinates'   => $this->coordinates,
-            'permissions'   => $this->permissions
+            'permissions'   => $this->permissions,
+            'hideTitle'     => $this->hideTitle,
+            'hideProgress'  => $this->hideProgress,
+            'hideMedia'     => $this->hideMedia
         ];
     }
 

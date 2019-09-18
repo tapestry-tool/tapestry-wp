@@ -147,6 +147,39 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Delete a node
+     *
+     * @param   Object  $nodeId  Tapestry node id
+     *
+     * @return  Object  $Array   Tapestry nodes
+     */
+    public function deleteNodeFromTapestry($nodeId)
+    {
+        // Remove the rootId field
+        if ($nodeId == $this->rootId) {
+            if (count($this->nodes) > 1) {
+                throw new TapestryError('CANNOT_DELETE_ROOT');
+            } else {
+                $this->rootId = 0;
+            }
+        }
+
+        // Delete the element from nodes array
+        foreach ($this->nodes as $elementId => $element) {
+            if ($element == $nodeId) {
+                array_splice($this->nodes, $elementId, 1);
+                // Delete node from database
+                $tapestryNode = new TapestryNode($this->postId, $nodeId);
+                $tapestryNode->deleteNode();
+            }
+        }
+
+        $tapestry = $this->_formTapestry();
+        update_post_meta($this->postId, 'tapestry', $tapestry);
+        return $this->nodes;
+    }
+
+    /**
      * Add a new link
      * 
      * @param  Object   $link   Tapestry link
@@ -158,6 +191,20 @@ class Tapestry implements ITapestry
         array_push($this->links, $link);
         $this->_saveToDatabase();
         return $link;
+    }
+
+    /**
+     * Delete a link from links array
+     * 
+     * @param  Integer $linkIndex Link Index
+     * 
+     * @return Array   $links     Tapestry links
+     */
+    public function removeLink($linkIndex)
+    {
+        array_splice($this->links, $linkIndex, 1);
+        $this->_saveToDatabase();
+        return $this->links;
     }
 
     /**

@@ -1,12 +1,13 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton v-show="!tapestry.rootId && !showNodeModal" @add-root-node="addRootNode" />
+    <RootNodeButton v-show="!tapestry.rootId" @add-root-node="addRootNode" />
     <NodeModal
       :node="populatedNode"
       :modalType="modalType"
       :rootNodeTitle="getCurrentRootNode().title"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
+      @delete-node="deleteNode"
     />
   </div>
 </template>
@@ -29,19 +30,18 @@ export default {
     thisTapestryTool.setDataset(this.tapestry);
     thisTapestryTool.setOriginalDataset(this.tapestry);
     thisTapestryTool.initialize();
-    thisTapestryTool.initialize(true);
 
     // Set up event listeners to communicate with D3 elements
     window.addEventListener('change-root-node', this.changeRootNode)
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
+    window.addEventListener('tapestry-updated', this.tapestryUpdated)
   },
   data() {
     return {
       tapestry: {},
       TapestryAPI: {},
       modalType: '',
-      showNodeModal: false,
       populatedNode: {
         title: '',
         mediaType: '',
@@ -58,14 +58,17 @@ export default {
     }
   },
   computed: {
-      xORfx: function () {
-          return this.tapestry.settings.autoLayout ? 'x' : 'fx';
-      },
-      yORfy: function () {
-          return this.tapestry.settings.autoLayout ? 'y' : 'fy';
-      },
+    xORfx: function () {
+      return this.tapestry.settings.autoLayout ? 'x' : 'fx';
+    },
+    yORfy: function () {
+      return this.tapestry.settings.autoLayout ? 'y' : 'fy';
+    },
   },
   methods: {
+    tapestryUpdated(event) {
+      this.tapestry = event.detail.dataset;
+    },
     getCurrentRootNode() {
       if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
         return this.tapestry.nodes.find(node => {
@@ -74,13 +77,8 @@ export default {
       }
       return {};
     },
-    addRootNode() {
-      this.modalType = 'add-root-node';
-      this.$bvModal.show('node-modal-container');
-    },
-    addNewNode() {
-      this.modalType = 'add-new-node';
-      this.populatedNode = {
+    getEmptyNode() {
+      return {
         title: '',
         mediaType: '',
         typeData: {
@@ -90,15 +88,31 @@ export default {
         mediaDuration: '',
         imageURL: '',
         unlocked: '',
+        hideTitle: false,
+        hideProgress: false,
+        hideMedia: false,
         permissions: { public: ['read'] },
         description: ''
       };
+    },
+    addRootNode() {
+      this.modalType = 'add-root-node';
+      this.populatedNode = this.getEmptyNode();
+      this.$bvModal.show('node-modal-container');
+    },
+    addNewNode() {
+      this.modalType = 'add-new-node';
+      this.populatedNode = this.getEmptyNode();
       this.$bvModal.show('node-modal-container');
     },
     editNode() {
       this.modalType = 'edit-node';
       this.populatedNode = this.getCurrentRootNode();
       this.$bvModal.show('node-modal-container');
+    },
+    deleteNode() {
+      thisTapestryTool.deleteNodeFromTapestry();
+      this.closeModal();
     },
     closeModal() {
       this.modalType = '';
@@ -141,6 +155,9 @@ export default {
           "mediaHeight": 600
         },
         "unlocked": true,
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
         "fx": Helpers.getBrowserWidth(),
         "fy": Helpers.getBrowserHeight()
       };
@@ -148,7 +165,7 @@ export default {
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
         newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
-        newNodeEntry[this.yOrfy]= this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
         newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
@@ -165,7 +182,7 @@ export default {
             newNodeEntry[fieldName] = fieldValue;
             break;
           case "imageURL":
-            newNodeEntry[fieldName] = fieldValue;
+            newNodeEntry[fieldName] = fieldValue || "";
             break;
           case "mediaType":
             if (fieldValue === "text") {
@@ -200,6 +217,15 @@ export default {
             break;
           case "unlocked":
             newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
+            break;
+          case "hideTitle":
+            newNodeEntry.hideTitle = fieldValue;
+            break;
+          case "hideProgress":
+            newNodeEntry.hideProgress = fieldValue;
+            break;
+          case "hideMedia":
+            newNodeEntry.hideMedia = fieldValue;
             break;
           case "description":
             newNodeEntry.description = fieldValue;
@@ -250,10 +276,9 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.redraw(isRoot);
+      thisTapestryTool.initialize(true);
 
-      this.modalType = '';
-      this.$bvModal.hide('node-modal-container');
+      this.closeModal();
     }
   }
 }
