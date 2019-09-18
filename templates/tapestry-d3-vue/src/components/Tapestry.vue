@@ -170,11 +170,11 @@ export default {
           case "mediaType":
             if (fieldValue === "text") {
               newNodeEntry["mediaType"] = "text";
-            } 
+            }
             else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "mp4";
-            } 
+            }
             else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "h5p";
