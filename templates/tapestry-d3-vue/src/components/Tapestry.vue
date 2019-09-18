@@ -170,7 +170,7 @@ export default {
             newNodeEntry[fieldName] = fieldValue;
             break;
           case "imageURL":
-            newNodeEntry[fieldName] = fieldValue;
+            newNodeEntry[fieldName] = fieldValue || "";
             break;
           case "mediaType":
             if (fieldValue === "text") {

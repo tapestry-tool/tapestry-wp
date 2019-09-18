@@ -51,8 +51,8 @@
         <h4>Appearance</h4>
       </b-row>
       <b-row>
-        <div>Thumbnail</div>
-        <input placeholder="Enter the URL for the thumbnail" required v-model="node.imageURL" />
+        <div>Thumbnail (optional)</div>
+        <input placeholder="Enter the URL for the thumbnail" v-model="node.imageURL" />
       </b-row>
       <b-row>
         <b-form-checkbox value="false" unchecked-value="true" v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
