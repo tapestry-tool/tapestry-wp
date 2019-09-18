@@ -1,130 +1,160 @@
 <template>
-  <b-modal id="node-modal-container" size="lg" scrollable>
-    <div class="d-block text-center" slot="modal-title">
-      <h3>
-        <strong>{{ modalTitle }}</strong>
-      </h3>
-    </div>
-    <b-container id="modal-content-details">
-      <b-row>
-        <h4>Content Details</h4>
-      </b-row>
-      <b-row>
-        <div>Title</div>
-        <input placeholder="Enter title" v-model="node.title" required />
-      </b-row>
-      <b-row>
-        <div>Description</div>
-        <textarea placeholder="Enter description" v-model="node.description"></textarea>
-      </b-row>
-      <b-row>
-        <div>Content Type</div>
-        <b-form-select v-model="node.mediaType" :options="mediaTypes"></b-form-select>
-      </b-row>
-      <b-row v-show="node.mediaType === 'text'">
-        <div>Text content</div>
-        <textarea
-          id="tapestry-node-text-area"
-          placeholder="Enter text here"
-          v-model="node.typeData.textContent"
-        ></textarea>
-      </b-row>
-      <b-row v-show="node.mediaType === 'video'">
-        <div>Video URL</div>
-        <input placeholder="Enter URL for MP4 Video" v-model="node.typeData.mediaURL" required />
-      </b-row>
-      <b-row v-show="node.mediaType === 'video'">
-        <div>Video Duration</div>
-        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
-      </b-row>
-      <b-row v-show="node.mediaType === 'h5p'">
-        <div>H5P Embed Link</div>
-        <input placeholder="Enter H5P Embed Link" v-model="node.typeData.mediaURL" required />
-      </b-row>
-      <b-row v-show="node.mediaType === 'h5p'">
-        <div>H5P Video Duration (only if video)</div>
-        <input placeholder="Enter duration (in seconds)" v-model="node.mediaDuration" required />
-      </b-row>
-    </b-container>
-    <b-container id="modal-appearance">
-      <b-row>
-        <h4>Appearance</h4>
-      </b-row>
-      <b-row>
-        <div>Thumbnail (optional)</div>
-        <input placeholder="Enter the URL for the thumbnail" v-model="node.imageURL" />
-      </b-row>
-      <b-row>
-        <b-form-checkbox value="false" unchecked-value="true" v-model="node.unlocked">Hide node until parent node is viewed</b-form-checkbox>
-      </b-row>
-      <b-row>
-        <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
-      </b-row>
-      <b-row>
-        <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
-      </b-row>
-      <b-row>
-        <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
-      </b-row>
-    </b-container>
-    <b-container id="modal-permissions">
-      <b-row>
-        <h4>Permissions</h4>
-      </b-row>
-      <b-row>
-        <b-table-simple class="text-center" striped responsive>
-          <b-thead>
-            <b-tr>
-              <b-th></b-th>
-              <b-th>Read</b-th>
-              <b-th>Add</b-th>
-              <b-th>Edit</b-th>
-              <!--
-              <b-th>Add Submit</b-th>
-              <b-th>Edit Submit</b-th>
-              <b-th>Approve</b-th>
-              -->
-            </b-tr>
-          </b-thead>
-          <b-tbody>
-            <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
-              <b-th>{{type}}</b-th>
-              <b-td>
-                <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              <b-td>
-                <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              <b-td>
-                <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              <!--
-              <b-td>
-                <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              <b-td>
-                <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              <b-td>
-                <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
-              </b-td>
-              -->
-            </b-tr>
-            <b-tr>
-              <b-td colspan="4">
-                <b-input-group>
-                  <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
-                  <b-input-group-append>
-                    <b-button variant="secondary" @click="addUser()">
-                      <span class="fas fa-plus permissions-plus"></span> User
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </b-td>
-            </b-tr>
-          </b-tbody>
-        </b-table-simple>
-      </b-row>
+  <b-modal id="node-modal-container" size="lg" class="text-muted" scrollable :title="modalTitle">
+    <b-container fluid class="px-0">
+      <b-tabs card>
+        <b-tab title="Content" active>
+          <div id="modal-content-details" class="px-3">
+            <b-form-group label="Title">
+              <b-form-input
+                id="node-title"
+                placeholder="Enter title"
+                v-model="node.title"
+                required
+              />
+            </b-form-group>
+            <b-form-group label="Description">
+              <b-form-textarea
+                id="node-description"
+                placeholder="Enter description"
+                v-model="node.description"
+              ></b-form-textarea>
+            </b-form-group>
+            <b-form-group label="Content Type">
+              <b-form-select id="node-media-type" v-model="node.mediaType" :options="mediaTypes"></b-form-select>
+            </b-form-group>
+            <b-form-group label="Text content" v-show="node.mediaType === 'text'">
+              <b-form-textarea
+                id="node-text-content"
+                placeholder="Enter text here"
+                v-model="node.typeData.textContent"
+              ></b-form-textarea>
+            </b-form-group>
+            <b-form-group label="Video URL" v-show="node.mediaType === 'video'">
+              <b-form-input
+                id="node-video-media-url"
+                placeholder="Enter URL for MP4 Video"
+                v-model="node.typeData.mediaURL"
+                required
+              />
+            </b-form-group>
+            <b-form-group label="Video Duration" v-show="node.mediaType === 'video'">
+              <b-form-input
+                id="node-video-media-duration"
+                placeholder="Enter duration (in seconds)"
+                v-model="node.mediaDuration"
+                required
+              />
+            </b-form-group>
+            <b-form-group label="H5P Embed Link" v-show="node.mediaType === 'h5p'">
+              <b-form-input
+                id="node-h5p-media-url"
+                placeholder="Enter H5P Embed Link"
+                v-model="node.typeData.mediaURL"
+                required
+              />
+            </b-form-group>
+            <b-form-group label="H5P Video Duration" description="This only applies to video H5P content" v-show="node.mediaType === 'h5p'">
+              <b-form-input
+                id="node-h5p-media-duration"
+                placeholder="Enter duration (in seconds)"
+                v-model="node.mediaDuration"
+                required
+              />
+            </b-form-group>
+          </div>
+        </b-tab>
+        <b-tab title="Appearance">
+          <div id="modal-appearance" class="px-3">
+            <b-form-group>
+              <b-form-checkbox
+                v-model="addThumbnail"
+              >Add a thumbnail</b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="addThumbnail">
+              <b-form-input
+                id="node-image-url"
+                placeholder="Enter the URL for the thumbnail"
+                required
+                v-model="node.imageURL"
+              />
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                value="false"
+                unchecked-value="true"
+                v-model="node.unlocked"
+              >Hide node until parent node is viewed</b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
+            </b-form-group>
+          </div>
+        </b-tab>
+        <b-tab title="Permissions">
+          <div id="modal-permissions" class="px-3">
+            <b-row>
+              <b-table-simple class="text-center" striped responsive>
+                <b-thead>
+                  <b-tr>
+                    <b-th></b-th>
+                    <b-th>Read</b-th>
+                    <b-th>Add</b-th>
+                    <b-th>Edit</b-th>
+                    <!--
+                    <b-th>Add Submit</b-th>
+                    <b-th>Edit Submit</b-th>
+                    <b-th>Approve</b-th>
+                    -->
+                  </b-tr>
+                </b-thead>
+                <b-tbody>
+                  <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
+                    <b-th>{{type}}</b-th>
+                    <b-td>
+                      <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    <b-td>
+                      <b-form-checkbox value="add" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    <b-td>
+                      <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    <!--
+                    <b-td>
+                      <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    <b-td>
+                      <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    <b-td>
+                      <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
+                    </b-td>
+                    -->
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="4">
+                      <b-input-group>
+                        <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
+                        <b-input-group-append>
+                          <b-button variant="secondary" @click="addUser()">
+                            <span class="fas fa-plus permissions-plus"></span> User
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-td>
+                  </b-tr>
+                </b-tbody>
+              </b-table-simple>
+            </b-row>
+          </div>
+        </b-tab>
+      </b-tabs>
     </b-container>
     <template slot="modal-footer">
       <b-button v-show="modalType === 'edit-node'" size="sm" variant="danger" @click="$emit('delete-node')">Delete Node</b-button>
@@ -149,7 +179,8 @@ export default {
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' }
-      ]
+      ],
+      addThumbnail: true
     }
   },
   props: {
@@ -188,14 +219,14 @@ export default {
         { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
         { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
         { name: 'mediaDuration', value: this.node.mediaDuration },
-        { name: 'imageURL', value: this.node.imageURL },
+        { name: 'imageURL', value: this.addThumbnail ? this.node.imageURL : '' },
         { name: 'unlocked', value: this.node.unlocked },
         { name: 'permissions', value: this.node.permissions },
         { name: 'hideTitle', value: this.node.hideTitle },
         { name: 'hideProgress', value: this.node.hideProgress },
         { name: 'hideMedia', value: this.node.hideMedia }
       ]
-    }
+    },
   },
   methods: {
     getCurrentRootNode() {
@@ -229,39 +260,41 @@ export default {
 }
 </script>
 
-<style scoped>
-#createNewNodeModalBody {
-  text-align: left;
-}
-
-#modal-content-details > div:nth-child(4) {
-  margin-bottom: 20px;
-}
-
-#modal-content-details,
-#modal-appearance,
-#modal-permissions {
-  padding: 20px;
-  /* border-bottom: 1px solid #ddd; */
-}
-
-#modal-content-details input,
-#modal-content-details textarea,
-#modal-appearance input,
-#modal-appearance textarea {
-  padding: 15px;
-  margin: 5px 0 22px 0;
-  border: none;
-  background: #f1f1f1;
-  width: 100%;
-}
-</style>
-
 <style>
+
 /* Use non-scoped styles to overwrite WP theme styles */
 table th,
 table td {
   word-break: unset;
+  border: none;
 }
+
+table {
+  border: 1px solid #dee2e6;
+}
+
+/* overwrite bootstrap styles */
+.modal-header {
+  padding: 16px 24px;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+</style>
+
+<style scoped>
+
+.form-control {
+  padding: 15px;
+  border: none;
+  background: #f1f1f1;
+}
+.modal-body {
+  padding: 0;
+}
+
 </style>
 
