@@ -186,7 +186,8 @@ export default {
         { value: '', text: 'Select content type' },
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
-        { value: 'h5p', text: 'H5P' }
+        { value: 'h5p', text: 'H5P' },
+        { value: 'url-embed', text: 'URL Embed' },
       ],
       addThumbnail: true
     }
