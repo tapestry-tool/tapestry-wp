@@ -79,10 +79,10 @@
     </b-container>
     <b-container id="modal-appearance" class="modal-section">
       <b-row>
-        <h4 class="modal-section-title">Appearance</h4>
+        <h4 class="modal-section-title">Appearance options</h4>
       </b-row>
       <b-row>
-        <label for="node-image-url">Thumbnail</label>
+        <label for="node-image-url">Thumbnail (optional)</label>
         <input
           id="node-image-url"
           class="modal-form-text-input"
@@ -98,6 +98,15 @@
           v-model="node.unlocked"
         >Hide node until parent node is viewed</b-form-checkbox>
       </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
+      </b-row>
+      <b-row>
+        <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
+      </b-row>
     </b-container>
     <b-container id="modal-permissions" class="modal-section">
       <b-row>
@@ -111,14 +120,16 @@
               <b-th>Read</b-th>
               <b-th>Add</b-th>
               <b-th>Edit</b-th>
+              <!--
               <b-th>Add Submit</b-th>
               <b-th>Edit Submit</b-th>
               <b-th>Approve</b-th>
+              -->
             </b-tr>
           </b-thead>
           <b-tbody>
             <b-tr v-for="(value, type) in node.permissions" :key="type" :value="value">
-              <b-td>{{type}}</b-td>
+              <b-th>{{type}}</b-th>
               <b-td>
                 <b-form-checkbox value="read" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
@@ -128,6 +139,7 @@
               <b-td>
                 <b-form-checkbox value="edit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
+              <!--
               <b-td>
                 <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
@@ -137,19 +149,18 @@
               <b-td>
                 <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
               </b-td>
+              -->
             </b-tr>
             <b-tr>
-              <b-td colspan="7">
-                <b-row>
-                  <b-col cols="3">
-                    <b-form-input v-model="userId" placeholder="123"></b-form-input>
-                  </b-col>
-                  <b-col cols="3">
-                    <b-button variant="primary" @click="addUser()">
+              <b-td colspan="4">
+                <b-input-group>
+                  <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
+                  <b-input-group-append>
+                    <b-button variant="secondary" @click="addUser()">
                       <span class="fas fa-plus permissions-plus"></span> User
                     </b-button>
-                  </b-col>
-                </b-row>
+                  </b-input-group-append>
+                </b-input-group>
               </b-td>
             </b-tr>
           </b-tbody>
@@ -157,8 +168,10 @@
       </b-row>
     </b-container>
     <template slot="modal-footer">
-      <b-button size="sm" variant="danger" @click="$emit('close-modal')">Cancel</b-button>
-      <b-button size="sm" variant="success" @click="submitNode()">Submit</b-button>
+      <b-button v-show="modalType === 'edit-node'" size="sm" variant="danger" @click="$emit('delete-node')">Delete Node</b-button>
+      <span style="flex-grow:1;"></span>
+      <b-button size="sm" variant="secondary" @click="$emit('close-modal')">Cancel</b-button>
+      <b-button size="sm" variant="primary" @click="submitNode()">Submit</b-button>
     </template>
   </b-modal>
 </template>
@@ -219,7 +232,9 @@ export default {
         { name: 'imageURL', value: this.node.imageURL },
         { name: 'unlocked', value: this.node.unlocked },
         { name: 'permissions', value: this.node.permissions },
-        { name: 'description', value: this.node.description },
+        { name: 'hideTitle', value: this.node.hideTitle },
+        { name: 'hideProgress', value: this.node.hideProgress },
+        { name: 'hideMedia', value: this.node.hideMedia }
       ]
     }
   },
