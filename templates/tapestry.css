@@ -1,0 +1,674 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#header {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+}
+
+#header h1 {
+    background: url(./logo.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top left;
+    min-height: 100px;
+    direction: rtl;
+    text-indent: -9999em;
+    min-width: 150px;
+    float: left;
+    margin: 0;
+}
+
+#header h2 {
+    color: #6e8795;
+    vertical-align: middle;
+    display: inline-block;
+    padding-left: 33px;
+    padding-top: 33px;
+    margin: 0;
+}
+#header div, p {
+    vertical-align: middle;
+    padding-left: 50px;
+    display: inline-block;
+}
+
+@media (max-width: 670px) {
+  #header h2 {
+      font-size: 1.1em;
+      padding-top: 38px;
+      padding-left: 1em;
+  }
+}
+
+@media (max-width: 400px) {
+  #header h1 {
+      min-width: 120px;
+  }
+  #header h2 {
+    font-size: 0.8em;
+  }
+}
+
+#tapestry-svg > g {
+    transform: translate(-8.5px, 0);
+}
+
+/* Tapestry Controls */
+
+#tapestry-controls-wrapper {
+    margin: 40px 10% 20px;
+    padding: 10px;
+    float: right;
+    width: auto;
+	background: #fbfbfb;
+    box-shadow: 0 0 7px 0 #DDD;
+    display: flex;
+    align-items: center;
+}
+@media (min-width:1000px) {
+	#tapestry-controls-wrapper {
+		position: absolute;
+		margin-top: -30px;
+		right: 0;
+	}
+}
+#tapestry-controls-wrapper > * {
+    float: left;
+}
+
+/* depth slider */
+
+#tapestry-depth-slider {
+    margin-top: 6px;
+    outline: none;
+    background: #d3d3d3;
+    height: 10px;
+    opacity: 0.8;
+    transition: opacity .2s;
+    position: relative;
+    margin: 0 32px;
+}
+
+#tapestry-depth-slider::before,
+#tapestry-depth-slider::after {
+    position: absolute;
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-image: url("img/zoom-in.png");
+    background-size: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid #dfdfdf;
+    border-radius: 50%;
+    left: -30px;
+    bottom: -9px;
+}
+
+#tapestry-depth-slider::after {
+    background-image: url("img/zoom-out.png");
+    left: initial;
+    right: -30px;
+}
+
+#tapestry-depth-slider {
+    -webkit-appearance: none;
+}
+
+#tapestry-depth-slider-wrapper {
+    padding-right: 10px;
+    border-right: 1px solid #a1a1a1;
+}
+
+/* webkit support */
+#tapestry-depth-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background: #ed7565;
+    cursor: pointer;
+}
+
+/* mozilla support */
+#tapestry-depth-slider::-moz-range-thumb {
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background: #ed7565;
+}
+
+/* internet explorer support */
+#tapestry-depth-slider::-ms-thumb {
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background: #ed7565;
+}
+
+#tapestry-depth-slider:hover {
+    opacity: 1
+}
+
+#tapestry-depth-slider {
+    align-items: center;
+}
+
+#tapestry-depth-slider-wrapper label {
+    display: none;
+}
+
+#tapestry-view-locked-checkbox-wrapper {
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+#tapestry-view-locked-checkbox-wrapper label {
+    margin-bottom: 0;
+    margin-left: 8px;
+}
+
+#footer {
+    width: 100%;
+    font-size: 0.7em;
+    color: #666;
+    text-align:center;
+}
+
+#spotlight-content {
+    position: absolute;
+    top: 5vh;
+    left: 5vw;
+    height: 90vh;
+    width: 90vw;
+    z-index: 100;
+    background-position: 0 0;
+    background-size: cover;
+    background-color: black;
+    opacity: 1;
+    transition: all 1s;
+    transition-timing-function: ease-in;
+    box-shadow: 0 0 100px -40px #000;
+    border-radius: 15px;
+}
+
+#spotlight-content[data-view-mode=true] {
+    box-shadow: none;
+    border-color: #999;
+}
+
+#spotlight-content[data-media-type=text] {
+    outline: none;
+    background: #eee;
+    color: #333;
+    padding: 1em;
+}
+
+#spotlight-content[data-media-type=text] .media-wrapper {
+    overflow: scroll;
+}
+
+#spotlight-content > * {
+    background: #000;
+    outline: none;
+}
+
+#spotlight-content[data-media-format=mp4] > * {
+    width: 100%;
+    height: auto;
+}
+
+.media-wrapper {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#spotlight-content[data-media-format=mp4] .media-wrapper > * {
+    width: 100%;
+    height: auto;
+}
+
+#spotlight-content[data-media-type=text]  > * {
+    background: transparent;
+}
+
+#spotlight-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Text Node Styling */
+#text-light-box-title > h3 {
+    margin: 1em 0 1em 15px;
+}
+
+#text-light-box-title > p {
+    font-size: 42px;
+    margin: 0.4em 0 0;
+    padding-left: 0.4em;
+}
+
+#text-light-box-paragraph {
+    font: 14px/1.7 "Source Sans Pro", sans-serif;
+    font-size: 16px;
+    color: #47425d;
+}
+
+#text-light-box-paragraph-text {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.progress-meter .background {
+    fill: #333333;
+}
+
+.progress-meter .foreground {
+    fill: #11a6d8;
+}
+
+.node .meta {
+    color: white;
+    min-height: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+    text-align: center;
+    font-size: 30px;
+    text-shadow: 1.5px 1.5px #333333;
+}
+.node .title {
+    padding-left: 0;
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+.node .timecode {
+    font-size: 20px;
+    padding-left: 0;
+    margin: 0;
+}
+
+.imageOverlay {
+    opacity: 0.5;
+}
+.imageOverlay--no-image {
+    opacity: 1;
+}
+
+.node .expandGrandchildren {
+    fill: #999;
+}
+
+.node:hover .expandGrandchildren {
+    transform: scale(1.2);
+}
+
+.node:hover .imageOverlay {
+    opacity: 0;
+}
+
+.node:hover text {
+    display: none;
+}
+
+.links line {
+    stroke-opacity: 5;
+}
+
+.link-lines{
+    cursor: pointer;
+}
+
+/* MEDIA BUTTON */
+
+.mediaButton {
+    transition: all 0.25s ease;
+    cursor: pointer;
+    color: #fff;
+    overflow: hidden;
+    background: #666;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    width: 55px;
+    height: 55px;
+    font-size: 32px;
+}
+
+.mediaButtonIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.mediaButton:hover,
+.mediaButton:active {
+    transform: scale(1.15) translate(0, 21px);
+    background: #11a6d8;
+}
+
+.mediaButtonIcon.fa-play:before {
+    font-size: 0.9em;
+    padding-left: 0.2em;
+}
+
+.mediaButton > i[data-media-type="text"]:not(.mediaButtonLoading) {
+    background: #666;
+    color: #fff;
+    font-size: 35px;
+    padding: 12px;
+}
+.mediaButton:hover > i[data-media-type="text"]:not(.mediaButtonLoading) {
+    background: #11a6d8;
+}
+
+.mediaButtonLoading {
+    color: transparent;
+    background-image: url(https://beta.tapestry-tool.com/wp-content/uploads/2018/11/loading-eclipse.svg);
+    background-color: #666;
+    border-radius: 100%;
+    margin: 2% 2% 2% 3%;
+    width: 94%;
+    height: 94%;
+    background-size: 98%;
+    box-shadow: 0 0 0 2px #666 inset;
+}
+
+/* ADD + EDIT NODE BUTTONS */
+.editNodeButton:hover,
+.editNodeButton:active,
+.addNodeButton:hover,
+.addNodeButton:active {
+    transform: scale(1.15) translate(0, -21px);
+}
+
+.lightbox {
+    background-color: rgba(0, 0, 0, 0.8);
+    overflow: scroll;
+    position: fixed;
+    display: none;
+    opacity: 0;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    transition: all 1s !important;
+}
+
+.lightbox-container {
+    position: relative;
+    max-width: 960px;
+    margin: 7% auto;
+    display: block;
+    height: auto;
+    z-index: 10;
+}
+
+@media screen and (max-width: 768px) {
+    .lightbox-container {
+        margin-top: 10%;
+    }
+}
+
+@media screen and (max-width: 414px) {
+    .lightbox-container {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        margin-top: 13%;
+    }
+}
+
+.lightbox-content {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+#lightbox-close-wrapper {
+    width: auto;
+    display: flex;
+    justify-content: flex-end;
+    background: none;
+    border: none;
+    outline: none;
+    position: absolute;
+    top: -37px;
+    right: -42px;
+}
+
+.lightbox-close {
+    background: #666;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
+    transition: all 0.25s ease;
+    border: solid 2px #fff;
+}
+
+.lightbox-close:hover {
+    transform: scale(1.15);
+    background: #11a6d8;
+}
+
+.lightbox-close i {
+    background: none;
+}
+
+#instructions-wrapper {
+    max-width: 430px;
+    border: solid 1px #CCC;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 8px;
+    text-align:center; 
+    color: #666; 
+    margin: 0 auto 1em; 
+    float: none;
+    font-size: 0.8em;
+}
+
+@media (min-width:800px) {
+    #instructions-wrapper {
+        max-width: 230px;
+        position: absolute;
+        top: 45px;
+        right: 10px;
+    }
+}
+
+@media (min-width:1000px) {
+    #instructions-wrapper {
+        max-width: 430px;
+        right: 45px;
+    }
+}
+
+/* Add new node form */
+
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* The popup form - hidden by default */
+.form-popup {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 15px;
+    border: 3px solid #f1f1f1;
+    z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+    padding: 3%;
+    background-color: white;
+    margin: 0 auto;
+}
+
+/* Full-width input fields */
+.form-container input[type=text],
+.form-container input[type=url], 
+.form-container input[type=file] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #f1f1f1;
+}
+
+/* Full-width input fields */
+.form-container textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0 22px 0;
+    background: #f1f1f1;
+}
+
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+}
+
+/* Set a style for the submit/login button */
+.form-container .btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+#submit-add-new-node, #submit-add-root-node {
+    color: white;
+}
+
+#cancel-add-new-node, #tapestry-delete-node {
+    color: white;
+    background-color: #dc3545;
+}
+
+#add-node-error-msg {
+    color: #dc3545;
+    font-size: 15px;
+    margin-left: 4%;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+    opacity: 1;
+}
+
+.dropdown #mediaType {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    width: 50%;
+    height: 30px;
+}
+
+.dropdown #mediaFormat {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    width: 50%;
+    height: 30px;
+}
+
+#root-node-container {
+    padding-top: 40px;
+}
+/* Root Node button */
+#root-node-btn {
+    margin-top: 20vh;
+    text-align: center;
+    cursor: pointer;
+}
+
+#root-node-label {
+    text-align: center; 
+    font-size: 1.5em;
+    padding-top: 10px;
+}
+
+#root-node-btn:hover,
+#root-node-btn:active {
+    transform: scale(1.1);
+    color: #11a6d8;
+}
+
+.lightbox-form-section {
+    border-top: solid 1px #DDD;
+    margin: 20px -32px;
+    padding: 5px 32px;
+}
+
+.lightbox-form-section > h4 {
+    margin: 2rem 0;
+}
+
+#contents-details {
+    margin-top: 1rem;
+}
+
+/* Permissions Labels */
+
+#permissions-details > table td {
+    border-color: #ddd;
+    background: #eee;
+}
+#permissions-details > table th {
+    border-color: #eee;
+    background: #fafafa;
+}
+#permissions-details > table tfoot td {
+    background: #ddd;
+}
+#permissions-details input#user-number-input {
+    width: 70px;
+}
+#user-permissions-btn, 
+#group-permissions-btn {
+    padding: 4px 1rem;
+    color: white;
+}
+
+.permissions-plus {
+    margin-right: 4px;
+}
+
+input[type="checkbox"][disabled] {
+    cursor: not-allowed;
+}
+
+#mediaFormat[disabled], #mediaType[disabled]{
+    cursor: not-allowed;
+}
+
+#locked-container {
+    margin-bottom: 10px;
+}

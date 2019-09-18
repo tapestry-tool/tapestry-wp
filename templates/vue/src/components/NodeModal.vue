@@ -282,7 +282,10 @@ table {
 
 /* overwrite bootstrap styles */
 .modal-header {
-  padding: 16px 24px;
+  background: #f7f7f7;
+  border: none;
+  padding-bottom: 0;
+  margin-left: 5px;
 }
 
 .modal-body {
@@ -290,7 +293,7 @@ table {
 }
 
 .modal-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
