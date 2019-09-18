@@ -4,112 +4,96 @@
       <b-tabs card>
         <b-tab title="Content" active>
           <div id="modal-content-details" class="px-3">
-            <b-row>
-              <label for="node-title">Title</label>
-              <input
+            <b-form-group label="Title">
+              <b-form-input
                 id="node-title"
-                class="modal-form-text-input"
                 placeholder="Enter title"
                 v-model="node.title"
                 required
               />
-            </b-row>
-            <b-row class="mt-2">
-              <label for="node-description">Description</label>
-              <textarea
+            </b-form-group>
+            <b-form-group label="Description">
+              <b-form-textarea
                 id="node-description"
-                class="modal-form-text-input"
                 placeholder="Enter description"
                 v-model="node.description"
-              ></textarea>
-            </b-row>
-            <b-row class="mt-2">
-              <label for="node-media-type">Content Type</label>
+              ></b-form-textarea>
+            </b-form-group>
+            <b-form-group label="Content Type">
               <b-form-select id="node-media-type" v-model="node.mediaType" :options="mediaTypes"></b-form-select>
-            </b-row>
-            <b-row class="mt-2" v-show="node.mediaType === 'text'">
-              <label for="node-text-content">Text content</label>
-              <textarea
+            </b-form-group>
+            <b-form-group label="Text content" v-show="node.mediaType === 'text'">
+              <b-form-textarea
                 id="node-text-content"
-                class="modal-form-text-input"
                 placeholder="Enter text here"
                 v-model="node.typeData.textContent"
-              ></textarea>
-            </b-row>
-            <b-row class="mt-2" v-show="node.mediaType === 'video'">
-              <label for="node-video-media-url">Video URL</label>
-              <input
+              ></b-form-textarea>
+            </b-form-group>
+            <b-form-group label="Video URL" v-show="node.mediaType === 'video'">
+              <b-form-input
                 id="node-video-media-url"
-                class="modal-form-text-input"
                 placeholder="Enter URL for MP4 Video"
                 v-model="node.typeData.mediaURL"
                 required
               />
-            </b-row>
-            <b-row class="mt-2" v-show="node.mediaType === 'video'">
-              <label for="node-video-media-duration">Video Duration</label>
-              <input
+            </b-form-group>
+            <b-form-group label="Video Duration" v-show="node.mediaType === 'video'">
+              <b-form-input
                 id="node-video-media-duration"
-                class="modal-form-text-input"
                 placeholder="Enter duration (in seconds)"
                 v-model="node.mediaDuration"
                 required
               />
-            </b-row>
-            <b-row class="mt-2" v-show="node.mediaType === 'h5p'">
-              <label for="node-h5p-media-url">H5P Embed Link</label>
-              <input
+            </b-form-group>
+            <b-form-group label="H5P Embed Link" v-show="node.mediaType === 'h5p'">
+              <b-form-input
                 id="node-h5p-media-url"
-                class="modal-form-text-input"
                 placeholder="Enter H5P Embed Link"
                 v-model="node.typeData.mediaURL"
                 required
               />
-            </b-row>
-            <b-row class="mt-2" v-show="node.mediaType === 'h5p'">
-              <label for="node-h5p-media-duration">H5P Video Duration (only if video)</label>
-              <input
+            </b-form-group>
+            <b-form-group label="H5P Video Duration" description="This only applies to video H5P content" v-show="node.mediaType === 'h5p'">
+              <b-form-input
                 id="node-h5p-media-duration"
-                class="modal-form-text-input"
                 placeholder="Enter duration (in seconds)"
                 v-model="node.mediaDuration"
                 required
               />
-            </b-row>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Appearance">
           <div id="modal-appearance" class="px-3">
-            <b-row>
+            <b-form-group>
               <b-form-checkbox
                 v-model="addThumbnail"
               >Add a thumbnail</b-form-checkbox>
-            </b-row>
-            <b-row class="mt-2" v-if="addThumbnail">
-              <input
+            </b-form-group>
+            <b-form-group v-if="addThumbnail">
+              <b-form-input
                 id="node-image-url"
-                class="modal-form-text-input"
                 placeholder="Enter the URL for the thumbnail"
                 required
                 v-model="node.imageURL"
               />
-            </b-row>
-            <b-row>
+            </b-form-group>
+            <b-form-group>
               <b-form-checkbox
                 value="false"
                 unchecked-value="true"
                 v-model="node.unlocked"
               >Hide node until parent node is viewed</b-form-checkbox>
-            </b-row>
-            <b-row>
+            </b-form-group>
+            <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
-            </b-row>
-            <b-row>
+            </b-form-group>
+            <b-form-group>
               <b-form-checkbox v-model="node.hideProgress">Hide progress bar</b-form-checkbox>
-            </b-row>
-            <b-row>
+            </b-form-group>
+            <b-form-group>
               <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
-            </b-row>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Permissions">
@@ -277,6 +261,7 @@ export default {
 </script>
 
 <style>
+
 /* Use non-scoped styles to overwrite WP theme styles */
 table th,
 table td {
@@ -298,39 +283,18 @@ table {
   font-weight: 600;
 }
 
-.modal-body {
-  padding: 0;
-}
 </style>
 
 <style scoped>
-.modal-section {
-  margin-bottom: 20px;
-}
 
-.modal-section:last-child {
-  margin-bottom: 0;
-}
-
-.modal-section > * {
-  margin-bottom: 16px;
-}
-
-.modal-section-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin-bottom: 0;
-}
-
-.modal-form-text-input {
+.form-control {
   padding: 15px;
   border: none;
   background: #f1f1f1;
-  width: 100%;
+}
+.modal-body {
+  padding: 0;
 }
 
-#createNewNodeModalBody {
-  text-align: left;
-}
 </style>
 
