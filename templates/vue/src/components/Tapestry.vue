@@ -1,6 +1,12 @@
 <template>
   <div id="tapestry">
-    <RootNodeButton v-show="!tapestry.rootId" @add-root-node="addRootNode" />
+    <div class="d-flex justify-content-center mb-3" style="padding: 30vh 0;" v-if="!tapestryLoaded">
+      <label>Rendering Tapstry </label>
+      <b-spinner type="grow" variant="secondary" small style="margin: 5px 5px 5px 20px;"></b-spinner>
+      <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
+      <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
+    </div>
+    <RootNodeButton v-show="tapestryLoaded && !tapestry.rootId" @add-root-node="addRootNode" />
     <NodeModal
       :node="populatedNode"
       :modalType="modalType"
@@ -37,6 +43,7 @@ export default {
     return {
       tapestry: {},
       TapestryAPI: {},
+      tapestryLoaded: false,
       modalType: '',
       populatedNode: {
         title: '',
@@ -64,6 +71,7 @@ export default {
   methods: {
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset;
+      this.tapestryLoaded = true
     },
     getCurrentRootNode() {
       if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
