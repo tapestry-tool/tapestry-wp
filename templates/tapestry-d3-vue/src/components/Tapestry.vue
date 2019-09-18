@@ -165,7 +165,7 @@ export default {
             newNodeEntry[fieldName] = fieldValue;
             break;
           case "imageURL":
-            newNodeEntry[fieldName] = fieldValue;
+            newNodeEntry[fieldName] = fieldValue || "";
             break;
           case "mediaType":
             if (fieldValue === "text") {
@@ -247,7 +247,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.redraw(isRoot);
+      thisTapestryTool.initialize(true);
 
       this.modalType = '';
       this.$bvModal.hide('node-modal-container');
