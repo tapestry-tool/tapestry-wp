@@ -57,12 +57,12 @@ export default {
     }
   },
   computed: {
-    xORfx: function () {
-      return this.tapestry.settings.autoLayout ? 'x' : 'fx';
-    },
-    yORfy: function () {
-      return this.tapestry.settings.autoLayout ? 'y' : 'fy';
-    },
+      xORfx: function () {
+          return this.tapestry.settings.autoLayout ? 'x' : 'fx';
+      },
+      yORfy: function () {
+          return this.tapestry.settings.autoLayout ? 'y' : 'fy';
+      },
   },
   methods: {
     getCurrentRootNode() {
@@ -153,7 +153,7 @@ export default {
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
         newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
-        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry[this.yOrfy]= this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
         newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
