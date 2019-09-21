@@ -58,9 +58,21 @@ class TapestryNode implements ITapestryNode
             $this->description = $node->description;
             $this->coordinates = $node->coordinates;
             $this->permissions = $node->permissions;
-            $this->hideTitle = $node->hideTitle;
-            $this->hideProgress = $node->hideProgress;
-            $this->hideMedia = $node->hideMedia;
+            if (isset($node->hideTitle)) {
+                $this->hideTitle = $node->hideTitle;
+            } else {
+                $this->hideTitle = false;
+            }
+            if (isset($node->hideProgress)) {
+                $this->hideProgress = $node->hideProgress;
+            } else {
+                $this->hideProgress = false;
+            }
+            if (isset($node->hideMedia)) {
+                $this->hideMedia = $node->hideMedia;
+            } else {
+                $this->hideMedia = false;
+            }
         } else {
             $this->size = '';
             $this->title = '';
