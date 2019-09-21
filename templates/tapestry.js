@@ -2292,6 +2292,8 @@ function tapestryTool(config){
         if (typeof depth == "undefined") {
             depth = findMaxDepth(root);
         }
+
+        tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = node.unlocked && parentIsAccessible;;
     
         getChildren(node.id, 1).forEach (childNodeId => {
             var thisNode = getNodeById(childNodeId);
