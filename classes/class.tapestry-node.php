@@ -43,53 +43,26 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
+        $this->size = '';
+        $this->title = '';
+        $this->status = '';
+        $this->imageURL = '';
+        $this->mediaType = '';
+        $this->mediaFormat = '';
+        $this->unlocked = false;
+        $this->mediaDuration = 0;
+        $this->description = '';
+        $this->type = 'tapestry_node';
+        $this->typeData = (object) [];
+        $this->coordinates = (object) [];
+        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        $this->hideTitle = false;
+        $this->hideProgress = false;
+        $this->hideMedia = false;
+
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
-            $this->type = $node->type;
-            $this->size = $node->size;
-            $this->title = $node->title;
-            $this->status = $node->status;
-            $this->imageURL = $node->imageURL;
-            $this->unlocked = $node->unlocked;
-            $this->typeData = $node->typeData;
-            $this->mediaType = $node->mediaType;
-            $this->mediaFormat = $node->mediaFormat;
-            $this->mediaDuration = $node->mediaDuration;
-            $this->description = $node->description;
-            $this->coordinates = $node->coordinates;
-            $this->permissions = $node->permissions;
-            if (isset($node->hideTitle)) {
-                $this->hideTitle = $node->hideTitle;
-            } else {
-                $this->hideTitle = false;
-            }
-            if (isset($node->hideProgress)) {
-                $this->hideProgress = $node->hideProgress;
-            } else {
-                $this->hideProgress = false;
-            }
-            if (isset($node->hideMedia)) {
-                $this->hideMedia = $node->hideMedia;
-            } else {
-                $this->hideMedia = false;
-            }
-        } else {
-            $this->size = '';
-            $this->title = '';
-            $this->status = '';
-            $this->imageURL = '';
-            $this->mediaType = '';
-            $this->mediaFormat = '';
-            $this->unlocked = false;
-            $this->mediaDuration = 0;
-            $this->description = '';
-            $this->type = 'tapestry_node';
-            $this->typeData = (object) [];
-            $this->coordinates = (object) [];
-            $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
-            $this->hideTitle = false;
-            $this->hideProgress = false;
-            $this->hideMedia = false;
+            $this->set($node);
         }
     }
 

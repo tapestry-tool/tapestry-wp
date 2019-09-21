@@ -175,12 +175,4 @@ class TapestryHelpers
         }
         return false;
     }
-
-    static function useDefaultValue($value, $default)
-    {
-        if (isset($value)) {
-            return $value;
-        }
-        return $default;
-    }
 }
