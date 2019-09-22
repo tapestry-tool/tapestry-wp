@@ -136,6 +136,8 @@ export default {
         return;
       }
 
+      const dimensions = thisTapestryTool.getTapestryDimensions();
+
       // Add the node data first
       var newNodeEntry = {
         "type": "tapestry_node",
@@ -162,8 +164,8 @@ export default {
         "hideTitle": false,
         "hideProgress": false,
         "hideMedia": false,
-        "fx": Helpers.getBrowserWidth(),
-        "fy": Helpers.getBrowserHeight()
+        "fx": (dimensions.width - dimensions.startX) / 2,
+        "fy": (dimensions.height - dimensions.startY) / 2
       };
 
       if (isEdit) {
@@ -245,6 +247,8 @@ export default {
       if (!isEdit) {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
         const result = response.data;
+        console.table(newNodeEntry);
+        console.table(result);
 
         // Save to database, first save node then the link
         // only add link if it's for adding new node and not root node
@@ -280,7 +284,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.initialize(true);
+      thisTapestryTool.reinitialize();
 
       this.closeModal();
     }

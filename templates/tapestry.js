@@ -1897,6 +1897,8 @@ function tapestryTool(config){
         };
     }
 
+    this.getTapestryDimensions = getTapestryDimensions;
+
     /* Updates the size of the overall tapestry
     (ie: the area that encompasses the boundaries of the nodes)
         according to where the nodes are placed in the dataset */
