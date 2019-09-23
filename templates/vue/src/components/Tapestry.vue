@@ -162,18 +162,20 @@ export default {
         "hideTitle": false,
         "hideProgress": false,
         "hideMedia": false,
-        "fx": Helpers.getBrowserWidth(),
-        "fy": Helpers.getBrowserHeight()
+        "coordinates": {
+          "fx": Helpers.getBrowserWidth(),
+          "fy": Helpers.getBrowserHeight()
+        }
       };
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
-        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
+        newNodeEntry.coordinates[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
-        newNodeEntry[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
-        newNodeEntry[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        newNodeEntry.coordinates[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       }
 
       var appearsAt = 0;
