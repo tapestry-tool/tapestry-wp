@@ -247,8 +247,6 @@ export default {
       if (!isEdit) {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
         const result = response.data;
-        console.table(newNodeEntry);
-        console.table(result);
 
         // Save to database, first save node then the link
         // only add link if it's for adding new node and not root node
@@ -284,7 +282,7 @@ export default {
       }
 
       thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.reinitialize();
+      thisTapestryTool.initialize(true);
 
       this.closeModal();
     }
