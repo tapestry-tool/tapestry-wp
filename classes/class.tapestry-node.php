@@ -43,41 +43,26 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
+        $this->size = '';
+        $this->title = '';
+        $this->status = '';
+        $this->imageURL = '';
+        $this->mediaType = '';
+        $this->mediaFormat = '';
+        $this->unlocked = false;
+        $this->mediaDuration = 0;
+        $this->description = '';
+        $this->type = 'tapestry_node';
+        $this->typeData = (object) [];
+        $this->coordinates = (object) [];
+        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        $this->hideTitle = false;
+        $this->hideProgress = false;
+        $this->hideMedia = false;
+
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
-            $this->type = $node->type;
-            $this->size = $node->size;
-            $this->title = $node->title;
-            $this->status = $node->status;
-            $this->imageURL = $node->imageURL;
-            $this->unlocked = $node->unlocked;
-            $this->typeData = $node->typeData;
-            $this->mediaType = $node->mediaType;
-            $this->mediaFormat = $node->mediaFormat;
-            $this->mediaDuration = $node->mediaDuration;
-            $this->description = $node->description;
-            $this->coordinates = $node->coordinates;
-            $this->permissions = $node->permissions;
-            $this->hideTitle = $node->hideTitle;
-            $this->hideProgress = $node->hideProgress;
-            $this->hideMedia = $node->hideMedia;
-        } else {
-            $this->size = '';
-            $this->title = '';
-            $this->status = '';
-            $this->imageURL = '';
-            $this->mediaType = '';
-            $this->mediaFormat = '';
-            $this->unlocked = false;
-            $this->mediaDuration = 0;
-            $this->description = '';
-            $this->type = 'tapestry_node';
-            $this->typeData = (object) [];
-            $this->coordinates = (object) [];
-            $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
-            $this->hideTitle = false;
-            $this->hideProgress = false;
-            $this->hideMedia = false;
+            $this->set($node);
         }
     }
 
