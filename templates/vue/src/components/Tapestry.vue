@@ -10,7 +10,7 @@
     <NodeModal
       :node="populatedNode"
       :modalType="modalType"
-      :rootNodeTitle="getCurrentRootNode().title"
+      :rootNodeTitle="selectedNode.title"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -31,10 +31,8 @@ export default {
     RootNodeButton
   },
   async mounted() {
-    this.TapestryAPI = new TapestryAPI(wpPostId);
-
     // Set up event listeners to communicate with D3 elements
-    window.addEventListener('change-root-node', this.changeRootNode)
+    window.addEventListener('change-selected-node', this.changeSelectedNode)
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
     window.addEventListener('tapestry-updated', this.tapestryUpdated)
@@ -42,11 +40,13 @@ export default {
   data() {
     return {
       tapestry: {},
-      TapestryAPI: {},
+      selectedNodeId: '',
+      TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
       modalType: '',
       populatedNode: {
         title: '',
+        description: '',
         mediaType: '',
         typeData: {
           mediaURL: '',
@@ -55,8 +55,7 @@ export default {
         mediaDuration: '',
         imageURL: '',
         unlocked: false,
-        permissions: { public: ['read'] },
-        description: ''
+        permissions: { public: ['read'] }
       }
     }
   },
@@ -67,19 +66,29 @@ export default {
     yORfy: function () {
       return this.tapestry.settings.autoLayout ? 'y' : 'fy';
     },
+    selectedNode: function() {
+      if (this.tapestry && this.tapestry.nodes) {
+        if (this.selectedNodeId) {
+          return this.tapestry.nodes.find(node => {
+            return node.id === this.selectedNodeId;
+          });
+        }
+        else if (this.tapestry.rootId) {
+          return this.tapestry.nodes.find(node => {
+            return node.id === this.tapestry.rootId;
+          });
+        }
+      }
+      return {};
+    },
   },
   methods: {
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset;
-      this.tapestryLoaded = true
-    },
-    getCurrentRootNode() {
-      if (this.tapestry && this.tapestry.nodes && this.tapestry.rootId) {
-        return this.tapestry.nodes.find(node => {
-          return node.id === this.tapestry.rootId;
-        });
+      if (!this.tapestryLoaded) {
+        this.selectedNodeId = this.tapestry.rootId;
+        this.tapestryLoaded = true
       }
-      return {};
     },
     getEmptyNode() {
       return {
@@ -111,7 +120,7 @@ export default {
     },
     editNode() {
       this.modalType = 'edit-node';
-      this.populatedNode = this.getCurrentRootNode();
+      this.populatedNode = this.selectedNode;
       this.$bvModal.show('node-modal-container');
     },
     deleteNode() {
@@ -122,21 +131,16 @@ export default {
       this.modalType = '';
       this.$bvModal.hide('node-modal-container');
     },
-    changeRootNode(event) {
-      this.tapestry.rootId = event.detail;
+    changeSelectedNode(event) {
+      this.selectedNodeId = event.detail;
     },
-    async addEditNode(formData, isEdit, isRoot = false) {
+    async addEditNode(formData, isEdit) {
       const NORMAL_RADIUS = 140;
       const ROOT_RADIUS_DIFF = 70;
-      let root = this.tapestry.rootId;
-
-      var errorMsg = tapestryValidateNewNode(formData, isRoot);
-      if (errorMsg) {
-        alert(errorMsg);
-        return;
-      }
 
       const dimensions = thisTapestryTool.getTapestryDimensions();
+
+      var isRoot = this.tapestry.nodes.length == 0;
 
       // Add the node data first
       var newNodeEntry = {
@@ -172,12 +176,12 @@ export default {
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
-        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x;
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
-        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
-        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y;
       }
 
       var appearsAt = 0;
@@ -246,45 +250,50 @@ export default {
         }
       }
 
-      if (!isEdit) {
+      if (!isEdit) { // New node
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
-        const result = response.data;
 
-        // Save to database, first save node then the link
-        // only add link if it's for adding new node and not root node
-        // Add new node to this.tapestry after getting the id
-        newNodeEntry.id = result.id;
+        newNodeEntry.id = response.data.id;
+        
         this.tapestry.nodes.push(newNodeEntry);
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
         newNodeEntry[this.yORfy] = newNodeEntry.coordinates.y;
 
         if (!isRoot) {
-          // Get ID from callback and set it as target's id
-          const newLink = { "source": root, "target": result.id, "value": 1, "type": "", "appearsAt": appearsAt };
-
-          await this.TapestryAPI.addLink(JSON.stringify(newLink));
-
-          // Add the new link to the this.tapestry
+          // Add link from parent node to this node
+          const newLink = { 
+            "source": this.selectedNodeId, 
+            "target": newNodeEntry.id, 
+            "value": 1, 
+            "type": "", 
+            "appearsAt": appearsAt 
+          };
+          this.TapestryAPI.addLink(JSON.stringify(newLink));
           this.tapestry.links.push(newLink);
-        } else {
-          const newId = result.id;
-
-          await this.TapestryAPI.updatePermissions(newId, JSON.stringify(newNodeEntry.permissions));
-
-          this.tapestry.rootId = newId;
-
-          root = this.tapestry.rootId; // need to set root to newly created node
+        } 
+        else {
+          // Root node
+          this.tapestry.rootId = newNodeEntry.id;
+          this.selectedNodeId = newNodeEntry.id;
         }
-      } else {
-        // Call endpoint for editing node
-        const response = await this.TapestryAPI.updateNode(root, JSON.stringify(newNodeEntry));
-        const result = response.data;
 
-        newNodeEntry.id = result.id;
+      } 
+      else { // Editing existing node
 
-        this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)] = newNodeEntry;
+        const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry));
+
+        newNodeEntry.id = response.data.id;
+
+        this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)] = newNodeEntry;
       }
+      
+      // Update permissions
+      this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions));
+
+      // Update coordinates in dataset
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.xORfx] = newNodeEntry.coordinates.x;
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.yORfy] = newNodeEntry.coordinates.y;
 
       thisTapestryTool.setDataset(this.tapestry);
       thisTapestryTool.initialize(true);
