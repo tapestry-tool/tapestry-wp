@@ -136,6 +136,8 @@ export default {
         return;
       }
 
+      const dimensions = thisTapestryTool.getTapestryDimensions();
+
       // Add the node data first
       var newNodeEntry = {
         "type": "tapestry_node",
@@ -162,8 +164,8 @@ export default {
         "hideTitle": false,
         "hideProgress": false,
         "hideMedia": false,
-        "fx": Helpers.getBrowserWidth(),
-        "fy": Helpers.getBrowserHeight()
+        "fx": (dimensions.width - dimensions.startX) / 2,
+        "fy": (dimensions.height - dimensions.startY) / 2
       };
 
       if (isEdit) {
