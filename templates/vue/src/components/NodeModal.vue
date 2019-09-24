@@ -23,16 +23,16 @@
               ></b-form-textarea>
             </b-form-group>
             <b-form-group label="Content Type">
-              <b-form-select id="node-media-type" v-model="node.mediaType" :options="mediaTypes"></b-form-select>
+              <b-form-select id="node-media-type" v-model="node.mediaFormat" :options="mediaFormats"></b-form-select>
             </b-form-group>
-            <b-form-group label="Text content" v-show="node.mediaType === 'text'">
+            <b-form-group label="Text content" v-show="node.mediaFormat === 'text'">
               <b-form-textarea
                 id="node-text-content"
                 placeholder="Enter text here"
                 v-model="node.typeData.textContent"
               ></b-form-textarea>
             </b-form-group>
-            <b-form-group label="Video URL" v-show="node.mediaType === 'video'">
+            <b-form-group label="Video URL" v-show="node.mediaFormat === 'mp4'">
               <b-form-input
                 id="node-video-media-url"
                 placeholder="Enter URL for MP4 Video"
@@ -40,7 +40,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group label="Video Duration" v-show="node.mediaType === 'video'">
+            <b-form-group label="Video Duration" v-show="node.mediaFormat === 'mp4'">
               <b-form-input
                 id="node-video-media-duration"
                 placeholder="Enter duration (in seconds)"
@@ -48,7 +48,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group label="H5P Embed Link" v-show="node.mediaType === 'h5p'">
+            <b-form-group label="H5P Embed Link" v-show="node.mediaFormat === 'h5p'">
               <b-form-input
                 id="node-h5p-media-url"
                 placeholder="Enter H5P Embed Link"
@@ -56,7 +56,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group label="H5P Video Duration" description="This only applies to video H5P content" v-show="node.mediaType === 'h5p'">
+            <b-form-group label="H5P Video Duration" description="This only applies to video H5P content" v-show="node.mediaFormat === 'h5p'">
               <b-form-input
                 id="node-h5p-media-duration"
                 placeholder="Enter duration (in seconds)"
@@ -64,7 +64,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group label="Embed Link" v-show="node.mediaType === 'url-embed'">
+            <b-form-group label="Embed Link" v-show="node.mediaFormat === 'embed'">
               <b-form-input
                 id="node-embed-media-duration"
                 placeholder="Enter embed link (starting with http)"
@@ -183,12 +183,12 @@ export default {
   data() {
     return {
       userId: null,
-      mediaTypes: [
+      mediaFormats: [
         { value: '', text: 'Select content type' },
         { value: 'text', text: 'Text' },
-        { value: 'video', text: 'Video' },
+        { value: 'mp4', text: 'Video' },
         { value: 'h5p', text: 'H5P' },
-        { value: 'url-embed', text: 'URL Embed' },
+        { value: 'embed', text: 'URL Embed' },
       ],
       formErrors: '',
       maxDescriptionLength: 250,
@@ -228,7 +228,7 @@ export default {
       return [
         { name: 'title', value: this.node.title },
         { name: 'description', value: this.node.description },
-        { name: 'mediaType', value: this.node.mediaType },
+        { name: 'mediaFormat', value: this.node.mediaFormat },
         { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
         { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
         { name: 'mediaDuration', value: this.node.mediaDuration },
@@ -273,10 +273,10 @@ export default {
         errMsgs.push("Please limit your description to under " + this.maxDescriptionLength + " characters");
       }
 
-      if (!this.node.mediaType) {
+      if (!this.node.mediaFormat) {
         errMsgs.push("Please select a Content Type");
       }
-      else if (this.node.mediaType === "video") {
+      else if (this.node.mediaFormat === "mp4") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL");
         }
@@ -284,7 +284,7 @@ export default {
           errMsgs.push("Please enter numeric value for Video Duration");
         }
       }
-      else if (this.node.mediaType === "h5p") {
+      else if (this.node.mediaFormat === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a H5P URL");
         }
@@ -292,12 +292,12 @@ export default {
           errMsgs.push("Please enter numeric value for H5P Video Duration");
         }
       }
-      else if (this.node.mediaType === 'url-embed') {
+      else if (this.node.mediaFormat === 'embed') {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL");
         }
       }
-      else if (this.node.mediaType === 'text') {
+      else if (this.node.mediaFormat === 'text') {
         if (!this.node.typeData.textContent || !this.node.typeData.textContent.length) {
           errMsgs.push("Please enter Text Content for this node");
         }

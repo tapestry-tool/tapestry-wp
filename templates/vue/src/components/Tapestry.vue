@@ -93,7 +93,7 @@ export default {
     getEmptyNode() {
       return {
         title: '',
-        mediaType: '',
+        mediaFormat: '',
         typeData: {
           mediaURL: '',
           textContent: ''
@@ -196,18 +196,19 @@ export default {
           case "imageURL":
             newNodeEntry[fieldName] = fieldValue || "";
             break;
-          case "mediaType":
+          case "mediaFormat":
             if (fieldValue === "text") {
               newNodeEntry["mediaType"] = "text";
+              newNodeEntry["mediaFormat"] = "text";
             }
-            else if (fieldValue === "video") {
+            else if (fieldValue === "mp4") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "mp4";
             }
             else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video";
               newNodeEntry["mediaFormat"] = "h5p";
-            } else if (fieldValue === "url-embed") {
+            } else if (fieldValue === "embed") {
               newNodeEntry["mediaType"] = "url-embed";
               newNodeEntry["mediaFormat"] = "embed";
             }
