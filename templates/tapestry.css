@@ -71,7 +71,7 @@ body {
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
 		position: absolute;
-		margin-top: -30px;
+		margin-top: -60px;
 		right: 0;
 	}
 }
@@ -278,6 +278,10 @@ body {
     fill: #11a6d8;
 }
 
+.node {
+    cursor: pointer;
+}
+
 .node .meta {
     color: white;
     min-height: 100%;
@@ -309,11 +313,16 @@ body {
     opacity: 1;
 }
 
-.node .expandGrandchildren {
+.node path:first-of-type {
+    fill: #11a6d8;
+}
+
+.node path.grandchild,
+.node .grandchild {
     fill: #999;
 }
 
-.node:hover .expandGrandchildren {
+.node:hover .grandchild {
     transform: scale(1.2);
 }
 
@@ -329,7 +338,7 @@ body {
     stroke-opacity: 5;
 }
 
-.link-lines{
+.link-lines.deletable {
     cursor: pointer;
 }
 
@@ -370,7 +379,6 @@ body {
     background: #666;
     color: #fff;
     font-size: 35px;
-    padding: 12px;
 }
 .mediaButton:hover > i[data-media-type="text"]:not(.mediaButtonLoading) {
     background: #11a6d8;

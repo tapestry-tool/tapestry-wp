@@ -4,11 +4,14 @@
       <b-tabs card>
         <b-tab title="Content" active>
           <div id="modal-content-details">
+            <b-alert v-if="formErrors.length" variant="danger" id="tapestry-modal-form-errors" v-html="formErrors" show>
+            </b-alert>
             <b-form-group label="Title">
               <b-form-input
                 id="node-title"
                 placeholder="Enter title"
                 v-model="node.title"
+                autofocus
                 required
               />
             </b-form-group>
@@ -86,13 +89,13 @@
                 v-model="node.imageURL"
               />
             </b-form-group>
-            <b-form-group>
+            <!-- <b-form-group>
               <b-form-checkbox
                 value="false"
                 unchecked-value="true"
                 v-model="node.unlocked"
               >Hide node until parent node is viewed</b-form-checkbox>
-            </b-form-group>
+            </b-form-group> -->
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">Hide node title</b-form-checkbox>
             </b-form-group>
@@ -149,7 +152,7 @@
                     <b-input-group>
                       <b-form-input v-model="userId" placeholder="Enter user ID"></b-form-input>
                       <b-input-group-append>
-                        <b-button variant="secondary" @click="addUser()">
+                        <b-button variant="secondary" @click="addUserPermissionRow()">
                           <span class="fas fa-plus permissions-plus"></span> User
                         </b-button>
                       </b-input-group-append>
@@ -187,7 +190,9 @@ export default {
         { value: 'h5p', text: 'H5P' },
         { value: 'url-embed', text: 'URL Embed' },
       ],
-      addThumbnail: true
+      formErrors: '',
+      maxDescriptionLength: 250,
+      addThumbnail: false
     }
   },
   props: {
@@ -222,6 +227,7 @@ export default {
     nodeData() {
       return [
         { name: 'title', value: this.node.title },
+        { name: 'description', value: this.node.description },
         { name: 'mediaType', value: this.node.mediaType },
         { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
         { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
@@ -234,29 +240,82 @@ export default {
         { name: 'hideMedia', value: this.node.hideMedia }
       ]
     },
+    nodeImageUrl() {
+      return this.node.imageURL
+    },
+  },
+  watch: {
+    nodeImageUrl: function(val) {
+      this.addThumbnail = this.node.imageURL.length > 0
+    }
+  },
+  mounted() {
+    this.$root.$on('bv::modal::show', (bvEvent, modalId) => {
+      if (modalId == 'node-modal-container') {
+        this.formErrors = ''
+      }
+    })
   },
   methods: {
-    getCurrentRootNode() {
-      if (this.tapestry && this.tapestry.nodes) {
-        return this.tapestry.nodes.find(node => {
-          return node.id = this.tapestry.rootId;
-        });
-      }
-    },
     submitNode() {
-      if (this.modalType === 'add-root-node') {
-        this.$emit("add-edit-node", this.nodeData, false, true);
-      } else if (this.modalType === 'add-new-node') {
-        this.$emit("add-edit-node", this.nodeData, false);
-      } else if (this.modalType === 'edit-node') {
-        this.$emit("add-edit-node", this.nodeData, true);
-      } else {
-        console.error(`Undefined modalType: ${this.modalType}`)
+      this.formErrors = this.validateNode(this.nodeData);
+      if (!this.formErrors.length) {
+        if (this.modalType === 'add-root-node') {
+          this.$emit("add-edit-node", this.nodeData, false, true);
+        } else if (this.modalType === 'add-new-node') {
+          this.$emit("add-edit-node", this.nodeData, false);
+        } else if (this.modalType === 'edit-node') {
+          this.$emit("add-edit-node", this.nodeData, true);
+        } else {
+          console.error(`Undefined modalType: ${this.modalType}`)
+        }
       }
     },
-    addUser() {
+    validateNode() {
+      var errMsgs = [];	
+
+      if (this.node.title.length == 0) {
+        errMsgs.push("Please enter a title");
+      }
+      if (this.node.description.length > this.maxDescriptionLength) {
+        errMsgs.push("Please limit your description to under " + this.maxDescriptionLength + " characters");
+      }
+
+      if (!this.node.mediaType) {
+        errMsgs.push("Please select a Content Type");
+      }
+      else if (this.node.mediaType === "video") {
+        if (this.node.typeData.mediaURL === "") {
+          errMsgs.push("Please enter a Video URL");
+        }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          errMsgs.push("Please enter numeric value for Video Duration");
+        }
+      }
+      else if (this.node.mediaType === "h5p") {
+        if (this.node.typeData.mediaURL === "") {
+          errMsgs.push("Please enter a H5P URL");
+        }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          errMsgs.push("Please enter numeric value for H5P Video Duration");
+        }
+      }
+      else if (this.node.mediaType === 'url-embed') {
+        if (this.node.typeData.mediaURL === "") {
+          errMsgs.push("Please enter an Embed URL");
+        }
+      }
+      else if (this.node.mediaType === 'text') {
+        if (!this.node.typeData.textContent || !this.node.typeData.textContent.length) {
+          errMsgs.push("Please enter Text Content for this node");
+        }
+      }
+      
+      return errMsgs.join("<br>");	
+    },
+    addUserPermissionRow () {
       const userId = this.userId;
-      if (userId && onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
+      if (userId && Helpers.onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
         this.$set(this.node.permissions, `user-${userId}`, [])
         this.userId = null;
       } else {
