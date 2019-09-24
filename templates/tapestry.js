@@ -178,7 +178,9 @@ function tapestryTool(config){
             detail: { dataset: this.dataset }
         }));
 
-        root = this.dataset.rootId;
+        if (!root) {
+            root = this.dataset.rootId;
+        }
 
         //---------------------------------------------------
         // 2. SIZE AND SCALE THE TAPESTRY AND SVG TO FIT WELL
@@ -378,8 +380,7 @@ function tapestryTool(config){
                            tapestry.dataset.links.splice(linkToRemove, 1);
                             if (isDeleteNode) {
                                 tapestry.dataset.nodes.splice(spliceIndex, 1);
-                                root = tapestry.dataset.rootId; // need to change root b/c deleting current root
-                                tapestryHideAddNodeModal();
+                                root = tapestry.dataset.rootId; // need to change selected node b/c deleting currently selected node
                             }
                             tapestry.reinitialize();
                         },
@@ -405,10 +406,11 @@ function tapestryTool(config){
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                 method: API_DELETE_METHOD,
                 success: function() {
-                    removeAllNodes();
-                    tapestry.dataset.nodes.splice(0, 1);
-                    tapestry.dataset.rootId = undefined;
-                    tapestry.reinitialize();
+                    // removeAllNodes();
+                    // tapestry.dataset.nodes.splice(0, 1);
+                    // tapestry.dataset.rootId = undefined;
+                    // tapestry.reinitialize();
+                    location.reload();
                 },
                 error: function(e) {
                     console.error("Error deleting root node", e);
@@ -537,7 +539,7 @@ function tapestryTool(config){
             .on("tick", ticked);
     }
 
-    //Resize all nodes, where id is now the root
+    //Resize all nodes, where id is now the selected node
     function resizeNodes(id) {
         getChildren(id);
         setNodeTypes(id);
@@ -699,26 +701,32 @@ function tapestryTool(config){
                             else return "";
                         })
                         .attr("class", function(d) {
-                            return "link-lines";
+                            return "link-lines " + (config.wpIsAdmin ? "deletable" : "");
                         })
                         .attr("id", function(d) {
                             return "link-lines-" + d.source.id + "-" + d.target.id;
                         })
                         .on("click", function(d) {
-                            var result = confirm("Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")");
-                            if (result) {
-                                deleteLink(d.source.id, d.target.id);
+                            if (config.wpIsAdmin) {
+                                var confirmMsg = "Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")";
+                                if (confirm(confirmMsg)) {
+                                    deleteLink(d.source.id, d.target.id);
+                                }
                             }
                         })
                         .on("mouseover", function(d) {
-                            $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
-                            $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
+                            if (config.wpIsAdmin) {
+                                $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
+                                $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
+                            }
                         })
                         .on("mouseout", function(d) {
-                            $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
-                                return setLinkStroke(d);
-                            });
-                            $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS);
+                            if (config.wpIsAdmin) {
+                                $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
+                                    return setLinkStroke(d);
+                                });
+                                $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS);
+                            }
                         });
     }
 
@@ -955,9 +963,9 @@ function tapestryTool(config){
                     root = d.id;
                     resizeNodes(d.id);
 
-                    dispatchEvent(new CustomEvent('change-root-node', {detail: root}));
+                    dispatchEvent(new CustomEvent('change-selected-node', {detail: root}));
 
-                    // slider's maximum depth is set to the longest path from the new root
+                    // slider's maximum depth is set to the longest path from the new selected node
                     tapestryDepthSlider.max = findMaxDepth(root);
                     updateSvgDimensions();
                 }
@@ -2081,7 +2089,7 @@ function tapestryTool(config){
         });
     }
     
-    /* Gets the size of the node depending on the type of the node relevant to the current root */
+    /* Gets the size of the node depending on the type of the node relevant to the currently selected node */
     function getRadius(d) {
         var radius;
         if (d.nodeType === "") {
@@ -2220,7 +2228,7 @@ function tapestryTool(config){
             var node = tapestry.dataset.nodes[i];
             var id = node.id;
     
-            //NOTE: If there are any nodes are that fit two roles (ie: root and the grandchild),
+            //NOTE: If there are any nodes are that fit two roles (ie: selected and the grandchild),
             //      should default to being the more senior role
             if (id === root) {
                 node.nodeType = "root";
@@ -2560,128 +2568,6 @@ function isEmptyObject(obj) {
             return false;
     }
     return true;
-}
-
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function onlyContainsDigits(string) {
-    var regex = new RegExp(/^\d+$/); 
-    return regex.test(string);
-}
-
-function extractDigitsFromString(string) {
-    return string.replace(/[^0-9]/g,'');
-}
-
-function tapestryValidateNewNode(formData, isRoot) {
-    var MAX_DESCRIPTION_LENGTH = 250;
-    
-    if (typeof isRoot == 'undefined') {	
-        isRoot = false;	
-    }	
-
-    var errMsg = "";	
-
-    for (var i = 0; i < formData.length; i++) {	
-        var fieldName = formData[i].name;	
-        var fieldValue = formData[i].value;	
-
-        switch (fieldName) {	
-            case "title":	
-                if (fieldValue === "") {	
-                    errMsg += "Please enter a title \n";	
-                }	
-                break;	
-            case "appearsAt":	
-                if (fieldValue.length > 0 && !onlyContainsDigits(fieldValue) && !isRoot) {	
-                    errMsg += "Please enter numeric value for Appears At (or leave empty to not lock) \n";	
-                }	
-                break;	
-            default:	
-                break;	
-        }	
-
-        if ($("#mediaType").val() === "video") {	
-            switch (fieldName) {	
-                case "mp4-mediaURL":	
-                    if (fieldValue === "") {	
-                        errMsg += "Please enter a MP4 video URL \n";	
-                    }	
-                    break;	
-                case "mp4-mediaDuration":	
-                    if (!onlyContainsDigits(fieldValue)) {	
-                        errMsg += "Please enter numeric value for media duration \n";	
-                    }	
-                    break;	
-                default:	
-                    break;	
-            }	
-        } else if ($("#mediaType").val() === "h5p") {	
-            switch (fieldName) {	
-                case "h5p-mediaURL":	
-                    if (fieldValue === "") {	
-                        errMsg += "Please enter a H5P URL \n";	
-                    }	
-                    break;	
-                case "h5p-mediaDuration":	
-                    if (!onlyContainsDigits(fieldValue)) {	
-                        errMsg += "Please enter numeric value for media duration \n";	
-                    }	
-                    break;	
-                default:	
-                    break;	
-            }	
-        } else if ($("#mediaType").val() === 'url-embed') {
-            if (fieldValue === "") {
-                errMsg += "Please enter an embed url \n";
-            }
-        }	
-    }	
-
-    if ($("#tapestry-node-description-area").val() && $("#tapestry-node-description-area").val().length > MAX_DESCRIPTION_LENGTH) {	
-        errMsg += "Please enter a description under " + MAX_DESCRIPTION_LENGTH + " characters \n";	
-    }	
-    return errMsg;	
-}	
-
-// Type is either "user" or "group"  
-function appendPermissionsRow(id, type) {
-    $('#permissions-table tbody').append(
-        '<tr class="permissions-dynamic-row">' +
-        '<td>' + capitalizeFirstLetter(type) + " " + id + '</td>' +
-        '<td id="' + type + "-" + id + "-editcell" + '"' + '></td>' +
-        '<td><input class="' + type + "-" + id + "-checkbox " + type + "-checkbox" + '"' + 'id="user-' + id +'-add-checkbox" name="add" type="checkbox"></td>' +
-        '<td><input class="' + type + "-" + id + "-checkbox " + type + "-checkbox" + '"' + 'id="user-' + id +'-edit-checkbox" name="edit" type="checkbox"></td>' +
-        '<td><input class="' + type + "-" + id + "-checkbox " + type + "-checkbox" + '"' + 'id="user-' + id +'-add-submit-checkbox" name="add_submit" type="checkbox"></td>' +
-        '<td><input class="' + type + "-" + id + "-checkbox " + type + "-checkbox"+ '"' + 'id="user-' + id +'-edit-submit-checkbox" name="edit_submit" type="checkbox"></td>' +
-        '<td><input class="' + type + "-" + id + "-checkbox " + type + "-checkbox" + '"' + 'id="user-' + id +'-approve-checkbox" name="approve" type="checkbox"></td>' +
-        '</tr>'
-    );
-    $('<input class="' + type + "-" + id + "-checkbox " + type + "-checkbox" + '"' + 'id="user-' + id +'-read-checkbox" name="read" type="checkbox" checked>').on("change", function() {
-        if ($(this).is(":checked")) {
-            $("." + type + "-" + id + "-checkbox").each(function() {
-                if($(this).prop('disabled')) {
-                    $(this).prop('disabled', false);
-                }
-            });
-        } else {
-            $("." + type + "-" + id + "-checkbox").each(function() {
-                if (this.id !== "user-" + id + "-read-checkbox") {
-                    $(this).prop('checked', false);
-                    $(this).prop('disabled', true);
-                }
-            });
-        }
-    }).appendTo("#" + type + "-" + id + "-editcell");
-
-    $('.public-checkbox').each(function() {
-        if ($(this).is(":checked")) {
-            $("#user-" + id + "-" + this.name.replace("_", "-") + "-checkbox").prop('checked', true);
-            $("#user-" + id + "-" + this.name.replace("_", "-") + "-checkbox").prop('disabled', true);
-        }
-    });
 }
 
 // Capture click events anywhere inside or outside tapestry
