@@ -163,19 +163,19 @@ export default {
         "hideProgress": false,
         "hideMedia": false,
         "coordinates": {
-          "fx": Helpers.getBrowserWidth(),
-          "fy": Helpers.getBrowserHeight()
+          "x": Helpers.getBrowserWidth(),
+          "y": Helpers.getBrowserHeight()
         }
       };
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry.coordinates[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
-        newNodeEntry.coordinates[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x;
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
-        newNodeEntry.coordinates[this.xOrfx] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
-        newNodeEntry.coordinates[this.yOrfy] = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(root, this.tapestry)].y;
       }
 
       var appearsAt = 0;
@@ -253,6 +253,9 @@ export default {
         // Add new node to this.tapestry after getting the id
         newNodeEntry.id = result.id;
         this.tapestry.nodes.push(newNodeEntry);
+
+        newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
+        newNodeEntry[this.yORfy] = newNodeEntry.coordinates.y;
 
         if (!isRoot) {
           // Get ID from callback and set it as target's id
