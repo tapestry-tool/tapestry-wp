@@ -501,7 +501,7 @@ function tapestryTool(config){
             });
         }
 
-        var tapestryDimensions = getTapestryDimensions();
+        var tapestryDimensions = tapestry.getTapestryDimensions();
         var nodes = tapestry.dataset.nodes;
 
         simulation = d3.forceSimulation(nodes)
@@ -546,7 +546,7 @@ function tapestryTool(config){
     }
 
     function ticked() {
-        var tapestryDimensions = getTapestryDimensions();
+        var tapestryDimensions = tapestry.getTapestryDimensions();
         links
             .attr("x1", function (d) {
                 return getBoundedCoord(d.source.x, tapestryDimensions.width);
@@ -632,7 +632,7 @@ function tapestryTool(config){
         document.getElementById(TAPESTRY_CONTAINER_ID).appendChild(tapestry.getControls());
 
         // actually create the SVG
-        var tapestryDimensions = getTapestryDimensions();
+        var tapestryDimensions = tapestry.getTapestryDimensions();
         tapestryDimensionsBeforeDrag = tapestryDimensions;
         var tapestrySvg = d3.select("#"+TAPESTRY_CONTAINER_ID)
                 .append("svg:svg")
@@ -648,7 +648,7 @@ function tapestryTool(config){
     }
 
     function updateSvgDimensions() {
-        var tapestryDimensions = getTapestryDimensions();
+        var tapestryDimensions = tapestry.getTapestryDimensions();
         tapestryDimensionsBeforeDrag = tapestryDimensions;
 
         d3.select("#"+TAPESTRY_CONTAINER_ID+"-svg")
@@ -1648,14 +1648,16 @@ function tapestryTool(config){
         var children = getChildren(root);
         setViewModeRadiusRatio(lightboxDimensions.adjustedOn, children.length);
         var coordinates = getViewModeCoordinates(lightboxDimensions, children);
+        
+        var tapestryDimensions = tapestry.getTapestryDimensions();
     
         // Add the coordinates to the nodes
         d3.selectAll('g.node').each(function(d) {
             d.fixed = true;
             if (d.nodeType === "root") {
-                d.fx = getTapestryDimensions().width / 2;
+                d.fx = tapestryDimensions.width / 2;
                 if (lightboxDimensions.adjustedOn === "width") {
-                    d.fy = getTapestryDimensions().height / 2;
+                    d.fy = tapestryDimensions.height / 2;
                 } else {
                     d.fy = screenToSVG(0, $("#header").height() + NORMAL_RADIUS + ($("#spotlight-content").height() / 2)).y;
                 }
@@ -1674,6 +1676,8 @@ function tapestryTool(config){
         // For determining how much space the node to be placed
         var nodeRadius = NORMAL_RADIUS * adjustedRadiusRatio * 0.8;
         var nodeSpace = (nodeRadius * 2);
+
+        var tapestryDimensions = tapestry.getTapestryDimensions();
     
         var coordinates = [];
         for (var i = 0; i < children.length; i++) {
@@ -1682,24 +1686,24 @@ function tapestryTool(config){
                     if (i % 2 === 0) {
                         coordinates[children[i]] = {
                             "fx": 0,
-                            "fy": getTapestryDimensions().height / 2
+                            "fy": tapestryDimensions.height / 2
                         };
                     } else {
                         coordinates[children[i]] = {
                             "fx": screenToSVG(getBrowserWidth(), 0).x - nodeSpace,
-                            "fy": getTapestryDimensions().height / 2
+                            "fy": tapestryDimensions.height / 2
                         };
                     }
                 } else {
                     if (i % 2 === 0) {
                         coordinates[children[i]] = {
-                            "fx": getTapestryDimensions().width / 2,
+                            "fx": tapestryDimensions.width / 2,
                             "fy": 0
                         };
                     } else {
                         coordinates[children[i]] = {
-                            "fx": getTapestryDimensions().width / 2,
-                            "fy": getTapestryDimensions().height - nodeSpace
+                            "fx": tapestryDimensions.width / 2,
+                            "fy": tapestryDimensions.height - nodeSpace
                         };
                     }
                 }
@@ -1708,23 +1712,23 @@ function tapestryTool(config){
                     if (i % 2 === 0) {
                         coordinates[children[i]] = {
                             "fx": 0,
-                            "fy": Math.min(screenToSVG(0, getBrowserHeight() * (i / (children.length - 1))).y + nodeRadius, getTapestryDimensions().height - nodeSpace)
+                            "fy": Math.min(screenToSVG(0, getBrowserHeight() * (i / (children.length - 1))).y + nodeRadius, tapestryDimensions.height - nodeSpace)
                         };
                     } else {
                         coordinates[children[i]] = {
                             "fx": screenToSVG(getBrowserWidth(), 0).x - nodeSpace,
-                            "fy": Math.min(screenToSVG(0, getBrowserHeight() * ((i-1) / (children.length - 1))).y + nodeRadius, getTapestryDimensions().height - nodeSpace)
+                            "fy": Math.min(screenToSVG(0, getBrowserHeight() * ((i-1) / (children.length - 1))).y + nodeRadius, tapestryDimensions.height - nodeSpace)
                         };
                     }
                 } else {
                     if (i % 2 === 0) {
                         coordinates[children[i]] = {
-                            "fx": Math.min(getTapestryDimensions().width * (i / (children.length - 1)) + nodeRadius, getTapestryDimensions().width - (nodeSpace * 2)),
+                            "fx": Math.min(tapestryDimensions.width * (i / (children.length - 1)) + nodeRadius, tapestryDimensions.width - (nodeSpace * 2)),
                             "fy": 0
                         };
                     } else {
                         coordinates[children[i]] = {
-                            "fx": Math.min(getTapestryDimensions().width * ((i - 1) / (children.length - 1)) + nodeRadius, getTapestryDimensions().width - (nodeSpace * 2)),
+                            "fx": Math.min(tapestryDimensions.width * ((i - 1) / (children.length - 1)) + nodeRadius, tapestryDimensions.width - (nodeSpace * 2)),
                             "fy": screenToSVG(0, (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1) + $("#spotlight-content").height() + $(".mediaButtonIcon").height()).y
                         };
                     }
@@ -1864,7 +1868,7 @@ function tapestryTool(config){
     }
 
     /* Gets the boundary of the tapestry */
-    function getTapestryDimensions() {
+    this.getTapestryDimensions = function () {
 
         var tapestryWidth = $('#'+TAPESTRY_CONTAINER_ID).outerWidth();
         var tapestryHeight = getBrowserHeight() - $('#'+TAPESTRY_CONTAINER_ID).offset().top;
