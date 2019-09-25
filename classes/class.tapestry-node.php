@@ -49,7 +49,7 @@ class TapestryNode implements ITapestryNode
         $this->imageURL = '';
         $this->mediaType = '';
         $this->mediaFormat = '';
-        $this->unlocked = false;
+        $this->unlocked = true;
         $this->mediaDuration = 0;
         $this->description = '';
         $this->type = 'tapestry_node';

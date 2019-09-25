@@ -54,7 +54,7 @@ export default {
         },
         mediaDuration: '',
         imageURL: '',
-        unlocked: false,
+        unlocked: true,
         permissions: { public: ['read'] }
       }
     }
@@ -100,7 +100,7 @@ export default {
         },
         mediaDuration: '',
         imageURL: '',
-        unlocked: '',
+        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,

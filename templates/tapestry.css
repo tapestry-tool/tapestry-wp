@@ -313,11 +313,16 @@ body {
     opacity: 1;
 }
 
-.node .expandGrandchildren {
+.node path:first-of-type {
+    fill: #11a6d8;
+}
+
+.node path.grandchild,
+.node .grandchild {
     fill: #999;
 }
 
-.node:hover .expandGrandchildren {
+.node:hover .grandchild {
     transform: scale(1.2);
 }
 

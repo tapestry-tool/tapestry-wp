@@ -104,6 +104,12 @@ function tapestryTool(config){
                 if (tapestry.dataset.nodes[i].id == tapestry.dataset.rootId) {
                     tapestry.dataset.nodes[i].unlocked = true;
                 }
+
+                // TEMPORARY BUG FIX: All nodes were getting saved as locked
+                // TODO: REMOVE THIS LINE WHEN WE HAVE LOCKING FUNCTIONALITY WORKING AGAIN
+                // Note: We will need to go through the existing modules wherever this is deployed
+                // and save the nodes to be unlocked when this feature is deployed again
+                tapestry.dataset.nodes[i].unlocked = true;
             }
         }
         for (var i=0; i < tapestry.dataset.nodes.length; i++) {
@@ -830,7 +836,7 @@ function tapestryTool(config){
         /* Draws the circle that defines how large the node is */
         nodes.append("rect")
             .attr("class", function (d) {
-                if (d.nodeType === "grandchild") return "imageContainer expandGrandchildren";
+                if (d.nodeType === "grandchild") return "imageContainer grandchild";
                 return "imageContainer";
             })
             .attr("rx", function (d) {
@@ -1006,7 +1012,7 @@ function tapestryTool(config){
         nodes.selectAll(".imageContainer")
                 .attr("class", function (d) {
                     if (!getViewable(d))
-                        return "imageContainer expandGrandchildren";
+                        return "imageContainer grandchild";
                     else return "imageContainer";
                 })
                 .transition()
@@ -1282,16 +1288,10 @@ function tapestryTool(config){
     
         path.enter()
             .append("path")
-            .attr("fill", function (d, i) {
-                if (d.data.group !== "viewed" || !getViewable(d)) 
-                    return "transparent";
-                else if (d.data.extra.nodeType === "grandchild")
-                    return "#cad7dc";
-                else return "#11a6d8";
-            })
+            .attr("fill", "transparent")
             .attr("class", function (d) {
                 if (d.data.extra.nodeType === "grandchild")
-                    return "expandGrandchildren";
+                    return "grandchild";
             })
             .attr("d", function (d) {
                 return arcGenerator(adjustProgressBarRadii(d));
@@ -1947,7 +1947,7 @@ function tapestryTool(config){
     function getNodeClasses(node) {
         var base = "imageOverlay";
         if (node.nodeType === "grandchild") {
-            base += " expandGrandchildren";
+            base += " grandchild";
         }
         if (node.imageURL.length === 0) {
             base += " imageOverlay--no-image";
