@@ -69,7 +69,11 @@ class TapestryError extends Error
         'POST_ID_ALREADY_SET' => [
             'MESSAGE'   => 'PostID should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 500]
-        ]
+        ],
+        'CANNOT_DELETE_ROOT' => [
+            'MESSAGE'   => 'Root node can only be deleted if there are no other nodes in the tapestry',
+            'STATUS'    => ['status' => 400]
+        ],
     ];
 
     /**

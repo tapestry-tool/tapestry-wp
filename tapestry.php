@@ -81,7 +81,7 @@ function create_tapestry_node_type()
         "query_var" => true,
         "supports" => array("title", "editor", "thumbnail"),
     );
-    register_post_type('tapestry-node', $args);
+    register_post_type('tapestry_node', $args);
 }
 add_action('init', 'create_tapestry_node_type');
 
