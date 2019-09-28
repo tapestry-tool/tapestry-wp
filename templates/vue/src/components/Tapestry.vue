@@ -285,7 +285,13 @@ export default {
 
         newNodeEntry.id = response.data.id;
 
-        this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)] = newNodeEntry;
+        var thisNodeIndex = Helpers.findNodeIndex(this.selectedNodeId, this.tapestry);
+
+        for (let key in this.tapestry.nodes[thisNodeIndex]) {
+          if (newNodeEntry.hasOwnProperty(key)) {
+            this.tapestry.nodes[thisNodeIndex][key] = newNodeEntry[key];
+          }
+        }
       }
       
       // Update permissions
