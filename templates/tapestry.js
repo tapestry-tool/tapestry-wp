@@ -659,12 +659,15 @@ function tapestryTool(config){
         var tapestryDimensions = tapestry.getTapestryDimensions();
         tapestryDimensionsBeforeDrag = tapestryDimensions;
 
+        const MIN_WIDTH = getBrowserWidth();
+        const MIN_HEIGHT = getBrowserHeight();
+
         d3.select("#"+TAPESTRY_CONTAINER_ID+"-svg")
             .attr("viewBox", 
                     tapestryDimensions.startX + " " + 
                     tapestryDimensions.startY + " " + 
-                    (tapestryDimensions.width - tapestryDimensions.startX) + " " + 
-                    (tapestryDimensions.height - tapestryDimensions.startY) 
+                    Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
+                    Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
                 );
                 
         startSimulation();
