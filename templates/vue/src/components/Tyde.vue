@@ -27,17 +27,21 @@ export default {
   },
   data() {
     return {
-      isMenuOpen: false
+      isMenuOpen: false,
     }
   },
   methods: {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen
     }
-  }
+  },
 }
 </script>
 
-<style scoped>
-
+<style>
+:root {
+  --gray: #404040;
+  --light-gray: #787878;
+  --light-blue: #1eade1;
+}
 </style>
