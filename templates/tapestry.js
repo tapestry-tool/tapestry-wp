@@ -119,6 +119,9 @@ function tapestryTool(config){
         tapestry.originalDataset = tapestry.dataset;
 
         tapestrySlug = tapestry.dataset.settings.tapestrySlug;
+        if (tapestry.dataset.settings.autolayout) {
+            autolayout = tapestry.dataset.settings.autolayout;
+        }
         root = tapestry.dataset.rootId;
         
         if (saveProgress) {
@@ -222,6 +225,7 @@ function tapestryTool(config){
         
         // Ensure tapestry size fits well into the browser and start force
         updateSvgDimensions();
+        setBackgroundImage();
 
         if (!isReload) {
             //---------------------------------------------------
@@ -232,6 +236,13 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+    }
+
+    function setBackgroundImage() {
+        const { backgroundUrl } = tapestry.dataset.settings;
+        const tapestryContainer = document.getElementById(TAPESTRY_CONTAINER_ID);
+        tapestryContainer.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
+        tapestryContainer.style.backgroundSize = "cover";
     }
 
     this.getControls = function() {
@@ -280,6 +291,27 @@ function tapestryTool(config){
         };
         
         tapestryControlsDiv.appendChild(depthSliderWrapper);
+
+        //--------------------------------------------------
+        // Add in settings modal button
+        //--------------------------------------------------
+        var settingsButton = document.createElement("button");
+        settingsButton.classList.add("settings-button");
+
+        var settingsIcon = document.createElement("i");
+        settingsIcon.classList.add("fas", "fa-cog", "settings-icon");
+        settingsButton.appendChild(settingsIcon);
+
+        settingsButton.onclick = function () {
+            dispatchEvent(new CustomEvent('open-settings-modal'));
+        };
+        
+        let showSettings = false;
+        // append settings modal only if logged in
+        if (config.wpUserId) {
+            tapestryControlsDiv.appendChild(settingsButton);
+            showSettings = true;
+        }
         
         //--------------------------------------------------
         // Checkbox to view locked nodes (logged in users only)
@@ -321,6 +353,9 @@ function tapestryTool(config){
             var showDepthSlider = findMaxDepth(root) >= 2;
             // Hide depth slider if depth is less than 3 
             depthSliderWrapper.style.display = showDepthSlider ? "flex" : "none";
+            if (showDepthSlider) {
+                settingsButton.style.marginLeft = "10px";
+            }
 
             // Hide this if there are no locked nodes
             var lockedNodesExist = false;
@@ -333,7 +368,7 @@ function tapestryTool(config){
             }
             viewLockedCheckboxWrapper.style.display = lockedNodesExist ? "flex" : "none";
 
-            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider) ? "flex" : "none";
+            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider || showSettings) ? "flex" : "none";
         }
         hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 

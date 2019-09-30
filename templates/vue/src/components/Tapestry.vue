@@ -6,6 +6,7 @@
       <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
+    <SettingsModal :tapestryApiClient="TapestryAPI" @settings-updated="handleSettingsUpdate" />
     <RootNodeButton v-show="tapestryLoaded && !tapestry.rootId" @add-root-node="addRootNode" />
     <NodeModal
       :node="populatedNode"
@@ -21,6 +22,7 @@
 <script>
 import Helpers from "../utils/Helpers"
 import NodeModal from './NodeModal'
+import SettingsModal from "./SettingsModal"
 import RootNodeButton from './RootNodeButton'
 import TapestryAPI from '../services/TapestryAPI'
 
@@ -28,7 +30,8 @@ export default {
   name: 'tapestry',
   components: {
     NodeModal,
-    RootNodeButton
+    RootNodeButton,
+    SettingsModal
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -161,7 +164,7 @@ export default {
             { "group": "unviewed", "value": 1 }
           ],
           "mediaURL": "",
-          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P
           "mediaHeight": 600
         },
         "unlocked": true,
@@ -254,7 +257,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
 
         newNodeEntry.id = response.data.id;
-        
+
         this.tapestry.nodes.push(newNodeEntry);
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
@@ -262,23 +265,23 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
-            "appearsAt": appearsAt 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
+            "appearsAt": appearsAt
           };
           this.TapestryAPI.addLink(JSON.stringify(newLink));
           this.tapestry.links.push(newLink);
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id;
           this.selectedNodeId = newNodeEntry.id;
         }
 
-      } 
+      }
       else { // Editing existing node
 
         const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry));
@@ -293,7 +296,7 @@ export default {
           }
         }
       }
-      
+
       // Update permissions
       this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions));
 
@@ -305,6 +308,11 @@ export default {
       thisTapestryTool.initialize(true);
 
       this.closeModal();
+    },
+    handleSettingsUpdate(settings) {
+      this.tapestry.settings = settings;
+      thisTapestryTool.setDataset(this.tapestry);
+      thisTapestryTool.reinitialize();
     }
   }
 }
