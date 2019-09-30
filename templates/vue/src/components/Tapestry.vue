@@ -36,6 +36,7 @@ export default {
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
     window.addEventListener('tapestry-updated', this.tapestryUpdated)
+    window.addEventListener('tapestry-updated-node', this.tapestryUpdatedNode)
   },
   data() {
     return {
@@ -83,6 +84,10 @@ export default {
     },
   },
   methods: {
+    tapestryUpdatedNode(event) {
+      const { index } = event.detail;
+      this.$set(this.tapestry.nodes, index, event.detail);
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset;
       if (!this.tapestryLoaded) {
@@ -161,7 +166,7 @@ export default {
             { "group": "unviewed", "value": 1 }
           ],
           "mediaURL": "",
-          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P
           "mediaHeight": 600
         },
         "unlocked": true,
@@ -254,7 +259,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
 
         newNodeEntry.id = response.data.id;
-        
+
         this.tapestry.nodes.push(newNodeEntry);
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
@@ -262,23 +267,23 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
-            "appearsAt": appearsAt 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
+            "appearsAt": appearsAt
           };
           this.TapestryAPI.addLink(JSON.stringify(newLink));
           this.tapestry.links.push(newLink);
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id;
           this.selectedNodeId = newNodeEntry.id;
         }
 
-      } 
+      }
       else { // Editing existing node
 
         const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry));
@@ -293,7 +298,7 @@ export default {
           }
         }
       }
-      
+
       // Update permissions
       this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions));
 

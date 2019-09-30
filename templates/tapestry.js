@@ -506,6 +506,10 @@ function tapestryTool(config){
             d3.selectAll('g.node').each(function(d){
                 delete d.fx;
                 delete d.fy;
+
+                dispatchEvent(new CustomEvent('tapestry-updated-node', {
+                    detail: d
+                }));
             });
         }
 
@@ -614,6 +618,10 @@ function tapestryTool(config){
         d[yORfy] = d.y;
         updateSvgDimensions();
 
+        dispatchEvent(new CustomEvent('tapestry-updated-node', {
+            detail: d
+        }));
+
         if (config.wpIsAdmin && !autoLayout) {
             $.ajax({
                 url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
@@ -624,6 +632,10 @@ function tapestryTool(config){
                     console.error(e);
                     d[xORfx] = nodeBeforeDrag.x;
                     d[yORfy] = nodeBeforeDrag.y;
+
+                    dispatchEvent(new CustomEvent('tapestry-updated-node', {
+                        detail: d
+                    }));
                 }
             });
         }
@@ -1673,6 +1685,9 @@ function tapestryTool(config){
                 d.fx = coordinates[d.id].fx;
                 d.fy = coordinates[d.id].fy;
             }
+            dispatchEvent(new CustomEvent('tapestry-updated-node', {
+                detail: d
+            }));
         });
     
         filterTapestry();
@@ -1777,6 +1792,10 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[i].fx = tapestry.originalDataset.nodes[i].fx;
                 tapestry.dataset.nodes[i].fy = tapestry.originalDataset.nodes[i].fy;
             }
+
+            dispatchEvent(new CustomEvent('tapestry-updated', {
+                detail: { dataset: tapestry.dataset }
+            }));
                 
             d3.selectAll('g.node')
                 .transition()
@@ -2012,6 +2031,10 @@ function tapestryTool(config){
                 }
             }
         }
+
+        dispatchEvent(new CustomEvent('tapestry-updated', {
+            detail: { dataset: tapestry.dataset }
+        }));
     }
     
     /* Return the distance between a node and its farthest descendant node */
@@ -2199,6 +2222,10 @@ function tapestryTool(config){
                 }
             }
         }
+
+        dispatchEvent(new CustomEvent('tapestry-updated', {
+            detail: { dataset: tapestry.dataset }
+        }));
     
         return true;
     }
@@ -2210,6 +2237,11 @@ function tapestryTool(config){
             "post_id": config.wpPostId,
             "node_id": node.id,
             "unlocked": true
+        })
+        .done(function() {
+            dispatchEvent(new CustomEvent('tapestry-updated', {
+                detail: { dataset: tapestry.dataset }
+            }));
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
