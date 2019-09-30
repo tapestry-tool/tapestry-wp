@@ -105,6 +105,9 @@
             <b-form-group>
               <b-form-checkbox v-model="node.hideMedia">Hide media button</b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.skippable" v-show="node.mediaType === 'h5p' || node.mediaType === 'video'">Allow skipping video if user has not watched at least once</b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Permissions">
@@ -237,7 +240,8 @@ export default {
         { name: 'permissions', value: this.node.permissions },
         { name: 'hideTitle', value: this.node.hideTitle },
         { name: 'hideProgress', value: this.node.hideProgress },
-        { name: 'hideMedia', value: this.node.hideMedia }
+        { name: 'hideMedia', value: this.node.hideMedia },
+        { name: 'skippable', value: this.node.skippable }
       ]
     },
     nodeImageUrl() {
@@ -272,7 +276,7 @@ export default {
       }
     },
     validateNode() {
-      var errMsgs = [];	
+      var errMsgs = [];
 
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title");
@@ -310,8 +314,8 @@ export default {
           errMsgs.push("Please enter Text Content for this node");
         }
       }
-      
-      return errMsgs.join("<br>");	
+
+      return errMsgs.join("<br>");
     },
     addUserPermissionRow () {
       const userId = this.userId;

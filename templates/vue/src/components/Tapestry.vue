@@ -104,6 +104,7 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
+        skippable: true,
         permissions: { public: ['read'] },
         description: ''
       };
@@ -161,13 +162,14 @@ export default {
             { "group": "unviewed", "value": 1 }
           ],
           "mediaURL": "",
-          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P	
+          "mediaWidth": 960,      //TODO: This needs to be flexible with H5P
           "mediaHeight": 600
         },
         "unlocked": true,
         "hideTitle": false,
         "hideProgress": false,
         "hideMedia": false,
+        "skippable": true,
         "coordinates": {
           "x": (dimensions.width - dimensions.startX) / 2,
           "y": (dimensions.height - dimensions.startY) / 2
@@ -239,6 +241,8 @@ export default {
           case "hideMedia":
             newNodeEntry.hideMedia = fieldValue;
             break;
+          case "skippable":
+            newNodeEntry.skippable = fieldValue;
           case "description":
             newNodeEntry.description = fieldValue;
             break;
@@ -254,7 +258,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
 
         newNodeEntry.id = response.data.id;
-        
+
         this.tapestry.nodes.push(newNodeEntry);
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
@@ -262,23 +266,23 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
-            "appearsAt": appearsAt 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
+            "appearsAt": appearsAt
           };
           this.TapestryAPI.addLink(JSON.stringify(newLink));
           this.tapestry.links.push(newLink);
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id;
           this.selectedNodeId = newNodeEntry.id;
         }
 
-      } 
+      }
       else { // Editing existing node
 
         const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry));
@@ -293,7 +297,7 @@ export default {
           }
         }
       }
-      
+
       // Update permissions
       this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions));
 

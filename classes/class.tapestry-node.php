@@ -28,6 +28,7 @@ class TapestryNode implements ITapestryNode
     private $hideTitle;
     private $hideProgress;
     private $hideMedia;
+    private $skippable;
 
     /**
      * Constructor
@@ -59,6 +60,7 @@ class TapestryNode implements ITapestryNode
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
+        $this->skippable = true;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -132,6 +134,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->hideMedia) && is_bool($node->hideMedia)) {
             $this->hideMedia = $node->hideMedia;
+        }
+        if (isset($node->skippable) && is_bool($node->skippable)) {
+            $this->skippable = $node->skippable;
         }
     }
 
@@ -235,7 +240,8 @@ class TapestryNode implements ITapestryNode
             'permissions'   => $this->permissions,
             'hideTitle'     => $this->hideTitle,
             'hideProgress'  => $this->hideProgress,
-            'hideMedia'     => $this->hideMedia
+            'hideMedia'     => $this->hideMedia,
+            'skippable'     => $this->skippable
         ];
     }
 

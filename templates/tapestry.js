@@ -179,6 +179,9 @@ function tapestryTool(config){
     });
 
     this.init = function(isReload = false) {
+        this.dataset.nodes = this.dataset.nodes.map(node => {
+            return fillEmptyFields(node, { skippable: true });
+        });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
             detail: { dataset: this.dataset }
@@ -232,6 +235,21 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+    }
+
+    /**
+     * Helper function to fill in default fields of a node if
+     * they do not exist.
+     * @param {object} node 
+     * @param {object} attributes 
+     */
+    function fillEmptyFields(node, attributes) {
+        for (const [key, value] of Object.entries(attributes)) {
+            if (!node.hasOwnProperty(key)) {
+                node[key] = value;
+            }
+        }
+        return node;
     }
 
     this.getControls = function() {
@@ -977,7 +995,7 @@ function tapestryTool(config){
                 }
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1160,7 +1178,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1324,17 +1342,23 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
     
-    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height) {
+    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height, skippable) {
         // Adjust the width and height here before passing it into setup media
         var lightboxDimensions = getLightboxDimensions(height, width);
         width = lightboxDimensions.width;
         height = lightboxDimensions.height;
         var media = setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height);
     
-    $('<div id="spotlight-overlay"></div>').on("click", function(){
+        const overlay = $('<div id="spotlight-overlay"></div>').on("click", function(){
             closeLightbox(id, mediaType);
             exitViewMode();
-        }).appendTo('body');
+        });
+
+        const closeLightboxButton = $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
+            .on("click", function () {
+                closeLightbox(id, mediaType);
+                exitViewMode();
+            });
     
         var top = lightboxDimensions.adjustedOn === "width" ? ((getBrowserHeight() - height) / 2) + $(this).scrollTop() : (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1);
         $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css({
@@ -1353,15 +1377,22 @@ function tapestryTool(config){
             });
         }
     
-    $("<div class='media-wrapper'></div>").appendTo('#spotlight-content');
-    media.appendTo('.media-wrapper');
-    
-    $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
-            .on("click", function() {
-                closeLightbox(id, mediaType);
-                exitViewMode();
-            })
-            .appendTo('#spotlight-content');
+        const wrapper = $("<div class='media-wrapper'></div>");
+        window.addEventListener("allow-skip", function () {
+            appendSkipTools();
+        });
+
+        wrapper.appendTo('#spotlight-content');
+        media.appendTo('.media-wrapper');
+
+        if (shouldAllowSkip(id)) {
+            appendSkipTools();
+        }
+
+        function appendSkipTools() {
+            overlay.appendTo('body');
+            closeLightboxButton.appendTo("#spotlight-content");
+        }
     
         setTimeout(function(){
             $('#spotlight-content').css({
@@ -1397,6 +1428,11 @@ function tapestryTool(config){
                 }, 200);
             });
         }
+    }
+
+    function shouldAllowSkip(id) {
+        const node = tapestry.dataset.nodes[findNodeIndex(id)];
+        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= 0.95;
     }
     
     function getLightboxDimensions(videoHeight, videoWidth) {
@@ -1479,6 +1515,7 @@ function tapestryTool(config){
                 });
                 
                 // Update the progress circle for this video
+                let wasDispatched = false;
                 video.addEventListener('timeupdate', function () {
                     for (var i = 0; i < childrenData.length; i++) {
                         if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
@@ -1489,6 +1526,12 @@ function tapestryTool(config){
                     }
                     updateViewedValue(id, video.currentTime, video.duration);
                     updateViewedProgress();
+                    if (video.currentTime / video.duration >= 0.95) {
+                        if (!wasDispatched) {
+                            dispatchEvent(new CustomEvent("allow-skip", { detail: id }));
+                        }
+                        wasDispatched = true;
+                    }
                 });
     
                 // Play the video at the last watched time (or at the beginning if not watched yet)
