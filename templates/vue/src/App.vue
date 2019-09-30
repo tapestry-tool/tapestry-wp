@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <Tapestry />
+    <Tyde />
   </div>
 </template>
 
 <script>
-import Tapestry from './components/Tapestry'
+import Tyde from './components/Tyde'
 
 export default {
   name: 'app',
   components: {
-    Tapestry
+    Tyde
   },
   data() {
     return {}
