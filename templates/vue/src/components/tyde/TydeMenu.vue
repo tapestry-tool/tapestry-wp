@@ -1,34 +1,20 @@
 <template>
   <div id="tyde-menu">
     <div class="buttons">
-      <TydeButton icon="cog"></TydeButton>
+      <TydeButton @click="setActivePage('settings')" icon="cog"></TydeButton>
       <TydeButton icon="globe-asia"></TydeButton>
       <TydeButton icon="question"></TydeButton>
     </div>
     <div class="content">
       <h1 class="title">Captain's Log</h1>
-      <nav>
-        <ul class="tabs">
-          <TydeTab @click="setActiveTab(tab)" v-for="tab in tabs" :key="tab" :isActive="tab === activeTab">
-            See {{ tab }}
-          </TydeTab>
-        </ul>
-      </nav>
-      <ul class="logs">
-        <TydeLog v-for="log in visibleLogs" :key="log">
-          <p>{{ log.name }}</p>
-          <p>Type: {{ log.type }}</p>
-          <p>Favourited: {{ log.isFavourite }}</p>
-        </TydeLog>
-      </ul>
+      <TydeMenuHome v-if="activePage === 'home'" :logs="logs" />
     </div>
   </div>
 </template>
 
 <script>
 import TydeButton from './TydeButton'
-import TydeTab from './TydeTab'
-import TydeLog from './TydeLog'
+import TydeMenuHome from './TydeMenuHome'
 
 export default {
   name: 'tyde-menu',
@@ -41,38 +27,21 @@ export default {
   },
   components: {
     TydeButton,
-    TydeTab,
-    TydeLog,
-  },
-  computed: {
-    visibleLogs() {
-      const filter = this.activeTab
-      if (filter === 'activities') {
-        return this.logs.filter(item => item.type === 'activity')
-      }
-      if (filter === 'content') {
-        return this.logs.filter(item => item.type === 'content')
-      }
-      if (filter === 'favourites') {
-        return this.logs.filter(item => item.isFavourite)
-      }
-      return this.logs
-    },
+    TydeMenuHome,
   },
   data() {
     return {
-      activeTab: 'all',
-      tabs: [
-        'activities',
-        'content',
-        'favourites',
-        'all',
-      ]
+      activePage: 'home',
+      pages: [
+        'home',
+        'settings',
+        'help',
+      ],
     }
   },
   methods: {
-    setActiveTab(tab) {
-      this.activeTab = tab
+    setActivePage(page) {
+      this.activePage = page
     },
   },
 }
@@ -100,24 +69,11 @@ export default {
 
 .content {
   background: var(--gray);
-  border: 3px solid white;
+  border: 4px solid white;
   min-height: 100%;
   padding: 32px 64px;
   position: relative;
   z-index: 0;
-}
-
-.logs {
-  margin-top: 16px;
-}
-
-.tabs {
-  display: flex;
-  font-size: 20px;
-  justify-content: space-between;
-  list-style: none;
-  margin: 0;
-  padding: 0 48px;
 }
 
 .title {
@@ -146,8 +102,8 @@ export default {
   bottom: 0;
   padding: 16px 3em;
   background: var(--gray);
-  border: 3px solid white;
-  border-bottom: 3px solid var(--gray);
+  border: 4px solid white;
+  border-bottom: 4px solid var(--gray);
   transform: perspective(10px) rotateX(1deg);
   z-index: -1;
 }
