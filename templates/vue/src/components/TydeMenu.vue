@@ -7,7 +7,13 @@
     </div>
     <div class="content">
       <h1 class="title">Captain's Log</h1>
-      <p>I'm the TYDE menu.</p>
+      <nav>
+        <ol class="tabs">
+          <li @click="setActiveTab(tab)" v-for="tab in tabs" :key="tab" :class="['tab', { 'tab-active': tab === activeTab }]">
+            See {{ tab }}
+          </li>
+        </ol>
+      </nav>
     </div>
   </div>
 </template>
@@ -22,7 +28,7 @@ export default {
   },
   data() {
     return {
-      activeTabIndex: 3,
+      activeTab: 'all',
       tabs: [
         'activities',
         'content',
@@ -30,6 +36,11 @@ export default {
         'all',
       ]
     }
+  },
+  methods: {
+    setActiveTab(tab) {
+      this.activeTab = tab
+    },
   },
 }
 </script>
@@ -55,11 +66,35 @@ export default {
 }
 
 .content {
-  position: relative;
   background: var(--gray);
   border: 3px solid white;
   min-height: 100%;
+  padding: 32px 64px;
+  position: relative;
   z-index: 0;
+}
+
+.tabs {
+  display: flex;
+  font-size: 24px;
+  justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tab {
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 1;
+  margin: 0;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+.tab:hover,
+.tab-active {
+  opacity: 1;
 }
 
 .title {
