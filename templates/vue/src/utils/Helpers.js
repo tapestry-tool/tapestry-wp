@@ -47,19 +47,4 @@ export default class {
 
         return tapestry.nodes.findIndex(helper);
     }
-
-    /**
-     * Checks if an object has all the properties given in keys
-     * @param {Object} obj
-     * @param {string[]} keys
-     * @return {boolean}
-     */
-    static hasAllProperties(obj, keys) {
-      for (const key of keys) {
-        if (!obj.hasOwnProperty(key)) {
-          return false
-        }
-      }
-      return true
-    }
 }

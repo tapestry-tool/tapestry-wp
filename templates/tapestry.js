@@ -1517,7 +1517,7 @@ function tapestryTool(config){
                     type: mediaType, 
                     id, 
                 }
-            }))
+            }));
         } 
         else if (mediaFormat === "h5p") {
     
