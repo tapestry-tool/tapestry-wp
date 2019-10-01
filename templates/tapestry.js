@@ -978,6 +978,11 @@ function tapestryTool(config){
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
                     setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+
+                    dispatchEvent(new CustomEvent("tyde-open-lightbox", {
+                        detail: thisBtn
+                    }));
+
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1160,7 +1165,13 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
+
             setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+
+            dispatchEvent(new CustomEvent("tyde-open-lightbox", {
+                detail: thisBtn
+            }));
+
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1324,6 +1335,14 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
     
+    this.openLightbox = function(dataset) {
+        return setupLightbox(dataset.id, dataset.format, dataset.mediaType, dataset.url, dataset.mediaWidth, dataset.mediaHeight);
+    } 
+
+    this.closeLightbox = function(dataset) {
+        return closeLightbox(dataset.id, dataset.mediaType);
+    }
+
     function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height) {
         // Adjust the width and height here before passing it into setup media
         var lightboxDimensions = getLightboxDimensions(height, width);
@@ -1331,8 +1350,9 @@ function tapestryTool(config){
         height = lightboxDimensions.height;
         var media = setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height);
     
-    $('<div id="spotlight-overlay"></div>').on("click", function(){
+        $('<div id="spotlight-overlay"></div>').on("click", function(){
             closeLightbox(id, mediaType);
+            dispatchEvent(new CustomEvent("tyde-close-lightbox"));
             exitViewMode();
         }).appendTo('body');
     
@@ -1359,6 +1379,7 @@ function tapestryTool(config){
     $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
             .on("click", function() {
                 closeLightbox(id, mediaType);
+                dispatchEvent(new CustomEvent("tyde-close-lightbox"));
                 exitViewMode();
             })
             .appendTo('#spotlight-content');
@@ -2414,6 +2435,14 @@ tapestryTool.prototype.setOriginalDataset = function (dataset) {
 tapestryTool.prototype.deleteNodeFromTapestry = function() {
     this.tapestryDeleteNode();
  };
+
+tapestryTool.prototype.openLightbox = function(dataset) {
+    this.openLightbox(dataset);
+}
+
+tapestryTool.prototype.closeLightbox = function(dataset) {
+    this.closeLightbox(dataset);
+}
 
 /*******************************************************
  * 

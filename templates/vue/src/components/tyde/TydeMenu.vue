@@ -2,7 +2,7 @@
   <div id="tyde-menu">
     <div class="buttons">
       <TydeButton @click="setActivePage('settings')" icon="cog"></TydeButton>
-      <TydeButton icon="globe-asia"></TydeButton>
+      <TydeButton @click="$emit('return-to-map')" icon="globe-asia"></TydeButton>
       <TydeButton @click="setActivePage('help')" icon="question"></TydeButton>
     </div>
     <div class="content">
@@ -12,7 +12,7 @@
       <TydeMenuHelp @back="setActivePage('home')" v-if="activePage === 'help'" />
     </div>
     <div class="continue">
-      <TydeButton @click="$emit('close')" icon="arrow-right" class="button-continue"></TydeButton>
+      <TydeButton @click="$emit('continue')" icon="arrow-right" class="button-continue"></TydeButton>
     </div>
   </div>
 </template>

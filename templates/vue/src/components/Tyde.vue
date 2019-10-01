@@ -1,7 +1,7 @@
 <template>
   <div id="tyde">
     <Tapestry />
-    <TydeMenu v-if="isMenuOpen" :logs="logs" />
+    <TydeMenu @continue="continueTapestry" @return-to-map="returnToMap" v-if="isMenuOpen" :logs="logs" />
   </div>
 </template>
 
@@ -18,16 +18,27 @@ export default {
   mounted() {
     window.addEventListener("keydown", evt => {
       if (evt.code === "Escape") {
+        if (this.isMenuOpen) {
+          // if open, reopen lightbox
+          thisTapestryTool.openLightbox(this.lightbox)
+        } else {
+          thisTapestryTool.closeLightbox(this.lightbox)
+        }
         this.toggleMenu()
       }
     })
+    window.addEventListener("tyde-open-lightbox", this.saveLightbox)
+    window.addEventListener("tyde-close-lightbox", this.clearLightbox)
   },
   beforeDestroy() {
     window.removeEventListener("keydown")
+    window.removeEventListener("tyde-open-lightbox")
+    window.removeEventListener("tyde-close-lightbox")
   },
   data() {
     return {
       isMenuOpen: false,
+      lightbox: null,
       logs: [
         {
           name: "Log 1",
@@ -48,9 +59,26 @@ export default {
     }
   },
   methods: {
+    continueTapestry() {
+      thisTapestryTool.openLightbox(this.lightbox)
+      this.toggleMenu()
+    },
+    clearLightbox() {
+      this.lightbox = null
+      console.log("Clearing", this.lightbox)
+    },
+    returnToMap() {
+      this.clearLightbox()
+      this.toggleMenu()
+    },
+    saveLightbox(event) {
+      const el = event.detail
+      this.lightbox = el.dataset
+      console.log("Saving", this.lightbox)
+    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen
-    }
+    },
   },
 }
 </script>
