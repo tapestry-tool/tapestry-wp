@@ -978,11 +978,6 @@ function tapestryTool(config){
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
                     setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
-
-                    dispatchEvent(new CustomEvent("tyde-open-lightbox", {
-                        detail: thisBtn
-                    }));
-
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1165,13 +1160,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-
             setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
-
-            dispatchEvent(new CustomEvent("tyde-open-lightbox", {
-                detail: thisBtn
-            }));
-
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1334,14 +1323,6 @@ function tapestryTool(config){
     /****************************************************
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
-    
-    this.openLightbox = function(dataset) {
-        return setupLightbox(dataset.id, dataset.format, dataset.mediaType, dataset.url, dataset.mediaWidth, dataset.mediaHeight);
-    } 
-
-    this.closeLightbox = function(dataset) {
-        return closeLightbox(dataset.id, dataset.mediaType);
-    }
 
     function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height) {
         // Adjust the width and height here before passing it into setup media
@@ -1529,7 +1510,14 @@ function tapestryTool(config){
                 }, 1000);
     
             }, false);
-            
+
+            dispatchEvent(new CustomEvent("tyde-open-lightbox-video", {
+                detail: { 
+                    el: video, 
+                    type: mediaType, 
+                    id, 
+                }
+            }))
         } 
         else if (mediaFormat === "h5p") {
     
@@ -2436,13 +2424,7 @@ tapestryTool.prototype.deleteNodeFromTapestry = function() {
     this.tapestryDeleteNode();
  };
 
-tapestryTool.prototype.openLightbox = function(dataset) {
-    this.openLightbox(dataset);
-}
-
-tapestryTool.prototype.closeLightbox = function(dataset) {
-    this.closeLightbox(dataset);
-}
+tapestryTool.prototype.closeLightbox = closeLightbox;
 
 /*******************************************************
  * 

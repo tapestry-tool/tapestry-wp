@@ -61,7 +61,7 @@ export default {
   left: 0;
   background: black;
   color: white;
-  z-index: 10;
+  z-index: 200;
   padding: 16px 80px;
 }
 

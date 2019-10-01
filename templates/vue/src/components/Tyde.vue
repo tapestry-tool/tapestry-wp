@@ -18,16 +18,14 @@ export default {
   mounted() {
     window.addEventListener("keydown", evt => {
       if (evt.code === "Escape") {
-        if (this.isMenuOpen) {
-          // if open, reopen lightbox
-          thisTapestryTool.openLightbox(this.lightbox)
-        } else {
-          thisTapestryTool.closeLightbox(this.lightbox)
+        const {el} = this.lightbox
+        if (el) {
+          this.isMenuOpen ? el.play() : el.pause()
         }
         this.toggleMenu()
       }
     })
-    window.addEventListener("tyde-open-lightbox", this.saveLightbox)
+    window.addEventListener("tyde-open-lightbox-video", this.saveLightbox)
     window.addEventListener("tyde-close-lightbox", this.clearLightbox)
   },
   beforeDestroy() {
@@ -38,7 +36,7 @@ export default {
   data() {
     return {
       isMenuOpen: false,
-      lightbox: null,
+      lightbox: {},
       logs: [
         {
           name: "Log 1",
@@ -60,20 +58,26 @@ export default {
   },
   methods: {
     continueTapestry() {
-      thisTapestryTool.openLightbox(this.lightbox)
+      const {el} = this.lightbox
       this.toggleMenu()
+      if (el) {
+        el.play()
+      }
     },
     clearLightbox() {
-      this.lightbox = null
+      this.lightbox = {}
       console.log("Clearing", this.lightbox)
     },
     returnToMap() {
+      const { id, type } = this.lightbox
+      if (id && type) {
+        thisTapestryTool.closeLightbox(id, type)
+      }
       this.clearLightbox()
       this.toggleMenu()
     },
     saveLightbox(event) {
-      const el = event.detail
-      this.lightbox = el.dataset
+      this.lightbox = event.detail
       console.log("Saving", this.lightbox)
     },
     toggleMenu() {
