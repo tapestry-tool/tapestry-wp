@@ -112,16 +112,27 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[i].unlocked = true;
             }
         }
-        for (var i=0; i < tapestry.dataset.nodes.length; i++) {
-            tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
-            tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
-        }
-        tapestry.originalDataset = tapestry.dataset;
 
         tapestrySlug = tapestry.dataset.settings.tapestrySlug;
-        if (tapestry.dataset.settings.autolayout) {
-            autolayout = tapestry.dataset.settings.autolayout;
+        if (tapestry.dataset.settings.autoLayout) {
+            autoLayout = tapestry.dataset.settings.autoLayout;
+            xORfx = autoLayout ? 'x' : 'fx';
+            yORfy = autoLayout ? 'y' : 'fy';
         }
+
+        for (var i=0; i < tapestry.dataset.nodes.length; i++) {
+            if (autoLayout) {
+                delete tapestry.dataset.nodes[i].fx;
+                delete tapestry.dataset.nodes[i].fy;
+            }
+            else {
+                tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
+                tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
+            }
+        }
+
+        tapestry.originalDataset = tapestry.dataset;
+        
         root = tapestry.dataset.rootId;
         
         if (saveProgress) {
@@ -240,9 +251,9 @@ function tapestryTool(config){
 
     function setBackgroundImage() {
         const { backgroundUrl } = tapestry.dataset.settings;
-        const tapestryContainer = document.getElementById(TAPESTRY_CONTAINER_ID);
-        tapestryContainer.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
-        tapestryContainer.style.backgroundSize = "cover";
+        const htmlBody = document.getElementsByTagName("BODY")[0];
+        htmlBody.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
+        htmlBody.style.backgroundSize = "cover";
     }
 
     this.getControls = function() {
@@ -1939,8 +1950,8 @@ function tapestryTool(config){
         return {
             'width': tapestryWidth + MAX_RADIUS*1.25,
             'height': tapestryHeight + MAX_RADIUS*1.25,
-            'startX': tapestryStartX,
-            'startY': tapestryStartY,
+            'startX': autoLayout ? 0 : tapestryStartX,
+            'startY': autoLayout ? 0 : tapestryStartY,
         };
     }
 

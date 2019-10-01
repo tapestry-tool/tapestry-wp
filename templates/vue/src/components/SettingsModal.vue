@@ -1,20 +1,31 @@
 <template>
-  <b-modal id="settings-modal" size="md" title="Update Settings">
+  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
     <b-container fluid class="px-0">
-      <b-form-group label="Background url">
-        <b-form-input
-          id="background-url"
-          placeholder="Enter background url"
-          v-model="backgroundUrl"
-          autofocus
-          required
-        />
-      </b-form-group>
-      <b-form-checkbox v-model="autolayout">Autolayout</b-form-checkbox>
+      <b-tabs card>
+        <b-tab title="Appearance" active>
+          <b-form-group label="Background URL" description="Add a background image to the page where this tapestry 
+              appears.">
+            <b-form-input
+              id="background-url"
+              placeholder="Enter background URL"
+              v-model="backgroundUrl"
+              autofocus
+              required
+            />
+          </b-form-group>
+          <b-form-group label="Auto-Layout" description="With auto-layout enabled, nodes will place themselves in
+              the best position possible. If this is disabled, you will need to manually place the nodes where
+              you want them to appear.">
+            <b-form-checkbox v-model="autoLayout" switch>{{ autoLayout ? 'Enabled' : 'Disabled' }}</b-form-checkbox>
+          </b-form-group>
+        </b-tab>
+      </b-tabs>
     </b-container>
     <template slot="modal-footer">
+      <p class="mb-0 p-0 text-muted small"><strong>Note:</strong> Page will refresh when you save to apply your new settings.</p>
+      <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="closeModal">Cancel</b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings">Submit</b-button>
+      <b-button size="sm" variant="primary" @click="updateSettings">Save</b-button>
     </template>
   </b-modal>
 </template>
@@ -26,7 +37,7 @@ export default {
     return {
       currentSettings: {},
       backgroundUrl: '',
-      autolayout: false
+      autoLayout: false
     }
   },
   props: {
@@ -51,16 +62,18 @@ export default {
     },
     async getSettings() {
       const response = await this.tapestryApiClient.getSettings();
-      const { backgroundUrl = "", autolayout = false } = response;
+      const { backgroundUrl = "", autoLayout = false } = response;
       this.currentSettings = response;
       this.backgroundUrl = backgroundUrl;
-      this.autolayout = autolayout;
+      this.autoLayout = autoLayout;
     },
     async updateSettings() {
-      const settings = Object.assign(this.currentSettings, { backgroundUrl: this.backgroundUrl, autolayout: this.autolayout });
+      const settings = Object.assign(this.currentSettings, { backgroundUrl: this.backgroundUrl, autoLayout: this.autoLayout });
       await this.tapestryApiClient.updateSettings(JSON.stringify(settings));
-      this.$emit("settings-updated", settings);
-      this.closeModal();
+      // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
+      // this.$emit("settings-updated", settings);
+      // this.closeModal();
+      location.reload();
     }
   }
 }
