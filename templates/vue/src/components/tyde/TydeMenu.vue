@@ -8,11 +8,9 @@
     <div class="content">
       <h1 class="title">Captain's Log</h1>
       <nav>
-        <ol class="tabs">
-          <li @click="setActiveTab(tab)" v-for="tab in tabs" :key="tab" :class="['tab', { 'tab-active': tab === activeTab }]">
-            See {{ tab }}
-          </li>
-        </ol>
+        <ul class="tabs">
+          <TydeTab @click="setActiveTab" v-for="tab in tabs" :key="tab" :isActive="tab === activeTab" :tab="tab"/>
+        </ul>
       </nav>
     </div>
   </div>
@@ -20,11 +18,13 @@
 
 <script>
 import TydeButton from './TydeButton'
+import TydeTab from './TydeTab'
 
 export default {
   name: 'tyde-menu',
   components: {
     TydeButton,
+    TydeTab,
   },
   data() {
     return {
@@ -81,20 +81,6 @@ export default {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.tab {
-  cursor: pointer;
-  font-weight: bold;
-  line-height: 1;
-  margin: 0;
-  opacity: 0.5;
-  text-transform: uppercase;
-}
-
-.tab:hover,
-.tab-active {
-  opacity: 1;
 }
 
 .title {

@@ -7,7 +7,12 @@
 
 <script>
 export default {
-  props: ['icon'],
+  props: {
+    icon: {
+      type: String,
+      required: true,
+    },
+  },
   name: 'tyde-button',
   computed: {
     iconClass: function() {

@@ -7,7 +7,7 @@
 
 <script>
 import Tapestry from "./Tapestry"
-import TydeMenu from "./TydeMenu"
+import TydeMenu from "./tyde/TydeMenu"
 
 export default {
   name: 'tyde',
