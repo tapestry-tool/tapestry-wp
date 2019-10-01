@@ -30,13 +30,19 @@ export default {
       isMenuOpen: false,
       logs: [
         {
-          name: "log 1"
+          name: "Log 1",
+          type: "activity",
+          isFavourite: false
         },
         {
-          name: "log 2"
+          name: "Log 2",
+          type: "content",
+          isFavourite: true
         },
         {
-          name: "log 3"
+          name: "Log 3",
+          type: "activity",
+          isFavourite: true
         },
       ],
     }

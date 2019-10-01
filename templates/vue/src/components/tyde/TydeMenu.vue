@@ -16,7 +16,9 @@
       </nav>
       <ul class="logs">
         <TydeLog v-for="log in visibleLogs" :key="log">
-          {{ log.name }}
+          <p>{{ log.name }}</p>
+          <p>Type: {{ log.type }}</p>
+          <p>Favourited: {{ log.isFavourite }}</p>
         </TydeLog>
       </ul>
     </div>
@@ -45,6 +47,15 @@ export default {
   computed: {
     visibleLogs() {
       const filter = this.activeTab
+      if (filter === 'activities') {
+        return this.logs.filter(item => item.type === 'activity')
+      }
+      if (filter === 'content') {
+        return this.logs.filter(item => item.type === 'content')
+      }
+      if (filter === 'favourites') {
+        return this.logs.filter(item => item.isFavourite)
+      }
       return this.logs
     },
   },
