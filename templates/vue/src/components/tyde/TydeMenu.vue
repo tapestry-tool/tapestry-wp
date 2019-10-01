@@ -9,7 +9,9 @@
       <h1 class="title">Captain's Log</h1>
       <nav>
         <ul class="tabs">
-          <TydeTab @click="setActiveTab" v-for="tab in tabs" :key="tab" :isActive="tab === activeTab" :tab="tab"/>
+          <TydeTab @click="setActiveTab(tab)" v-for="tab in tabs" :key="tab" :isActive="tab === activeTab">
+            See {{ tab }}
+          </TydeTab>
         </ul>
       </nav>
     </div>

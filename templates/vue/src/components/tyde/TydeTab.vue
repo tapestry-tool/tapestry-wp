@@ -1,6 +1,7 @@
 <template>
-  <li @click="$emit('click', tab)" :class="['tab', { 'tab-active': isActive }]">
-    See {{ tab }}
+  <li @click="$emit('click')" :class="['tab', { 'tab-active': isActive }]">
+    <i class="far fa-eye icon"></i>
+    <slot></slot>
   </li>
 </template>
 
@@ -12,23 +13,28 @@ export default {
       required: false,
       default: false,
     },
-    tab: {
-      type: String,
-      required: true,
-    },
   },
   name: 'tyde-tab',
 }
 </script>
 
 <style scoped>
+.icon {
+  font-size: 1.8em;
+  margin-bottom: 8px;
+}
+
 .tab {
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
   font-weight: bold;
   line-height: 1;
   margin: 0;
   opacity: 0.5;
+  text-align: center;
   text-transform: uppercase;
+  transition: all 0.2s ease;
 }
 
 .tab:hover,
