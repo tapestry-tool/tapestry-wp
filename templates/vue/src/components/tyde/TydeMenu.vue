@@ -9,6 +9,10 @@
       <h1 class="title">Captain's Log</h1>
       <TydeMenuHome v-if="activePage === 'home'" :logs="logs" />
       <TydeMenuSettings @back="setActivePage('home')" v-if="activePage === 'settings'" />
+      <TydeMenuHelp @back="setActivePage('home')" v-if="activePage === 'help'" />
+    </div>
+    <div class="continue">
+      <TydeButton @click="$emit('close')" icon="arrow-right" class="button-continue"></TydeButton>
     </div>
   </div>
 </template>
@@ -17,6 +21,7 @@
 import TydeButton from './TydeButton'
 import TydeMenuHome from './TydeMenuHome'
 import TydeMenuSettings from './TydeMenuSettings'
+import TydeMenuHelp from './TydeMenuHelp'
 
 export default {
   name: 'tyde-menu',
@@ -31,15 +36,11 @@ export default {
     TydeButton,
     TydeMenuHome,
     TydeMenuSettings,
+    TydeMenuHelp,
   },
   data() {
     return {
       activePage: 'home',
-      pages: [
-        'home',
-        'settings',
-        'help',
-      ],
     }
   },
   methods: {
@@ -68,6 +69,19 @@ export default {
   width: 100%;
   display: flex;
   margin-bottom: 16px;
+}
+
+.button-continue {
+  width: 96px;
+  height: 96px;
+  font-size: 56px;
+}
+
+.continue {
+  position: fixed;
+  bottom: 2em;
+  right: 2em;
+  z-index: 20;
 }
 
 .content {
