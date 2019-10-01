@@ -8,7 +8,7 @@
       </ul>
     </nav>
     <ul class="logs">
-      <TydeLog v-for="log in visibleLogs" :key="log">
+      <TydeLog v-for="log in visibleLogs" :key="log.name" :log="log">
         <p>{{ log.name }}</p>
         <p>Type: {{ log.type }}</p>
         <p>Favourited: {{ log.isFavourite }}</p>

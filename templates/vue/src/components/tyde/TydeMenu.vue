@@ -3,11 +3,12 @@
     <div class="buttons">
       <TydeButton @click="setActivePage('settings')" icon="cog"></TydeButton>
       <TydeButton icon="globe-asia"></TydeButton>
-      <TydeButton icon="question"></TydeButton>
+      <TydeButton @click="setActivePage('help')" icon="question"></TydeButton>
     </div>
     <div class="content">
       <h1 class="title">Captain's Log</h1>
       <TydeMenuHome v-if="activePage === 'home'" :logs="logs" />
+      <TydeMenuSettings @back="setActivePage('home')" v-if="activePage === 'settings'" />
     </div>
   </div>
 </template>
@@ -15,6 +16,7 @@
 <script>
 import TydeButton from './TydeButton'
 import TydeMenuHome from './TydeMenuHome'
+import TydeMenuSettings from './TydeMenuSettings'
 
 export default {
   name: 'tyde-menu',
@@ -28,6 +30,7 @@ export default {
   components: {
     TydeButton,
     TydeMenuHome,
+    TydeMenuSettings,
   },
   data() {
     return {
