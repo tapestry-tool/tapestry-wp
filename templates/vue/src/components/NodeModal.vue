@@ -195,36 +195,36 @@ export default {
       ],
       formErrors: '',
       maxDescriptionLength: 250,
-      addThumbnail: false
+      addThumbnail: false,
     }
   },
   props: {
     node: {
       type: Object,
-      required: false
+      required: false,
     },
     modalType: {
       type: String,
       required: true,
       validator: function (value) {
-        return ['add-new-node', 'edit-node', 'add-root-node', ''].indexOf(value) !== -1;
-      }
+        return ['add-new-node', 'edit-node', 'add-root-node', ''].indexOf(value) !== -1
+      },
     },
     rootNodeTitle: {
       type: String,
-      required: false
+      required: false,
     }
   },
   computed: {
     modalTitle() {
       if (this.modalType === 'add-new-node') {
-        return `Add new sub-topic to ${this.rootNodeTitle}`;
+        return `Add new sub-topic to ${this.rootNodeTitle}`
       } else if (this.modalType === 'edit-node') {
-        return `Edit node: ${this.rootNodeTitle}`;
+        return `Edit node: ${this.rootNodeTitle}`
       } else if (this.modalType === 'add-root-node') {
-        return 'Add root node';
+        return 'Add root node'
       } else {
-        return '';
+        return ''
       }
     },
     nodeData() {
@@ -262,68 +262,68 @@ export default {
   },
   methods: {
     submitNode() {
-      this.formErrors = this.validateNode(this.nodeData);
+      this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
         if (this.modalType === 'add-root-node') {
-          this.$emit("add-edit-node", this.nodeData, false, true);
+          this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === 'add-new-node') {
-          this.$emit("add-edit-node", this.nodeData, false);
+          this.$emit("add-edit-node", this.nodeData, false)
         } else if (this.modalType === 'edit-node') {
-          this.$emit("add-edit-node", this.nodeData, true);
+          this.$emit("add-edit-node", this.nodeData, true)
         } else {
           console.error(`Undefined modalType: ${this.modalType}`)
         }
       }
     },
     validateNode() {
-      var errMsgs = [];
+      var errMsgs = []	
 
       if (this.node.title.length == 0) {
-        errMsgs.push("Please enter a title");
+        errMsgs.push("Please enter a title")
       }
       if (this.node.description.length > this.maxDescriptionLength) {
-        errMsgs.push("Please limit your description to under " + this.maxDescriptionLength + " characters");
+        errMsgs.push("Please limit your description to under " + this.maxDescriptionLength + " characters")
       }
 
       if (!this.node.mediaType) {
-        errMsgs.push("Please select a Content Type");
+        errMsgs.push("Please select a Content Type")
       }
       else if (this.node.mediaType === "video") {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter a Video URL");
+          errMsgs.push("Please enter a Video URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration");
+          errMsgs.push("Please enter numeric value for Video Duration")
         }
       }
       else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter a H5P URL");
+          errMsgs.push("Please enter a H5P URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration");
+          errMsgs.push("Please enter numeric value for H5P Video Duration")
         }
       }
       else if (this.node.mediaType === 'url-embed') {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter an Embed URL");
+          errMsgs.push("Please enter an Embed URL")
         }
       }
       else if (this.node.mediaType === 'text') {
         if (!this.node.typeData.textContent || !this.node.typeData.textContent.length) {
-          errMsgs.push("Please enter Text Content for this node");
+          errMsgs.push("Please enter Text Content for this node")
         }
       }
-
-      return errMsgs.join("<br>");
+      
+      return errMsgs.join("<br>")	
     },
     addUserPermissionRow () {
-      const userId = this.userId;
+      const userId = this.userId
       if (userId && Helpers.onlyContainsDigits(userId) && $("#user-" + userId + "-editcell").val() != "") {
         this.$set(this.node.permissions, `user-${userId}`, [])
-        this.userId = null;
+        this.userId = null
       } else {
-        alert("Enter valid user id");
+        alert("Enter valid user id")
       }
     }
   }
