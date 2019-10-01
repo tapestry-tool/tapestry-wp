@@ -55,6 +55,10 @@ export default {
   border-radius: 50%;
 }
 
+.tyde-button:focus {
+  outline: none;
+}
+
 .tyde-button:hover {
   background: var(--light-blue);
   color: white;

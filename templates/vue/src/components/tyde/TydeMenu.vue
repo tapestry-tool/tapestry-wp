@@ -14,6 +14,11 @@
           </TydeTab>
         </ul>
       </nav>
+      <ul class="logs">
+        <TydeLog v-for="log in visibleLogs" :key="log">
+          {{ log.name }}
+        </TydeLog>
+      </ul>
     </div>
   </div>
 </template>
@@ -21,12 +26,27 @@
 <script>
 import TydeButton from './TydeButton'
 import TydeTab from './TydeTab'
+import TydeLog from './TydeLog'
 
 export default {
   name: 'tyde-menu',
+  props: {
+    logs: {
+      type: Array,
+      required: false,
+      default: [],
+    },
+  },
   components: {
     TydeButton,
     TydeTab,
+    TydeLog,
+  },
+  computed: {
+    visibleLogs() {
+      const filter = this.activeTab
+      return this.logs
+    },
   },
   data() {
     return {
@@ -76,13 +96,17 @@ export default {
   z-index: 0;
 }
 
+.logs {
+  margin-top: 16px;
+}
+
 .tabs {
   display: flex;
-  font-size: 24px;
+  font-size: 20px;
   justify-content: space-between;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 48px;
 }
 
 .title {

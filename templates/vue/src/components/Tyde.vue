@@ -1,7 +1,7 @@
 <template>
   <div id="tyde">
     <Tapestry />
-    <TydeMenu v-if="isMenuOpen" />
+    <TydeMenu v-if="isMenuOpen" :logs="logs" />
   </div>
 </template>
 
@@ -28,6 +28,17 @@ export default {
   data() {
     return {
       isMenuOpen: false,
+      logs: [
+        {
+          name: "log 1"
+        },
+        {
+          name: "log 2"
+        },
+        {
+          name: "log 3"
+        },
+      ],
     }
   },
   methods: {
@@ -42,6 +53,7 @@ export default {
 :root {
   --gray: #404040;
   --light-gray: #787878;
+  --med-gray: #535353;
   --light-blue: #1eade1;
 }
 </style>
