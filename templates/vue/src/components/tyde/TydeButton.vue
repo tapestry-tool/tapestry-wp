@@ -51,7 +51,7 @@ export default {
   right: -7px;
   bottom: -7px;
   background: transparent;
-  border: 3px solid var(--light-gray);
+  border: 3px solid var(--tapestry-light-gray);
   border-radius: 50%;
 }
 
@@ -60,7 +60,7 @@ export default {
 }
 
 .tyde-button:hover {
-  background: var(--light-blue);
+  background: var(--tapestry-light-blue);
   color: white;
   transform: scale(1.1);
 }

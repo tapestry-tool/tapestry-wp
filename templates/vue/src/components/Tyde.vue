@@ -89,9 +89,9 @@ export default {
 
 <style>
 :root {
-  --gray: #404040;
-  --light-gray: #787878;
-  --med-gray: #535353;
-  --light-blue: #1eade1;
+  --tapestry-gray: #404040;
+  --tapestry-light-gray: #787878;
+  --tapestry-med-gray: #535353;
+  --tapestry-light-blue: #1eade1;
 }
 </style>

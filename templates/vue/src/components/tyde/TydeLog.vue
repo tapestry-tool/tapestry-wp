@@ -18,8 +18,8 @@ export default {
 
 <style scoped>
 .log {
-  background: var(--med-gray);
-  border: 1px solid var(--light-gray);
+  background: var(--tapestry-med-gray);
+  border: 1px solid var(--tapestry-light-gray);
   margin: 0;
   margin-bottom: 8px;
   min-height: 160px;

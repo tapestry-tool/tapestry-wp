@@ -85,7 +85,7 @@ export default {
 }
 
 .content {
-  background: var(--gray);
+  background: var(--tapestry-gray);
   border: 4px solid white;
   min-height: 100%;
   padding: 32px 64px;
@@ -118,9 +118,9 @@ export default {
   right: 0;
   bottom: 0;
   padding: 16px 3em;
-  background: var(--gray);
+  background: var(--tapestry-gray);
   border: 4px solid white;
-  border-bottom: 4px solid var(--gray);
+  border-bottom: 4px solid var(--tapestry-gray);
   transform: perspective(10px) rotateX(1deg);
   z-index: -1;
 }

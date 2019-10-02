@@ -1323,7 +1323,7 @@ function tapestryTool(config){
     /****************************************************
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
-
+    
     function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height) {
         // Adjust the width and height here before passing it into setup media
         var lightboxDimensions = getLightboxDimensions(height, width);
@@ -1331,7 +1331,7 @@ function tapestryTool(config){
         height = lightboxDimensions.height;
         var media = setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height);
     
-        $('<div id="spotlight-overlay"></div>').on("click", function(){
+    $('<div id="spotlight-overlay"></div>').on("click", function(){
             closeLightbox(id, mediaType);
             dispatchEvent(new CustomEvent("tyde-close-lightbox"));
             exitViewMode();
