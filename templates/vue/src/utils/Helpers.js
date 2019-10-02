@@ -5,7 +5,7 @@ export default class {
     /**
      * Check if a string only contains digits
      * 
-     * @param {String} string
+     * @param {String} string 
      * 
      * @return {Boolean}
      */
