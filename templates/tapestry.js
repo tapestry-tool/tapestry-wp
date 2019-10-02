@@ -37,6 +37,7 @@ function tapestryTool(config){
         API_DELETE_METHOD = 'DELETE',
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
+        USER_NODE_SKIP_URL = config.apiUrl + "/users/skip",
         TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
 
     var // declared variables
@@ -130,6 +131,7 @@ function tapestryTool(config){
             if (config.wpUserId) { // Get from database if user is logged in
 
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                    console.log(retrievedUserProgress);
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(JSON.parse(retrievedUserProgress));
@@ -1529,6 +1531,7 @@ function tapestryTool(config){
                     if (video.currentTime / video.duration >= 0.95) {
                         if (!wasDispatched) {
                             dispatchEvent(new CustomEvent("allow-skip", { detail: id }));
+                            saveNodeAsSkippable(tapestry.dataset.nodes[index]);
                         }
                         wasDispatched = true;
                     }
@@ -2223,6 +2226,7 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
+            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -2231,6 +2235,7 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
+                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     
@@ -2256,6 +2261,20 @@ function tapestryTool(config){
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
+            console.error(e);
+        });
+    }
+
+    function saveNodeAsSkippable(node) {
+        console.log(node);
+        tapestry.dataset.nodes[node.index].skippable = true;
+        jQuery.post(USER_NODE_SKIP_URL, {
+            "post_id": config.wpPostId,
+            "node_id": node.id,
+            "skippable": true,
+        })
+        .fail(function (e) {
+            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
             console.error(e);
         });
     }
