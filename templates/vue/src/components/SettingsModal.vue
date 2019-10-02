@@ -37,13 +37,13 @@ export default {
     return {
       currentSettings: {},
       backgroundUrl: '',
-      autoLayout: false
+      autoLayout: false,
     }
   },
   props: {
     tapestryApiClient: {
       type: Object,
-      required: true
+      required: true,
     }
   },
   async mounted() {

@@ -6,7 +6,7 @@ function tapestryTool(config){
         'settings': {},
         'nodes':    [],
         'links':    [],
-        'groups':   []
+        'groups':   [],
     };
     var tapestry = this;
 
@@ -2255,7 +2255,7 @@ function tapestryTool(config){
         jQuery.post(USER_NODE_UNLOCKED_URL, {
             "post_id": config.wpPostId,
             "node_id": node.id,
-            "unlocked": true
+            "unlocked": true,
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
@@ -2535,7 +2535,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'font';
+            classStr = classStrStart + 'text';
             break;
 
         case "url-embed":
@@ -2592,7 +2592,7 @@ function recordAnalyticsEvent(actor, action, object, objectID, details){
         'object': object,
         'user_guid': userUUID,
         'object_id': objectID,
-        'details': JSON.stringify(details)
+        'details': JSON.stringify(details),
     };
 
     // Send the event to an AJAX URL to be saved

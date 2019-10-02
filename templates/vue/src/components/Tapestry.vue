@@ -1,7 +1,7 @@
 <template>
   <div id="tapestry">
     <div class="d-flex justify-content-center mb-3" style="padding: 30vh 0;" v-if="!tapestryLoaded">
-      <label>Rendering Tapstry </label>
+      <label>Loading Tapestry </label>
       <b-spinner type="grow" variant="secondary" small style="margin: 5px 5px 5px 20px;"></b-spinner>
       <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
@@ -31,7 +31,7 @@ export default {
   components: {
     NodeModal,
     RootNodeButton,
-    SettingsModal
+    SettingsModal,
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -58,38 +58,38 @@ export default {
         mediaDuration: '',
         imageURL: '',
         unlocked: true,
-        permissions: { public: ['read'] }
-      }
+        permissions: { public: ['read'] },
+      },
     }
   },
   computed: {
     xORfx: function () {
-      return this.tapestry.settings.autoLayout ? 'x' : 'fx';
+      return this.tapestry.settings.autoLayout ? 'x' : 'fx'
     },
     yORfy: function () {
-      return this.tapestry.settings.autoLayout ? 'y' : 'fy';
+      return this.tapestry.settings.autoLayout ? 'y' : 'fy'
     },
     selectedNode: function() {
       if (this.tapestry && this.tapestry.nodes) {
         if (this.selectedNodeId) {
           return this.tapestry.nodes.find(node => {
-            return node.id === this.selectedNodeId;
-          });
+            return node.id === this.selectedNodeId
+          })
         }
         else if (this.tapestry.rootId) {
           return this.tapestry.nodes.find(node => {
-            return node.id === this.tapestry.rootId;
-          });
+            return node.id === this.tapestry.rootId
+          })
         }
       }
-      return {};
+      return {}
     },
   },
   methods: {
     tapestryUpdated(event) {
-      this.tapestry = event.detail.dataset;
+      this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
-        this.selectedNodeId = this.tapestry.rootId;
+        this.selectedNodeId = this.tapestry.rootId
         this.tapestryLoaded = true
       }
     },
@@ -108,42 +108,42 @@ export default {
         hideProgress: false,
         hideMedia: false,
         permissions: { public: ['read'] },
-        description: ''
-      };
+        description: '',
+      }
     },
     addRootNode() {
-      this.modalType = 'add-root-node';
-      this.populatedNode = this.getEmptyNode();
-      this.$bvModal.show('node-modal-container');
+      this.modalType = 'add-root-node'
+      this.populatedNode = this.getEmptyNode()
+      this.$bvModal.show('node-modal-container')
     },
     addNewNode() {
-      this.modalType = 'add-new-node';
-      this.populatedNode = this.getEmptyNode();
-      this.$bvModal.show('node-modal-container');
+      this.modalType = 'add-new-node'
+      this.populatedNode = this.getEmptyNode()
+      this.$bvModal.show('node-modal-container')
     },
     editNode() {
-      this.modalType = 'edit-node';
-      this.populatedNode = this.selectedNode;
-      this.$bvModal.show('node-modal-container');
+      this.modalType = 'edit-node'
+      this.populatedNode = this.selectedNode
+      this.$bvModal.show('node-modal-container')
     },
     deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry();
-      this.closeModal();
+      thisTapestryTool.deleteNodeFromTapestry()
+      this.closeModal()
     },
     closeModal() {
-      this.modalType = '';
-      this.$bvModal.hide('node-modal-container');
+      this.modalType = ''
+      this.$bvModal.hide('node-modal-container')
     },
     changeSelectedNode(event) {
-      this.selectedNodeId = event.detail;
+      this.selectedNodeId = event.detail
     },
     async addEditNode(formData, isEdit) {
-      const NORMAL_RADIUS = 140;
-      const ROOT_RADIUS_DIFF = 70;
+      const NORMAL_RADIUS = 140
+      const ROOT_RADIUS_DIFF = 70
 
-      const dimensions = thisTapestryTool.getTapestryDimensions();
+      const dimensions = thisTapestryTool.getTapestryDimensions()
 
-      var isRoot = this.tapestry.nodes.length == 0;
+      var isRoot = this.tapestry.nodes.length == 0
 
       // Add the node data first
       var newNodeEntry = {
@@ -174,145 +174,145 @@ export default {
         "coordinates": {
           "x": (dimensions.width - dimensions.startX) / 2,
           "y": (dimensions.height - dimensions.startY) / 2
-        }
-      };
+        },
+      }
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x;
-        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
-        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50;
-        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y;
+        newNodeEntry.coordinates.x = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
+        newNodeEntry.coordinates.y = this.tapestry.nodes[Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)].y
       }
 
-      var appearsAt = 0;
+      var appearsAt = 0
       for (var i = 0; i < formData.length; i++) {
-        var fieldName = formData[i].name;
-        var fieldValue = formData[i].value;
+        var fieldName = formData[i].name
+        var fieldValue = formData[i].value
 
         switch (fieldName) {
           case "title":
-            newNodeEntry[fieldName] = fieldValue;
-            break;
+            newNodeEntry[fieldName] = fieldValue
+            break
           case "imageURL":
-            newNodeEntry[fieldName] = fieldValue || "";
-            break;
+            newNodeEntry[fieldName] = fieldValue || ""
+            break
           case "mediaType":
             if (fieldValue === "text") {
-              newNodeEntry["mediaType"] = "text";
+              newNodeEntry["mediaType"] = "text"
             }
             else if (fieldValue === "video") {
-              newNodeEntry["mediaType"] = "video";
-              newNodeEntry["mediaFormat"] = "mp4";
+              newNodeEntry["mediaType"] = "video"
+              newNodeEntry["mediaFormat"] = "mp4"
             }
             else if (fieldValue === "h5p") {
-              newNodeEntry["mediaType"] = "video";
-              newNodeEntry["mediaFormat"] = "h5p";
+              newNodeEntry["mediaType"] = "video"
+              newNodeEntry["mediaFormat"] = "h5p"
             } else if (fieldValue === "url-embed") {
-              newNodeEntry["mediaType"] = "url-embed";
-              newNodeEntry["mediaFormat"] = "embed";
+              newNodeEntry["mediaType"] = "url-embed"
+              newNodeEntry["mediaFormat"] = "embed"
             }
-            break;
+            break
           case "textContent":
             if (fieldValue) {
-              newNodeEntry.typeData.textContent = fieldValue;
+              newNodeEntry.typeData.textContent = fieldValue
             }
-            break;
+            break
           case "mediaURL":
             if (fieldValue) {
-              newNodeEntry.typeData.mediaURL = fieldValue;
+              newNodeEntry.typeData.mediaURL = fieldValue
             }
-            break;
+            break
           case "mediaDuration":
             if (fieldValue) {
-              newNodeEntry.mediaDuration = parseInt(fieldValue);
+              newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
-            break;
+            break
           case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot;
-            break;
+            newNodeEntry.unlocked = String(fieldValue) === 'true' || isRoot
+            break
           case "hideTitle":
-            newNodeEntry.hideTitle = fieldValue;
-            break;
+            newNodeEntry.hideTitle = fieldValue
+            break
           case "hideProgress":
-            newNodeEntry.hideProgress = fieldValue;
-            break;
+            newNodeEntry.hideProgress = fieldValue
+            break
           case "hideMedia":
-            newNodeEntry.hideMedia = fieldValue;
-            break;
+            newNodeEntry.hideMedia = fieldValue
+            break
           case "description":
-            newNodeEntry.description = fieldValue;
-            break;
+            newNodeEntry.description = fieldValue
+            break
           case "permissions":
-            newNodeEntry.permissions = fieldValue;
-            break;
+            newNodeEntry.permissions = fieldValue
+            break
           default:
-            break;
+            break
         }
       }
 
       if (!isEdit) { // New node
-        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry));
+        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
-        newNodeEntry.id = response.data.id;
+        newNodeEntry.id = response.data.id
+        
+        this.tapestry.nodes.push(newNodeEntry)
 
-        this.tapestry.nodes.push(newNodeEntry);
-
-        newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x;
-        newNodeEntry[this.yORfy] = newNodeEntry.coordinates.y;
+        newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
+        newNodeEntry[this.yORfy] = newNodeEntry.coordinates.y
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = {
-            "source": this.selectedNodeId,
-            "target": newNodeEntry.id,
-            "value": 1,
-            "type": "",
-            "appearsAt": appearsAt
-          };
-          this.TapestryAPI.addLink(JSON.stringify(newLink));
-          this.tapestry.links.push(newLink);
-        }
+          const newLink = { 
+            "source": this.selectedNodeId, 
+            "target": newNodeEntry.id, 
+            "value": 1, 
+            "type": "", 
+            "appearsAt": appearsAt,
+          }
+          this.TapestryAPI.addLink(JSON.stringify(newLink))
+          this.tapestry.links.push(newLink)
+        } 
         else {
           // Root node
-          this.tapestry.rootId = newNodeEntry.id;
-          this.selectedNodeId = newNodeEntry.id;
+          this.tapestry.rootId = newNodeEntry.id
+          this.selectedNodeId = newNodeEntry.id
         }
 
       }
       else { // Editing existing node
 
-        const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry));
+        const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry))
 
-        newNodeEntry.id = response.data.id;
+        newNodeEntry.id = response.data.id
 
-        var thisNodeIndex = Helpers.findNodeIndex(this.selectedNodeId, this.tapestry);
+        var thisNodeIndex = Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
 
         for (let key in this.tapestry.nodes[thisNodeIndex]) {
           if (newNodeEntry.hasOwnProperty(key)) {
-            this.tapestry.nodes[thisNodeIndex][key] = newNodeEntry[key];
+            this.tapestry.nodes[thisNodeIndex][key] = newNodeEntry[key]
           }
         }
       }
 
       // Update permissions
-      this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions));
+      this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions))
 
       // Update coordinates in dataset
-      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.xORfx] = newNodeEntry.coordinates.x;
-      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.yORfy] = newNodeEntry.coordinates.y;
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.xORfx] = newNodeEntry.coordinates.x
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][this.yORfy] = newNodeEntry.coordinates.y
 
-      thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.initialize(true);
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.initialize(true)
 
-      this.closeModal();
+      this.closeModal()
     },
     handleSettingsUpdate(settings) {
-      this.tapestry.settings = settings;
-      thisTapestryTool.setDataset(this.tapestry);
-      thisTapestryTool.reinitialize();
+      this.tapestry.settings = settings
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.reinitialize()
     }
   }
 }

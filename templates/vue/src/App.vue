@@ -10,7 +10,7 @@ import Tapestry from './components/Tapestry'
 export default {
   name: 'app',
   components: {
-    Tapestry
+    Tapestry,
   },
   data() {
     return {}

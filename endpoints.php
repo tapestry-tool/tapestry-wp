@@ -12,11 +12,17 @@ require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
+
+$REST_API_GET_METHOD = 'GET';
+$REST_API_POST_METHOD = 'POST';
+$REST_API_PUT_METHOD = 'PUT';
+$REST_API_DELETE_METHOD = 'DELETE';
+
 $REST_API_ENDPOINTS = [
     'POST_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestryNode',
             'permission_callback'   => 'TapestryPermissions::postTapestryNode'
         ]
@@ -24,7 +30,7 @@ $REST_API_ENDPOINTS = [
     'POST_TAPESTRY' => (object) [
         'ROUTE'     => '/tapestries',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestry',
             'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
@@ -32,7 +38,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_SETTINGS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestrySettings',
             'permission_callback'   => 'TapestryPermissions::putTapestrySettings'
         ]
@@ -40,14 +46,14 @@ $REST_API_ENDPOINTS = [
     'GET_TAPESTRY' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'   => 'GET',
+            'methods'   => $REST_API_GET_METHOD,
             'callback'  => 'getTapestry'
         ]
     ],
     'POST_TAPESTRY_GROUP' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestryGroup',
             'permission_callback'   => 'TapestryPermissions::postTapestryGroup'
         ]
@@ -55,7 +61,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNode',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -63,7 +69,7 @@ $REST_API_ENDPOINTS = [
     'DELETE_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => 'DELETE',
+            'methods'               => $REST_API_DELETE_METHOD,
             'callback'              => 'deleteTapestryNode',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -71,7 +77,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeSize',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -79,7 +85,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodePermissions',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -87,7 +93,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeDescription',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -95,7 +101,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_TITLE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeTitle',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -103,7 +109,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_IMAGE_URL' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeImageURL',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -111,7 +117,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeTypeData',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -119,7 +125,7 @@ $REST_API_ENDPOINTS = [
     'PUT_TAPESTRY_NODE_COORDINATES' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
         'ARGUMENTS' => [
-            'methods'               => 'PUT',
+            'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestryNodeCoordinates',
             'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
         ]
@@ -127,7 +133,7 @@ $REST_API_ENDPOINTS = [
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestryLink',
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
@@ -135,7 +141,7 @@ $REST_API_ENDPOINTS = [
     'DELETE_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
-            'methods'               => 'DELETE',
+            'methods'               => $REST_API_DELETE_METHOD,
             'callback'              => 'deleteTapestryLink',
             'permission_callback'   => 'TapestryPermissions::postTapestryLink'
         ]
@@ -144,35 +150,35 @@ $REST_API_ENDPOINTS = [
 
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
-            'methods'               => 'GET',
+            'methods'               => $REST_API_GET_METHOD,
             'callback'              => 'getUserProgressByPostId',
         ]
     ],
     'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
     'UPDATE_TAPESTRY_USER_UNLOCKED' => (object)[
         'ROUTE'     => 'users/unlocked',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'unlockByNodeId'
         ]
     ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
-            'methods'               => 'GET',
+            'methods'               => $REST_API_GET_METHOD,
             'callback'              => 'getUserU5PSettingsByPostId',
         ]
     ],
     'UPDATE_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
-            'methods'               => 'POST',
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PSettingsByPostId',
         ]
     ],
