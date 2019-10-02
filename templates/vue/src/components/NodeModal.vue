@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="node-modal-container" size="lg" class="text-muted" scrollable :title="modalTitle">
+  <b-modal id="node-modal-container" size="lg" class="text-muted" scrollable :title="modalTitle" body-class="p-0">
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
@@ -345,10 +345,6 @@ table {
   border: none;
   padding-bottom: 0;
   margin-left: 5px;
-}
-
-.modal-body {
-  padding: 0;
 }
 
 .modal-title {
