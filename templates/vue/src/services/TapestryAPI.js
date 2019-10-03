@@ -105,6 +105,21 @@ export default class {
         }
     }
 
+    async updateUserProgress(id, progressValue) {
+      try {
+        const url = `${apiUrl}/users/progress`
+        const response = await axios.post(url, {
+          post_id: this.postId,
+          node_id: id,
+          progress_value: progressValue
+        })
+        console.log('succeed')
+        return response
+      } catch (e) {
+        throw e
+      }
+    }
+
     async getSettings() {
       try {
         const tapestry = await this.getTapestry()

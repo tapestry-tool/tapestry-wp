@@ -28,9 +28,15 @@ export default {
     const node = await this.tapestryApiClient.getNode(this.nodeId);
     this.lightbox = node;
     this.isLoaded = true;
-    this.dimensions.left = (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2
-    this.dimensions.width = this.lightboxDimensions.width
-    this.dimensions.height = this.lightboxDimensions.height
+    this.dimensions = {
+      ...this.dimensions,
+      left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
+      width: this.lightboxDimensions.width,
+      height: this.lightboxDimensions.height,
+    }
+  },
+  async beforeDestroy() {
+    await this.tapestryApiClient.updateUserProgress(this.nodeId, this.lightbox && this.lightbox.typeData.progress[0].value)
   },
   data() {
     return {
@@ -43,13 +49,6 @@ export default {
     }
   },
   computed: {
-    adjustedLightbox() {
-      return {
-        ...this.lightbox,
-        width: this.lightboxDimensions.width,
-        height: this.lightboxDimensions.height
-      }
-    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
