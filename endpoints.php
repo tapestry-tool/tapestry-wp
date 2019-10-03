@@ -161,7 +161,7 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
-    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object)[
+    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object) [
         'ROUTE'     => 'users/unlocked',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
@@ -180,6 +180,20 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PSettingsByPostId',
+        ]
+    ],
+    'GET_TAPESTRY_USER_H5P_AUDIO' => (object) [
+        'ROUTE'     => 'users/h5psettings',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getUserH5PAudio',
+        ]
+    ],
+    'UPDATE_TAPESTRY_USER_H5P_AUDIO' => (object) [
+        'ROUTE'     => 'users/h5paudio',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'updateUserH5PAudioByPostId',
         ]
     ],
 ];
@@ -802,6 +816,30 @@ function getUserProgressByPostId($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
         return $userProgress->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function updateUserH5PAudioByPostId($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $audio = $request['audio'];
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!is_string($audio) || empty($audio)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
+
+        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId);
+        return $TapestryAudio->save($audio);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

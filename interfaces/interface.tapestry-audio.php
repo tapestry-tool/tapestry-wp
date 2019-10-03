@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Tapestry H5P Audio Interface
+ * Tapestry Audio Interface
  * 
  */
-interface ITapestryH5PAudio
+interface ITapestryAudio
 {
     /**	
-     * Save the H5P audio
+     * Save the audio
      *
      * @return  Object  $audio
      */
     public function save();
 
     /**
-     * Get the H5P audio
+     * Get the audio
      * 
      * @return  $audio    audio
      */
