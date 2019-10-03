@@ -1394,6 +1394,8 @@ function tapestryTool(config){
             exitViewMode();
         }).appendTo('body');
     
+        console.log(this);
+        console.log($(this).scrollTop());
         var top = lightboxDimensions.adjustedOn === "width" ? ((getBrowserHeight() - height) / 2) + $(this).scrollTop() : (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1);
         $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css({
             top: top,

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Helpers from '../utils/Helpers'
 
 export default class {
     /**
@@ -23,6 +24,15 @@ export default class {
         } catch (e) {
             throw e;
         }
+    }
+
+    async getNode(id) {
+      try {
+        const data = await this.getTapestry();
+        return data.nodes[Helpers.findNodeIndex(id, data)];
+      } catch (e) {
+        throw e;
+      }
     }
 
     /**

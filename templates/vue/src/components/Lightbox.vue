@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div id="spotlight-overlay"></div>
-    <div id="spotlight-content">
+  <div v-if="isLoaded" id="lightbox" ref="container">
+    <div id="spotlight-overlay" @click="$emit('close')"></div>
+    <div id="spotlight-content" :style="lightboxContentStyles">
       <button id='lightbox-close-wrapper' @click="$emit('close')">
         <div class='lightbox-close'>
           <i class='fa fa-times'></i>
@@ -25,11 +25,19 @@ export default {
     VideoMedia,
   },
   async mounted() {
-
+    const node = await this.tapestryApiClient.getNode(this.nodeId);
+    this.lightbox = node;
+    this.isLoaded = true;
+    this.position.left = (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2
   },
   data() {
     return {
       lightbox: {},
+      isLoaded: false,
+      position: {
+        top: 100,
+        left: 50
+      },
     }
   },
   computed: {
@@ -42,15 +50,19 @@ export default {
     },
     lightboxContentStyles() {
       return {
-        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-        width: this.lightboxDimensions.width,
-        height: this.lightboxDimensions.height
+        top: this.position.top + "px",
+        left: this.position.left + "px",
+        width: this.lightboxDimensions.width + "px",
+        height: this.lightboxDimensions.height + "px"
       }
     },
     lightboxDimensions() {
       const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
+      if (!this.lightbox) {
+        return {}
+      }
 
-      const { width, height } = this.lightbox
+      const { mediaWidth: width, mediaHeight: height } = this.lightbox.typeData
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
@@ -77,7 +89,7 @@ export default {
       )
       const adjustedVideoWidth = Math.min(
         videoWidth,
-        browserHeight - nodeSpace
+        browserWidth - nodeSpace
       )
 
       const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
@@ -96,11 +108,17 @@ export default {
         width: videoWidth * adjustmentRatio,
         height: videoHeight * adjustmentRatio
       }
-    }
+    },
   }
 }
 </script>
 
 <style scoped>
-
+#lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
 </style>
