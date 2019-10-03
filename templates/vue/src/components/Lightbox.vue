@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoaded" id="lightbox" ref="container">
+  <div v-if="isLoaded" id="lightbox">
     <div id="spotlight-overlay" @click="$emit('close')"></div>
     <div id="spotlight-content" :style="lightboxContentStyles">
       <button id='lightbox-close-wrapper' @click="$emit('close')">
