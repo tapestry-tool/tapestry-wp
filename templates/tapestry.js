@@ -132,6 +132,7 @@ function tapestryTool(config){
             if (config.wpUserId) { // Get from database if user is logged in
 
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                    
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(JSON.parse(retrievedUserProgress));
                     }
