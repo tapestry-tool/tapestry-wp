@@ -37,8 +37,9 @@ function tapestryTool(config){
         API_DELETE_METHOD = 'DELETE',
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
-        USER_NODE_SKIP_URL = config.apiUrl + "/users/skip",
-        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
+        USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
+        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings",
+        ALLOW_SKIP_THRESHOLD = 0.95;
 
     var // declared variables
         root, svg, links, nodes,                                // Basics
@@ -131,8 +132,6 @@ function tapestryTool(config){
             if (config.wpUserId) { // Get from database if user is logged in
 
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
-                    console.log(retrievedUserProgress);
-
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(JSON.parse(retrievedUserProgress));
                     }
@@ -1434,7 +1433,7 @@ function tapestryTool(config){
 
     function shouldAllowSkip(id) {
         const node = tapestry.dataset.nodes[findNodeIndex(id)];
-        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= 0.95;
+        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= ALLOW_SKIP_THRESHOLD;
     }
     
     function getLightboxDimensions(videoHeight, videoWidth) {
@@ -1528,7 +1527,7 @@ function tapestryTool(config){
                     }
                     updateViewedValue(id, video.currentTime, video.duration);
                     updateViewedProgress();
-                    if (video.currentTime / video.duration >= 0.95) {
+                    if (video.currentTime / video.duration >= ALLOW_SKIP_THRESHOLD) {
                         if (!wasDispatched) {
                             dispatchEvent(new CustomEvent("allow-skip", { detail: id }));
                             saveNodeAsSkippable(tapestry.dataset.nodes[index]);
@@ -2266,9 +2265,8 @@ function tapestryTool(config){
     }
 
     function saveNodeAsSkippable(node) {
-        console.log(node);
         tapestry.dataset.nodes[node.index].skippable = true;
-        jQuery.post(USER_NODE_SKIP_URL, {
+        jQuery.post(USER_NODE_SKIPPED_URL, {
             "post_id": config.wpPostId,
             "node_id": node.id,
             "skippable": true,

@@ -168,8 +168,8 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'unlockByNodeId'
         ]
     ],
-    'UPDATE_TAPESTRY_USER_SKIP'     => (object) [
-        'ROUTE'     => 'users/skip',
+    'UPDATE_TAPESTRY_USER_SKIPPED'  => (object) [
+        'ROUTE'     => 'users/skipped',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'allowSkipByNodeId'
