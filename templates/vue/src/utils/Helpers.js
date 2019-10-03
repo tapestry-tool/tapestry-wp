@@ -4,9 +4,9 @@
 export default class {
     /**
      * Check if a string only contains digits
-     * 
-     * @param {String} string 
-     * 
+     *
+     * @param {String} string
+     *
      * @return {Boolean}
      */
     static onlyContainsDigits(string) {
@@ -16,7 +16,7 @@ export default class {
 
     /**
      * Get browser width
-     * 
+     *
      * @return {Number}
      */
     static getBrowserWidth() {
@@ -25,7 +25,7 @@ export default class {
 
     /**
      * Get browser height
-     * 
+     *
      * @return {Number}
      */
     static getBrowserHeight() {
@@ -34,10 +34,10 @@ export default class {
 
     /**
      * Finds the node index with node ID
-     * 
+     *
      * @param  {Number} id          nodeMetaId
      * @param  {Object} tapestry    tapestry
-     * 
+     *
      * @return {Number}
      */
     static findNodeIndex(id, tapestry) {
@@ -46,5 +46,14 @@ export default class {
         }
 
         return tapestry.nodes.findIndex(helper);
+    }
+
+    static getAspectRatio() {
+      const browserHeight = this.getBrowserHeight();
+      const browserWidth = this.getBrowserWidth();
+      if (browserHeight < 10) {
+        return 0;
+      }
+      return browserWidth / browserHeight;
     }
 }

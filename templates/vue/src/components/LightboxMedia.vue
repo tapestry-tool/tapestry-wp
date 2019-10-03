@@ -4,7 +4,10 @@
 
 <script>
 export default {
-  name: 'lightbox-media'
+  name: 'lightbox-media',
+  props: {
+
+  }
 }
 </script>
 

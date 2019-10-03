@@ -16,6 +16,12 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
+    <Lightbox
+      v-if="lightbox.isOpen"
+      :tapestryApiClient="TapestryAPI"
+      :nodeId="lightbox.id"
+      @close="closeLightbox"
+    />
   </div>
 </template>
 
@@ -25,6 +31,7 @@ import NodeModal from './NodeModal'
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from './RootNodeButton'
 import TapestryAPI from '../services/TapestryAPI'
+import Lightbox from './Lightbox'
 
 export default {
   name: 'tapestry',
@@ -32,6 +39,7 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
+    Lightbox
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -39,6 +47,7 @@ export default {
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
     window.addEventListener('tapestry-updated', this.tapestryUpdated)
+    window.addEventListener('open-lightbox', this.openLightbox)
   },
   data() {
     return {
@@ -59,6 +68,10 @@ export default {
         imageURL: '',
         unlocked: true,
         permissions: { public: ['read'] },
+      },
+      lightbox: {
+        isOpen: false,
+        id: null,
       },
     }
   },
@@ -86,6 +99,18 @@ export default {
     },
   },
   methods: {
+    openLightbox(event) {
+      this.lightbox = {
+        isOpen: true,
+        id: event.detail,
+      }
+    },
+    closeLightbox() {
+      this.lightbox = {
+        isOpen: false,
+        id: null,
+      }
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
@@ -257,7 +282,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
-        
+
         this.tapestry.nodes.push(newNodeEntry)
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
@@ -265,16 +290,16 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
             "appearsAt": appearsAt,
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id
