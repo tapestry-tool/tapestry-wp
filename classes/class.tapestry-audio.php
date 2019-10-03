@@ -27,18 +27,27 @@ class TapestryAudio implements ITapestryAudio
      */
     public function save($audio)
     {
-        if ($this->userId == 0) {
-            throw new TapestryError('INVALID_USER_ID');
+        $filename = md5('nodeMetaId-' . $this->nodeMetaId . '-'
+            . 'tapestryPostId-' . $this->tapestryPostId) . '.wav';
+        $decodedAudio = base64_decode($audio);
+
+        if (!is_dir(__DIR__ . '/../h5p_uploads/')) {
+            mkdir(__DIR__ . '/../h5p_uploads/');
         }
+        if (!is_dir(__DIR__ . '/../h5p_uploads/' . $this->userId)) {
+            mkdir(__DIR__ . '/../h5p_uploads/' . $this->userId);
+        }
+
+        file_put_contents(__DIR__ . '/../h5p_uploads/' . $this->userId . '/' . $filename, $decodedAudio);
+        return $filename;
     }
 
     /**
      * Get the audio
      * 
-     * @param   String  $audioName
      * @return  String  $audio      base64 data string
      */
-    public function get($audioName)
+    public function get()
     {
         // TO BE IMPLEMENTED
     }

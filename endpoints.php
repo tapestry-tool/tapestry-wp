@@ -10,6 +10,7 @@ require_once __DIR__ . '/classes/class.tapestry.php';
 require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/classes/class.tapestry-audio.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -190,7 +191,7 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'UPDATE_TAPESTRY_USER_H5P_AUDIO' => (object) [
-        'ROUTE'     => 'users/h5paudio',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PAudioByPostId',
@@ -825,10 +826,10 @@ function updateUserH5PAudioByPostId($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
-    $audio = $request['audio'];
+    $audio = $request->get_body();
 
     try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+        if (!TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
@@ -836,6 +837,9 @@ function updateUserH5PAudioByPostId($request)
         }
         if (!is_string($audio) || empty($audio)) {
             throw new TapestryError('INVALID_AUDIO');
+        }
+        if (wp_get_current_user()->ID == 0) {
+            throw new TapestryError('INVALID_USER_ID');
         }
 
         $TapestryAudio = new TapestryAudio($postId, $nodeMetaId);

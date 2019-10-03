@@ -9,9 +9,10 @@ interface ITapestryAudio
     /**	
      * Save the audio
      *
+     * @param   String  $audio      base64 data string
      * @return  Object  $audio
      */
-    public function save();
+    public function save($audio);
 
     /**
      * Get the audio

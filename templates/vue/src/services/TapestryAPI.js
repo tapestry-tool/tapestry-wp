@@ -94,4 +94,22 @@ export default class {
             throw e;
         }
     }
+
+    /**
+     * Upload audio to server
+     * 
+     * @param   {Number}    nodeMetaId
+     * @param   {String}    audio       base64 data string
+     * 
+     * @return  {Object}
+     */
+    async uploadAudioToServer(nodeMetaId, audio) {
+        try {
+            const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio`;
+            const response = await axios.post(url, audio);
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    }
 }

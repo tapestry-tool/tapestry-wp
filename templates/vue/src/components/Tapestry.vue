@@ -1,7 +1,7 @@
 <template>
   <div id="tapestry">
     <div class="d-flex justify-content-center mb-3" style="padding: 30vh 0;" v-if="!tapestryLoaded">
-      <label>Loading Tapestry </label>
+      <label>Loading Tapestry</label>
       <b-spinner type="grow" variant="secondary" small style="margin: 5px 5px 5px 20px;"></b-spinner>
       <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
@@ -36,6 +36,7 @@ export default {
     window.addEventListener('add-new-node', this.addNewNode)
     window.addEventListener('edit-node', this.editNode)
     window.addEventListener('tapestry-updated', this.tapestryUpdated)
+    window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer)
   },
   data() {
     return {
@@ -66,7 +67,7 @@ export default {
     yORfy: function () {
       return this.tapestry.settings.autoLayout ? 'y' : 'fy'
     },
-    selectedNode: function() {
+    selectedNode: function () {
       if (this.tapestry && this.tapestry.nodes) {
         if (this.selectedNodeId) {
           return this.tapestry.nodes.find(node => {
@@ -83,6 +84,16 @@ export default {
     },
   },
   methods: {
+    async saveH5PAudioToServer(event) {
+      const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
+      if (encodedH5PAudio) {
+        try {
+          await this.TapestryAPI.uploadAudioToServer(this.selectedNodeId, encodedH5PAudio)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
@@ -254,7 +265,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
-        
+
         this.tapestry.nodes.push(newNodeEntry)
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
@@ -262,23 +273,23 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
             "appearsAt": appearsAt,
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id
           this.selectedNodeId = newNodeEntry.id
         }
 
-      } 
+      }
       else { // Editing existing node
 
         const response = await this.TapestryAPI.updateNode(this.selectedNodeId, JSON.stringify(newNodeEntry))
@@ -293,7 +304,7 @@ export default {
           }
         }
       }
-      
+
       // Update permissions
       this.TapestryAPI.updatePermissions(newNodeEntry.id, JSON.stringify(newNodeEntry.permissions))
 
