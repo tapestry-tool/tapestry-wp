@@ -35,6 +35,15 @@ export default class {
       }
     }
 
+    async getNodeProgress(id) {
+      try {
+        const progress = await this.getUserProgress()
+        return progress[id]
+      } catch (e) {
+        throw e
+      }
+    }
+
     /**
      * Add node
      *
@@ -105,6 +114,16 @@ export default class {
         }
     }
 
+    async getUserProgress() {
+      try {
+        const url = `${apiUrl}/users/progress?post_id=${this.postId}`
+        const response = await axios.get(url)
+        return JSON.parse(response.data)
+      } catch (e) {
+        throw e
+      }
+    }
+
     async updateUserProgress(id, progressValue) {
       try {
         const url = `${apiUrl}/users/progress`
@@ -113,7 +132,6 @@ export default class {
           node_id: id,
           progress_value: progressValue
         })
-        console.log('succeed')
         return response
       } catch (e) {
         throw e

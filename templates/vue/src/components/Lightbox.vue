@@ -26,6 +26,10 @@ export default {
   },
   async mounted() {
     const node = await this.tapestryApiClient.getNode(this.nodeId);
+    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId);
+    node.typeData.progress[0].value = meta.progress
+    node.typeData.progress[1].value = 1.00 - meta.progress
+
     this.lightbox = node;
     this.isLoaded = true;
     this.dimensions = {
@@ -113,7 +117,6 @@ export default {
   },
   methods: {
     updateDimensions({ width, height }) {
-      console.log(width, height)
       this.dimensions = {
         ...this.dimensions,
         width,
