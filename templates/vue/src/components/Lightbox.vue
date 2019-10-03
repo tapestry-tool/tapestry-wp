@@ -8,7 +8,7 @@
         </div>
       </button>
       <div class="media-wrapper">
-        {{ nodeId }}
+        <VideoMedia :node="lightbox" @load="updateDimensions" />
       </div>
     </div>
   </div>
@@ -28,13 +28,15 @@ export default {
     const node = await this.tapestryApiClient.getNode(this.nodeId);
     this.lightbox = node;
     this.isLoaded = true;
-    this.position.left = (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2
+    this.dimensions.left = (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2
+    this.dimensions.width = this.lightboxDimensions.width
+    this.dimensions.height = this.lightboxDimensions.height
   },
   data() {
     return {
       lightbox: {},
       isLoaded: false,
-      position: {
+      dimensions: {
         top: 100,
         left: 50
       },
@@ -50,10 +52,10 @@ export default {
     },
     lightboxContentStyles() {
       return {
-        top: this.position.top + "px",
-        left: this.position.left + "px",
-        width: this.lightboxDimensions.width + "px",
-        height: this.lightboxDimensions.height + "px"
+        top: this.dimensions.top + "px",
+        left: this.dimensions.left + "px",
+        width: this.dimensions.width + "px",
+        height: this.dimensions.height + "px"
       }
     },
     lightboxDimensions() {
@@ -109,6 +111,16 @@ export default {
         height: videoHeight * adjustmentRatio
       }
     },
+  },
+  methods: {
+    updateDimensions({ width, height }) {
+      console.log(width, height)
+      this.dimensions = {
+        ...this.dimensions,
+        width,
+        height
+      }
+    }
   }
 }
 </script>
