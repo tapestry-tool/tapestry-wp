@@ -112,13 +112,27 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[i].unlocked = true;
             }
         }
-        for (var i=0; i < tapestry.dataset.nodes.length; i++) {
-            tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
-            tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
-        }
-        tapestry.originalDataset = tapestry.dataset;
 
         tapestrySlug = tapestry.dataset.settings.tapestrySlug;
+        if (tapestry.dataset.settings.autoLayout) {
+            autoLayout = tapestry.dataset.settings.autoLayout;
+            xORfx = autoLayout ? 'x' : 'fx';
+            yORfy = autoLayout ? 'y' : 'fy';
+        }
+
+        for (var i=0; i < tapestry.dataset.nodes.length; i++) {
+            if (autoLayout) {
+                delete tapestry.dataset.nodes[i].fx;
+                delete tapestry.dataset.nodes[i].fy;
+            }
+            else {
+                tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
+                tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
+            }
+        }
+
+        tapestry.originalDataset = tapestry.dataset;
+        
         root = tapestry.dataset.rootId;
         
         if (saveProgress) {
@@ -222,6 +236,7 @@ function tapestryTool(config){
         
         // Ensure tapestry size fits well into the browser and start force
         updateSvgDimensions();
+        setBackgroundImage();
 
         if (!isReload) {
             //---------------------------------------------------
@@ -232,6 +247,13 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+    }
+
+    function setBackgroundImage() {
+        const { backgroundUrl } = tapestry.dataset.settings;
+        const htmlBody = document.getElementsByTagName("BODY")[0];
+        htmlBody.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
+        htmlBody.style.backgroundSize = "cover";
     }
 
     this.getControls = function() {
@@ -280,6 +302,27 @@ function tapestryTool(config){
         };
         
         tapestryControlsDiv.appendChild(depthSliderWrapper);
+
+        //--------------------------------------------------
+        // Add in settings modal button
+        //--------------------------------------------------
+        var settingsButton = document.createElement("button");
+        settingsButton.classList.add("settings-button");
+
+        var settingsIcon = document.createElement("i");
+        settingsIcon.classList.add("fas", "fa-cog", "settings-icon");
+        settingsButton.appendChild(settingsIcon);
+
+        settingsButton.onclick = function () {
+            dispatchEvent(new CustomEvent('open-settings-modal'));
+        };
+        
+        let showSettings = false;
+        // append settings modal only if logged in
+        if (config.wpUserId) {
+            tapestryControlsDiv.appendChild(settingsButton);
+            showSettings = true;
+        }
         
         //--------------------------------------------------
         // Checkbox to view locked nodes (logged in users only)
@@ -321,6 +364,9 @@ function tapestryTool(config){
             var showDepthSlider = findMaxDepth(root) >= 2;
             // Hide depth slider if depth is less than 3 
             depthSliderWrapper.style.display = showDepthSlider ? "flex" : "none";
+            if (showDepthSlider) {
+                settingsButton.style.marginLeft = "10px";
+            }
 
             // Hide this if there are no locked nodes
             var lockedNodesExist = false;
@@ -333,7 +379,7 @@ function tapestryTool(config){
             }
             viewLockedCheckboxWrapper.style.display = lockedNodesExist ? "flex" : "none";
 
-            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider) ? "flex" : "none";
+            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider || showSettings) ? "flex" : "none";
         }
         hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 
@@ -1904,8 +1950,8 @@ function tapestryTool(config){
         return {
             'width': tapestryWidth + MAX_RADIUS*1.25,
             'height': tapestryHeight + MAX_RADIUS*1.25,
-            'startX': tapestryStartX,
-            'startY': tapestryStartY,
+            'startX': autoLayout ? 0 : tapestryStartX,
+            'startY': autoLayout ? 0 : tapestryStartY,
         };
     }
 

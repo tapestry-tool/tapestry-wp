@@ -2,8 +2,8 @@ import axios from 'axios'
 
 export default class {
     /**
-     * 
-     * @param {Number} postId 
+     *
+     * @param {Number} postId
      */
     constructor(postId) {
         axios.defaults.headers.common['X-WP-Nonce'] = wpData.nonce;
@@ -12,7 +12,7 @@ export default class {
 
     /**
      * Get the tapestry
-     * 
+     *
      * @return  {Object}
      */
     async getTapestry() {
@@ -27,9 +27,9 @@ export default class {
 
     /**
      * Add node
-     * 
+     *
      * @param   {Object}    node
-     * 
+     *
      * @return  {Object}
      */
     async addNode(node) {
@@ -44,9 +44,9 @@ export default class {
 
     /**
      * Add link
-     * 
+     *
      * @param   {Object}    link
-     * 
+     *
      * @return  {Object}
      */
     async addLink(link) {
@@ -61,10 +61,10 @@ export default class {
 
     /**
      * Add permissions
-     * 
+     *
      * @param   {Number}    nodeMetaId
      * @param   {Object}    permissions
-     * 
+     *
      * @return  {Object}
      */
     async updatePermissions(nodeMetaId, permissions) {
@@ -79,10 +79,10 @@ export default class {
 
     /**
      * Update node
-     * 
+     *
      * @param   {Number}    nodeMetaId
      * @param   {Object}    node
-     * 
+     *
      * @return  {Object}
      */
     async updateNode(nodeMetaId, node) {
@@ -127,6 +127,25 @@ export default class {
             return response.data;
         } catch (e) {
             throw e;
+        }
+    }
+
+    async getSettings() {
+        try {
+            const tapestry = await this.getTapestry()
+            return tapestry.settings
+        } catch (e) {
+            throw e
+        }
+    }
+
+    async updateSettings(settings) {
+        try {
+            const url = `${apiUrl}/tapestries/${this.postId}/settings`
+            const response = await axios.put(url, settings)
+            return response
+        } catch (e) {
+            throw e
         }
     }
 }
