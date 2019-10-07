@@ -94,6 +94,21 @@ export default {
         }
       }
     },
+    async getH5PAudio(event) {
+      try {
+        const audio = await this.TapestryAPI.getH5PAudioFromServer(this.selectedNodeId)
+        const h5pAudioRecorder = document.getElementById('h5p')
+        if (h5pAudioRecorder) {
+          h5pAudioRecorder.window.dispatchEvent('tapestry-get-h5p-audio', {
+            detail: audio
+          })
+        } else {
+          console.error('H5P module is not loaded.')
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {

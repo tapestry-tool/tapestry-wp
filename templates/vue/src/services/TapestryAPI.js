@@ -112,4 +112,21 @@ export default class {
             throw e;
         }
     }
+
+    /**
+     * Get audio from server
+     * 
+     * @param   {Number}    nodeMetaId
+     * 
+     * @return  {String}    audio       base64 data string
+     */
+    async getH5PAudioFromServer(nodeMetaId) {
+        try {
+            const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio`;
+            const response = await axios.get(url);
+            return response.data;
+        } catch (e) {
+            throw e;
+        }
+    }
 }
