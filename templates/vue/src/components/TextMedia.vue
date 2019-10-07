@@ -1,30 +1,23 @@
 <template>
-  <article>
-    <h1 id="text-light-box-title">{{ title }}</h1>
-    <div id="text-light-box-paragraph" v-html="html"></div>
+  <article class="article">
+    <h1 id="text-light-box-title">{{ node.title }}</h1>
+    <div class="html" v-html="html"></div>
   </article>
 </template>
 
 <script>
 export default {
   name: 'text-media',
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: false,
-      default: '',
-    },
-  },
+  props: ['node'],
   computed: {
     html() {
+      const title = this.node.title
+      const content = this.node.typeData.textContent
+
       let htmlText = ''
-      const paragraphs = this.content.split('\n\n')
+      const paragraphs = content.split('\n\n')
       paragraphs.forEach(text => {
-        htmlText += `<p>${text.replace('\n', '<br>')}</p>`
+        htmlText += `<p class="lightbox-text">${text.replace('\n', '<br>')}</p>`
       })
       return htmlText
     }
@@ -33,5 +26,31 @@ export default {
 </script>
 
 <style scoped>
+.article {
+  padding: 0 15px;
+  text-align: left;
+}
 
+#text-light-box-title {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 1em 0;
+}
+
+#text-light-box-title:before {
+  display: none;
+}
+
+.html {
+  color: #47425d;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 16px;
+}
+</style>
+
+<style>
+.lightbox-text {
+  padding: 0;
+  margin-bottom: 1rem;
+}
 </style>

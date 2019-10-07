@@ -1,20 +1,22 @@
 <template>
   <div v-if="isLoaded" id="lightbox">
     <div id="spotlight-overlay" @click="$emit('close')"></div>
-    <div id="spotlight-content" :style="lightboxContentStyles">
+    <div id="spotlight-content" :class="['content', { 'content-text': this.node.mediaType === 'text' }]" :style="lightboxContentStyles">
       <button id='lightbox-close-wrapper' @click="$emit('close')">
         <div class='lightbox-close'>
           <i class='fa fa-times'></i>
         </div>
       </button>
       <div class="media-wrapper">
-        <VideoMedia :node="lightbox" @load="updateDimensions" />
+        <TextMedia v-if="node.mediaType === 'text'" :node="node" />
+        <VideoMedia v-if="node.mediaFormat === 'mp4'" :node="node" @load="updateDimensions" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import TextMedia from './TextMedia'
 import VideoMedia from './VideoMedia'
 import Helpers from '../utils/Helpers'
 
@@ -23,6 +25,7 @@ export default {
   props: ['nodeId', 'tapestryApiClient'],
   components: {
     VideoMedia,
+    TextMedia
   },
   async mounted() {
     const node = await this.tapestryApiClient.getNode(this.nodeId);
@@ -30,7 +33,7 @@ export default {
     node.typeData.progress[0].value = meta.progress
     node.typeData.progress[1].value = 1.00 - meta.progress
 
-    this.lightbox = node;
+    this.node = node;
     this.isLoaded = true;
     this.dimensions = {
       ...this.dimensions,
@@ -40,11 +43,11 @@ export default {
     }
   },
   async beforeDestroy() {
-    await this.tapestryApiClient.updateUserProgress(this.nodeId, this.lightbox && this.lightbox.typeData.progress[0].value)
+    await this.tapestryApiClient.updateUserProgress(this.nodeId, this.node && this.node.typeData.progress[0].value)
   },
   data() {
     return {
-      lightbox: {},
+      node: {},
       isLoaded: false,
       dimensions: {
         top: 100,
@@ -63,11 +66,11 @@ export default {
     },
     lightboxDimensions() {
       const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
-      if (!this.lightbox) {
+      if (!this.node) {
         return {}
       }
 
-      const { mediaWidth: width, mediaHeight: height } = this.lightbox.typeData
+      const { mediaWidth: width, mediaHeight: height } = this.node.typeData
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
@@ -134,5 +137,42 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+}
+
+.content {
+  position: absolute;
+  top: 5vh;
+  left: 5vw;
+  height: 90vh;
+  width: 90vw;
+  z-index: 100;
+  background-position: 0 0;
+  background-size: cover;
+  background-color: black;
+  opacity: 1;
+  transition: all 1s;
+  transition-timing-function: ease-in;
+  box-shadow: 0 0 100px -40px #000;
+  border-radius: 15px;
+}
+
+.media-wrapper {
+  background: #000;
+  outline: none;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.content-text {
+  outline: none;
+  background: #eee;
+  color: #333;
+  padding: 1em;
+}
+
+.content-text .media-wrapper {
+  height: 100%;
+  overflow: scroll;
+  background: transparent;
 }
 </style>
