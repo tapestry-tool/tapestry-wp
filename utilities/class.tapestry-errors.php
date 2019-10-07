@@ -78,6 +78,10 @@ class TapestryError extends Error
             'MESSAGE'   => 'PostID should not be passed in when creating a new Tapestry',
             'STATUS'    => ['status' => 500]
         ],
+        'FAILED_TO_SAVE_AUDIO' => [
+            'MESSAGE'   => 'Failed to save audio to the server.',
+            'STATUS'    => ['status' => 500]
+        ],
         'CANNOT_DELETE_ROOT' => [
             'MESSAGE'   => 'Root node can only be deleted if there are no other nodes in the tapestry',
             'STATUS'    => ['status' => 400]
