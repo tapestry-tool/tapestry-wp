@@ -18,6 +18,10 @@ export default {
   mounted() {
     setTimeout(() => this.$refs.video.play(), 1000)
   },
+  beforeDestroy() {
+    this.$refs.video.pause()
+    this.updateVideoProgress()
+  },
   methods: {
     handleLoad() {
       const videoRect = this.$refs.video.getBoundingClientRect();

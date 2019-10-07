@@ -200,29 +200,6 @@
     text-align:center;
 }
 
-#spotlight-content[data-view-mode=true] {
-    box-shadow: none;
-    border-color: #999;
-}
-
-#spotlight-content[data-media-format=mp4] > * {
-    width: 100%;
-    height: auto;
-}
-
-#spotlight-content[data-media-format=mp4] .media-wrapper > * {
-    width: 100%;
-    height: auto;
-}
-
-#spotlight-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
 .progress-meter .background {
     fill: #333333;
 }

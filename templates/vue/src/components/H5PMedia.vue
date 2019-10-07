@@ -84,7 +84,6 @@ export default {
               this.$emit('update-settings', newSettings)
           }
         })
-
         setTimeout(() => {
           h5pVideo.play()
         }, 1000)

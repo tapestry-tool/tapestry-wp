@@ -8,9 +8,31 @@
               <i class='fa fa-times'></i>
             </div>
           </button>
-          <div class="media-wrapper">
+          <div
+            :class="[
+              'media-wrapper',
+              { 'media-wrapper-embed': node.mediaFormat === 'embed' }
+            ]"
+          >
             <TextMedia v-if="node.mediaType === 'text'" :node="node" />
-            <VideoMedia v-if="node.mediaFormat === 'mp4'" :node="node" @load="updateDimensions" />
+            <VideoMedia
+              v-if="node.mediaFormat === 'mp4'"
+              :node="node"
+              @load="updateDimensions"
+            />
+            <ExternalMedia
+              v-if="node.mediaFormat === 'embed'"
+              :node="node"
+              :width="this.dimensions.width"
+              :height="this.dimensions.height"
+            />
+            <H5PMedia
+              v-if="node.mediaFormat === 'h5p'"
+              :node="node"
+              :width="this.dimensions.width"
+              :height="this.dimensions.height"
+              :settings="this.h5pSettings"
+            />
           </div>
         </div>
       </transition>
@@ -20,6 +42,8 @@
 <script>
 import TextMedia from './TextMedia'
 import VideoMedia from './VideoMedia'
+import ExternalMedia from './ExternalMedia'
+import H5PMedia from './H5PMedia'
 import Helpers from '../utils/Helpers'
 
 export default {
@@ -27,7 +51,9 @@ export default {
   props: ['nodeId', 'tapestryApiClient'],
   components: {
     VideoMedia,
-    TextMedia
+    TextMedia,
+    ExternalMedia,
+    H5PMedia,
   },
   async mounted() {
     const node = await this.tapestryApiClient.getNode(this.nodeId)
@@ -35,8 +61,8 @@ export default {
     node.typeData.progress[0].value = meta.progress
     node.typeData.progress[1].value = 1.00 - meta.progress
 
-    const h5pSettings = await this.tapestryApiClient.getH5pSettings()
-    this.settings = h5pSettings
+    const settings = await this.tapestryApiClient.getH5pSettings()
+    this.h5pSettings = settings
 
     this.node = node;
     this.isLoaded = true;
@@ -147,6 +173,12 @@ export default {
   transform: translateY(0);
 }
 
+#spotlight-overlay {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+
 .content {
   position: absolute;
   top: 5vh;
@@ -166,6 +198,10 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
+}
+
+.media-wrapper-embed {
+  background: white;
 }
 
 .content-text {
