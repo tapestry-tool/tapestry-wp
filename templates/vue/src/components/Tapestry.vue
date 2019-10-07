@@ -282,7 +282,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
-
+        
         this.tapestry.nodes.push(newNodeEntry)
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
@@ -290,16 +290,16 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = {
-            "source": this.selectedNodeId,
-            "target": newNodeEntry.id,
-            "value": 1,
-            "type": "",
-            "appearsAt": appearsAt,
+          const newLink = { 
+            "source": this.selectedNodeId, 
+            "target": newNodeEntry.id, 
+            "value": 1, 
+            "type": "", 
+            "appearsAt": appearsAt, 
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
-        }
+        } 
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id
