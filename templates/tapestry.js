@@ -1502,7 +1502,7 @@ function tapestryTool(config){
         };
     }
 
-    this.saveVideoProgress = function(id, video) {
+    this.updateChildren = function(id, video) {
         const childrenData = getChildrenData(id)
         for (var i = 0; i < childrenData.length; i++) {
             if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
@@ -1511,7 +1511,10 @@ function tapestryTool(config){
                 filterTapestry();
             }
         }
-        updateViewedValue(id, video.currentTime, video.duration);
+    }
+
+    this.saveVideoProgress = function(id, currentTime, duration) {
+        updateViewedValue(id, currentTime, duration);
         updateViewedProgress();
     }
     

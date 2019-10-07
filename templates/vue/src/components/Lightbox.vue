@@ -30,10 +30,13 @@ export default {
     TextMedia
   },
   async mounted() {
-    const node = await this.tapestryApiClient.getNode(this.nodeId);
-    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId);
+    const node = await this.tapestryApiClient.getNode(this.nodeId)
+    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
     node.typeData.progress[0].value = meta.progress
     node.typeData.progress[1].value = 1.00 - meta.progress
+
+    const h5pSettings = await this.tapestryApiClient.getH5pSettings()
+    this.settings = h5pSettings
 
     this.node = node;
     this.isLoaded = true;
@@ -55,6 +58,7 @@ export default {
         top: 100,
         left: 50
       },
+      h5pSettings: {}
     }
   },
   computed: {

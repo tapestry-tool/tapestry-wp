@@ -156,4 +156,14 @@ export default class {
         throw e
       }
     }
+
+    async getH5pSettings() {
+      try {
+        const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
+        const response = await axios.get(url)
+        return response
+      } catch (e) {
+        throw e
+      }
+    }
 }

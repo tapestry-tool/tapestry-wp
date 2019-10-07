@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'video-media',
+  name: 'external-media',
   props: ['node'],
   mounted() {
     setTimeout(() => this.$refs.video.play(), 1000)
@@ -38,8 +38,7 @@ export default {
       const amountNotViewed = 1.00 - amountViewed
       this.$set(this.node.typeData.progress[0], 'value', amountViewed)
       this.$set(this.node.typeData.progress[1], 'value', amountNotViewed)
-      thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.saveVideoProgress(this.node.id, video.currentTime, video.duration)
+      thisTapestryTool.saveVideoProgress(this.node.id, video)
     },
   }
 }
