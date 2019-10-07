@@ -1,18 +1,20 @@
 <template>
-  <div v-if="isLoaded" id="lightbox">
-    <div id="spotlight-overlay" @click="$emit('close')"></div>
-    <div id="spotlight-content" :class="['content', { 'content-text': this.node.mediaType === 'text' }]" :style="lightboxContentStyles">
-      <button id='lightbox-close-wrapper' @click="$emit('close')">
-        <div class='lightbox-close'>
-          <i class='fa fa-times'></i>
+    <div id="lightbox">
+      <div id="spotlight-overlay" @click="$emit('close')"></div>
+      <transition name="lightbox">
+        <div v-if="isLoaded" id="spotlight-content" :class="['content', { 'content-text': this.node.mediaType === 'text' }]" :style="lightboxContentStyles">
+          <button id='lightbox-close-wrapper' @click="$emit('close')">
+            <div class='lightbox-close'>
+              <i class='fa fa-times'></i>
+            </div>
+          </button>
+          <div class="media-wrapper">
+            <TextMedia v-if="node.mediaType === 'text'" :node="node" />
+            <VideoMedia v-if="node.mediaFormat === 'mp4'" :node="node" @load="updateDimensions" />
+          </div>
         </div>
-      </button>
-      <div class="media-wrapper">
-        <TextMedia v-if="node.mediaType === 'text'" :node="node" />
-        <VideoMedia v-if="node.mediaFormat === 'mp4'" :node="node" @load="updateDimensions" />
-      </div>
+      </transition>
     </div>
-  </div>
 </template>
 
 <script>
@@ -137,6 +139,8 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .content {
@@ -149,9 +153,6 @@ export default {
   background-position: 0 0;
   background-size: cover;
   background-color: black;
-  opacity: 1;
-  transition: all 1s;
-  transition-timing-function: ease-in;
   box-shadow: 0 0 100px -40px #000;
   border-radius: 15px;
 }
@@ -174,5 +175,16 @@ export default {
   height: 100%;
   overflow: scroll;
   background: transparent;
+}
+</style>
+
+<style>
+.lightbox-enter-active, .lightbox-leave-active {
+  transition: all 1s;
+}
+
+.lightbox-enter, .lightbox-leave-to {
+  opacity: 0;
+  transform: translateY(32px);
 }
 </style>
