@@ -1717,9 +1717,12 @@ function tapestryTool(config){
         }
         return $(lightboxContent);
     }
+
+    this.recordAnalyticsEvent = recordAnalyticsEvent;
     
+    this.exitViewMode = exitViewMode;
     // Builds the view mode, including functionality to
-    function changeToViewMode(lightboxDimensions) {
+    this.changeToViewMode = function changeToViewMode(lightboxDimensions) {
     
         if (!enablePopupNodes) {
             return;
@@ -2488,6 +2491,8 @@ tapestryTool.prototype.setOriginalDataset = function (dataset) {
 tapestryTool.prototype.deleteNodeFromTapestry = function() {
     this.tapestryDeleteNode();
  };
+
+tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
 
 /*******************************************************
  * 

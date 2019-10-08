@@ -69,6 +69,10 @@ export default {
                 seeked = true;
               }
 
+              const { id, mediaType } = this.node
+              thisTapestryTool.updateMediaIcon(id, mediaType, 'pause')
+              thisTapestryTool.recordAnalyticsEvent('user', 'play', 'h5p-video', id, { time: h5pVideo.getCurrentTime() })
+
               break;
 
             case h5pObj.Video.PAUSED:
@@ -81,11 +85,19 @@ export default {
                 time: h5pVideo.getCurrentTime()
               }
               seeked = true
+              thisTapestryTool.updateMediaIcon(id, mediaType, 'play')
+              thisTapestryTool.recordAnalyticsEvent('user', 'pause', 'h5p-video', id, { time: h5pVideo.getCurrentTime() })
               this.$emit('update-settings', newSettings)
+              break
+
+            case h5pObj.Video.BUFFERING:
+              thisTapestryTool.updateMediaIcon(id, mediaType, 'loading')
+              break
           }
         })
         setTimeout(() => {
           h5pVideo.play()
+          thisTapestryTool.recordAnalyticsEvent('app', 'auto-play', 'h5p-video', this.node.id)
         }, 1000)
       }
     }

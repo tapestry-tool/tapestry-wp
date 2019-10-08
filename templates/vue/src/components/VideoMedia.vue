@@ -2,6 +2,8 @@
   <video
     @loadstart="handleLoad"
     @loadedmetadata="setVideoTime"
+    @play="handlePlay"
+    @pause="handlePause"
     @timeupdate="updateVideoProgress"
     ref="video"
     class="video"
@@ -16,7 +18,10 @@ export default {
   name: 'video-media',
   props: ['node'],
   mounted() {
-    setTimeout(() => this.$refs.video.play(), 1000)
+    setTimeout(() => {
+      this.$refs.video.play()
+      thisTapestryTool.recordAnalyticsEvent('app', 'auto-play', 'html5-video', this.node.id);
+    }, 1000)
   },
   beforeDestroy() {
     this.$refs.video.pause()
@@ -26,6 +31,38 @@ export default {
     handleLoad() {
       const videoRect = this.$refs.video.getBoundingClientRect();
       this.$emit('load', { width: videoRect.width, height: videoRect.height })
+    },
+    handlePlay() {
+      const { id, mediaType } = this.node
+      const video = this.$refs.video
+      thisTapestryTool.updateMediaIcon(
+        this.node.id,
+        this.node.mediaType,
+        'pause'
+      )
+      thisTapestryTool.recordAnalyticsEvent(
+        'user',
+        'play',
+        'html5-video',
+        id,
+        { time: video.currentTime }
+      )
+    },
+    handlePause() {
+      const { id, mediaType } = this.node
+      const video = this.$refs.video
+      thisTapestryTool.updateMediaIcon(
+        this.node.id,
+        this.node.mediaType,
+        'play'
+      )
+      thisTapestryTool.recordAnalyticsEvent(
+        'user',
+        'pause',
+        'html5-video',
+        id,
+        { time: video.currentTime }
+      )
     },
     setVideoTime() {
       const video = this.$refs.video

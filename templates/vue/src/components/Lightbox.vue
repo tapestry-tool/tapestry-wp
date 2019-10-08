@@ -32,6 +32,7 @@
               :width="this.dimensions.width"
               :height="this.dimensions.height"
               :settings="this.h5pSettings"
+              @update-settings="this.updateH5pSettings"
             />
           </div>
         </div>
@@ -72,9 +73,11 @@ export default {
       width: this.lightboxDimensions.width,
       height: this.lightboxDimensions.height,
     }
+    thisTapestryTool.changeToViewMode(this.lightboxDimensions)
   },
   async beforeDestroy() {
     await this.tapestryApiClient.updateUserProgress(this.nodeId, this.node && this.node.typeData.progress[0].value)
+    thisTapestryTool.exitViewMode()
   },
   data() {
     return {
@@ -88,6 +91,9 @@ export default {
     }
   },
   computed: {
+    updateH5pSettings(newSettings) {
+      this.h5pSettings = newSettings;
+    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
