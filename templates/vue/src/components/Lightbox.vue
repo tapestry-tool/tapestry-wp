@@ -25,6 +25,7 @@
               :node="node"
               :width="this.dimensions.width"
               :height="this.dimensions.height"
+              @update-tapestry-node="updateNode"
             />
             <H5PMedia
               v-if="node.mediaFormat === 'h5p'"
@@ -32,7 +33,7 @@
               :width="this.dimensions.width"
               :height="this.dimensions.height"
               :settings="this.h5pSettings"
-              @update-settings="this.updateH5pSettings"
+              @update-settings="updateH5pSettings"
             />
           </div>
         </div>
@@ -157,6 +158,9 @@ export default {
     },
   },
   methods: {
+    async updateNode(node) {
+      await this.tapestryApiClient.updateNode(node.id, JSON.stringify(node))
+    },
     updateDimensions({ width, height }) {
       this.dimensions = {
         ...this.dimensions,
@@ -204,6 +208,7 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
+  height: 100%;
 }
 
 .media-wrapper-embed {
