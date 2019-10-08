@@ -193,6 +193,9 @@ function tapestryTool(config){
     });
 
     this.init = function(isReload = false) {
+        this.dataset.nodes = this.dataset.nodes.map(node => {
+            return fillEmptyFields(node, { behaviour: 'embed' });
+        });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
             detail: { dataset: this.dataset }
@@ -247,6 +250,21 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+    }
+
+    /**
+     * Helper function to fill in default fields of a node if
+     * they do not exist.
+     * @param {object} node 
+     * @param {object} attributes 
+     */
+    function fillEmptyFields(node, attributes) {
+        for (const [key, value] of Object.entries(attributes)) {
+            if (!node.hasOwnProperty(key)) {
+                node[key] = value;
+            }
+        }
+        return node;
     }
 
     function setBackgroundImage() {

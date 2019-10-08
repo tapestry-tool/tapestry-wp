@@ -64,13 +64,19 @@
                 required
               />
             </b-form-group>
-            <b-form-group label="Embed Link" v-show="node.mediaType === 'url-embed'">
+            <b-form-group label="External Link" v-show="node.mediaType === 'url-embed'">
               <b-form-input
                 id="node-embed-media-duration"
                 placeholder="Enter embed link (starting with http)"
                 v-model="node.typeData.mediaURL"
                 required
               />
+            </b-form-group>
+            <b-form-group label="Behaviour" v-show="node.mediaType === 'url-embed'">
+              <b-form-radio-group id="external-link-behaviour" v-model="node.behaviour">
+                <b-form-radio value="embed">Embed in Tapestry</b-form-radio>
+                <b-form-radio value="new-window">Open in a New Window</b-form-radio>
+              </b-form-radio-group>
             </b-form-group>
           </div>
         </b-tab>
@@ -188,7 +194,7 @@ export default {
         { value: 'text', text: 'Text' },
         { value: 'video', text: 'Video' },
         { value: 'h5p', text: 'H5P' },
-        { value: 'url-embed', text: 'URL Embed' },
+        { value: 'url-embed', text: 'External Link' },
       ],
       formErrors: '',
       maxDescriptionLength: 250,
@@ -228,6 +234,7 @@ export default {
       return [
         { name: 'title', value: this.node.title },
         { name: 'description', value: this.node.description },
+        { name: 'behaviour', value: this.node.behaviour },
         { name: 'mediaType', value: this.node.mediaType },
         { name: 'mediaURL', value: this.node.typeData && this.node.typeData.mediaURL },
         { name: 'textContent', value: this.node.typeData && this.node.typeData.textContent },
@@ -272,7 +279,7 @@ export default {
       }
     },
     validateNode() {
-      var errMsgs = []	
+      var errMsgs = []
 
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
@@ -310,8 +317,8 @@ export default {
           errMsgs.push("Please enter Text Content for this node")
         }
       }
-      
-      return errMsgs.join("<br>")	
+
+      return errMsgs.join("<br>")
     },
     addUserPermissionRow () {
       const userId = this.userId

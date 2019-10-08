@@ -17,6 +17,7 @@ class TapestryNode implements ITapestryNode
     private $title;
     private $status;
     private $unlocked;
+    private $behaviour;
     private $typeData;
     private $imageURL;
     private $mediaType;
@@ -52,6 +53,7 @@ class TapestryNode implements ITapestryNode
         $this->unlocked = true;
         $this->mediaDuration = 0;
         $this->description = '';
+        $this->behaviour = 'embed';
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
@@ -96,6 +98,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->status) && is_string($node->status)) {
             $this->status = $node->status;
+        }
+        if (isset($node->behaviour) && is_string($node->behaviour)) {
+            $this->behaviour = $node->behaviour;
         }
         if (isset($node->unlocked) && is_bool($node->unlocked)) {
             $this->unlocked = $node->unlocked;
@@ -230,6 +235,7 @@ class TapestryNode implements ITapestryNode
             'unlocked'      => $this->unlocked,
             'mediaDuration' => $this->mediaDuration,
             'description'   => $this->description,
+            'behaviour'     => $this->behaviour,
             'typeData'      => $this->typeData,
             'coordinates'   => $this->coordinates,
             'permissions'   => $this->permissions,

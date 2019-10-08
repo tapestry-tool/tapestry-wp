@@ -121,6 +121,7 @@ export default {
     getEmptyNode() {
       return {
         title: '',
+        behaviour: 'embed',
         mediaType: '',
         typeData: {
           mediaURL: '',
@@ -174,6 +175,7 @@ export default {
       var newNodeEntry = {
         "type": "tapestry_node",
         "description": "",
+        "behaviour": "embed",
         "status": "publish",
         "nodeType": "",
         "title": "",
@@ -223,6 +225,9 @@ export default {
             break
           case "imageURL":
             newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "behaviour":
+            newNodeEntry[fieldName] = fieldValue
             break
           case "mediaType":
             if (fieldValue === "text") {
@@ -282,7 +287,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
-        
+
         this.tapestry.nodes.push(newNodeEntry)
 
         newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
@@ -290,16 +295,16 @@ export default {
 
         if (!isRoot) {
           // Add link from parent node to this node
-          const newLink = { 
-            "source": this.selectedNodeId, 
-            "target": newNodeEntry.id, 
-            "value": 1, 
-            "type": "", 
+          const newLink = {
+            "source": this.selectedNodeId,
+            "target": newNodeEntry.id,
+            "value": 1,
+            "type": "",
             "appearsAt": appearsAt,
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
-        } 
+        }
         else {
           // Root node
           this.tapestry.rootId = newNodeEntry.id
