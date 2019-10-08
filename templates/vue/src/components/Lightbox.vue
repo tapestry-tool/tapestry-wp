@@ -208,7 +208,6 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
-  height: 100%;
 }
 
 .media-wrapper-embed {

@@ -1,5 +1,5 @@
 <template>
-  <div class="external-media-container">
+  <div class="external-media-container" :style="containerStyles">
     <iframe
       v-if="node.behaviour === 'embed'"
       id="external"
@@ -54,6 +54,14 @@ export default {
       }
     }
   },
+  computed: {
+    containerStyles() {
+      return {
+        width: this.width + "px",
+        height: this.height + "px",
+      }
+    }
+  },
   methods: {
     shouldFetch() {
       if (!this.node.typeData.linkMetadata) return true
@@ -79,11 +87,6 @@ export default {
 </script>
 
 <style scoped>
-.external-media-container {
-  width: 100%;
-  height: 100%;
-}
-
 .spinners {
   width: 100%;
   height: 100%;
