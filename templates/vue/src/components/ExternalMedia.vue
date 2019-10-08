@@ -10,6 +10,11 @@
       :height="height"
     >
     </iframe>
+    <div v-if="fetching" class="spinners">
+      <b-spinner type="grow" variant="secondary" small style="margin: 5px 5px 5px 20px;"></b-spinner>
+      <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
+      <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
+    </div>
     <div v-else class="preview">
       <div class="preview-image" :style="{ 'background-image': `url(${linkMetadata.image})` }">
         <a :href="node.typeData.mediaURL" target="blank" class="preview-image-link"></a>
@@ -36,22 +41,37 @@ export default {
   data() {
     return {
       linkMetadata: {},
-      error: null
+      error: null,
+      fetching: false,
     }
   },
   async mounted() {
     if (this.node.behaviour !== 'embed') {
-      if (this.node.typeData.linkMetadata) {
-        this.linkMetadata = this.node.typeData.linkMetadata
+      if (this.shouldFetch()) {
+        this.fetchLinkData(this.node.typeData.mediaURL)
       } else {
-        const { data, error } = await getLinkMetadata(this.node.typeData.mediaURL)
-        if (error) {
-          this.error = error
-        } else {
-          this.linkMetadata = data
-          this.$set(this.node.typeData, 'linkMetadata', this.linkMetadata)
-          this.$emit('update-tapestry-node', this.node)
-        }
+        this.linkMetadata = this.node.typeData.linkMetadata
+      }
+    }
+  },
+  methods: {
+    shouldFetch() {
+      if (!this.node.typeData.linkMetadata) return true
+      const { prevUrl } = this.node.typeData.linkMetadata
+      if (prevUrl !== this.node.typeData.mediaURL) return true
+      return false
+    },
+    async fetchLinkData(url) {
+      this.fetching = true
+
+      const { data, error } = await getLinkMetadata(this.node.typeData.mediaURL)
+      this.fetching = false
+      if (error) {
+        this.error = error
+      } else {
+        this.linkMetadata = data
+        this.$set(this.node.typeData, 'linkMetadata', this.linkMetadata)
+        this.$emit('update-tapestry-node', this.node)
       }
     }
   }
@@ -64,6 +84,14 @@ export default {
   height: 100%;
 }
 
+.spinners {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .preview {
   display: flex;
   height: 100%;
@@ -73,7 +101,7 @@ export default {
 .preview-image {
   cursor: pointer;
   position: relative;
-  flex: 1;
+  flex: 2;
   height: auto;
   background-size: cover;
   background-position: center;
