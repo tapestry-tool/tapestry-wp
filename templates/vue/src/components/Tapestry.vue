@@ -295,7 +295,7 @@ export default {
             "target": newNodeEntry.id, 
             "value": 1, 
             "type": "", 
-            "appearsAt": appearsAt, 
+            "appearsAt": appearsAt,
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
