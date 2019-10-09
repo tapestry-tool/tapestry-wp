@@ -20,10 +20,7 @@ export default class {
    * @return {Number}
    */
   static getBrowserWidth() {
-    return Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    )
+    return Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
   }
 
   /**
@@ -32,10 +29,7 @@ export default class {
    * @return {Number}
    */
   static getBrowserHeight() {
-    return Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0
-    )
+    return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
   }
 
   /**

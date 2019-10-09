@@ -17,8 +17,7 @@
               variant="danger"
               show
               v-html="formErrors"
-            >
-            </b-alert>
+            ></b-alert>
             <b-form-group label="Title">
               <b-form-input
                 id="node-title"
@@ -42,10 +41,7 @@
                 :options="mediaTypes"
               ></b-form-select>
             </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'text'"
-              label="Text content"
-            >
+            <b-form-group v-show="node.mediaType === 'text'" label="Text content">
               <b-form-textarea
                 id="node-text-content"
                 v-model="node.typeData.textContent"
@@ -60,10 +56,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video'"
-              label="Video Duration"
-            >
+            <b-form-group v-show="node.mediaType === 'video'" label="Video Duration">
               <b-form-input
                 id="node-video-media-duration"
                 v-model="node.mediaDuration"
@@ -71,10 +64,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'h5p'"
-              label="H5P Embed Link"
-            >
+            <b-form-group v-show="node.mediaType === 'h5p'" label="H5P Embed Link">
               <b-form-input
                 id="node-h5p-media-url"
                 v-model="node.typeData.mediaURL"
@@ -94,10 +84,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'url-embed'"
-              label="Embed Link"
-            >
+            <b-form-group v-show="node.mediaType === 'url-embed'" label="Embed Link">
               <b-form-input
                 id="node-embed-media-duration"
                 v-model="node.typeData.mediaURL"
@@ -110,9 +97,9 @@
         <b-tab title="Appearance">
           <div id="modal-appearance">
             <b-form-group>
-              <b-form-checkbox v-model="addThumbnail"
-                >Add a thumbnail</b-form-checkbox
-              >
+              <b-form-checkbox v-model="addThumbnail">
+                Add a thumbnail
+              </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addThumbnail">
               <b-form-input
@@ -130,19 +117,19 @@
               >Hide node until parent node is viewed</b-form-checkbox>
             </b-form-group> -->
             <b-form-group>
-              <b-form-checkbox v-model="node.hideTitle"
-                >Hide node title</b-form-checkbox
-              >
+              <b-form-checkbox v-model="node.hideTitle">
+                Hide node title
+              </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideProgress"
-                >Hide progress bar</b-form-checkbox
-              >
+              <b-form-checkbox v-model="node.hideProgress">
+                Hide progress bar
+              </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideMedia"
-                >Hide media button</b-form-checkbox
-              >
+              <b-form-checkbox v-model="node.hideMedia">
+                Hide media button
+              </b-form-checkbox>
             </b-form-group>
           </div>
         </b-tab>
@@ -230,15 +217,16 @@
         size="sm"
         variant="danger"
         @click="$emit('delete-node')"
-        >Delete Node</b-button
       >
+        Delete Node
+      </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('close-modal')"
-        >Cancel</b-button
-      >
-      <b-button size="sm" variant="primary" @click="submitNode()"
-        >Submit</b-button
-      >
+      <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
+        Cancel
+      </b-button>
+      <b-button size="sm" variant="primary" @click="submitNode()">
+        Submit
+      </b-button>
     </template>
   </b-modal>
 </template>
@@ -247,28 +235,27 @@
 import Helpers from "../utils/Helpers"
 
 export default {
-  name: "NodeModal",
+  name: "node-modal",
   props: {
     node: {
       type: Object,
       required: false,
-      default: () => ({})
+      default: () => ({}),
     },
     modalType: {
       type: String,
       required: true,
       validator: function(value) {
         return (
-          ["add-new-node", "edit-node", "add-root-node", ""].indexOf(value) !==
-          -1
+          ["add-new-node", "edit-node", "add-root-node", ""].indexOf(value) !== -1
         )
-      }
+      },
     },
     rootNodeTitle: {
       type: String,
       required: false,
-      default: "Node"
-    }
+      default: "Node",
+    },
   },
   data() {
     return {
@@ -278,11 +265,11 @@ export default {
         { value: "text", text: "Text" },
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "URL Embed" }
+        { value: "url-embed", text: "URL Embed" },
       ],
       formErrors: "",
       maxDescriptionLength: 250,
-      addThumbnail: false
+      addThumbnail: false,
     }
   },
   computed: {
@@ -304,32 +291,32 @@ export default {
         { name: "mediaType", value: this.node.mediaType },
         {
           name: "mediaURL",
-          value: this.node.typeData && this.node.typeData.mediaURL
+          value: this.node.typeData && this.node.typeData.mediaURL,
         },
         {
           name: "textContent",
-          value: this.node.typeData && this.node.typeData.textContent
+          value: this.node.typeData && this.node.typeData.textContent,
         },
         { name: "mediaDuration", value: this.node.mediaDuration },
         {
           name: "imageURL",
-          value: this.addThumbnail ? this.node.imageURL : ""
+          value: this.addThumbnail ? this.node.imageURL : "",
         },
         { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
-        { name: "hideMedia", value: this.node.hideMedia }
+        { name: "hideMedia", value: this.node.hideMedia },
       ]
     },
     nodeImageUrl() {
       return this.node.imageURL
-    }
+    },
   },
   watch: {
     nodeImageUrl: function() {
       this.addThumbnail = this.node.imageURL.length > 0
-    }
+    },
   },
   mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
@@ -410,8 +397,8 @@ export default {
       } else {
         alert("Enter valid user id")
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

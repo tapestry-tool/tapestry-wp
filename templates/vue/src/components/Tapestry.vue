@@ -5,7 +5,7 @@
       class="d-flex justify-content-center mb-3"
       style="padding: 30vh 0;"
     >
-      <label>Loading Tapestry </label>
+      <label>Loading Tapestry</label>
       <b-spinner
         type="grow"
         variant="secondary"
@@ -18,22 +18,17 @@
         small
         style="margin: 5px;"
       ></b-spinner>
-      <b-spinner
-        type="grow"
-        variant="danger"
-        small
-        style="margin: 5px;"
-      ></b-spinner>
+      <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <SettingsModal
+    <settings-modal
       :tapestry-api-client="TapestryAPI"
       @settings-updated="handleSettingsUpdate"
     />
-    <RootNodeButton
+    <root-node-button
       v-show="tapestryLoaded && !tapestry.rootId"
       @add-root-node="addRootNode"
     />
-    <NodeModal
+    <node-modal
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
@@ -56,7 +51,7 @@ export default {
   components: {
     NodeModal,
     RootNodeButton,
-    SettingsModal
+    SettingsModal,
   },
   data() {
     return {
@@ -71,13 +66,13 @@ export default {
         mediaType: "",
         typeData: {
           mediaURL: "",
-          textContent: ""
+          textContent: "",
         },
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
-        permissions: { public: ["read"] }
-      }
+        permissions: { public: ["read"] },
+      },
     }
   },
   computed: {
@@ -100,7 +95,7 @@ export default {
         }
       }
       return {}
-    }
+    },
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -123,7 +118,7 @@ export default {
         mediaType: "",
         typeData: {
           mediaURL: "",
-          textContent: ""
+          textContent: "",
         },
         mediaDuration: "",
         imageURL: "",
@@ -132,7 +127,7 @@ export default {
         hideProgress: false,
         hideMedia: false,
         permissions: { public: ["read"] },
-        description: ""
+        description: "",
       }
     },
     addRootNode() {
@@ -183,13 +178,10 @@ export default {
         typeId: 1,
         group: 1,
         typeData: {
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 }
-          ],
+          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
-          mediaHeight: 600
+          mediaHeight: 600,
         },
         unlocked: true,
         hideTitle: false,
@@ -197,8 +189,8 @@ export default {
         hideMedia: false,
         coordinates: {
           x: (dimensions.width - dimensions.startX) / 2,
-          y: (dimensions.height - dimensions.startY) / 2
-        }
+          y: (dimensions.height - dimensions.startY) / 2,
+        },
       }
 
       if (isEdit) {
@@ -288,9 +280,7 @@ export default {
 
       if (!isEdit) {
         // New node
-        const response = await this.TapestryAPI.addNode(
-          JSON.stringify(newNodeEntry)
-        )
+        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
 
@@ -306,7 +296,7 @@ export default {
             target: newNodeEntry.id,
             value: 1,
             type: "",
-            appearsAt: appearsAt
+            appearsAt: appearsAt,
           }
           this.TapestryAPI.addLink(JSON.stringify(newLink))
           this.tapestry.links.push(newLink)
@@ -325,10 +315,7 @@ export default {
 
         newNodeEntry.id = response.data.id
 
-        var thisNodeIndex = Helpers.findNodeIndex(
-          this.selectedNodeId,
-          this.tapestry
-        )
+        var thisNodeIndex = Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
 
         for (let key in this.tapestry.nodes[thisNodeIndex]) {
           if (newNodeEntry.hasOwnProperty(key)) {
@@ -344,12 +331,12 @@ export default {
       )
 
       // Update coordinates in dataset
-      this.tapestry.nodes[
-        Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)
-      ][this.xORfx] = newNodeEntry.coordinates.x
-      this.tapestry.nodes[
-        Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)
-      ][this.yORfy] = newNodeEntry.coordinates.y
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][
+        this.xORfx
+      ] = newNodeEntry.coordinates.x
+      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][
+        this.yORfy
+      ] = newNodeEntry.coordinates.y
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.initialize(true)
@@ -360,8 +347,8 @@ export default {
       this.tapestry.settings = settings
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.reinitialize()
-    }
-  }
+    },
+  },
 }
 </script>
 

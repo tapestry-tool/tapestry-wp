@@ -1,10 +1,5 @@
 <template>
-  <b-modal
-    id="settings-modal"
-    size="lg"
-    title="Tapestry Settings"
-    body-class="p-0"
-  >
+  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Appearance" active>
@@ -27,25 +22,25 @@
               the best position possible. If this is disabled, you will need to manually place the nodes where
               you want them to appear."
           >
-            <b-form-checkbox v-model="autoLayout" switch>{{
-              autoLayout ? "Enabled" : "Disabled"
-            }}</b-form-checkbox>
+            <b-form-checkbox v-model="autoLayout" switch>
+              {{ autoLayout ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
           </b-form-group>
         </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
       <p class="mb-0 p-0 text-muted small">
-        <strong>Note:</strong> Page will refresh when you save to apply your new
-        settings.
+        <strong>Note:</strong>
+        Page will refresh when you save to apply your new settings.
       </p>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="closeModal"
-        >Cancel</b-button
-      >
-      <b-button size="sm" variant="primary" @click="updateSettings"
-        >Save</b-button
-      >
+      <b-button size="sm" variant="secondary" @click="closeModal">
+        Cancel
+      </b-button>
+      <b-button size="sm" variant="primary" @click="updateSettings">
+        Save
+      </b-button>
     </template>
   </b-modal>
 </template>
@@ -56,14 +51,14 @@ export default {
   props: {
     tapestryApiClient: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       currentSettings: {},
       backgroundUrl: "",
-      autoLayout: false
+      autoLayout: false,
     }
   },
   async mounted() {
@@ -90,15 +85,15 @@ export default {
     async updateSettings() {
       const settings = Object.assign(this.currentSettings, {
         backgroundUrl: this.backgroundUrl,
-        autoLayout: this.autoLayout
+        autoLayout: this.autoLayout,
       })
       await this.tapestryApiClient.updateSettings(JSON.stringify(settings))
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
-    }
-  }
+    },
+  },
 }
 </script>
 

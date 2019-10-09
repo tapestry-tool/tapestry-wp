@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Tapestry />
+    <tapestry />
   </div>
 </template>
 
@@ -10,11 +10,11 @@ import Tapestry from "./components/Tapestry"
 export default {
   name: "app",
   components: {
-    Tapestry
+    Tapestry,
   },
   data() {
     return {}
-  }
+  },
 }
 </script>
 

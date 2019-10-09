@@ -1,32 +1,41 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
   },
   extends: [
     "plugin:vue/recommended",
     "eslint:recommended",
     "prettier/vue",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
   ],
   rules: {
-    "vue/component-name-in-template-casing": ["error", "PascalCase"],
+    "vue/component-name-in-template-casing": ["error", "kebab-case"],
     "vue/name-property-casing": ["error", "kebab-case"],
     "vue/no-v-html": "off",
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-    "no-prototype-builtins": "off"
+    "no-prototype-builtins": "off",
+    "prettier/prettier": [
+      "warn",
+      {
+        semi: false,
+        htmlWhitespaceSensitivity: "ignore",
+        printWidth: 85,
+        trailingComma: "es5",
+      },
+    ],
   },
   parserOptions: {
-    parser: "babel-eslint"
+    parser: "babel-eslint",
   },
   globals: {
-    "wpData": "readonly",
-    "wpPostId": "readonly",
-    "apiUrl": "readonly",
-    "thisTapestryTool": "readonly"
+    wpData: "readonly",
+    wpPostId: "readonly",
+    apiUrl: "readonly",
+    thisTapestryTool: "readonly",
   },
   env: {
-    "jquery": true
-  }
-};
+    jquery: true,
+  },
+}

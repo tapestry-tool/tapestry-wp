@@ -16,8 +16,8 @@ export default {
   methods: {
     showModal() {
       this.$emit("add-root-node")
-    }
-  }
+    },
+  },
 }
 </script>
 
