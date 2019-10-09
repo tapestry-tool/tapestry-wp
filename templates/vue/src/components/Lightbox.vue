@@ -23,9 +23,9 @@
             <ExternalMedia
               v-if="node.mediaFormat === 'embed'"
               :node="node"
-              :width="this.dimensions.width"
-              :height="this.dimensions.height"
+              :dimensions="dimensions"
               @update-tapestry-node="updateNode"
+              @mounted="updateDimensions"
             />
             <H5PMedia
               v-if="node.mediaFormat === 'h5p'"
@@ -161,11 +161,10 @@ export default {
     async updateNode(node) {
       await this.tapestryApiClient.updateNode(node.id, JSON.stringify(node))
     },
-    updateDimensions({ width, height }) {
+    updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
-        width,
-        height
+        ...dimensions
       }
     }
   }

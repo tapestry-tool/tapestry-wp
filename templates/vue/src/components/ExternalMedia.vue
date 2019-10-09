@@ -6,8 +6,8 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="node.typeData.mediaURL"
-      :width="width"
-      :height="height"
+      :width="dimensions.width"
+      :height="dimensions.height"
     >
     </iframe>
     <div v-if="fetching" class="spinners">
@@ -35,9 +35,12 @@
 <script>
 import { getLinkMetadata } from '../services/LinkPreviewApi'
 
+const MIN_MEDIA_WIDTH = 700
+const MIN_MEDIA_HEIGHT = 500
+
 export default {
   name: 'external-media',
-  props: ['node', 'width', 'height'],
+  props: ['node', 'dimensions'],
   data() {
     return {
       linkMetadata: {},
@@ -53,12 +56,24 @@ export default {
         this.linkMetadata = this.node.typeData.linkMetadata
       }
     }
+    this.$emit('mounted', this.adjustedDimensions)
   },
   computed: {
     containerStyles() {
+      const { width, height } = this.adjustedDimensions
       return {
-        width: this.width + "px",
-        height: this.height + "px",
+        width: width + "px",
+        height: height + "px",
+      }
+    },
+    adjustedDimensions() {
+      const width = Math.max(this.dimensions.width, MIN_MEDIA_WIDTH)
+      const height = Math.max(this.dimensions.height, MIN_MEDIA_HEIGHT)
+      const left = width === this.dimensions.width ? this.dimensions.left : this.dimensions.left - ((MIN_MEDIA_WIDTH - this.dimensions.width) / 2)
+      return {
+        width,
+        height,
+        left
       }
     }
   },
@@ -104,11 +119,17 @@ export default {
 .preview-image {
   cursor: pointer;
   position: relative;
-  flex: 2;
+  flex: 1;
   height: auto;
   background-size: cover;
   background-position: center;
   transition: all 0.2s ease;
+}
+
+@media (min-width: 1000px) {
+  .preview-image {
+    flex: 2;
+  }
 }
 
 .preview-image:hover {
