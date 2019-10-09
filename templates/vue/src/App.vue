@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import Tapestry from './components/Tapestry'
+import Tapestry from "./components/Tapestry"
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    Tapestry,
+    Tapestry
   },
   data() {
     return {}
