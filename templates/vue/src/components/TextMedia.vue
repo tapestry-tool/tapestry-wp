@@ -7,21 +7,24 @@
 
 <script>
 export default {
-  name: 'text-media',
-  props: ['node'],
+  name: "text-media",
+  props: {
+    node: {
+      type: Object,
+      required: true,
+    },
+  },
   computed: {
     html() {
-      const title = this.node.title
       const content = this.node.typeData.textContent
-
-      let htmlText = ''
-      const paragraphs = content.split('\n\n')
+      let htmlText = ""
+      const paragraphs = content.split("\n\n")
       paragraphs.forEach(text => {
-        htmlText += `<p class="lightbox-text">${text.replace('\n', '<br>')}</p>`
+        htmlText += `<p class="lightbox-text">${text.replace("\n", "<br>")}</p>`
       })
       return htmlText
-    }
-  }
+    },
+  },
 }
 </script>
 
