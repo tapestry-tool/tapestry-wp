@@ -8,20 +8,38 @@
       :src="node.typeData.mediaURL"
       :width="dimensions.width"
       :height="dimensions.height"
-    >
-    </iframe>
+    ></iframe>
     <div v-if="fetching" class="spinners">
-      <b-spinner type="grow" variant="secondary" small style="margin: 5px 5px 5px 20px;"></b-spinner>
-      <b-spinner type="grow" variant="primary" small style="margin: 5px;"></b-spinner>
+      <b-spinner
+        type="grow"
+        variant="secondary"
+        small
+        style="margin: 5px 5px 5px 20px;"
+      ></b-spinner>
+      <b-spinner
+        type="grow"
+        variant="primary"
+        small
+        style="margin: 5px;"
+      ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
     <div v-else class="preview">
-      <div class="preview-image" :style="{ 'background-image': `url(${linkMetadata.image})` }">
-        <a :href="node.typeData.mediaURL" target="blank" class="preview-image-link"></a>
+      <div
+        class="preview-image"
+        :style="{ 'background-image': `url(${linkMetadata.image})` }"
+      >
+        <a
+          :href="node.typeData.mediaURL"
+          target="blank"
+          class="preview-image-link"
+        ></a>
       </div>
       <div class="preview-content">
         <h1 class="preview-content-title">
-          <a :href="node.typeData.mediaURL" target="blank">{{ linkMetadata.title }}</a>
+          <a :href="node.typeData.mediaURL" target="blank">
+            {{ linkMetadata.title }}
+          </a>
         </h1>
         <p class="preview-content-description">{{ linkMetadata.description }}</p>
         <p class="preview-content-description">
@@ -33,30 +51,29 @@
 </template>
 
 <script>
-import { getLinkMetadata } from '../services/LinkPreviewApi'
+import { getLinkMetadata } from "../services/LinkPreviewApi"
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
 
 export default {
-  name: 'external-media',
-  props: ['node', 'dimensions'],
+  name: "external-media",
+  props: {
+    node: {
+      type: Object,
+      required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       linkMetadata: {},
       error: null,
       fetching: false,
     }
-  },
-  async mounted() {
-    if (this.node.behaviour !== 'embed') {
-      if (this.shouldFetch()) {
-        this.fetchLinkData(this.node.typeData.mediaURL)
-      } else {
-        this.linkMetadata = this.node.typeData.linkMetadata
-      }
-    }
-    this.$emit('mounted', this.adjustedDimensions)
   },
   computed: {
     containerStyles() {
@@ -69,13 +86,26 @@ export default {
     adjustedDimensions() {
       const width = Math.max(this.dimensions.width, MIN_MEDIA_WIDTH)
       const height = Math.max(this.dimensions.height, MIN_MEDIA_HEIGHT)
-      const left = width === this.dimensions.width ? this.dimensions.left : this.dimensions.left - ((MIN_MEDIA_WIDTH - this.dimensions.width) / 2)
+      const left =
+        width === this.dimensions.width
+          ? this.dimensions.left
+          : this.dimensions.left - (MIN_MEDIA_WIDTH - this.dimensions.width) / 2
       return {
         width,
         height,
-        left
+        left,
+      }
+    },
+  },
+  async mounted() {
+    if (this.node.behaviour !== "embed") {
+      if (this.shouldFetch()) {
+        this.fetchLinkData(this.node.typeData.mediaURL)
+      } else {
+        this.linkMetadata = this.node.typeData.linkMetadata
       }
     }
+    this.$emit("mounted", this.adjustedDimensions)
   },
   methods: {
     shouldFetch() {
@@ -87,17 +117,17 @@ export default {
     async fetchLinkData(url) {
       this.fetching = true
 
-      const { data, error } = await getLinkMetadata(this.node.typeData.mediaURL)
+      const { data, error } = await getLinkMetadata(url)
       this.fetching = false
       if (error) {
         this.error = error
       } else {
         this.linkMetadata = data
-        this.$set(this.node.typeData, 'linkMetadata', this.linkMetadata)
-        this.$emit('update-tapestry-node', this.node)
+        this.$set(this.node.typeData, "linkMetadata", this.linkMetadata)
+        this.$emit("update-tapestry-node", this.node)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

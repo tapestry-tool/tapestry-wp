@@ -1,13 +1,13 @@
 <template>
   <video
+    ref="video"
+    class="video"
+    controls
     @loadstart="handleLoad"
     @loadedmetadata="setVideoTime"
     @play="handlePlay"
     @pause="handlePause"
     @timeupdate="updateVideoProgress"
-    ref="video"
-    class="video"
-    controls
   >
     <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
   </video>
@@ -15,12 +15,22 @@
 
 <script>
 export default {
-  name: 'video-media',
-  props: ['node'],
+  name: "video-media",
+  props: {
+    node: {
+      type: Object,
+      required: true,
+    },
+  },
   mounted() {
     setTimeout(() => {
       this.$refs.video.play()
-      thisTapestryTool.recordAnalyticsEvent('app', 'auto-play', 'html5-video', this.node.id);
+      thisTapestryTool.recordAnalyticsEvent(
+        "app",
+        "auto-play",
+        "html5-video",
+        this.node.id
+      )
     }, 1000)
   },
   beforeDestroy() {
@@ -29,40 +39,24 @@ export default {
   },
   methods: {
     handleLoad() {
-      const videoRect = this.$refs.video.getBoundingClientRect();
-      this.$emit('load', { width: videoRect.width, height: videoRect.height })
+      const videoRect = this.$refs.video.getBoundingClientRect()
+      this.$emit("load", { width: videoRect.width, height: videoRect.height })
     },
     handlePlay() {
       const { id, mediaType } = this.node
       const video = this.$refs.video
-      thisTapestryTool.updateMediaIcon(
-        this.node.id,
-        this.node.mediaType,
-        'pause'
-      )
-      thisTapestryTool.recordAnalyticsEvent(
-        'user',
-        'play',
-        'html5-video',
-        id,
-        { time: video.currentTime }
-      )
+      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
+      thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+        time: video.currentTime,
+      })
     },
     handlePause() {
       const { id, mediaType } = this.node
       const video = this.$refs.video
-      thisTapestryTool.updateMediaIcon(
-        this.node.id,
-        this.node.mediaType,
-        'play'
-      )
-      thisTapestryTool.recordAnalyticsEvent(
-        'user',
-        'pause',
-        'html5-video',
-        id,
-        { time: video.currentTime }
-      )
+      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
+      thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+        time: video.currentTime,
+      })
     },
     setVideoTime() {
       const video = this.$refs.video
@@ -76,13 +70,17 @@ export default {
     updateVideoProgress() {
       const video = this.$refs.video
       const amountViewed = video.currentTime / video.duration
-      const amountNotViewed = 1.00 - amountViewed
-      this.$set(this.node.typeData.progress[0], 'value', amountViewed)
-      this.$set(this.node.typeData.progress[1], 'value', amountNotViewed)
+      const amountNotViewed = 1.0 - amountViewed
+      this.$set(this.node.typeData.progress[0], "value", amountViewed)
+      this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
       thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.saveVideoProgress(this.node.id, video.currentTime, video.duration)
+      thisTapestryTool.saveVideoProgress(
+        this.node.id,
+        video.currentTime,
+        video.duration
+      )
     },
-  }
+  },
 }
 </script>
 

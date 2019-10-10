@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <Tapestry />
+    <tapestry />
   </div>
 </template>
 
 <script>
-import Tapestry from './components/Tapestry'
+import Tapestry from "./components/Tapestry"
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     Tapestry,
   },
   data() {
     return {}
-  }
+  },
 }
 </script>
 

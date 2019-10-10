@@ -1,5 +1,5 @@
 import axios from "axios"
-import { LINK_PREVIEW_API_KEY } from '../../config'
+import { LINK_PREVIEW_API_KEY } from "../../config"
 
 const API_URL = `http://api.linkpreview.net`
 
@@ -14,5 +14,5 @@ export async function getLinkMetadata(url) {
 }
 
 function normalizeUrl(url) {
-  return url.startsWith('http:') || url.startsWith('https:') ? url : `https:${url}`
+  return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
 }

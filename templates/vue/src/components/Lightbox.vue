@@ -1,84 +1,75 @@
 <template>
-    <div id="lightbox">
-      <div id="spotlight-overlay" @click="$emit('close')"></div>
-      <transition name="lightbox">
-        <div v-if="isLoaded" id="spotlight-content" :class="['content', { 'content-text': this.node.mediaType === 'text' }]" :style="lightboxContentStyles">
-          <button id='lightbox-close-wrapper' @click="$emit('close')">
-            <div class='lightbox-close'>
-              <i class='fa fa-times'></i>
-            </div>
-          </button>
-          <div
-            :class="[
-              'media-wrapper',
-              { 'media-wrapper-embed': node.mediaFormat === 'embed' }
-            ]"
-          >
-            <TextMedia v-if="node.mediaType === 'text'" :node="node" />
-            <VideoMedia
-              v-if="node.mediaFormat === 'mp4'"
-              :node="node"
-              @load="updateDimensions"
-            />
-            <ExternalMedia
-              v-if="node.mediaFormat === 'embed'"
-              :node="node"
-              :dimensions="dimensions"
-              @update-tapestry-node="updateNode"
-              @mounted="updateDimensions"
-            />
-            <H5PMedia
-              v-if="node.mediaFormat === 'h5p'"
-              :node="node"
-              :width="this.dimensions.width"
-              :height="this.dimensions.height"
-              :settings="this.h5pSettings"
-              @update-settings="updateH5pSettings"
-            />
+  <div id="lightbox">
+    <div id="spotlight-overlay" @click="$emit('close')"></div>
+    <transition name="lightbox">
+      <div
+        v-if="isLoaded"
+        id="spotlight-content"
+        :class="['content', { 'content-text': node.mediaType === 'text' }]"
+        :style="lightboxContentStyles"
+      >
+        <button id="lightbox-close-wrapper" @click="$emit('close')">
+          <div class="lightbox-close">
+            <i class="fa fa-times"></i>
           </div>
+        </button>
+        <div
+          :class="[
+            'media-wrapper',
+            { 'media-wrapper-embed': node.mediaFormat === 'embed' },
+          ]"
+        >
+          <text-media v-if="node.mediaType === 'text'" :node="node" />
+          <video-media
+            v-if="node.mediaFormat === 'mp4'"
+            :node="node"
+            @load="updateDimensions"
+          />
+          <external-media
+            v-if="node.mediaFormat === 'embed'"
+            :node="node"
+            :dimensions="dimensions"
+            @update-tapestry-node="updateNode"
+            @mounted="updateDimensions"
+          />
+          <h5p-media
+            v-if="node.mediaFormat === 'h5p'"
+            :node="node"
+            :width="dimensions.width"
+            :height="dimensions.height"
+            :settings="h5pSettings"
+            @update-settings="updateH5pSettings"
+          />
         </div>
-      </transition>
-    </div>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script>
-import TextMedia from './TextMedia'
-import VideoMedia from './VideoMedia'
-import ExternalMedia from './ExternalMedia'
-import H5PMedia from './H5PMedia'
-import Helpers from '../utils/Helpers'
+import TextMedia from "./TextMedia"
+import VideoMedia from "./VideoMedia"
+import ExternalMedia from "./ExternalMedia"
+import H5PMedia from "./H5PMedia"
+import Helpers from "../utils/Helpers"
 
 export default {
-  name: 'lightbox',
-  props: ['nodeId', 'tapestryApiClient'],
+  name: "lightbox",
   components: {
     VideoMedia,
     TextMedia,
     ExternalMedia,
-    H5PMedia,
+    "h5p-media": H5PMedia,
   },
-  async mounted() {
-    const node = await this.tapestryApiClient.getNode(this.nodeId)
-    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
-    node.typeData.progress[0].value = meta.progress
-    node.typeData.progress[1].value = 1.00 - meta.progress
-
-    const settings = await this.tapestryApiClient.getH5pSettings()
-    this.h5pSettings = settings
-
-    this.node = node;
-    this.isLoaded = true;
-    this.dimensions = {
-      ...this.dimensions,
-      left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-      width: this.lightboxDimensions.width,
-      height: this.lightboxDimensions.height,
-    }
-    thisTapestryTool.changeToViewMode(this.lightboxDimensions)
-  },
-  async beforeDestroy() {
-    await this.tapestryApiClient.updateUserProgress(this.nodeId, this.node && this.node.typeData.progress[0].value)
-    thisTapestryTool.exitViewMode()
+  props: {
+    nodeId: {
+      type: Number,
+      required: true,
+    },
+    tapestryApiClient: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -86,21 +77,18 @@ export default {
       isLoaded: false,
       dimensions: {
         top: 100,
-        left: 50
+        left: 50,
       },
-      h5pSettings: {}
+      h5pSettings: {},
     }
   },
   computed: {
-    updateH5pSettings(newSettings) {
-      this.h5pSettings = newSettings;
-    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
         left: this.dimensions.left + "px",
         width: this.dimensions.width + "px",
-        height: this.dimensions.height + "px"
+        height: this.dimensions.height + "px",
       }
     },
     lightboxDimensions() {
@@ -130,14 +118,8 @@ export default {
       }
 
       const nodeSpace = NORMAL_RADIUS * 2 * 1.3
-      const adjustedVideoHeight = Math.min(
-        videoHeight,
-        browserHeight - nodeSpace
-      )
-      const adjustedVideoWidth = Math.min(
-        videoWidth,
-        browserWidth - nodeSpace
-      )
+      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
+      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
 
       const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
       const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
@@ -153,21 +135,50 @@ export default {
       return {
         adjustedOn,
         width: videoWidth * adjustmentRatio,
-        height: videoHeight * adjustmentRatio
+        height: videoHeight * adjustmentRatio,
       }
     },
   },
+  async mounted() {
+    const node = await this.tapestryApiClient.getNode(this.nodeId)
+    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
+    node.typeData.progress[0].value = meta.progress
+    node.typeData.progress[1].value = 1.0 - meta.progress
+
+    const settings = await this.tapestryApiClient.getH5pSettings()
+    this.h5pSettings = settings
+
+    this.node = node
+    this.isLoaded = true
+    this.dimensions = {
+      ...this.dimensions,
+      left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
+      width: this.lightboxDimensions.width,
+      height: this.lightboxDimensions.height,
+    }
+    thisTapestryTool.changeToViewMode(this.lightboxDimensions)
+  },
+  async beforeDestroy() {
+    await this.tapestryApiClient.updateUserProgress(
+      this.nodeId,
+      this.node && this.node.typeData.progress[0].value
+    )
+    thisTapestryTool.exitViewMode()
+  },
   methods: {
+    updateH5pSettings(newSettings) {
+      this.h5pSettings = newSettings
+    },
     async updateNode(node) {
       await this.tapestryApiClient.updateNode(node.id, JSON.stringify(node))
     },
     updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
-        ...dimensions
+        ...dimensions,
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -228,11 +239,13 @@ export default {
 </style>
 
 <style>
-.lightbox-enter-active, .lightbox-leave-active {
+.lightbox-enter-active,
+.lightbox-leave-active {
   transition: all 1s;
 }
 
-.lightbox-enter, .lightbox-leave-to {
+.lightbox-enter,
+.lightbox-leave-to {
   opacity: 0;
   transform: translateY(32px);
 }
