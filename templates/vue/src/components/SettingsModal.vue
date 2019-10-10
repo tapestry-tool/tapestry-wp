@@ -35,8 +35,12 @@
         Page will refresh when you save to apply your new settings.
       </p>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="closeModal">Cancel</b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings">Save</b-button>
+      <b-button size="sm" variant="secondary" @click="closeModal">
+        Cancel
+      </b-button>
+      <b-button size="sm" variant="primary" @click="updateSettings">
+        Save
+      </b-button>
     </template>
   </b-modal>
 </template>

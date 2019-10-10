@@ -17,7 +17,6 @@ export default {
   computed: {
     html() {
       const content = this.node.typeData.textContent
-
       let htmlText = ""
       const paragraphs = content.split("\n\n")
       paragraphs.forEach(text => {

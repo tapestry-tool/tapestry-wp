@@ -19,16 +19,16 @@ export default {
       type: Object,
       required: true,
     },
+    settings: {
+      type: Object,
+      required: true,
+    },
     width: {
       type: Number,
       required: true,
     },
     height: {
       type: Number,
-      required: true,
-    },
-    settings: {
-      type: Object,
       required: true,
     },
   },
