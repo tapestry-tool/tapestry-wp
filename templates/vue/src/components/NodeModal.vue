@@ -5,6 +5,7 @@
     class="text-muted"
     scrollable
     :title="modalTitle"
+    body-class="p-0"
   >
     <b-container fluid class="px-0">
       <b-tabs card>
@@ -231,7 +232,9 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">Submit</b-button>
+      <b-button size="sm" variant="primary" @click="submitNode()">
+        Submit
+      </b-button>
     </template>
   </b-modal>
 </template>
@@ -259,7 +262,7 @@ export default {
     rootNodeTitle: {
       type: String,
       required: false,
-      default: "",
+      default: "Node",
     },
   },
   data() {
@@ -303,7 +306,10 @@ export default {
           value: this.node.typeData && this.node.typeData.textContent,
         },
         { name: "mediaDuration", value: this.node.mediaDuration },
-        { name: "imageURL", value: this.addThumbnail ? this.node.imageURL : "" },
+        {
+          name: "imageURL",
+          value: this.addThumbnail ? this.node.imageURL : "",
+        },
         { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
@@ -423,10 +429,6 @@ table {
   border: none;
   padding-bottom: 0;
   margin-left: 5px;
-}
-
-.modal-body {
-  padding: 0;
 }
 
 .modal-title {

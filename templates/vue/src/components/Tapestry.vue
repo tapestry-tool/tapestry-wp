@@ -20,6 +20,10 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
+    <settings-modal
+      :tapestry-api-client="TapestryAPI"
+      @settings-updated="handleSettingsUpdate"
+    />
     <root-node-button
       v-show="tapestryLoaded && !tapestry.rootId"
       @add-root-node="addRootNode"
@@ -38,6 +42,7 @@
 <script>
 import Helpers from "../utils/Helpers"
 import NodeModal from "./NodeModal"
+import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryAPI from "../services/TapestryAPI"
 
@@ -46,6 +51,7 @@ export default {
   components: {
     NodeModal,
     RootNodeButton,
+    SettingsModal,
   },
   data() {
     return {
@@ -341,6 +347,11 @@ export default {
       thisTapestryTool.initialize(true)
 
       this.closeModal()
+    },
+    handleSettingsUpdate(settings) {
+      this.tapestry.settings = settings
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.reinitialize()
     },
   },
 }
