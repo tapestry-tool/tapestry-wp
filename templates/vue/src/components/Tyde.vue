@@ -1,6 +1,6 @@
 <template>
   <div id="tyde">
-    <Tapestry />
+    <tapestry />
   </div>
 </template>
 
@@ -8,13 +8,11 @@
 import Tapestry from "./Tapestry"
 
 export default {
-  name: 'tyde',
+  name: "tyde",
   components: {
-    Tapestry
-  }
+    Tapestry,
+  },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
