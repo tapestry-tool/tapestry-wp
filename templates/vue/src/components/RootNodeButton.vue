@@ -9,15 +9,15 @@
 
 <script>
 export default {
-  name: 'root-node-button',
+  name: "root-node-button",
   data() {
     return {}
   },
   methods: {
     showModal() {
-      this.$emit('add-root-node');
-    }
-  }
+      this.$emit("add-root-node")
+    },
+  },
 }
 </script>
 
@@ -40,4 +40,3 @@ export default {
   color: #11a6d8;
 }
 </style>
-

@@ -2,27 +2,32 @@
   <section>
     <nav>
       <ul class="tabs">
-        <TydeTab @click="setActiveTab(tab)" v-for="tab in tabs" :key="tab" :isActive="tab === activeTab">
+        <tyde-tab
+          v-for="tab in tabs"
+          :key="tab"
+          :is-active="tab === activeTab"
+          @click="setActiveTab(tab)"
+        >
           See {{ tab }}
-        </TydeTab>
+        </tyde-tab>
       </ul>
     </nav>
     <ul class="logs">
-      <TydeLog v-for="log in visibleLogs" :key="log.name" :log="log">
+      <tyde-log v-for="log in visibleLogs" :key="log.name" :log="log">
         <p>{{ log.name }}</p>
         <p>Type: {{ log.type }}</p>
         <p>Favourited: {{ log.isFavourite }}</p>
-      </TydeLog>
+      </tyde-log>
     </ul>
   </section>
 </template>
 
 <script>
-import TydeLog from './TydeLog'
-import TydeTab from './TydeTab'
+import TydeLog from "./TydeLog"
+import TydeTab from "./TydeTab"
 
 export default {
-  name: 'tyde-menu-home',
+  name: "tyde-menu-home",
   components: {
     TydeLog,
     TydeTab,
@@ -31,34 +36,29 @@ export default {
     logs: {
       type: Array,
       required: false,
-      default: [],
-    },
-  },
-  computed: {
-    visibleLogs() {
-      const filter = this.activeTab
-      if (filter === 'activities') {
-        return this.logs.filter(item => item.type === 'activity')
-      }
-      if (filter === 'content') {
-        return this.logs.filter(item => item.type === 'content')
-      }
-      if (filter === 'favourites') {
-        return this.logs.filter(item => item.isFavourite)
-      }
-      return this.logs
+      default: () => [],
     },
   },
   data() {
     return {
-      activeTab: 'all',
-      tabs: [
-        'activities',
-        'content',
-        'favourites',
-        'all',
-      ]
+      activeTab: "all",
+      tabs: ["activities", "content", "favourites", "all"],
     }
+  },
+  computed: {
+    visibleLogs() {
+      const filter = this.activeTab
+      if (filter === "activities") {
+        return this.logs.filter(item => item.type === "activity")
+      }
+      if (filter === "content") {
+        return this.logs.filter(item => item.type === "content")
+      }
+      if (filter === "favourites") {
+        return this.logs.filter(item => item.isFavourite)
+      }
+      return this.logs
+    },
   },
   methods: {
     setActiveTab(tab) {

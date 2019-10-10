@@ -1,5 +1,5 @@
 <template>
-  <li @click="$emit('click')" :class="['tab', { 'tab-active': isActive }]">
+  <li :class="['tab', { 'tab-active': isActive }]" @click="$emit('click')">
     <i class="far fa-eye icon"></i>
     <slot></slot>
   </li>
@@ -7,6 +7,7 @@
 
 <script>
 export default {
+  name: "tyde-tab",
   props: {
     isActive: {
       type: Boolean,
@@ -14,7 +15,6 @@ export default {
       default: false,
     },
   },
-  name: 'tyde-tab',
 }
 </script>
 

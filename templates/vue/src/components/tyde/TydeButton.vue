@@ -1,5 +1,5 @@
 <template>
-  <button @click="$emit('click')" class="tyde-button">
+  <button class="tyde-button" @click="$emit('click')">
     <i :class="iconClass"></i>
     <slot></slot>
   </button>
@@ -7,18 +7,18 @@
 
 <script>
 export default {
+  name: "tyde-button",
   props: {
     icon: {
       type: String,
       required: true,
     },
   },
-  name: 'tyde-button',
   computed: {
     iconClass: function() {
       return `fas fa-${this.icon}`
     },
-  }
+  },
 }
 </script>
 
@@ -44,7 +44,7 @@ export default {
 }
 
 .tyde-button:before {
-  content: '';
+  content: "";
   position: absolute;
   top: -7px;
   left: -7px;

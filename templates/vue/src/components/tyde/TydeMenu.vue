@@ -1,46 +1,53 @@
 <template>
   <div id="tyde-menu">
     <div class="buttons">
-      <TydeButton @click="setActivePage('settings')" icon="cog"></TydeButton>
-      <TydeButton @click="$emit('return-to-map')" icon="globe-asia"></TydeButton>
-      <TydeButton @click="setActivePage('help')" icon="question"></TydeButton>
+      <tyde-button icon="cog" @click="setActivePage('settings')"></tyde-button>
+      <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
+      <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
     </div>
     <div class="content">
       <h1 class="title">Captain's Log</h1>
-      <TydeMenuHome v-if="activePage === 'home'" :logs="logs" />
-      <TydeMenuSettings @back="setActivePage('home')" v-if="activePage === 'settings'" />
-      <TydeMenuHelp @back="setActivePage('home')" v-if="activePage === 'help'" />
+      <tyde-menu-home v-if="activePage === 'home'" :logs="logs" />
+      <tyde-menu-settings
+        v-if="activePage === 'settings'"
+        @back="setActivePage('home')"
+      />
+      <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
     </div>
     <div class="continue">
-      <TydeButton @click="$emit('continue')" icon="arrow-right" class="button-continue"></TydeButton>
+      <tyde-button
+        icon="arrow-right"
+        class="button-continue"
+        @click="$emit('continue')"
+      ></tyde-button>
     </div>
   </div>
 </template>
 
 <script>
-import TydeButton from './TydeButton'
-import TydeMenuHome from './TydeMenuHome'
-import TydeMenuSettings from './TydeMenuSettings'
-import TydeMenuHelp from './TydeMenuHelp'
+import TydeButton from "./TydeButton"
+import TydeMenuHome from "./TydeMenuHome"
+import TydeMenuSettings from "./TydeMenuSettings"
+import TydeMenuHelp from "./TydeMenuHelp"
 
 export default {
-  name: 'tyde-menu',
-  props: {
-    logs: {
-      type: Array,
-      required: false,
-      default: [],
-    },
-  },
+  name: "tyde-menu",
   components: {
     TydeButton,
     TydeMenuHome,
     TydeMenuSettings,
     TydeMenuHelp,
   },
+  props: {
+    logs: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+  },
   data() {
     return {
-      activePage: 'home',
+      activePage: "home",
     }
   },
   methods: {

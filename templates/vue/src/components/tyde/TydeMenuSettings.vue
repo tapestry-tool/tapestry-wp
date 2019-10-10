@@ -1,15 +1,15 @@
 <template>
   <section class="wrapper">
-    <TydeButton @click="$emit('back')" class="back-button" icon="arrow-left" />
+    <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
     <h1 class="title">Settings</h1>
   </section>
 </template>
 
 <script>
-import TydeButton from './TydeButton'
+import TydeButton from "./TydeButton"
 
 export default {
-  name: 'tyde-menu-settings',
+  name: "tyde-menu-settings",
   components: {
     TydeButton,
   },

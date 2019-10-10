@@ -1,17 +1,20 @@
 <template>
   <section class="wrapper">
-    <TydeButton @click="$emit('back')" class="back-button" icon="arrow-left" />
+    <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
     <h1 class="title">How to Play</h1>
     <p>Click on any icon to play.</p>
-    <p>Once you are done viewing all the nodes, click the green next arrow to view more content.</p>
+    <p>
+      Once you are done viewing all the nodes, click the green next arrow to view
+      more content.
+    </p>
   </section>
 </template>
 
 <script>
-import TydeButton from './TydeButton'
+import TydeButton from "./TydeButton"
 
 export default {
-  name: 'tyde-menu-help',
+  name: "tyde-menu-help",
   components: {
     TydeButton,
   },

@@ -6,13 +6,13 @@
 
 <script>
 export default {
-  name: 'tyde-log',
+  name: "tyde-log",
   props: {
     log: {
       type: Object,
       required: true,
     },
-  }
+  },
 }
 </script>
 
