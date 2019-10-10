@@ -224,7 +224,9 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">Submit</b-button>
+      <b-button size="sm" variant="primary" @click="submitNode()">
+        Submit
+      </b-button>
     </template>
   </b-modal>
 </template>
@@ -296,7 +298,10 @@ export default {
           value: this.node.typeData && this.node.typeData.textContent,
         },
         { name: "mediaDuration", value: this.node.mediaDuration },
-        { name: "imageURL", value: this.addThumbnail ? this.node.imageURL : "" },
+        {
+          name: "imageURL",
+          value: this.addThumbnail ? this.node.imageURL : "",
+        },
         { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
