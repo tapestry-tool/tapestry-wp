@@ -301,7 +301,7 @@ export default {
       return [
         { name: "title", value: this.node.title },
         { name: "description", value: this.node.description },
-        { name: "mediaType", value: this.node.mediaType },
+        { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
           value: this.node.typeData && this.node.typeData.mediaURL,
