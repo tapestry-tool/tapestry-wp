@@ -74,4 +74,15 @@ export default class {
     const response = await axios.put(url, node)
     return response
   }
+
+  async getSettings() {
+    const tapestry = await this.getTapestry()
+    return tapestry.settings
+  }
+
+  async updateSettings(settings) {
+    const url = `${apiUrl}/tapestries/${this.postId}/settings`
+    const response = await axios.put(url, settings)
+    return response
+  }
 }
