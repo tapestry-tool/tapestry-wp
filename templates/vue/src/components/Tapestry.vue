@@ -188,8 +188,8 @@ export default {
         hideProgress: false,
         hideMedia: false,
         coordinates: {
-          x: (dimensions.width - dimensions.startX) / 2,
-          y: (dimensions.height - dimensions.startY) / 2,
+          x: 3000,
+          y: 3000,
         },
       }
 
