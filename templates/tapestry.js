@@ -50,7 +50,7 @@ function tapestryTool(config){
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 2,                                      // Default depth of Tapestry
+        tapestryDepth = 4,                                      // Default depth of Tapestry
         viewLockedCheckbox = {'checked': false}, 
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         autoLayout = false;
@@ -284,9 +284,9 @@ function tapestryTool(config){
         tapestryDepthSlider = document.createElement("input");
         setAttributes(tapestryDepthSlider ,{
             type:"range",
-            min:"1",
-            max:"3",
-            value:"2",
+            min:"2",
+            max:"4",
+            value:"4",
             id:"tapestry-depth-slider"
         });
         depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -502,6 +502,7 @@ function tapestryTool(config){
                             method: API_DELETE_METHOD,
                             success: function() {
                                 deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
+                                location.reload();
                             },
                             error: function(e) {
                                 console.error("Error deleting node " + nodeId, e);
@@ -2549,7 +2550,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'text';
+            classStr = classStrStart + 'play fa-text';
             break;
 
         case "url-embed":
