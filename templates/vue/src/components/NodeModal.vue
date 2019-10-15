@@ -138,11 +138,16 @@
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
+          </div>
+        </b-tab>
+        <b-tab
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          title="Behaviour"
+        >
+          >
+          <div id="modal-behaviour">
             <b-form-group>
-              <b-form-checkbox
-                v-show="node.mediaType === 'h5p' || node.mediaType === 'video'"
-                v-model="node.skippable"
-              >
+              <b-form-checkbox v-model="node.skippable">
                 Allow skipping video if user has not watched at least once
               </b-form-checkbox>
             </b-form-group>
