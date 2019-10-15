@@ -8,5 +8,5 @@ Vue.use(BootstrapVue)
 
 new Vue({
   el: "#tapestry-container",
-  render: h => h(App)
+  render: h => h(App),
 })

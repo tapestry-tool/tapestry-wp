@@ -126,6 +126,7 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
+        skippable: true,
         permissions: { public: ["read"] },
         description: "",
       }
@@ -187,6 +188,7 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
+        skippable: true,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -266,6 +268,9 @@ export default {
             break
           case "hideMedia":
             newNodeEntry.hideMedia = fieldValue
+            break
+          case "skippable":
+            newNodeEntry.skippable = fieldValue
             break
           case "description":
             newNodeEntry.description = fieldValue

@@ -140,6 +140,18 @@
             </b-form-group>
           </div>
         </b-tab>
+        <b-tab
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          title="Behaviour"
+        >
+          <div id="modal-behaviour">
+            <b-form-group>
+              <b-form-checkbox v-model="node.skippable">
+                Allow skipping video if user has not watched at least once
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+        </b-tab>
         <b-tab title="Permissions">
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
@@ -320,6 +332,7 @@ export default {
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
         { name: "hideMedia", value: this.node.hideMedia },
+        { name: "skippable", value: this.node.skippable },
       ]
     },
     nodeImageUrl() {
