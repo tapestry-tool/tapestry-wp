@@ -308,10 +308,13 @@
     font-size: 0.9em;
     padding-left: 0.2em;
 }
-.mediaButton > i.fa-text:before {
+.mediaButton > i.fa-play.fa-text:after {
     content: "T";
     font-family: serif;
-	padding-top: 3px;
+    padding-top: 2px;
+    position: absolute;
+    color: #333;
+    font-size: 21px;
 }
 
 .mediaButton > i[data-media-type="text"]:not(.mediaButtonLoading) {
