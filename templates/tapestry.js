@@ -2119,7 +2119,7 @@ function tapestryTool(config){
             node.depth = depth;
         }
 
-        const children = getChildren(id, 1);
+        const children = getChildren(id, 0);
         children.forEach(child => {
             if (visited.includes(child)) {
                 const childNode = tapestry.dataset.nodes[findNodeIndex(child)];
@@ -2160,8 +2160,7 @@ function tapestryTool(config){
 
     function updateChildrenCache(newRoot) {
         cache = {};
-        getChildren(newRoot);
-        console.table(cache);
+        const children = getChildren(newRoot);
     }
 
     function getChildren(id, depth = tapestryDepth, visited = []) {
@@ -2173,11 +2172,11 @@ function tapestryTool(config){
             return [];
         }
 
-        if (cache[id] !== undefined) {
-            return cache[id];
+        const key = JSON.stringify({ id, depth });
+        if (cache[key] !== undefined) {
+            return cache[key];
         }
 
-        console.count('get-children')
         visited.push(id);
 
         let children = [];
@@ -2196,7 +2195,7 @@ function tapestryTool(config){
             }
         }
 
-        cache[id] = children;
+        cache[key] = children;
         return children;
     }
     
