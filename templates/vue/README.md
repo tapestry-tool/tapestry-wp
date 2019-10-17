@@ -19,8 +19,9 @@ For detailed explanation on how things work, consult the [docs for vue-loader](h
 
 ## Link Preview API Key
 
-Get the API key for the LinkPreview API by going [here](https://www.linkpreview.net/) and navigating to "API Keys".
+To get link previews working for the "External Link" content type, you will need to get an API key for LinkPreview and set a config variable first by following these instructions:
 
-- Create an account, or connect your github or google accounts.
-- Login with the account, then press "Generate new access key" on the top right corner.
-- In this repo, update the API key in the `config.js` file.
+1. Navigate to [linkpreview.net](https://www.linkpreview.net/) and sign up to get an API Key
+2. Once logged in, press "Generate new access key" on the top right corner and copy the key
+3. In this directory (vue), make a copy of the `config-sample.js` file and rename it to `config.js` (if it doesn't exist yet)
+4. Open the `config.js` file and paste the API key as the value of the `LINK_PREVIEW_API_KEY` variable
