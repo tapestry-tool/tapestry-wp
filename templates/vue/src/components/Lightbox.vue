@@ -63,7 +63,7 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: String,
       required: true,
     },
     tapestryApiClient: {

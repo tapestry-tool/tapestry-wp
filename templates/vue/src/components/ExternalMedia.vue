@@ -76,6 +76,18 @@ export default {
     }
   },
   computed: {
+    shouldFetch() {
+      if (!this.node.typeData.linkMetadata) {
+        console.log('missing meta')
+        return true
+      }
+      const { url } = this.node.typeData.linkMetadata
+      if (!url.startsWith(this.node.typeData.mediaURL)) {
+        console.log('stale url', `url: ${url}`, `media url: ${this.node.typeData.mediaURL}`)
+        return true
+      }
+      return false
+    },
     containerStyles() {
       const { width, height } = this.adjustedDimensions
       return {
@@ -99,7 +111,7 @@ export default {
   },
   async mounted() {
     if (this.node.behaviour !== "embed") {
-      if (this.shouldFetch()) {
+      if (this.shouldFetch) {
         this.fetchLinkData(this.node.typeData.mediaURL)
       } else {
         this.linkMetadata = this.node.typeData.linkMetadata
@@ -108,12 +120,6 @@ export default {
     this.$emit("mounted", this.adjustedDimensions)
   },
   methods: {
-    shouldFetch() {
-      if (!this.node.typeData.linkMetadata) return true
-      const { prevUrl } = this.node.typeData.linkMetadata
-      if (prevUrl !== this.node.typeData.mediaURL) return true
-      return false
-    },
     async fetchLinkData(url) {
       this.fetching = true
 
