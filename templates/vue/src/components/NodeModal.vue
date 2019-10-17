@@ -37,8 +37,9 @@
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
-                v-model="node.mediaType"
+                :value="nodeType"
                 :options="mediaTypes"
+                @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
             <b-form-group v-show="node.mediaType === 'text'" label="Text content">
@@ -48,7 +49,10 @@
                 placeholder="Enter text here"
               ></b-form-textarea>
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'video'" label="Video URL">
+            <b-form-group
+              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
+              label="Video URL"
+            >
               <b-form-input
                 id="node-video-media-url"
                 v-model="node.typeData.mediaURL"
@@ -56,7 +60,10 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'video'" label="Video Duration">
+            <b-form-group
+              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
+              label="Video Duration"
+            >
               <b-form-input
                 id="node-video-media-duration"
                 v-model="node.mediaDuration"
@@ -64,7 +71,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'h5p'" label="H5P Embed Link">
+            <b-form-group v-show="nodeType === 'h5p'" label="H5P Embed Link">
               <b-form-input
                 id="node-h5p-media-url"
                 v-model="node.typeData.mediaURL"
@@ -73,7 +80,7 @@
               />
             </b-form-group>
             <b-form-group
-              v-show="node.mediaType === 'h5p'"
+              v-show="nodeType === 'h5p'"
               label="H5P Video Duration"
               description="This only applies to video H5P content"
             >
@@ -285,6 +292,12 @@ export default {
     }
   },
   computed: {
+    nodeType() {
+      if (this.node.mediaFormat === "h5p") {
+        return "h5p"
+      }
+      return this.node.mediaType
+    },
     modalTitle() {
       if (this.modalType === "add-new-node") {
         return `Add new sub-topic to ${this.rootNodeTitle}`
@@ -301,7 +314,7 @@ export default {
         { name: "title", value: this.node.title },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
-        { name: "mediaType", value: this.node.mediaType },
+        { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
           value: this.node.typeData && this.node.typeData.mediaURL,
@@ -339,6 +352,14 @@ export default {
     })
   },
   methods: {
+    handleTypeChange(event) {
+      this.$set(this.node, "mediaType", event)
+      if (event === "video" || event === "h5p") {
+        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
+      } else {
+        this.$set(this.node, "mediaFormat", "")
+      }
+    },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {

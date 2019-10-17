@@ -31,8 +31,9 @@ function tapestryTool(config){
         COLOR_LINK = "#999",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        TIME_BETWEEN_SAVE_PROGRESS = 5, // Means the number of seconds between each save progress call
-        NODE_UNLOCK_TIMEFRAME = 2, // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
+        TIME_BETWEEN_SAVE_PROGRESS = 5,                         // Means the number of seconds between each save progress call
+        NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
+        MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
         API_DELETE_METHOD = 'DELETE',
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
@@ -49,7 +50,7 @@ function tapestryTool(config){
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 2,                                      // Default depth of Tapestry
+        tapestryDepth = 4,                                      // Default depth of Tapestry
         viewLockedCheckbox = {'checked': false}, 
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         autoLayout = false;
@@ -301,9 +302,9 @@ function tapestryTool(config){
         tapestryDepthSlider = document.createElement("input");
         setAttributes(tapestryDepthSlider ,{
             type:"range",
-            min:"1",
-            max:"3",
-            value:"2",
+            min:"2",
+            max:"4",
+            value:"4",
             id:"tapestry-depth-slider"
         });
         depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -519,6 +520,7 @@ function tapestryTool(config){
                             method: API_DELETE_METHOD,
                             success: function() {
                                 deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
+                                location.reload();
                             },
                             error: function(e) {
                                 console.error("Error deleting node " + nodeId, e);
@@ -701,7 +703,7 @@ function tapestryTool(config){
         $("#"+TAPESTRY_CONTAINER_ID).hide();
 
         // add in the controls
-        document.getElementById(TAPESTRY_CONTAINER_ID).appendChild(tapestry.getControls());
+        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
@@ -723,12 +725,15 @@ function tapestryTool(config){
         var tapestryDimensions = tapestry.getTapestryDimensions();
         tapestryDimensionsBeforeDrag = tapestryDimensions;
 
+        const MIN_WIDTH = getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR;
+        const MIN_HEIGHT = getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR;
+
         d3.select("#"+TAPESTRY_CONTAINER_ID+"-svg")
             .attr("viewBox", 
                     tapestryDimensions.startX + " " + 
                     tapestryDimensions.startY + " " + 
-                    (tapestryDimensions.width - tapestryDimensions.startX) + " " + 
-                    (tapestryDimensions.height - tapestryDimensions.startY) 
+                    Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
+                    Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
                 );
                 
         startSimulation();
@@ -1665,13 +1670,23 @@ function tapestryTool(config){
             tapestryHeight = nodeDimensions.y;
         }
 
+        var windowWidth = getBrowserWidth();
+        // Center the nodes if there is not enough of them to fill the width of the screen
+        if ( (tapestryWidth - tapestryStartX - MAX_RADIUS*1.25) < windowWidth) {
+            tapestryStartX -= (windowWidth - tapestryWidth + tapestryStartX) / 2 + MAX_RADIUS;
+        }
+
         // Transpose the tapestry so it's longest side is aligned with the longest side of the browser
         // For example, vertically long tapestries should be transposed so they are horizontally long on desktop,
         // but kept the same way on mobile phones where the browser is vertically longer
-        var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
-        var windowAspectRatio = getAspectRatio();
-        if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
-            transposeNodes();
+        // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
+        // they want to while drafting a tapestry if we keep transposing it
+        if (!config.wpIsAdmin) {
+            var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
+            var windowAspectRatio = getAspectRatio();
+            if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
+                transposeNodes();
+            }
         }
 
         return {
@@ -2264,7 +2279,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'text';
+            classStr = classStrStart + 'play fa-text';
             break;
 
         case "url-embed":
