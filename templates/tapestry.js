@@ -64,8 +64,6 @@ function tapestryTool(config){
         xORfx = autoLayout ? 'x' : 'fx',
         yORfy = autoLayout ? 'y' : 'fy';
 
-    const childrenMap = {}
-
     /****************************************************
      * EDIT-RELATED VARIABLES
      ****************************************************/
@@ -1219,7 +1217,7 @@ function tapestryTool(config){
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
-                var base = "<p class='title'>" + d.title + d.id + "</p>"; // temp add id for debugging
+                var base = "<p class='title'>" + d.title + "</p>";
                 if (d.mediaType === 'video')
                     base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 return base;
@@ -2163,6 +2161,8 @@ function tapestryTool(config){
         const children = getChildren(newRoot);
     }
 
+    /* Find children based on depth.
+        depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
     function getChildren(id, depth = tapestryDepth, visited = []) {
         if (depth < 0) {
             return [];
@@ -2198,53 +2198,6 @@ function tapestryTool(config){
         cache[key] = children;
         return children;
     }
-    
-    /* Find children based on depth. 
-        depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
-    /* function getChildrenOld(id, depth) {
-        console.count('get-children');
-        if (typeof depth === 'undefined') {
-            depth = tapestryDepth;
-        }
-        
-        var children = [];
-        var dataLinks = tapestry.dataset.links;
-        for (step = 0; step < depth; step++) {
-            for (var linkId in dataLinks) {
-                var link = dataLinks[linkId];
-    
-                // search for links
-                if (typeof link.source === 'number' && link.source === id) {
-                    children.push(link.target);
-                    children = children.concat(getChildren(link.target, depth-1));
-                }
-                else if (typeof link.source === 'object' && link.source.id === id) {
-                    children.push(link.target.id);
-                    children = children.concat(getChildren(link.target.id, depth-1));
-                }
-    
-                // account for links where the ID is the target.
-                if (typeof link.target === 'number' && link.target === id) {
-                    children.push(link.source);
-                    children = children.concat(getChildren(link.source, depth-1));
-                }
-                else if (typeof link.target === 'object' && link.target.id === id) {
-                    children.push(link.source.id);
-                    children = children.concat(getChildren(link.source.id, depth-1));
-                }
-            }
-        }
-        // clear out duplicate IDs
-        var rchildren = arrayRemove(children, id);
-        return rchildren;
-    } */
-    
-    /* Remove any duplicates in an array. */
-    /* function arrayRemove(arr, value) {
-        return arr.filter(function(ele){
-            return ele != value;
-        });
-    } */
     
     /* Gets the size of the node depending on the type of the node relevant to the currently selected node */
     function getRadius(d) {
@@ -2444,6 +2397,7 @@ function tapestryTool(config){
     
     /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
     function setUnlocked() {
+        // this is here because the other unlock fix wasn't working for some reason.
         tapestry.dataset.nodes.forEach(node => {
             node.unlocked = true
         });
@@ -2481,8 +2435,7 @@ function tapestryTool(config){
 
         tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = node.unlocked && parentIsAccessible;
     
-        const children = getChildren(node.id, 0);
-        children.forEach (childNodeId => {
+        getChildren(node.id, 0).forEach (childNodeId => {
             var thisNode = getNodeById(childNodeId);
     
             // Do not traverse up the parent
