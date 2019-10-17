@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <Tyde />
+    <tyde />
   </div>
 </template>
 
 <script>
-import Tyde from './components/Tyde'
+import Tyde from "./components/Tyde"
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    Tyde
+    Tyde,
   },
   data() {
     return {}
-  }
+  },
 }
 </script>
 
