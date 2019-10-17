@@ -1219,7 +1219,7 @@ function tapestryTool(config){
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
-                var base = "<p class='title'>" + d.title + "</p>";
+                var base = "<p class='title'>" + d.title + d.id + "</p>"; // temp add id for debugging
                 if (d.mediaType === 'video')
                     base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 return base;
@@ -2161,6 +2161,7 @@ function tapestryTool(config){
     function updateChildrenCache(newRoot) {
         cache = {};
         getChildren(newRoot);
+        console.table(cache);
     }
 
     function getChildren(id, depth = tapestryDepth, visited = []) {
@@ -2201,7 +2202,7 @@ function tapestryTool(config){
     
     /* Find children based on depth. 
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
-    function getChildrenOld(id, depth) {
+    /* function getChildrenOld(id, depth) {
         console.count('get-children');
         if (typeof depth === 'undefined') {
             depth = tapestryDepth;
@@ -2237,14 +2238,14 @@ function tapestryTool(config){
         // clear out duplicate IDs
         var rchildren = arrayRemove(children, id);
         return rchildren;
-    }
+    } */
     
     /* Remove any duplicates in an array. */
-    function arrayRemove(arr, value) {
+    /* function arrayRemove(arr, value) {
         return arr.filter(function(ele){
             return ele != value;
         });
-    }
+    } */
     
     /* Gets the size of the node depending on the type of the node relevant to the currently selected node */
     function getRadius(d) {
