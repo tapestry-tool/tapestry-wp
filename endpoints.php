@@ -23,8 +23,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::postTapestryNode'
+            'callback'              => 'addTapestryNode'
         ]
     ],
     'POST_TAPESTRY' => (object) [
@@ -62,88 +61,77 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNode'
         ]
     ],
     'DELETE_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'deleteTapestryNode'
         ]
     ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeSize',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeSize'
         ]
     ],
     'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodePermissions',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodePermissions'
         ]
     ],
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeDescription',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeDescription'
         ]
     ],
     'PUT_TAPESTRY_NODE_TITLE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTitle',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeTitle'
         ]
     ],
     'PUT_TAPESTRY_NODE_IMAGE_URL' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeImageURL',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeImageURL'
         ]
     ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTypeData',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeTypeData'
         ]
     ],
     'PUT_TAPESTRY_NODE_COORDINATES' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeCoordinates',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeCoordinates'
         ]
     ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryLink',
-            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+            'callback'              => 'addTapestryLink'
         ]
     ],
     'DELETE_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryLink',
-            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+            'callback'              => 'deleteTapestryLink'
         ]
     ],
     'GET_TAPESTRY_USER_PROGRESS' => (object) [
@@ -316,6 +304,9 @@ function addTapestryLink($request)
             || (!TapestryHelpers::isChildNodeOfTapestry($link->target, $postId))
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->source, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->target, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');

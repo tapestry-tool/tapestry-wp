@@ -348,22 +348,8 @@ class Tapestry implements ITapestry
         $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
 
         foreach ($nodeMetaIds as $nodeMetaId) {
-            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
-
-            if ((property_exists($nodePermissions, 'public')
-                    && in_array($options['READ'], $nodePermissions->public))
-                || (property_exists($nodePermissions, 'user-' . $userId)
-                    && in_array($options['READ'], $nodePermissions->{'user-' . $userId}))
-            ) {
+            if (TapestryHelpers::currentUserIsAllowed('READ', $nodeMetaId, $this->postId)) {
                 array_push($newNodeMetaIds, $nodeMetaId);
-            } else {
-                foreach ($groupIds as $groupId) {
-                    if ((property_exists($nodePermissions, 'group-' . $groupId))
-                        && (in_array($options['READ'], $nodePermissions->{'group-' . $groupId}))
-                    ) {
-                        array_push($newNodeMetaIds, $nodeMetaId);
-                    }
-                }
             }
         }
 

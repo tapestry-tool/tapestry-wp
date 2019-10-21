@@ -65,22 +65,6 @@ class TapestryPermissions
     }
 
     /**
-     * Put Tapestry Node Properties
-     * 
-     * @param   Object  $request    request
-     * 
-     * @return  Object  $permission permission
-     */
-    static function putTapestryNodeProperties($request)
-    {
-        $postId = $request['tapestryPostId'];
-        if (isset($postId)) {
-            return current_user_can('read', $postId);
-        }
-        return false;
-    }
-
-    /**
      * Post Tapestry Link Permission
      *
      * @param   Object  $request    request
