@@ -362,7 +362,6 @@ export default {
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
-      console.log(this.nodeData);
       if (!this.formErrors.length) {
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)

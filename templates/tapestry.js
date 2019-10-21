@@ -2448,24 +2448,26 @@ function tapestryTool(config){
     
     function checkPermission(node, permissionType) {
         // If admin, give permissinos to add and edit
-        const isRoot = node.nodeType === "root";
+        if (node.nodeType !== "root") {
+            return false;
+        }
 
         if (config.wpIsAdmin) {
-            return isRoot;
+            return true;
         }
     
         if (node.permissions.public && node.permissions.public.includes(permissionType)) {
-            return isRoot;
+            return true;
         }
     
         if (config.wpUserId && config.wpUserId !== "") {
             if (node.permissions.authenticated && node.permissions.authenticated.includes(permissionType)) {
-                return isRoot;
+                return true;
             }
 
             var userIndex = "user-" + config.wpUserId;
             if (node.permissions[userIndex] && node.permissions[userIndex].includes(permissionType)) {
-                return isRoot;
+                return true;
             }
         }
     
