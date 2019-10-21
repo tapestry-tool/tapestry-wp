@@ -199,7 +199,9 @@ function tapestryTool(config){
 
     this.init = function(isReload = false) {
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            return fillEmptyFields(node, { skippable: true });
+            const updatedNode = fillEmptyFields(node, { skippable: true })
+            updatedNode.permissions = fillEmptyFields(updatedNode.permissions, { authenticated: ["read"] })
+            return updatedNode
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 

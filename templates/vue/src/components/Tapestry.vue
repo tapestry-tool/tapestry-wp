@@ -71,7 +71,10 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authorized: ["read"],
+        },
       },
     }
   },
@@ -127,7 +130,10 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authorized: ["read"],
+        },
         description: "",
       }
     },
