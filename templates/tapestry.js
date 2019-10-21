@@ -349,7 +349,7 @@ function tapestryTool(config){
         
         let showSettings = false;
         // append settings modal only if logged in
-        if (config.wpUserId) {
+        if (config.wpCanEditTapestry) {
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
