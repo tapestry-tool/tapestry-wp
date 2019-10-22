@@ -102,9 +102,9 @@ export default {
         const audio = await this.TapestryAPI.getH5PAudioFromServer(this.selectedNodeId)
         const h5pAudioRecorder = document.getElementById('h5p')
         if (h5pAudioRecorder) {
-          h5pAudioRecorder.window.dispatchEvent('tapestry-get-h5p-audio', {
+          dispatchEvent(new CustomEvent('tapestry-get-h5p-audio', {
             detail: audio
-          })
+          }))
         } else {
           console.error('H5P module is not loaded.')
         }
