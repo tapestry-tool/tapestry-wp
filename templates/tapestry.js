@@ -31,13 +31,16 @@ function tapestryTool(config){
         COLOR_LINK = "#999",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        TIME_BETWEEN_SAVE_PROGRESS = 5, // Means the number of seconds between each save progress call
-        NODE_UNLOCK_TIMEFRAME = 2, // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
+        TIME_BETWEEN_SAVE_PROGRESS = 5,                         // Means the number of seconds between each save progress call
+        NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
+        MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
         API_DELETE_METHOD = 'DELETE',
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
-        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
+        USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
+        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings",
+        ALLOW_SKIP_THRESHOLD = 0.95;
 
     var // declared variables
         root, svg, links, nodes,                                // Basics
@@ -49,9 +52,11 @@ function tapestryTool(config){
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 2,                                      // Default depth of Tapestry
+        tapestryDepth = 4,                                      // Default depth of Tapestry
         viewLockedCheckbox = {'checked': false}, 
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
+        childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
+                                                                // of children of each node at the given depth
         autoLayout = false;
 
     var // calculated
@@ -193,6 +198,9 @@ function tapestryTool(config){
     });
 
     this.init = function(isReload = false) {
+        this.dataset.nodes = this.dataset.nodes.map(node => {
+            return fillEmptyFields(node, { skippable: true });
+        });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
             detail: { dataset: this.dataset }
@@ -219,6 +227,7 @@ function tapestryTool(config){
         setNodeTypes(root);
         setLinkTypes(root);
         setUnlocked();
+        addDepthToNodes(root, 0, []);
         setAccessibleStatus();
 
         if (!isReload) {
@@ -249,6 +258,25 @@ function tapestryTool(config){
         }
     }
 
+    this.resetNodeCache = function() {
+        childrenOfNodeAtDepth = {}
+    }
+
+    /**
+     * Helper function to fill in default fields of a node if
+     * they do not exist.
+     * @param {object} node 
+     * @param {object} attributes 
+     */
+    function fillEmptyFields(node, attributes) {
+        for (const [key, value] of Object.entries(attributes)) {
+            if (!node.hasOwnProperty(key)) {
+                node[key] = value;
+            }
+        }
+        return node;
+    }
+    
     function setBackgroundImage() {
         const { backgroundUrl } = tapestry.dataset.settings;
         const htmlBody = document.getElementsByTagName("BODY")[0];
@@ -283,9 +311,9 @@ function tapestryTool(config){
         tapestryDepthSlider = document.createElement("input");
         setAttributes(tapestryDepthSlider ,{
             type:"range",
-            min:"1",
-            max:"3",
-            value:"2",
+            min:"2",
+            max:"4",
+            value:"4",
             id:"tapestry-depth-slider"
         });
         depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -468,7 +496,7 @@ function tapestryTool(config){
                     console.error("Error deleting root node", e);
                 }
             });
-        } else if (getChildren(nodeId, 1) && getChildren(nodeId, 1).length > 1) {
+        } else if (getChildren(nodeId, 0) && getChildren(nodeId, 0).length > 1) {
             alert("Can only delete nodes with one neighbouring node.");
         } else {
             var linkToBeDeleted = -1;
@@ -501,6 +529,7 @@ function tapestryTool(config){
                             method: API_DELETE_METHOD,
                             success: function() {
                                 deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
+                                location.reload();
                             },
                             error: function(e) {
                                 console.error("Error deleting node " + nodeId, e);
@@ -593,7 +622,6 @@ function tapestryTool(config){
 
     //Resize all nodes, where id is now the selected node
     function resizeNodes(id) {
-        getChildren(id);
         setNodeTypes(id);
         setLinkTypes(id);
         filterTapestry();
@@ -683,7 +711,7 @@ function tapestryTool(config){
         $("#"+TAPESTRY_CONTAINER_ID).hide();
 
         // add in the controls
-        document.getElementById(TAPESTRY_CONTAINER_ID).appendChild(tapestry.getControls());
+        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
@@ -705,12 +733,15 @@ function tapestryTool(config){
         var tapestryDimensions = tapestry.getTapestryDimensions();
         tapestryDimensionsBeforeDrag = tapestryDimensions;
 
+        const MIN_WIDTH = getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR;
+        const MIN_HEIGHT = getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR;
+
         d3.select("#"+TAPESTRY_CONTAINER_ID+"-svg")
             .attr("viewBox", 
                     tapestryDimensions.startX + " " + 
                     tapestryDimensions.startY + " " + 
-                    (tapestryDimensions.width - tapestryDimensions.startX) + " " + 
-                    (tapestryDimensions.height - tapestryDimensions.startY) 
+                    Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
+                    Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
                 );
                 
         startSimulation();
@@ -1013,7 +1044,9 @@ function tapestryTool(config){
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     root = d.id;
+                    tapestry.resetNodeCache();
                     resizeNodes(d.id);
+                    addDepthToNodes(root, 0, []);
 
                     dispatchEvent(new CustomEvent('change-selected-node', {detail: root}));
 
@@ -1023,7 +1056,7 @@ function tapestryTool(config){
                 }
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1206,7 +1239,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight);
+            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1370,17 +1403,23 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
     
-    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height) {
+    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height, skippable) {
         // Adjust the width and height here before passing it into setup media
         var lightboxDimensions = getLightboxDimensions(height, width);
         width = lightboxDimensions.width;
         height = lightboxDimensions.height;
         var media = setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height);
     
-    $('<div id="spotlight-overlay"></div>').on("click", function(){
+        const overlay = $('<div id="spotlight-overlay"></div>').on("click", function(){
             closeLightbox(id, mediaType);
             exitViewMode();
-        }).appendTo('body');
+        });
+
+        const closeLightboxButton = $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
+            .on("click", function () {
+                closeLightbox(id, mediaType);
+                exitViewMode();
+            });
     
         var top = lightboxDimensions.adjustedOn === "width" ? ((getBrowserHeight() - height) / 2) + $(this).scrollTop() : (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1);
         $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css({
@@ -1399,15 +1438,22 @@ function tapestryTool(config){
             });
         }
     
-    $("<div class='media-wrapper'></div>").appendTo('#spotlight-content');
-    media.appendTo('.media-wrapper');
-    
-    $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
-            .on("click", function() {
-                closeLightbox(id, mediaType);
-                exitViewMode();
-            })
-            .appendTo('#spotlight-content');
+        const wrapper = $("<div class='media-wrapper'></div>");
+        window.addEventListener("allow-skip", function () {
+            appendSkipTools();
+        });
+
+        wrapper.appendTo('#spotlight-content');
+        media.appendTo('.media-wrapper');
+
+        if (shouldAllowSkip(id)) {
+            appendSkipTools();
+        }
+
+        function appendSkipTools() {
+            overlay.appendTo('body');
+            closeLightboxButton.appendTo("#spotlight-content");
+        }
     
         setTimeout(function(){
             $('#spotlight-content').css({
@@ -1443,6 +1489,11 @@ function tapestryTool(config){
                 }, 200);
             });
         }
+    }
+
+    function shouldAllowSkip(id) {
+        const node = tapestry.dataset.nodes[findNodeIndex(id)];
+        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= ALLOW_SKIP_THRESHOLD;
     }
     
     function getLightboxDimensions(videoHeight, videoWidth) {
@@ -1525,6 +1576,7 @@ function tapestryTool(config){
                 });
                 
                 // Update the progress circle for this video
+                let wasDispatched = false;
                 video.addEventListener('timeupdate', function () {
                     for (var i = 0; i < childrenData.length; i++) {
                         if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
@@ -1535,6 +1587,13 @@ function tapestryTool(config){
                     }
                     updateViewedValue(id, video.currentTime, video.duration);
                     updateViewedProgress();
+                    if (video.currentTime / video.duration >= ALLOW_SKIP_THRESHOLD) {
+                        if (!wasDispatched) {
+                            dispatchEvent(new CustomEvent("allow-skip", { detail: id }));
+                            saveNodeAsSkippable(tapestry.dataset.nodes[index]);
+                        }
+                        wasDispatched = true;
+                    }
                 });
     
                 // Play the video at the last watched time (or at the beginning if not watched yet)
@@ -1938,13 +1997,23 @@ function tapestryTool(config){
             tapestryHeight = nodeDimensions.y;
         }
 
+        var windowWidth = getBrowserWidth();
+        // Center the nodes if there is not enough of them to fill the width of the screen
+        if ( (tapestryWidth - tapestryStartX - MAX_RADIUS*1.25) < windowWidth) {
+            tapestryStartX -= (windowWidth - tapestryWidth + tapestryStartX) / 2 + MAX_RADIUS;
+        }
+
         // Transpose the tapestry so it's longest side is aligned with the longest side of the browser
         // For example, vertically long tapestries should be transposed so they are horizontally long on desktop,
         // but kept the same way on mobile phones where the browser is vertically longer
-        var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
-        var windowAspectRatio = getAspectRatio();
-        if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
-            transposeNodes();
+        // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
+        // they want to while drafting a tapestry if we keep transposing it
+        if (!config.wpIsAdmin) {
+            var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
+            var windowAspectRatio = getAspectRatio();
+            if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
+                transposeNodes();
+            }
         }
 
         return {
@@ -2021,43 +2090,20 @@ function tapestryTool(config){
     function addDepthToNodes(id, depth, visited) {
         visited.push(id);
 
-        var depthAt = 0;
+        const node = tapestry.dataset.nodes[findNodeIndex(id)];
+        if (node) {
+            node.depth = depth;
+        }
 
-        if (tapestry.dataset.nodes[findNodeIndex(id)] && tapestry.dataset.nodes[findNodeIndex(id)].depth) {
-            tapestry.dataset.nodes[findNodeIndex(id)].depth = depth;
-        }
-        var children = getChildren(id, 1);
-    
-        var childLevel;
-    
-        // Progress through every child at a given node one at a time:
-        while (depthAt < children.length) {
-            for (var childId in children) {
-                // if the child has been visited, check to make sure the calculated depth
-                // is as low as it can be (via childLevel) to correct for shorter paths
-                // to the same node.
-                if (visited.includes(children[childId])) {
-                    childLevel = depth;
-                    if (tapestry.dataset.nodes[findNodeIndex(children[childId])].depth > childLevel) {
-                        tapestry.dataset.nodes[findNodeIndex(children[childId])].depth = childLevel;
-                    }
-                    else {
-                        depthAt++;
-                    }
-                }
-                // If the child has not been visited, record its depth (one away from the
-                // current node's childLevel), and recursively add depth to all of the 
-                // child's children.
-                else {
-                    childLevel = depth + 1;
-                    tapestry.dataset.nodes[findNodeIndex(children[childId])].depth = childLevel;
-                    visited.push(children[childId]);
-    
-                    addDepthToNodes(children[childId], childLevel, visited);
-                    depthAt++;
-                }
+        const children = getChildren(id, 0);
+        children.forEach(child => {
+            if (visited.includes(child)) {
+                const childNode = tapestry.dataset.nodes[findNodeIndex(child)];
+                childNode.depth = Math.min(childNode.depth, depth);
+            } else {
+                addDepthToNodes(child, depth + 1, visited);
             }
-        }
+        })
     }
     
     /* Return the distance between a node and its farthest descendant node */
@@ -2065,9 +2111,6 @@ function tapestryTool(config){
     
         if ((tapestry.dataset && tapestry.dataset.nodes.length === 0) || !id || (findNodeIndex(id) === -1))  {
             return 0;
-        } else {
-            // Create the .depth parameter for every node
-            addDepthToNodes(id, 0, []);
         }
     
         var nodes = tapestry.dataset.nodes;
@@ -2088,51 +2131,44 @@ function tapestryTool(config){
     
         return maxDepth;
     }
-    
-    /* Find children based on depth. 
+
+    /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
-    function getChildren(id, depth) {
-        if (typeof depth === 'undefined') {
-            depth = tapestryDepth;
+    function getChildren(id, depth = tapestryDepth, visited = []) {
+        if (depth < 0) {
+            return [];
         }
+
+        if (visited.includes(id)) {
+            return [];
+        }
+
+        const key = id + '-' + depth;
         
-        var children = [];
-        var dataLinks = tapestry.dataset.links;
-        for (step = 0; step < depth; step++) {
-            for (var linkId in dataLinks) {
-                var link = dataLinks[linkId];
-    
-                // search for links
-                if (typeof link.source === 'number' && link.source === id) {
-                    children.push(link.target);
-                    children = children.concat(getChildren(link.target, depth-1));
-                }
-                else if (typeof link.source === 'object' && link.source.id === id) {
-                    children.push(link.target.id);
-                    children = children.concat(getChildren(link.target.id, depth-1));
-                }
-    
-                // account for links where the ID is the target.
-                if (typeof link.target === 'number' && link.target === id) {
-                    children.push(link.source);
-                    children = children.concat(getChildren(link.source, depth-1));
-                }
-                else if (typeof link.target === 'object' && link.target.id === id) {
-                    children.push(link.source.id);
-                    children = children.concat(getChildren(link.source.id, depth-1));
-                }
+        if (childrenOfNodeAtDepth[key] !== undefined) {
+            return childrenOfNodeAtDepth[key];
+        }
+
+        visited.push(id);
+
+        let children = [];
+        const links = tapestry.dataset.links.filter(
+            link => link.source.id === id || link.target.id === id
+        );
+
+        for (let link of links) {
+            const child = link.source.id === id ? link.target.id : link.source.id;
+            if (!visited.includes(child)) {
+                children.push(child);
+                children = [
+                    ...children,
+                    ...getChildren(child, depth - 1, visited),
+                ];
             }
         }
-        // clear out duplicate IDs
-        var rchildren = arrayRemove(children, id);
-        return rchildren;
-    }
-    
-    /* Remove any duplicates in an array. */
-    function arrayRemove(arr, value) {
-        return arr.filter(function(ele){
-            return ele != value;
-        });
+
+        childrenOfNodeAtDepth[key] = children;
+        return children;
     }
     
     /* Gets the size of the node depending on the type of the node relevant to the currently selected node */
@@ -2226,6 +2262,7 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
+            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -2234,6 +2271,7 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
+                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     
@@ -2262,13 +2300,26 @@ function tapestryTool(config){
             console.error(e);
         });
     }
+
+    function saveNodeAsSkippable(node) {
+        tapestry.dataset.nodes[node.index].skippable = true;
+        jQuery.post(USER_NODE_SKIPPED_URL, {
+            "post_id": config.wpPostId,
+            "node_id": node.id,
+            "skippable": true,
+        })
+        .fail(function (e) {
+            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
+            console.error(e);
+        });
+    }
     
     /* For setting the "type" field of nodes in dataset */
     function setNodeTypes(rootId) {
     
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 1),
-            grandchildren = getChildren(root);
+        var children = getChildren(root, tapestryDepth - 2),
+            grandchildren = getChildren(root, tapestryDepth - 1);
     
         for (var i in tapestry.dataset.nodes) {
             var node = tapestry.dataset.nodes[i];
@@ -2291,8 +2342,8 @@ function tapestryTool(config){
     /* For setting the "type" field of links in dataset */
     function setLinkTypes(rootId) {
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 1),
-            grandchildren = getChildren(root);
+        var children = getChildren(root, tapestryDepth - 2),
+            grandchildren = getChildren(root, tapestryDepth - 1);
     
         for (var i in tapestry.dataset.links) {
             var link = tapestry.dataset.links[i];
@@ -2318,7 +2369,11 @@ function tapestryTool(config){
     
     /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
     function setUnlocked() {
-        var parentIndex;
+        // this is here because the other unlock fix wasn't working for some reason.
+        tapestry.dataset.nodes.forEach(node => {
+            node.unlocked = true
+        });
+        /* var parentIndex;
         for (var i = 0; i < tapestry.dataset.links.length; i++) {
             
             childIndex = findNodeIndex(tapestry.dataset.links[i].target.id);
@@ -2327,7 +2382,7 @@ function tapestryTool(config){
             if (tapestry.dataset.links[i].appearsAt <= (tapestry.dataset.nodes[parentIndex].typeData.progress[0].value * tapestry.dataset.nodes[parentIndex].mediaDuration)) {
                 tapestry.dataset.nodes[childIndex].unlocked = true;
             }
-        }
+        } */
     }
     
     /**
@@ -2336,24 +2391,23 @@ function tapestryTool(config){
      * @param {integer} depth 
      */
     function setAccessibleStatus(node, depth, parentNodeId, parentIsAccessible = true){
-    
         if (tapestry.dataset.nodes.length == 0) {
             return;
         }
     
         // If no node passed in, assume root node
         if (typeof node == "undefined") {
-            node = tapestry.dataset.nodes[findNodeIndex(tapestry.dataset.rootId)];
+            node = getNodeById(root);
         }
     
         // If no node passed in, use max depth
         if (typeof depth == "undefined") {
-            depth = findMaxDepth(root);
+            depth = findMaxDepth(node.id);
         }
 
         tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = node.unlocked && parentIsAccessible;
     
-        getChildren(node.id, 1).forEach (childNodeId => {
+        getChildren(node.id, 0).forEach (childNodeId => {
             var thisNode = getNodeById(childNodeId);
     
             // Do not traverse up the parent
@@ -2451,6 +2505,7 @@ tapestryTool.prototype.getDataset = function() {
 
 tapestryTool.prototype.setDataset = function(newDataset) {
     this.dataset = newDataset;
+    this.resetNodeCache();
 };
 
 tapestryTool.prototype.setOriginalDataset = function (dataset) {
@@ -2535,7 +2590,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'text';
+            classStr = classStrStart + 'play fa-text';
             break;
 
         case "url-embed":
