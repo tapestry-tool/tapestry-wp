@@ -1,6 +1,6 @@
 <template>
   <div id="lightbox">
-    <div id="spotlight-overlay" @click="$emit('close')"></div>
+    <div v-if="skippable" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -8,7 +8,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button id="lightbox-close-wrapper" @click="$emit('close')">
+        <button v-if="skippable" id="lightbox-close-wrapper" @click="$emit('close')">
           <div class="lightbox-close">
             <i class="fa fa-times"></i>
           </div>
@@ -24,6 +24,7 @@
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
             @load="updateDimensions"
+            @update-skippable="updateSkippable"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -46,10 +47,10 @@
 </template>
 
 <script>
-import TextMedia from "./TextMedia"
-import VideoMedia from "./VideoMedia"
-import ExternalMedia from "./ExternalMedia"
-import H5PMedia from "./H5PMedia"
+import TextMedia from "./lightbox/TextMedia"
+import VideoMedia from "./lightbox/VideoMedia"
+import ExternalMedia from "./lightbox/ExternalMedia"
+import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
 
 export default {
@@ -62,7 +63,7 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: String,
       required: true,
     },
     tapestryApiClient: {
@@ -79,6 +80,7 @@ export default {
         left: 50,
       },
       h5pSettings: {},
+      skippable: false,
     }
   },
   computed: {
@@ -148,6 +150,7 @@ export default {
     this.h5pSettings = settings
 
     this.node = node
+    this.skippable = meta.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -165,6 +168,10 @@ export default {
     thisTapestryTool.exitViewMode()
   },
   methods: {
+    async updateSkippable() {
+      await this.tapestryApiClient.updateSkippable(this.nodeId)
+      this.skippable = true
+    },
     updateH5pSettings(newSettings) {
       this.h5pSettings = newSettings
     },

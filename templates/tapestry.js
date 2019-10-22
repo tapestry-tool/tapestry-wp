@@ -1062,7 +1062,6 @@ function tapestryTool(config){
                             { detail: thisBtn.dataset.id }
                         )
                     );
-                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1251,7 +1250,6 @@ function tapestryTool(config){
                     { detail: thisBtn.dataset.id }
                 )
             );
-            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
