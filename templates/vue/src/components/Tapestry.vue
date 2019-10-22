@@ -106,8 +106,6 @@ export default {
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer)
     window.addEventListener('tapestry-h5p-item-clicked', this.h5pItemClicked)
-    
-    this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
   },
   methods: {
     async h5pItemClicked(event) {
@@ -142,11 +140,14 @@ export default {
         console.error(e)
       }
     },
-    tapestryUpdated(event) {
+    async tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
         this.selectedNodeId = this.tapestry.rootId
         this.tapestryLoaded = true
+        if (wpApiSettings && wpApiSettings.userLoggedIn === 'true') {
+          this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
+        }
       }
     },
     getEmptyNode() {

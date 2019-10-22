@@ -47,7 +47,8 @@ add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
 function addNonceToScript()
 {
     $params = array(
-        'nonce'  => wp_create_nonce('wp_rest')
+        'nonce'  => wp_create_nonce('wp_rest'),
+        'userLoggedIn' => get_current_user_id() != 0 ? 'true' : 'false'
     );
 
     wp_register_script(
