@@ -171,6 +171,7 @@ export default {
     },
     async updateNode(node) {
       await this.tapestryApiClient.updateNode(node.id, JSON.stringify(node))
+      this.$emit("update-node", node)
     },
     updateDimensions(dimensions) {
       this.dimensions = {

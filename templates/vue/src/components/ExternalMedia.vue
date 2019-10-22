@@ -52,6 +52,7 @@
 
 <script>
 import { getLinkMetadata } from "../services/LinkPreviewApi"
+import Helpers from "../utils/Helpers"
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
@@ -78,12 +79,11 @@ export default {
   computed: {
     shouldFetch() {
       if (!this.node.typeData.linkMetadata) {
-        console.log('missing meta')
         return true
       }
       const { url } = this.node.typeData.linkMetadata
-      if (!url.startsWith(this.node.typeData.mediaURL)) {
-        console.log('stale url', `url: ${url}`, `media url: ${this.node.typeData.mediaURL}`)
+      const mediaUrl = Helpers.normalizeUrl(this.node.typeData.mediaURL)
+      if (!url.startsWith(mediaUrl)) {
         return true
       }
       return false

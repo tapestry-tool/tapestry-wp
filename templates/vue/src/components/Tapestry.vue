@@ -41,6 +41,7 @@
       :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
+      @update-node="updateNode"
     />
   </div>
 </template>
@@ -118,6 +119,14 @@ export default {
     window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
+    updateNode(node) {
+      const oldNodeIndex = this.tapestry.nodes.findIndex(
+        oldNode => oldNode.id === node.id
+      )
+      this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.reinitialize()
+    },
     openLightbox(event) {
       this.lightbox = {
         isOpen: true,
@@ -205,6 +214,7 @@ export default {
         typeId: 1,
         group: 1,
         typeData: {
+          linkMetadata: null,
           progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
@@ -228,6 +238,9 @@ export default {
         newNodeEntry.coordinates.y = this.tapestry.nodes[
           Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
         ].y
+        newNodeEntry.typeData.linkMetadata = this.tapestry.nodes[
+          Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
+        ].typeData.linkMetadata
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
         newNodeEntry.coordinates.x =
