@@ -857,6 +857,13 @@ function getUserProgressByPostId($request)
     }
 }
 
+/**
+ * Update h5p audio of a node for a user
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
 function updateUserH5PAudio($request)
 {
     $postId = $request['tapestryPostId'];
@@ -884,6 +891,13 @@ function updateUserH5PAudio($request)
     }
 }
 
+/**
+ * Get h5p audio of a node for a user
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
 function getUserH5PAudio($request)
 {
     $postId = $request['tapestryPostId'];
@@ -907,6 +921,13 @@ function getUserH5PAudio($request)
     }
 }
 
+/**
+ * Get all node IDs that have H5P audios recorded
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
 function getNodesWithRecordedAudios($request)
 {
     $postId = $request['tapestryPostId'];

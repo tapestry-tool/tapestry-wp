@@ -2,6 +2,10 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-audio.php";
 
+/**
+ * Update/retrieve H5P audio of a node for a user
+ * 
+ */
 class TapestryAudio implements ITapestryAudio
 {
     /**
