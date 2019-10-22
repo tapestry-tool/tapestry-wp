@@ -73,7 +73,7 @@ export default {
         unlocked: true,
         permissions: {
           public: ["read"],
-          authorized: ["read"],
+          authenticated: ["read"],
         },
       },
     }
@@ -132,7 +132,7 @@ export default {
         skippable: true,
         permissions: {
           public: ["read"],
-          authorized: ["read"],
+          authenticated: ["read"],
         },
         description: "",
       }
