@@ -180,7 +180,7 @@
                       v-model="node.permissions[type]"
                       value="read"
                       :disabled="getDisabled(type, 'read')"
-                      @change="updatePermissions(type, 'read')"
+                      @change="updatePermissions($event, type, 'read')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
@@ -188,7 +188,7 @@
                       v-model="node.permissions[type]"
                       value="add"
                       :disabled="getDisabled(type, 'add')"
-                      @change="updatePermissions(type, 'add')"
+                      @change="updatePermissions($event, type, 'add')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
@@ -196,7 +196,7 @@
                       v-model="node.permissions[type]"
                       value="edit"
                       :disabled="getDisabled(type, 'edit')"
-                      @change="updatePermissions(type, 'edit')"
+                      @change="updatePermissions($event, type, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
                   <!--
@@ -349,6 +349,10 @@ export default {
     nodeImageUrl() {
       return this.node.imageURL
     },
+    newPermissions() {
+      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
+      return this.node.permissions[last]
+    },
   },
   watch: {
     nodeImageUrl: function() {
@@ -363,10 +367,13 @@ export default {
     })
   },
   methods: {
-    getDisabled(type, value) {
-      const typeIndex = this.permissionsOrder.findIndex(
-        permission => permission === type
+    getPriority(permissionType) {
+      return this.permissionsOrder.findIndex(
+        permission => permission === permissionType
       )
+    },
+    getDisabled(type, value) {
+      const typeIndex = this.getPriority(type)
       const higherPriorityPermissionName = this.permissionsOrder[typeIndex - 1]
       const permissions = this.node.permissions[higherPriorityPermissionName]
       if (permissions) {
@@ -374,22 +381,23 @@ export default {
       }
       return false
     },
-    updatePermissions(type, value) {
-      if (value) {
-        const typeIndex = this.permissionsOrder.findIndex(
-          permission => permission === type
-        )
-        const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
-        lowerPriorityPermissions.forEach(permission => {
-          const currentPermissions = this.node.permissions[permission]
-          if (!currentPermissions.includes(value)) {
-            this.$set(this.node.permissions, permission, [
-              ...currentPermissions,
-              value,
-            ])
+    updatePermissions(event, type, value) {
+      const typeIndex = this.getPriority(type)
+      const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
+      lowerPriorityPermissions.forEach(permission => {
+        const currentPermissions = this.node.permissions[permission]
+        let newPermissions = [...currentPermissions]
+        if (event) {
+          if (!currentPermissions.includes(event)) {
+            newPermissions.push(event)
           }
-        })
-      }
+        } else {
+          newPermissions = currentPermissions.filter(
+            permission => permission !== value
+          )
+        }
+        this.$set(this.node.permissions, permission, newPermissions)
+      })
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
@@ -465,7 +473,7 @@ export default {
         Helpers.onlyContainsDigits(userId) &&
         $("#user-" + userId + "-editcell").val() != ""
       ) {
-        this.$set(this.node.permissions, `user-${userId}`, [])
+        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
         this.userId = null
       } else {
         alert("Enter valid user id")

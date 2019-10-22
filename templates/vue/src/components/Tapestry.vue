@@ -61,7 +61,6 @@ export default {
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
       modalType: "",
-      permissionsOrder: ["public", "authenticated"],
       populatedNode: {
         title: "",
         description: "",
@@ -100,6 +99,10 @@ export default {
         }
       }
       return {}
+    },
+    permissionsOrder: function() {
+      const node = this.selectedNode
+      return node.permissions ? Object.keys(node.permissions) : []
     },
   },
   async mounted() {
