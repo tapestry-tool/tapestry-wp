@@ -15,7 +15,7 @@ class TapestryNodePermissions
     {
         return (object) [
             'public'        => ['read'],
-            'authorized'    => ['read']
+            'authenticated'    => ['read']
         ];
     }
 
