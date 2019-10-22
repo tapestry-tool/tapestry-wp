@@ -97,6 +97,9 @@ export default {
       }
       return {}
     },
+    userLoggedIn: function () {
+      return wpApiSettings && wpApiSettings.userLoggedIn === 'true';
+    },
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -116,7 +119,7 @@ export default {
     },
     async saveH5PAudioToServer(event) {
       const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
-      if (encodedH5PAudio) {
+      if (encodedH5PAudio && this.userLoggedIn) {
         try {
           await this.TapestryAPI.uploadAudioToServer(this.selectedNodeId, encodedH5PAudio)
           this.recordedNodeIds.push(this.selectedNodeId)
@@ -145,7 +148,7 @@ export default {
       if (!this.tapestryLoaded) {
         this.selectedNodeId = this.tapestry.rootId
         this.tapestryLoaded = true
-        if (wpApiSettings && wpApiSettings.userLoggedIn === 'true') {
+        if (this.userLoggedIn) {
           this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
         }
       }
