@@ -179,18 +179,24 @@
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="read"
+                      :disabled="getDisabled(type, 'read')"
+                      @change="updatePermissions(type, 'read')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="add"
+                      :disabled="getDisabled(type, 'add')"
+                      @change="updatePermissions(type, 'add')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="edit"
+                      :disabled="getDisabled(type, 'edit')"
+                      @change="updatePermissions(type, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
                   <!--
@@ -275,6 +281,11 @@ export default {
       required: false,
       default: "Node",
     },
+    permissionsOrder: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -352,6 +363,34 @@ export default {
     })
   },
   methods: {
+    getDisabled(type, value) {
+      const typeIndex = this.permissionsOrder.findIndex(
+        permission => permission === type
+      )
+      const higherPriorityPermissionName = this.permissionsOrder[typeIndex - 1]
+      const permissions = this.node.permissions[higherPriorityPermissionName]
+      if (permissions) {
+        return permissions.includes(value)
+      }
+      return false
+    },
+    updatePermissions(type, value) {
+      if (value) {
+        const typeIndex = this.permissionsOrder.findIndex(
+          permission => permission === type
+        )
+        const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
+        lowerPriorityPermissions.forEach(permission => {
+          const currentPermissions = this.node.permissions[permission]
+          if (!currentPermissions.includes(value)) {
+            this.$set(this.node.permissions, permission, [
+              ...currentPermissions,
+              value,
+            ])
+          }
+        })
+      }
+    },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
       if (event === "video" || event === "h5p") {
