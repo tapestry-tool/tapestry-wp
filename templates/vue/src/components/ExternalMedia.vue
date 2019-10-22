@@ -130,6 +130,15 @@ export default {
       } else {
         this.linkMetadata = data
         this.$set(this.node.typeData, "linkMetadata", this.linkMetadata)
+
+        let shouldChange = true
+        if (this.node.imageURL) {
+          shouldChange = confirm("Change thumbnail to new image?")
+        }
+
+        if (shouldChange) {
+          this.$set(this.node, "imageURL", this.linkMetadata.image)
+        }
         this.$emit("update-tapestry-node", this.node)
       }
     },

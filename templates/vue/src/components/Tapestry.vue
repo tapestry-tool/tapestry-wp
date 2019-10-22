@@ -124,6 +124,7 @@ export default {
         oldNode => oldNode.id === node.id
       )
       this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
+      this.tapestry.nodes[oldNodeIndex].imageURL = node.imageURL
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.reinitialize()
     },
