@@ -56,6 +56,7 @@ export default {
   data() {
     return {
       tapestry: {},
+      recordedNodeIds: [],
       selectedNodeId: "",
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
@@ -104,25 +105,35 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer)
+    window.addEventListener('tapestry-h5p-item-clicked', this.h5pItemClicked)
+    
+    this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
   },
   methods: {
+    async h5pItemClicked(event) {
+      const nodeMetaId = Number(event.detail.id)
+      if (nodeMetaId && this.recordedNodeIds.includes(nodeMetaId)) {
+        await this.loadH5PAudio(nodeMetaId)
+      }
+    },
     async saveH5PAudioToServer(event) {
       const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
       if (encodedH5PAudio) {
         try {
           await this.TapestryAPI.uploadAudioToServer(this.selectedNodeId, encodedH5PAudio)
+          this.recordedNodeIds.push(this.selectedNodeId)
         } catch (e) {
           console.error(e)
         }
       }
     },
-    async getH5PAudio(event) {
+    async loadH5PAudio(nodeMetaId) {
       try {
-        const audio = await this.TapestryAPI.getH5PAudioFromServer(this.selectedNodeId)
+        const audio = await this.TapestryAPI.getH5PAudioFromServer(nodeMetaId)
         const h5pAudioRecorder = document.getElementById('h5p')
         if (h5pAudioRecorder) {
           dispatchEvent(new CustomEvent('tapestry-get-h5p-audio', {
-            detail: audio
+            detail: { audio }
           }))
         } else {
           console.error('H5P module is not loaded.')

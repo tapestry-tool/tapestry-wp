@@ -120,4 +120,19 @@ export default class {
       throw e;
     }
   }
+
+  /**
+   * Get H5P audio nodes that are recorded
+   * 
+   * @return  {Array}    nodeIds       an array of node IDs
+   */
+  async getRecordedNodeIds() {
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/recorded-audio-nodes`;
+      const response = await axios.get(url);
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
+  }
 }

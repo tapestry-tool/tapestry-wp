@@ -1624,7 +1624,11 @@ function tapestryTool(config){
     
                 var h5pObj = document.getElementById('h5p').contentWindow.H5P;
                 var mediaProgress = tapestry.dataset.nodes[index].typeData.progress[0].value;    // Percentage of the video already watched
-    
+
+                dispatchEvent(new CustomEvent('tapestry-h5p-item-clicked', {
+                    detail: { id }
+                }))
+
                 // TODO: support other types of H5P content
                 if (mediaType == "video") {
     
