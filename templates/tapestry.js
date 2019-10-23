@@ -1413,6 +1413,7 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
 
+    // unlocks children based on video progress
     this.updateChildren = function(id, video) {
         const childrenData = getChildrenData(id)
         for (var i = 0; i < childrenData.length; i++) {
@@ -2206,40 +2207,6 @@ tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
  * NON-CLASS FUNCTIONS (could be moved to a separate file)
  * 
  *******************************************************/
-
-// Functionality for the X button that closes the media and the light-box
-function closeLightbox(id, mediaType) {
-        
-    // Pause the H5P video before closing it. This will also trigger saving of the settings
-    // TODO: Do this for HTML5 video as well
-    // var h5pObj = document.getElementById('h5p').contentWindow.H5P;
-    // if (h5pObj !== undefined && mediaType == "video") {
-        // var h5pVideo = h5pObj.instances[0].video;
-        // h5pVideo.pause();
-    // }
-
-    if (document.getElementById('h5p') !== null) {
-        var h5pObj = document.getElementById('h5p').contentWindow.H5P;
-        if (h5pObj !== undefined && mediaType == "video") {
-            var h5pVideo = h5pObj.instances[0].video;
-            if (typeof h5pVideo != "undefined" && typeof h5pVideo.pause !== "undefined") {
-                h5pVideo.pause();
-            }
-        }
-    }
-    
-    updateMediaIcon(id, mediaType, 'play');
-
-    $('#spotlight-overlay').remove();
-    $('#spotlight-content').css('opacity', 0);
-
-    // wait for css animation before removing it
-    setTimeout(function () {
-        $('#spotlight-content').remove();
-    }, 1000);
-
-    recordAnalyticsEvent('user', 'close', 'lightbox', id);
-}
 
 // Updates the icon for the given media button
 function updateMediaIcon(id, mediaType, action) {
