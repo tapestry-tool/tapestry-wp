@@ -70,6 +70,10 @@ export default {
       type: Object,
       required: true,
     },
+    h5pSettings: {
+      type: Object,
+      required: true,
+    }
   },
   data() {
     return {
@@ -79,7 +83,6 @@ export default {
         top: 100,
         left: 50,
       },
-      h5pSettings: {},
       skippable: false,
     }
   },
@@ -145,9 +148,6 @@ export default {
     const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
     node.typeData.progress[0].value = meta.progress
     node.typeData.progress[1].value = 1.0 - meta.progress
-
-    const settings = await this.tapestryApiClient.getH5pSettings()
-    this.h5pSettings = settings
 
     this.node = node
     this.skippable = meta.skippable
