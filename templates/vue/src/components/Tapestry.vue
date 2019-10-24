@@ -25,9 +25,10 @@
       @settings-updated="handleSettingsUpdate"
     />
     <root-node-button
-      v-show="tapestryLoaded && !tapestry.rootId"
+      v-if="showRootNodeButton"
       @add-root-node="addRootNode"
     />
+    <div v-if="showEmpty">This Tapestry is empty.</div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
@@ -80,6 +81,12 @@ export default {
     }
   },
   computed: {
+    showRootNodeButton: function() {
+      return this.tapestryLoaded && !this.tapestry.rootId && thisTapestryTool.canCurrentUserEdit()
+    },
+    showEmpty: function () {
+      return this.tapestryLoaded && !this.tapestry.rootId && !thisTapestryTool.canCurrentUserEdit()
+    },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
     },

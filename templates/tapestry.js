@@ -197,6 +197,8 @@ function tapestryTool(config){
         console.error(e);
     });
 
+    this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
+
     this.init = function(isReload = false) {
         const reorderPermissions = permissions => {
             const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
