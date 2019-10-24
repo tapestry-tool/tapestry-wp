@@ -198,9 +198,20 @@ function tapestryTool(config){
     });
 
     this.init = function(isReload = false) {
+        const reorderPermissions = permissions => {
+            const remainder = Object.keys(permissions).filter(
+                permission => permission !== 'public' || permission !== 'authenticated'
+            );
+            return ["public", "authenticated", ...remainder];
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
             const updatedNode = fillEmptyFields(node, { skippable: true })
-            updatedNode.permissions = fillEmptyFields(updatedNode.permissions, { authenticated: ["read"] })
+            updatedNode.permissions = fillEmptyFields(
+                updatedNode.permissions, 
+                { authenticated: ["read"] }
+            );
+            updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
             return updatedNode
         });
 
