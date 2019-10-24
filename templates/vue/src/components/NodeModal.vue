@@ -351,7 +351,7 @@ export default {
     },
     newPermissions() {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
-      return this.node.permissions[last]
+      return [...this.node.permissions[last]]
     },
     permissions() {
       const ordered = {}
@@ -380,6 +380,9 @@ export default {
       )
     },
     getDisabled(type, value) {
+      if (type.startsWith("user")) {
+        return false;
+      }
       const typeIndex = this.getPriority(type)
       const higherPriorityPermissionName = this.permissionsOrder[typeIndex - 1]
       const permissions = this.node.permissions[higherPriorityPermissionName]
@@ -388,22 +391,28 @@ export default {
       }
       return false
     },
+    changeIndividualPermission(event, type, value) {
+      const currentPermissions = this.node.permissions[type]
+      let newPermissions = [...currentPermissions]
+      if (event) {
+        if (!currentPermissions.includes(event)) {
+          newPermissions.push(event)
+        }
+      } else {
+        newPermissions = currentPermissions.filter(
+          permission => permission !== value
+        )
+      }
+      this.$set(this.node.permissions, type, newPermissions)
+    },
     updatePermissions(event, type, value) {
+      if (type.startsWith("user")) {
+        return this.changeIndividualPermission(event, type, value)
+      }
       const typeIndex = this.getPriority(type)
       const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
       lowerPriorityPermissions.forEach(permission => {
-        const currentPermissions = this.node.permissions[permission]
-        let newPermissions = [...currentPermissions]
-        if (event) {
-          if (!currentPermissions.includes(event)) {
-            newPermissions.push(event)
-          }
-        } else {
-          newPermissions = currentPermissions.filter(
-            permission => permission !== value
-          )
-        }
-        this.$set(this.node.permissions, permission, newPermissions)
+        this.changeIndividualPermission(event, permission, value)
       })
     },
     handleTypeChange(event) {
@@ -481,6 +490,7 @@ export default {
         $("#user-" + userId + "-editcell").val() != ""
       ) {
         this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
+        this.permissionsOrder.push(`user-${userId}`)
         this.userId = null
       } else {
         alert("Enter valid user id")
