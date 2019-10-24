@@ -199,10 +199,8 @@ function tapestryTool(config){
 
     this.init = function(isReload = false) {
         const reorderPermissions = permissions => {
-            const remainder = Object.keys(permissions).filter(
-                permission => permission !== 'public' || permission !== 'authenticated'
-            );
-            return ["public", "authenticated", ...remainder];
+            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            return [...withoutDuplicates];
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {

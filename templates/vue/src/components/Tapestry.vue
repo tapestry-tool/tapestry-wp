@@ -32,7 +32,7 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="permissionsOrder"
+      :permissions-order="selectedNode.permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -99,10 +99,6 @@ export default {
         }
       }
       return {}
-    },
-    permissionsOrder: function() {
-      const node = this.selectedNode
-      return node.permissions ? Object.keys(node.permissions) : []
     },
   },
   async mounted() {

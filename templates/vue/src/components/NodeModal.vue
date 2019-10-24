@@ -170,7 +170,7 @@
               </b-thead>
               <b-tbody>
                 <b-tr
-                  v-for="(value, type) in node.permissions"
+                  v-for="(value, type) in permissions"
                   :key="type"
                   :value="value"
                 >
@@ -353,6 +353,13 @@ export default {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
       return this.node.permissions[last]
     },
+    permissions() {
+      const ordered = {}
+      this.permissionsOrder.forEach(permission => {
+        ordered[permission] = this.node.permissions[permission]
+      })
+      return ordered
+    }
   },
   watch: {
     nodeImageUrl: function() {
