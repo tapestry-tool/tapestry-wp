@@ -145,12 +145,11 @@ export default {
   },
   async mounted() {
     const node = await this.tapestryApiClient.getNode(this.nodeId)
-    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
-    node.typeData.progress[0].value = meta.progress
-    node.typeData.progress[1].value = 1.0 - meta.progress
+    const metadata = await this.tapestryApiClient.getNodeProgress(this.nodeId)
+    this.setNodeProgress(node, metadata);
 
     this.node = node
-    this.skippable = meta.skippable
+    this.skippable = node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -182,6 +181,12 @@ export default {
         height,
       }
     },
+    setNodeProgress(node, metadata) {
+      node.typeData.progress[0].value = metadata.progress
+      node.typeData.progress[1].value = 1.0 - metadata.progress
+      node.skippable = metadata.skippable
+      node.completed = metadata.completed
+    }
   },
 }
 </script>

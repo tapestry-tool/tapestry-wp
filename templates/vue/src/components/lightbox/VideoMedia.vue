@@ -78,6 +78,7 @@ export default {
 
       if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
         this.$set(this.node, "skippable", true)
+        this.$set(this.node, "completed", true)
         this.$emit("update-skippable", true)
       }
 

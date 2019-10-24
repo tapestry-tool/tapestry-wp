@@ -135,6 +135,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _allowSkip()
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $this->nodeMetaId, true);
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
     }
 
     private function _getUserProgress($nodeIdArr)
@@ -162,9 +163,16 @@ class TapestryUserProgress implements ITapestryUserProgress
             
             $skippable_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $nodeId, true);
             if ($skippable_value !== null) {
-                $progress->$nodeId->skippable = $skippable_value;
+                $progress->$nodeId->skippable = $skippable_value === "" ? false : true;
             } else {
-                $progress->$nodeId->skippable = isset($nodeMetadata->skippable) && $nodeMetadata->skippable;
+                $progress->$nodeId->skippable = isset($nodeMetadata->skippable) && $nodeMetadata->skippable ? true : false;
+            }
+
+            $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
+            if ($completed_value !== null) {
+                $progress->$nodeId->completed = $completed_value === "" ? false : true;
+            } else {
+                $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
         }
 
