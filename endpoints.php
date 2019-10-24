@@ -10,6 +10,7 @@ require_once __DIR__ . '/classes/class.tapestry.php';
 require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -251,6 +252,16 @@ function addTapestryNode($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
+
+        if ($tapestry->isEmpty()) {
+            if (!(TapestryUserRoles::isEditor())
+                && !(TapestryUserRoles::isAdministrator())
+                && !(TapestryUserRoles::isAuthorOfThePost($postId))
+            ) {
+                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            }
+        }
+
         return $tapestry->addNode($node);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

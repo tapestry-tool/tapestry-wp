@@ -146,6 +146,11 @@ class Tapestry implements ITapestry
         return $node;
     }
 
+    public function isEmpty()
+    {
+        return empty($this->rootId);
+    }
+
     /**
      * Delete a node
      *

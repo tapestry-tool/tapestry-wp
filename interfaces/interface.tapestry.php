@@ -87,4 +87,6 @@ interface ITapestry
      * @return  Object  $group          group controller
      */
     public function getGroup($groupMetaId);
+
+    public function isEmpty();
 }
