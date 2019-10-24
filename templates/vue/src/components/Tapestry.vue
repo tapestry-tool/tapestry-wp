@@ -32,7 +32,7 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="permissionsOrder"
+      :permissions-order="selectedNode.permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -61,7 +61,6 @@ export default {
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
       modalType: "",
-      permissionsOrder: ["public", "authenticated"],
       populatedNode: {
         title: "",
         description: "",
