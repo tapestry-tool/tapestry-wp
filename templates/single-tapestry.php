@@ -66,7 +66,6 @@ function addNonceToScript()
             'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
             'wpUserId': '". apply_filters('determine_current_user', false) ."',
             'wpPostId': '". get_the_ID() ."',
-            'wpIsAdmin': '". current_user_can('administrator') ."',
             'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
             'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
         });

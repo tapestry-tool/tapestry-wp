@@ -146,11 +146,6 @@ class Tapestry implements ITapestry
         return $node;
     }
 
-    public function isEmpty()
-    {
-        return empty($this->rootId);
-    }
-
     /**
      * Delete a node
      *
@@ -252,6 +247,16 @@ class Tapestry implements ITapestry
     public function getGroup($groupMetaId)
     {
         return new TapestryNode($this->postId, $groupMetaId);
+    }
+
+    /**
+     * Returns true if the tapestry is empty
+     *
+     * @return  Boolean true if there is no root node, false otherwise
+     */
+    public function isEmpty()
+    {
+        return empty($this->rootId);
     }
 
     private function _loadFromDatabase()

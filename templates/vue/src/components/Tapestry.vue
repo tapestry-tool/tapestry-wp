@@ -28,7 +28,7 @@
       v-if="showRootNodeButton"
       @add-root-node="addRootNode"
     />
-    <div v-if="showEmpty">This Tapestry is empty.</div>
+    <div v-if="showEmpty" style="margin-top: 40vh;">The requested tapestry is empty.</div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"

@@ -673,7 +673,7 @@ function tapestryTool(config){
 
         nodeBeforeDrag = d;
 
-        if (config.wpIsAdmin) {
+        if (config.wpCanEditTapestry) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -685,7 +685,7 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
-        if (config.wpIsAdmin) {
+        if (config.wpCanEditTapestry) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -701,7 +701,7 @@ function tapestryTool(config){
         d[yORfy] = d.y;
         updateSvgDimensions();
 
-        if (config.wpIsAdmin && !autoLayout) {
+        if (config.wpCanEditTapestry && !autoLayout) {
             $.ajax({
                 url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
                 method: API_PUT_METHOD,
@@ -797,13 +797,13 @@ function tapestryTool(config){
                             else return "";
                         })
                         .attr("class", function(d) {
-                            return "link-lines " + (config.wpIsAdmin ? "deletable" : "");
+                            return "link-lines " + (config.wpCanEditTapestry ? "deletable" : "");
                         })
                         .attr("id", function(d) {
                             return "link-lines-" + d.source.id + "-" + d.target.id;
                         })
                         .on("click", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (config.wpCanEditTapestry) {
                                 var confirmMsg = "Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")";
                                 if (confirm(confirmMsg)) {
                                     deleteLink(d.source.id, d.target.id);
@@ -811,13 +811,13 @@ function tapestryTool(config){
                             }
                         })
                         .on("mouseover", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (config.wpCanEditTapestry) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
                             }
                         })
                         .on("mouseout", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (config.wpCanEditTapestry) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
                                     return setLinkStroke(d);
                                 });
@@ -2021,7 +2021,7 @@ function tapestryTool(config){
         // but kept the same way on mobile phones where the browser is vertically longer
         // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
         // they want to while drafting a tapestry if we keep transposing it
-        if (!config.wpIsAdmin) {
+        if (!config.wpCanEditTapestry) {
             var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
             var windowAspectRatio = getAspectRatio();
             if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
@@ -2463,7 +2463,7 @@ function tapestryTool(config){
             return false;
         }
 
-        if (config.wpIsAdmin) {
+        if (config.wpCanEditTapestry) {
             return true;
         }
     

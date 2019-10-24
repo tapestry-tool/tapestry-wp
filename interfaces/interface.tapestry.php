@@ -88,5 +88,10 @@ interface ITapestry
      */
     public function getGroup($groupMetaId);
 
+    /**
+     * Returns true if the tapestry is empty
+     *
+     * @return  Boolean true if there is no root node, false otherwise
+     */
     public function isEmpty();
 }
