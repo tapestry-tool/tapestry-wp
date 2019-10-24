@@ -1,4 +1,4 @@
-body {
+{
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -60,13 +60,14 @@ body {
 
 #tapestry-controls-wrapper {
     margin: 40px 10% 20px;
-    padding: 10px;
+    padding: 10px 16px;
     float: right;
     width: auto;
 	background: #fbfbfb;
     box-shadow: 0 0 7px 0 #DDD;
     display: flex;
     align-items: center;
+    border-radius: 4px;
 }
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
@@ -77,6 +78,22 @@ body {
 }
 #tapestry-controls-wrapper > * {
     float: left;
+}
+
+.settings-button,
+.settings-button:focus {
+    padding: 0;
+    background: none;
+    color: #999;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.settings-button:hover {
+    background: none;
+    color: #11a6d8;
+    transform: scale(1.1);
 }
 
 /* depth slider */
@@ -118,7 +135,7 @@ body {
     -webkit-appearance: none;
 }
 
-#tapestry-depth-slider-wrapper {
+#tapestry-depth-slider-wrapper:not(:only-child) {
     padding-right: 10px;
     border-right: 1px solid #a1a1a1;
 }
@@ -213,6 +230,7 @@ body {
 }
 
 #spotlight-content[data-media-type=text] .media-wrapper {
+	height: 100%;
     overflow: scroll;
 }
 
@@ -351,17 +369,21 @@ body {
     overflow: hidden;
     background: #666;
     border-radius: 50%;
-    border: 4px solid #fff;
     width: 55px;
     height: 55px;
     font-size: 32px;
 }
 
-.mediaButtonIcon {
+.mediaButton > i {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #666;
+    color: #fff;
+    border: 4px solid #fff;
 }
 
 .mediaButton:hover,
@@ -370,9 +392,14 @@ body {
     background: #11a6d8;
 }
 
-.mediaButtonIcon.fa-play:before {
+.mediaButton > i.fa-play:before {
     font-size: 0.9em;
     padding-left: 0.2em;
+}
+.mediaButton > i.fa-text:before {
+    content: "T";
+    font-family: serif;
+	padding-top: 3px;
 }
 
 .mediaButton > i[data-media-type="text"]:not(.mediaButtonLoading) {
