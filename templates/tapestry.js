@@ -656,6 +656,11 @@ function tapestryTool(config){
 
     // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
+        if(!config.wpIsAdmin &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+ 
         if (!d3.event.active) simulation.alphaTarget(0.2).restart();
 
         nodeBeforeDrag = d;
@@ -672,6 +677,11 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
+        if(!config.wpIsAdmin &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
         if (config.wpIsAdmin) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
@@ -682,6 +692,11 @@ function tapestryTool(config){
     }
 
     function dragended(d) {
+        if(!config.wpIsAdmin &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
         if (!d3.event.active) simulation.alphaTarget(0);
 
         d[xORfx] = d.x;
