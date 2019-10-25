@@ -310,6 +310,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
+        newNodeEntry.author = wpData.wpUserId
 
         this.tapestry.nodes.push(newNodeEntry)
 

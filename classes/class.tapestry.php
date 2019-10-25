@@ -253,7 +253,7 @@ class Tapestry implements ITapestry
     /**
      * Returns true if the tapestry is empty
      *
-     * @return  Boolean true if there is no root node, false otherwise
+     * @return Boolean true if there is no root node, false otherwise
      */
     public function isEmpty()
     {
@@ -277,12 +277,9 @@ class Tapestry implements ITapestry
 
     private function _getAuthor()
     {
-        if ($this->postId)
-        {
-            return get_post_field( 'post_author', $this->postId );
-        }
-        else
-        {
+        if ($this->postId) {
+            return get_post_field('post_author', $this->postId);
+        } else {
             return wp_get_current_user()->ID;
         }
     }

@@ -31,6 +31,7 @@ function enqueue_vue_app_build()
                 'fields' => 'names',
             )),
             'nonce' => wp_create_nonce('wp_rest'),
+            'wpUserId' => apply_filters('determine_current_user', false),
         )
     );
 
