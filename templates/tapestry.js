@@ -1509,7 +1509,7 @@ function tapestryTool(config){
 
     function shouldAllowSkip(id) {
         const node = tapestry.dataset.nodes[findNodeIndex(id)];
-        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= ALLOW_SKIP_THRESHOLD;
+        return node.skippable !== false || node.mediaType !== "video" || node.typeData.progress[0].value >= ALLOW_SKIP_THRESHOLD;
     }
     
     function getLightboxDimensions(videoHeight, videoWidth) {
