@@ -403,21 +403,11 @@ function updateTapestryNode($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) $nodeData);
-        $result = $node->save();
-
-        error_log(print_r(get_the_author_meta('ID')));
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -451,17 +441,8 @@ function deleteTapestryNode($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-        
         $tapestry = new Tapestry($postId);
-        $result = $tapestry->deleteNodeFromTapestry($nodeMetaId);
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $tapestry->deleteNodeFromTapestry($nodeMetaId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -496,20 +477,11 @@ function updateTapestryNodeSize($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['size' => $size]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -543,20 +515,11 @@ function updateTapestryNodePermissions($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['permissions' => $permissions]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -590,20 +553,11 @@ function updateTapestryNodeDescription($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['description' => $description]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -637,20 +591,11 @@ function updateTapestryNodeTitle($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['title' => $title]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -684,20 +629,11 @@ function updateTapestryNodeImageURL($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['imageURL' => $imageURL]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -731,20 +667,11 @@ function updateTapestryNodeTypeData($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['typeData' => $typeData]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -778,20 +705,11 @@ function updateTapestryNodeCoordinates($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
 
-        $originalAuthor = get_the_author_meta('ID');
-
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['coordinates' => $coordinates]);
-        $result = $node->save();
-
-        wp_update_post(array(
-            'ID'            => $postId,
-            'post_author'   => $originalAuthor
-        ));
-
-        return $result;
+        return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

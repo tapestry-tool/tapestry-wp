@@ -149,10 +149,12 @@ class TapestryHelpers
         $options = TapestryNodePermissions::getNodePermissions();
         $userId = wp_get_current_user()->ID;
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+        $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
 
         if ((TapestryUserRoles::isEditor())
             || (TapestryUserRoles::isAdministrator())
             || (TapestryUserRoles::isAuthorOfThePost($tapestryPostId))
+            || (TapestryUserRoles::isAuthorOfThePost($nodePostId))
         ) {
             return true;
         } else {

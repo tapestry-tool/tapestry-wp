@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
 class Tapestry implements ITapestry
 {
     private $postId;
-
+    private $author;
     private $groups;
     private $links;
     private $settings;
@@ -31,6 +31,7 @@ class Tapestry implements ITapestry
     public function __construct($postId = 0)
     {
         $this->postId = (int) $postId;
+        $this->author = (int) $this->_getAuthor();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -274,6 +275,18 @@ class Tapestry implements ITapestry
         return $tapestry;
     }
 
+    private function _getAuthor()
+    {
+        if ($this->postId)
+        {
+            return get_post_field( 'post_author', $this->postId );
+        }
+        else
+        {
+            return wp_get_current_user()->ID;
+        }
+    }
+
     private function _formTapestry()
     {
         return (object) [
@@ -291,11 +304,20 @@ class Tapestry implements ITapestry
 
         if ($this->updateTapestryPost) {
             $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry', $this->postId);
+            $this->_resetAuthor();
         }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $tapestry;
+    }
+    
+    private function _resetAuthor()
+    {
+        wp_update_post(array(
+            'ID'            => $this->postId,
+            'post_author'   => $this->author
+        ));
     }
 
     private function _getTapestry()
