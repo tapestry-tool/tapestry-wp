@@ -17,6 +17,16 @@
             />
           </b-form-group>
           <b-form-group
+            v-show="userRoles.includes('administrator')"
+            label="Users can move nodes"
+            description="If enabled, you allow users to move nodes to different positions on the screen.
+              However, changes made by the users won't be saved."
+          >
+            <b-form-checkbox v-model="nodeDraggable" switch>
+              {{ nodeDraggable ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
             label="Auto-Layout"
             description="With auto-layout enabled, nodes will place themselves in
               the best position possible. If this is disabled, you will need to manually place the nodes where
@@ -49,6 +59,11 @@
 export default {
   name: "settings-modal",
   props: {
+    userRoles: {
+      type: Array,
+      required: false,
+      default: []
+    },
     tapestryApiClient: {
       type: Object,
       required: true,
@@ -59,6 +74,7 @@ export default {
       currentSettings: {},
       backgroundUrl: "",
       autoLayout: false,
+      nodeDraggable: true,
     }
   },
   async mounted() {
@@ -77,15 +93,17 @@ export default {
     },
     async getSettings() {
       const response = await this.tapestryApiClient.getSettings()
-      const { backgroundUrl = "", autoLayout = false } = response
+      const { backgroundUrl = "", autoLayout = false, nodeDraggable = true } = response
       this.currentSettings = response
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
+      this.nodeDraggable = nodeDraggable
     },
     async updateSettings() {
       const settings = Object.assign(this.currentSettings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
+        nodeDraggable: this.nodeDraggable
       })
       await this.tapestryApiClient.updateSettings(JSON.stringify(settings))
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
