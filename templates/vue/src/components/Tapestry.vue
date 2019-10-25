@@ -21,6 +21,7 @@
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
     <settings-modal
+      :user-roles="userRoles"
       :tapestry-api-client="TapestryAPI"
       @settings-updated="handleSettingsUpdate"
     />
@@ -96,8 +97,11 @@ export default {
       }
       return {}
     },
+    userRoles: function() {
+      return wpApiSettings && wpApiSettings.userRoles
+    }
   },
-  async mounted() {
+  mounted() {
     // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
