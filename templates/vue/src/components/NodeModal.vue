@@ -170,44 +170,44 @@
               </b-thead>
               <b-tbody>
                 <b-tr
-                  v-for="(value, type) in permissions"
-                  :key="type"
+                  v-for="(value, rowName) in permissions"
+                  :key="rowName"
                   :value="value"
                 >
-                  <b-th>{{ type }}</b-th>
+                  <b-th>{{ rowName }}</b-th>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="read"
-                      :disabled="getDisabled(type, 'read')"
-                      @change="updatePermissions($event, type, 'read')"
+                      :disabled="isPermissionDisabled(rowName, 'read')"
+                      @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="add"
-                      :disabled="getDisabled(type, 'add')"
-                      @change="updatePermissions($event, type, 'add')"
+                      :disabled="isPermissionDisabled(rowName, 'add')"
+                      @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="edit"
-                      :disabled="getDisabled(type, 'edit')"
-                      @change="updatePermissions($event, type, 'edit')"
+                      :disabled="isPermissionDisabled(rowName, 'edit')"
+                      @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
                   <!--
                   <b-td>
-                    <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="add-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   <b-td>
-                    <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="edit-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   <b-td>
-                    <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="approve" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   -->
                 </b-tr>
@@ -374,45 +374,54 @@ export default {
     })
   },
   methods: {
-    getPriority(permissionType) {
+    getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(
-        permission => permission === permissionType
+        thisRow => thisRow === rowName
       )
     },
-    getDisabled(type, value) {
-      if (type.startsWith("user")) {
-        return false;
+    isPermissionDisabled(rowName, type) {
+      if (rowName == "public") {
+        return false
       }
-      const typeIndex = this.getPriority(type)
-      const higherPriorityPermissionName = this.permissionsOrder[typeIndex - 1]
-      const permissions = this.node.permissions[higherPriorityPermissionName]
+
+      // keep going up until we find a non-user higher row
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const higherRow = this.permissionsOrder[rowIndex - 1]
+      if (higherRow.startsWith("user")) {
+        return this.isPermissionDisabled(higherRow, type)
+      }
+
+      const permissions = this.node.permissions[higherRow]
       if (permissions) {
-        return permissions.includes(value)
+        return permissions.includes(type)
       }
       return false
     },
-    changeIndividualPermission(event, type, value) {
-      const currentPermissions = this.node.permissions[type]
+    changeIndividualPermission(value, rowName, type) {
+      let currentPermissions = this.node.permissions[rowName]
+      if (!currentPermissions) {
+        currentPermissions = []
+      }
       let newPermissions = [...currentPermissions]
-      if (event) {
-        if (!currentPermissions.includes(event)) {
-          newPermissions.push(event)
+      if (value) {
+        if (!currentPermissions.includes(value)) {
+          newPermissions.push(value)
         }
       } else {
         newPermissions = currentPermissions.filter(
-          permission => permission !== value
+          permission => permission !== type
         )
       }
-      this.$set(this.node.permissions, type, newPermissions)
+      this.$set(this.node.permissions, rowName, newPermissions)
     },
-    updatePermissions(event, type, value) {
-      if (type.startsWith("user")) {
-        return this.changeIndividualPermission(event, type, value)
+    updatePermissions(value, rowName, type) {
+      if (rowName.startsWith("user")) {
+        return this.changeIndividualPermission(value, rowName, type)
       }
-      const typeIndex = this.getPriority(type)
-      const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
-      lowerPriorityPermissions.forEach(permission => {
-        this.changeIndividualPermission(event, permission, value)
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
+      lowerPriorityPermissions.forEach(newRow => {
+        this.changeIndividualPermission(value, newRow, type)
       })
     },
     handleTypeChange(event) {

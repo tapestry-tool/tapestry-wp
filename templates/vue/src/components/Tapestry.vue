@@ -33,7 +33,7 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="selectedNode.permissionsOrder"
+      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -107,6 +107,14 @@ export default {
       }
       return {}
     },
+    permissionsOrder: function() {
+      switch (this.modalType) {
+        case "edit-node":
+          return this.selectedNode.permissionsOrder
+        default:
+          return ["public", "authenticated"]
+      }
+    }
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
