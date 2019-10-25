@@ -198,8 +198,19 @@ function tapestryTool(config){
     });
 
     this.init = function(isReload = false) {
+        const reorderPermissions = permissions => {
+            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            return [...withoutDuplicates];
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            return fillEmptyFields(node, { skippable: true });
+            const updatedNode = fillEmptyFields(node, { skippable: true })
+            updatedNode.permissions = fillEmptyFields(
+                updatedNode.permissions, 
+                { authenticated: ["read"] }
+            );
+            updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            return updatedNode
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 

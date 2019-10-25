@@ -170,7 +170,7 @@
               </b-thead>
               <b-tbody>
                 <b-tr
-                  v-for="(value, type) in node.permissions"
+                  v-for="(value, type) in permissions"
                   :key="type"
                   :value="value"
                 >
@@ -179,18 +179,24 @@
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="read"
+                      :disabled="getDisabled(type, 'read')"
+                      @change="updatePermissions($event, type, 'read')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="add"
+                      :disabled="getDisabled(type, 'add')"
+                      @change="updatePermissions($event, type, 'add')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
                       v-model="node.permissions[type]"
                       value="edit"
+                      :disabled="getDisabled(type, 'edit')"
+                      @change="updatePermissions($event, type, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
                   <!--
@@ -275,6 +281,11 @@ export default {
       required: false,
       default: "Node",
     },
+    permissionsOrder: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -338,6 +349,17 @@ export default {
     nodeImageUrl() {
       return this.node.imageURL
     },
+    newPermissions() {
+      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
+      return [...this.node.permissions[last]]
+    },
+    permissions() {
+      const ordered = {}
+      this.permissionsOrder.forEach(permission => {
+        ordered[permission] = this.node.permissions[permission]
+      })
+      return ordered
+    }
   },
   watch: {
     nodeImageUrl: function() {
@@ -352,6 +374,47 @@ export default {
     })
   },
   methods: {
+    getPriority(permissionType) {
+      return this.permissionsOrder.findIndex(
+        permission => permission === permissionType
+      )
+    },
+    getDisabled(type, value) {
+      if (type.startsWith("user")) {
+        return false;
+      }
+      const typeIndex = this.getPriority(type)
+      const higherPriorityPermissionName = this.permissionsOrder[typeIndex - 1]
+      const permissions = this.node.permissions[higherPriorityPermissionName]
+      if (permissions) {
+        return permissions.includes(value)
+      }
+      return false
+    },
+    changeIndividualPermission(event, type, value) {
+      const currentPermissions = this.node.permissions[type]
+      let newPermissions = [...currentPermissions]
+      if (event) {
+        if (!currentPermissions.includes(event)) {
+          newPermissions.push(event)
+        }
+      } else {
+        newPermissions = currentPermissions.filter(
+          permission => permission !== value
+        )
+      }
+      this.$set(this.node.permissions, type, newPermissions)
+    },
+    updatePermissions(event, type, value) {
+      if (type.startsWith("user")) {
+        return this.changeIndividualPermission(event, type, value)
+      }
+      const typeIndex = this.getPriority(type)
+      const lowerPriorityPermissions = this.permissionsOrder.slice(typeIndex + 1)
+      lowerPriorityPermissions.forEach(permission => {
+        this.changeIndividualPermission(event, permission, value)
+      })
+    },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
       if (event === "video" || event === "h5p") {
@@ -426,7 +489,8 @@ export default {
         Helpers.onlyContainsDigits(userId) &&
         $("#user-" + userId + "-editcell").val() != ""
       ) {
-        this.$set(this.node.permissions, `user-${userId}`, [])
+        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
+        this.permissionsOrder.push(`user-${userId}`)
         this.userId = null
       } else {
         alert("Enter valid user id")

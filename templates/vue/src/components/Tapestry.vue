@@ -32,6 +32,7 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
+      :permissions-order="selectedNode.permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -71,7 +72,10 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
       },
     }
   },
@@ -127,7 +131,10 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
         description: "",
       }
     },
