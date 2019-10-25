@@ -25,14 +25,15 @@
       @settings-updated="handleSettingsUpdate"
     />
     <root-node-button
-      v-show="tapestryLoaded && !tapestry.rootId"
+      v-if="showRootNodeButton"
       @add-root-node="addRootNode"
     />
+    <div v-if="showEmpty" style="margin-top: 40vh;">The requested tapestry is empty.</div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="selectedNode.permissionsOrder"
+      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -80,6 +81,12 @@ export default {
     }
   },
   computed: {
+    showRootNodeButton: function() {
+      return this.tapestryLoaded && !this.tapestry.rootId && thisTapestryTool.canCurrentUserEdit()
+    },
+    showEmpty: function () {
+      return this.tapestryLoaded && !this.tapestry.rootId && !thisTapestryTool.canCurrentUserEdit()
+    },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
     },
@@ -100,6 +107,14 @@ export default {
       }
       return {}
     },
+    permissionsOrder: function() {
+      switch (this.modalType) {
+        case "edit-node":
+          return this.selectedNode.permissionsOrder
+        default:
+          return ["public", "authenticated"]
+      }
+    }
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -295,6 +310,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
+        newNodeEntry.author = wpData.wpUserId
 
         this.tapestry.nodes.push(newNodeEntry)
 

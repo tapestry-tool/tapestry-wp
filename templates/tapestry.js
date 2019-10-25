@@ -197,6 +197,8 @@ function tapestryTool(config){
         console.error(e);
     });
 
+    this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
+
     this.init = function(isReload = false) {
         const reorderPermissions = permissions => {
             const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
@@ -358,7 +360,7 @@ function tapestryTool(config){
         
         let showSettings = false;
         // append settings modal only if logged in
-        if (config.wpUserId) {
+        if (config.wpCanEditTapestry) {
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
@@ -671,7 +673,7 @@ function tapestryTool(config){
 
         nodeBeforeDrag = d;
 
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -683,7 +685,7 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -699,7 +701,7 @@ function tapestryTool(config){
         d[yORfy] = d.y;
         updateSvgDimensions();
 
-        if (config.wpIsAdmin && !autoLayout) {
+        if (canEditNode(d) && !autoLayout) {
             $.ajax({
                 url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
                 method: API_PUT_METHOD,
@@ -795,13 +797,13 @@ function tapestryTool(config){
                             else return "";
                         })
                         .attr("class", function(d) {
-                            return "link-lines " + (config.wpIsAdmin ? "deletable" : "");
+                            return "link-lines " + (canEditLink(d) ? "deletable" : "");
                         })
                         .attr("id", function(d) {
                             return "link-lines-" + d.source.id + "-" + d.target.id;
                         })
                         .on("click", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 var confirmMsg = "Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")";
                                 if (confirm(confirmMsg)) {
                                     deleteLink(d.source.id, d.target.id);
@@ -809,13 +811,13 @@ function tapestryTool(config){
                             }
                         })
                         .on("mouseover", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
                             }
                         })
                         .on("mouseout", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
                                     return setLinkStroke(d);
                                 });
@@ -2019,7 +2021,7 @@ function tapestryTool(config){
         // but kept the same way on mobile phones where the browser is vertically longer
         // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
         // they want to while drafting a tapestry if we keep transposing it
-        if (!config.wpIsAdmin) {
+        if (!config.wpCanEditTapestry) {
             var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
             var windowAspectRatio = getAspectRatio();
             if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
@@ -2456,25 +2458,42 @@ function tapestryTool(config){
     }
     
     function checkPermission(node, permissionType) {
-        // If admin, give permissinos to add and edit
-        if (config.wpIsAdmin) {
-            return node.nodeType === "root";
+        if (config.wpCanEditTapestry) {
+            return true;
         }
-    
+        if (node.author == config.wpUserId) {
+            return true;
+        }
+
+        if (node.nodeType !== "root") {
+            return false;
+        }
         if (node.permissions.public && node.permissions.public.includes(permissionType)) {
-            return node.nodeType === "root";
+            return true;
         }
     
         if (config.wpUserId && config.wpUserId !== "") {
+            if (node.permissions.authenticated && node.permissions.authenticated.includes(permissionType)) {
+                return true;
+            }
+
             var userIndex = "user-" + config.wpUserId;
             if (node.permissions[userIndex] && node.permissions[userIndex].includes(permissionType)) {
-                return node.nodeType === "root";
+                return true;
             }
         }
     
         // // TODO Check user's group id
     
         return false;
+    }
+
+    function canEditNode(d) {
+        return config.wpCanEditTapestry || checkPermission(d, "edit");
+    }
+
+    function canEditLink(d) {
+        return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
     }
     
     // Get data from child needed for knowing whether it is unlocked or not
