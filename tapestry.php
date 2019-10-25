@@ -43,7 +43,7 @@ function create_tapestry_type()
         "hierarchical" => false,
         "rewrite" => array("with_front" => true),
         "query_var" => true,
-        "supports" => array("title", "editor", "thumbnail"),
+        "supports" => array("title", "editor", "thumbnail", "author"),
     );
     register_post_type('tapestry', $args);
 }
@@ -79,7 +79,7 @@ function create_tapestry_node_type()
         "hierarchical" => false,
         "rewrite" => array("with_front" => true),
         "query_var" => true,
-        "supports" => array("title", "editor", "thumbnail"),
+        "supports" => array("title", "editor", "thumbnail", "author"),
     );
     register_post_type('tapestry_node', $args);
 }

@@ -149,29 +149,43 @@ class TapestryHelpers
         $options = TapestryNodePermissions::getNodePermissions();
         $userId = wp_get_current_user()->ID;
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+        $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
 
         if ((TapestryUserRoles::isEditor())
             || (TapestryUserRoles::isAdministrator())
             || (TapestryUserRoles::isAuthorOfThePost($tapestryPostId))
+            || (TapestryUserRoles::isAuthorOfThePost($nodePostId))
         ) {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
-            if ((property_exists($nodePermissions, 'public')
-                    && in_array($options[$action], $nodePermissions->public))
-                || (property_exists($nodePermissions, 'user-' . $userId)
-                    && in_array($options[$action], $nodePermissions->{'user-' . $userId}))
+
+            if (
+                property_exists($nodePermissions, 'user-' . $userId) && 
+                in_array($options[$action], $nodePermissions->{'user-' . $userId})
+            ) {
+                return true;
+            } else if (
+                property_exists($nodePermissions, 'public') && 
+                in_array($options[$action], $nodePermissions->public)
+            ) {
+                return true;
+            } else if (
+                is_user_logged_in() && 
+                property_exists($nodePermissions, 'authenticated') && 
+                in_array($options[$action], $nodePermissions->authenticated)
             ) {
                 return true;
             } else {
                 foreach ($groupIds as $groupId) {
-                    if ((property_exists($nodePermissions, 'group-' . $groupId))
+                    if (
+                        (property_exists($nodePermissions, 'group-' . $groupId))
                         && (in_array($options[$action], $nodePermissions->{'group-' . $groupId}))
                     ) {
                         return true;
                     }
                 }
-            }
+            } 
         }
         return false;
     }
