@@ -1231,7 +1231,8 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' + 
+                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
                     ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';
@@ -1255,7 +1256,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
+            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable, thisBtn.dataset.fullscreen === 'true');
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1419,7 +1420,7 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
     
-    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height, skippable) {
+    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height, skippable, fullScreen) {
         // Adjust the width and height here before passing it into setup media
         var lightboxDimensions = getLightboxDimensions(height, width);
         width = lightboxDimensions.width;
@@ -1438,13 +1439,30 @@ function tapestryTool(config){
             });
     
         var top = lightboxDimensions.adjustedOn === "width" ? ((getBrowserHeight() - height) / 2) + $(this).scrollTop() : (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1);
-        $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css({
-            top: top,
-            left: (getBrowserWidth() - width) / 2,
-            width: width,
-            height: height,
-            opacity: 0
-        }).appendTo('body');
+        if (fullScreen) {
+            styles = {
+                'min-width': '100%',
+                'min-height': '100%',
+                'z-index': 999999,
+                'border-radius': 0,
+                position: 'fixed',
+                right: 0,
+                bottom: 0,
+                top: '-10px',
+                left: 'auto',
+                height: getBrowserHeight(),
+                transitionDuration: "0.2s",
+            } 
+        } else {
+            styles = {
+                top: top,
+                left: (getBrowserWidth() - width) / 2,
+                width: width,
+                height: height,
+                opacity: 0
+            }
+        }
+        $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css(styles).appendTo('body');
     
         // We don't want draggable for text because we want the user to be able to select text
         if (mediaType != "text") {
@@ -1491,7 +1509,7 @@ function tapestryTool(config){
                 window.setTimeout(function(){
                     height = $('#spotlight-content > *').outerHeight();
                     width = $('#spotlight-content > *').outerWidth();
-    
+
                     $('#spotlight-content').css({
                         width: width,
                         height: height,
@@ -1549,7 +1567,7 @@ function tapestryTool(config){
         }
     
         adjustmentRatio *= 0.95;
-    
+
         return {
             "adjustedOn": adjustedOn,
             "width": videoWidth * adjustmentRatio,
@@ -1632,29 +1650,29 @@ function tapestryTool(config){
             
         } 
         else if (mediaFormat === "h5p") {
-    
+
             mediaEl = $('<iframe id="h5p" src="' + mediaUrl + '" width="' + width + '" height="' + height + '" frameborder="0" allowfullscreen="allowfullscreen"><\/iframe>');
             var iframe = mediaEl[0];
     
             iframe.addEventListener('load', function() {
-    
+
                 var h5pObj = document.getElementById('h5p').contentWindow.H5P;
                 var mediaProgress = tapestry.dataset.nodes[index].typeData.progress[0].value;    // Percentage of the video already watched
-    
+                
                 // TODO: support other types of H5P content
                 if (mediaType == "video") {
-    
+
                     var h5pVideo = h5pObj.instances[0].video;
-                    
+
                     var seeked = false;
                     var currentPlayedTime;
-    
+
                     h5pVideo.on('stateChange', function (event) {
     
                         switch (event.data) {
                             case h5pObj.Video.PLAYING:
-    
-                                var videoDuration = h5pVideo.getDuration();
+
+                            var videoDuration = h5pVideo.getDuration();
     
                                 // Update the progress circle for this video
                                 // Done with an interval because H5P does not have a way to continuously check the updated time
