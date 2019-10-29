@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import { getLinkMetadata } from "../services/LinkPreviewApi"
-import Helpers from "../utils/Helpers"
+import { getLinkMetadata } from "../../services/LinkPreviewApi"
+import Helpers from "../../utils/Helpers"
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
