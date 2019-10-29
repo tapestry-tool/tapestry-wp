@@ -1,10 +1,14 @@
 <template>
+  <div v-if="showEndScreen" style="width: 100%; height: 100%;">
+    <h1>I'm the end screen!</h1>
+  </div>
   <video
+    v-else
     ref="video"
     class="video"
     controls
-    @loadstart="handleLoad"
-    @loadedmetadata="setVideoTime"
+    autoplay
+    @loadedmetadata="handleLoad"
     @play="handlePlay"
     @pause="handlePause"
     @timeupdate="updateVideoProgress"
@@ -24,13 +28,21 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      lastSaved: null,
-    }
+  computed: {
+    showEndScreen() {
+      const progress = this.node.typeData.progress[0].value
+      if (progress >= 1) {
+        return true
+      }
+      if (this.$refs.video) {
+        const viewedAmount = progress * this.$refs.video.duration
+        return this.$refs.video.duration <= viewedAmount
+      }
+      return false
+    },
   },
   mounted() {
-    setTimeout(() => {
+    /* setTimeout(() => {
       this.$refs.video.play()
       thisTapestryTool.recordAnalyticsEvent(
         "app",
@@ -38,17 +50,15 @@ export default {
         "html5-video",
         this.node.id
       )
-    }, 1000)
+    }, 1000) */
   },
   beforeDestroy() {
-    this.$refs.video.pause()
-    this.updateVideoProgress()
+    if (this.$refs.video) {
+      this.$refs.video.pause()
+      this.updateVideoProgress()
+    }
   },
   methods: {
-    handleLoad() {
-      const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", { width: videoRect.width, height: videoRect.height })
-    },
     handlePlay() {
       const { id, mediaType } = this.node
       const video = this.$refs.video
@@ -65,14 +75,14 @@ export default {
         time: video.currentTime,
       })
     },
-    setVideoTime() {
+    handleLoad() {
       const video = this.$refs.video
-      const viewedAmount = this.node.typeData.progress[0].value * video.duration
-      if (viewedAmount > 0 && viewedAmount !== video.duration) {
-        video.currentTime = viewedAmount
-      } else {
-        video.currentTime = 0
-      }
+      const videoRect = this.$refs.video.getBoundingClientRect()
+      this.$emit("load", { width: videoRect.width, height: videoRect.height })
+
+      const progress = this.node.typeData.progress[0].value
+      const viewedAmount = progress * video.duration
+      video.currentTime = progress >= 1 ? video.duration : viewedAmount
     },
     updateVideoProgress() {
       const video = this.$refs.video
