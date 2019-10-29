@@ -1,6 +1,6 @@
 <template>
   <div id="lightbox">
-    <div v-if="skippable" id="spotlight-overlay" @click="$emit('close')"></div>
+    <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -8,7 +8,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button v-if="skippable" id="lightbox-close-wrapper" @click="$emit('close')">
+        <button v-if="canSkip" id="lightbox-close-wrapper" @click="$emit('close')">
           <div class="lightbox-close">
             <i class="fa fa-times"></i>
           </div>
@@ -24,7 +24,7 @@
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
             @load="updateDimensions"
-            @update-skippable="updateSkippable"
+            @complete="complete"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -83,10 +83,12 @@ export default {
         top: 100,
         left: 50,
       },
-      skippable: false,
     }
   },
   computed: {
+    canSkip() {
+      return this.node.completed || this.node.skippable
+    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
@@ -149,7 +151,6 @@ export default {
     this.setNodeProgress(node, metadata);
 
     this.node = node
-    this.skippable = node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -167,9 +168,9 @@ export default {
     thisTapestryTool.exitViewMode()
   },
   methods: {
-    async updateSkippable() {
-      await this.tapestryApiClient.updateSkippable(this.nodeId)
-      this.skippable = true
+    async complete() {
+      await this.tapestryApiClient.completeNode(this.nodeId)
+      this.$set(this.node, 'completed', true)
     },
     updateH5pSettings(newSettings) {
       this.h5pSettings = newSettings
@@ -184,7 +185,6 @@ export default {
     setNodeProgress(node, metadata) {
       node.typeData.progress[0].value = metadata.progress
       node.typeData.progress[1].value = 1.0 - metadata.progress
-      node.skippable = metadata.skippable
       node.completed = metadata.completed
     }
   },

@@ -113,8 +113,8 @@ export default class {
     return response
   }
 
-  async updateSkippable(nodeId) {
-    const url = `${apiUrl}/users/skipped?post_id=${this.postId}&node_id=${nodeId}`
+  async completeNode(nodeId) {
+    const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
     const response = await axios.post(url)
     return response
   }
