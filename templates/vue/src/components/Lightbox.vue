@@ -26,6 +26,7 @@
             @load="updateDimensions"
             @update-skippable="updateSkippable"
             @timeupdate="updateProgress"
+            @close="$emit('close')"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"

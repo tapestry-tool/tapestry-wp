@@ -8,11 +8,11 @@
         },
       ]"
     >
-      <button class="end-screen-button">
+      <button class="end-screen-button" @click="rewatch">
         <i class="fas fa-redo fa-4x"></i>
         <p class="end-screen-button-text">Rewatch</p>
       </button>
-      <button class="end-screen-button">
+      <button class="end-screen-button" @click="close">
         <i class="far fa-times-circle fa-4x"></i>
         <p class="end-screen-button-text">Close</p>
       </button>
@@ -48,17 +48,6 @@ export default {
       showEndScreen: this.getInitialEndScreenState(),
     }
   },
-  mounted() {
-    /* setTimeout(() => {
-      this.$refs.video.play()
-      thisTapestryTool.recordAnalyticsEvent(
-        "app",
-        "auto-play",
-        "html5-video",
-        this.node.id
-      )
-    }, 1000) */
-  },
   beforeDestroy() {
     if (this.$refs.video) {
       this.$refs.video.pause()
@@ -66,6 +55,18 @@ export default {
     }
   },
   methods: {
+    rewatch() {
+      this.showEndScreen = false
+      this.$refs.video.currentTime = 0
+      this.$refs.video.play()
+    },
+    close() {
+      if (this.$refs.video) {
+        this.$refs.video.pause()
+        this.updateVideoProgress()
+      }
+      this.$emit("close")
+    },
     getInitialEndScreenState() {
       const progress = this.node.typeData.progress[0].value
       if (progress >= 1) {
@@ -146,6 +147,7 @@ export default {
 
 .end-screen--hide {
   opacity: 0;
+  pointer-events: none;
 }
 
 .end-screen-button {
