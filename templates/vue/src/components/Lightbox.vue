@@ -25,6 +25,7 @@
             :node="node"
             @load="updateDimensions"
             @update-skippable="updateSkippable"
+            @timeupdate="updateProgress"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -39,6 +40,7 @@
             :height="dimensions.height"
             :settings="h5pSettings"
             @update-settings="updateH5pSettings"
+            @timeupdate="updateProgress"
           />
         </div>
       </div>
@@ -52,6 +54,8 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
+
+const SAVE_INTERVAL = 5
 
 export default {
   name: "lightbox",
@@ -84,6 +88,7 @@ export default {
         left: 50,
       },
       skippable: false,
+      timeSinceLastSaved: new Date()
     }
   },
   computed: {
@@ -171,6 +176,21 @@ export default {
     async updateSkippable() {
       await this.tapestryApiClient.updateSkippable(this.nodeId)
       this.skippable = true
+    },
+    async updateProgress(type, amountViewed) {
+      const now = new Date()
+      const secondsDiff = Math.abs((now.getTime() - this.timeSinceLastSaved.getTime()) / 1000)
+      this.$emit("progress", this.nodeId, amountViewed)
+
+      if (secondsDiff > SAVE_INTERVAL) {
+        await this.tapestryApiClient.updateUserProgress(this.nodeId, amountViewed)
+
+        if (type === "h5p") {
+          await this.tapestryApiClient.updateH5pSettings(this.h5pSettings)
+        }
+
+        this.timeSinceLastSaved = now;
+      }
     },
     updateH5pSettings(newSettings) {
       this.h5pSettings = newSettings

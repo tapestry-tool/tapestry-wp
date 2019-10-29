@@ -24,6 +24,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      lastSaved: null
+    }
+  },
   mounted() {
     setTimeout(() => {
       this.$refs.video.play()
@@ -73,6 +78,8 @@ export default {
       const video = this.$refs.video
       const amountViewed = video.currentTime / video.duration
       const amountNotViewed = 1.0 - amountViewed
+
+      this.$emit("timeupdate", "video", amountViewed)
       this.$set(this.node.typeData.progress[0], "value", amountViewed)
       this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
 
@@ -82,11 +89,7 @@ export default {
       }
 
       thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.saveVideoProgress(
-        this.node.id,
-        video.currentTime,
-        video.duration
-      )
+      thisTapestryTool.updateProgressBars()
     },
   },
 }

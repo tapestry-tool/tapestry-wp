@@ -1441,10 +1441,7 @@ function tapestryTool(config){
         }
     }
 
-    this.saveVideoProgress = function(id, currentTime, duration) {
-        updateViewedValue(id, currentTime, duration);
-        updateViewedProgress();
-    }
+    this.updateProgressBars = updateViewedProgress;
 
     this.recordAnalyticsEvent = recordAnalyticsEvent;
     
@@ -1884,72 +1881,6 @@ function tapestryTool(config){
             radius = NORMAL_RADIUS * adjustedRadiusRatio;
         }
         return radius;
-    }
-    
-    /* Updates the data in the node for how much the video has been viewed */
-    function updateViewedValue(id, amountViewedTime, duration) {
-        var amountViewed = amountViewedTime / duration;
-        var amountUnviewed = 1.00 - amountViewed;
-    
-        var index = findNodeIndex(id);
-    
-        //Update the dataset with new values
-        tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-        tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-    
-        var progressObj = JSON.stringify(getDatasetProgress());
-        if (saveProgress) {
-            
-            // Save to database if logged in
-            if (config.wpUserId) {
-                // Send save progress requests 5 seconds after the last time saved
-                var secondsDiff = Math.abs((new Date().getTime() - progressLastSaved.getTime()) / 1000);
-                if (secondsDiff > TIME_BETWEEN_SAVE_PROGRESS) {
-                    if (id) {
-                        var progData = {
-                            "post_id": config.wpPostId,
-                            "node_id": id,
-                            "progress_value": amountViewed
-                        };
-                        jQuery.post(USER_NODE_PROGRESS_URL, progData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding progress data");
-                            console.error(e);
-                        });
-                    }
-    
-                    if (h5pVideoSettings && !isEmptyObject(h5pVideoSettings)) {
-                        var h5pData = {
-                            "post_id": config.wpPostId,
-                            "json": JSON.stringify(h5pVideoSettings)
-                        };
-                        jQuery.post(TAPESTRY_H5P_SETTINGS_URL, h5pData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding h5p video settings");
-                            console.error(e);
-                        });
-                    }
-                    progressLastSaved = new Date();
-                }
-            } else {
-                // Set Cookies if not logged in
-                Cookies.set("progress-data-"+tapestrySlug, progressObj);
-                Cookies.set("h5p-video-settings", h5pVideoSettings);
-            }
-        }
-    }
-    
-    /* Tells the overall dataset progress of the entire tapestry */
-    function getDatasetProgress() {
-        
-        var progressObj = {};
-        
-        for (var index in tapestry.dataset.nodes) {
-            var node = tapestry.dataset.nodes[index];
-            progressObj[node.id] = node.typeData.progress[0].value;
-        }
-        
-        return progressObj;
     }
     
     function setDatasetProgress(progressObj) {

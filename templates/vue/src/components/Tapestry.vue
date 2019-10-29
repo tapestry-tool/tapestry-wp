@@ -44,6 +44,7 @@
       :h5pSettings="h5pSettings"
       :node-id="lightbox.id"
       @close="closeLightbox"
+      @progress="updateNodeProgress"
     />
   </div>
 </template>
@@ -142,6 +143,13 @@ export default {
     this.h5pSettings = settings
   },
   methods: {
+    updateNodeProgress(nodeId, amountViewed) {
+      const nodeIndex = Helpers.findNodeIndex(nodeId, this.tapestry)
+      this.tapestry.nodes[nodeIndex].typeData.progress[0].value = amountViewed
+      this.tapestry.nodes[nodeIndex].typeData.progress[1].value = 1.0 - amountViewed
+
+      thisTapestryTool.setDataset(this.tapestry)
+    },
     openLightbox(event) {
       this.lightbox = {
         isOpen: true,
