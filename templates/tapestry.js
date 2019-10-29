@@ -197,9 +197,22 @@ function tapestryTool(config){
         console.error(e);
     });
 
+    this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
+
     this.init = function(isReload = false) {
+        const reorderPermissions = permissions => {
+            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            return [...withoutDuplicates];
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            return fillEmptyFields(node, { skippable: true, completed: false });
+            const updatedNode = fillEmptyFields(node, { skippable: true, completed: false })
+            updatedNode.permissions = fillEmptyFields(
+                updatedNode.permissions, 
+                { authenticated: ["read"] }
+            );
+            updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            return updatedNode
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
@@ -347,7 +360,7 @@ function tapestryTool(config){
         
         let showSettings = false;
         // append settings modal only if logged in
-        if (config.wpUserId) {
+        if (config.wpCanEditTapestry) {
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
@@ -660,7 +673,7 @@ function tapestryTool(config){
 
         nodeBeforeDrag = d;
 
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -672,7 +685,7 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -688,7 +701,7 @@ function tapestryTool(config){
         d[yORfy] = d.y;
         updateSvgDimensions();
 
-        if (config.wpIsAdmin && !autoLayout) {
+        if (canEditNode(d) && !autoLayout) {
             $.ajax({
                 url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
                 method: API_PUT_METHOD,
@@ -784,13 +797,13 @@ function tapestryTool(config){
                             else return "";
                         })
                         .attr("class", function(d) {
-                            return "link-lines " + (config.wpIsAdmin ? "deletable" : "");
+                            return "link-lines " + (canEditLink(d) ? "deletable" : "");
                         })
                         .attr("id", function(d) {
                             return "link-lines-" + d.source.id + "-" + d.target.id;
                         })
                         .on("click", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 var confirmMsg = "Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")";
                                 if (confirm(confirmMsg)) {
                                     deleteLink(d.source.id, d.target.id);
@@ -798,13 +811,13 @@ function tapestryTool(config){
                             }
                         })
                         .on("mouseover", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
                             }
                         })
                         .on("mouseout", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
                                     return setLinkStroke(d);
                                 });
@@ -1201,8 +1214,11 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video')
-                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
+                if (d.mediaType === 'video') {
+                    if (d.mediaDuration) {
+                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
+                    }
+                }
                 return base;
                 });
             
@@ -1425,10 +1441,7 @@ function tapestryTool(config){
         }
     }
 
-    this.saveVideoProgress = function(id, currentTime, duration) {
-        updateViewedValue(id, currentTime, duration);
-        updateViewedProgress();
-    }
+    this.updateProgressBars = updateViewedProgress;
 
     this.recordAnalyticsEvent = recordAnalyticsEvent;
     
@@ -1692,7 +1705,7 @@ function tapestryTool(config){
         // but kept the same way on mobile phones where the browser is vertically longer
         // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
         // they want to while drafting a tapestry if we keep transposing it
-        if (!config.wpIsAdmin) {
+        if (!config.wpCanEditTapestry) {
             var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
             var windowAspectRatio = getAspectRatio();
             if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
@@ -1868,72 +1881,6 @@ function tapestryTool(config){
             radius = NORMAL_RADIUS * adjustedRadiusRatio;
         }
         return radius;
-    }
-    
-    /* Updates the data in the node for how much the video has been viewed */
-    function updateViewedValue(id, amountViewedTime, duration) {
-        var amountViewed = amountViewedTime / duration;
-        var amountUnviewed = 1.00 - amountViewed;
-    
-        var index = findNodeIndex(id);
-    
-        //Update the dataset with new values
-        tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-        tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-    
-        var progressObj = JSON.stringify(getDatasetProgress());
-        if (saveProgress) {
-            
-            // Save to database if logged in
-            if (config.wpUserId) {
-                // Send save progress requests 5 seconds after the last time saved
-                var secondsDiff = Math.abs((new Date().getTime() - progressLastSaved.getTime()) / 1000);
-                if (secondsDiff > TIME_BETWEEN_SAVE_PROGRESS) {
-                    if (id) {
-                        var progData = {
-                            "post_id": config.wpPostId,
-                            "node_id": id,
-                            "progress_value": amountViewed
-                        };
-                        jQuery.post(USER_NODE_PROGRESS_URL, progData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding progress data");
-                            console.error(e);
-                        });
-                    }
-    
-                    if (h5pVideoSettings && !isEmptyObject(h5pVideoSettings)) {
-                        var h5pData = {
-                            "post_id": config.wpPostId,
-                            "json": JSON.stringify(h5pVideoSettings)
-                        };
-                        jQuery.post(TAPESTRY_H5P_SETTINGS_URL, h5pData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding h5p video settings");
-                            console.error(e);
-                        });
-                    }
-                    progressLastSaved = new Date();
-                }
-            } else {
-                // Set Cookies if not logged in
-                Cookies.set("progress-data-"+tapestrySlug, progressObj);
-                Cookies.set("h5p-video-settings", h5pVideoSettings);
-            }
-        }
-    }
-    
-    /* Tells the overall dataset progress of the entire tapestry */
-    function getDatasetProgress() {
-        
-        var progressObj = {};
-        
-        for (var index in tapestry.dataset.nodes) {
-            var node = tapestry.dataset.nodes[index];
-            progressObj[node.id] = node.typeData.progress[0].value;
-        }
-        
-        return progressObj;
     }
     
     function setDatasetProgress(progressObj) {
@@ -2129,25 +2076,42 @@ function tapestryTool(config){
     }
     
     function checkPermission(node, permissionType) {
-        // If admin, give permissinos to add and edit
-        if (config.wpIsAdmin) {
-            return node.nodeType === "root";
+        if (config.wpCanEditTapestry) {
+            return true;
         }
-    
+        if (node.author == config.wpUserId) {
+            return true;
+        }
+
+        if (node.nodeType !== "root") {
+            return false;
+        }
         if (node.permissions.public && node.permissions.public.includes(permissionType)) {
-            return node.nodeType === "root";
+            return true;
         }
     
         if (config.wpUserId && config.wpUserId !== "") {
+            if (node.permissions.authenticated && node.permissions.authenticated.includes(permissionType)) {
+                return true;
+            }
+
             var userIndex = "user-" + config.wpUserId;
             if (node.permissions[userIndex] && node.permissions[userIndex].includes(permissionType)) {
-                return node.nodeType === "root";
+                return true;
             }
         }
     
         // // TODO Check user's group id
     
         return false;
+    }
+
+    function canEditNode(d) {
+        return config.wpCanEditTapestry || checkPermission(d, "edit");
+    }
+
+    function canEditLink(d) {
+        return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
     }
     
     // Get data from child needed for knowing whether it is unlocked or not
