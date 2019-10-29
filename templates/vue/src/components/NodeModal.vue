@@ -359,7 +359,7 @@ export default {
         ordered[permission] = this.node.permissions[permission]
       })
       return ordered
-    }
+    },
   },
   watch: {
     nodeImageUrl: function() {
@@ -375,9 +375,7 @@ export default {
   },
   methods: {
     getPermissionRowIndex(rowName) {
-      return this.permissionsOrder.findIndex(
-        thisRow => thisRow === rowName
-      )
+      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
     },
     isPermissionDisabled(rowName, type) {
       if (rowName == "public") {
@@ -408,9 +406,7 @@ export default {
           newPermissions.push(value)
         }
       } else {
-        newPermissions = currentPermissions.filter(
-          permission => permission !== type
-        )
+        newPermissions = currentPermissions.filter(permission => permission !== type)
       }
       this.$set(this.node.permissions, rowName, newPermissions)
     },
