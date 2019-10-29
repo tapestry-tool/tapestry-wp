@@ -10,7 +10,9 @@
       <tyde-menu-home v-if="activePage === 'home'" :logs="logs" />
       <tyde-menu-settings
         v-if="activePage === 'settings'"
+        :settings="settings"
         @back="setActivePage('home')"
+        @settings-change="updateSettings"
       />
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
     </div>
@@ -48,11 +50,24 @@ export default {
   data() {
     return {
       activePage: "home",
+      settings: {
+        isAudioPlaying: false,
+      },
     }
+  },
+  watch: {
+    settings(newSettings, prevSettings) {
+      if (newSettings.isAudioPlaying !== prevSettings.isAudioPlaying) {
+        this.$emit("audio-change")
+      }
+    },
   },
   methods: {
     setActivePage(page) {
       this.activePage = page
+    },
+    updateSettings(partialNewSettings) {
+      this.settings = { ...this.settings, ...partialNewSettings }
     },
   },
 }
