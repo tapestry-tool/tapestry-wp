@@ -79,6 +79,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Set 'skippable' status of a Tapestry Node for this User to true
+     * 
+     * @return Null
+     */
+    public function allowSkip()
+    {
+        $this->_checkUserAndPostId();
+        $this->_allowSkip();
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param   String  $h5pSettingsData stores volume,
@@ -121,6 +132,11 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $this->nodeMetaId, true);
     }
 
+    private function _allowSkip()
+    {
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $this->nodeMetaId, true);
+    }
+
     private function _getUserProgress($nodeIdArr)
     {
         $progress = new stdClass();
@@ -142,7 +158,14 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->unlocked = $unlocked_value;
             } else {
                 $progress->$nodeId->unlocked = $default_unlocked_status;
-            }            
+            }           
+            
+            $skippable_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $nodeId, true);
+            if ($skippable_value !== null) {
+                $progress->$nodeId->skippable = $skippable_value;
+            } else {
+                $progress->$nodeId->skippable = isset($nodeMetadata->skippable) && $nodeMetadata->skippable;
+            }
         }
 
         return json_encode($progress);

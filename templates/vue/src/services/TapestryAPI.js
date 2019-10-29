@@ -113,9 +113,21 @@ export default class {
     return response
   }
 
+  async updateSkippable(nodeId) {
+    const url = `${apiUrl}/users/skipped?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await axios.post(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
     const response = await axios.get(url)
+    return response
+  }
+
+  async updateH5pSettings(settings) {
+    const url = `${apiUrl}/users/h5pSettings`
+    const response = await axios.post(url, { post_id: this.postId, json: JSON.stringify(settings) })
     return response
   }
 }

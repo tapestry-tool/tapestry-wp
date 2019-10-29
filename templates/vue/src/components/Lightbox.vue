@@ -1,6 +1,6 @@
 <template>
   <div id="lightbox">
-    <div id="spotlight-overlay" @click="$emit('close')"></div>
+    <div v-if="skippable" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -8,7 +8,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button id="lightbox-close-wrapper" @click="$emit('close')">
+        <button v-if="skippable" id="lightbox-close-wrapper" @click="$emit('close')">
           <div class="lightbox-close">
             <i class="fa fa-times"></i>
           </div>
@@ -24,6 +24,8 @@
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
             @load="updateDimensions"
+            @update-skippable="updateSkippable"
+            @timeupdate="updateProgress"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -39,6 +41,7 @@
             :height="dimensions.height"
             :settings="h5pSettings"
             @update-settings="updateH5pSettings"
+            @timeupdate="updateProgress"
           />
         </div>
       </div>
@@ -47,11 +50,13 @@
 </template>
 
 <script>
-import TextMedia from "./TextMedia"
-import VideoMedia from "./VideoMedia"
-import ExternalMedia from "./ExternalMedia"
-import H5PMedia from "./H5PMedia"
+import TextMedia from "./lightbox/TextMedia"
+import VideoMedia from "./lightbox/VideoMedia"
+import ExternalMedia from "./lightbox/ExternalMedia"
+import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
+
+const SAVE_INTERVAL = 5
 
 export default {
   name: "lightbox",
@@ -70,6 +75,10 @@ export default {
       type: Object,
       required: true,
     },
+    h5pSettings: {
+      type: Object,
+      required: true,
+    }
   },
   data() {
     return {
@@ -79,7 +88,8 @@ export default {
         top: 100,
         left: 50,
       },
-      h5pSettings: {},
+      skippable: false,
+      timeSinceLastSaved: new Date()
     }
   },
   computed: {
@@ -145,10 +155,8 @@ export default {
     node.typeData.progress[0].value = meta.progress
     node.typeData.progress[1].value = 1.0 - meta.progress
 
-    const settings = await this.tapestryApiClient.getH5pSettings()
-    this.h5pSettings = settings
-
     this.node = node
+    this.skippable = meta.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -166,6 +174,25 @@ export default {
     thisTapestryTool.exitViewMode()
   },
   methods: {
+    async updateSkippable() {
+      await this.tapestryApiClient.updateSkippable(this.nodeId)
+      this.skippable = true
+    },
+    async updateProgress(type, amountViewed) {
+      const now = new Date()
+      const secondsDiff = Math.abs((now.getTime() - this.timeSinceLastSaved.getTime()) / 1000)
+      this.$emit("progress", this.nodeId, amountViewed)
+
+      if (secondsDiff > SAVE_INTERVAL) {
+        await this.tapestryApiClient.updateUserProgress(this.nodeId, amountViewed)
+
+        if (type === "h5p") {
+          await this.tapestryApiClient.updateH5pSettings(this.h5pSettings)
+        }
+
+        this.timeSinceLastSaved = now;
+      }
+    },
     updateH5pSettings(newSettings) {
       this.h5pSettings = newSettings
     },

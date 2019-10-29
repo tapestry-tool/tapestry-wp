@@ -54,11 +54,8 @@ export default {
                   h5pVideo.getCurrentTime() > 0
                 ) {
                   currentPlayedTime = h5pVideo.getCurrentTime()
-                  thisTapestryTool.saveVideoProgress(
-                    this.node.id,
-                    currentPlayedTime,
-                    videoDuration
-                  )
+                  this.$emit("timeupdate", "h5p", currentPlayedTime / videoDuration)
+                  thisTapestryTool.updateProgressBars()
                 } else {
                   clearInterval(updateVideoInterval)
                 }

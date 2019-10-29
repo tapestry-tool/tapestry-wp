@@ -14,6 +14,8 @@
 </template>
 
 <script>
+const ALLOW_SKIP_THRESHOLD = 0.95
+
 export default {
   name: "video-media",
   props: {
@@ -21,6 +23,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      lastSaved: null
+    }
   },
   mounted() {
     setTimeout(() => {
@@ -71,14 +78,18 @@ export default {
       const video = this.$refs.video
       const amountViewed = video.currentTime / video.duration
       const amountNotViewed = 1.0 - amountViewed
+
+      this.$emit("timeupdate", "video", amountViewed)
       this.$set(this.node.typeData.progress[0], "value", amountViewed)
       this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
+
+      if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+        this.$set(this.node, "skippable", true)
+        this.$emit("update-skippable", true)
+      }
+
       thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.saveVideoProgress(
-        this.node.id,
-        video.currentTime,
-        video.duration
-      )
+      thisTapestryTool.updateProgressBars()
     },
   },
 }

@@ -12,6 +12,7 @@ class TapestryNode implements ITapestryNode
     private $tapestryPostId;
     private $nodePostId;
     private $nodeMetaId;
+    private $author;
     private $type;
     private $size;
     private $title;
@@ -29,6 +30,7 @@ class TapestryNode implements ITapestryNode
     private $hideTitle;
     private $hideProgress;
     private $hideMedia;
+    private $skippable;
 
     /**
      * Constructor
@@ -44,6 +46,7 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
+        $this->author = wp_get_current_user()->ID;
         $this->size = '';
         $this->title = '';
         $this->status = '';
@@ -61,10 +64,12 @@ class TapestryNode implements ITapestryNode
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
+        $this->skippable = true;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->set($node);
+            $this->author = get_post_field( 'post_author', $this->nodePostId );
         }
     }
 
@@ -138,6 +143,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->hideMedia) && is_bool($node->hideMedia)) {
             $this->hideMedia = $node->hideMedia;
         }
+        if (isset($node->skippable) && is_bool($node->skippable)) {
+            $this->skippable = $node->skippable;
+        }
     }
 
     /**
@@ -193,7 +201,17 @@ class TapestryNode implements ITapestryNode
         // the "original" node data
         update_post_meta($nodePostId, 'tapestry_node_data', $node);
 
+        $this->_resetAuthor();
+
         return $node;
+    }
+    
+    private function _resetAuthor()
+    {
+        wp_update_post(array(
+            'ID'            => $this->nodePostId,
+            'post_author'   => $this->author
+        ));
     }
 
     private function _loadFromDatabase()
@@ -225,6 +243,7 @@ class TapestryNode implements ITapestryNode
     {
         return (object) [
             'id'            => $this->nodeMetaId,
+            'author'        => $this->author,
             'type'          => $this->type,
             'size'          => $this->size,
             'title'         => $this->title,
@@ -241,7 +260,8 @@ class TapestryNode implements ITapestryNode
             'permissions'   => $this->permissions,
             'hideTitle'     => $this->hideTitle,
             'hideProgress'  => $this->hideProgress,
-            'hideMedia'     => $this->hideMedia
+            'hideMedia'     => $this->hideMedia,
+            'skippable'     => $this->skippable
         ];
     }
 

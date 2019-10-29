@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
 class Tapestry implements ITapestry
 {
     private $postId;
-
+    private $author;
     private $groups;
     private $links;
     private $settings;
@@ -31,6 +31,7 @@ class Tapestry implements ITapestry
     public function __construct($postId = 0)
     {
         $this->postId = (int) $postId;
+        $this->author = (int) $this->_getAuthor();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -249,6 +250,16 @@ class Tapestry implements ITapestry
         return new TapestryNode($this->postId, $groupMetaId);
     }
 
+    /**
+     * Returns true if the tapestry is empty
+     *
+     * @return Boolean true if there is no root node, false otherwise
+     */
+    public function isEmpty()
+    {
+        return empty($this->rootId);
+    }
+
     private function _loadFromDatabase()
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
@@ -262,6 +273,15 @@ class Tapestry implements ITapestry
             ];
         }
         return $tapestry;
+    }
+
+    private function _getAuthor()
+    {
+        if ($this->postId) {
+            return get_post_field('post_author', $this->postId);
+        } else {
+            return wp_get_current_user()->ID;
+        }
     }
 
     private function _formTapestry()
@@ -281,11 +301,20 @@ class Tapestry implements ITapestry
 
         if ($this->updateTapestryPost) {
             $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry', $this->postId);
+            $this->_resetAuthor();
         }
 
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $tapestry;
+    }
+    
+    private function _resetAuthor()
+    {
+        wp_update_post(array(
+            'ID'            => $this->postId,
+            'post_author'   => $this->author
+        ));
     }
 
     private function _getTapestry()
@@ -348,22 +377,8 @@ class Tapestry implements ITapestry
         $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
 
         foreach ($nodeMetaIds as $nodeMetaId) {
-            $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
-
-            if ((property_exists($nodePermissions, 'public')
-                    && in_array($options['READ'], $nodePermissions->public))
-                || (property_exists($nodePermissions, 'user-' . $userId)
-                    && in_array($options['READ'], $nodePermissions->{'user-' . $userId}))
-            ) {
+            if (TapestryHelpers::currentUserIsAllowed('READ', $nodeMetaId, $this->postId)) {
                 array_push($newNodeMetaIds, $nodeMetaId);
-            } else {
-                foreach ($groupIds as $groupId) {
-                    if ((property_exists($nodePermissions, 'group-' . $groupId))
-                        && (in_array($options['READ'], $nodePermissions->{'group-' . $groupId}))
-                    ) {
-                        array_push($newNodeMetaIds, $nodeMetaId);
-                    }
-                }
             }
         }
 
