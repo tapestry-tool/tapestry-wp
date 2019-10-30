@@ -24,11 +24,10 @@
       :tapestry-api-client="TapestryAPI"
       @settings-updated="handleSettingsUpdate"
     />
-    <root-node-button
-      v-if="showRootNodeButton"
-      @add-root-node="addRootNode"
-    />
-    <div v-if="showEmpty" style="margin-top: 40vh;">The requested tapestry is empty.</div>
+    <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
+    <div v-if="showEmpty" style="margin-top: 40vh;">
+      The requested tapestry is empty.
+    </div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
@@ -41,7 +40,7 @@
     <lightbox
       v-if="lightbox.isOpen"
       :tapestry-api-client="TapestryAPI"
-      :h5pSettings="h5pSettings"
+      :h5p-settings="h5pSettings"
       :node-id="lightbox.id"
       @close="closeLightbox"
       @progress="updateNodeProgress"
@@ -97,10 +96,18 @@ export default {
   },
   computed: {
     showRootNodeButton: function() {
-      return this.tapestryLoaded && !this.tapestry.rootId && thisTapestryTool.canCurrentUserEdit()
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        thisTapestryTool.canCurrentUserEdit()
+      )
     },
-    showEmpty: function () {
-      return this.tapestryLoaded && !this.tapestry.rootId && !thisTapestryTool.canCurrentUserEdit()
+    showEmpty: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        !thisTapestryTool.canCurrentUserEdit()
+      )
     },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
@@ -129,7 +136,7 @@ export default {
         default:
           return ["public", "authenticated"]
       }
-    }
+    },
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
