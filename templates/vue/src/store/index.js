@@ -1,15 +1,35 @@
 import Vue from "vue"
 import Vuex from "vuex"
 
+import * as actions from "./actions"
+import * as mutations from "./mutations"
+
 Vue.use(Vuex)
 
-export const store = new Vuex.Store({
+const store = new Vuex.Store({
   state: {
-    count: 0,
+    groups: [],
+    links: [],
+    nodes: [],
+    rootId: null,
+    settings: {},
+    selectedNodeId: null,
   },
-  mutations: {
-    increment(state) {
-      state.count++
+  getters: {
+    selectedNode: state => {
+      const { selectedNodeId } = state
+      const node = state.nodes.find(node => node.id === selectedNodeId)
+      return node || {}
+    },
+    tapestry: state => {
+      return state
+    },
+    getNode: state => id => {
+      return state.nodes.find(node => node.id === id)
     },
   },
+  mutations,
+  actions,
 })
+
+export default store
