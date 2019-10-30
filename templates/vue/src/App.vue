@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div>{{ test }}</div>
     <tapestry />
   </div>
 </template>
@@ -14,6 +15,11 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    test() {
+      return this.$store.state.count
+    },
   },
 }
 </script>
