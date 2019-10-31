@@ -37,7 +37,6 @@
     <lightbox
       v-if="lightbox.isOpen"
       :tapestry-api-client="TapestryAPI"
-      :h5p-settings="h5pSettings"
       :node-id="lightbox.id"
       @close="closeLightbox"
       @progress="updateNodeProgress"
@@ -86,7 +85,6 @@ export default {
         isOpen: false,
         id: null,
       },
-      h5pSettings: {},
     }
   },
   computed: {
@@ -127,9 +125,6 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("open-lightbox", this.openLightbox)
-
-    const settings = await this.TapestryAPI.getH5pSettings()
-    this.h5pSettings = settings
   },
   methods: {
     updateNodeProgress(nodeId, amountViewed) {

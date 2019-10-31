@@ -7,6 +7,11 @@ export async function updateSettings({ commit }, newSettings) {
   commit("updateSettings", newSettings)
 }
 
+export async function updateH5pSettings({ commit }, newSettings) {
+  await client.updateH5pSettings(JSON.stringify(newSettings))
+  commit("updateH5pSettings", newSettings)
+}
+
 // nodes
 export async function addNode({ commit }, newNode) {
   const response = await client.addNode(JSON.stringify(newNode))
@@ -32,6 +37,12 @@ export async function updateNode({ commit }, payload) {
     newNode: newNode,
   })
   return payload.id
+}
+
+export async function updateNodeProgress({ commit }, payload) {
+  const { id, progress } = payload
+  await client.updateUserProgress(id, progress)
+  commit("updateNodeProgress", { id, progress })
 }
 
 export function updateNodePermissions(_, payload) {
