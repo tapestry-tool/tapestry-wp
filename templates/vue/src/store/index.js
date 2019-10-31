@@ -21,9 +21,8 @@ const store = new Vuex.Store({
       const node = state.nodes.find(node => node.id === selectedNodeId)
       return node || {}
     },
-    tapestry: state => {
-      return state
-    },
+    settings: state => state.settings,
+    tapestry: state => state,
     getNode: state => id => {
       return state.nodes.find(node => node.id === id)
     },

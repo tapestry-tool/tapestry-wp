@@ -20,10 +20,7 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal
-      :tapestry-api-client="TapestryAPI"
-      @settings-updated="handleSettingsUpdate"
-    />
+    <settings-modal @settings-updated="handleSettingsUpdate" />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
       The requested tapestry is empty.
@@ -208,7 +205,7 @@ export default {
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {
-      this.$store.commit("changeSelectedNode", event.detail)
+      this.$store.commit("updateSelectedNode", event.detail)
     },
     async addEditNode(formData, isEdit) {
       const NORMAL_RADIUS = 140
@@ -339,8 +336,8 @@ export default {
           }
           this.$store.dispatch("addLink", newLink)
         } else {
-          this.$store.commit("changeRootNode", newNodeEntry.id)
-          this.$store.commit("changeSelectedNode", newNodeEntry.id)
+          this.$store.commit("updateRootNode", newNodeEntry.id)
+          this.$store.commit("updateSelectedNode", newNodeEntry.id)
         }
       } else {
         // Editing existing node
@@ -371,7 +368,7 @@ export default {
       this.closeModal()
     },
     handleSettingsUpdate(settings) {
-      this.$store.commit("changeSettings", settings)
+      this.$store.commit("updateSettings", settings)
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.reinitialize()
     },

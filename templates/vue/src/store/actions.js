@@ -2,6 +2,11 @@ import TapestryApi from "../services/TapestryAPI"
 
 const client = new TapestryApi(wpPostId)
 
+export async function updateSettings({ commit }, newSettings) {
+  await client.updateSettings(JSON.stringify(newSettings))
+  commit("updateSettings", newSettings)
+}
+
 // nodes
 export async function addNode({ commit }, newNode) {
   const response = await client.addNode(JSON.stringify(newNode))

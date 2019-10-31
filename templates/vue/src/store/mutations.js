@@ -13,15 +13,15 @@ export function setDataset(state, dataset) {
   })
 }
 
-export function changeSettings(state, newSettings) {
+export function updateSettings(state, newSettings) {
   state.settings = newSettings
 }
 
-export function changeSelectedNode(state, newNodeId) {
+export function updateSelectedNode(state, newNodeId) {
   state.selectedNodeId = newNodeId
 }
 
-export function changeRootNode(state, newNodeId) {
+export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
