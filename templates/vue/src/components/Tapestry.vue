@@ -20,7 +20,7 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal @settings-updated="handleSettingsUpdate" />
+    <settings-modal />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
       The requested tapestry is empty.
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
@@ -126,6 +126,14 @@ export default {
     window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
+    ...mapMutations([
+      "init",
+      "setDataset",
+      "updateSelectedNode",
+      "updateRootNode",
+      "updateNodeCoordinates",
+    ]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     openLightbox(event) {
       this.lightbox = {
         isOpen: true,
@@ -140,10 +148,10 @@ export default {
     },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
-        this.$store.commit("init", event.detail.dataset)
+        this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {
-        this.$store.commit("setDataset", event.detail.dataset)
+        this.setDataset(event.detail.dataset)
       }
     },
     getEmptyNode() {
@@ -192,13 +200,13 @@ export default {
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {
-      this.$store.commit("updateSelectedNode", event.detail)
+      this.updateSelectedNode(event.detail)
     },
     async addEditNode(formData, isEdit) {
       const NORMAL_RADIUS = 140
       const ROOT_RADIUS_DIFF = 70
 
-      var isRoot = this.tapestry.nodes.length == 0
+      var isRoot = this.$store.state.nodes.length === 0
 
       // Add the node data first
       var newNodeEntry = {
@@ -311,37 +319,38 @@ export default {
       let id
       if (!isEdit) {
         // New node
-        id = await this.$store.dispatch("addNode", newNodeEntry)
+        id = await this.addNode(newNodeEntry)
+        newNodeEntry.id = id
         if (!isRoot) {
           // Add link from parent node to this node
           const newLink = {
-            source: this.selectedNodeId,
+            source: this.selectedNode.id,
             target: newNodeEntry.id,
             value: 1,
             type: "",
             appearsAt: appearsAt,
           }
-          this.$store.dispatch("addLink", newLink)
+          await this.addLink(newLink)
         } else {
-          this.$store.commit("updateRootNode", newNodeEntry.id)
-          this.$store.commit("updateSelectedNode", newNodeEntry.id)
+          this.updateRootNode(newNodeEntry.id)
+          this.updateSelectedNode(newNodeEntry.id)
         }
       } else {
         // Editing existing node
-        id = await this.$store.dispatch("updateNode", {
+        id = await this.updateNode({
           id: this.selectedNode.id,
           newNode: newNodeEntry,
         })
       }
 
       // Update permissions
-      this.$store.dispatch("updateNodePermissions", {
+      this.updateNodePermissions({
         id,
         permissions: newNodeEntry.permissions,
       })
 
       // Update coordinates in dataset
-      this.$store.commit("updateNodeCoordinates", {
+      this.updateNodeCoordinates({
         id,
         coordinates: {
           [this.xORfx]: newNodeEntry.coordinates.x,
@@ -354,11 +363,11 @@ export default {
 
       this.closeModal()
     },
-    handleSettingsUpdate(settings) {
+    /* handleSettingsUpdate(settings) {
       this.$store.commit("updateSettings", settings)
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.reinitialize()
-    },
+    }, */
   },
 }
 </script>
