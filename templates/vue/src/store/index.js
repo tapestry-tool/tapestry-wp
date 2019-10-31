@@ -34,4 +34,7 @@ const store = new Vuex.Store({
   actions,
 })
 
+// sets dataset every time the state changes
+store.subscribe((_, state) => thisTapestryTool.setDataset(state))
+
 export default store

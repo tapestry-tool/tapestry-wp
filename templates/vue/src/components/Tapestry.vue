@@ -39,7 +39,6 @@
       :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
-      @progress="updateNodeProgress"
     />
   </div>
 </template>
@@ -127,13 +126,6 @@ export default {
     window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
-    updateNodeProgress(nodeId, amountViewed) {
-      this.$store.commit("updateNodeProgress", {
-        id: nodeId,
-        progress: amountViewed,
-      })
-      thisTapestryTool.setDataset(this.tapestry)
-    },
     openLightbox(event) {
       this.lightbox = {
         isOpen: true,

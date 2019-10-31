@@ -179,7 +179,6 @@ export default {
       const secondsDiff = Math.abs(
         (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
       )
-      this.$emit("progress", this.nodeId, amountViewed)
 
       if (secondsDiff > SAVE_INTERVAL) {
         await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
