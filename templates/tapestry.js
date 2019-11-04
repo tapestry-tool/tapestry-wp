@@ -151,6 +151,7 @@ function tapestryTool(config){
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
+                        console.log(retrievedUserProgress)
                         setDatasetProgress(JSON.parse(retrievedUserProgress));
                     }
 
@@ -1893,7 +1894,6 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -1902,7 +1902,6 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     
