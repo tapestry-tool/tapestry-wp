@@ -47,4 +47,13 @@ export default class {
 
     return tapestry.nodes.findIndex(helper)
   }
+
+  static getAspectRatio() {
+    const browserHeight = this.getBrowserHeight()
+    const browserWidth = this.getBrowserWidth()
+    if (browserHeight < 10) {
+      return 0
+    }
+    return browserWidth / browserHeight
+  }
 }

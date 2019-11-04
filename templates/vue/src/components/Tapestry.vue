@@ -24,17 +24,26 @@
       :tapestry-api-client="TapestryAPI"
       @settings-updated="handleSettingsUpdate"
     />
-    <root-node-button
-      v-show="tapestryLoaded && !tapestry.rootId"
-      @add-root-node="addRootNode"
-    />
+    <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
+    <div v-if="showEmpty" style="margin-top: 40vh;">
+      The requested tapestry is empty.
+    </div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
+      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
+    />
+    <lightbox
+      v-if="lightbox.isOpen"
+      :tapestry-api-client="TapestryAPI"
+      :h5p-settings="h5pSettings"
+      :node-id="lightbox.id"
+      @close="closeLightbox"
+      @progress="updateNodeProgress"
     />
   </div>
 </template>
@@ -45,6 +54,7 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryAPI from "../services/TapestryAPI"
+import Lightbox from "./Lightbox"
 
 export default {
   name: "tapestry",
@@ -52,6 +62,7 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
+    Lightbox,
   },
   data() {
     return {
@@ -71,11 +82,33 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
       },
+      lightbox: {
+        isOpen: false,
+        id: null,
+      },
+      h5pSettings: {},
     }
   },
   computed: {
+    showRootNodeButton: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        thisTapestryTool.canCurrentUserEdit()
+      )
+    },
+    showEmpty: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        !thisTapestryTool.canCurrentUserEdit()
+      )
+    },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
     },
@@ -96,6 +129,25 @@ export default {
       }
       return {}
     },
+    permissionsOrder: function() {
+      switch (this.modalType) {
+        case "edit-node":
+          return this.selectedNode.permissionsOrder
+        default:
+          return ["public", "authenticated"]
+      }
+    },
+  },
+  async mounted() {
+    // Set up event listeners to communicate with D3 elements
+    window.addEventListener("change-selected-node", this.changeSelectedNode)
+    window.addEventListener("add-new-node", this.addNewNode)
+    window.addEventListener("edit-node", this.editNode)
+    window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("open-lightbox", this.openLightbox)
+
+    const settings = await this.tapestryApiClient.getH5pSettings()
+    this.h5pSettings = settings
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -105,6 +157,25 @@ export default {
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
   },
   methods: {
+    updateNodeProgress(nodeId, amountViewed) {
+      const nodeIndex = Helpers.findNodeIndex(nodeId, this.tapestry)
+      this.tapestry.nodes[nodeIndex].typeData.progress[0].value = amountViewed
+      this.tapestry.nodes[nodeIndex].typeData.progress[1].value = 1.0 - amountViewed
+
+      thisTapestryTool.setDataset(this.tapestry)
+    },
+    openLightbox(event) {
+      this.lightbox = {
+        isOpen: true,
+        id: event.detail,
+      }
+    },
+    closeLightbox() {
+      this.lightbox = {
+        isOpen: false,
+        id: null,
+      }
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
@@ -126,7 +197,11 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
-        permissions: { public: ["read"] },
+        skippable: true,
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
         description: "",
       }
     },
@@ -187,9 +262,10 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
+        skippable: true,
         coordinates: {
-          x: (dimensions.width - dimensions.startX) / 2,
-          y: (dimensions.height - dimensions.startY) / 2,
+          x: 3000,
+          y: 3000,
         },
       }
 
@@ -267,6 +343,9 @@ export default {
           case "hideMedia":
             newNodeEntry.hideMedia = fieldValue
             break
+          case "skippable":
+            newNodeEntry.skippable = fieldValue
+            break
           case "description":
             newNodeEntry.description = fieldValue
             break
@@ -283,6 +362,7 @@ export default {
         const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
 
         newNodeEntry.id = response.data.id
+        newNodeEntry.author = wpData.wpUserId
 
         this.tapestry.nodes.push(newNodeEntry)
 

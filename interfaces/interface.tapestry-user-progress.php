@@ -31,6 +31,13 @@ interface ITapestryUserProgress
     public function unlockNode();
 
     /**
+     * Set 'skippable' status of a Tapestry Node for this User to true
+     * 
+     * @return Null
+     */
+    public function allowSkip();
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param String $h5pSettingsData stores volume,
