@@ -78,7 +78,6 @@ export default {
   },
   data() {
     return {
-      node: {},
       isLoaded: false,
       dimensions: {
         top: 100,
@@ -91,6 +90,9 @@ export default {
   computed: {
     ...mapState(["h5pSettings"]),
     ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     canSkip() {
       return this.node.completed || this.node.skippable
     },
@@ -151,8 +153,6 @@ export default {
     },
   },
   async mounted() {
-    const node = this.getNode(this.nodeId)
-    this.node = node
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -170,15 +170,9 @@ export default {
     thisTapestryTool.exitViewMode()
   },
   methods: {
-    ...mapActions(["updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     async complete() {
-      await this.tapestryApiClient.completeNode(this.nodeId)
-      this.$set(this.node, "completed", true)
-    },
-    async updateSkippable() {
-      // TODO: Change this to an action
-      await this.tapestryApiClient.updateSkippable(this.nodeId)
-      this.skippable = true
+      await this.completeNode(this.nodeId)
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()
@@ -206,11 +200,6 @@ export default {
         width,
         height,
       }
-    },
-    setNodeProgress(node, metadata) {
-      node.typeData.progress[0].value = metadata.progress
-      node.typeData.progress[1].value = 1.0 - metadata.progress
-      node.completed = metadata.completed
     },
   },
 }
