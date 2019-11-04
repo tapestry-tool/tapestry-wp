@@ -53,6 +53,7 @@
 <script>
 import { getLinkMetadata } from "../../services/LinkPreviewApi"
 import Helpers from "../../utils/Helpers"
+import { mapActions } from 'vuex'
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
@@ -120,6 +121,7 @@ export default {
     this.$emit("mounted", this.adjustedDimensions)
   },
   methods: {
+    ...mapActions(["updateNode"]),
     async fetchLinkData(url) {
       this.fetching = true
 
@@ -139,7 +141,7 @@ export default {
         if (shouldChange) {
           this.$set(this.node, "imageURL", this.linkMetadata.image)
         }
-        this.$emit("update-tapestry-node", this.node)
+        this.updateNode({ id: this.node.id, newNode: this.node })
       }
     },
   },

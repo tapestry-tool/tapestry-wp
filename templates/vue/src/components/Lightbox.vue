@@ -31,7 +31,6 @@
             v-if="node.mediaFormat === 'embed'"
             :node="node"
             :dimensions="dimensions"
-            @update-tapestry-node="updateNode"
             @mounted="updateDimensions"
           />
           <h5p-media
@@ -79,7 +78,6 @@ export default {
   },
   data() {
     return {
-      node: {},
       isLoaded: false,
       dimensions: {
         top: 100,
@@ -92,6 +90,9 @@ export default {
   computed: {
     ...mapState(["h5pSettings"]),
     ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
@@ -149,9 +150,7 @@ export default {
     },
   },
   async mounted() {
-    const node = this.getNode(this.nodeId)
-    this.node = node
-    this.skippable = node.skippable
+    this.skippable = this.node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -194,10 +193,6 @@ export default {
     async updateH5pSettings(newSettings) {
       await this.$store.dispatch("updateH5pSettings", newSettings)
       this.h5pSettings = newSettings
-    },
-    async updateNode(node) {
-      await this.tapestryApiClient.updateNode(node.id, JSON.stringify(node))
-      this.$emit("update-node", node)
     },
     updateDimensions(dimensions) {
       this.dimensions = {
