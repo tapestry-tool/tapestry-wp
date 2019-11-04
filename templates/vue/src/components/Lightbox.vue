@@ -78,7 +78,7 @@ export default {
     h5pSettings: {
       type: Object,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -89,7 +89,7 @@ export default {
         left: 50,
       },
       skippable: false,
-      timeSinceLastSaved: new Date()
+      timeSinceLastSaved: new Date(),
     }
   },
   computed: {
@@ -180,7 +180,9 @@ export default {
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()
-      const secondsDiff = Math.abs((now.getTime() - this.timeSinceLastSaved.getTime()) / 1000)
+      const secondsDiff = Math.abs(
+        (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
+      )
       this.$emit("progress", this.nodeId, amountViewed)
 
       if (secondsDiff > SAVE_INTERVAL) {
@@ -190,7 +192,7 @@ export default {
           await this.tapestryApiClient.updateH5pSettings(this.h5pSettings)
         }
 
-        this.timeSinceLastSaved = now;
+        this.timeSinceLastSaved = now
       }
     },
     updateH5pSettings(newSettings) {

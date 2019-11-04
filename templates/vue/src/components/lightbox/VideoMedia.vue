@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      lastSaved: null
+      lastSaved: null,
     }
   },
   mounted() {
