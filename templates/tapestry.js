@@ -216,7 +216,7 @@ function tapestryTool(config){
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: this.dataset }
+            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
         }));
 
         if (!root) {
@@ -1915,6 +1915,9 @@ function tapestryTool(config){
             }
         }
     
+        dispatchEvent(new CustomEvent("tapestry-updated", {
+            detail: { dataset: tapestry.dataset }
+        }))
         return true;
     }
     
