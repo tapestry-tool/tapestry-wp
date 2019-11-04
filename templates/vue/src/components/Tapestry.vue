@@ -24,11 +24,10 @@
       :tapestry-api-client="TapestryAPI"
       @settings-updated="handleSettingsUpdate"
     />
-    <root-node-button
-      v-if="showRootNodeButton"
-      @add-root-node="addRootNode"
-    />
-    <div v-if="showEmpty" style="margin-top: 40vh;">The requested tapestry is empty.</div>
+    <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
+    <div v-if="showEmpty" style="margin-top: 40vh;">
+      The requested tapestry is empty.
+    </div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
@@ -37,6 +36,14 @@
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
+    />
+    <lightbox
+      v-if="lightbox.isOpen"
+      :tapestry-api-client="TapestryAPI"
+      :h5p-settings="h5pSettings"
+      :node-id="lightbox.id"
+      @close="closeLightbox"
+      @progress="updateNodeProgress"
     />
   </div>
 </template>
@@ -47,6 +54,7 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryAPI from "../services/TapestryAPI"
+import Lightbox from "./Lightbox"
 
 export default {
   name: "tapestry",
@@ -54,6 +62,7 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
+    Lightbox,
   },
   data() {
     return {
@@ -78,14 +87,27 @@ export default {
           authenticated: ["read"],
         },
       },
+      lightbox: {
+        isOpen: false,
+        id: null,
+      },
+      h5pSettings: {},
     }
   },
   computed: {
     showRootNodeButton: function() {
-      return this.tapestryLoaded && !this.tapestry.rootId && thisTapestryTool.canCurrentUserEdit()
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        thisTapestryTool.canCurrentUserEdit()
+      )
     },
-    showEmpty: function () {
-      return this.tapestryLoaded && !this.tapestry.rootId && !thisTapestryTool.canCurrentUserEdit()
+    showEmpty: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        !thisTapestryTool.canCurrentUserEdit()
+      )
     },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
@@ -114,7 +136,7 @@ export default {
         default:
           return ["public", "authenticated"]
       }
-    }
+    },
   },
   async mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -122,8 +144,31 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("open-lightbox", this.openLightbox)
+
+    const settings = await this.tapestryApiClient.getH5pSettings()
+    this.h5pSettings = settings
   },
   methods: {
+    updateNodeProgress(nodeId, amountViewed) {
+      const nodeIndex = Helpers.findNodeIndex(nodeId, this.tapestry)
+      this.tapestry.nodes[nodeIndex].typeData.progress[0].value = amountViewed
+      this.tapestry.nodes[nodeIndex].typeData.progress[1].value = 1.0 - amountViewed
+
+      thisTapestryTool.setDataset(this.tapestry)
+    },
+    openLightbox(event) {
+      this.lightbox = {
+        isOpen: true,
+        id: event.detail,
+      }
+    },
+    closeLightbox() {
+      this.lightbox = {
+        isOpen: false,
+        id: null,
+      }
+    },
     tapestryUpdated(event) {
       this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
