@@ -154,7 +154,7 @@ export default {
   async mounted() {
     const node = await this.tapestryApiClient.getNode(this.nodeId)
     const metadata = await this.tapestryApiClient.getNodeProgress(this.nodeId)
-    this.setNodeProgress(node, metadata);
+    this.setNodeProgress(node, metadata)
 
     this.node = node
     this.isLoaded = true
@@ -176,7 +176,7 @@ export default {
   methods: {
     async complete() {
       await this.tapestryApiClient.completeNode(this.nodeId)
-      this.$set(this.node, 'completed', true)
+      this.$set(this.node, "completed", true)
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()
@@ -209,7 +209,7 @@ export default {
       node.typeData.progress[0].value = metadata.progress
       node.typeData.progress[1].value = 1.0 - metadata.progress
       node.completed = metadata.completed
-    }
+    },
   },
 }
 </script>
