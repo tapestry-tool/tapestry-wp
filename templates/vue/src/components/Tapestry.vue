@@ -126,6 +126,15 @@ export default {
     window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
+    updateNode(node) {
+      const oldNodeIndex = this.tapestry.nodes.findIndex(
+        oldNode => oldNode.id === node.id
+      )
+      this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
+      this.tapestry.nodes[oldNodeIndex].imageURL = node.imageURL
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.reinitialize()
+    },
     ...mapMutations([
       "init",
       "setDataset",
@@ -157,6 +166,7 @@ export default {
     getEmptyNode() {
       return {
         title: "",
+        behaviour: "embed",
         mediaType: "",
         typeData: {
           mediaURL: "",
@@ -212,6 +222,7 @@ export default {
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        behaviour: "embed",
         status: "publish",
         nodeType: "",
         title: "",
@@ -222,6 +233,7 @@ export default {
         typeId: 1,
         group: 1,
         typeData: {
+          linkMetadata: null,
           progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
@@ -242,6 +254,8 @@ export default {
         // If just editing, set the node coordinates to its current location
         newNodeEntry.coordinates.x = this.selectedNode.x
         newNodeEntry.coordinates.y = this.selectedNode.y
+
+        newNodeEntry.typeData.linkMetadata = this.selectedNode.typeData.linkMetadata
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
         newNodeEntry.coordinates.x =
@@ -260,6 +274,9 @@ export default {
             break
           case "imageURL":
             newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "behaviour":
+            newNodeEntry[fieldName] = fieldValue
             break
           case "mediaType":
             if (fieldValue === "text") {
