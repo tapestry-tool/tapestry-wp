@@ -46,48 +46,43 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
   name: "settings-modal",
-  props: {
-    tapestryApiClient: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
-      currentSettings: {},
       backgroundUrl: "",
       autoLayout: false,
     }
   },
-  async mounted() {
+  computed: {
+    ...mapGetters(["settings"]),
+  },
+  mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
-    await this.getSettings()
   },
   beforeDestroy() {
     window.removeEventListener("open-settings-modal")
   },
   methods: {
-    async openModal() {
+    openModal() {
       this.$bvModal.show("settings-modal")
+      this.getSettings()
     },
     closeModal() {
       this.$bvModal.hide("settings-modal")
     },
-    async getSettings() {
-      const response = await this.tapestryApiClient.getSettings()
-      const { backgroundUrl = "", autoLayout = false } = response
-      this.currentSettings = response
+    getSettings() {
+      const { backgroundUrl = "", autoLayout = false } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
     },
     async updateSettings() {
-      const settings = Object.assign(this.currentSettings, {
+      const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
       })
-      await this.tapestryApiClient.updateSettings(JSON.stringify(settings))
+      await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();

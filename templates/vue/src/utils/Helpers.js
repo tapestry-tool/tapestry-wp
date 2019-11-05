@@ -56,4 +56,8 @@ export default class {
     }
     return browserWidth / browserHeight
   }
+
+  static normalizeUrl(url) {
+    return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
+  }
 }
