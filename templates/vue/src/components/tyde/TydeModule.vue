@@ -1,12 +1,17 @@
 <template>
   <div :id="`module-${nodeId}`">
-    <div :stage="activeStage" @next="next"></div>
+    <tyde-stage :node-id="activeStage" @next="next"></tyde-stage>
   </div>
 </template>
 
 <script>
+import TydeStage from "./TydeStage"
+
 export default {
   name: "tyde-module",
+  components: {
+    TydeStage,
+  },
   props: {
     nodeId: {
       type: String,
