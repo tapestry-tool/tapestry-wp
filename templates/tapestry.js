@@ -2169,11 +2169,18 @@ tapestryTool.prototype.deleteNodeFromTapestry = function() {
 
 tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
 
+tapestryTool.prototype.updateNodeImage = updateNodeImage;
+
 /*******************************************************
  * 
  * NON-CLASS FUNCTIONS (could be moved to a separate file)
  * 
  *******************************************************/
+
+function updateNodeImage(id, src) {
+    const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
 
 // Updates the icon for the given media button
 function updateMediaIcon(id, mediaType, action) {

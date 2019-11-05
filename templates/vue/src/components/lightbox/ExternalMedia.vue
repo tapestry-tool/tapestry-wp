@@ -5,7 +5,7 @@
       id="external"
       frameborder="0"
       allowfullscreen="allowfullscreen"
-      :src="node.typeData.mediaURL"
+      :src="normalizedUrl"
       :width="dimensions.width"
       :height="dimensions.height"
     ></iframe>
@@ -78,6 +78,9 @@ export default {
     }
   },
   computed: {
+    normalizedUrl() {
+      return Helpers.normalizeUrl(this.node.typeData.mediaURL)
+    },
     shouldFetch() {
       if (!this.node.typeData.linkMetadata) {
         return true
@@ -131,7 +134,7 @@ export default {
         this.error = error
       } else {
         this.linkMetadata = data
-        this.$set(this.node.typeData, "linkMetadata", this.linkMetadata)
+        this.node.typeData.linkMetadata = this.linkMetadata
 
         let shouldChange = true
         if (this.node.imageURL) {
@@ -139,7 +142,8 @@ export default {
         }
 
         if (shouldChange) {
-          this.$set(this.node, "imageURL", this.linkMetadata.image)
+          this.node.imageURL = this.linkMetadata.image
+          thisTapestryTool.updateNodeImage(this.node.id, this.node.imageURL)
         }
         this.updateNode({ id: this.node.id, newNode: this.node })
       }
