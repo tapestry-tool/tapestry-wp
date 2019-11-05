@@ -151,7 +151,6 @@ function tapestryTool(config){
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        console.log(retrievedUserProgress)
                         setDatasetProgress(JSON.parse(retrievedUserProgress));
                     }
 

@@ -94,7 +94,7 @@ export default {
       return this.getNode(this.nodeId)
     },
     canSkip() {
-      return this.node.completed || this.node.skippable
+      return this.node.completed || this.node.skippable !== false
     },
     lightboxContentStyles() {
       return {
