@@ -30,8 +30,8 @@
           <external-media
             v-if="node.mediaFormat === 'embed'"
             :node="node"
-            :width="dimensions.width"
-            :height="dimensions.height"
+            :dimensions="dimensions"
+            @mounted="updateDimensions"
           />
           <h5p-media
             v-if="node.mediaFormat === 'h5p'"
@@ -194,11 +194,10 @@ export default {
       await this.$store.dispatch("updateH5pSettings", newSettings)
       this.h5pSettings = newSettings
     },
-    updateDimensions({ width, height }) {
+    updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
-        width,
-        height,
+        ...dimensions,
       }
     },
   },
