@@ -30,8 +30,8 @@
           <external-media
             v-if="node.mediaFormat === 'embed'"
             :node="node"
-            :width="dimensions.width"
-            :height="dimensions.height"
+            :dimensions="dimensions"
+            @mounted="updateDimensions"
           />
           <h5p-media
             v-if="node.mediaFormat === 'h5p'"
@@ -54,6 +54,7 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
+import { mapGetters, mapState, mapActions } from "vuex"
 
 const SAVE_INTERVAL = 5
 
@@ -74,14 +75,9 @@ export default {
       type: Object,
       required: true,
     },
-    h5pSettings: {
-      type: Object,
-      required: true,
-    },
   },
   data() {
     return {
-      node: {},
       isLoaded: false,
       dimensions: {
         top: 100,
@@ -92,6 +88,11 @@ export default {
     }
   },
   computed: {
+    ...mapState(["h5pSettings"]),
+    ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
@@ -149,13 +150,7 @@ export default {
     },
   },
   async mounted() {
-    const node = await this.tapestryApiClient.getNode(this.nodeId)
-    const meta = await this.tapestryApiClient.getNodeProgress(this.nodeId)
-    node.typeData.progress[0].value = meta.progress
-    node.typeData.progress[1].value = 1.0 - meta.progress
-
-    this.node = node
-    this.skippable = meta.skippable
+    this.skippable = this.node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -166,14 +161,16 @@ export default {
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
   },
   async beforeDestroy() {
-    await this.tapestryApiClient.updateUserProgress(
-      this.nodeId,
-      this.node && this.node.typeData.progress[0].value
-    )
+    await this.updateNodeProgress({
+      id: this.nodeId,
+      progress: this.node && this.node.typeData.progress[0].value,
+    })
     thisTapestryTool.exitViewMode()
   },
   methods: {
+    ...mapActions(["updateNodeProgress"]),
     async updateSkippable() {
+      // TODO: Change this to an action
       await this.tapestryApiClient.updateSkippable(this.nodeId)
       this.skippable = true
     },
@@ -182,26 +179,25 @@ export default {
       const secondsDiff = Math.abs(
         (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
       )
-      this.$emit("progress", this.nodeId, amountViewed)
 
       if (secondsDiff > SAVE_INTERVAL) {
-        await this.tapestryApiClient.updateUserProgress(this.nodeId, amountViewed)
+        await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
 
         if (type === "h5p") {
-          await this.tapestryApiClient.updateH5pSettings(this.h5pSettings)
+          await this.updateH5pSettings(this.h5pSettings)
         }
 
         this.timeSinceLastSaved = now
       }
     },
-    updateH5pSettings(newSettings) {
+    async updateH5pSettings(newSettings) {
+      await this.$store.dispatch("updateH5pSettings", newSettings)
       this.h5pSettings = newSettings
     },
-    updateDimensions({ width, height }) {
+    updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
-        width,
-        height,
+        ...dimensions,
       }
     },
   },
