@@ -19,7 +19,11 @@
             { 'media-wrapper-embed': node.mediaFormat === 'embed' },
           ]"
         >
-          <text-media v-if="node.mediaType === 'text'" :node="node" />
+          <text-media
+            v-if="node.mediaType === 'text'"
+            :node="node"
+            @complete="complete"
+          />
           <video-media
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
@@ -32,6 +36,7 @@
             :node="node"
             :dimensions="dimensions"
             @mounted="updateDimensions"
+            @complete="complete"
           />
           <h5p-media
             v-if="node.mediaFormat === 'h5p'"
@@ -41,6 +46,7 @@
             :settings="h5pSettings"
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
+            @complete="complete"
           />
         </div>
       </div>
@@ -83,7 +89,6 @@ export default {
         top: 100,
         left: 50,
       },
-      skippable: false,
       timeSinceLastSaved: new Date(),
     }
   },
