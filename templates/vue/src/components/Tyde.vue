@@ -1,8 +1,8 @@
 <template>
   <div id="tyde">
     <tapestry />
-    <!-- Change node id to whatever the module id is -->
-    <tyde-module v-if="showModule" node-id="5517" />
+    <!-- Node id defaults to original root node, i.e. first node that was added -->
+    <tyde-module v-if="showModule" :node-id="originalRootNode" />
   </div>
 </template>
 
@@ -20,6 +20,11 @@ export default {
     return {
       showModule: false,
     }
+  },
+  computed: {
+    originalRootNode() {
+      return this.$store.state.nodes[0].id
+    },
   },
   mounted() {
     // temp for dev purposes
