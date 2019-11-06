@@ -35,10 +35,15 @@ export function addNode(state, node) {
 }
 
 export function updateNode(state, payload) {
-  const node = state.nodes[Helpers.findNodeIndex(payload.id, state)]
+  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
+  const oldNode = state.nodes[nodeIndex]
+
+  const newNode = { ...oldNode }
   Object.entries(payload.newNode).forEach(([key, value]) => {
-    node[key] = value
+    newNode[key] = value
   })
+  state.nodes[nodeIndex] = newNode
+  state.nodes = [...state.nodes]
 }
 
 export function updateNodeProgress(state, payload) {

@@ -31,8 +31,8 @@
           <external-media
             v-if="node.mediaFormat === 'embed'"
             :node="node"
-            :width="dimensions.width"
-            :height="dimensions.height"
+            :dimensions="dimensions"
+            @mounted="updateDimensions"
           />
           <h5p-media
             v-if="node.mediaFormat === 'h5p'"
@@ -79,7 +79,6 @@ export default {
   },
   data() {
     return {
-      node: {},
       isLoaded: false,
       dimensions: {
         top: 100,
@@ -92,6 +91,9 @@ export default {
   computed: {
     ...mapState(["h5pSettings"]),
     ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     lightboxContentStyles() {
       return {
         top: this.dimensions.top + "px",
@@ -149,9 +151,7 @@ export default {
     },
   },
   async mounted() {
-    const node = this.getNode(this.nodeId)
-    this.node = node
-    this.skippable = node.skippable
+    this.skippable = this.node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -195,11 +195,10 @@ export default {
       await this.$store.dispatch("updateH5pSettings", newSettings)
       this.h5pSettings = newSettings
     },
-    updateDimensions({ width, height }) {
+    updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
-        width,
-        height,
+        ...dimensions,
       }
     },
   },

@@ -91,13 +91,25 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'url-embed'" label="Embed Link">
+            <b-form-group
+              v-show="node.mediaType === 'url-embed'"
+              label="External Link"
+            >
               <b-form-input
                 id="node-embed-media-duration"
                 v-model="node.typeData.mediaURL"
                 placeholder="Enter embed link (starting with http)"
                 required
               />
+            </b-form-group>
+            <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
+              <b-form-radio-group
+                id="external-link-behaviour"
+                v-model="node.behaviour"
+              >
+                <b-form-radio value="embed">Embed in Tapestry</b-form-radio>
+                <b-form-radio value="new-window">Open in a New Window</b-form-radio>
+              </b-form-radio-group>
             </b-form-group>
           </div>
         </b-tab>
@@ -295,7 +307,7 @@ export default {
         { value: "text", text: "Text" },
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "URL Embed" },
+        { value: "url-embed", text: "External Link" },
       ],
       formErrors: "",
       maxDescriptionLength: 250,
@@ -324,6 +336,7 @@ export default {
       return [
         { name: "title", value: this.node.title },
         { name: "description", value: this.node.description },
+        { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
