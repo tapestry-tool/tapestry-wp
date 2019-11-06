@@ -1,10 +1,14 @@
 <template>
-  <div :id="`module-${nodeId}`">
+  <div :id="`module-${nodeId}`" class="wrapper">
+    <p>
+      <code>{{ node.title }}</code>
+    </p>
     <tyde-stage :node-id="activeStage" @next="next"></tyde-stage>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import TydeStage from "./TydeStage"
 
 export default {
@@ -24,8 +28,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getNode", "getDirectChildren"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     stages() {
-      return []
+      return this.getDirectChildren(this.nodeId)
     },
     activeStage() {
       return this.stages[this.activeStageIndex]
@@ -39,4 +47,15 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.wrapper {
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  padding: 80px;
+}
+</style>

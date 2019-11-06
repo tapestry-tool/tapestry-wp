@@ -7,27 +7,39 @@
     >
       {{ question.title }}
     </button>
+    <button v-if="done" @click="$emit('next')"></button>
+    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
+import Lightbox from "../Lightbox"
+
 export default {
   name: "tyde-stage",
+  components: {
+    Lightbox,
+  },
   props: {
     nodeId: {
       type: String,
       required: true,
     },
   },
+  data() {
+    return {
+      isLightboxOpen: false,
+      lightboxId: null,
+    }
+  },
   computed: {
+    ...mapGetters(["getNode", "getDirectChildren"]),
     done() {
       return this.questions.every(question => question.completed)
     },
     node() {
-      // TODO: Change this to 'getNode' from store
-      return {
-        imageURL: "",
-      }
+      return this.getNode(this.nodeId)
     },
     nodeStyles() {
       return {
@@ -35,17 +47,14 @@ export default {
       }
     },
     questions() {
-      // TODO: Change this to 'getChildren' from store
-      return []
+      const childrenIds = this.getDirectChildren(this.nodeId)
+      return childrenIds.map(id => this.getNode(id))
     },
   },
   methods: {
-    next() {
-      this.activeStageIndex++
-    },
     openLightbox(id) {
-      // TODO: Move lightbox code to store, make this method commit an event to open lightbox
-      return id // stub
+      this.isLightboxOpen = true
+      this.lightboxId = id
     },
   },
 }
