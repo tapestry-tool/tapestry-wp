@@ -150,7 +150,7 @@ export default {
     },
   },
   async mounted() {
-    this.skippable = this.node.skippable
+    this.skippable = this.node.skippable !== false
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,

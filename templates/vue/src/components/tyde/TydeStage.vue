@@ -1,14 +1,17 @@
 <template>
   <div :style="nodeStyles">
-    <button
-      v-for="question in questions"
-      :key="question.id"
-      @click="openLightbox(question.id)"
-    >
-      {{ question.title }}
-    </button>
-    <button v-if="done" @click="$emit('next')"></button>
-    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" />
+    <p>{{ node.title }}</p>
+    <div>
+      <button
+        v-for="question in questions"
+        :key="question.id"
+        @click="openLightbox(question.id)"
+      >
+        {{ question.title }}
+      </button>
+      <button v-if="done" @click="$emit('next')">Next</button>
+    </div>
+    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>
 </template>
 
@@ -55,6 +58,10 @@ export default {
     openLightbox(id) {
       this.isLightboxOpen = true
       this.lightboxId = id
+    },
+    closeLightbox() {
+      this.isLightboxOpen = false
+      this.lightboxId = null
     },
   },
 }
