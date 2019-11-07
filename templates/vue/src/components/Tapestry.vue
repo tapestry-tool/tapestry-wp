@@ -20,31 +20,36 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal
-      :tapestry-api-client="TapestryAPI"
-      @settings-updated="handleSettingsUpdate"
-    />
-    <root-node-button
-      v-show="tapestryLoaded && !tapestry.rootId"
-      @add-root-node="addRootNode"
-    />
+    <settings-modal />
+    <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
+    <div v-if="showEmpty" style="margin-top: 40vh;">
+      The requested tapestry is empty.
+    </div>
     <node-modal
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
+      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
+    />
+    <lightbox
+      v-if="lightbox.isOpen"
+      :tapestry-api-client="TapestryAPI"
+      :node-id="lightbox.id"
+      @close="closeLightbox"
     />
   </div>
 </template>
 
 <script>
-import Helpers from "../utils/Helpers"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryAPI from "../services/TapestryAPI"
+import Lightbox from "./Lightbox"
 
 export default {
   name: "tapestry",
@@ -52,11 +57,10 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
+    Lightbox,
   },
   data() {
     return {
-      tapestry: {},
-      selectedNodeId: "",
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
       modalType: "",
@@ -71,30 +75,54 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
-        permissions: { public: ["read"] },
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
+      },
+      lightbox: {
+        isOpen: false,
+        id: null,
       },
     }
   },
   computed: {
+    ...mapGetters(["selectedNode", "tapestry"]),
+    showRootNodeButton: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        thisTapestryTool.canCurrentUserEdit()
+      )
+    },
+    showEmpty: function() {
+      return (
+        this.tapestryLoaded &&
+        !this.tapestry.rootId &&
+        !thisTapestryTool.canCurrentUserEdit()
+      )
+    },
     xORfx: function() {
       return this.tapestry.settings.autoLayout ? "x" : "fx"
     },
     yORfy: function() {
       return this.tapestry.settings.autoLayout ? "y" : "fy"
     },
-    selectedNode: function() {
-      if (this.tapestry && this.tapestry.nodes) {
-        if (this.selectedNodeId) {
-          return this.tapestry.nodes.find(node => {
-            return node.id === this.selectedNodeId
-          })
-        } else if (this.tapestry.rootId) {
-          return this.tapestry.nodes.find(node => {
-            return node.id === this.tapestry.rootId
-          })
-        }
+    permissionsOrder: function() {
+      switch (this.modalType) {
+        case "edit-node":
+          return this.selectedNode.permissionsOrder
+        default:
+          return ["public", "authenticated"]
       }
-      return {}
+    },
+    permissionsOrder: function() {
+      switch (this.modalType) {
+        case "edit-node":
+          return this.selectedNode.permissionsOrder
+        default:
+          return ["public", "authenticated"]
+      }
     },
   },
   async mounted() {
@@ -103,18 +131,68 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("open-lightbox", this.openLightbox)
+
+    const settings = await this.tapestryApiClient.getH5pSettings()
+    this.h5pSettings = settings
+  },
+  async mounted() {
+    // Set up event listeners to communicate with D3 elements
+    window.addEventListener("change-selected-node", this.changeSelectedNode)
+    window.addEventListener("add-new-node", this.addNewNode)
+    window.addEventListener("edit-node", this.editNode)
+    window.addEventListener("tapestry-updated", this.tapestryUpdated)
+  },
+  async mounted() {
+    // Set up event listeners to communicate with D3 elements
+    window.addEventListener("change-selected-node", this.changeSelectedNode)
+    window.addEventListener("add-new-node", this.addNewNode)
+    window.addEventListener("edit-node", this.editNode)
+    window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
+    updateNode(node) {
+      const oldNodeIndex = this.tapestry.nodes.findIndex(
+        oldNode => oldNode.id === node.id
+      )
+      this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
+      this.tapestry.nodes[oldNodeIndex].imageURL = node.imageURL
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.reinitialize()
+    },
+    ...mapMutations([
+      "init",
+      "setDataset",
+      "updateSelectedNode",
+      "updateRootNode",
+      "updateNodeCoordinates",
+    ]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    openLightbox(event) {
+      this.lightbox = {
+        isOpen: true,
+        id: event.detail,
+      }
+    },
+    closeLightbox() {
+      this.lightbox = {
+        isOpen: false,
+        id: null,
+      }
+    },
     tapestryUpdated(event) {
-      this.tapestry = event.detail.dataset
       if (!this.tapestryLoaded) {
-        this.selectedNodeId = this.tapestry.rootId
+        this.init(event.detail.dataset)
         this.tapestryLoaded = true
+      } else {
+        this.setDataset(event.detail.dataset)
       }
     },
     getEmptyNode() {
       return {
         title: "",
+        behaviour: "embed",
         mediaType: "",
         typeData: {
           mediaURL: "",
@@ -126,7 +204,11 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
-        permissions: { public: ["read"] },
+        skippable: true,
+        permissions: {
+          public: ["read"],
+          authenticated: ["read"],
+        },
         description: "",
       }
     },
@@ -154,20 +236,19 @@ export default {
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {
-      this.selectedNodeId = event.detail
+      this.updateSelectedNode(event.detail)
     },
     async addEditNode(formData, isEdit) {
       const NORMAL_RADIUS = 140
       const ROOT_RADIUS_DIFF = 70
 
-      const dimensions = thisTapestryTool.getTapestryDimensions()
-
-      var isRoot = this.tapestry.nodes.length == 0
+      var isRoot = this.$store.state.nodes.length === 0
 
       // Add the node data first
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        behaviour: "embed",
         status: "publish",
         nodeType: "",
         title: "",
@@ -178,6 +259,7 @@ export default {
         typeId: 1,
         group: 1,
         typeData: {
+          linkMetadata: null,
           progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
@@ -187,31 +269,24 @@ export default {
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
+        skippable: true,
         coordinates: {
-          x: (dimensions.width - dimensions.startX) / 2,
-          y: (dimensions.height - dimensions.startY) / 2,
+          x: 3000,
+          y: 3000,
         },
       }
 
       if (isEdit) {
         // If just editing, set the node coordinates to its current location
-        newNodeEntry.coordinates.x = this.tapestry.nodes[
-          Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
-        ].x
-        newNodeEntry.coordinates.y = this.tapestry.nodes[
-          Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
-        ].y
+        newNodeEntry.coordinates.x = this.selectedNode.x
+        newNodeEntry.coordinates.y = this.selectedNode.y
+
+        newNodeEntry.typeData.linkMetadata = this.selectedNode.typeData.linkMetadata
       } else if (!isRoot) {
         // If adding a new node, add it to the right of the existing node
         newNodeEntry.coordinates.x =
-          this.tapestry.nodes[
-            Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
-          ].x +
-          (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 +
-          50
-        newNodeEntry.coordinates.y = this.tapestry.nodes[
-          Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
-        ].y
+          this.selectedNode.x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
+        newNodeEntry.coordinates.y = this.selectedNode.y
       }
 
       var appearsAt = 0
@@ -225,6 +300,9 @@ export default {
             break
           case "imageURL":
             newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "behaviour":
+            newNodeEntry[fieldName] = fieldValue
             break
           case "mediaType":
             if (fieldValue === "text") {
@@ -267,6 +345,9 @@ export default {
           case "hideMedia":
             newNodeEntry.hideMedia = fieldValue
             break
+          case "skippable":
+            newNodeEntry.skippable = fieldValue
+            break
           case "description":
             newNodeEntry.description = fieldValue
             break
@@ -278,76 +359,58 @@ export default {
         }
       }
 
+      let id
       if (!isEdit) {
         // New node
-        const response = await this.TapestryAPI.addNode(JSON.stringify(newNodeEntry))
-
-        newNodeEntry.id = response.data.id
-
-        this.tapestry.nodes.push(newNodeEntry)
-
-        newNodeEntry[this.xORfx] = newNodeEntry.coordinates.x
-        newNodeEntry[this.yORfy] = newNodeEntry.coordinates.y
-
+        id = await this.addNode(newNodeEntry)
+        newNodeEntry.id = id
         if (!isRoot) {
           // Add link from parent node to this node
           const newLink = {
-            source: this.selectedNodeId,
+            source: this.selectedNode.id,
             target: newNodeEntry.id,
             value: 1,
             type: "",
             appearsAt: appearsAt,
           }
-          this.TapestryAPI.addLink(JSON.stringify(newLink))
-          this.tapestry.links.push(newLink)
+          await this.addLink(newLink)
         } else {
-          // Root node
-          this.tapestry.rootId = newNodeEntry.id
-          this.selectedNodeId = newNodeEntry.id
+          this.updateRootNode(newNodeEntry.id)
+          this.updateSelectedNode(newNodeEntry.id)
         }
       } else {
         // Editing existing node
-
-        const response = await this.TapestryAPI.updateNode(
-          this.selectedNodeId,
-          JSON.stringify(newNodeEntry)
-        )
-
-        newNodeEntry.id = response.data.id
-
-        var thisNodeIndex = Helpers.findNodeIndex(this.selectedNodeId, this.tapestry)
-
-        for (let key in this.tapestry.nodes[thisNodeIndex]) {
-          if (newNodeEntry.hasOwnProperty(key)) {
-            this.tapestry.nodes[thisNodeIndex][key] = newNodeEntry[key]
-          }
-        }
+        id = await this.updateNode({
+          id: this.selectedNode.id,
+          newNode: newNodeEntry,
+        })
       }
 
       // Update permissions
-      this.TapestryAPI.updatePermissions(
-        newNodeEntry.id,
-        JSON.stringify(newNodeEntry.permissions)
-      )
+      this.updateNodePermissions({
+        id,
+        permissions: newNodeEntry.permissions,
+      })
 
       // Update coordinates in dataset
-      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][
-        this.xORfx
-      ] = newNodeEntry.coordinates.x
-      this.tapestry.nodes[Helpers.findNodeIndex(newNodeEntry.id, this.tapestry)][
-        this.yORfy
-      ] = newNodeEntry.coordinates.y
+      this.updateNodeCoordinates({
+        id,
+        coordinates: {
+          [this.xORfx]: newNodeEntry.coordinates.x,
+          [this.yORfy]: newNodeEntry.coordinates.y,
+        },
+      })
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.initialize(true)
 
       this.closeModal()
     },
-    handleSettingsUpdate(settings) {
-      this.tapestry.settings = settings
+    /* handleSettingsUpdate(settings) {
+      this.$store.commit("updateSettings", settings)
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.reinitialize()
-    },
+    }, */
   },
 }
 </script>
