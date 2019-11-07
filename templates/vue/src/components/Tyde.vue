@@ -31,6 +31,8 @@ export default {
           isFavourite: false,
         },
         {
+          title: "What's so great about having a job? Hello",
+          description: "my Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's great",
           name: "Log 2",
           type: "content",
           isFavourite: true,

@@ -13,11 +13,7 @@
       </ul>
     </nav>
     <ul class="logs">
-      <tyde-log v-for="log in visibleLogs" :key="log.name" :log="log">
-        <p>{{ log.name }}</p>
-        <p>Type: {{ log.type }}</p>
-        <p>Favourited: {{ log.isFavourite }}</p>
-      </tyde-log>
+      <tyde-log v-for="log in visibleLogs" :key="log.name" :log="log" />
     </ul>
   </section>
 </template>
