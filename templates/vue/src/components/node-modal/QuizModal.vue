@@ -4,15 +4,26 @@
       <b-form-checkbox v-model="canAddQuiz">Add Quiz</b-form-checkbox>
     </b-form-group>
     <div v-if="canAddQuiz" class="quizzes">
-      <b-card v-for="(quiz, index) in quizzes" :key="index" bg-variant="light">
+      <b-card
+        v-for="(quiz, index) in quizzes"
+        :key="index"
+        bg-variant="light"
+        class="mb-3"
+      >
         <b-form-group class="mb-0">
-          <b-row align-v="center" class="mb-2">
-            <b-col>
-              <i :class="`fas fa-${quiz.icon} icon`"></i>
-              <p class="font-weight-bold p-0 m-0">
-                {{ getGroupTitle(quiz, index) }}
-              </p>
-            </b-col>
+          <b-row align-v="center" class="mb-2 mx-0">
+            <i :class="`fas fa-${quiz.icon} icon-form`"></i>
+            <p class="font-weight-bold p-0 m-0">
+              {{ getGroupTitle(quiz, index) }}
+            </p>
+            <b-button
+              class="button-delete"
+              size="sm"
+              variant="outline-danger"
+              @click="deleteQuiz(index)"
+            >
+              Delete
+            </b-button>
           </b-row>
           <b-form-group label="Quiz Title">
             <b-form-input v-model="quiz.title" />
@@ -29,7 +40,7 @@
         </b-form-group>
       </b-card>
     </div>
-    <b-button v-if="canAddQuiz" variant="primary">
+    <b-button v-if="canAddQuiz" variant="primary" @click="addQuiz">
       <i class="fas fa-plus icon"></i>
       Add Quiz
     </b-button>
@@ -37,6 +48,13 @@
 </template>
 
 <script>
+const defaultQuiz = {
+  contentId: "",
+  icon: "microphone",
+  title: "",
+  type: "H5P Audio Recorder",
+}
+
 export default {
   name: "quiz-modal",
   data() {
@@ -58,6 +76,12 @@ export default {
     getGroupTitle(quiz, index) {
       return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
     },
+    addQuiz() {
+      this.quizzes = [...this.quizzes, { ...defaultQuiz }]
+    },
+    deleteQuiz(index) {
+      this.quizzes = this.quizzes.filter((_, idx) => idx !== index)
+    },
   },
 }
 </script>
@@ -65,6 +89,14 @@ export default {
 <style scoped>
 .icon {
   margin-right: 4px;
+}
+
+.icon-form {
+  margin-right: 1em;
+}
+
+.button-delete {
+  margin-left: auto;
 }
 
 .quizzes {
