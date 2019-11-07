@@ -246,6 +246,7 @@
             </b-table-simple>
           </div>
         </b-tab>
+        <quiz-modal />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -270,9 +271,13 @@
 
 <script>
 import Helpers from "../utils/Helpers"
+import QuizModal from "./node-modal/QuizModal"
 
 export default {
   name: "node-modal",
+  components: {
+    QuizModal,
+  },
   props: {
     node: {
       type: Object,
