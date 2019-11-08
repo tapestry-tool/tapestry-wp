@@ -91,13 +91,25 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'url-embed'" label="Embed Link">
+            <b-form-group
+              v-show="node.mediaType === 'url-embed'"
+              label="External Link"
+            >
               <b-form-input
                 id="node-embed-media-duration"
                 v-model="node.typeData.mediaURL"
                 placeholder="Enter embed link (starting with http)"
                 required
               />
+            </b-form-group>
+            <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
+              <b-form-radio-group
+                id="external-link-behaviour"
+                v-model="node.behaviour"
+              >
+                <b-form-radio value="embed">Embed in Tapestry</b-form-radio>
+                <b-form-radio value="new-window">Open in a New Window</b-form-radio>
+              </b-form-radio-group>
             </b-form-group>
           </div>
         </b-tab>
@@ -170,38 +182,44 @@
               </b-thead>
               <b-tbody>
                 <b-tr
-                  v-for="(value, type) in node.permissions"
-                  :key="type"
+                  v-for="(value, rowName) in permissions"
+                  :key="rowName"
                   :value="value"
                 >
-                  <b-th>{{ type }}</b-th>
+                  <b-th>{{ rowName }}</b-th>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="read"
+                      :disabled="isPermissionDisabled(rowName, 'read')"
+                      @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="add"
+                      :disabled="isPermissionDisabled(rowName, 'add')"
+                      @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
                   <b-td>
                     <b-form-checkbox
-                      v-model="node.permissions[type]"
+                      v-model="node.permissions[rowName]"
                       value="edit"
+                      :disabled="isPermissionDisabled(rowName, 'edit')"
+                      @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
                   <!--
                   <b-td>
-                    <b-form-checkbox value="add-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="add-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   <b-td>
-                    <b-form-checkbox value="edit-submit" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="edit-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   <b-td>
-                    <b-form-checkbox value="approve" v-model="node.permissions[type]"></b-form-checkbox>
+                    <b-form-checkbox value="approve" v-model="node.permissions[rowName]"></b-form-checkbox>
                   </b-td>
                   -->
                 </b-tr>
@@ -275,6 +293,11 @@ export default {
       required: false,
       default: "Node",
     },
+    permissionsOrder: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -284,7 +307,7 @@ export default {
         { value: "text", text: "Text" },
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "URL Embed" },
+        { value: "url-embed", text: "External Link" },
       ],
       formErrors: "",
       maxDescriptionLength: 250,
@@ -313,6 +336,7 @@ export default {
       return [
         { name: "title", value: this.node.title },
         { name: "description", value: this.node.description },
+        { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
@@ -338,6 +362,17 @@ export default {
     nodeImageUrl() {
       return this.node.imageURL
     },
+    newPermissions() {
+      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
+      return [...this.node.permissions[last]]
+    },
+    permissions() {
+      const ordered = {}
+      this.permissionsOrder.forEach(permission => {
+        ordered[permission] = this.node.permissions[permission]
+      })
+      return ordered
+    },
   },
   watch: {
     nodeImageUrl: function() {
@@ -352,6 +387,52 @@ export default {
     })
   },
   methods: {
+    getPermissionRowIndex(rowName) {
+      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
+    },
+    isPermissionDisabled(rowName, type) {
+      if (rowName == "public") {
+        return false
+      }
+
+      // keep going up until we find a non-user higher row
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const higherRow = this.permissionsOrder[rowIndex - 1]
+      if (higherRow.startsWith("user")) {
+        return this.isPermissionDisabled(higherRow, type)
+      }
+
+      const permissions = this.node.permissions[higherRow]
+      if (permissions) {
+        return permissions.includes(type)
+      }
+      return false
+    },
+    changeIndividualPermission(value, rowName, type) {
+      let currentPermissions = this.node.permissions[rowName]
+      if (!currentPermissions) {
+        currentPermissions = []
+      }
+      let newPermissions = [...currentPermissions]
+      if (value) {
+        if (!currentPermissions.includes(value)) {
+          newPermissions.push(value)
+        }
+      } else {
+        newPermissions = currentPermissions.filter(permission => permission !== type)
+      }
+      this.$set(this.node.permissions, rowName, newPermissions)
+    },
+    updatePermissions(value, rowName, type) {
+      if (rowName.startsWith("user")) {
+        return this.changeIndividualPermission(value, rowName, type)
+      }
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
+      lowerPriorityPermissions.forEach(newRow => {
+        this.changeIndividualPermission(value, newRow, type)
+      })
+    },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
       if (event === "video" || event === "h5p") {
@@ -426,7 +507,8 @@ export default {
         Helpers.onlyContainsDigits(userId) &&
         $("#user-" + userId + "-editcell").val() != ""
       ) {
-        this.$set(this.node.permissions, `user-${userId}`, [])
+        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
+        this.permissionsOrder.push(`user-${userId}`)
         this.userId = null
       } else {
         alert("Enter valid user id")

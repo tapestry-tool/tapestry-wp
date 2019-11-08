@@ -12,11 +12,13 @@ class TapestryNode implements ITapestryNode
     private $tapestryPostId;
     private $nodePostId;
     private $nodeMetaId;
+    private $author;
     private $type;
     private $size;
     private $title;
     private $status;
     private $unlocked;
+    private $behaviour;
     private $typeData;
     private $imageURL;
     private $mediaType;
@@ -44,6 +46,7 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
+        $this->author = wp_get_current_user()->ID;
         $this->size = '';
         $this->title = '';
         $this->status = '';
@@ -53,6 +56,7 @@ class TapestryNode implements ITapestryNode
         $this->unlocked = true;
         $this->mediaDuration = 0;
         $this->description = '';
+        $this->behaviour = 'embed';
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
@@ -65,6 +69,7 @@ class TapestryNode implements ITapestryNode
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->set($node);
+            $this->author = get_post_field( 'post_author', $this->nodePostId );
         }
     }
 
@@ -98,6 +103,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->status) && is_string($node->status)) {
             $this->status = $node->status;
+        }
+        if (isset($node->behaviour) && is_string($node->behaviour)) {
+            $this->behaviour = $node->behaviour;
         }
         if (isset($node->unlocked) && is_bool($node->unlocked)) {
             $this->unlocked = $node->unlocked;
@@ -193,7 +201,17 @@ class TapestryNode implements ITapestryNode
         // the "original" node data
         update_post_meta($nodePostId, 'tapestry_node_data', $node);
 
+        $this->_resetAuthor();
+
         return $node;
+    }
+    
+    private function _resetAuthor()
+    {
+        wp_update_post(array(
+            'ID'            => $this->nodePostId,
+            'post_author'   => $this->author
+        ));
     }
 
     private function _loadFromDatabase()
@@ -225,6 +243,7 @@ class TapestryNode implements ITapestryNode
     {
         return (object) [
             'id'            => $this->nodeMetaId,
+            'author'        => $this->author,
             'type'          => $this->type,
             'size'          => $this->size,
             'title'         => $this->title,
@@ -235,6 +254,7 @@ class TapestryNode implements ITapestryNode
             'unlocked'      => $this->unlocked,
             'mediaDuration' => $this->mediaDuration,
             'description'   => $this->description,
+            'behaviour'     => $this->behaviour,
             'typeData'      => $this->typeData,
             'coordinates'   => $this->coordinates,
             'permissions'   => $this->permissions,

@@ -197,13 +197,26 @@ function tapestryTool(config){
         console.error(e);
     });
 
+    this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
+
     this.init = function(isReload = false) {
+        const reorderPermissions = permissions => {
+            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            return [...withoutDuplicates];
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            return fillEmptyFields(node, { skippable: true });
+            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false })
+            updatedNode.permissions = fillEmptyFields(
+                updatedNode.permissions, 
+                { authenticated: ["read"] }
+            );
+            updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            return updatedNode
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: this.dataset }
+            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
         }));
 
         if (!root) {
@@ -347,7 +360,7 @@ function tapestryTool(config){
         
         let showSettings = false;
         // append settings modal only if logged in
-        if (config.wpUserId) {
+        if (config.wpCanEditTapestry) {
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
@@ -656,7 +669,7 @@ function tapestryTool(config){
 
     // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
-        if(!config.wpIsAdmin &&
+        if(!config.wpCanEditTapestry &&
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
@@ -665,7 +678,7 @@ function tapestryTool(config){
 
         nodeBeforeDrag = d;
 
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -677,12 +690,12 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
-        if(!config.wpIsAdmin &&
+        if(!config.wpCanEditTapestry &&
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
 
-        if (config.wpIsAdmin) {
+        if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
         } else {
@@ -692,7 +705,7 @@ function tapestryTool(config){
     }
 
     function dragended(d) {
-        if(!config.wpIsAdmin &&
+        if(!config.wpCanEditTapestry &&
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
@@ -703,7 +716,7 @@ function tapestryTool(config){
         d[yORfy] = d.y;
         updateSvgDimensions();
 
-        if (config.wpIsAdmin && !autoLayout) {
+        if (canEditNode(d) && !autoLayout) {
             $.ajax({
                 url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
                 method: API_PUT_METHOD,
@@ -799,13 +812,13 @@ function tapestryTool(config){
                             else return "";
                         })
                         .attr("class", function(d) {
-                            return "link-lines " + (config.wpIsAdmin ? "deletable" : "");
+                            return "link-lines " + (canEditLink(d) ? "deletable" : "");
                         })
                         .attr("id", function(d) {
                             return "link-lines-" + d.source.id + "-" + d.target.id;
                         })
                         .on("click", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 var confirmMsg = "Are you sure you want to delete this link? (" + tapestry.dataset.nodes[findNodeIndex(d.source.id)].title + "-" + tapestry.dataset.nodes[findNodeIndex(d.target.id)].title + ")";
                                 if (confirm(confirmMsg)) {
                                     deleteLink(d.source.id, d.target.id);
@@ -813,13 +826,13 @@ function tapestryTool(config){
                             }
                         })
                         .on("mouseover", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", "red");
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke-width", LINK_THICKNESS + 5);
                             }
                         })
                         .on("mouseout", function(d) {
-                            if (config.wpIsAdmin) {
+                            if (canEditLink(d)) {
                                 $("#link-lines-" + d.source.id + "-" + d.target.id).attr("stroke", function(d){
                                     return setLinkStroke(d);
                                 });
@@ -1071,7 +1084,12 @@ function tapestryTool(config){
                 }
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
+                    dispatchEvent(
+                        new CustomEvent(
+                            'open-lightbox', 
+                            { detail: thisBtn.dataset.id }
+                        )
+                    );
                     recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
@@ -1211,8 +1229,11 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video')
-                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
+                if (d.mediaType === 'video') {
+                    if (d.mediaDuration) {
+                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
+                    }
+                }
                 return base;
                 });
             
@@ -1254,7 +1275,12 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            setupLightbox(thisBtn.dataset.id, thisBtn.dataset.format, thisBtn.dataset.mediaType, thisBtn.dataset.url, thisBtn.dataset.mediaWidth, thisBtn.dataset.mediaHeight, thisBtn.dataset.skippable);
+            dispatchEvent(
+                new CustomEvent(
+                    'open-lightbox', 
+                    { detail: thisBtn.dataset.id }
+                )
+            );
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1417,355 +1443,26 @@ function tapestryTool(config){
     /****************************************************
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
-    
-    function setupLightbox(id, mediaFormat, mediaType, mediaUrl, width, height, skippable) {
-        // Adjust the width and height here before passing it into setup media
-        var lightboxDimensions = getLightboxDimensions(height, width);
-        width = lightboxDimensions.width;
-        height = lightboxDimensions.height;
-        var media = setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height);
-    
-        const overlay = $('<div id="spotlight-overlay"></div>').on("click", function(){
-            closeLightbox(id, mediaType);
-            exitViewMode();
-        });
 
-        const closeLightboxButton = $("<button id='lightbox-close-wrapper'><div class='lightbox-close'><i class='fa fa-times'</i></div></button>")
-            .on("click", function () {
-                closeLightbox(id, mediaType);
-                exitViewMode();
-            });
-    
-        var top = lightboxDimensions.adjustedOn === "width" ? ((getBrowserHeight() - height) / 2) + $(this).scrollTop() : (NORMAL_RADIUS * 1.5) + (NORMAL_RADIUS * 0.1);
-        $('<div id="spotlight-content" data-view-mode="' + (enablePopupNodes ? 'true' : 'false') + '" data-media-format="' + mediaFormat + '" data-media-type="' + mediaType + '"><\/div>').css({
-            top: top,
-            left: (getBrowserWidth() - width) / 2,
-            width: width,
-            height: height,
-            opacity: 0
-        }).appendTo('body');
-    
-        // We don't want draggable for text because we want the user to be able to select text
-        if (mediaType != "text") {
-            $('#spotlight-content').draggable({
-                delay: 10,
-                distance: 8
-            });
-        }
-    
-        const wrapper = $("<div class='media-wrapper'></div>");
-        window.addEventListener("allow-skip", function () {
-            appendSkipTools();
-        });
-
-        wrapper.appendTo('#spotlight-content');
-        media.appendTo('.media-wrapper');
-
-        if (shouldAllowSkip(id)) {
-            appendSkipTools();
-        }
-
-        function appendSkipTools() {
-            overlay.appendTo('body');
-            closeLightboxButton.appendTo("#spotlight-content");
-        }
-    
-        setTimeout(function(){
-            $('#spotlight-content').css({
-                opacity: 1
-            });
-            if (mediaType != 'video') {
-                updateMediaIcon(id, mediaType);
+    // unlocks children based on video progress
+    this.updateChildren = function(id, video) {
+        const childrenData = getChildrenData(id)
+        for (var i = 0; i < childrenData.length; i++) {
+            if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
+                saveNodeAsUnlocked(childrenData[i]);
+                setAccessibleStatus();
+                filterTapestry();
             }
-        }, 1000);
-    
-        if (mediaType === "video") {
-            var loadEvent = 'load';
-            if (mediaFormat == "mp4") {
-                loadEvent = "loadstart";
-            }
-            
-            media.on(loadEvent, function() {
-                changeToViewMode(lightboxDimensions);
-                window.setTimeout(function(){
-                    height = $('#spotlight-content > *').outerHeight();
-                    width = $('#spotlight-content > *').outerWidth();
-    
-                    $('#spotlight-content').css({
-                        width: width,
-                        height: height,
-                        transitionDuration: "0.2s"
-                    });
-                }, 2000);
-                window.setTimeout(function(){
-                    $('#spotlight-content').css({
-                        transitionDuration: "1s"
-                    });
-                }, 200);
-            });
         }
     }
 
-    function shouldAllowSkip(id) {
-        const node = tapestry.dataset.nodes[findNodeIndex(id)];
-        return node.skippable || node.mediaType !== "video" || node.typeData.progress[0].value >= ALLOW_SKIP_THRESHOLD;
-    }
-    
-    function getLightboxDimensions(videoHeight, videoWidth) {
-        var resizeRatio = 1;
-        if (videoWidth > getBrowserWidth()) {
-            resizeRatio = getBrowserWidth() / videoWidth;
-            videoWidth *= resizeRatio;
-            videoHeight *= resizeRatio;
-        }
-    
-        // Possibly interfering with the resizer
-        if (videoHeight > getBrowserHeight() * resizeRatio) {
-            resizeRatio *= getBrowserHeight() / videoHeight;
-            videoWidth *= resizeRatio;
-            videoHeight *= resizeRatio;
-        }
-    
-        var nodeSpace = (NORMAL_RADIUS * 2) * 1.3;     // Calculate the amount of space we need to reserve for nodes
-        var adjustedVideoHeight = getBrowserHeight() - nodeSpace;               // Max height for the video
-        var adjustedVideoWidth = getBrowserWidth() - nodeSpace;                 // Max width for the video
-    
-        if (adjustedVideoHeight > videoHeight) {
-            adjustedVideoHeight = videoHeight;
-        }
-        if (adjustedVideoWidth > videoWidth) {
-            adjustedVideoWidth = videoWidth;
-        }
-    
-        var heightAdjustmentRatio = adjustedVideoHeight / videoHeight;
-        var widthAdjustmentRatio = adjustedVideoWidth / videoWidth;
-    
-        var adjustmentRatio = widthAdjustmentRatio;                       // Object indicating everything you need to know to make the adjustment
-        var adjustedOn = "width";
-        if (getAspectRatio() < 1) {
-            adjustedOn = "height";
-            adjustmentRatio = heightAdjustmentRatio;
-        }
-    
-        adjustmentRatio *= 0.95;
-    
-        return {
-            "adjustedOn": adjustedOn,
-            "width": videoWidth * adjustmentRatio,
-            "height": videoHeight * adjustmentRatio
-        };
-    }
-    
-    function setupMedia(id, mediaFormat, mediaType, mediaUrl, width, height) {
-    
-        var buttonElementId = "#mediaButtonIcon" + id;
-    
-        // Add the loading gif
-        $(buttonElementId).addClass('mediaButtonLoading');
-    
-        var index = findNodeIndex(id);
-        var viewedAmount;
-        var mediaEl;
-    
-        var childrenData = getChildrenData(id);
-    
-        if (mediaType == "text") {
-            mediaEl = createTextNodeElement(tapestry.dataset.nodes[index].title, tapestry.dataset.nodes[index].typeData.textContent);
-        }
-        else if (mediaFormat === "mp4") {
-    
-            mediaEl = $('<video id="' + mediaFormat + '" controls><source id="video-source" src="' + mediaUrl + '" type="video/mp4"><\/video>');
-            var video = mediaEl[0];
-    
-            video.addEventListener('loadedmetadata', function () {
-        
-                // Update the mediaButton icon to pause icon when video is playing
-                video.addEventListener('play', function () {
-                    updateMediaIcon(id, mediaType, 'pause');
-                    recordAnalyticsEvent('user', 'play', 'html5-video', id, {'time': video.currentTime});
-                });
-                // Update the mediaButton icon to play icon when video is paused
-                video.addEventListener('pause', function () {
-                    updateMediaIcon(id, mediaType, 'play');
-                    recordAnalyticsEvent('user', 'pause', 'html5-video', id, {'time': video.currentTime});
-                });
-                
-                // Update the progress circle for this video
-                let wasDispatched = false;
-                video.addEventListener('timeupdate', function () {
-                    for (var i = 0; i < childrenData.length; i++) {
-                        if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
-                            saveNodeAsUnlocked(childrenData[i]);
-                            setAccessibleStatus();
-                            filterTapestry();
-                        }
-                    }
-                    updateViewedValue(id, video.currentTime, video.duration);
-                    updateViewedProgress();
-                    if (video.currentTime / video.duration >= ALLOW_SKIP_THRESHOLD) {
-                        if (!wasDispatched) {
-                            dispatchEvent(new CustomEvent("allow-skip", { detail: id }));
-                            saveNodeAsSkippable(tapestry.dataset.nodes[index]);
-                        }
-                        wasDispatched = true;
-                    }
-                });
-    
-                // Play the video at the last watched time (or at the beginning if not watched yet)
-                // (start from beginning again if person had already viewed whole video)
-                viewedAmount = tapestry.dataset.nodes[index].typeData.progress[0].value * video.duration;
-                if (viewedAmount > 0 && viewedAmount !== video.duration) {
-                    video.currentTime = viewedAmount;
-                }
-                else {
-                    video.currentTime = 0;
-                }
-    
-                // Auto-play
-                setTimeout(function(){
-                    video.play();
-                    recordAnalyticsEvent('app', 'auto-play', 'html5-video', id);
-                }, 1000);
-    
-            }, false);
-            
-        } 
-        else if (mediaFormat === "h5p") {
-    
-            mediaEl = $('<iframe id="h5p" src="' + mediaUrl + '" width="' + width + '" height="' + height + '" frameborder="0" allowfullscreen="allowfullscreen"><\/iframe>');
-            var iframe = mediaEl[0];
-    
-            iframe.addEventListener('load', function() {
-    
-                var h5pObj = document.getElementById('h5p').contentWindow.H5P;
-                var mediaProgress = tapestry.dataset.nodes[index].typeData.progress[0].value;    // Percentage of the video already watched
-    
-                // TODO: support other types of H5P content
-                if (mediaType == "video") {
-    
-                    var h5pVideo = h5pObj.instances[0].video;
-                    
-                    var seeked = false;
-                    var currentPlayedTime;
-    
-                    h5pVideo.on('stateChange', function (event) {
-    
-                        switch (event.data) {
-                            case h5pObj.Video.PLAYING:
-    
-                                var videoDuration = h5pVideo.getDuration();
-    
-                                // Update the progress circle for this video
-                                // Done with an interval because H5P does not have a way to continuously check the updated time
-                                var updateVideoDuration = setInterval( function () {
-                                    if (currentPlayedTime != h5pVideo.getCurrentTime() && h5pVideo.getCurrentTime() > 0) {
-                                        currentPlayedTime = h5pVideo.getCurrentTime();
-                                        updateViewedValue(id, currentPlayedTime, videoDuration);
-                                        updateViewedProgress();
-                                    }
-                                    else {
-                                        clearInterval(updateVideoDuration);
-                                    }
-                                }, 300);
-                                
-                                if (!seeked) {
-                                    // Change the video settings to whatever the user had set before
-                                    if (h5pVideoSettings.volume !== undefined) {
-                                        h5pVideo.setVolume(h5pVideoSettings.volume);
-                                        if (h5pVideoSettings.muted) h5pVideo.mute(); else h5pVideo.unMute();
-                                        h5pVideo.setCaptionsTrack(h5pVideoSettings.caption);
-                                        h5pVideo.setQuality(h5pVideoSettings.quality);
-                                        h5pVideo.setPlaybackRate(h5pVideoSettings.playbackRate);
-                                    }
-                                    // Play the video at the last watched time (or at the beginning if the user has
-                                    // not watched yet or if the user had already viewed whole video)
-                                    var viewedAmount = mediaProgress * videoDuration;
-                                    if (viewedAmount > 0 && viewedAmount !== videoDuration) {
-                                        h5pVideo.seek(viewedAmount);
-                                    }
-                                    else {
-                                        h5pVideo.seek(0);
-                                    }
-                                    seeked = true;
-                                }
-    
-                                // Update the mediaButton icon to pause icon
-                                updateMediaIcon(id, mediaType, 'pause');
-    
-                                recordAnalyticsEvent('user', 'play', 'h5p-video', id, {'time': h5pVideo.getCurrentTime()});
-                                break;
-    
-                            case h5pObj.Video.PAUSED:
-                                
-                                // Save the video settings
-                                h5pVideoSettings = {
-                                    'volume': h5pVideo.getVolume(),
-                                    'muted': h5pVideo.isMuted(),
-                                    'caption': h5pVideo.getCaptionsTrack(),
-                                    'quality': h5pVideo.getQuality(),
-                                    'playbackRate': h5pVideo.getPlaybackRate(),
-                                    'time': h5pVideo.getCurrentTime()
-                                };
-    
-                                // Update the mediaButton icon to play icon
-                                updateMediaIcon(id, mediaType, 'play');
-                                seeked = true;
-    
-                                recordAnalyticsEvent('user', 'pause', 'h5p-video', id, {'time': h5pVideo.getCurrentTime()});
-                                break;
-    
-                            case h5pObj.Video.BUFFERING:
-    
-                                // Update the mediaButton icon to loading icon
-                                updateMediaIcon(id, mediaType, 'loading');
-                                break;
-                        }
-                    });
-    
-                    // Auto-play
-                    setTimeout(function(){
-                        h5pVideo.play();
-                        recordAnalyticsEvent('app', 'auto-play', 'h5p-video', id);
-                    }, 1000);
-                }
+    this.updateProgressBars = updateViewedProgress;
 
-            }, false);
-        } else if (mediaFormat === "embed") {
-            mediaEl = $('<iframe id="embed" src="' + mediaUrl + '" width="' + width + '" height="' + height + '" frameborder="0" allowfullscreen="allowfullscreen"><\/iframe>');
-        }
+    this.recordAnalyticsEvent = recordAnalyticsEvent;
     
-        return mediaEl;
-    }
-    
-    function createTextNodeElement(title, str) {
-        var lightboxContent = document.createElement("div");
-        var titleSection = document.createElement("div");
-        titleSection.setAttribute("id", "text-light-box-title");
-    
-        var titleText = document.createElement("h3");
-        titleText.appendChild(document.createTextNode(title));
-        titleSection.append(titleText);
-        lightboxContent.append(titleSection);
-    
-        if (str) {
-            var paragraphSection = document.createElement("div");
-            paragraphSection.setAttribute("id", "text-light-box-paragraph");
-            paragraphArray = str.split("\n\n");
-            for (var i = 0; i < paragraphArray.length; i++) {
-                var paraDiv = document.createElement("div");
-                var para = document.createElement("p");
-                para.setAttribute("id", "text-light-box-paragraph-text");
-                para.innerHTML = paragraphArray[i].replace('\n','<br>');
-                paraDiv.appendChild(para);
-                paragraphSection.appendChild(paraDiv);
-            }
-            lightboxContent.appendChild(paragraphSection);
-        }
-        return $(lightboxContent);
-    }
-    
+    this.exitViewMode = exitViewMode;
     // Builds the view mode, including functionality to
-    function changeToViewMode(lightboxDimensions) {
+    this.changeToViewMode = function changeToViewMode(lightboxDimensions) {
     
         if (!enablePopupNodes) {
             return;
@@ -2023,7 +1720,7 @@ function tapestryTool(config){
         // but kept the same way on mobile phones where the browser is vertically longer
         // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
         // they want to while drafting a tapestry if we keep transposing it
-        if (!config.wpIsAdmin) {
+        if (!config.wpCanEditTapestry) {
             var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
             var windowAspectRatio = getAspectRatio();
             if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
@@ -2201,72 +1898,6 @@ function tapestryTool(config){
         return radius;
     }
     
-    /* Updates the data in the node for how much the video has been viewed */
-    function updateViewedValue(id, amountViewedTime, duration) {
-        var amountViewed = amountViewedTime / duration;
-        var amountUnviewed = 1.00 - amountViewed;
-    
-        var index = findNodeIndex(id);
-    
-        //Update the dataset with new values
-        tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-        tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-    
-        var progressObj = JSON.stringify(getDatasetProgress());
-        if (saveProgress) {
-            
-            // Save to database if logged in
-            if (config.wpUserId) {
-                // Send save progress requests 5 seconds after the last time saved
-                var secondsDiff = Math.abs((new Date().getTime() - progressLastSaved.getTime()) / 1000);
-                if (secondsDiff > TIME_BETWEEN_SAVE_PROGRESS) {
-                    if (id) {
-                        var progData = {
-                            "post_id": config.wpPostId,
-                            "node_id": id,
-                            "progress_value": amountViewed
-                        };
-                        jQuery.post(USER_NODE_PROGRESS_URL, progData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding progress data");
-                            console.error(e);
-                        });
-                    }
-    
-                    if (h5pVideoSettings && !isEmptyObject(h5pVideoSettings)) {
-                        var h5pData = {
-                            "post_id": config.wpPostId,
-                            "json": JSON.stringify(h5pVideoSettings)
-                        };
-                        jQuery.post(TAPESTRY_H5P_SETTINGS_URL, h5pData, function() {})
-                        .fail(function(e) {
-                            console.error("Error with adding h5p video settings");
-                            console.error(e);
-                        });
-                    }
-                    progressLastSaved = new Date();
-                }
-            } else {
-                // Set Cookies if not logged in
-                Cookies.set("progress-data-"+tapestrySlug, progressObj);
-                Cookies.set("h5p-video-settings", h5pVideoSettings);
-            }
-        }
-    }
-    
-    /* Tells the overall dataset progress of the entire tapestry */
-    function getDatasetProgress() {
-        
-        var progressObj = {};
-        
-        for (var index in tapestry.dataset.nodes) {
-            var node = tapestry.dataset.nodes[index];
-            progressObj[node.id] = node.typeData.progress[0].value;
-        }
-        
-        return progressObj;
-    }
-    
     function setDatasetProgress(progressObj) {
         
         if (progressObj.length < 1) {
@@ -2277,7 +1908,6 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -2286,7 +1916,6 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     
@@ -2299,6 +1928,9 @@ function tapestryTool(config){
             }
         }
     
+        dispatchEvent(new CustomEvent("tapestry-updated", {
+            detail: { dataset: tapestry.dataset }
+        }))
         return true;
     }
     
@@ -2460,25 +2092,42 @@ function tapestryTool(config){
     }
     
     function checkPermission(node, permissionType) {
-        // If admin, give permissinos to add and edit
-        if (config.wpIsAdmin) {
-            return node.nodeType === "root";
+        if (config.wpCanEditTapestry) {
+            return true;
         }
-    
+        if (node.author == config.wpUserId) {
+            return true;
+        }
+
+        if (node.nodeType !== "root") {
+            return false;
+        }
         if (node.permissions.public && node.permissions.public.includes(permissionType)) {
-            return node.nodeType === "root";
+            return true;
         }
     
         if (config.wpUserId && config.wpUserId !== "") {
+            if (node.permissions.authenticated && node.permissions.authenticated.includes(permissionType)) {
+                return true;
+            }
+
             var userIndex = "user-" + config.wpUserId;
             if (node.permissions[userIndex] && node.permissions[userIndex].includes(permissionType)) {
-                return node.nodeType === "root";
+                return true;
             }
         }
     
         // // TODO Check user's group id
     
         return false;
+    }
+
+    function canEditNode(d) {
+        return config.wpCanEditTapestry || checkPermission(d, "edit");
+    }
+
+    function canEditLink(d) {
+        return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
     }
     
     // Get data from child needed for knowing whether it is unlocked or not
@@ -2531,44 +2180,19 @@ tapestryTool.prototype.deleteNodeFromTapestry = function() {
     this.tapestryDeleteNode();
  };
 
+tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
+
+tapestryTool.prototype.updateNodeImage = updateNodeImage;
+
 /*******************************************************
  * 
  * NON-CLASS FUNCTIONS (could be moved to a separate file)
  * 
  *******************************************************/
 
-// Functionality for the X button that closes the media and the light-box
-function closeLightbox(id, mediaType) {
-        
-    // Pause the H5P video before closing it. This will also trigger saving of the settings
-    // TODO: Do this for HTML5 video as well
-    // var h5pObj = document.getElementById('h5p').contentWindow.H5P;
-    // if (h5pObj !== undefined && mediaType == "video") {
-        // var h5pVideo = h5pObj.instances[0].video;
-        // h5pVideo.pause();
-    // }
-
-    if (document.getElementById('h5p') !== null) {
-        var h5pObj = document.getElementById('h5p').contentWindow.H5P;
-        if (h5pObj !== undefined && mediaType == "video") {
-            var h5pVideo = h5pObj.instances[0].video;
-            if (typeof h5pVideo != "undefined" && typeof h5pVideo.pause !== "undefined") {
-                h5pVideo.pause();
-            }
-        }
-    }
-    
-    updateMediaIcon(id, mediaType, 'play');
-
-    $('#spotlight-overlay').remove();
-    $('#spotlight-content').css('opacity', 0);
-
-    // wait for css animation before removing it
-    setTimeout(function () {
-        $('#spotlight-content').remove();
-    }, 1000);
-
-    recordAnalyticsEvent('user', 'close', 'lightbox', id);
+function updateNodeImage(id, src) {
+    const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
 }
 
 // Updates the icon for the given media button

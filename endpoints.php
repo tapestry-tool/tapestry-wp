@@ -10,6 +10,7 @@ require_once __DIR__ . '/classes/class.tapestry.php';
 require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -23,8 +24,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::postTapestryNode'
+            'callback'              => 'addTapestryNode'
         ]
     ],
     'POST_TAPESTRY' => (object) [
@@ -62,88 +62,77 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNode'
         ]
     ],
     'DELETE_TAPESTRY_NODE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryNode',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'deleteTapestryNode'
         ]
     ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeSize',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeSize'
         ]
     ],
     'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodePermissions',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodePermissions'
         ]
     ],
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeDescription',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeDescription'
         ]
     ],
     'PUT_TAPESTRY_NODE_TITLE' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTitle',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeTitle'
         ]
     ],
     'PUT_TAPESTRY_NODE_IMAGE_URL' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeImageURL',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeImageURL'
         ]
     ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTypeData',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeTypeData'
         ]
     ],
     'PUT_TAPESTRY_NODE_COORDINATES' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeCoordinates',
-            'permission_callback'   => 'TapestryPermissions::putTapestryNodeProperties'
+            'callback'              => 'updateTapestryNodeCoordinates'
         ]
     ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryLink',
-            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+            'callback'              => 'addTapestryLink'
         ]
     ],
     'DELETE_TAPESTRY_LINK' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
             'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryLink',
-            'permission_callback'   => 'TapestryPermissions::postTapestryLink'
+            'callback'              => 'deleteTapestryLink'
         ]
     ],
     'GET_TAPESTRY_USER_PROGRESS' => (object) [
@@ -168,11 +157,11 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'unlockByNodeId'
         ]
     ],
-    'UPDATE_TAPESTRY_USER_SKIPPED'  => (object) [
-        'ROUTE'     => 'users/skipped',
+    'UPDATE_TAPESTRY_USER_COMPLETED'  => (object) [
+        'ROUTE'     => 'users/completed',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'allowSkipByNodeId'
+            'callback'              => 'completeByNodeId'
         ]
     ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
@@ -263,6 +252,16 @@ function addTapestryNode($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
+
+        if ($tapestry->isEmpty()) {
+            if (!(TapestryUserRoles::isEditor())
+                && !(TapestryUserRoles::isAdministrator())
+                && !(TapestryUserRoles::isAuthorOfThePost($postId))
+            ) {
+                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            }
+        }
+
         return $tapestry->addNode($node);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -316,6 +315,9 @@ function addTapestryLink($request)
             || (!TapestryHelpers::isChildNodeOfTapestry($link->target, $postId))
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->source, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::currentUserIsAllowed('ADD', $link->target, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
@@ -756,21 +758,21 @@ function unlockByNodeId($request)
 }
 
 /**
- * Set skippable status of a single node for the current user to true by passing in node id and post id
- * Example: /wp-json/tapestry-tool/v1/users/skip?post_id=44&node_id=1
+ * Set node as completed for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1
  * 
  * @param Object $request HTTP request
  * 
  * @return null
  */
-function allowSkipByNodeId($request)
+function completeByNodeId($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->allowSkip();
+        $userProgress->complete();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
