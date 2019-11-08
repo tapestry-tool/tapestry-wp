@@ -541,7 +541,6 @@ function tapestryTool(config){
                             url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                             method: API_DELETE_METHOD,
                             success: function() {
-                                deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
                                 location.reload();
                             },
                             error: function(e) {
