@@ -13,6 +13,7 @@
 <script>
 import Tapestry from "./Tapestry"
 import TydeMenu from "./tyde/TydeMenu"
+import { mapGetters } from "vuex"
 
 export default {
   name: "tyde",
@@ -24,25 +25,20 @@ export default {
     return {
       isMenuOpen: false,
       lightbox: {},
-      logs: [
-        {
-          name: "Log 1",
-          type: "activity",
-          isFavourite: false,
-        },
-        {
-          title: "What's so great about having a job? Hello",
-          description: "my Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's greatmy Description<br>Hello, it's great",
-          name: "Log 2",
+    }
+  },
+  computed: {
+    ...mapGetters(["nodes"]),
+    logs() {
+      return this.nodes.filter(node => node.completed).map(node => {
+        return {
           type: "content",
-          isFavourite: true,
-        },
-        {
-          name: "Log 3",
-          type: "activity",
-          isFavourite: true,
-        },
-      ],
+          title: node.title,
+          imageURL: node.imageURL,
+          description: node.description,
+          isFavourite: node.isFavourite,
+        }
+      })
     }
   },
   mounted() {

@@ -29,6 +29,7 @@ const store = new Vuex.Store({
     tapestry: state => state,
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
+    nodes: state => state.nodes,
   },
   mutations,
   actions,

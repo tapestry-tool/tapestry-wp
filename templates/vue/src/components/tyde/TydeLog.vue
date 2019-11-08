@@ -1,6 +1,6 @@
 <template>
   <li class="log">
-    <img src="https://www.w3schools.com/howto/img_forest.jpg" />
+    <img :src="log.imageURL" />
     <div class="log-details">
       <div>{{log.title}}</div>
       <div>{{log.description}}</div>
@@ -52,6 +52,7 @@ img {
   font-size: 20px;
   margin: 0 50px;
   flex-direction: column;
+  word-break: break-word;
 }
 
 .log-details > div:first-child {
@@ -63,6 +64,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-left: auto;
 }
 
 .log {
@@ -74,6 +76,5 @@ img {
   padding: 24px;
   width: 100%;
   display: flex;
-  justify-content: space-between;
 }
 </style>
