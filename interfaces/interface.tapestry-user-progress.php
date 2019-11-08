@@ -35,7 +35,7 @@ interface ITapestryUserProgress
      * 
      * @return Null
      */
-    public function allowSkip();
+    public function complete();
 
     /**
      * Update User's h5p video setting for a tapestry post
