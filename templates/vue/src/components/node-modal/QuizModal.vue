@@ -57,6 +57,12 @@ const defaultQuiz = {
 
 export default {
   name: "quiz-modal",
+  props: {
+    node: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       canAddQuiz: false,
@@ -72,15 +78,27 @@ export default {
       icons: ["microphone"],
     }
   },
+  mounted() {
+    const node = this.node
+    if (node.quizzes && node.quizzes.length) {
+      this.canAddQuiz = true
+      this.quizzes = node.quizzes
+    }
+  },
+  beforeDestroy() {
+    if (this.canAddQuiz) {
+      this.node.quizzes = this.quizzes
+    }
+  },
   methods: {
-    getGroupTitle(quiz, index) {
-      return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
-    },
     addQuiz() {
       this.quizzes = [...this.quizzes, { ...defaultQuiz }]
     },
     deleteQuiz(index) {
       this.quizzes = this.quizzes.filter((_, idx) => idx !== index)
+    },
+    getGroupTitle(quiz, index) {
+      return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
     },
   },
 }

@@ -246,7 +246,7 @@
             </b-table-simple>
           </div>
         </b-tab>
-        <quiz-modal />
+        <quiz-modal :node="node" />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
