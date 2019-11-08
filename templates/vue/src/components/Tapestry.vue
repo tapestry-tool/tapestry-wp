@@ -39,6 +39,7 @@
       :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
+      @h5p-media-loaded="h5pMediaLoaded"
     />
   </div>
 </template>
@@ -130,8 +131,7 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
-    window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer)
-    window.addEventListener('tapestry-h5p-item-clicked', this.h5pItemClicked)
+    window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
     window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
@@ -164,10 +164,10 @@ export default {
         id: null,
       }
     },
-    async h5pItemClicked(event) {
-      const nodeMetaId = Number(event.detail.id)
-      if (nodeMetaId && this.recordedNodeIds.includes(nodeMetaId)) {
-        await this.loadH5PAudio(nodeMetaId)
+    async h5pMediaLoaded() {
+      const selectedNodeId = this.selectedNode.id
+      if (selectedNodeId && this.recordedNodeIds.includes(selectedNodeId)) {
+        await this.loadH5PAudio(selectedNodeId)
       }
     },
     async saveH5PAudioToServer(event) {

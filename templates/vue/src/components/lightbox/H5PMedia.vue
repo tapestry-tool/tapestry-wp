@@ -36,12 +36,20 @@ export default {
   },
   methods: {
     handleLoad() {
+      this.$emit('h5p-media-loaded')
+
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
         const settings = this.settings
+
+        // If h5pVideo is undefined, let's return
+        // This is because we don't have a separate type for H5P recorder
+        if (!h5pVideo) {
+          return
+        }
 
         let seeked = false
         let currentPlayedTime
