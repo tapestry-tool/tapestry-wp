@@ -1,4 +1,5 @@
 import axios from "axios"
+import Helpers from "../utils/Helpers"
 
 export default class {
   /**
@@ -19,6 +20,16 @@ export default class {
     const url = `${apiUrl}/tapestries/${this.postId}`
     const response = await axios.get(url)
     return response.data
+  }
+
+  async getNode(id) {
+    const data = await this.getTapestry()
+    return data.nodes[Helpers.findNodeIndex(id, data)]
+  }
+
+  async getNodeProgress(id) {
+    const progress = await this.getUserProgress()
+    return progress[id]
   }
 
   /**
@@ -72,6 +83,22 @@ export default class {
   async updateNode(nodeMetaId, node) {
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
     const response = await axios.put(url, node)
+    return response
+  }
+
+  async getUserProgress() {
+    const url = `${apiUrl}/users/progress?post_id=${this.postId}`
+    const response = await axios.get(url)
+    return JSON.parse(response.data)
+  }
+
+  async updateUserProgress(id, progressValue) {
+    const url = `${apiUrl}/users/progress`
+    const response = await axios.post(url, {
+      post_id: this.postId,
+      node_id: id,
+      progress_value: progressValue,
+    })
     return response
   }
 
@@ -134,5 +161,26 @@ export default class {
     } catch (e) {
       throw e;
     }
+  }
+
+  async completeNode(nodeId) {
+    const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await axios.post(url)
+    return response
+  }
+
+  async getH5pSettings() {
+    const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
+    const response = await axios.get(url)
+    return response
+  }
+
+  async updateH5pSettings(settings) {
+    const url = `${apiUrl}/users/h5pSettings`
+    const response = await axios.post(url, {
+      post_id: this.postId,
+      json: settings,
+    })
+    return response
   }
 }

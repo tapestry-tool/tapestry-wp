@@ -26,6 +26,7 @@ export default {
   margin-top: 20vh;
   text-align: center;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 #root-node-label {

@@ -17,6 +17,16 @@
             />
           </b-form-group>
           <b-form-group
+            v-show="wpCanEditTapestry"
+            label="Users can move nodes"
+            description="If enabled, you allow users to move nodes to different positions on the screen.
+              However, changes made by the users won't be saved."
+          >
+            <b-form-checkbox v-model="nodeDraggable" switch>
+              {{ nodeDraggable ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
             label="Auto-Layout"
             description="With auto-layout enabled, nodes will place themselves in
               the best position possible. If this is disabled, you will need to manually place the nodes where
@@ -46,48 +56,53 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
   name: "settings-modal",
   props: {
-    tapestryApiClient: {
-      type: Object,
-      required: true,
+    wpCanEditTapestry: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
   data() {
     return {
-      currentSettings: {},
       backgroundUrl: "",
       autoLayout: false,
+      nodeDraggable: true,
     }
   },
-  async mounted() {
+  computed: {
+    ...mapGetters(["settings"]),
+  },
+  mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
-    await this.getSettings()
   },
   beforeDestroy() {
     window.removeEventListener("open-settings-modal")
   },
   methods: {
-    async openModal() {
+    openModal() {
       this.$bvModal.show("settings-modal")
+      this.getSettings()
     },
     closeModal() {
       this.$bvModal.hide("settings-modal")
     },
-    async getSettings() {
-      const response = await this.tapestryApiClient.getSettings()
-      const { backgroundUrl = "", autoLayout = false } = response
-      this.currentSettings = response
+    getSettings() {
+      const { backgroundUrl = "", autoLayout = false, nodeDraggable = true } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
+      this.nodeDraggable = nodeDraggable
     },
     async updateSettings() {
-      const settings = Object.assign(this.currentSettings, {
+      const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
+        nodeDraggable: this.nodeDraggable
       })
-      await this.tapestryApiClient.updateSettings(JSON.stringify(settings))
+      await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();
