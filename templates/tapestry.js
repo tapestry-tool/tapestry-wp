@@ -206,7 +206,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed" })
+            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -1893,7 +1893,6 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -1902,7 +1901,6 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     

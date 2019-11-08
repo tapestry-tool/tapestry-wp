@@ -45,6 +45,14 @@ export async function updateNodeProgress({ commit }, payload) {
   commit("updateNodeProgress", { id, progress })
 }
 
+export async function completeNode({ commit }, nodeId) {
+  await client.completeNode(nodeId)
+  commit("updateNode", {
+    id: nodeId,
+    newNode: { completed: true },
+  })
+}
+
 export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }
