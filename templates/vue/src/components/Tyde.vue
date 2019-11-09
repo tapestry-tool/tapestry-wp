@@ -77,7 +77,6 @@ export default {
     },
     clearLightbox() {
       this.lightbox = {}
-      console.log("Clearing", this.lightbox)
     },
     returnToMap() {
       const { id, type } = this.lightbox
@@ -89,7 +88,6 @@ export default {
     },
     saveLightbox(event) {
       this.lightbox = event.detail
-      console.log("Saving", this.lightbox)
     },
     toggleAudio() {
       if (this.backgroundAudio.paused) {
