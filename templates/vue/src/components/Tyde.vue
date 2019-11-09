@@ -4,6 +4,7 @@
     <tyde-menu
       v-if="isMenuOpen"
       :logs="logs"
+      @audio-change="toggleAudio"
       @continue="continueTapestry"
       @return-to-map="returnToMap"
     />
@@ -14,6 +15,9 @@
 import Tapestry from "./Tapestry"
 import TydeMenu from "./tyde/TydeMenu"
 
+const TYDE_BACKGROUND_AUDIO_SRC =
+  "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file
+
 export default {
   name: "tyde",
   components: {
@@ -22,6 +26,7 @@ export default {
   },
   data() {
     return {
+      backgroundAudio: new Audio(TYDE_BACKGROUND_AUDIO_SRC),
       isMenuOpen: false,
       lightbox: {},
       logs: [
@@ -55,6 +60,7 @@ export default {
     })
     window.addEventListener("tyde-open-lightbox-video", this.saveLightbox)
     window.addEventListener("tyde-close-lightbox", this.clearLightbox)
+    this.backgroundAudio.loop = true
   },
   beforeDestroy() {
     window.removeEventListener("keydown")
@@ -84,6 +90,13 @@ export default {
     saveLightbox(event) {
       this.lightbox = event.detail
       console.log("Saving", this.lightbox)
+    },
+    toggleAudio() {
+      if (this.backgroundAudio.paused) {
+        this.backgroundAudio.play()
+      } else {
+        this.backgroundAudio.pause()
+      }
     },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen
