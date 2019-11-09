@@ -206,7 +206,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true })
+            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed" })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -216,7 +216,7 @@ function tapestryTool(config){
         });
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: this.dataset }
+            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
         }));
 
         if (!root) {
@@ -1915,6 +1915,9 @@ function tapestryTool(config){
             }
         }
     
+        dispatchEvent(new CustomEvent("tapestry-updated", {
+            detail: { dataset: tapestry.dataset }
+        }))
         return true;
     }
     
@@ -2166,11 +2169,18 @@ tapestryTool.prototype.deleteNodeFromTapestry = function() {
 
 tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
 
+tapestryTool.prototype.updateNodeImage = updateNodeImage;
+
 /*******************************************************
  * 
  * NON-CLASS FUNCTIONS (could be moved to a separate file)
  * 
  *******************************************************/
+
+function updateNodeImage(id, src) {
+    const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
 
 // Updates the icon for the given media button
 function updateMediaIcon(id, mediaType, action) {
