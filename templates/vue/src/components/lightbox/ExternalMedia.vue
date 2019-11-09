@@ -53,7 +53,7 @@
 <script>
 import { getLinkMetadata } from "../../services/LinkPreviewApi"
 import Helpers from "../../utils/Helpers"
-import { mapActions } from 'vuex'
+import { mapActions } from "vuex"
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
@@ -122,6 +122,7 @@ export default {
       }
     }
     this.$emit("mounted", this.adjustedDimensions)
+    this.$emit("complete")
   },
   methods: {
     ...mapActions(["updateNode"]),
