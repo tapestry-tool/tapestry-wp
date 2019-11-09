@@ -156,6 +156,7 @@ export default {
   margin: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   color: inherit;
   margin-right: 3em;
 }
