@@ -23,7 +23,7 @@
           <video-media
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
-            @load="updateDimensions"
+            @load="handleLoad"
             @update-skippable="updateSkippable"
             @timeupdate="updateProgress"
           />
@@ -54,7 +54,7 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
-import { mapGetters, mapState, mapActions } from "vuex"
+import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
 
 const SAVE_INTERVAL = 5
 
@@ -168,7 +168,12 @@ export default {
     thisTapestryTool.exitViewMode()
   },
   methods: {
+    ...mapMutations(["setLightboxEl"]),
     ...mapActions(["updateNodeProgress"]),
+    handleLoad({ width, height, el }) {
+      this.updateDimensions({ width, height })
+      this.setLightboxEl(el)
+    },
     async updateSkippable() {
       // TODO: Change this to an action
       await this.tapestryApiClient.updateSkippable(this.nodeId)

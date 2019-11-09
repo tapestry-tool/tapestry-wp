@@ -47,7 +47,11 @@ export default {
   methods: {
     handleLoad() {
       const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", { width: videoRect.width, height: videoRect.height })
+      this.$emit("load", {
+        width: videoRect.width,
+        height: videoRect.height,
+        el: this.$refs.video,
+      })
     },
     handlePlay() {
       const { id, mediaType } = this.node
