@@ -17,7 +17,7 @@
               {{ getGroupTitle(quiz, index) }}
             </p>
             <b-button
-              class="button-delete"
+              class="ml-auto"
               size="sm"
               variant="outline-danger"
               @click="deleteQuiz(index)"
@@ -31,7 +31,7 @@
           <b-form-group label="Quiz Type">
             <b-form-select v-model="quiz.type" :options="typeOptions" />
           </b-form-group>
-          <b-form-group label="Content ID">
+          <b-form-group label="Quiz Content ID">
             <b-form-input v-model="quiz.contentId" />
           </b-form-group>
           <b-form-group label="Quiz Icon">
@@ -40,10 +40,12 @@
         </b-form-group>
       </b-card>
     </div>
-    <b-button v-if="canAddQuiz" variant="primary" @click="addQuiz">
-      <i class="fas fa-plus icon"></i>
-      Add Quiz
-    </b-button>
+    <b-row v-if="canAddQuiz" class="mx-0">
+      <b-button variant="primary" @click="addQuiz">
+        <i class="fas fa-plus icon"></i>
+        Add Quiz
+      </b-button>
+    </b-row>
   </b-tab>
 </template>
 
@@ -111,10 +113,6 @@ export default {
 
 .icon-form {
   margin-right: 1em;
-}
-
-.button-delete {
-  margin-left: auto;
 }
 
 .quizzes {
