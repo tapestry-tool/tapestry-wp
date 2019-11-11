@@ -39,6 +39,8 @@ export default {
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
+        this.$emit("load", { el: h5pVideo })
+
         const settings = this.settings
 
         let seeked = false

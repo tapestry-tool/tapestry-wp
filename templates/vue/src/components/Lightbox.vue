@@ -39,6 +39,7 @@
             :width="dimensions.width"
             :height="dimensions.height"
             :settings="h5pSettings"
+            @load="handleLoad"
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
           />
@@ -171,7 +172,9 @@ export default {
     ...mapMutations(["setLightboxEl"]),
     ...mapActions(["updateNodeProgress"]),
     handleLoad({ width, height, el }) {
-      this.updateDimensions({ width, height })
+      if (width && height) {
+        this.updateDimensions({ width, height })
+      }
       this.setLightboxEl(el)
     },
     async updateSkippable() {
