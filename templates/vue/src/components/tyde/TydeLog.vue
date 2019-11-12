@@ -2,8 +2,8 @@
   <li class="log">
     <img :src="log.imageURL" />
     <div class="log-details">
-      <div>{{log.title}}</div>
-      <div>{{log.description}}</div>
+      <h1>{{log.title}}</h1>
+      <p>{{log.description}}</p>
     </div>
     <div class="log-controls">
       <div>
@@ -55,9 +55,12 @@ img {
   word-break: break-word;
 }
 
-.log-details > div:first-child {
-  font-size: 30px;
-  font-weight: bold;
+.log-details > h1::before {
+  content: none;
+}
+
+.log-details > p {
+  padding: unset;
 }
 
 .log-controls {
