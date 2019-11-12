@@ -62,7 +62,7 @@ export default {
       if (h5pVideo) {
         h5pVideo.pause()
       }
-      this.$emit('close')
+      this.$emit("close")
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
