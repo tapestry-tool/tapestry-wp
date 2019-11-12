@@ -25,6 +25,9 @@ export default {
       return htmlText
     },
   },
+  mounted() {
+    this.$emit("complete")
+  },
 }
 </script>
 
