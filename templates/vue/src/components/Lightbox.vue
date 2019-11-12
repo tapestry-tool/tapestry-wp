@@ -206,8 +206,8 @@ export default {
         ...dimensions,
       }
     },
-    h5pMediaLoaded() {
-      this.$emit('h5p-media-loaded')
+    h5pMediaLoaded(event) {
+      this.$emit('h5p-media-loaded', { loadedH5pId: event.loadedH5pId })
     },
   },
 }

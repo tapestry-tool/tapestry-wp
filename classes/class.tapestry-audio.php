@@ -16,10 +16,11 @@ class TapestryAudio implements ITapestryAudio
      * 
      * @return  NULL
      */
-    public function __construct($tapestryPostId = 0, $nodeMetaId = 0)
+    public function __construct($tapestryPostId = 0, $nodeMetaId = 0, $h5pId = 0)
     {
         $this->tapestryPostId = (int) $tapestryPostId;
         $this->nodeMetaId = (int) $nodeMetaId;
+        $this->h5pId = (int) $h5pId;
         $this->userId = wp_get_current_user()->ID;
     }
 
@@ -38,8 +39,12 @@ class TapestryAudio implements ITapestryAudio
             mkdir(__DIR__ . '/../h5p_uploads/' . $this->userId);
         }
 
-        $filename = md5('nodeMetaId-' . $this->nodeMetaId . '-'
-            . 'tapestryPostId-' . $this->tapestryPostId) . '.wav';
+        $filename = md5('tapestryPostId-' . $this->tapestryPostId . '-'
+            . 'nodeMetaId-' . $this->nodeMetaId . '-'
+            . 'h5pId-' . $this->h5pId . '-'
+            . 'userId-' . $this->userId)
+            . '.wav';
+
         $decodedAudio = base64_decode($audio);
 
         if (file_put_contents(__DIR__ . '/../h5p_uploads/' . $this->userId . '/' . $filename, $decodedAudio)) {
@@ -57,8 +62,11 @@ class TapestryAudio implements ITapestryAudio
      */
     public function get()
     {
-        $filename = md5('nodeMetaId-' . $this->nodeMetaId . '-'
-            . 'tapestryPostId-' . $this->tapestryPostId) . '.wav';
+        $filename = md5('tapestryPostId-' . $this->tapestryPostId . '-'
+            . 'nodeMetaId-' . $this->nodeMetaId . '-'
+            . 'h5pId-' . $this->h5pId . '-'
+            . 'userId-' . $this->userId)
+            . '.wav';
         $audio = file_get_contents(__DIR__ . '/../h5p_uploads/' . $this->userId . '/' . $filename);
         $encodedAudio = base64_encode($audio);
 

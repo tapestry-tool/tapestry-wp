@@ -123,8 +123,8 @@ export default class {
    */
   async uploadAudioToServer(nodeMetaId, audio) {
     try {
-      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio`;
-      const response = await axios.post(url, audio);
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${audio.h5pId}`;
+      const response = await axios.post(url, audio.blob);
       return response;
     } catch (e) {
       throw e;
@@ -138,9 +138,9 @@ export default class {
    * 
    * @return  {String}    audio       base64 data string
    */
-  async getH5PAudioFromServer(nodeMetaId) {
+  async getH5PAudioFromServer(nodeMetaId, h5pId) {
     try {
-      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio`;
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${h5pId}`;
       const response = await axios.get(url);
       return response.data;
     } catch (e) {

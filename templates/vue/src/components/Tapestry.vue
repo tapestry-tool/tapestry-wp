@@ -62,6 +62,7 @@ export default {
   },
   data() {
     return {
+      loadedH5pId: 0,
       recordedNodeIds: [],
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
@@ -164,26 +165,31 @@ export default {
         id: null,
       }
     },
-    async h5pMediaLoaded() {
+    async h5pMediaLoaded(event) {
+      this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
-      if (selectedNodeId && this.recordedNodeIds.includes(selectedNodeId)) {
-        await this.loadH5PAudio(selectedNodeId)
+      if (selectedNodeId && this.loadedH5pId && this.recordedNodeIds.includes(selectedNodeId)) {
+        await this.loadH5PAudio(selectedNodeId, this.loadedH5pId)
       }
     },
     async saveH5PAudioToServer(event) {
       const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
       if (encodedH5PAudio && this.userLoggedIn) {
         try {
-          await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, encodedH5PAudio)
+          const audio = {
+            blob: encodedH5PAudio,
+            h5pId: this.loadedH5pId
+          }
+          await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
           this.recordedNodeIds.push(this.selectedNode.id)
         } catch (e) {
           console.error(e)
         }
       }
     },
-    async loadH5PAudio(nodeMetaId) {
+    async loadH5PAudio(nodeMetaId, loadedH5pId) {
       try {
-        const audio = await this.TapestryAPI.getH5PAudioFromServer(nodeMetaId)
+        const audio = await this.TapestryAPI.getH5PAudioFromServer(nodeMetaId, loadedH5pId)
         const h5pAudioRecorder = document.getElementById('h5p')
         if (h5pAudioRecorder) {
           dispatchEvent(new CustomEvent('tapestry-get-h5p-audio', {

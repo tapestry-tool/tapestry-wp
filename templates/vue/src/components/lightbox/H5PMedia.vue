@@ -36,10 +36,10 @@ export default {
   },
   methods: {
     handleLoad() {
-      this.$emit('h5p-media-loaded')
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
+
+      this.$emit('h5p-media-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video

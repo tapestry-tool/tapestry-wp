@@ -180,7 +180,7 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'GET_USER_H5P_AUDIO' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<h5pId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_GET_METHOD,
             'callback'              => 'getUserH5PAudio',
@@ -194,7 +194,7 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'UPDATE_USER_H5P_AUDIO' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<h5pId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PAudio',
@@ -870,6 +870,7 @@ function updateUserH5PAudio($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
+    $h5pId = $request['h5pId'];
     $audio = $request->get_body();
 
     try {
@@ -879,6 +880,9 @@ function updateUserH5PAudio($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
+        if (!is_numeric($h5pId)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
         if (!is_string($audio) || empty($audio)) {
             throw new TapestryError('INVALID_AUDIO');
         }
@@ -886,7 +890,7 @@ function updateUserH5PAudio($request)
             throw new TapestryError('INVALID_USER_ID');
         }
 
-        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId);
+        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $h5pId);
         return $TapestryAudio->save($audio);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -904,6 +908,7 @@ function getUserH5PAudio($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
+    $h5pId = $request['h5pId'];
 
     try {
         if (!TapestryHelpers::isValidTapestry($postId)) {
@@ -912,11 +917,14 @@ function getUserH5PAudio($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
+        if (!is_numeric($h5pId)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
         if (wp_get_current_user()->ID == 0) {
             throw new TapestryError('INVALID_USER_ID');
         }
 
-        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId);
+        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $h5pId);
         return $TapestryAudio->get();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
