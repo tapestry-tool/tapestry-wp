@@ -3,15 +3,15 @@
     :class="[
       'end-screen',
       {
-        'end-screen--hide': !showEndScreen,
+        'end-screen--hide': !show,
       },
     ]"
   >
-    <button class="end-screen-button" @click="rewatch">
+    <button class="end-screen-button" @click="$emit('rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p class="end-screen-button-text">Rewatch</p>
     </button>
-    <button class="end-screen-button" @click="close">
+    <button class="end-screen-button" @click="$emit('close')">
       <i class="far fa-times-circle fa-4x"></i>
       <p class="end-screen-button-text">Close</p>
     </button>
@@ -21,6 +21,13 @@
 <script>
 export default {
   name: "end-screen",
+  props: {
+    show: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
+  }
 }
 </script>
 
