@@ -157,11 +157,11 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'unlockByNodeId'
         ]
     ],
-    'UPDATE_TAPESTRY_USER_SKIPPED'  => (object) [
-        'ROUTE'     => 'users/skipped',
+    'UPDATE_TAPESTRY_USER_COMPLETED'  => (object) [
+        'ROUTE'     => 'users/completed',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'allowSkipByNodeId'
+            'callback'              => 'completeByNodeId'
         ]
     ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
@@ -758,21 +758,21 @@ function unlockByNodeId($request)
 }
 
 /**
- * Set skippable status of a single node for the current user to true by passing in node id and post id
- * Example: /wp-json/tapestry-tool/v1/users/skip?post_id=44&node_id=1
+ * Set node as completed for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1
  * 
  * @param Object $request HTTP request
  * 
  * @return null
  */
-function allowSkipByNodeId($request)
+function completeByNodeId($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->allowSkip();
+        $userProgress->complete();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
