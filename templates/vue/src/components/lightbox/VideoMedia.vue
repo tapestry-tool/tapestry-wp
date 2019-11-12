@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <end-screen v-if="showEndScreen" />
+    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <video
       ref="video"
       class="video"
