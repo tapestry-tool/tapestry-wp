@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <end-screen v-if="showEndScreen" />
+    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <iframe
       id="h5p"
       ref="h5p"
@@ -48,6 +48,22 @@ export default {
     }
   },
   methods: {
+    rewatch() {
+      this.showEndScreen = false
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      h5pVideo.seek(0)
+      h5pVideo.play()
+    },
+    close() {
+      this.showEndScreen = false
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      if (h5pVideo) {
+        h5pVideo.pause()
+      }
+      this.$emit('close')
+    },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
@@ -101,12 +117,13 @@ export default {
                   h5pVideo.setQuality(settings.quality)
                   h5pVideo.setPlaybackRate(settings.playbackRate)
                 }
-                // Play the video at the last watched time (or at the beginning if the user has not watched yet or if the user had already viewed whole video)
+
                 const viewedAmount = mediaProgress * videoDuration
                 if (viewedAmount > 0 && viewedAmount !== videoDuration) {
                   h5pVideo.seek(viewedAmount)
                 } else {
-                  h5pVideo.seek(0)
+                  h5pVideo.seek(videoDuration)
+                  this.showEndScreen = true
                 }
                 seeked = true
               }
