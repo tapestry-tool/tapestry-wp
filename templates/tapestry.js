@@ -206,7 +206,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", quizzes: [] })
+            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quizzes: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -669,6 +669,11 @@ function tapestryTool(config){
 
     // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+ 
         if (!d3.event.active) simulation.alphaTarget(0.2).restart();
 
         nodeBeforeDrag = d;
@@ -685,6 +690,11 @@ function tapestryTool(config){
     }
 
     function dragged(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
         if (canEditNode(d)) {
             d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
             d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
@@ -695,6 +705,11 @@ function tapestryTool(config){
     }
 
     function dragended(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
         if (!d3.event.active) simulation.alphaTarget(0);
 
         d[xORfx] = d.x;
@@ -1893,7 +1908,6 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var skippable = progressObj[id].skippable;
         
             var index = findNodeIndex(id);
             
@@ -1902,7 +1916,6 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].skippable = skippable;
             }
         }
     

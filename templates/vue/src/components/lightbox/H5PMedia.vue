@@ -1,19 +1,29 @@
 <template>
-  <iframe
-    id="h5p"
-    ref="h5p"
-    frameborder="0"
-    allowfullscreen="allowfullscreen"
-    :src="node.typeData.mediaURL"
-    :width="width"
-    :height="height"
-    @load="handleLoad"
-  ></iframe>
+  <div class="container">
+    <end-screen v-if="showEndScreen" />
+    <iframe
+      id="h5p"
+      ref="h5p"
+      frameborder="0"
+      allowfullscreen="allowfullscreen"
+      :src="node.typeData.mediaURL"
+      :width="width"
+      :height="height"
+      @load="handleLoad"
+    ></iframe>
+  </div>
 </template>
 
 <script>
+import EndScreen from "./EndScreen"
+
+const ALLOW_SKIP_THRESHOLD = 0.95
+
 export default {
   name: "h5p-media",
+  components: {
+    EndScreen,
+  },
   props: {
     node: {
       type: Object,
@@ -31,6 +41,11 @@ export default {
       type: Number,
       required: true,
     },
+  },
+  data() {
+    return {
+      showEndScreen: false,
+    }
   },
   methods: {
     handleLoad() {
@@ -54,8 +69,18 @@ export default {
                   h5pVideo.getCurrentTime() > 0
                 ) {
                   currentPlayedTime = h5pVideo.getCurrentTime()
-                  this.$emit("timeupdate", "h5p", currentPlayedTime / videoDuration)
+                  const amountViewed = currentPlayedTime / videoDuration
+
+                  this.$emit("timeupdate", "h5p", amountViewed)
                   thisTapestryTool.updateProgressBars()
+
+                  if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+                    this.$emit("complete")
+                  }
+
+                  if (amountViewed >= 1) {
+                    this.showEndScreen = true
+                  }
                 } else {
                   clearInterval(updateVideoInterval)
                 }
@@ -144,4 +169,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+</style>
