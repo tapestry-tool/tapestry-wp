@@ -277,7 +277,8 @@ class TapestryNode implements ITapestryNode
             'post_id'       => $nodePostId,
             'title'         => $node->title,
             'permissions'   => $node->permissions,
-            'coordinates'   => $node->coordinates
+            'coordinates'   => $node->coordinates,
+            'quizzes'       => $node->quizzes
         );
     }
 

@@ -6,7 +6,7 @@
     <div v-if="canAddQuiz" class="quizzes">
       <b-card
         v-for="(quiz, index) in quizzes"
-        :key="index"
+        :key="quiz.id"
         bg-variant="light"
         class="mb-3"
       >
@@ -20,7 +20,7 @@
               class="ml-auto"
               size="sm"
               variant="outline-danger"
-              @click="deleteQuiz(index)"
+              @click="deleteQuiz(quiz.id)"
             >
               Delete
             </b-button>
@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import Helpers from "../../utils/Helpers"
+
 const defaultQuiz = {
   contentId: "",
   icon: "microphone",
@@ -75,10 +77,10 @@ export default {
   },
   methods: {
     addQuiz() {
-      this.quizzes = [...this.quizzes, { ...defaultQuiz }]
+      this.quizzes = [...this.quizzes, { ...defaultQuiz, id: Helpers.createUUID() }]
     },
-    deleteQuiz(index) {
-      this.quizzes = this.quizzes.filter((_, idx) => idx !== index)
+    deleteQuiz(id) {
+      this.quizzes = this.quizzes.filter((quiz) => quiz.id !== id)
     },
     getGroupTitle(quiz, index) {
       return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`

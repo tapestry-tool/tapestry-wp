@@ -166,9 +166,32 @@ class TapestryUserProgress implements ITapestryUserProgress
             } else {
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
+
+            $quizzes = $this->_getQuizProgress($nodeId, $nodeMetadata);
+            $progress->$nodeId->quizzes = $quizzes;
         }
 
         return json_encode($progress);
+    }
+
+    private function _getQuizProgress($nodeId, $nodeMetadata)
+    {
+        $quizzes = array();
+        $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quizzes_' . $nodeId, true);
+
+        foreach($nodeMetadata->quizzes as $quiz) {
+            if (isset($quiz->id)) {
+                $quizzes[$quiz->id] = false;
+            }
+        }
+
+        if (isset($completed_values) && is_array($completed_values)) {
+            foreach($completed_values as $id => $completed) {
+                $quizzes[$id] = $completed;
+            }
+        }
+
+        return count($quizzes) > 0 ? $quizzes : (object) $quizzes;
     }
 
     private function _updateUserH5PSettings($h5pSettingsData)

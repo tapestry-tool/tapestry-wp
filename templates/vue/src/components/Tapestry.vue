@@ -79,6 +79,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
+        quizzes: []
       },
       lightbox: {
         isOpen: false,
@@ -187,6 +188,7 @@ export default {
           authenticated: ["read"],
         },
         description: "",
+        quizzes: []
       }
     },
     addRootNode() {
