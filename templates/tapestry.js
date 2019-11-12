@@ -1069,13 +1069,23 @@ function tapestryTool(config){
                 }
                 else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    dispatchEvent(
-                        new CustomEvent(
-                            'open-lightbox', 
-                            { detail: thisBtn.dataset.id }
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
                         )
-                    );
-                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
                 }
             });
     }

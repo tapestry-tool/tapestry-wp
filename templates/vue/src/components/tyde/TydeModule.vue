@@ -1,20 +1,24 @@
 <template>
   <div :id="`module-${nodeId}`" class="wrapper">
-    <p>
-      <code>{{ node.title }}</code>
-    </p>
-    <tyde-stage :node-id="activeStage" @next="next"></tyde-stage>
+    <tyde-stage
+      v-show="!isLightboxOpen"
+      :node-id="activeStage"
+      @next="next"
+    ></tyde-stage>
+    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex"
 import TydeStage from "./TydeStage"
+import Lightbox from "../Lightbox"
 
 export default {
   name: "tyde-module",
   components: {
     TydeStage,
+    Lightbox,
   },
   props: {
     nodeId: {
@@ -25,6 +29,8 @@ export default {
   data() {
     return {
       activeStageIndex: 0,
+      isLightboxOpen: false,
+      lightboxId: null,
     }
   },
   computed: {
@@ -39,9 +45,28 @@ export default {
       return this.stages[this.activeStageIndex]
     },
   },
+  watch: {
+    activeStage(newStage) {
+      if (this.isLightboxOpen) {
+        this.closeLightbox()
+      }
+      this.openLightbox(newStage)
+    },
+  },
+  mounted() {
+    this.openLightbox(this.activeStage)
+  },
   methods: {
     next() {
       this.activeStageIndex++
+    },
+    openLightbox(id) {
+      this.isLightboxOpen = true
+      this.lightboxId = id
+    },
+    closeLightbox() {
+      this.isLightboxOpen = false
+      this.lightboxId = null
     },
   },
 }

@@ -2,7 +2,7 @@
   <div id="tyde">
     <tapestry />
     <!-- Node id defaults to original root node, i.e. first node that was added -->
-    <tyde-module v-if="showModule" :node-id="originalRootNode" />
+    <tyde-module v-if="showModule" :node-id="moduleId" />
   </div>
 </template>
 
@@ -19,19 +19,13 @@ export default {
   data() {
     return {
       showModule: false,
+      moduleId: null,
     }
   },
-  computed: {
-    originalRootNode() {
-      return this.$store.state.nodes[0].id
-    },
-  },
   mounted() {
-    // temp for dev purposes
-    window.addEventListener("keydown", evt => {
-      if (evt.code === "Escape") {
-        this.showModule = !this.showModule
-      }
+    window.addEventListener("start-module", evt => {
+      this.showModule = !this.showModule
+      this.moduleId = evt.detail
     })
   },
 }
