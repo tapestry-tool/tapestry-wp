@@ -1,5 +1,5 @@
 <template>
-  <div id="lightbox">
+  <div id="lightbox" :class="{ 'full-screen': node.fullscreen}" v-bind:format="node.mediaFormat">
     <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
@@ -276,4 +276,35 @@ export default {
   opacity: 0;
   transform: translateY(32px);
 }
+
+#lightbox.full-screen #spotlight-content {
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0;
+}
+#lightbox[format=h5p].full-screen #spotlight-content {
+    left: 5vw !important;
+    width: 90vw !important;
+    height: 100vh !important;
+}
+
+#lightbox[format=mp4].full-screen #spotlight-content video {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+}
+
+#lightbox.full-screen #lightbox-close-wrapper {
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 100;
+}
+
 </style>

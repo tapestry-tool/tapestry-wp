@@ -164,7 +164,7 @@
             </b-form-group>
             <b-form-group>
               <b-form-checkbox v-model="node.fullscreen">
-                Allow video to fill up the screen
+                Maximize video size to fit in the window
               </b-form-checkbox>
             </b-form-group>
           </div>
