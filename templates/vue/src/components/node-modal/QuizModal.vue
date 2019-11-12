@@ -67,29 +67,10 @@ export default {
   },
   data() {
     return {
-      canAddQuiz: false,
-      quizzes: [
-        {
-          contentId: "",
-          icon: "microphone",
-          title: "",
-          type: "H5P Audio Recorder",
-        },
-      ],
+      canAddQuiz: Boolean(this.node.quizzes && this.node.quizzes.length),
+      quizzes: this.node.quizzes,
       typeOptions: ["H5P Audio Recorder"],
       icons: ["microphone"],
-    }
-  },
-  mounted() {
-    const node = this.node
-    if (node.quizzes && node.quizzes.length) {
-      this.canAddQuiz = true
-      this.quizzes = node.quizzes
-    }
-  },
-  beforeDestroy() {
-    if (this.canAddQuiz) {
-      this.node.quizzes = this.quizzes
     }
   },
   methods: {
@@ -103,6 +84,16 @@ export default {
       return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
     },
   },
+  watch: {
+    canAddQuiz(isAdding) {
+      if (isAdding && !this.quizzes.length) {
+        this.addQuiz()
+      }
+    },
+    quizzes(newQuizzes) {
+      this.$set(this.node, "quizzes", newQuizzes)
+    }
+  }
 }
 </script>
 

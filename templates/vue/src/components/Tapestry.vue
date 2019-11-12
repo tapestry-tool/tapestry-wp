@@ -328,6 +328,9 @@ export default {
           case "permissions":
             newNodeEntry.permissions = fieldValue
             break
+          case "quizzes":
+            newNodeEntry.quizzes = fieldValue
+            break
           default:
             break
         }
