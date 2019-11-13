@@ -26,16 +26,18 @@
             </b-button>
           </b-row>
           <b-form-group label="Quiz Title">
-            <b-form-input v-model="quiz.title" />
+            <b-form-input v-model="quiz.text" />
           </b-form-group>
-          <b-form-group label="Quiz Type">
-            <b-form-select v-model="quiz.type" :options="typeOptions" />
-          </b-form-group>
-          <b-form-group label="Quiz Content ID">
-            <b-form-input v-model="quiz.contentId" />
-          </b-form-group>
-          <b-form-group label="Quiz Icon">
-            <b-form-select v-model="quiz.icon" :options="icons" />
+          <b-form-group label="Quiz Answer Types">
+            <b-form-group label="Textbox">
+              <b-form-input v-model="quiz.answers.textId" />
+            </b-form-group>
+            <b-form-group label="Audio">
+              <b-form-input v-model="quiz.answers.audioId" />
+            </b-form-group>
+            <b-form-group label="Checklist">
+              <b-form-input v-model="quiz.answers.checklistId" />
+            </b-form-group>
           </b-form-group>
         </b-form-group>
       </b-card>
@@ -52,11 +54,13 @@
 <script>
 import Helpers from "../../utils/Helpers"
 
-const defaultQuiz = {
-  contentId: "",
-  icon: "microphone",
-  title: "",
-  type: "H5P Audio Recorder",
+const defaultQuestion = {
+  text: "",
+  answers: {
+    textId: "",
+    audioId: "",
+    checklistId: "",
+  },
 }
 
 export default {
@@ -87,7 +91,10 @@ export default {
   },
   methods: {
     addQuiz() {
-      this.quizzes = [...this.quizzes, { ...defaultQuiz, id: Helpers.createUUID() }]
+      this.quizzes = [
+        ...this.quizzes,
+        { ...defaultQuestion, id: Helpers.createUUID() },
+      ]
     },
     deleteQuiz(id) {
       this.quizzes = this.quizzes.filter(quiz => quiz.id !== id)
