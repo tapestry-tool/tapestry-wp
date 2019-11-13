@@ -38,6 +38,11 @@ interface ITapestryUserProgress
     public function complete();
 
     /**
+     * Set the quiz with the given id to be marked as 'completed'
+     */
+    public function completeQuiz($quizId);
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param String $h5pSettingsData stores volume,

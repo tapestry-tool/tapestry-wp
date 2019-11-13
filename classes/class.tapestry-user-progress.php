@@ -89,6 +89,12 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_complete();
     }
 
+    public function completeQuiz($quizId)
+    {
+        $this->_checkUserAndPostId();
+        $this->_completeQuiz($quizId);
+    }
+
     /**
      * Update User's h5p video setting for a tapestry post
      *
@@ -135,6 +141,14 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _complete()
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
+    }
+
+    private function _completeQuiz($quizId)
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
+        $quizzes = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
+        $quizzes[$quizId] = true;
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quizzes_' . $this->nodeMetaId, $quizzes);
     }
 
     private function _getUserProgress($nodeIdArr)
