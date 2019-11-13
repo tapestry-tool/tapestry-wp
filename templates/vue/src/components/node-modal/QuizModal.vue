@@ -12,7 +12,6 @@
       >
         <b-form-group class="mb-0">
           <b-row align-v="center" class="mb-2 mx-0">
-            <i :class="`fas fa-${quiz.icon} icon-form`"></i>
             <p class="font-weight-bold p-0 m-0">
               {{ getGroupTitle(quiz, index) }}
             </p>
@@ -29,13 +28,13 @@
             <b-form-input v-model="quiz.text" />
           </b-form-group>
           <b-form-group label="Quiz Answer Types">
-            <b-form-group label="Textbox">
+            <b-form-group label="Textbox ID">
               <b-form-input v-model="quiz.answers.textId" />
             </b-form-group>
-            <b-form-group label="Audio">
+            <b-form-group label="Audio ID">
               <b-form-input v-model="quiz.answers.audioId" />
             </b-form-group>
-            <b-form-group label="Checklist">
+            <b-form-group label="Checklist ID">
               <b-form-input v-model="quiz.answers.checklistId" />
             </b-form-group>
           </b-form-group>
