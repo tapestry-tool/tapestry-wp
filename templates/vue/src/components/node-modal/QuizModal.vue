@@ -75,17 +75,6 @@ export default {
       icons: ["microphone"],
     }
   },
-  methods: {
-    addQuiz() {
-      this.quizzes = [...this.quizzes, { ...defaultQuiz, id: Helpers.createUUID() }]
-    },
-    deleteQuiz(id) {
-      this.quizzes = this.quizzes.filter((quiz) => quiz.id !== id)
-    },
-    getGroupTitle(quiz, index) {
-      return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
-    },
-  },
   watch: {
     canAddQuiz(isAdding) {
       if (isAdding && !this.quizzes.length) {
@@ -94,8 +83,19 @@ export default {
     },
     quizzes(newQuizzes) {
       this.$set(this.node, "quizzes", newQuizzes)
-    }
-  }
+    },
+  },
+  methods: {
+    addQuiz() {
+      this.quizzes = [...this.quizzes, { ...defaultQuiz, id: Helpers.createUUID() }]
+    },
+    deleteQuiz(id) {
+      this.quizzes = this.quizzes.filter(quiz => quiz.id !== id)
+    },
+    getGroupTitle(quiz, index) {
+      return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
+    },
+  },
 }
 </script>
 
