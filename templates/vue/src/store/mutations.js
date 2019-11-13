@@ -59,6 +59,12 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
+export function completeQuiz(state, quizId) {
+  const node = state.nodes[Helpers.findNodeIndex(payload.id, state)]
+  const quiz = node.quizzes.find(quiz => quiz.id === quizId)
+  quiz.completed = true
+}
+
 // links
 export function addLink(state, link) {
   state.links.push(link)

@@ -119,6 +119,12 @@ export default class {
     return response
   }
 
+  async completeQuiz(nodeId, quizId) {
+    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&quiz_id=${quizId}`
+    const response = await axios.post(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
     const response = await axios.get(url)
