@@ -193,9 +193,11 @@ class TapestryUserProgress implements ITapestryUserProgress
         $quizzes = array();
         $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quizzes_' . $nodeId, true);
 
-        foreach($nodeMetadata->quizzes as $quiz) {
-            if (isset($quiz->id)) {
-                $quizzes[$quiz->id] = false;
+        if (isset($nodeMetadata->quizzes) && is_array($nodeMetadata->quizzes)) {
+            foreach($nodeMetadata->quizzes as $quiz) {
+                if (isset($quiz->id)) {
+                    $quizzes[$quiz->id] = false;
+                }
             }
         }
 
