@@ -1,6 +1,7 @@
 <template>
   <li class="log">
-    <img :src="log.imageURL" />
+    <img v-if="log.imageURL" :src="log.imageURL" />
+    <div v-else class="thumbnail-placeholder"></div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
       <p>{{log.description}}</p>
@@ -44,7 +45,13 @@ export default {
 
 <style scoped>
 img {
-  max-width: 350px;
+  max-width: 300px;
+}
+
+.thumbnail-placeholder {
+  min-width: 300px;
+  min-height: 300px;
+  background-color: gray;
 }
 
 .log-details {
