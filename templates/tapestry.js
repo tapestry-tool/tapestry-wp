@@ -206,7 +206,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, questions: [] })
+            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -1919,10 +1919,12 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
 
                 const questions = tapestry.dataset.nodes[index].quiz;
-                Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
-                    const question = questions.find(question => question.id === questionId);
-                    question.completed = isCompleted;
-                })
+                if (quizCompletionInfo) {
+                    Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
+                        const question = questions.find(question => question.id === questionId);
+                        question.completed = isCompleted;
+                    })
+                }
             }
         }
     

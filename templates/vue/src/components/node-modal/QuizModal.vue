@@ -12,11 +12,11 @@
       >
         <b-form-group class="mb-0">
           <b-row align-v="center" class="mb-2 mx-0">
-            <p class="font-weight-bold p-0 m-0">
+            <p class="font-weight-bold p-0 m-0 question-text">
               {{ getGroupTitle(question, index) }}
             </p>
             <b-button
-              class="ml-auto"
+              class="ml-auto del-button"
               size="sm"
               variant="outline-danger"
               @click="deleteQuestion(question.id)"
@@ -41,8 +41,8 @@
         </b-form-group>
       </b-card>
     </div>
-    <b-row v-if="canAddQuiz" class="mx-0">
-      <b-button variant="primary" @click="addQuiz">
+    <b-row v-if="canAddQuestion" class="mx-0">
+      <b-button variant="primary" @click="addQuestion">
         <i class="fas fa-plus icon"></i>
         Add Question
       </b-button>
@@ -116,5 +116,13 @@ export default {
 
 .quiz {
   margin-bottom: 1em;
+}
+
+.question-text {
+  flex: 10;
+}
+
+.del-button {
+  flex: 1;
 }
 </style>
