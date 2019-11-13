@@ -9,7 +9,7 @@
       >
         {{ question.title }}
       </button>
-      <button @click="$emit('next')">Next</button>
+      <button v-if="done" @click="$emit('next')">Next</button>
     </div>
     <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>

@@ -178,6 +178,7 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress"]),
     async complete() {
       await this.completeNode(this.nodeId)
+      this.$emit("complete")
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()
