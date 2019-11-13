@@ -59,6 +59,9 @@ export default {
   methods: {
     next() {
       this.activeStageIndex++
+      if (this.activeStageIndex >= this.stages.length) {
+        this.$emit("done")
+      }
     },
     openLightbox(id) {
       this.isLightboxOpen = true

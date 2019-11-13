@@ -2,7 +2,7 @@
   <div id="tyde">
     <tapestry />
     <!-- Node id defaults to original root node, i.e. first node that was added -->
-    <tyde-module v-if="showModule" :node-id="moduleId" />
+    <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
   </div>
 </template>
 
