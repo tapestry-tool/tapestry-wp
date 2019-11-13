@@ -1,41 +1,41 @@
 <template>
   <b-tab title="Quiz">
     <b-form-group>
-      <b-form-checkbox v-model="canAddQuiz">Add Quiz</b-form-checkbox>
+      <b-form-checkbox v-model="canAddQuestion">Add Question</b-form-checkbox>
     </b-form-group>
-    <div v-if="canAddQuiz" class="quizzes">
+    <div v-if="canAddQuestion" class="quiz">
       <b-card
-        v-for="(quiz, index) in quizzes"
-        :key="quiz.id"
+        v-for="(question, index) in questions"
+        :key="question.id"
         bg-variant="light"
         class="mb-3"
       >
         <b-form-group class="mb-0">
           <b-row align-v="center" class="mb-2 mx-0">
             <p class="font-weight-bold p-0 m-0">
-              {{ getGroupTitle(quiz, index) }}
+              {{ getGroupTitle(question, index) }}
             </p>
             <b-button
               class="ml-auto"
               size="sm"
               variant="outline-danger"
-              @click="deleteQuiz(quiz.id)"
+              @click="deleteQuestion(question.id)"
             >
               Delete
             </b-button>
           </b-row>
-          <b-form-group label="Quiz Title">
-            <b-form-input v-model="quiz.text" />
+          <b-form-group label="Question Text">
+            <b-form-input v-model="question.text" />
           </b-form-group>
-          <b-form-group label="Quiz Answer Types">
+          <b-form-group label="Question Answer Types">
             <b-form-group label="Textbox ID">
-              <b-form-input v-model="quiz.answers.textId" />
+              <b-form-input v-model="question.answers.textId" />
             </b-form-group>
             <b-form-group label="Audio ID">
-              <b-form-input v-model="quiz.answers.audioId" />
+              <b-form-input v-model="question.answers.audioId" />
             </b-form-group>
             <b-form-group label="Checklist ID">
-              <b-form-input v-model="quiz.answers.checklistId" />
+              <b-form-input v-model="question.answers.checklistId" />
             </b-form-group>
           </b-form-group>
         </b-form-group>
@@ -44,7 +44,7 @@
     <b-row v-if="canAddQuiz" class="mx-0">
       <b-button variant="primary" @click="addQuiz">
         <i class="fas fa-plus icon"></i>
-        Add Quiz
+        Add Question
       </b-button>
     </b-row>
   </b-tab>
@@ -72,34 +72,34 @@ export default {
   },
   data() {
     return {
-      canAddQuiz: Boolean(this.node.quizzes && this.node.quizzes.length),
-      quizzes: this.node.quizzes,
+      canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
+      questions: this.node.quiz,
       typeOptions: ["H5P Audio Recorder"],
       icons: ["microphone"],
     }
   },
   watch: {
-    canAddQuiz(isAdding) {
-      if (isAdding && !this.quizzes.length) {
-        this.addQuiz()
+    canAddQuestion(isAdding) {
+      if (isAdding && !this.questions.length) {
+        this.addQuestion()
       }
     },
-    quizzes(newQuizzes) {
-      this.$set(this.node, "quizzes", newQuizzes)
+    questions(newQuestions) {
+      this.$set(this.node, "quiz", newQuestions)
     },
   },
   methods: {
-    addQuiz() {
-      this.quizzes = [
-        ...this.quizzes,
+    addQuestion() {
+      this.questions = [
+        ...this.questions,
         { ...defaultQuestion, id: Helpers.createUUID() },
       ]
     },
-    deleteQuiz(id) {
-      this.quizzes = this.quizzes.filter(quiz => quiz.id !== id)
+    deleteQuestion(id) {
+      this.questions = this.questions.filter(question => question.id !== id)
     },
-    getGroupTitle(quiz, index) {
-      return `Quiz #${index + 1}: ${quiz.title || "Untitled"}`
+    getGroupTitle(question, index) {
+      return `Question #${index + 1}: ${question.text || "Untitled"}`
     },
   },
 }
@@ -114,7 +114,7 @@ export default {
   margin-right: 1em;
 }
 
-.quizzes {
+.quiz {
   margin-bottom: 1em;
 }
 </style>

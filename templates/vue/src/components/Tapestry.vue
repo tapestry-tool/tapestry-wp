@@ -79,7 +79,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
-        quizzes: []
+        quiz: []
       },
       lightbox: {
         isOpen: false,
@@ -188,7 +188,7 @@ export default {
           authenticated: ["read"],
         },
         description: "",
-        quizzes: []
+        quiz: []
       }
     },
     addRootNode() {
@@ -333,8 +333,8 @@ export default {
           case "permissions":
             newNodeEntry.permissions = fieldValue
             break
-          case "quizzes":
-            newNodeEntry.quizzes = fieldValue
+          case "quiz":
+            newNodeEntry.quiz = fieldValue
             break
           default:
             break

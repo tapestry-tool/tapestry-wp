@@ -119,8 +119,8 @@ export default class {
     return response
   }
 
-  async completeQuiz(nodeId, quizId) {
-    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&quiz_id=${quizId}`
+  async completeQuestion(nodeId, questionId) {
+    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await axios.post(url)
     return response
   }

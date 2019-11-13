@@ -38,9 +38,9 @@ interface ITapestryUserProgress
     public function complete();
 
     /**
-     * Set the quiz with the given id to be marked as 'completed'
+     * Set the question with the given id to be marked as 'completed'
      */
-    public function completeQuiz($quizId);
+    public function completeQuestion($questionId);
 
     /**
      * Update User's h5p video setting for a tapestry post

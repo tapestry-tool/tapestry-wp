@@ -89,10 +89,10 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_complete();
     }
 
-    public function completeQuiz($quizId)
+    public function completeQuestion($questionId)
     {
         $this->_checkUserAndPostId();
-        $this->_completeQuiz($quizId);
+        $this->completeQuestion($questionId);
     }
 
     /**
@@ -143,12 +143,12 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
     }
 
-    private function _completeQuiz($quizId)
+    private function _completeQuestion($questionId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $quizzes = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
-        $quizzes[$quizId] = true;
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quizzes_' . $this->nodeMetaId, $quizzes);
+        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
+        $quiz[$questionId] = true;
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }
 
     private function _getUserProgress($nodeIdArr)
@@ -181,8 +181,8 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
 
-            $quizzes = $this->_getQuizProgress($nodeId, $nodeMetadata);
-            $progress->$nodeId->quizzes = $quizzes;
+            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
+            $progress->$nodeId->quiz = $quiz;
         }
 
         return json_encode($progress);
@@ -190,24 +190,24 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _getQuizProgress($nodeId, $nodeMetadata)
     {
-        $quizzes = array();
-        $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quizzes_' . $nodeId, true);
+        $quiz = array();
+        $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
 
-        if (isset($nodeMetadata->quizzes) && is_array($nodeMetadata->quizzes)) {
-            foreach($nodeMetadata->quizzes as $quiz) {
-                if (isset($quiz->id)) {
-                    $quizzes[$quiz->id] = false;
+        if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
+            foreach($nodeMetadata->quiz as $question) {
+                if (isset($question->id)) {
+                    $quiz[$question->id] = false;
                 }
             }
         }
 
         if (isset($completed_values) && is_array($completed_values)) {
             foreach($completed_values as $id => $completed) {
-                $quizzes[$id] = $completed;
+                $quiz[$id] = $completed;
             }
         }
 
-        return count($quizzes) > 0 ? $quizzes : (object) $quizzes;
+        return count($quiz) > 0 ? $quiz : (object) $quiz;
     }
 
     private function _updateUserH5PSettings($h5pSettingsData)

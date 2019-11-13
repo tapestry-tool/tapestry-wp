@@ -362,7 +362,7 @@ export default {
         { name: "hideProgress", value: this.node.hideProgress },
         { name: "hideMedia", value: this.node.hideMedia },
         { name: "skippable", value: this.node.skippable },
-        { name: "quizzes", value: this.node.quizzes || [] },
+        { name: "quiz", value: this.node.quiz || [] },
       ]
     },
     nodeImageUrl() {
