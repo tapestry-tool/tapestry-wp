@@ -1,5 +1,5 @@
 <template>
-  <div :style="nodeStyles">
+  <div class="module-container" :style="nodeStyles">
     <p>{{ node.title }}</p>
     <div>
       <button
@@ -67,4 +67,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.module-container {
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+</style>
