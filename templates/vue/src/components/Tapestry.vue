@@ -160,13 +160,12 @@ export default {
       }
     },
     closeLightbox() {
-      const { id, mediaType } = this.selectedNode
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      
       this.lightbox = {
         isOpen: false,
         id: null,
       }
+      const { id, mediaType } = this.selectedNode
+      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
     },
     async h5pMediaLoaded(event) {
       this.loadedH5pId = event.loadedH5pId

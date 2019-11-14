@@ -199,7 +199,6 @@ export default {
     },
     async updateH5pSettings(newSettings) {
       await this.$store.dispatch("updateH5pSettings", newSettings)
-      this.h5pSettings = newSettings
     },
     updateDimensions(dimensions) {
       this.dimensions = {

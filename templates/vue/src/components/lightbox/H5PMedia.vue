@@ -129,7 +129,7 @@ export default {
                 const viewedAmount = mediaProgress * videoDuration
                 if (viewedAmount > 0 && viewedAmount !== videoDuration) {
                   h5pVideo.seek(viewedAmount)
-                } else {
+                } else if (viewedAmount > 0) {
                   h5pVideo.seek(videoDuration)
                   this.showEndScreen = true
                 }
@@ -199,5 +199,6 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
+  padding: 0;
 }
 </style>
