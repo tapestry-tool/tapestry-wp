@@ -4,6 +4,7 @@
     <tyde-menu
       v-if="isMenuOpen"
       :logs="logs"
+      @audio-change="toggleAudio"
       @continue="continueTapestry"
       @return-to-map="returnToMap"
     />
@@ -13,7 +14,10 @@
 <script>
 import Tapestry from "./Tapestry"
 import TydeMenu from "./tyde/TydeMenu"
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
+
+const TYDE_BACKGROUND_AUDIO_SRC =
+  "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file
 
 export default {
   name: "tyde",
@@ -23,12 +27,12 @@ export default {
   },
   data() {
     return {
+      backgroundAudio: new Audio(TYDE_BACKGROUND_AUDIO_SRC),
       isMenuOpen: false,
-      lightbox: {},
     }
   },
   computed: {
-    ...mapGetters(["nodes"]),
+    ...mapGetters(["lightbox", "nodes"]),
     logs() {
       return this.nodes.filter(node => node.completed).map(node => {
         return {
@@ -51,15 +55,13 @@ export default {
         this.toggleMenu()
       }
     })
-    window.addEventListener("tyde-open-lightbox-video", this.saveLightbox)
-    window.addEventListener("tyde-close-lightbox", this.clearLightbox)
+    this.backgroundAudio.loop = true
   },
   beforeDestroy() {
     window.removeEventListener("keydown")
-    window.removeEventListener("tyde-open-lightbox")
-    window.removeEventListener("tyde-close-lightbox")
   },
   methods: {
+    ...mapMutations(["closeLightbox"]),
     continueTapestry() {
       const { el } = this.lightbox
       this.toggleMenu()
@@ -67,21 +69,16 @@ export default {
         el.play()
       }
     },
-    clearLightbox() {
-      this.lightbox = {}
-      console.log("Clearing", this.lightbox)
-    },
     returnToMap() {
-      const { id, type } = this.lightbox
-      if (id && type) {
-        thisTapestryTool.closeLightbox(id, type)
-      }
-      this.clearLightbox()
+      this.closeLightbox()
       this.toggleMenu()
     },
-    saveLightbox(event) {
-      this.lightbox = event.detail
-      console.log("Saving", this.lightbox)
+    toggleAudio() {
+      if (this.backgroundAudio.paused) {
+        this.backgroundAudio.play()
+      } else {
+        this.backgroundAudio.pause()
+      }
     },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen

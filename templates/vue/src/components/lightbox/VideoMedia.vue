@@ -47,7 +47,11 @@ export default {
   methods: {
     handleLoad() {
       const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", { width: videoRect.width, height: videoRect.height })
+      this.$emit("load", {
+        width: videoRect.width,
+        height: videoRect.height,
+        el: this.$refs.video,
+      })
     },
     handlePlay() {
       const { id, mediaType } = this.node
@@ -84,8 +88,8 @@ export default {
       this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
 
       if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-        this.$set(this.node, "skippable", true)
-        this.$emit("update-skippable", true)
+        this.$set(this.node, "completed", true)
+        this.$emit("complete")
       }
 
       thisTapestryTool.updateChildren(this.node.id, video)

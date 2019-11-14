@@ -79,14 +79,14 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set 'skippable' status of a Tapestry Node for this User to true
+     * Set 'completed' status of a Tapestry Node for this User to true
      * 
      * @return Null
      */
-    public function allowSkip()
+    public function complete()
     {
         $this->_checkUserAndPostId();
-        $this->_allowSkip();
+        $this->_complete();
     }
 
     /**
@@ -132,9 +132,9 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $this->nodeMetaId, true);
     }
 
-    private function _allowSkip()
+    private function _complete()
     {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $this->nodeMetaId, true);
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
     }
 
     private function _getUserProgress($nodeIdArr)
@@ -159,12 +159,12 @@ class TapestryUserProgress implements ITapestryUserProgress
             } else {
                 $progress->$nodeId->unlocked = $default_unlocked_status;
             }           
-            
-            $skippable_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_skippable_' . $nodeId, true);
-            if ($skippable_value !== null) {
-                $progress->$nodeId->skippable = $skippable_value;
+
+            $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
+            if ($completed_value !== null) {
+                $progress->$nodeId->completed = $completed_value === "1";
             } else {
-                $progress->$nodeId->skippable = isset($nodeMetadata->skippable) && $nodeMetadata->skippable;
+                $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
         }
 
