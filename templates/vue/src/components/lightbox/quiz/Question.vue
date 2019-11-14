@@ -3,8 +3,14 @@
     <div v-show="formOpened" ref="form-container"></div>
     <div v-show="!formOpened">
       <h1 class="question-title">
+        <div class="question-title-step">
+          {{ currentStep }}
+        </div>
         {{ question.text }}
-        <div class="question-title-bubble" :style="{ backgroundImage: bubbleImage }"></div>
+        <div
+          class="question-title-bubble"
+          :style="{ backgroundImage: bubbleImage }"
+        ></div>
       </h1>
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
@@ -24,9 +30,9 @@ import TapestryAPI from "@/services/TapestryAPI"
 import SpeechBubble from "../../../assets/speech-bubble-end.png"
 
 export default {
-  name: 'question',
+  name: "question",
   components: {
-    AnswerButton
+    AnswerButton,
   },
   data() {
     return {
@@ -36,8 +42,13 @@ export default {
   props: {
     question: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
+    currentStep: {
+      type: String,
+      required: false,
+      default: "1/1",
+    },
   },
   methods: {
     async openForm(id) {
@@ -63,8 +74,8 @@ export default {
   computed: {
     bubbleImage() {
       return `url(${wpData.vue_uri}/${SpeechBubble.split("dist")[1]})`
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -77,6 +88,7 @@ button {
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
+  height: 100%;
 }
 
 .question-title {
@@ -108,6 +120,21 @@ button {
   background-size: cover;
 }
 
+.question-title-step {
+  position: absolute;
+  border: 2px solid black;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  top: -16px;
+  left: -24px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
 .question-title:before {
   display: none;
 }
@@ -115,6 +142,7 @@ button {
 .question-content {
   padding-left: 30%;
   width: 100%;
+  height: 100%;
 }
 
 .question-answer-text {

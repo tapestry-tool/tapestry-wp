@@ -1,6 +1,6 @@
 <template>
   <button class="button" @click="$emit('click')">
-    <div v-if="isFaIcon" class="icon" >
+    <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
     <img v-else :src="textIcon" class="icon" />
@@ -12,12 +12,12 @@
 import TextIcon from "../../../assets/Aa.svg"
 
 export default {
-  name: 'answer-button',
+  name: "answer-button",
   props: {
     icon: {
       type: String,
       required: false,
-      default: "text"
+      default: "text",
     },
   },
   computed: {
@@ -26,8 +26,8 @@ export default {
     },
     textIcon() {
       return `${wpData.vue_uri}/${TextIcon.split("dist")[1]}`
-    }
-  }
+    },
+  },
 }
 </script>
 
