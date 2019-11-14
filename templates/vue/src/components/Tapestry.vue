@@ -136,15 +136,6 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    updateNode(node) {
-      const oldNodeIndex = this.tapestry.nodes.findIndex(
-        oldNode => oldNode.id === node.id
-      )
-      this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
-      this.tapestry.nodes[oldNodeIndex].imageURL = node.imageURL
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.reinitialize()
-    },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
