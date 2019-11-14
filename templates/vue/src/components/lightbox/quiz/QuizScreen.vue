@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-screen" :style="{ backgroundImage: `url(${backgroundImage})` }">
-    <button class="button-nav button-nav-menu">
+    <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <question
@@ -10,7 +10,7 @@
     ></question>
     <footer class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
-      <button class="button-nav" :disabled="!hasPrev">
+      <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
       </button>
       <button v-show="!formOpened" class="button-nav" :disabled="!hasNext" @click="next">
@@ -61,6 +61,12 @@ export default {
   methods: {
     next() {
       this.activeQuestionIndex++
+    },
+    prev() {
+      this.activeQuestionIndex--
+    },
+    back() {
+      this.$emit("close")
     },
   },
 }

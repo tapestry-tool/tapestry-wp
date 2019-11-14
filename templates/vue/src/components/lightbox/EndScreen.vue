@@ -1,5 +1,9 @@
 <template>
-  <quiz-screen v-if="showQuiz" :quiz="node.quiz"></quiz-screen>
+  <quiz-screen
+    v-if="showQuiz"
+    :quiz="node.quiz"
+    @close="showQuiz = false"
+  ></quiz-screen>
   <div
     v-else
     :class="[
@@ -30,22 +34,22 @@ import QuizScreen from "./quiz/QuizScreen"
 export default {
   name: "end-screen",
   components: {
-    QuizScreen
+    QuizScreen,
   },
   props: {
     node: {
       type: Object,
-      required: true
+      required: true,
     },
     show: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     return {
-      showQuiz: false
+      showQuiz: false,
     }
   },
   computed: {
@@ -55,8 +59,8 @@ export default {
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Retake Quiz" : "Take Quiz"
-    }
-  }
+    },
+  },
 }
 </script>
 
