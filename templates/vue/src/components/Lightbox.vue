@@ -30,6 +30,7 @@
             @load="updateDimensions"
             @complete="complete"
             @timeupdate="updateProgress"
+            @close="$emit('close')"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -47,6 +48,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
+            @h5p-media-loaded="h5pMediaLoaded"
           />
         </div>
       </div>
@@ -197,13 +199,15 @@ export default {
     },
     async updateH5pSettings(newSettings) {
       await this.$store.dispatch("updateH5pSettings", newSettings)
-      this.h5pSettings = newSettings
     },
     updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
         ...dimensions,
       }
+    },
+    h5pMediaLoaded(event) {
+      this.$emit('h5p-media-loaded', { loadedH5pId: event.loadedH5pId })
     },
   },
 }
@@ -245,6 +249,7 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
+  height: 100%;
 }
 
 .media-wrapper-embed {
