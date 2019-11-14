@@ -48,6 +48,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
+            @h5p-media-loaded="h5pMediaLoaded"
           />
         </div>
       </div>
@@ -205,6 +206,9 @@ export default {
         ...this.dimensions,
         ...dimensions,
       }
+    },
+    h5pMediaLoaded(event) {
+      this.$emit('h5p-media-loaded', { loadedH5pId: event.loadedH5pId })
     },
   },
 }
