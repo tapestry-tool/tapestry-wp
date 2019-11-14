@@ -44,10 +44,18 @@ export default {
 </script>
 
 <style>
+:root {
+  --tyde-blue: #1074bb;
+  --tyde-orange: #f79621;
+  --tyde-orange-light: #f9b664;
+}
+
 .quiz-screen {
   display: flex;
   background-size: cover;
   flex-direction: column;
+  padding: 24px;
+  padding-left: 25%;
   position: absolute;
   left: 0;
   top: 0;
