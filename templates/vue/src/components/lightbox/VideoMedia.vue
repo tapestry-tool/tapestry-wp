@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <video
       ref="video"
       class="video"

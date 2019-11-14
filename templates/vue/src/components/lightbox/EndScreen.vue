@@ -1,5 +1,7 @@
 <template>
+  <quiz-screen v-if="showQuiz" :quiz="node.quiz"></quiz-screen>
   <div
+    v-else
     :class="[
       'end-screen',
       {
@@ -7,6 +9,10 @@
       },
     ]"
   >
+    <button v-if="showQuizButton" class="end-screen-button" @click="showQuiz = true">
+      <i class="fas fa-question-circle fa-4x"></i>
+      <p class="end-screen-button-text">{{ buttonText }}</p>
+    </button>
     <button class="end-screen-button" @click="$emit('rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p class="end-screen-button-text">Rewatch</p>
@@ -19,13 +25,36 @@
 </template>
 
 <script>
+import QuizScreen from "./quiz/QuizScreen"
+
 export default {
   name: "end-screen",
+  components: {
+    QuizScreen
+  },
   props: {
+    node: {
+      type: Object,
+      required: true
+    },
     show: {
       type: Boolean,
       required: false,
       default: true
+    }
+  },
+  data() {
+    return {
+      showQuiz: false
+    }
+  },
+  computed: {
+    showQuizButton() {
+      return Boolean(this.node.quiz && this.node.quiz.length)
+    },
+    buttonText() {
+      const allDone = this.node.quiz.every(question => question.completed)
+      return allDone ? "Retake Quiz" : "Take Quiz"
     }
   }
 }
