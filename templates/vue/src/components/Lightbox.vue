@@ -27,7 +27,7 @@
           <video-media
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
-            @load="updateDimensions"
+            @load="handleLoad"
             @complete="complete"
             @timeupdate="updateProgress"
           />
