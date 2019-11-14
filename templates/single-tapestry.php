@@ -3,6 +3,40 @@
 /*
  Template Name: Tapestry Page Template
  */
+/**
+ * Register Script with Nonce
+ * 
+ * @return Object null
+ */
+function addNonceToScript()
+{
+    $params = array(
+        'nonce'  => wp_create_nonce('wp_rest'),
+        'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID())
+    );
+
+    wp_register_script(
+        'wp_tapestry_script',
+        plugin_dir_url(__FILE__) . 'tapestry.js',
+        array('jquery'),
+        null,
+        true
+    );
+    wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
+    wp_enqueue_script('wp_tapestry_script');
+
+    wp_add_inline_script( 'wp_tapestry_script', "
+        var thisTapestryTool = new tapestryTool({
+            'containerId': 'tapestry',
+            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+            'wpUserId': '". apply_filters('determine_current_user', false) ."',
+            'wpPostId': '". get_the_ID() ."',
+            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
+            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
+        });
+    " );
+}
+add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 function enqueue_vue_app_build()
 {
@@ -39,40 +73,6 @@ function enqueue_vue_app_build()
     wp_enqueue_script('tapestry_d3_vue');
 }
 add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
-
-/**
- * Register Script with Nonce
- * 
- * @return Object null
- */
-function addNonceToScript()
-{
-    $params = array(
-        'nonce'  => wp_create_nonce('wp_rest')
-    );
-
-    wp_register_script(
-        'wp_tapestry_script',
-        plugin_dir_url(__FILE__) . 'tapestry.js',
-        array('jquery'),
-        null,
-        true
-    );
-    wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
-    wp_enqueue_script('wp_tapestry_script');
-
-    wp_add_inline_script( 'wp_tapestry_script', "
-        var thisTapestryTool = new tapestryTool({
-            'containerId': 'tapestry',
-            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
-            'wpUserId': '". apply_filters('determine_current_user', false) ."',
-            'wpPostId': '". get_the_ID() ."',
-            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
-            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
-        });
-    " );
-}
-add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 get_header(); ?>
 

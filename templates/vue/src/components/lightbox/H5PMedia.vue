@@ -12,6 +12,8 @@
 </template>
 
 <script>
+const ALLOW_SKIP_THRESHOLD = 0.95
+
 export default {
   name: "h5p-media",
   props: {
@@ -56,8 +58,14 @@ export default {
                   h5pVideo.getCurrentTime() > 0
                 ) {
                   currentPlayedTime = h5pVideo.getCurrentTime()
-                  this.$emit("timeupdate", "h5p", currentPlayedTime / videoDuration)
+                  const amountViewed = currentPlayedTime / videoDuration
+
+                  this.$emit("timeupdate", "h5p", amountViewed)
                   thisTapestryTool.updateProgressBars()
+
+                  if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+                    this.$emit("complete")
+                  }
                 } else {
                   clearInterval(updateVideoInterval)
                 }

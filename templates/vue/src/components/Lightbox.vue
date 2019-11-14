@@ -1,6 +1,6 @@
 <template>
   <div id="lightbox">
-    <div v-if="skippable" id="spotlight-overlay" @click="$emit('close')"></div>
+    <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -8,7 +8,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button v-if="skippable" id="lightbox-close-wrapper" @click="$emit('close')">
+        <button v-if="canSkip" id="lightbox-close-wrapper" @click="$emit('close')">
           <div class="lightbox-close">
             <i class="fa fa-times"></i>
           </div>
@@ -19,12 +19,16 @@
             { 'media-wrapper-embed': node.mediaFormat === 'embed' },
           ]"
         >
-          <text-media v-if="node.mediaType === 'text'" :node="node" />
+          <text-media
+            v-if="node.mediaType === 'text'"
+            :node="node"
+            @complete="complete"
+          />
           <video-media
             v-if="node.mediaFormat === 'mp4'"
             :node="node"
-            @load="handleLoad"
-            @update-skippable="updateSkippable"
+            @load="updateDimensions"
+            @complete="complete"
             @timeupdate="updateProgress"
           />
           <external-media
@@ -32,6 +36,7 @@
             :node="node"
             :dimensions="dimensions"
             @mounted="updateDimensions"
+            @complete="complete"
           />
           <h5p-media
             v-if="node.mediaFormat === 'h5p'"
@@ -42,6 +47,7 @@
             @load="handleLoad"
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
+            @complete="complete"
           />
         </div>
       </div>
@@ -84,7 +90,6 @@ export default {
         top: 100,
         left: 50,
       },
-      skippable: false,
       timeSinceLastSaved: new Date(),
     }
   },
@@ -93,6 +98,9 @@ export default {
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
+    },
+    canSkip() {
+      return this.node.completed || this.node.skippable !== false
     },
     lightboxContentStyles() {
       return {
@@ -151,7 +159,6 @@ export default {
     },
   },
   async mounted() {
-    this.skippable = this.node.skippable
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -170,17 +177,15 @@ export default {
   },
   methods: {
     ...mapMutations(["setLightboxEl"]),
-    ...mapActions(["updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     handleLoad({ width, height, el }) {
       if (width && height) {
         this.updateDimensions({ width, height })
       }
       this.setLightboxEl(el)
     },
-    async updateSkippable() {
-      // TODO: Change this to an action
-      await this.tapestryApiClient.updateSkippable(this.nodeId)
-      this.skippable = true
+    async complete() {
+      await this.completeNode(this.nodeId)
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()

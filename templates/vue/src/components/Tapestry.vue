@@ -20,7 +20,7 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal />
+    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
       The requested tapestry is empty.
@@ -112,8 +112,11 @@ export default {
           return ["public", "authenticated"]
       }
     },
+    wpCanEditTapestry: function() {
+      return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
   },
-  async mounted() {
+  mounted() {
     // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
