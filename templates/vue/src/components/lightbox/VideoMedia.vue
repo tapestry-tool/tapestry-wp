@@ -11,7 +11,7 @@
       class="video"
       controls
       autoplay
-      @loadedmetadata="handleLoad"
+      @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"
       @timeupdate="updateVideoProgress"
