@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="question">
     <h1>{{ question.text }}</h1>
     <p>I would like to answer with:</p>
     <div>
@@ -7,9 +7,6 @@
       <button>Audio</button>
       <button>Checklist</button>
     </div>
-    <footer>
-      <button @click="$emit('next')">Next</button>
-    </footer>
   </div>
 </template>
 
@@ -24,3 +21,6 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+</style>

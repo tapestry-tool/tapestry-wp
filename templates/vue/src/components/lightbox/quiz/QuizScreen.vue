@@ -1,11 +1,15 @@
 <template>
-  <div class="quiz-screen">
-    <question :question="activeQuestion" @next="next"></question>
+  <div class="quiz-screen" :style="{ backgroundImage: `url(${backgroundImage})` }">
+    <question :question="activeQuestion"></question>
+    <footer>
+      <button @click="next">Next</button>
+    </footer>
   </div>
 </template>
 
 <script>
 import Question from "./Question"
+import BackgroundImg from "../../../assets/11-18-QuestionScreen.png";
 
 export default {
   name: 'quiz-screen',
@@ -14,7 +18,7 @@ export default {
   },
   props: {
     quiz: {
-      type: Object,
+      type: Array,
       required: true
     }
   },
@@ -26,6 +30,9 @@ export default {
   computed: {
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
+    },
+    backgroundImage() {
+      return `${wpData.vue_uri}/${BackgroundImg.split("dist")[1]}`
     }
   },
   methods: {
@@ -39,14 +46,13 @@ export default {
 <style>
 .quiz-screen {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  background-size: cover;
+  flex-direction: column;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 1);
   color: black;
   z-index: 10;
 }
