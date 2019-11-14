@@ -79,6 +79,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
+        skippable: true
       },
     }
   },

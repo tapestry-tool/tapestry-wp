@@ -957,7 +957,7 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (d.imageURL.length)
+                if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
             });
@@ -1879,7 +1879,7 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var skippable = progressObj[id].skippable;
+            var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
             
@@ -1888,7 +1888,7 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].skippable = skippable;
+                tapestry.dataset.nodes[index].completed = completed;
             }
         }
     
