@@ -15,9 +15,16 @@
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
-          <answer-button @click="openForm(question.answers.textId)">text</answer-button>
+          <answer-button @click="openForm(question.answers.textId)">
+            text
+          </answer-button>
           <answer-button icon="microphone">audio</answer-button>
-          <answer-button @click="openForm(question.answers.checklistId)" icon="tasks">checklist</answer-button>
+          <answer-button
+            icon="tasks"
+            @click="openForm(question.answers.checklistId)"
+          >
+            checklist
+          </answer-button>
         </div>
       </div>
     </div>
@@ -26,18 +33,13 @@
 
 <script>
 import AnswerButton from "./AnswerButton"
-import TapestryAPI from "@/services/TapestryAPI"
+import TapestryAPI from "../../../services/TapestryAPI"
 import SpeechBubble from "../../../assets/speech-bubble-end.png"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-  },
-  data() {
-    return {
-      formOpened: false
-    }
   },
   props: {
     question: {
@@ -50,30 +52,35 @@ export default {
       default: "1/1",
     },
   },
-  methods: {
-    async openForm(id) {
-      if (!id) {
-        return;
-      }
-      const TapestryApi = new TapestryAPI(wpPostId)
-      try {
-        const response = await TapestryApi.getGravityForm(id)
-        if (response) {
-          const gravityForm = document.createElement('div')
-          gravityForm.innerHTML = response.data
-
-          this.$refs['form-container'].appendChild(gravityForm)
-          this.formOpened = true
-          this.$emit('form-opened')
-        }
-      } catch (e) {
-        console.error(e)
-      }
+  data() {
+    return {
+      formOpened: false,
     }
   },
   computed: {
     bubbleImage() {
       return `url(${wpData.vue_uri}/${SpeechBubble.split("dist")[1]})`
+    },
+  },
+  methods: {
+    async openForm(id) {
+      if (!id) {
+        return
+      }
+      const TapestryApi = new TapestryAPI(wpPostId)
+      try {
+        const response = await TapestryApi.getGravityForm(id)
+        if (response) {
+          const gravityForm = document.createElement("div")
+          gravityForm.innerHTML = response.data
+
+          this.$refs["form-container"].appendChild(gravityForm)
+          this.formOpened = true
+          this.$emit("form-opened")
+        }
+      } catch (e) {
+        console.error(e)
+      }
     },
   },
 }

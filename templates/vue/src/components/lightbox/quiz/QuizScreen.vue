@@ -13,7 +13,12 @@
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button v-show="!formOpened" class="button-nav" :disabled="!hasNext" @click="next">
+      <button
+        v-show="!formOpened"
+        class="button-nav"
+        :disabled="!hasNext"
+        @click="next"
+      >
         <i class="fas fa-arrow-right"></i>
       </button>
     </footer>
@@ -38,7 +43,7 @@ export default {
   data() {
     return {
       activeQuestionIndex: 0,
-      formOpened: false
+      formOpened: false,
     }
   },
   computed: {
