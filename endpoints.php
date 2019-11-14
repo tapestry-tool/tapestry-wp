@@ -150,7 +150,7 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
-    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object)[
+    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object) [
         'ROUTE'     => 'users/unlocked',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
@@ -881,10 +881,11 @@ function getUserProgressByPostId($request)
  * 
  * @return Object $response HTTP response
  */
-function getGravityForm($request){
-	$formId = isset( $request['formId'] ) ? absint( $request['formId'] ) : 0;
-	// Render an AJAX-enabled form.
-	// https://www.gravityhelp.com/documentation/article/embedding-a-form/#function-call
-	gravity_form( $formId,true, false, false, false, true );
-	die();
+function getGravityForm($request)
+{
+    $formId = isset($request['formId']) ? absint($request['formId']) : 0;
+    // Render an AJAX-enabled form.
+    // https://www.gravityhelp.com/documentation/article/embedding-a-form/#function-call
+    gravity_form($formId, true, false, false, false, true);
+    die();
 }
