@@ -37,6 +37,14 @@ h2 {
   font-weight: normal;
 }
 
+#app h1::before {
+  content: none;
+}
+
+#app p {
+  padding: 0;
+}
+
 ul {
   list-style-type: none;
   padding: 0;

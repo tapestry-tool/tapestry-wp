@@ -125,6 +125,12 @@ export default class {
     return response
   }
 
+  async getGravityForm(formId) {
+    const url = `${apiUrl}/gravity-forms/${formId}`
+    const response = await axios.get(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
     const response = await axios.get(url)
