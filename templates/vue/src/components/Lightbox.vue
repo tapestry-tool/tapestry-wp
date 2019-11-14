@@ -30,6 +30,7 @@
             @load="updateDimensions"
             @complete="complete"
             @timeupdate="updateProgress"
+            @close="$emit('close')"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -198,7 +199,6 @@ export default {
     },
     async updateH5pSettings(newSettings) {
       await this.$store.dispatch("updateH5pSettings", newSettings)
-      this.h5pSettings = newSettings
     },
     updateDimensions(dimensions) {
       this.dimensions = {
@@ -249,6 +249,7 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
+  height: 100%;
 }
 
 .media-wrapper-embed {
