@@ -127,10 +127,10 @@ export default {
                 }
 
                 const viewedAmount = mediaProgress * videoDuration
-                if (viewedAmount > 0 && viewedAmount !== videoDuration) {
+                if (viewedAmount > 0) {
                   h5pVideo.seek(viewedAmount)
-                } else if (viewedAmount > 0) {
-                  h5pVideo.seek(videoDuration)
+                }
+                if (viewedAmount === videoDuration) {
                   this.showEndScreen = true
                 }
                 seeked = true
