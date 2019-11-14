@@ -512,45 +512,16 @@ function tapestryTool(config){
         } else if (getChildren(nodeId, 0) && getChildren(nodeId, 0).length > 1) {
             alert("Can only delete nodes with one neighbouring node.");
         } else {
-            var linkToBeDeleted = -1;
-            for (var i = 0; i < tapestry.dataset.links.length; i++) {
-                var linkedNodeId;
-                if (tapestry.dataset.links[i].source.id === nodeId) {
-                    linkedNodeId = tapestry.dataset.links[i].target.id; // Node linked to the node to be deleted
-                } else if (tapestry.dataset.links[i].target.id === nodeId) {
-                    linkedNodeId = tapestry.dataset.links[i].source.id // Node linked to the node to be deleted
-                } else {
-                    continue;
+            $.ajax({
+                url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
+                method: API_DELETE_METHOD,
+                success: function() {
+                    location.reload();
+                },
+                error: function(e) {
+                    console.error("Error deleting node " + nodeId, e);
                 }
-    
-                var newLinks = JSON.parse(JSON.stringify(tapestry.dataset.links)); // deep copy
-                newLinks.splice(i, 1); // remove the link and see if linkedNode is connected to root node
-                if(!hasPathBetweenNodes(tapestry.dataset.rootId, linkedNodeId, newLinks)) {
-                    alert("Cannot delete node.");
-                    return;
-                } else {
-                    linkToBeDeleted = i;
-                }
-            }
-    
-             if (linkToBeDeleted !== -1) {
-                for (var j = 0; j < tapestry.dataset.nodes.length; j++) {
-                    if (tapestry.dataset.nodes[j].id === nodeId) {
-                        var spliceIndex = j;
-                        $.ajax({
-                            url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
-                            method: API_DELETE_METHOD,
-                            success: function() {
-                                deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
-                                location.reload();
-                            },
-                            error: function(e) {
-                                console.error("Error deleting node " + nodeId, e);
-                            }
-                        });
-                    }
-                }
-            }
+            });
         }
     }
     
