@@ -2155,6 +2155,8 @@ tapestryTool.prototype.deleteNodeFromTapestry = function() {
 
 tapestryTool.prototype.updateMediaIcon = updateMediaIcon;
 
+tapestryTool.prototype.updateNodeImage = updateNodeImage;
+
 /*******************************************************
  * 
  * NON-CLASS FUNCTIONS (could be moved to a separate file)
