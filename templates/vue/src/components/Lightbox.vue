@@ -213,7 +213,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #lightbox {
   position: fixed;
   top: 0;
@@ -269,7 +269,7 @@ export default {
 }
 </style>
 
-<style>
+<style lang="scss">
 .lightbox-enter-active,
 .lightbox-leave-active {
   transition: all 1s;

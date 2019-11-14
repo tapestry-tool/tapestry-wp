@@ -95,7 +95,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .video {
   width: 100%;
   height: auto;
