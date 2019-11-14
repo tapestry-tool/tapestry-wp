@@ -14,7 +14,7 @@ export default {
   },
   props: {
     quiz: {
-      type: Object,
+      type: Array,
       required: true
     }
   },
