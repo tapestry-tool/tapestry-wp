@@ -29,27 +29,21 @@ export default {
     return {
       backgroundAudio: new Audio(TYDE_BACKGROUND_AUDIO_SRC),
       isMenuOpen: false,
-      logs: [
-        {
-          name: "Log 1",
-          type: "activity",
-          isFavourite: false,
-        },
-        {
-          name: "Log 2",
-          type: "content",
-          isFavourite: true,
-        },
-        {
-          name: "Log 3",
-          type: "activity",
-          isFavourite: true,
-        },
-      ],
     }
   },
   computed: {
-    ...mapGetters(["lightbox"]),
+    ...mapGetters(["lightbox", "nodes"]),
+    logs() {
+      return this.nodes.filter(node => node.completed).map(node => {
+        return {
+          type: "content",
+          title: node.title,
+          imageURL: node.imageURL,
+          description: node.description,
+          isFavourite: node.isFavourite,
+        }
+      })
+    }
   },
   mounted() {
     window.addEventListener("keydown", evt => {
