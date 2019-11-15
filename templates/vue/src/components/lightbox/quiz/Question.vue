@@ -67,12 +67,23 @@ export default {
       if (!id) {
         return
       }
+
+      // Clear previous form data
+      delete window[`gf_submitting_${id}`]
+      this.$refs["form-container"].innerHTML = ""
+
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
         const response = await TapestryApi.getGravityForm(id)
         if (response) {
           const gravityForm = document.createElement("div")
           gravityForm.innerHTML = response.data
+          gravityForm
+            .querySelector(`form#gform_${id}`)
+            .addEventListener("submit", (event) => {
+              this.formOpened = false
+              this.$emit("form-submitted")
+            })
 
           this.$refs["form-container"].appendChild(gravityForm)
           this.formOpened = true

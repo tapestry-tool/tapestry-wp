@@ -7,6 +7,7 @@
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
+      @form-submitted="formOpened = false"
     ></question>
     <footer class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
