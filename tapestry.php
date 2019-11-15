@@ -146,6 +146,11 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
 
 // Gravity Forms Pluggin
+
+// Hook up the AJAX ajctions
+add_action('wp_ajax_nopriv_gf_button_get_form', 'gf_button_ajax_get_form');
+add_action('wp_ajax_gf_button_get_form', 'gf_button_ajax_get_form');
+
 // Add the "button" action to the gravityforms shortcode
 // e.g. [gravityforms action="button" id=1 text="button text"]
 add_filter('gform_shortcode_button', 'gf_button_shortcode', 10, 3);
@@ -157,7 +162,7 @@ function gf_button_shortcode($shortcode_string, $attributes, $content)
     ), $attributes);
 
     $form_id = absint($a['id']);
-
+    
     if ($form_id < 1) {
         return 'Missing the ID attribute.';
     }
@@ -173,10 +178,8 @@ function gf_button_shortcode($shortcode_string, $attributes, $content)
 				(function (SHFormLoader, $) {
 				$('#gf_button_get_form_{$form_id}').click(function(){
                     var button = $(this);
-                    debugger
 					$.get('{$ajax_url}?action=gf_button_get_form&form_id={$form_id}',function(response){
 						$('#gf_button_form_container_{$form_id}').html(response).fadeIn();
-                        debugger
                         button.remove();
 						if(window['gformInitDatepicker']) {gformInitDatepicker();}
 					});
@@ -184,5 +187,12 @@ function gf_button_shortcode($shortcode_string, $attributes, $content)
 			}(window.SHFormLoader = window.SHFormLoader || {}, jQuery));
 			</script>";
     return $html;
+}
+
+function gf_button_ajax_get_form()
+{
+    $form_id = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
+    gravity_form($form_id, true, false, false, false, true);
+    die();
 }
 // End of Gravity Forms Pluggin

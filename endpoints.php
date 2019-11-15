@@ -185,13 +185,6 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateUserH5PSettingsByPostId',
         ]
     ],
-    'GET_GRAVITY_FORM' => (object) [
-        'ROUTE'     => 'gravity-forms/(?P<formId>[\d]+)',
-        'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getGravityForm',
-        ]
-    ],
 ];
 
 /**
@@ -871,21 +864,4 @@ function getUserProgressByPostId($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-}
-
-/**
- * Get a gravity form with its id
- * Example: /wp-json/tapestry-tool/v1/gravity-forms/{id}
- * 
- * @param Object $request HTTP request
- * 
- * @return Object $response HTTP response
- */
-function getGravityForm($request)
-{
-    $formId = isset($request['formId']) ? absint($request['formId']) : 0;
-    // Render an AJAX-enabled form.
-    // https://www.gravityhelp.com/documentation/article/embedding-a-form/#function-call
-    gravity_form($formId, true, false, false, false, true);
-    die();
 }
