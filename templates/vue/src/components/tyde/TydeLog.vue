@@ -7,12 +7,8 @@
       <p v-html="formatParagraph(log.description)" />
     </div>
     <div class="log-controls">
-      <div>
-        <i :class="favoriteClass" @click="favorite = !favorite"></i>
-      </div>
-      <div>
-        <i class="fas fa-angle-double-right fa-2x"></i>
-      </div>
+      <i :class="favoriteClass" @click="favorite = !favorite"></i>
+      <i class="fas fa-angle-double-right fa-2x"></i>
     </div>
   </li>
 </template>
