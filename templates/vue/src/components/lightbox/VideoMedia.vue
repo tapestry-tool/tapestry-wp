@@ -117,7 +117,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .video {
   position: absolute;
   left: 0;

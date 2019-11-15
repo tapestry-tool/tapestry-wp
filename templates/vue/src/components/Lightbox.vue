@@ -48,6 +48,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
+            @h5p-media-loaded="h5pMediaLoaded"
           />
         </div>
       </div>
@@ -198,7 +199,6 @@ export default {
     },
     async updateH5pSettings(newSettings) {
       await this.$store.dispatch("updateH5pSettings", newSettings)
-      this.h5pSettings = newSettings
     },
     updateDimensions(dimensions) {
       this.dimensions = {
@@ -206,11 +206,14 @@ export default {
         ...dimensions,
       }
     },
+    h5pMediaLoaded(event) {
+      this.$emit('h5p-media-loaded', { loadedH5pId: event.loadedH5pId })
+    },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #lightbox {
   position: fixed;
   top: 0;
@@ -267,7 +270,7 @@ export default {
 }
 </style>
 
-<style>
+<style lang="scss">
 .lightbox-enter-active,
 .lightbox-leave-active {
   transition: all 1s;

@@ -242,6 +242,7 @@ class TapestryNode implements ITapestryNode
         }
         $nodePostId = $nodeMetadata->meta_value->post_id;
         delete_post_meta($nodePostId, 'tapestry_node_data');
+        delete_metadata_by_mid('post', $this->nodeMetaId);
     }
 
     private function _formNode()
