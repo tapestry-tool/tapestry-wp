@@ -1,5 +1,5 @@
 <template>
-  <button class="button" @click="$emit('click')">
+  <button :disabled="disabled" class="button" @click="$emit('click')">
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
@@ -14,6 +14,11 @@ import TextIcon from "../../../assets/Aa.svg"
 export default {
   name: "answer-button",
   props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     icon: {
       type: String,
       required: false,

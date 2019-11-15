@@ -15,16 +15,9 @@
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
-          <answer-button @click="openForm(question.answers.textId)">
-            text
-          </answer-button>
-          <answer-button icon="microphone">audio</answer-button>
-          <answer-button
-            icon="tasks"
-            @click="openForm(question.answers.checklistId)"
-          >
-            checklist
-          </answer-button>
+          <answer-button :disabled="disableButton" @click="openForm(question.answers.textId)">text</answer-button>
+          <answer-button :disabled="disableButton" icon="microphone">audio</answer-button>
+          <answer-button :disabled="disableButton" icon="tasks" @click="openForm(question.answers.checklistId)">checklist</answer-button>
         </div>
       </div>
     </div>
@@ -55,6 +48,7 @@ export default {
   data() {
     return {
       formOpened: false,
+      disableButton: false,
     }
   },
   computed: {
@@ -71,6 +65,7 @@ export default {
       // Clear previous form data
       delete window[`gf_submitting_${id}`]
       this.$refs["form-container"].innerHTML = ""
+      this.disableButton = true;
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -83,6 +78,7 @@ export default {
             .addEventListener("submit", (event) => {
               this.formOpened = false
               this.$emit("form-submitted")
+              this.disableButton = false;
             })
 
           this.$refs["form-container"].appendChild(gravityForm)
