@@ -12,6 +12,7 @@
         'end-screen--hide': !show,
       },
     ]"
+    :style="{ backgroundImage: backgroundUrl }"
   >
     <button v-if="showQuizButton" class="end-screen-button" @click="showQuiz = true">
       <i class="fas fa-question-circle fa-4x"></i>
@@ -30,6 +31,7 @@
 
 <script>
 import QuizScreen from "./quiz/QuizScreen"
+import EndScreenBg from "../../assets/end-screen-bg.png"
 
 export default {
   name: "end-screen",
@@ -60,6 +62,9 @@ export default {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Retake Quiz" : "Take Quiz"
     },
+    backgroundUrl() {
+      return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
+    },
   },
 }
 </script>
@@ -74,7 +79,7 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background-size: cover;
   color: black;
   opacity: 1;
   transition: opacity 0.4s ease-out;
