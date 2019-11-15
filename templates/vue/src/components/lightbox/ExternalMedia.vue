@@ -153,7 +153,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .spinners {
   width: 100%;
   height: 100%;
