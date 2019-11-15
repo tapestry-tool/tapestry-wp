@@ -1,5 +1,9 @@
 <template>
-  <div id="lightbox">
+  <div
+    id="lightbox"
+    :class="{ 'full-screen': node.fullscreen }"
+    :format="node.mediaFormat"
+  >
     <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
@@ -207,7 +211,7 @@ export default {
       }
     },
     h5pMediaLoaded(event) {
-      this.$emit('h5p-media-loaded', { loadedH5pId: event.loadedH5pId })
+      this.$emit("h5p-media-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }
@@ -280,5 +284,44 @@ export default {
 .lightbox-leave-to {
   opacity: 0;
   transform: translateY(32px);
+}
+
+#lightbox.full-screen {
+  background: #000;
+
+  #spotlight-content {
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0;
+  }
+}
+
+#lightbox[format="h5p"].full-screen #spotlight-content {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+#lightbox[format="h5p"].full-screen #spotlight-content iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+#lightbox[format="mp4"].full-screen #spotlight-content video {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+}
+
+#lightbox.full-screen #lightbox-close-wrapper {
+  top: 0 !important;
+  right: 0 !important;
+  z-index: 100;
 }
 </style>
