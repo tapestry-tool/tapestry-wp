@@ -14,22 +14,34 @@
     ]"
     :style="{ backgroundImage: backgroundUrl }"
   >
-    <button v-if="showQuizButton" class="end-screen-button" @click="showQuiz = true">
-      <i class="fas fa-question-circle fa-4x"></i>
-      <p class="end-screen-button-text">{{ buttonText }}</p>
-    </button>
-    <button class="end-screen-button" @click="$emit('rewatch')">
-      <i class="fas fa-redo fa-4x"></i>
-      <p class="end-screen-button-text">Rewatch</p>
-    </button>
-    <button class="end-screen-button" @click="$emit('close')">
-      <i class="far fa-times-circle fa-4x"></i>
-      <p class="end-screen-button-text">Close</p>
-    </button>
+    <speech-bubble>
+      We've got a question for you!
+      <br />
+      Do you wanna...
+    </speech-bubble>
+    <div>
+      <button
+        v-if="showQuizButton"
+        class="end-screen-button"
+        @click="showQuiz = true"
+      >
+        <i class="fas fa-question-circle fa-4x"></i>
+        <p class="end-screen-button-text">{{ buttonText }}</p>
+      </button>
+      <button class="end-screen-button" @click="$emit('rewatch')">
+        <i class="fas fa-redo fa-4x"></i>
+        <p class="end-screen-button-text">Rewatch</p>
+      </button>
+      <button class="end-screen-button" @click="$emit('close')">
+        <i class="far fa-times-circle fa-4x"></i>
+        <p class="end-screen-button-text">Close</p>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
+import SpeechBubble from "../SpeechBubble"
 import QuizScreen from "./quiz/QuizScreen"
 import EndScreenBg from "../../assets/end-screen-bg.png"
 
@@ -37,6 +49,7 @@ export default {
   name: "end-screen",
   components: {
     QuizScreen,
+    SpeechBubble,
   },
   props: {
     node: {
@@ -72,8 +85,7 @@ export default {
 <style scoped>
 .end-screen {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   position: absolute;
   left: 0;
   top: 0;
@@ -84,6 +96,9 @@ export default {
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
+
+  padding: 24px;
+  padding-left: 38%;
 }
 
 .end-screen--hide {

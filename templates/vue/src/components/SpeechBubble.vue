@@ -24,6 +24,9 @@ export default {
   border: 2px solid black;
   padding: 12px 16px;
   border-radius: 1em;
+  font-size: 28px;
+  font-style: italic;
+  line-height: 1.2;
 }
 
 .bubble-pointer {

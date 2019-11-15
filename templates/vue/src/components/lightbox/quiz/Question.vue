@@ -92,11 +92,7 @@ button {
 }
 
 .question-title {
-  position: relative;
-  font-size: 28px;
-  font-style: italic;
   margin-bottom: 36px;
-  line-height: 1.2;
 }
 
 .question-title-step {
