@@ -4,7 +4,7 @@
     <div v-else class="thumbnail-placeholder"></div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
-      <p>{{log.description}}</p>
+      <p v-html="formatParagraph(log.description)" />
     </div>
     <div class="log-controls">
       <div>
@@ -39,25 +39,30 @@ export default {
     favoriteClass() {
       return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
     }
+  },
+  methods: {
+    formatParagraph(str) {
+      return str.replace(/(?:\r\n|\r|\n)/g, '<br>')
+    },
   }
 }
 </script>
 
 <style scoped>
 img {
-  max-width: 300px;
+  max-width: 250px;
 }
 
 .thumbnail-placeholder {
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 250px;
+  min-height: 250px;
   background-color: gray;
 }
 
 .log-details {
   display: flex;
   font-size: 20px;
-  margin: 0 50px;
+  margin: 0 35px;
   flex-direction: column;
   word-break: break-word;
 }
@@ -68,6 +73,8 @@ img {
 
 .log-details > p {
   padding: unset;
+  line-height: 1.4em;
+  margin-bottom: 0;
 }
 
 .log-controls {
@@ -75,6 +82,11 @@ img {
   flex-direction: column;
   justify-content: space-between;
   margin-left: auto;
+  /* Currently do not support favorites, so hiding this */
+  display: none;
+}
+.log-controls i {
+    font-size: 1.5em;
 }
 
 .log {

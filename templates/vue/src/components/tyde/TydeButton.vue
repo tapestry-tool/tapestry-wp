@@ -25,8 +25,8 @@ export default {
 <style scoped>
 .tyde-button {
   position: relative;
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -34,7 +34,7 @@ export default {
   color: black;
   border: 4px solid black;
   background: white;
-  font-size: 40px;
+  font-size: 30px;
   margin-right: 16px;
   transition: all 0.2s ease;
 }

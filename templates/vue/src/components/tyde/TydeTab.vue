@@ -20,7 +20,7 @@ export default {
 
 <style scoped>
 .icon {
-  font-size: 1.8em;
+  font-size: 1.3em;
   margin-bottom: 8px;
 }
 
@@ -30,7 +30,7 @@ export default {
   flex-direction: column;
   font-weight: bold;
   line-height: 1;
-  margin: 0;
+  margin: 0 30px;
   opacity: 0.5;
   text-align: center;
   text-transform: uppercase;

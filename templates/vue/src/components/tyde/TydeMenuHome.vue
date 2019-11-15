@@ -38,7 +38,7 @@ export default {
   data() {
     return {
       activeTab: "all",
-      tabs: ["activities", "content", "favourites", "all"],
+      tabs: ["all", "activities", "content" /*, "favourites"*/],
     }
   },
   computed: {
@@ -66,15 +66,17 @@ export default {
 
 <style scoped>
 .logs {
-  margin-top: 16px;
+  margin-top: 26px;
+  height: calc(100vh - 210px);
+  overflow-y: scroll;
 }
 
 .tabs {
   display: flex;
-  font-size: 20px;
-  justify-content: space-between;
+  font-size: 16px;
+  justify-content: left;
   list-style: none;
   margin: 0;
-  padding: 0 48px;
+  padding: 0;
 }
 </style>

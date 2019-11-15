@@ -90,7 +90,7 @@ export default {
 .buttons {
   width: 100%;
   display: flex;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .button-continue {
@@ -109,8 +109,8 @@ export default {
 .content {
   background: var(--tapestry-gray);
   border: 4px solid white;
-  min-height: 100%;
-  padding: 32px 64px;
+  height: calc(100vh - 86px);
+  padding: 16px 32px;
   position: relative;
   z-index: 0;
 }
@@ -118,12 +118,12 @@ export default {
 .title {
   position: absolute;
   right: 1.5em;
-  top: -74px;
+  top: -63px;
   padding: 16px 3em;
   line-height: 1;
   margin: 0;
   font-weight: 900;
-  font-size: 40px;
+  font-size: 30px;
   text-transform: uppercase;
   z-index: 10;
 }

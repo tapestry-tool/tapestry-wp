@@ -79,6 +79,8 @@ export default {
 
 .settings {
   margin-top: 2em;
+  height: calc(100vh - 210px);
+  overflow-y: scroll;
 }
 
 .setting {
