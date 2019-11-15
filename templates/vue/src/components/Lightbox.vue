@@ -286,21 +286,30 @@ export default {
   transform: translateY(32px);
 }
 
-#lightbox.full-screen #spotlight-content {
-  top: 0 !important;
-  left: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  border-radius: 0;
-}
-#lightbox[format="h5p"].full-screen #spotlight-content {
-  left: 5vw !important;
-  width: 90vw !important;
-  height: 100vh !important;
+#lightbox.full-screen {
+  background: #000;
+
+  #spotlight-content {
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0;
+  }
 }
 
+#lightbox[format="h5p"].full-screen #spotlight-content {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+#lightbox[format="h5p"].full-screen #spotlight-content iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
 #lightbox[format="mp4"].full-screen #spotlight-content video {
   top: 0 !important;
   left: 0 !important;
