@@ -21,7 +21,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #root-node-btn {
   margin-top: 20vh;
   text-align: center;
