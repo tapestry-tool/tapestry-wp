@@ -1,21 +1,29 @@
 <template>
-  <iframe
-    id="h5p"
-    ref="h5p"
-    frameborder="0"
-    allowfullscreen="allowfullscreen"
-    :src="node.typeData.mediaURL"
-    :width="width"
-    :height="height"
-    @load="handleLoad"
-  ></iframe>
+  <div class="container">
+    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <iframe
+      id="h5p"
+      ref="h5p"
+      frameborder="0"
+      allowfullscreen="allowfullscreen"
+      :src="node.typeData.mediaURL"
+      :width="width"
+      :height="height"
+      @load="handleLoad"
+    ></iframe>
+  </div>
 </template>
 
 <script>
+import EndScreen from "./EndScreen"
+
 const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
   name: "h5p-media",
+  components: {
+    EndScreen,
+  },
   props: {
     node: {
       type: Object,
@@ -34,7 +42,28 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      showEndScreen: false,
+    }
+  },
   methods: {
+    rewatch() {
+      this.showEndScreen = false
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      h5pVideo.seek(0)
+      h5pVideo.play()
+    },
+    close() {
+      this.showEndScreen = false
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      if (h5pVideo) {
+        h5pVideo.pause()
+      }
+      this.$emit('close')
+    },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
@@ -72,6 +101,10 @@ export default {
                   if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
                     this.$emit("complete")
                   }
+
+                  if (amountViewed >= 1) {
+                    this.showEndScreen = true
+                  }
                 } else {
                   clearInterval(updateVideoInterval)
                 }
@@ -92,12 +125,13 @@ export default {
                   h5pVideo.setQuality(settings.quality)
                   h5pVideo.setPlaybackRate(settings.playbackRate)
                 }
-                // Play the video at the last watched time (or at the beginning if the user has not watched yet or if the user had already viewed whole video)
+
                 const viewedAmount = mediaProgress * videoDuration
-                if (viewedAmount > 0 && viewedAmount !== videoDuration) {
+                if (viewedAmount > 0) {
                   h5pVideo.seek(viewedAmount)
-                } else {
-                  h5pVideo.seek(0)
+                }
+                if (viewedAmount === videoDuration) {
+                  this.showEndScreen = true
                 }
                 seeked = true
               }
@@ -160,4 +194,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+</style>
