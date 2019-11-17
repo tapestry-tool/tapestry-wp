@@ -32,7 +32,7 @@
         <i class="fas fa-play"></i>
         <p class="end-screen-button-text">Replay Video</p>
       </button>
-      <button class="end-screen-button">
+      <button class="end-screen-button" @click="$emit('close')">
         <i class="fas fa-history"></i>
         <p class="end-screen-button-text">Come Back Later</p>
       </button>
