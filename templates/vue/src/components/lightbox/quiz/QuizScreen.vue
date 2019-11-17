@@ -78,12 +78,6 @@ export default {
 </script>
 
 <style>
-:root {
-  --tyde-blue: #1074bb;
-  --tyde-orange: #f79621;
-  --tyde-orange-light: #f9b664;
-}
-
 .quiz-screen {
   display: flex;
   background-size: cover;

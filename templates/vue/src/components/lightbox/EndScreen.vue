@@ -19,22 +19,26 @@
       <br />
       Do you wanna...
     </speech-bubble>
-    <div>
+    <div class="button-container">
       <button
         v-if="showQuizButton"
-        class="end-screen-button"
+        class="end-screen-button end-screen-button-quiz"
         @click="showQuiz = true"
       >
-        <i class="fas fa-question-circle fa-4x"></i>
+        <i class="fas fa-question-circle"></i>
         <p class="end-screen-button-text">{{ buttonText }}</p>
       </button>
       <button class="end-screen-button" @click="$emit('rewatch')">
-        <i class="fas fa-redo fa-4x"></i>
-        <p class="end-screen-button-text">Rewatch</p>
+        <i class="fas fa-play"></i>
+        <p class="end-screen-button-text">Replay Video</p>
       </button>
-      <button class="end-screen-button" @click="$emit('close')">
-        <i class="far fa-times-circle fa-4x"></i>
-        <p class="end-screen-button-text">Close</p>
+      <button class="end-screen-button">
+        <i class="fas fa-history"></i>
+        <p class="end-screen-button-text">Come Back Later</p>
+      </button>
+      <button v-show="false" class="end-screen-button">
+        <i class="far fa-times-circle"></i>
+        <p class="end-screen-button-text">Favourite Video</p>
       </button>
     </div>
   </div>
@@ -73,7 +77,7 @@ export default {
     },
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
-      return allDone ? "Retake Quiz" : "Take Quiz"
+      return allDone ? "Reanswer Question" : "Answer Question"
     },
     backgroundUrl() {
       return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
@@ -81,6 +85,14 @@ export default {
   },
 }
 </script>
+
+<style>
+:root {
+  --tyde-blue: #1074bb;
+  --tyde-orange: #f79621;
+  --tyde-orange-light: #f9b664;
+}
+</style>
 
 <style scoped>
 .end-screen {
@@ -99,6 +111,7 @@ export default {
 
   padding: 24px;
   padding-left: 38%;
+  padding-right: 64px;
 }
 
 .end-screen--hide {
@@ -108,27 +121,43 @@ export default {
 
 .end-screen-button {
   background: none;
-  padding: 0;
+  background-color: var(--tyde-blue);
+  padding: 4px 32px;
   margin: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: inherit;
-  margin-right: 3em;
+  flex-direction: row;
+  align-items: center;
+  color: white;
+  border-radius: 4px;
+  opacity: 1;
+  transition: opacity 0.1s ease-out;
+  font-size: 32px;
+  margin-bottom: 32px;
 }
 
 .end-screen-button:last-child {
-  margin-right: 0;
+  margin-bottom: 0;
+}
+
+.end-screen-button-quiz {
+  background-color: var(--tyde-orange);
 }
 
 .end-screen-button:hover {
-  color: #11a6d8;
+  opacity: 0.9;
 }
 
 .end-screen-button-text {
   margin: 0;
   padding: 0;
   font-weight: 600;
-  margin-top: 1em;
+  margin-left: 32px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  padding-left: 96px;
+  margin-top: 64px;
 }
 </style>
