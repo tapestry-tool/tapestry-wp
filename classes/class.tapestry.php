@@ -175,6 +175,13 @@ class Tapestry implements ITapestry
             }
         }
 
+        // Delete associated links with this node
+        foreach ($this->links as $index => $link) {
+            if ($link->source == $nodeId || $link->target == $nodeId) {
+                $this->removeLink($index);
+            }
+        }
+
         $tapestry = $this->_formTapestry();
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $this->nodes;

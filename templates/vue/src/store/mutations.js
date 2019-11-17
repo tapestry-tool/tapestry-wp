@@ -63,3 +63,19 @@ export function updateNodeCoordinates(state, payload) {
 export function addLink(state, link) {
   state.links.push(link)
 }
+
+// lightbox
+export function openLightbox(state, lightboxId) {
+  state.isLightboxOpen = true
+  state.lightboxId = lightboxId
+}
+
+export function closeLightbox(state) {
+  state.isLightboxOpen = false
+  state.lightboxId = null
+  state.lightboxEl = null
+}
+
+export function setLightboxEl(state, el) {
+  state.lightboxEl = el
+}
