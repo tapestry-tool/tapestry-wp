@@ -152,6 +152,7 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->quizzes) && is_array($node->quizzes)) {
             $this->quizzes = $node->quizzes;
+        }
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
         }
