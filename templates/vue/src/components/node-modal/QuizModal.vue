@@ -92,7 +92,7 @@ export default {
     addQuestion() {
       this.questions = [
         ...this.questions,
-        { ...defaultQuestion, id: Helpers.createUUID() },
+        { id: Helpers.createUUID(), text: "", answers: { ...defaultQuestion.answers } },
       ]
     },
     deleteQuestion(id) {
