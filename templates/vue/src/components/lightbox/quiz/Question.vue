@@ -27,6 +27,7 @@
 <script>
 import AnswerButton from "./AnswerButton"
 import TapestryAPI from "../../../services/TapestryAPI"
+import Helpers from "../../../utils/Helpers"
 import SpeechBubble from "../../../assets/speech-bubble-end.png"
 
 export default {
@@ -53,7 +54,7 @@ export default {
   },
   computed: {
     bubbleImage() {
-      return `url(${wpData.vue_uri}/${SpeechBubble.split("dist")[1]})`
+      return `url(${Helpers.getImagePath(SpeechBubble)})`
     },
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-screen" :style="{ backgroundImage: `url(${backgroundImage})` }">
+  <div class="quiz-screen" :style="{ backgroundImage }">
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
@@ -28,6 +28,7 @@
 
 <script>
 import Question from "./Question"
+import Helpers from "../../../utils/Helpers"
 import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
 
 export default {
@@ -52,7 +53,7 @@ export default {
       return this.quiz[this.activeQuestionIndex]
     },
     backgroundImage() {
-      return `${wpData.vue_uri}/${BackgroundImg.split("dist")[1]}`
+      return `url(${Helpers.getImagePath(BackgroundImg)})`
     },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
