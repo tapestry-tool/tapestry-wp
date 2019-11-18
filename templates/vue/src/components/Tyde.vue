@@ -47,10 +47,11 @@ export default {
         if (currentNode.quiz) {
           const completedQuestions = currentNode.quiz.filter(q => q.completed).map(q => {
             return {
+              //TODO: Figure out imageURL and Description
               type: "activity",
-              title: q.text,
-              imageURL: "",                       // TODO: Figure out which image to use here
-              description: `Question ID: ${q.id}` // TODO: Figure out what description to go here
+              title: `Completed: ${q.text}`,
+              imageURL: "",
+              description: `Question ID: ${q.id}`
             }
           })
           return [...activities, ...completedQuestions]
