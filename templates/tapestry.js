@@ -1222,7 +1222,8 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' + 
+                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
                     ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';

@@ -231,6 +231,7 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
+        fullscreen: false,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -296,6 +297,7 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
+        fullscreen: false,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -373,6 +375,9 @@ export default {
             break
           case "skippable":
             newNodeEntry.skippable = fieldValue
+            break
+          case "fullscreen":
+            newNodeEntry.fullscreen = fieldValue
             break
           case "description":
             newNodeEntry.description = fieldValue
