@@ -65,12 +65,45 @@ export default {
       this.$emit("close")
     },
     handleLoad() {
+
+      $('iframe').each(function () {
+        $( this ).data( "ratio", this.height / this.width )
+          // Remove the hardcoded width & height attributes
+          .removeAttr( "width" )
+          .removeAttr( "height" );
+      });
+      const setIframeDimensions = function() {
+        $('iframe').each( function() {
+          // Get the parent container's width
+          var width = $( this ).parent().width();
+          var height = $( this ).parent().height();
+          if (width * $( this ).data( "ratio" ) <= height) {
+            $( this ).width( width )
+              .height( width * $( this ).data( "ratio" ) );
+          }
+          else {
+            $( this ).height( height )
+              .width( height / $( this ).data( "ratio" ) );
+          }
+        });
+      }
+      $( window ).resize(setIframeDimensions);
+      setIframeDimensions();
+
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
+
+      this.$emit('h5p-media-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
         const settings = this.settings
+
+        // If h5pVideo is undefined, let's return
+        // This is because we don't have a separate type for H5P recorder
+        if (!h5pVideo) {
+          return
+        }
 
         let seeked = false
         let currentPlayedTime
@@ -119,10 +152,10 @@ export default {
                 }
 
                 const viewedAmount = mediaProgress * videoDuration
-                if (viewedAmount > 0 && viewedAmount !== videoDuration) {
+                if (viewedAmount > 0) {
                   h5pVideo.seek(viewedAmount)
-                } else {
-                  h5pVideo.seek(videoDuration)
+                }
+                if (viewedAmount === videoDuration) {
                   this.showEndScreen = true
                 }
                 seeked = true
@@ -186,10 +219,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   position: relative;
   width: 100%;
   height: 100%;
+  max-width: 100vw;
+  padding: 0;
 }
 </style>

@@ -162,6 +162,11 @@
                 Allow skipping video if user has not watched at least once
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.fullscreen">
+                Maximize video size to fit in the window
+              </b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Permissions">
@@ -363,6 +368,7 @@ export default {
         { name: "hideMedia", value: this.node.hideMedia },
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
+        { name: "fullscreen", value: this.node.fullscreen },
       ]
     },
     nodeImageUrl() {

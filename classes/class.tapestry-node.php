@@ -32,6 +32,7 @@ class TapestryNode implements ITapestryNode
     private $hideMedia;
     private $skippable;
     private $quiz;
+    private $fullscreen;
 
     /**
      * Constructor
@@ -67,6 +68,7 @@ class TapestryNode implements ITapestryNode
         $this->hideMedia = false;
         $this->skippable = true;
         $this->quiz = array();
+        $this->fullscreen = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -150,6 +152,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->quiz) && is_array($node->quiz)) {
             $this->quiz = $node->quiz;
+        }
+        if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
+            $this->fullscreen = $node->fullscreen;
         }
     }
 
@@ -242,6 +247,7 @@ class TapestryNode implements ITapestryNode
         }
         $nodePostId = $nodeMetadata->meta_value->post_id;
         delete_post_meta($nodePostId, 'tapestry_node_data');
+        delete_metadata_by_mid('post', $this->nodeMetaId);
     }
 
     private function _formNode()
@@ -267,7 +273,8 @@ class TapestryNode implements ITapestryNode
             'hideProgress'  => $this->hideProgress,
             'hideMedia'     => $this->hideMedia,
             'skippable'     => $this->skippable,
-            'quiz'       => $this->quiz
+            'quiz'          => $this->quiz,
+            'fullscreen'    => $this->fullscreen,
         ];
     }
 

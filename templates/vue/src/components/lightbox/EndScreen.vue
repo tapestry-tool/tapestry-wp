@@ -74,8 +74,8 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  color: black;
+  background: #111;
+  color: #eee;
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
@@ -106,9 +106,8 @@ export default {
 }
 
 .end-screen-button-text {
-  margin: 0;
+  margin: 1em auto 0;
   padding: 0;
   font-weight: 600;
-  margin-top: 1em;
 }
 </style>

@@ -18,7 +18,8 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+
 html {
   font-size: 100%;
 }
@@ -57,5 +58,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+button:focus {
+  outline: none;
 }
 </style>

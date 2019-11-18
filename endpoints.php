@@ -10,6 +10,7 @@ require_once __DIR__ . '/classes/class.tapestry.php';
 require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/classes/class.tapestry-audio.php';
 require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -183,6 +184,27 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PSettingsByPostId',
+        ]
+    ],
+    'GET_USER_H5P_AUDIO' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<h5pId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getUserH5PAudio',
+        ]
+    ],
+    'GET_NODE_IDS_WITH_RECORDED_AUDIOS' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/recorded-audio-nodes',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getNodesWithRecordedAudios',
+        ]
+    ],
+    'UPDATE_USER_H5P_AUDIO' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<h5pId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'updateUserH5PAudio',
         ]
     ],
 ];
@@ -861,6 +883,104 @@ function getUserProgressByPostId($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
         return $userProgress->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update h5p audio of a node for a user
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function updateUserH5PAudio($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $h5pId = $request['h5pId'];
+    $audio = $request->get_body();
+
+    try {
+        if (!TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!is_numeric($h5pId)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
+        if (!is_string($audio) || empty($audio)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
+        if (wp_get_current_user()->ID == 0) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+
+        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $h5pId);
+        return $TapestryAudio->save($audio);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get h5p audio of a node for a user
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getUserH5PAudio($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $h5pId = $request['h5pId'];
+
+    try {
+        if (!TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!is_numeric($h5pId)) {
+            throw new TapestryError('INVALID_AUDIO');
+        }
+        if (wp_get_current_user()->ID == 0) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+
+        $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $h5pId);
+        return $TapestryAudio->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get all node IDs that have H5P audios recorded
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getNodesWithRecordedAudios($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    try {
+        if (!TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (wp_get_current_user()->ID == 0) {
+            throw new TapestryError('INVALID_USER_ID');
+        }
+
+        $TapestryAudio = new TapestryAudio($postId);
+        return $TapestryAudio->getNodesWithRecordedAudios();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
