@@ -25,9 +25,9 @@ export default {
     show: {
       type: Boolean,
       required: false,
-      default: true
-    }
-  }
+      default: true,
+    },
+  },
 }
 </script>
 
