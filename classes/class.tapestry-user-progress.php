@@ -92,7 +92,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function completeQuestion($questionId)
     {
         $this->_checkUserAndPostId();
-        $this->completeQuestion($questionId);
+        $this->_completeQuestion($questionId);
     }
 
     /**
