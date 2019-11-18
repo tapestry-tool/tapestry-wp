@@ -34,7 +34,7 @@ export default {
   computed: {
     ...mapGetters(["lightbox", "nodes"]),
     logs() {
-      return this.nodes.filter(node => node.completed).map(node => {
+      const completedContents = this.nodes.filter(node => node.completed).map(node => {
         return {
           type: "content",
           title: node.title,
@@ -43,6 +43,20 @@ export default {
           isFavourite: node.isFavourite,
         }
       })
+      const completedActivities = this.nodes.reduce((activities, currentNode) => {
+        if (currentNode.quiz) {
+          const completedQuestions = currentNode.quiz.filter(q => q.completed).map(q => {
+            return {
+              type: "activity",
+              title: q.text,
+              imageURL: "",                       // TODO: Figure out which image to use here
+              description: `Question ID: ${q.id}` // TODO: Figure out what description to go here
+            }
+          })
+          return [...activities, ...completedQuestions]
+        }
+      }, [])
+      return [...completedContents, ...completedActivities]
     }
   },
   mounted() {
