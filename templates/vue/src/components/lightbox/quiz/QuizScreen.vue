@@ -115,7 +115,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .question-footer {
   margin-top: 1em;
   display: flex;
@@ -136,19 +136,19 @@ export default {
   margin-right: 12px;
   opacity: 1;
   transition: opacity 0.1s ease-out;
-}
 
-.button-nav:hover {
-  opacity: 0.8;
-}
+  &:hover {
+    opacity: 0.8;
+  }
 
-.button-nav:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
-.button-nav:last-child {
-  margin-right: 0;
+  &:last-child {
+    margin-right: 0;
+  }
 }
 
 .button-nav-menu {
