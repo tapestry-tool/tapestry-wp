@@ -31,19 +31,19 @@ html {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
 
-h1,
-h2 {
-  font-weight: normal;
-}
+  h1,
+  h2 {
+    font-weight: normal;
+  }
 
-#app h1::before {
-  content: none;
-}
+  h1:before {
+    content: none;
+  }
 
-#app p {
-  padding: 0;
+  p {
+    padding: 0;
+  }
 }
 
 ul {
