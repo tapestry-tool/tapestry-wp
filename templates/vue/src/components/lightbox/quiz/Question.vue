@@ -20,11 +20,17 @@
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
-          <answer-button @click="openForm(question.answers.textId)">
+          <answer-button
+            v-if="hasId('textId')"
+            @click="openForm(question.answers.textId)"
+          >
             text
           </answer-button>
-          <answer-button icon="microphone">audio</answer-button>
+          <answer-button v-if="hasId('audioId')" icon="microphone">
+            audio
+          </answer-button>
           <answer-button
+            v-if="hasId('checklistId')"
             icon="tasks"
             @click="openForm(question.answers.checklistId)"
           >
@@ -100,6 +106,10 @@ export default {
     handleFormSubmit(questionId) {
       this.formOpened = false
       this.$emit("form-submitted", questionId)
+    },
+    hasId(label) {
+      const id = this.question.answers[label]
+      return id && id.length > 0
     },
   },
 }
