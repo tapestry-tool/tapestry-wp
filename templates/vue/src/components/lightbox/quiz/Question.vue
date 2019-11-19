@@ -1,7 +1,7 @@
 <template>
   <div class="question">
-    <div v-show="formOpened" ref="form-container"></div>
-    <div v-show="!formOpened">
+    <div v-if="formOpened" @submit="handleFormSubmit" v-html="formHtml"></div>
+    <div v-else>
       <h1 class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
@@ -15,9 +15,16 @@
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
-          <answer-button :disabled="disableButton" @click="openForm(question.answers.textId)">text</answer-button>
-          <answer-button :disabled="disableButton" icon="microphone">audio</answer-button>
-          <answer-button :disabled="disableButton" icon="tasks" @click="openForm(question.answers.checklistId)">checklist</answer-button>
+          <answer-button @click="openForm(question.answers.textId)">
+            text
+          </answer-button>
+          <answer-button icon="microphone">audio</answer-button>
+          <answer-button
+            icon="tasks"
+            @click="openForm(question.answers.checklistId)"
+          >
+            checklist
+          </answer-button>
         </div>
       </div>
     </div>
@@ -49,7 +56,8 @@ export default {
   data() {
     return {
       formOpened: false,
-      disableButton: false,
+      formHtml: "",
+      loadingForm: false,
     }
   },
   computed: {
@@ -65,30 +73,26 @@ export default {
 
       // Clear previous form data
       delete window[`gf_submitting_${id}`]
-      this.$refs["form-container"].innerHTML = ""
-      this.disableButton = true;
+      this.formHtml = ""
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
+        this.loadingForm = true
         const response = await TapestryApi.getGravityForm(id)
+        this.loadingForm = false
         if (response) {
-          const gravityForm = document.createElement("div")
-          gravityForm.innerHTML = response.data
-          gravityForm
-            .querySelector(`form#gform_${id}`)
-            .addEventListener("submit", (event) => {
-              this.formOpened = false
-              this.$emit("form-submitted")
-              this.disableButton = false;
-            })
-
-          this.$refs["form-container"].appendChild(gravityForm)
+          this.formHtml = response.data
           this.formOpened = true
           this.$emit("form-opened")
         }
       } catch (e) {
+        this.loadingForm = false
         console.error(e)
       }
+    },
+    handleFormSubmit() {
+      this.formOpened = false
+      this.$emit("form-submitted")
     },
   },
 }
