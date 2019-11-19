@@ -36,6 +36,14 @@ html {
       font-weight: normal;
     }
 
+    h1:before {
+      content: none;
+    }
+
+    p {
+      padding: 0;
+    }
+
     ul {
       list-style-type: none;
       padding: 0;
