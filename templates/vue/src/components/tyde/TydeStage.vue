@@ -186,6 +186,7 @@ export default {
 
   font-family: inherit;
   font-size: 2.5em;
+  color: inherit;
 }
 
 .tyde-stage-footer {
