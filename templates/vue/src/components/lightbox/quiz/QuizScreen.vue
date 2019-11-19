@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-screen" :style="{ backgroundImage }">
+  <div class="quiz-screen">
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
@@ -90,32 +90,24 @@ export default {
 }
 </script>
 
-<style>
-:root {
-  --tyde-blue: #1074bb;
-  --tyde-orange: #f79621;
-  --tyde-orange-light: #f9b664;
-}
-
+<style lang="scss" scoped>
 .quiz-screen {
   display: flex;
   background-size: cover;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 24px;
-  padding-left: 25%;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  color: black;
+  background: #111;
+  color: #eee;
   z-index: 10;
+  padding: 24px;
 }
-</style>
 
-<style lang="scss" scoped>
 .question-footer {
   margin-top: 1em;
   display: flex;
@@ -127,7 +119,7 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: var(--tyde-blue);
+  background: #262626;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,14 +127,15 @@ export default {
   color: white;
   margin-right: 12px;
   opacity: 1;
-  transition: opacity 0.1s ease-out;
+  transition: all 0.1s ease-out;
 
   &:hover {
-    opacity: 0.8;
+    background: #11a6d8;
   }
 
   &:disabled {
     opacity: 0.6;
+    pointer-events: none;
     cursor: not-allowed;
   }
 
@@ -154,11 +147,12 @@ export default {
 .button-nav-menu {
   width: 80px;
   height: 80px;
-  font-size: 64px;
+  font-size: 56px;
 
   position: absolute;
   top: 24px;
   left: 24px;
+  z-index: 20;
 }
 
 .question-step {

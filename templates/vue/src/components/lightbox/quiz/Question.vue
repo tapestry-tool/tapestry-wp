@@ -8,14 +8,7 @@
     ></div>
     <div v-else>
       <h1 class="question-title">
-        <div class="question-title-step">
-          {{ currentStep }}
-        </div>
         {{ question.text }}
-        <div
-          class="question-title-bubble"
-          :style="{ backgroundImage: bubbleImage }"
-        ></div>
       </h1>
       <div class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
@@ -46,8 +39,6 @@
 import AnswerButton from "./AnswerButton"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
-import Helpers from "../../../utils/Helpers"
-import SpeechBubble from "../../../assets/speech-bubble-end.png"
 
 export default {
   name: "question",
@@ -72,11 +63,6 @@ export default {
       formHtml: "",
       loadingForm: false,
     }
-  },
-  computed: {
-    bubbleImage() {
-      return `url(${Helpers.getImagePath(SpeechBubble)})`
-    },
   },
   methods: {
     async openForm(id) {
@@ -129,46 +115,10 @@ button {
 
 .question-title {
   position: relative;
-  font-size: 28px;
-  font-style: italic;
-  border: 2px solid black;
-  padding: 12px 16px;
-  border-radius: 1em;
+  font-size: 48px;
+  font-weight: 600 !important;
+  padding-top: 16px;
   margin-bottom: 36px;
-}
-
-.question-title:after {
-  content: "";
-  position: absolute;
-  left: 10%;
-  bottom: -2px;
-  width: 15px;
-  height: 2px;
-  background: black;
-}
-
-.question-title-bubble {
-  position: absolute;
-  left: 10%;
-  bottom: -31px;
-  width: 46px;
-  height: 32px;
-  background-size: cover;
-}
-
-.question-title-step {
-  position: absolute;
-  border: 2px solid black;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  top: -16px;
-  left: -24px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
 }
 
 .question-title:before {
@@ -176,9 +126,12 @@ button {
 }
 
 .question-content {
-  padding-left: 30%;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .question-answer-text {

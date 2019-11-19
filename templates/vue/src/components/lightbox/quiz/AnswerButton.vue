@@ -40,7 +40,7 @@ export default {
 .button {
   padding: 0;
   margin: 0;
-  background-color: var(--tyde-orange);
+  background-color: #262626;
   color: white;
   width: 136px;
   height: 144px;
@@ -59,7 +59,7 @@ export default {
   }
 
   &:hover {
-    background-color: var(--tyde-orange-light);
+    background-color: #11a6d8;
   }
 }
 
