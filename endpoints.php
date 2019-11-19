@@ -168,7 +168,7 @@ $REST_API_ENDPOINTS = [
     'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
         'ROUTE'     => 'users/quiz',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
+            'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'completeQuestionById'
         ]
     ],

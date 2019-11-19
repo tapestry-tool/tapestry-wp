@@ -1,6 +1,10 @@
 <template>
   <div class="question">
-    <div v-if="formOpened" @submit="handleFormSubmit" v-html="formHtml"></div>
+    <div
+      v-if="formOpened"
+      @submit="handleFormSubmit(question.id)"
+      v-html="formHtml"
+    ></div>
     <div v-else>
       <h1 class="question-title">
         <div class="question-title-step">
@@ -90,9 +94,9 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit() {
+    handleFormSubmit(questionId) {
       this.formOpened = false
-      this.$emit("form-submitted")
+      this.$emit("form-submitted", questionId)
     },
   },
 }

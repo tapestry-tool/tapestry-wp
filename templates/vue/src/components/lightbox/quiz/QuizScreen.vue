@@ -7,7 +7,7 @@
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
-      @form-submitted="formOpened = false"
+      @form-submitted="handleFormSubmit"
     ></question>
     <footer v-if="!formOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex"
 import Question from "./Question"
 import Helpers from "../../../utils/Helpers"
 import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
@@ -32,8 +33,8 @@ export default {
     Question,
   },
   props: {
-    quiz: {
-      type: Array,
+    node: {
+      type: Object,
       required: true,
     },
   },
@@ -44,6 +45,9 @@ export default {
     }
   },
   computed: {
+    quiz() {
+      return this.node.quiz
+    },
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
     },
@@ -61,6 +65,11 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["completeQuestion"]),
+    async handleFormSubmit(questionId) {
+      await this.completeQuestion({ nodeId: this.node.id, questionId })
+      this.formOpened = false
+    },
     next() {
       this.activeQuestionIndex++
     },

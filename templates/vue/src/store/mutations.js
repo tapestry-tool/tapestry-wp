@@ -59,8 +59,8 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
-export function completeQuestion(state, questionId) {
-  const node = state.nodes[Helpers.findNodeIndex(payload.id, state)]
+export function completeQuestion(state, { nodeId, questionId }) {
+  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
   const question = node.quiz.find(question => question.id === questionId)
   question.completed = true
 }

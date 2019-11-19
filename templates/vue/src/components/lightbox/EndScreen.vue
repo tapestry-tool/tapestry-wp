@@ -1,9 +1,5 @@
 <template>
-  <quiz-screen
-    v-if="showQuiz"
-    :quiz="node.quiz"
-    @close="showQuiz = false"
-  ></quiz-screen>
+  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false"></quiz-screen>
   <div
     v-else
     :class="[
