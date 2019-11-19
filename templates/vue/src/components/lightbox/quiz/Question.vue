@@ -1,7 +1,8 @@
 <template>
   <div class="question">
+    <loading v-if="loadingForm" label="Loading form..." />
     <div
-      v-if="formOpened"
+      v-else-if="formOpened"
       @submit="handleFormSubmit(question.id)"
       v-html="formHtml"
     ></div>
@@ -37,6 +38,7 @@
 
 <script>
 import AnswerButton from "./AnswerButton"
+import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
 import Helpers from "../../../utils/Helpers"
 import SpeechBubble from "../../../assets/speech-bubble-end.png"
@@ -45,6 +47,7 @@ export default {
   name: "question",
   components: {
     AnswerButton,
+    Loading,
   },
   props: {
     question: {

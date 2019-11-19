@@ -4,11 +4,13 @@
       <i class="fas fa-arrow-left"></i>
     </button>
     <question
+      v-if="!submittingForm"
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
       @form-submitted="handleFormSubmit"
     ></question>
+    <loading v-if="submittingForm" label="Submitting..." />
     <footer v-if="!formOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
@@ -24,6 +26,7 @@
 <script>
 import { mapActions } from "vuex"
 import Question from "./Question"
+import Loading from "../../Loading"
 import Helpers from "../../../utils/Helpers"
 import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
 
@@ -31,6 +34,7 @@ export default {
   name: "quiz-screen",
   components: {
     Question,
+    Loading,
   },
   props: {
     node: {
@@ -42,6 +46,7 @@ export default {
     return {
       activeQuestionIndex: 0,
       formOpened: false,
+      submittingForm: false,
     }
   },
   computed: {
@@ -67,7 +72,9 @@ export default {
   methods: {
     ...mapActions(["completeQuestion"]),
     async handleFormSubmit(questionId) {
+      this.submittingForm = true
       await this.completeQuestion({ nodeId: this.node.id, questionId })
+      this.submittingForm = false
       this.formOpened = false
     },
     next() {
