@@ -1,18 +1,29 @@
 <template>
   <div class="module-container" :style="nodeStyles">
-    <div class="button-container">
-      <button
-        v-for="(question, index) in questions"
-        class="tyde-stage-button"
-        :key="question.id"
-        @click="openLightbox(question.id)"
-      >
-        <div class="tyde-stage-button-image-container" >
-          <img class="tyde-stage-button-image" :src="getButtonImage(index)" :style="getImageStyles(index)" />
-        </div>
-        <p class="tyde-stage-button-text">{{ question.title }}</p>
-      </button>
-      <button class="tyde-button-next" v-if="done" @click="$emit('next')">Next</button>
+    <div class="stage-content">
+      <h1 class="tyde-stage-title">{{ node.title }}</h1>
+      <section class="button-container">
+        <button
+          v-for="(question, index) in questions"
+          :key="question.id"
+          class="tyde-stage-button"
+          @click="openLightbox(question.id)"
+        >
+          <div class="tyde-stage-button-image-container">
+            <img
+              class="tyde-stage-button-image"
+              :src="getButtonImage(index)"
+              :style="getImageStyles(index)"
+            />
+          </div>
+          <p class="tyde-stage-button-text">{{ question.title }}</p>
+        </button>
+      </section>
+      <footer class="tyde-stage-footer">
+        <button v-if="done" class="tyde-button-next" @click="$emit('next')">
+          Next
+        </button>
+      </footer>
     </div>
     <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>
@@ -82,7 +93,7 @@ export default {
         return { width: "70%" }
       }
       return {}
-    }
+    },
   },
 }
 </script>
@@ -101,16 +112,25 @@ export default {
   width: 100%;
 }
 
-.button-container {
+.stage-content {
   width: 70vw;
   height: 72vh;
   position: absolute;
   top: 32px;
   right: 32px;
+  font-family: "VT323", monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 64px;
+  color: var(--tyde-border-green);
+}
+
+.button-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'VT323', monospace;
+  font-family: inherit;
 }
 
 .tyde-stage-button {
@@ -166,12 +186,23 @@ export default {
 
   font-family: inherit;
   font-size: 2.5em;
-  position: absolute;
-  bottom: 56px;
-  right: 64px;
+}
+
+.tyde-stage-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .tyde-button-next:hover {
   text-decoration: underline;
+}
+
+.tyde-stage-title {
+  font-family: inherit;
+  font-size: 64px;
+}
+
+.tyde-stage-title::before {
+  display: none;
 }
 </style>
