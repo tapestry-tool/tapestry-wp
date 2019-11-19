@@ -4,17 +4,13 @@
       <h1 class="tyde-stage-title">{{ node.title }}</h1>
       <section class="button-container">
         <button
-          v-for="(question, index) in questions"
+          v-for="question in questions"
           :key="question.id"
           class="tyde-stage-button"
           @click="openLightbox(question.id)"
         >
           <div class="tyde-stage-button-image-container">
-            <img
-              class="tyde-stage-button-image"
-              :src="getButtonImage(index)"
-              :style="getImageStyles(index)"
-            />
+            <img class="tyde-stage-button-image" :src="question.imageURL" />
           </div>
           <p class="tyde-stage-button-text">{{ question.title }}</p>
         </button>
@@ -135,48 +131,31 @@ export default {
 
 .tyde-stage-button {
   margin: 0;
-  padding: 20px 0;
-
-  width: 164px;
-  height: 196px;
-  background: var(--tyde-green);
-  border: 1px solid var(--tyde-border-green);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  transition: all 0.2s ease-out;
-  margin-right: 8px;
+  background: none;
+  color: inherit;
 }
 
-.tyde-stage-button:last-child {
-  margin-right: 0;
-}
-
-.tyde-stage-button:hover {
-  background: var(--tyde-border-green);
-}
-
-.tyde-stage-button:hover img {
+.tyde-stage-button:hover .tyde-stage-button-text {
   transform: translateY(-8px);
 }
 
 .tyde-stage-button-image {
-  transition: transform 0.2s ease-out;
+  width: 90%;
+  height: auto;
 }
 
 .tyde-stage-button-image-container {
-  width: 80%;
-  flex: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 198px;
+  height: 184px;
 }
 
 .tyde-stage-button-text {
   padding: 0;
   margin: 0;
   font-family: inherit;
+  color: inherit;
+  font-size: 32px;
+  transition: transform 0.2s ease-out;
 }
 
 .tyde-button-next {
