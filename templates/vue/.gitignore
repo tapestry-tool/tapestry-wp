@@ -11,3 +11,7 @@ config.js
 *.ntvs*
 *.njsproj
 *.sln
+
+# Config and package lock
+config.js
+package-lock.json

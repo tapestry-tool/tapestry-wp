@@ -315,7 +315,7 @@ class Tapestry implements ITapestry
 
         return $tapestry;
     }
-
+    
     private function _resetAuthor()
     {
         wp_update_post(array(

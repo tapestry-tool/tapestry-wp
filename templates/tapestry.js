@@ -957,7 +957,7 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (d.imageURL.length)
+                if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
             });
@@ -1881,6 +1881,7 @@ function tapestryTool(config){
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
             var quizCompletionInfo = progressObj[id].quiz;
+            var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
             
@@ -1899,6 +1900,7 @@ function tapestryTool(config){
                         }
                     })
                 }
+                tapestry.dataset.nodes[index].completed = completed;
             }
         }
     

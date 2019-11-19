@@ -5,7 +5,7 @@ touch .vscode/settings.json
 touch .vscode/extensions.json
 
 echo '{
-  "recommendations": ["octref.vetur", "dbaeumer.vscode-eslint"]
+  "recommendations": ["octref.vetur", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
 }' > .vscode/extensions.json
 
 echo '{

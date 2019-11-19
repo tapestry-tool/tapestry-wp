@@ -72,6 +72,14 @@ export default {
       }
       return false
     },
+    handleLoad() {
+      const videoRect = this.$refs.video.getBoundingClientRect()
+      this.$emit("load", {
+        width: videoRect.width,
+        height: videoRect.height,
+        el: this.$refs.video,
+      })
+    },
     handlePlay() {
       const { id, mediaType } = this.node
       const video = this.$refs.video
@@ -88,15 +96,15 @@ export default {
         time: video.currentTime,
       })
     },
-    handleLoad() {
-      const video = this.$refs.video
-      const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", { width: videoRect.width, height: videoRect.height })
+    // handleLoad() {
+    //   const video = this.$refs.video
+    //   const videoRect = this.$refs.video.getBoundingClientRect()
+    //   this.$emit("load", { width: videoRect.width, height: videoRect.height })
 
-      const progress = this.node.typeData.progress[0].value
-      const viewedAmount = progress * video.duration
-      video.currentTime = viewedAmount
-    },
+    //   const progress = this.node.typeData.progress[0].value
+    //   const viewedAmount = progress * video.duration
+    //   video.currentTime = viewedAmount
+    // },
     updateVideoProgress() {
       const video = this.$refs.video
       const amountViewed = video.currentTime / video.duration
