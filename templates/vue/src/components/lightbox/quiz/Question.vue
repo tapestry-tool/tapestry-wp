@@ -1,12 +1,12 @@
 <template>
   <div class="question">
-    <loading v-if="loadingForm" label="Loading form..." />
-    <div
-      v-else-if="formOpened"
-      @submit="handleFormSubmit(question.id)"
-      v-html="formHtml"
-    ></div>
-    <div v-else>
+    <gravity-form
+      v-if="formOpened"
+      :form="formHtml"
+      @submit="handleFormSubmit"
+    ></gravity-form>
+    <loading v-if="loadingForm" class="loading" :label="loadingText" />
+    <div v-if="!formOpened">
       <h1 class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
@@ -44,6 +44,7 @@
 
 <script>
 import AnswerButton from "./AnswerButton"
+import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
 import Helpers from "../../../utils/Helpers"
@@ -54,6 +55,7 @@ export default {
   components: {
     AnswerButton,
     Loading,
+    GravityForm,
   },
   props: {
     question: {
@@ -76,6 +78,9 @@ export default {
   computed: {
     bubbleImage() {
       return `url(${Helpers.getImagePath(SpeechBubble)})`
+    },
+    loadingText() {
+      return this.formOpened ? "Submitting..." : "Loading form..."
     },
   },
   methods: {
@@ -103,9 +108,13 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit(questionId) {
-      this.formOpened = false
-      this.$emit("form-submitted", questionId)
+    handleFormSubmit() {
+      // this.loadingForm = true
+      /* setTimeout(() => {
+        this.formOpened = false
+        this.loadingForm = false
+        this.$emit("form-submitted", this.question.id)
+      }, 150) */
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -192,5 +201,14 @@ button {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.loading {
+  background: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.9;
+  z-index: 30;
 }
 </style>
