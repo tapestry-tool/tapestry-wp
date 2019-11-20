@@ -10,7 +10,7 @@
       @form-opened="formOpened = true"
       @form-submitted="handleFormSubmit"
     ></question>
-    <loading v-if="submittingForm" label="Submitting..." />
+    <loading v-if="submittingForm" label="Completing..." />
     <footer v-if="!formOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">

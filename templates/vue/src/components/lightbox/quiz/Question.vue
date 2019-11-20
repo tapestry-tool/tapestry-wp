@@ -2,6 +2,7 @@
   <div class="question">
     <gravity-form
       v-if="formOpened"
+      :id="formId"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
@@ -72,6 +73,7 @@ export default {
     return {
       formOpened: false,
       formHtml: "",
+      formId: null,
       loadingForm: false,
     }
   },
@@ -92,6 +94,7 @@ export default {
       // Clear previous form data
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
+      this.formId = id
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -108,13 +111,15 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit() {
-      // this.loadingForm = true
-      /* setTimeout(() => {
-        this.formOpened = false
-        this.loadingForm = false
-        this.$emit("form-submitted", this.question.id)
-      }, 150) */
+    handleFormSubmit({ id, success, formData, response }) {
+      if (!success) {
+        delete window[`gf_submitting_${id}`]
+        this.formHtml = response
+        return
+      }
+      // TODO: Save form submission somehow
+      this.formOpened = false
+      this.$emit("form-submitted", this.question.id)
     },
     hasId(label) {
       const id = this.question.answers[label]
