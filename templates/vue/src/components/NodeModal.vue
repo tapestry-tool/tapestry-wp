@@ -354,7 +354,7 @@ export default {
         { name: "mediaDuration", value: this.node.mediaDuration },
         {
           name: "imageURL",
-          value: this.addThumbnail ? this.node.imageURL : "",
+          value: this.node.imageURL || "",
         },
         { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
@@ -382,7 +382,7 @@ export default {
   },
   watch: {
     nodeImageUrl: function() {
-      this.addThumbnail = this.node.imageURL.length > 0
+      this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
   },
   mounted() {

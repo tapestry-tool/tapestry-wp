@@ -93,7 +93,11 @@ export default {
       const video = this.$refs.video
       if (video) {
         const videoRect = this.$refs.video.getBoundingClientRect()
-        this.$emit("load", { width: videoRect.width, height: videoRect.height })
+        this.$emit("load", {
+          width: videoRect.width,
+          height: videoRect.height,
+          el: this.$refs.video,
+        })
 
         const progress = this.node.typeData.progress[0].value
         const viewedAmount = progress * video.duration

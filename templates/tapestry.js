@@ -955,7 +955,7 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (d.imageURL.length)
+                if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
             })
@@ -1883,6 +1883,7 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
+            var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
             
@@ -1891,6 +1892,7 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
+                tapestry.dataset.nodes[index].completed = completed;
             }
         }
     
@@ -1919,19 +1921,6 @@ function tapestryTool(config){
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
-            console.error(e);
-        });
-    }
-
-    function saveNodeAsSkippable(node) {
-        tapestry.dataset.nodes[node.index].skippable = true;
-        jQuery.post(USER_NODE_SKIPPED_URL, {
-            "post_id": config.wpPostId,
-            "node_id": node.id,
-            "skippable": true,
-        })
-        .fail(function (e) {
-            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
             console.error(e);
         });
     }

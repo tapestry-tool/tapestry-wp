@@ -18,6 +18,9 @@ const store = new Vuex.Store({
     settings: {},
     h5pSettings: {},
     selectedNodeId: null,
+    lightboxId: null,
+    isLightboxOpen: false,
+    lightboxEl: null,
   },
   getters: {
     selectedNode: state => {
@@ -27,8 +30,17 @@ const store = new Vuex.Store({
     },
     settings: state => state.settings,
     tapestry: state => state,
+    getDirectChildren: state => id => {
+      const links = state.links
+      return links.filter(link => link.source.id == id).map(link => link.target.id)
+    },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
+    lightbox: state => ({
+      id: state.lightboxId,
+      isOpen: state.isLightboxOpen,
+      el: state.lightboxEl,
+    }),
   },
   mutations,
   actions,
