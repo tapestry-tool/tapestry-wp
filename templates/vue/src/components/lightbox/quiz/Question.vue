@@ -82,6 +82,9 @@ export default {
       loadingForm: false,
     }
   },
+  computed: {
+    ...mapGetters(["selectedNode"]),
+  },
   methods: {
     async openRecorder() {
       this.h5pRecorderUrl = `http://localhost:8888/tapestry-wp/wp-admin/admin-ajax.php?action=h5p_embed&id=34`
