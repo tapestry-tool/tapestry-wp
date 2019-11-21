@@ -1,24 +1,21 @@
 <template>
   <div :id="`module-${nodeId}`" class="wrapper">
     <tyde-stage
-      v-show="!isLightboxOpen"
+      v-show="!lightbox.isOpen"
       :node-id="activeStage"
       @next="next"
     ></tyde-stage>
-    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
 import TydeStage from "./TydeStage"
-import Lightbox from "../Lightbox"
 
 export default {
   name: "tyde-module",
   components: {
     TydeStage,
-    Lightbox,
   },
   props: {
     nodeId: {
@@ -29,12 +26,10 @@ export default {
   data() {
     return {
       activeStageIndex: 0,
-      isLightboxOpen: false,
-      lightboxId: null,
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getDirectChildren", "lightbox"]),
     node() {
       return this.getNode(this.nodeId)
     },
@@ -47,7 +42,7 @@ export default {
   },
   watch: {
     activeStage(newStage) {
-      if (this.isLightboxOpen) {
+      if (this.lightbox.isOpen) {
         this.closeLightbox()
       }
       this.openLightbox(newStage)
@@ -57,19 +52,12 @@ export default {
     this.openLightbox(this.activeStage)
   },
   methods: {
+    ...mapMutations(["openLightbox", "closeLightbox"]),
     next() {
       this.activeStageIndex++
       if (this.activeStageIndex >= this.stages.length) {
         this.$emit("done")
       }
-    },
-    openLightbox(id) {
-      this.isLightboxOpen = true
-      this.lightboxId = id
-    },
-    closeLightbox() {
-      this.isLightboxOpen = false
-      this.lightboxId = null
     },
   },
 }

@@ -75,7 +75,9 @@ export default {
       const { el } = this.lightbox
       this.toggleMenu()
       if (el) {
-        el.play()
+        if (el.currentTime < el.duration) {
+          el.play()
+        }
       }
     },
     returnToMap() {

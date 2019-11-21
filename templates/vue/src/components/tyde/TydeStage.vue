@@ -21,33 +21,22 @@
         </button>
       </footer>
     </div>
-    <lightbox v-if="isLightboxOpen" :node-id="lightboxId" @close="closeLightbox" />
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex"
-import Lightbox from "../Lightbox"
+import { mapGetters, mapMutations } from "vuex"
 
 export default {
   name: "tyde-stage",
-  components: {
-    Lightbox,
-  },
   props: {
     nodeId: {
       type: [String, Number],
       required: true,
     },
   },
-  data() {
-    return {
-      isLightboxOpen: false,
-      lightboxId: null,
-    }
-  },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getDirectChildren", "lightbox"]),
     done() {
       return this.questions.every(question => question.completed)
     },
@@ -65,14 +54,7 @@ export default {
     },
   },
   methods: {
-    openLightbox(id) {
-      this.isLightboxOpen = true
-      this.lightboxId = id
-    },
-    closeLightbox() {
-      this.isLightboxOpen = false
-      this.lightboxId = null
-    },
+    ...mapMutations(["openLightbox", "closeLightbox"]),
     getImageStyles(index) {
       if (index === 0 || index === 3) {
         return { width: "70%" }
