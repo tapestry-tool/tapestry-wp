@@ -45,7 +45,11 @@ export default {
       if (evt.code === "Escape") {
         const { el } = this.lightbox
         if (el) {
-          this.isMenuOpen ? el.play() : el.pause()
+          if (this.isMenuOpen && el.currentTime < el.duration) {
+            el.play()
+          } else {
+            el.pause()
+          }
         }
         this.toggleMenu()
       }
