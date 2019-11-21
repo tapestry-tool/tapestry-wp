@@ -140,8 +140,8 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
-  width: 100%;
+  height: 90%;
+  width: 90%;
 }
 
 .question-title {
