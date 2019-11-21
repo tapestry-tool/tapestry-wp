@@ -6,6 +6,15 @@
       @submit="handleFormSubmit(question.id)"
       v-html="formHtml"
     ></div>
+    <iframe
+      ref="h5p"
+      v-else-if="h5pRecorderUrl"
+      allowfullscreen="false"
+      :src="h5pRecorderUrl"
+      width="300"
+      height="300"
+      @load="handleLoad"
+    ></iframe>
     <div v-else>
       <speech-bubble class="question-title">
         <div class="question-title-step">
