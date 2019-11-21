@@ -27,8 +27,6 @@
 import { mapActions } from "vuex"
 import Question from "./Question"
 import Loading from "../../Loading"
-import Helpers from "../../../utils/Helpers"
-import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
 
 export default {
   name: "quiz-screen",
@@ -55,9 +53,6 @@ export default {
     },
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
-    },
-    backgroundImage() {
-      return `url(${Helpers.getImagePath(BackgroundImg)})`
     },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
