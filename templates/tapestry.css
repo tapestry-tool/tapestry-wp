@@ -2,6 +2,8 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+@import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
+
 #header {
     position: fixed;
     top: 1em;

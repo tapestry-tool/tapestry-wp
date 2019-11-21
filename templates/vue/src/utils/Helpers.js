@@ -60,4 +60,8 @@ export default class {
   static normalizeUrl(url) {
     return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
   }
+
+  static getBackgroundUrl(image) {
+    return `${wpData.vue_uri}/${image.split("dist")[1]}`
+  }
 }
