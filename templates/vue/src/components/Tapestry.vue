@@ -39,6 +39,7 @@
       :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
+      @h5p-media-loaded="h5pMediaLoaded"
     />
   </div>
 </template>
@@ -61,6 +62,8 @@ export default {
   },
   data() {
     return {
+      loadedH5pId: 0,
+      recordedNodeIds: [],
       TapestryAPI: new TapestryAPI(wpPostId),
       tapestryLoaded: false,
       modalType: "",
@@ -113,6 +116,9 @@ export default {
           return ["public", "authenticated"]
       }
     },
+    userLoggedIn: function () {
+      return wpApiSettings && wpApiSettings.userLoggedIn === 'true';
+    },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
@@ -123,7 +129,8 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
-    window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
+    window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
+    window.addEventListener("open-lightbox", this.openLightbox)
   },
   methods: {
     ...mapMutations([
@@ -136,10 +143,64 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    tapestryUpdated(event) {
+    openLightbox(event) {
+      this.lightbox = {
+        isOpen: true,
+        id: event.detail,
+      }
+    },
+    closeLightbox() {
+      this.lightbox = {
+        isOpen: false,
+        id: null,
+      }
+      const { id, mediaType } = this.selectedNode
+      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
+    },
+    async h5pMediaLoaded(event) {
+      this.loadedH5pId = event.loadedH5pId
+      const selectedNodeId = this.selectedNode.id
+      if (selectedNodeId && this.loadedH5pId && this.recordedNodeIds.includes(selectedNodeId)) {
+        await this.loadH5PAudio(selectedNodeId, this.loadedH5pId)
+      }
+    },
+    async saveH5PAudioToServer(event) {
+      const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
+      if (encodedH5PAudio && this.userLoggedIn) {
+        try {
+          const audio = {
+            blob: encodedH5PAudio,
+            h5pId: this.loadedH5pId
+          }
+          await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
+          this.recordedNodeIds.push(this.selectedNode.id)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    },
+    async loadH5PAudio(nodeMetaId, loadedH5pId) {
+      try {
+        const audio = await this.TapestryAPI.getH5PAudioFromServer(nodeMetaId, loadedH5pId)
+        const h5pAudioRecorder = document.getElementById('h5p')
+        if (h5pAudioRecorder) {
+          dispatchEvent(new CustomEvent('tapestry-get-h5p-audio', {
+            detail: { audio }
+          }))
+        } else {
+          console.error('H5P module is not loaded.')
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
+        if (this.userLoggedIn) {
+          this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
+        }
       } else {
         this.setDataset(event.detail.dataset)
       }
@@ -160,6 +221,7 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
+        fullscreen: false,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -225,6 +287,7 @@ export default {
         hideProgress: false,
         hideMedia: false,
         skippable: true,
+        fullscreen: false,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -303,6 +366,9 @@ export default {
           case "skippable":
             newNodeEntry.skippable = fieldValue
             break
+          case "fullscreen":
+            newNodeEntry.fullscreen = fieldValue
+            break
           case "description":
             newNodeEntry.description = fieldValue
             break
@@ -370,4 +436,4 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

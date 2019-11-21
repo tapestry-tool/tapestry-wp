@@ -10,6 +10,14 @@ class TapestryError extends Error
     protected $status;
 
     const ERRORS = [
+        'INVALID_USER_ID' => [
+            'MESSAGE'   => 'UserID is invalid or user is not logged in.',
+            'STATUS'    => ['status' => 404]
+        ],
+        'INVALID_AUDIO' => [
+            'MESSAGE'   => 'Audio is invalid.',
+            'STATUS'    => ['status' => 404]
+        ],
         'INVALID_POST_ID' => [
             'MESSAGE'   => 'PostID is invalid',
             'STATUS'    => ['status' => 404]
@@ -68,6 +76,10 @@ class TapestryError extends Error
         ],
         'POST_ID_ALREADY_SET' => [
             'MESSAGE'   => 'PostID should not be passed in when creating a new Tapestry',
+            'STATUS'    => ['status' => 500]
+        ],
+        'FAILED_TO_SAVE_AUDIO' => [
+            'MESSAGE'   => 'Failed to save audio to the server.',
             'STATUS'    => ['status' => 500]
         ],
         'CANNOT_DELETE_ROOT' => [
