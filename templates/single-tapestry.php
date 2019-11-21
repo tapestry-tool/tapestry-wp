@@ -78,7 +78,7 @@ add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
 get_header(); ?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="post-wrap" role="main">
+    <main id="main" class="post-wrap<?php if (current_user_can('edit_post', get_the_ID())) { echo ' is-editor"'; } ?>" role="main">
 
         <div id="tapestry-container"></div>
 
