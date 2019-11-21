@@ -1924,19 +1924,6 @@ function tapestryTool(config){
             console.error(e);
         });
     }
-
-    function saveNodeAsSkippable(node) {
-        tapestry.dataset.nodes[node.index].skippable = true;
-        jQuery.post(USER_NODE_SKIPPED_URL, {
-            "post_id": config.wpPostId,
-            "node_id": node.id,
-            "skippable": true,
-        })
-        .fail(function (e) {
-            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
-            console.error(e);
-        });
-    }
     
     /* For setting the "type" field of nodes in dataset */
     function setNodeTypes(rootId) {
