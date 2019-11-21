@@ -144,7 +144,7 @@ export default {
 }
 
 .end-screen-button-text {
-  margin: 1em auto 0;
+  margin: 0;
   padding: 0;
   font-weight: 600;
   margin-left: 32px;
