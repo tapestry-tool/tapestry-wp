@@ -86,6 +86,10 @@ export default {
     async openRecorder() {
       this.h5pRecorderUrl = `http://localhost:8888/tapestry-wp/wp-admin/admin-ajax.php?action=h5p_embed&id=34`
     },
+    handleLoad() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      this.$emit('h5p-recorder-saver-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
+    },
     async openForm(id) {
       if (!id) {
         return
