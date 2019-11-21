@@ -12,7 +12,8 @@ function addNonceToScript()
 {
     $params = array(
         'nonce'  => wp_create_nonce('wp_rest'),
-        'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID())
+        'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
+        'userLoggedIn' => get_current_user_id() != 0 ? 'true' : 'false'
     );
 
     wp_register_script(

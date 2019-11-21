@@ -1,5 +1,9 @@
 <template>
-  <div id="lightbox">
+  <div
+    id="lightbox"
+    :class="{ 'full-screen': node.fullscreen }"
+    :format="node.mediaFormat"
+  >
     <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
@@ -30,6 +34,7 @@
             @load="handleLoad"
             @complete="complete"
             @timeupdate="updateProgress"
+            @close="$emit('close')"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -48,6 +53,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
+            @h5p-media-loaded="h5pMediaLoaded"
           />
         </div>
       </div>
@@ -209,11 +215,14 @@ export default {
         ...dimensions,
       }
     },
+    h5pMediaLoaded(event) {
+      this.$emit("h5p-media-loaded", { loadedH5pId: event.loadedH5pId })
+    },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #lightbox {
   position: fixed;
   top: 0;
@@ -249,6 +258,7 @@ export default {
   outline: none;
   border-radius: 15px;
   overflow: hidden;
+  height: 100%;
 }
 
 .media-wrapper-embed {
@@ -269,7 +279,7 @@ export default {
 }
 </style>
 
-<style>
+<style lang="scss">
 .lightbox-enter-active,
 .lightbox-leave-active {
   transition: all 1s;
@@ -279,5 +289,44 @@ export default {
 .lightbox-leave-to {
   opacity: 0;
   transform: translateY(32px);
+}
+
+#lightbox.full-screen {
+  background: #000;
+
+  #spotlight-content {
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0;
+  }
+}
+
+#lightbox[format="h5p"].full-screen #spotlight-content {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+#lightbox[format="h5p"].full-screen #spotlight-content iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+#lightbox[format="mp4"].full-screen #spotlight-content video {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+}
+
+#lightbox.full-screen #lightbox-close-wrapper {
+  top: 0 !important;
+  right: 0 !important;
+  z-index: 100;
 }
 </style>

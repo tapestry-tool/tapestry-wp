@@ -31,7 +31,6 @@ function tapestryTool(config){
         COLOR_LINK = "#999",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        TIME_BETWEEN_SAVE_PROGRESS = 5,                         // Means the number of seconds between each save progress call
         NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
         MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
@@ -39,8 +38,7 @@ function tapestryTool(config){
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
         USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
-        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings",
-        ALLOW_SKIP_THRESHOLD = 0.95;
+        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
 
     var // declared variables
         root, svg, links, nodes,                                // Basics
@@ -48,7 +46,7 @@ function tapestryTool(config){
         simulation,                                             // Force
         adjustedRadiusRatio = 1,                                // Radius adjusted for view mode
         tapestrySlug, 
-        saveProgress = true, progressLastSaved = new Date(),    // Saving Progress
+        saveProgress = true,                                    // Saving Progress
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
@@ -960,6 +958,28 @@ function tapestryTool(config){
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
+            })
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
+                        )
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
+                }
             });
     
         nodes.append("circle")
@@ -1052,26 +1072,6 @@ function tapestryTool(config){
                     // slider's maximum depth is set to the longest path from the new selected node
                     tapestryDepthSlider.max = findMaxDepth(root);
                     updateSvgDimensions();
-                }
-                else if (d.hideMedia) {
-                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-
-                    if (d.title === "Module 2") {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'start-module',
-                                { detail: d.id }
-                            )
-                        )
-                    } else {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'open-lightbox',
-                                { detail: thisBtn.dataset.id }
-                            )
-                        );
-                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
-                    }
                 }
             });
     }
@@ -1232,7 +1232,8 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' + 
+                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
                     ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';
@@ -1376,6 +1377,9 @@ function tapestryTool(config){
 
     function updateViewedProgress() {
         path = nodes
+            .filter(function (d) {
+                return !d.hideProgress;
+            })
             .selectAll("path")
             .data(function (d, i) {
                 var data = d.typeData.progress;

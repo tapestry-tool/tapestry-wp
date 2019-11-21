@@ -401,6 +401,7 @@
     position: absolute;
     top: -37px;
     right: -42px;
+    z-index: 20;
 }
 
 .lightbox-close {
