@@ -49,7 +49,7 @@ import { mapGetters, mapMutations, mapActions } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
-import TapestryAPI from "../services/TapestryAPI"
+import TapestryApi from "../services/TapestryAPI"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -64,7 +64,7 @@ export default {
     return {
       loadedH5pId: 0,
       recordedNodeIds: [],
-      TapestryAPI: new TapestryAPI(wpPostId),
+      TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
       populatedNode: {
@@ -83,15 +83,12 @@ export default {
           authenticated: ["read"],
         },
         quiz: [],
-      },
-      lightbox: {
-        isOpen: false,
-        id: null,
+        skippable: true
       },
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["selectedNode", "tapestry", "lightbox"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -134,40 +131,19 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("tapestry-h5p-audio-recorder", this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
-    window.addEventListener("open-lightbox", this.openLightbox)
+    window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
   },
   methods: {
-    updateNode(node) {
-      const oldNodeIndex = this.tapestry.nodes.findIndex(
-        oldNode => oldNode.id === node.id
-      )
-      this.tapestry.nodes[oldNodeIndex].typeData = { ...node.typeData }
-      this.tapestry.nodes[oldNodeIndex].imageURL = node.imageURL
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.reinitialize()
-    },
     ...mapMutations([
       "init",
+      "openLightbox",
+      "closeLightbox",
       "setDataset",
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    openLightbox(event) {
-      this.lightbox = {
-        isOpen: true,
-        id: event.detail,
-      }
-    },
-    closeLightbox() {
-      this.lightbox = {
-        isOpen: false,
-        id: null,
-      }
-      const { id, mediaType } = this.selectedNode
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-    },
     async h5pMediaLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
