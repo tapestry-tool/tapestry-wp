@@ -78,10 +78,6 @@ export default {
       type: String,
       required: true,
     },
-    tapestryApiClient: {
-      type: Object,
-      required: true,
-    },
   },
   data() {
     return {
