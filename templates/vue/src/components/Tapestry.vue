@@ -129,7 +129,7 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
-    window.addEventListener("open-lightbox", this.openLightbox)
+    window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
   },
   methods: {
     ...mapMutations([
@@ -142,20 +142,6 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    openLightbox(event) {
-      this.lightbox = {
-        isOpen: true,
-        id: event.detail,
-      }
-    },
-    closeLightbox() {
-      this.lightbox = {
-        isOpen: false,
-        id: null,
-      }
-      const { id, mediaType } = this.selectedNode
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-    },
     async h5pMediaLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
