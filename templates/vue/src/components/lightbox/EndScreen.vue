@@ -10,12 +10,12 @@
     ]"
     :style="{ backgroundImage: backgroundUrl }"
   >
-    <speech-bubble>
+    <speech-bubble v-if="showQuizButton">
       We've got a question for you!
       <br />
       Do you wanna...
     </speech-bubble>
-    <div class="button-container">
+    <div class="button-container" :class="{'pt-4':!showQuizButton}">
       <button
         v-if="showQuizButton"
         class="end-screen-button end-screen-button-quiz"
@@ -28,7 +28,11 @@
         <i class="fas fa-play"></i>
         <p class="end-screen-button-text">Replay Video</p>
       </button>
-      <button class="end-screen-button" @click="$emit('close')">
+      <button class="end-screen-button" @click="$emit('close')" v-if="!showQuizButton">
+        <i class="fas fa-arrow-circle-right"></i>
+        <p class="end-screen-button-text">Continue</p>
+      </button>
+      <button class="end-screen-button" @click="$emit('close')" v-if="showQuizButton">
         <i class="fas fa-history"></i>
         <p class="end-screen-button-text">Come Back Later</p>
       </button>
