@@ -75,7 +75,7 @@ export default {
   },
   props: {
     nodeId: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
   },
