@@ -28,13 +28,6 @@
 <script>
 import { mapGetters } from "vuex"
 import Lightbox from "../Lightbox"
-import Helpers from "../../utils/Helpers"
-
-import StageBackground from "../../assets/stage-bg.png"
-import ButtonOne from "../../assets/tyde-button-1.png"
-import ButtonTwo from "../../assets/tyde-button-2.png"
-import ButtonThree from "../../assets/tyde-button-3.png"
-import ButtonFour from "../../assets/tyde-button-4.png"
 
 export default {
   name: "tyde-stage",
@@ -63,7 +56,7 @@ export default {
     },
     nodeStyles() {
       return {
-        backgroundImage: `url(${Helpers.getBackgroundUrl(StageBackground)})`,
+        backgroundImage: `url(${this.node.imageURL})`,
       }
     },
     questions() {
@@ -79,10 +72,6 @@ export default {
     closeLightbox() {
       this.isLightboxOpen = false
       this.lightboxId = null
-    },
-    getButtonImage(index) {
-      const images = [ButtonOne, ButtonTwo, ButtonThree, ButtonFour]
-      return Helpers.getBackgroundUrl(images[index])
     },
     getImageStyles(index) {
       if (index === 0 || index === 3) {
