@@ -960,7 +960,8 @@ function tapestryTool(config){
                 else return COLOR_BLANK_HOVER;
             })
             .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
+                // this callback is not getting called for some reason
+                /* if (root === d.id && d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
 
                     if (d.title === "Module 2") {
@@ -979,7 +980,7 @@ function tapestryTool(config){
                         );
                         recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                     }
-                }
+                } */
             });
     
         nodes.append("circle")
@@ -1060,6 +1061,7 @@ function tapestryTool(config){
                 .on("end", dragended)
             )
             .on("click keydown", function (d) {
+                // but this callback is getting called instead
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     root = d.id;
@@ -1072,6 +1074,25 @@ function tapestryTool(config){
                     // slider's maximum depth is set to the longest path from the new selected node
                     tapestryDepthSlider.max = findMaxDepth(root);
                     updateSvgDimensions();
+                } else if (d.hideMedia) {
+                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
+                        )
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
                 }
             });
     }
