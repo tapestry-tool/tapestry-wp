@@ -33,7 +33,7 @@
           <answer-button
             v-if="hasId('audioId')"
             icon="microphone"
-            @click="openRecorder()"
+            @click="openRecorder(question.answers.audioId)"
           >
             audio
           </answer-button>
@@ -88,10 +88,12 @@ export default {
     ...mapGetters(["selectedNode"]),
   },
   methods: {
-    openRecorder() {
-      this.recorderOpened = true
-      this.$emit("recorder-opened")
-      this.h5pRecorderUrl = `http://localhost:8888/tapestry-wp/wp-admin/admin-ajax.php?action=h5p_embed&id=34`
+    openRecorder(id) {
+      if (id) {
+        this.recorderOpened = true
+        this.$emit("recorder-opened")
+        this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
+      }
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
