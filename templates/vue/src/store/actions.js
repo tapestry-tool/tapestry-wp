@@ -59,7 +59,7 @@ export function updateNodePermissions(_, payload) {
 
 export async function completeQuestion({ commit }, payload) {
   await client.completeQuestion(payload.nodeId, payload.questionId)
-  commit("completeQuestion", payload.questionId)
+  commit("completeQuestion", payload)
 }
 
 // links

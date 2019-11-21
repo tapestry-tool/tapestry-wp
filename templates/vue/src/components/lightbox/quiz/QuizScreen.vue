@@ -1,24 +1,22 @@
 <template>
-  <div class="quiz-screen" :style="{ backgroundImage: `url(${backgroundImage})` }">
+  <div class="quiz-screen" :style="{ backgroundImage }">
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <question
+      v-if="!submittingForm"
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
+      @form-submitted="handleFormSubmit"
     ></question>
-    <footer class="question-footer">
+    <loading v-if="submittingForm" label="Submitting..." />
+    <footer v-if="!formOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button
-        v-show="!formOpened"
-        class="button-nav"
-        :disabled="!hasNext"
-        @click="next"
-      >
+      <button class="button-nav" :disabled="!hasNext" @click="next">
         <i class="fas fa-arrow-right"></i>
       </button>
     </footer>
@@ -26,17 +24,21 @@
 </template>
 
 <script>
+import { mapActions } from "vuex"
 import Question from "./Question"
+import Loading from "../../Loading"
+import Helpers from "../../../utils/Helpers"
 import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
 
 export default {
   name: "quiz-screen",
   components: {
     Question,
+    Loading,
   },
   props: {
-    quiz: {
-      type: Array,
+    node: {
+      type: Object,
       required: true,
     },
   },
@@ -44,14 +46,18 @@ export default {
     return {
       activeQuestionIndex: 0,
       formOpened: false,
+      submittingForm: false,
     }
   },
   computed: {
+    quiz() {
+      return this.node.quiz
+    },
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
     },
     backgroundImage() {
-      return `${wpData.vue_uri}/${BackgroundImg.split("dist")[1]}`
+      return `url(${Helpers.getImagePath(BackgroundImg)})`
     },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
@@ -64,6 +70,13 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["completeQuestion"]),
+    async handleFormSubmit(questionId) {
+      this.submittingForm = true
+      await this.completeQuestion({ nodeId: this.node.id, questionId })
+      this.submittingForm = false
+      this.formOpened = false
+    },
     next() {
       this.activeQuestionIndex++
     },
@@ -96,7 +109,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .question-footer {
   margin-top: 1em;
   display: flex;
@@ -117,19 +130,19 @@ export default {
   margin-right: 12px;
   opacity: 1;
   transition: opacity 0.1s ease-out;
-}
 
-.button-nav:hover {
-  opacity: 0.8;
-}
+  &:hover {
+    opacity: 0.8;
+  }
 
-.button-nav:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
-.button-nav:last-child {
-  margin-right: 0;
+  &:last-child {
+    margin-right: 0;
+  }
 }
 
 .button-nav-menu {

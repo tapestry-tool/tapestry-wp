@@ -63,7 +63,7 @@ export default {
     wpCanEditTapestry: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
   },
   data() {
@@ -91,7 +91,11 @@ export default {
       this.$bvModal.hide("settings-modal")
     },
     getSettings() {
-      const { backgroundUrl = "", autoLayout = false, nodeDraggable = true } = this.settings
+      const {
+        backgroundUrl = "",
+        autoLayout = false,
+        nodeDraggable = true,
+      } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
@@ -100,7 +104,7 @@ export default {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
-        nodeDraggable: this.nodeDraggable
+        nodeDraggable: this.nodeDraggable,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
@@ -112,4 +116,4 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

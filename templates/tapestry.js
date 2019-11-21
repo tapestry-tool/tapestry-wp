@@ -31,7 +31,6 @@ function tapestryTool(config){
         COLOR_LINK = "#999",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        TIME_BETWEEN_SAVE_PROGRESS = 5,                         // Means the number of seconds between each save progress call
         NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
         MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
@@ -39,8 +38,7 @@ function tapestryTool(config){
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
         USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
-        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings",
-        ALLOW_SKIP_THRESHOLD = 0.95;
+        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
 
     var // declared variables
         root, svg, links, nodes,                                // Basics
@@ -48,7 +46,7 @@ function tapestryTool(config){
         simulation,                                             // Force
         adjustedRadiusRatio = 1,                                // Radius adjusted for view mode
         tapestrySlug, 
-        saveProgress = true, progressLastSaved = new Date(),    // Saving Progress
+        saveProgress = true,                                    // Saving Progress
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
@@ -512,45 +510,16 @@ function tapestryTool(config){
         } else if (getChildren(nodeId, 0) && getChildren(nodeId, 0).length > 1) {
             alert("Can only delete nodes with one neighbouring node.");
         } else {
-            var linkToBeDeleted = -1;
-            for (var i = 0; i < tapestry.dataset.links.length; i++) {
-                var linkedNodeId;
-                if (tapestry.dataset.links[i].source.id === nodeId) {
-                    linkedNodeId = tapestry.dataset.links[i].target.id; // Node linked to the node to be deleted
-                } else if (tapestry.dataset.links[i].target.id === nodeId) {
-                    linkedNodeId = tapestry.dataset.links[i].source.id // Node linked to the node to be deleted
-                } else {
-                    continue;
+            $.ajax({
+                url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
+                method: API_DELETE_METHOD,
+                success: function() {
+                    location.reload();
+                },
+                error: function(e) {
+                    console.error("Error deleting node " + nodeId, e);
                 }
-    
-                var newLinks = JSON.parse(JSON.stringify(tapestry.dataset.links)); // deep copy
-                newLinks.splice(i, 1); // remove the link and see if linkedNode is connected to root node
-                if(!hasPathBetweenNodes(tapestry.dataset.rootId, linkedNodeId, newLinks)) {
-                    alert("Cannot delete node.");
-                    return;
-                } else {
-                    linkToBeDeleted = i;
-                }
-            }
-    
-             if (linkToBeDeleted !== -1) {
-                for (var j = 0; j < tapestry.dataset.nodes.length; j++) {
-                    if (tapestry.dataset.nodes[j].id === nodeId) {
-                        var spliceIndex = j;
-                        $.ajax({
-                            url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
-                            method: API_DELETE_METHOD,
-                            success: function() {
-                                deleteLink(tapestry.dataset.links[linkToBeDeleted].source.id, tapestry.dataset.links[linkToBeDeleted].target.id, true, spliceIndex);
-                                location.reload();
-                            },
-                            error: function(e) {
-                                console.error("Error deleting node " + nodeId, e);
-                            }
-                        });
-                    }
-                }
-            }
+            });
         }
     }
     
@@ -986,9 +955,21 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (d.imageURL.length)
+                if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
+            })
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
+                    dispatchEvent(
+                        new CustomEvent(
+                            'open-lightbox', 
+                            { detail: thisBtn.dataset.id }
+                        )
+                    );
+                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                }
             });
     
         nodes.append("circle")
@@ -1081,16 +1062,6 @@ function tapestryTool(config){
                     // slider's maximum depth is set to the longest path from the new selected node
                     tapestryDepthSlider.max = findMaxDepth(root);
                     updateSvgDimensions();
-                }
-                else if (d.hideMedia) {
-                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    dispatchEvent(
-                        new CustomEvent(
-                            'open-lightbox', 
-                            { detail: thisBtn.dataset.id }
-                        )
-                    );
-                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
                 }
             });
     }
@@ -1251,7 +1222,8 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' + 
+                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
                     ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';
@@ -1395,6 +1367,9 @@ function tapestryTool(config){
 
     function updateViewedProgress() {
         path = nodes
+            .filter(function (d) {
+                return !d.hideProgress;
+            })
             .selectAll("path")
             .data(function (d, i) {
                 var data = d.typeData.progress;
@@ -1908,7 +1883,8 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            const quizCompletionInfo = progressObj[id].quiz;
+            var quizCompletionInfo = progressObj[id].quiz;
+            var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
             
@@ -1918,13 +1894,16 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
 
-                const questions = tapestry.dataset.nodes[index].quiz;
+                var questions = tapestry.dataset.nodes[index].quiz;
                 if (quizCompletionInfo) {
                     Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
-                        const question = questions.find(question => question.id === questionId);
-                        question.completed = isCompleted;
+                        var question = questions.find(question => question.id === questionId);
+                        if (question) {
+                            question.completed = isCompleted;
+                        }
                     })
                 }
+                tapestry.dataset.nodes[index].completed = completed;
             }
         }
     
@@ -1953,19 +1932,6 @@ function tapestryTool(config){
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
-            console.error(e);
-        });
-    }
-
-    function saveNodeAsSkippable(node) {
-        tapestry.dataset.nodes[node.index].skippable = true;
-        jQuery.post(USER_NODE_SKIPPED_URL, {
-            "post_id": config.wpPostId,
-            "node_id": node.id,
-            "skippable": true,
-        })
-        .fail(function (e) {
-            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
             console.error(e);
         });
     }

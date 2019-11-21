@@ -67,4 +67,8 @@ export default class {
       return v.toString(16);
     });
   }
+
+  static getImagePath(image) {
+    return `${wpData.vue_uri}/${image.split("dist")[1]}`;
+  }
 }

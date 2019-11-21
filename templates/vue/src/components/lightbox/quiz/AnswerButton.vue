@@ -1,5 +1,5 @@
 <template>
-  <button class="button" @click="$emit('click')">
+  <button :disabled="disabled" class="button" @click="$emit('click')">
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
@@ -14,6 +14,11 @@ import TextIcon from "../../../assets/Aa.svg"
 export default {
   name: "answer-button",
   props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     icon: {
       type: String,
       required: false,
@@ -31,7 +36,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .button {
   padding: 0;
   margin: 0;
@@ -46,22 +51,24 @@ export default {
   justify-content: center;
   font-size: 24px;
   transition: all 0.1s ease-out;
-}
+  margin-right: 24px;
 
-.button:hover {
-  background-color: var(--tyde-orange-light);
-}
+  &:last-child,
+  &:only-child {
+    margin-right: 0;
+  }
 
-.button:first-child {
-  margin-left: 0;
+  &:hover {
+    background-color: var(--tyde-orange-light);
+  }
 }
 
 .icon {
   height: 56px;
   margin-bottom: 16px;
-}
 
-.icon-fa {
-  font-size: 56px;
+  &-fa {
+    font-size: 56px;
+  }
 }
 </style>

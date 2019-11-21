@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <tapestry />
+    <tyde />
   </div>
 </template>
 
 <script>
-import Tapestry from "./components/Tapestry"
+import Tyde from "./components/Tyde"
 
 export default {
   name: "app",
   components: {
-    Tapestry,
+    Tyde,
   },
   data() {
     return {}
@@ -18,7 +18,8 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+
 html {
   font-size: 100%;
 }
@@ -30,19 +31,19 @@ html {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
 
-h1,
-h2 {
-  font-weight: normal;
-}
+  h1,
+  h2 {
+    font-weight: normal;
+  }
 
-#app h1::before {
-  content: none;
-}
+  h1:before {
+    content: none;
+  }
 
-#app p {
-  padding: 0;
+  p {
+    padding: 0;
+  }
 }
 
 ul {
@@ -57,5 +58,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+button:focus {
+  outline: none;
 }
 </style>

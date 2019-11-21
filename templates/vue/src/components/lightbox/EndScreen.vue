@@ -1,9 +1,5 @@
 <template>
-  <quiz-screen
-    v-if="showQuiz"
-    :quiz="node.quiz"
-    @close="showQuiz = false"
-  ></quiz-screen>
+  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false"></quiz-screen>
   <div
     v-else
     :class="[
@@ -148,7 +144,7 @@ export default {
 }
 
 .end-screen-button-text {
-  margin: 0;
+  margin: 1em auto 0;
   padding: 0;
   font-weight: 600;
   margin-left: 32px;

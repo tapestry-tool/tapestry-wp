@@ -113,6 +113,56 @@ export default class {
     return response
   }
 
+  /**
+   * Upload audio to server
+   * 
+   * @param   {Number}    nodeMetaId
+   * @param   {String}    audio       base64 data string
+   * 
+   * @return  {Object}
+   */
+  async uploadAudioToServer(nodeMetaId, audio) {
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${audio.h5pId}`;
+      const response = await axios.post(url, audio.blob);
+      return response;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * Get audio from server
+   * 
+   * @param   {Number}    nodeMetaId
+   * 
+   * @return  {String}    audio       base64 data string
+   */
+  async getH5PAudioFromServer(nodeMetaId, h5pId) {
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${h5pId}`;
+      const response = await axios.get(url);
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * Get H5P audio nodes that are recorded
+   * 
+   * @return  {Array}    nodeIds       an array of node IDs
+   */
+  async getRecordedNodeIds() {
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/recorded-audio-nodes`;
+      const response = await axios.get(url);
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async completeNode(nodeId) {
     const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
     const response = await axios.post(url)
@@ -126,7 +176,7 @@ export default class {
   }
 
   async getGravityForm(formId) {
-    const url = `${apiUrl}/gravity-forms/${formId}`
+    const url = `${adminAjaxUrl}?action=gf_button_get_form&form_id=${formId}`
     const response = await axios.get(url)
     return response
   }

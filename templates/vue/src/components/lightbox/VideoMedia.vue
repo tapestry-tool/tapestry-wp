@@ -51,8 +51,10 @@ export default {
   methods: {
     rewatch() {
       this.showEndScreen = false
-      this.$refs.video.currentTime = 0
-      this.$refs.video.play()
+      if (this.$refs.video) {
+        this.$refs.video.currentTime = 0
+        this.$refs.video.play()
+      }
     },
     close() {
       if (this.$refs.video) {
@@ -74,55 +76,82 @@ export default {
     },
     handlePlay() {
       const { id, mediaType } = this.node
-      const video = this.$refs.video
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
-        time: video.currentTime,
-      })
+      const video = this.$refs.video
+      if (video) {
+        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+          time: video.currentTime,
+        })
+      }
     },
     handlePause() {
       const { id, mediaType } = this.node
-      const video = this.$refs.video
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
-        time: video.currentTime,
-      })
+      const video = this.$refs.video
+      if (video) {
+        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+          time: video.currentTime,
+        })
+      }
     },
     handleLoad() {
       const video = this.$refs.video
-      const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", { width: videoRect.width, height: videoRect.height })
+      if (video) {
+        const videoRect = this.$refs.video.getBoundingClientRect()
+        this.$emit("load", {
+          width: videoRect.width,
+          height: videoRect.height,
+          el: this.$refs.video,
+        })
 
-      const progress = this.node.typeData.progress[0].value
-      const viewedAmount = progress * video.duration
-      video.currentTime = viewedAmount
+        const progress = this.node.typeData.progress[0].value
+        const viewedAmount = progress * video.duration
+        video.currentTime = viewedAmount
+      }
     },
     updateVideoProgress() {
       const video = this.$refs.video
-      const amountViewed = video.currentTime / video.duration
-      const amountNotViewed = 1.0 - amountViewed
+      if (video) {
+        const amountViewed = video.currentTime / video.duration
+        const amountNotViewed = 1.0 - amountViewed
 
-      this.$emit("timeupdate", "video", amountViewed)
-      this.$set(this.node.typeData.progress[0], "value", amountViewed)
-      this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
+        this.$emit("timeupdate", "video", amountViewed)
+        this.$set(this.node.typeData.progress[0], "value", amountViewed)
+        this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
 
-      if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-        this.$set(this.node, "completed", true)
-        this.$emit("complete")
+        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+          this.$set(this.node, "completed", true)
+          this.$emit("complete")
+        }
+
+        if (amountViewed >= 1) {
+          this.showEndScreen = true
+        }
+
+        thisTapestryTool.updateChildren(this.node.id, video)
+        thisTapestryTool.updateProgressBars()
       }
-
-      if (amountViewed >= 1) {
-        this.showEndScreen = true
-      }
-
-      thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.updateProgressBars()
     },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+}
+
 .video {
   position: absolute;
   left: 0;

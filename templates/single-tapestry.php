@@ -12,7 +12,8 @@ function addNonceToScript()
 {
     $params = array(
         'nonce'  => wp_create_nonce('wp_rest'),
-        'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID())
+        'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
+        'userLoggedIn' => get_current_user_id() != 0 ? 'true' : 'false'
     );
 
     wp_register_script(
@@ -113,6 +114,7 @@ get_header(); ?>
 
             var wpPostId = "<?php echo get_the_ID(); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
+            var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
 
             // Capture click events anywhere inside or outside tapestry
             $(document).ready(function() {

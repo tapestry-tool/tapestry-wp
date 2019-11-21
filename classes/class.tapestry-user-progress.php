@@ -92,7 +92,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function completeQuestion($questionId)
     {
         $this->_checkUserAndPostId();
-        $this->completeQuestion($questionId);
+        $this->_completeQuestion($questionId);
     }
 
     /**
@@ -176,7 +176,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
             if ($completed_value !== null) {
-                $progress->$nodeId->completed = $completed_value;
+                $progress->$nodeId->completed = $completed_value === "1";
             } else {
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }

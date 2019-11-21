@@ -36,13 +36,10 @@ export function addNode(state, node) {
 
 export function updateNode(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  const oldNode = state.nodes[nodeIndex]
-
-  const newNode = { ...oldNode }
+  const thisNode = state.nodes[nodeIndex]
   Object.entries(payload.newNode).forEach(([key, value]) => {
-    newNode[key] = value
+    thisNode[key] = value
   })
-  state.nodes[nodeIndex] = newNode
   state.nodes = [...state.nodes]
 }
 
@@ -59,8 +56,8 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
-export function completeQuestion(state, questionId) {
-  const node = state.nodes[Helpers.findNodeIndex(payload.id, state)]
+export function completeQuestion(state, { nodeId, questionId }) {
+  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
   const question = node.quiz.find(question => question.id === questionId)
   question.completed = true
 }
@@ -68,4 +65,20 @@ export function completeQuestion(state, questionId) {
 // links
 export function addLink(state, link) {
   state.links.push(link)
+}
+
+// lightbox
+export function openLightbox(state, lightboxId) {
+  state.isLightboxOpen = true
+  state.lightboxId = lightboxId
+}
+
+export function closeLightbox(state) {
+  state.isLightboxOpen = false
+  state.lightboxId = null
+  state.lightboxEl = null
+}
+
+export function setLightboxEl(state, el) {
+  state.lightboxEl = el
 }
