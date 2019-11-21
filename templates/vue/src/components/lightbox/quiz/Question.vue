@@ -31,7 +31,11 @@
           >
             text
           </answer-button>
-          <answer-button v-if="hasId('audioId')" icon="microphone">
+          <answer-button
+            v-if="hasId('audioId')"
+            icon="microphone"
+            @click="openRecorder()"
+          >
             audio
           </answer-button>
           <answer-button
@@ -79,6 +83,9 @@ export default {
     }
   },
   methods: {
+    async openRecorder() {
+      this.h5pRecorderUrl = `http://localhost:8888/tapestry-wp/wp-admin/admin-ajax.php?action=h5p_embed&id=34`
+    },
     async openForm(id) {
       if (!id) {
         return
