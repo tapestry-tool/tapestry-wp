@@ -8,12 +8,11 @@
     ></div>
     <iframe
       ref="h5p"
-      v-else-if="h5pRecorderUrl"
+      v-else-if="recorderOpened"
       allowfullscreen="false"
       :src="h5pRecorderUrl"
-      width="300"
-      height="300"
       @load="handleLoad"
+      frameBorder="0"
     ></iframe>
     <div v-else>
       <speech-bubble class="question-title">
@@ -79,6 +78,7 @@ export default {
   data() {
     return {
       formOpened: false,
+      recorderOpened: false,
       formHtml: "",
       loadingForm: false,
       h5pRecorderUrl: "",
@@ -88,12 +88,17 @@ export default {
     ...mapGetters(["selectedNode"]),
   },
   methods: {
-    async openRecorder() {
+    openRecorder() {
+      this.recorderOpened = true
+      this.$emit("recorder-opened")
       this.h5pRecorderUrl = `http://localhost:8888/tapestry-wp/wp-admin/admin-ajax.php?action=h5p_embed&id=34`
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
-      this.$emit('h5p-recorder-saver-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
+      const loadedH5pId = h5pObj.instances[0].contentId
+      if (loadedH5pId) {
+        this.$emit('h5p-recorder-saver-loaded', { loadedH5pId })
+      }
     },
     async openForm(id) {
       if (!id) {

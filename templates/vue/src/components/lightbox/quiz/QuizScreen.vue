@@ -8,11 +8,12 @@
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
+      @recorder-opened="recorderOpened = true"
       @form-submitted="handleFormSubmit"
       @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
     ></question>
     <loading v-if="submittingForm" label="Submitting..." />
-    <footer v-if="!formOpened" class="question-footer">
+    <footer v-if="!formOpened && !recorderOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -47,6 +48,7 @@ export default {
     return {
       activeQuestionIndex: 0,
       formOpened: false,
+      recorderOpened: false,
       submittingForm: false,
     }
   },
