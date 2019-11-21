@@ -81,6 +81,7 @@ export default {
       formOpened: false,
       formHtml: "",
       loadingForm: false,
+      h5pRecorderUrl: "",
     }
   },
   computed: {
