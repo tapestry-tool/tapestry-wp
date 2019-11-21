@@ -235,6 +235,7 @@ export default {
   right: 0;
   opacity: 1;
   transform: translateY(0);
+  z-index: 100;
 }
 
 #spotlight-overlay {
