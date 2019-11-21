@@ -1755,6 +1755,8 @@ function tapestryTool(config){
 
     /* Changes the node depending on horizontal/vertical view */
     function transposeNodes() {
+        // Do not transpose nodes for TYDE
+        return;
         for (var index in tapestry.dataset.nodes) {
             var temp_fx = tapestry.dataset.nodes[index].fy;
             tapestry.dataset.nodes[index].fy = tapestry.dataset.nodes[index].fx;
