@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import SpeechBubble from "../../SpeechBubble"
 import TapestryAPI from "../../../services/TapestryAPI"
