@@ -8,7 +8,6 @@
     ></gravity-form>
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened">
-      <h1 class="question-title">
       <speech-bubble class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
@@ -45,13 +44,11 @@ import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
-import Loading from "../../Loading"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    SpeechBubble,
     Loading,
     GravityForm,
   },
