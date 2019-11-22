@@ -36,7 +36,6 @@
     />
     <lightbox
       v-if="lightbox.isOpen"
-      :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
       @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
@@ -49,7 +48,7 @@ import { mapGetters, mapMutations, mapActions } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
-import TapestryAPI from "../services/TapestryAPI"
+import TapestryApi from "../services/TapestryAPI"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -64,7 +63,7 @@ export default {
     return {
       loadedH5pId: 0,
       recordedNodeIds: [],
-      TapestryAPI: new TapestryAPI(wpPostId),
+      TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
       populatedNode: {
@@ -82,7 +81,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
-        quiz: []
+        quiz: [],
       },
     }
   },
@@ -116,8 +115,8 @@ export default {
           return ["public", "authenticated"]
       }
     },
-    userLoggedIn: function () {
-      return wpApiSettings && wpApiSettings.userLoggedIn === 'true';
+    userLoggedIn: function() {
+      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
     },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
@@ -129,7 +128,7 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
-    window.addEventListener('tapestry-h5p-audio-recorder', this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
+    window.addEventListener("tapestry-h5p-audio-recorder", this.saveH5PAudioToServer) // listen to event dispatched by H5P Audio Recorder lib
     window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
   },
   methods: {
@@ -146,17 +145,24 @@ export default {
     async h5pRecorderSaverLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
-      if (selectedNodeId && this.loadedH5pId && this.recordedNodeIds.includes(selectedNodeId)) {
+      if (
+        selectedNodeId &&
+        this.loadedH5pId &&
+        this.recordedNodeIds.includes(selectedNodeId)
+      ) {
         await this.loadH5PAudio(selectedNodeId, this.loadedH5pId)
       }
     },
     async saveH5PAudioToServer(event) {
-      const encodedH5PAudio = event.detail.base64data.replace(/^data:audio\/[a-z]+;base64,/, "")
+      const encodedH5PAudio = event.detail.base64data.replace(
+        /^data:audio\/[a-z]+;base64,/,
+        ""
+      )
       if (encodedH5PAudio && this.userLoggedIn) {
         try {
           const audio = {
             blob: encodedH5PAudio,
-            h5pId: this.loadedH5pId
+            h5pId: this.loadedH5pId,
           }
           await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
           this.recordedNodeIds.push(this.selectedNode.id)
@@ -167,14 +173,19 @@ export default {
     },
     async loadH5PAudio(nodeMetaId, loadedH5pId) {
       try {
-        const audio = await this.TapestryAPI.getH5PAudioFromServer(nodeMetaId, loadedH5pId)
-        const h5pAudioRecorder = document.getElementById('h5p')
+        const audio = await this.TapestryAPI.getH5PAudioFromServer(
+          nodeMetaId,
+          loadedH5pId
+        )
+        const h5pAudioRecorder = document.getElementById("h5p")
         if (h5pAudioRecorder) {
-          dispatchEvent(new CustomEvent('tapestry-get-h5p-audio', {
-            detail: { audio }
-          }))
+          dispatchEvent(
+            new CustomEvent("tapestry-get-h5p-audio", {
+              detail: { audio },
+            })
+          )
         } else {
-          console.error('H5P module is not loaded.')
+          console.error("H5P module is not loaded.")
         }
       } catch (e) {
         console.error(e)
@@ -213,7 +224,7 @@ export default {
           authenticated: ["read"],
         },
         description: "",
-        quiz: []
+        quiz: [],
       }
     },
     addRootNode() {

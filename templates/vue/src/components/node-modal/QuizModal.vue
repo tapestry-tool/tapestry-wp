@@ -28,16 +28,28 @@
             <b-form-input v-model="question.text" />
           </b-form-group>
           <b-form-group label="Question Answer Types">
-            <b-form-group label="Textbox ID">
-              <b-form-input v-model="question.answers.textId" />
+            <b-form-group label="Textbox Gravity Form ID">
+              <b-form-input
+                v-model="question.answers.textId"
+                @focus="wasFocused = true"
+              />
             </b-form-group>
-            <b-form-group label="Audio ID">
-              <b-form-input v-model="question.answers.audioId" />
+            <b-form-group label="H5P Audio Recorder ID">
+              <b-form-input
+                v-model="question.answers.audioId"
+                @focus="wasFocused = true"
+              />
             </b-form-group>
-            <b-form-group label="Checklist ID">
-              <b-form-input v-model="question.answers.checklistId" />
+            <b-form-group label="Checklist Gravity Form ID">
+              <b-form-input
+                v-model="question.answers.checklistId"
+                @focus="wasFocused = true"
+              />
             </b-form-group>
           </b-form-group>
+          <b-form-invalid-feedback :state="isAnswerValid(question)">
+            Please enter an ID in at least one of the answer types.
+          </b-form-invalid-feedback>
         </b-form-group>
       </b-card>
     </div>
@@ -76,6 +88,7 @@ export default {
       questions: this.node.quiz,
       typeOptions: ["H5P Audio Recorder"],
       icons: ["microphone"],
+      wasFocused: false,
     }
   },
   watch: {
@@ -92,7 +105,11 @@ export default {
     addQuestion() {
       this.questions = [
         ...this.questions,
-        { ...defaultQuestion, id: Helpers.createUUID() },
+        {
+          id: Helpers.createUUID(),
+          text: "",
+          answers: { ...defaultQuestion.answers },
+        },
       ]
     },
     deleteQuestion(id) {
@@ -100,6 +117,12 @@ export default {
     },
     getGroupTitle(question, index) {
       return `Question #${index + 1}: ${question.text || "Untitled"}`
+    },
+    isAnswerValid(question) {
+      if (!this.wasFocused) {
+        return null
+      }
+      return Object.values(question.answers).some(value => value.length > 0)
     },
   },
 }

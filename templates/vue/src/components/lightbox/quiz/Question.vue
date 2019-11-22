@@ -1,11 +1,11 @@
 <template>
   <div class="question">
-    <loading v-if="loadingForm" label="Loading form..." />
-    <div
-      v-else-if="formOpened"
-      @submit="handleFormSubmit(question.id)"
-      v-html="formHtml"
-    ></div>
+    <gravity-form
+      v-if="formOpened"
+      :id="formId"
+      :form="formHtml"
+      @submit="handleFormSubmit"
+    ></gravity-form>
     <iframe
       ref="h5p"
       v-else-if="recorderOpened"
@@ -14,7 +14,8 @@
       @load="handleLoad"
       frameBorder="0"
     ></iframe>
-    <div v-else>
+    <loading v-if="loadingForm" class="loading" :label="loadingText" />
+    <div v-if="!formOpened && !recorderOpened">
       <speech-bubble class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
@@ -53,16 +54,16 @@
 <script>
 import { mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
-import SpeechBubble from "../../SpeechBubble"
-import TapestryAPI from "../../../services/TapestryAPI"
+import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
+import TapestryAPI from "../../../services/TapestryAPI"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    SpeechBubble,
     Loading,
+    GravityForm,
   },
   props: {
     question: {
@@ -86,6 +87,9 @@ export default {
   },
   computed: {
     ...mapGetters(["selectedNode"]),
+    loadingText() {
+      return this.formOpened ? "Submitting..." : "Loading form..."
+    },
   },
   methods: {
     openRecorder(id) {
@@ -110,6 +114,7 @@ export default {
       // Clear previous form data
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
+      this.formId = id
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -126,9 +131,15 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit(questionId) {
+    handleFormSubmit({ id, success, formData, response }) {
+      if (!success) {
+        delete window[`gf_submitting_${id}`]
+        this.formHtml = response
+        return
+      }
+      // TODO: Save form submission somehow
       this.formOpened = false
-      this.$emit("form-submitted", questionId)
+      this.$emit("form-submitted", this.question.id)
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -137,6 +148,14 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.question label.gfield_label {
+    font-weight: bold;
+    margin-top: 1em;
+    font-size: 1.3em;
+}
+</style>
 
 <style scoped>
 button {
@@ -147,8 +166,8 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 90%;
-  width: 90%;
+  height: 100%;
+  width: 100%;
 }
 
 .question-title {
@@ -191,5 +210,14 @@ button {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.loading {
+  background: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.9;
+  z-index: 30;
 }
 </style>

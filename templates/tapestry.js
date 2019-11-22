@@ -198,13 +198,13 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
-        const reorderPermissions = permissions => {
-            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+        var reorderPermissions = permissions => {
+            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
             return [...withoutDuplicates];
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
+            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -962,13 +962,23 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    dispatchEvent(
-                        new CustomEvent(
-                            'open-lightbox', 
-                            { detail: thisBtn.dataset.id }
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
                         )
-                    );
-                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
                 }
             });
     
@@ -1724,6 +1734,8 @@ function tapestryTool(config){
 
     /* Changes the node depending on horizontal/vertical view */
     function transposeNodes() {
+        // Do not transpose nodes for TYDE
+        return;
         for (var index in tapestry.dataset.nodes) {
             var temp_fx = tapestry.dataset.nodes[index].fy;
             tapestry.dataset.nodes[index].fy = tapestry.dataset.nodes[index].fx;
