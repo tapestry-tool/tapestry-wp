@@ -1,12 +1,13 @@
 <template>
   <div class="question">
-    <loading v-if="loadingForm" label="Loading form..." />
-    <div
-      v-else-if="formOpened"
-      @submit="handleFormSubmit(question.id)"
-      v-html="formHtml"
-    ></div>
-    <div v-else>
+    <gravity-form
+      v-if="formOpened"
+      :id="formId"
+      :form="formHtml"
+      @submit="handleFormSubmit"
+    ></gravity-form>
+    <loading v-if="loadingForm" class="loading" :label="loadingText" />
+    <div v-if="!formOpened">
       <h1 class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
@@ -44,6 +45,7 @@
 
 <script>
 import AnswerButton from "./AnswerButton"
+import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
 import Helpers from "../../../utils/Helpers"
@@ -54,6 +56,7 @@ export default {
   components: {
     AnswerButton,
     Loading,
+    GravityForm,
   },
   props: {
     question: {
@@ -70,12 +73,16 @@ export default {
     return {
       formOpened: false,
       formHtml: "",
+      formId: null,
       loadingForm: false,
     }
   },
   computed: {
     bubbleImage() {
       return `url(${Helpers.getImagePath(SpeechBubble)})`
+    },
+    loadingText() {
+      return this.formOpened ? "Submitting..." : "Loading form..."
     },
   },
   methods: {
@@ -87,6 +94,7 @@ export default {
       // Clear previous form data
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
+      this.formId = id
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -103,9 +111,15 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit(questionId) {
+    handleFormSubmit({ id, success, formData, response }) {
+      if (!success) {
+        delete window[`gf_submitting_${id}`]
+        this.formHtml = response
+        return
+      }
+      // TODO: Save form submission somehow
       this.formOpened = false
-      this.$emit("form-submitted", questionId)
+      this.$emit("form-submitted", this.question.id)
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -192,5 +206,14 @@ button {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.loading {
+  background: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.9;
+  z-index: 30;
 }
 </style>
