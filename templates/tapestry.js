@@ -198,13 +198,13 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
-        const reorderPermissions = permissions => {
-            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+        var reorderPermissions = permissions => {
+            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
             return [...withoutDuplicates];
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
+            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
