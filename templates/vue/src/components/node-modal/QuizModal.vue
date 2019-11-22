@@ -28,13 +28,13 @@
             <b-form-input v-model="question.text" />
           </b-form-group>
           <b-form-group label="Question Answer Types">
-            <b-form-group label="Textbox ID">
+            <b-form-group label="Textbox Gravity Form ID">
               <b-form-input v-model="question.answers.textId" />
             </b-form-group>
-            <b-form-group label="Audio ID">
+            <b-form-group label="H5P Audio Recorder ID">
               <b-form-input v-model="question.answers.audioId" />
             </b-form-group>
-            <b-form-group label="Checklist ID">
+            <b-form-group label="Checklist Gravity Form ID">
               <b-form-input v-model="question.answers.checklistId" />
             </b-form-group>
           </b-form-group>
@@ -92,7 +92,11 @@ export default {
     addQuestion() {
       this.questions = [
         ...this.questions,
-        { ...defaultQuestion, id: Helpers.createUUID() },
+        {
+          id: Helpers.createUUID(),
+          text: "",
+          answers: { ...defaultQuestion.answers },
+        },
       ]
     },
     deleteQuestion(id) {
