@@ -41,9 +41,6 @@ add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 function enqueue_vue_app_build()
 {
-    $vueUrl = "http://localhost:8080/dist";
-    // $vueUrl = plugin_dir_url(__FILE__) . "vue/dist";
-
     // register the Vue build script.
     $vueUrl = "http://localhost:8080/dist";
     // $vueUrl = plugin_dir_url(__FILE__) . "vue/dist";

@@ -38,7 +38,7 @@
       v-if="lightbox.isOpen"
       :node-id="lightbox.id"
       @close="closeLightbox"
-      @h5p-media-loaded="h5pMediaLoaded"
+      @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
     />
   </div>
 </template>
@@ -142,7 +142,7 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    async h5pMediaLoaded(event) {
+    async h5pRecorderSaverLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
       if (
