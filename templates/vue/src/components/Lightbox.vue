@@ -314,7 +314,7 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }
 #lightbox[format="mp4"].full-screen #spotlight-content video {
   top: 0 !important;

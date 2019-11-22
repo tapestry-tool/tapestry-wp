@@ -41,6 +41,9 @@ add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 function enqueue_vue_app_build()
 {
+    $vueUrl = "http://localhost:8080/dist";
+    // $vueUrl = plugin_dir_url(__FILE__) . "vue/dist";
+
     // register the Vue build script.
     $vueUrl = "http://localhost:8080/dist";
     // $vueUrl = plugin_dir_url(__FILE__) . "vue/dist";
@@ -113,6 +116,7 @@ get_header(); ?>
 
             var wpPostId = "<?php echo get_the_ID(); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
+            var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
 
             // Capture click events anywhere inside or outside tapestry
             $(document).ready(function() {

@@ -165,6 +165,13 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'completeByNodeId'
         ]
     ],
+    'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
+        'ROUTE'     => 'users/quiz',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'completeQuestionById'
+        ]
+    ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
         'ROUTE'     => 'users/h5psettings',
         'ARGUMENTS' => [
@@ -795,6 +802,28 @@ function completeByNodeId($request)
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
         $userProgress->complete();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Set quiz as completed for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/quiz?post_id=44&node_id=1&question_id=abcd
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return null
+ */
+function completeQuestionById($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+    $questionId = $request['question'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        $userProgress->completeQuestion($questionId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

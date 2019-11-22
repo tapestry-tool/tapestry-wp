@@ -169,6 +169,18 @@ export default class {
     return response
   }
 
+  async completeQuestion(nodeId, questionId) {
+    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+    const response = await axios.post(url)
+    return response
+  }
+
+  async getGravityForm(formId) {
+    const url = `${adminAjaxUrl}?action=gf_button_get_form&form_id=${formId}`
+    const response = await axios.get(url)
+    return response
+  }
+
   async getH5pSettings() {
     const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
     const response = await axios.get(url)

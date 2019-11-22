@@ -61,7 +61,14 @@ export default class {
     return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
   }
 
-  static getBackgroundUrl(image) {
-    return `${wpData.vue_uri}/${image.split("dist")[1]}`
+  static createUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  static getImagePath(image) {
+    return `${wpData.vue_uri}/${image.split("dist")[1]}`;
   }
 }

@@ -1,12 +1,17 @@
 <template>
   <div class="container">
-    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
     <video
       ref="video"
       class="video"
       controls
       autoplay
-      @loadedmetadata="handleLoad"
+      @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"
       @timeupdate="updateVideoProgress"
@@ -145,6 +150,20 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+}
+
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .video {

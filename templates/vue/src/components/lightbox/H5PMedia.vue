@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <iframe
       id="h5p"
       ref="h5p"
@@ -62,38 +62,43 @@ export default {
       if (h5pVideo) {
         h5pVideo.pause()
       }
-      this.$emit('close')
+      this.$emit("close")
     },
     handleLoad() {
-
-      $('iframe').each(function () {
-        $( this ).data( "ratio", this.height / this.width )
+      $("iframe").each(function() {
+        $(this)
+          .data("ratio", this.height / this.width)
           // Remove the hardcoded width & height attributes
-          .removeAttr( "width" )
-          .removeAttr( "height" );
-      });
+          .removeAttr("width")
+          .removeAttr("height")
+      })
       const setIframeDimensions = function() {
-        $('iframe').each( function() {
+        $("iframe").each(function() {
           // Get the parent container's width
-          var width = $( this ).parent().width();
-          var height = $( this ).parent().height();
-          if (width * $( this ).data( "ratio" ) <= height) {
-            $( this ).width( width )
-              .height( width * $( this ).data( "ratio" ) );
+          var width = $(this)
+            .parent()
+            .width()
+          var height = $(this)
+            .parent()
+            .height()
+          if (width * $(this).data("ratio") <= height) {
+            $(this)
+              .width(width)
+              .height(width * $(this).data("ratio"))
+          } else {
+            $(this)
+              .height(height)
+              .width(height / $(this).data("ratio"))
           }
-          else {
-            $( this ).height( height )
-              .width( height / $( this ).data( "ratio" ) );
-          }
-        });
+        })
       }
-      $( window ).resize(setIframeDimensions);
-      setIframeDimensions();
+      $(window).resize(setIframeDimensions)
+      setIframeDimensions()
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
 
-      this.$emit('h5p-media-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
+      this.$emit("h5p-media-loaded", { loadedH5pId: h5pObj.instances[0].contentId })
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
