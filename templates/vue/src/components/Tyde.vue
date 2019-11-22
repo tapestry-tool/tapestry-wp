@@ -2,6 +2,7 @@
   <div id="tyde">
     <tapestry />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
+    <input type="image" class="backpack" :src="backpack" @click="toggleMenu"/>
     <tyde-menu
       v-if="isMenuOpen"
       :logs="logs"
@@ -17,6 +18,7 @@ import Tapestry from "./Tapestry"
 import TydeModule from "./tyde/TydeModule"
 import TydeMenu from "./tyde/TydeMenu"
 import { mapGetters, mapMutations } from "vuex"
+import Backpack from "@/assets/backpack.svg"
 
 const TYDE_BACKGROUND_AUDIO_SRC =
   "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file
@@ -61,6 +63,9 @@ export default {
   },
   computed: {
     ...mapGetters(["lightbox", "nodes"]),
+    backpack() {
+      return `${wpData.vue_uri}/${Backpack.split("dist")[1]}`
+    },
     logs() {
       return this.nodes.filter(node => node.completed).map(node => {
         return {
@@ -101,6 +106,16 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.backpack {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin: 50px 8%;
+  max-width: 140px;
+}
+</style>
 
 <style>
 :root {
