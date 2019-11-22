@@ -39,6 +39,10 @@ interface ITapestryUserProgress
 
     /**
      * Set the question with the given id to be marked as 'completed'
+     * 
+     * @param Integer $questionId the question to mark
+     * 
+     * @return Null
      */
     public function completeQuestion($questionId);
 
