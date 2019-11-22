@@ -36,7 +36,6 @@
     />
     <lightbox
       v-if="lightbox.isOpen"
-      :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
       @h5p-media-loaded="h5pMediaLoaded"
@@ -49,7 +48,7 @@ import { mapGetters, mapMutations, mapActions } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
-import TapestryAPI from "../services/TapestryAPI"
+import TapestryApi from "../services/TapestryAPI"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -64,7 +63,7 @@ export default {
     return {
       loadedH5pId: 0,
       recordedNodeIds: [],
-      TapestryAPI: new TapestryAPI(wpPostId),
+      TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
       populatedNode: {

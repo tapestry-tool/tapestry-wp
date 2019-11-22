@@ -81,11 +81,7 @@ export default {
   },
   props: {
     nodeId: {
-      type: String,
-      required: true,
-    },
-    tapestryApiClient: {
-      type: Object,
+      type: [String, Number],
       required: true,
     },
   },
@@ -192,6 +188,7 @@ export default {
     },
     async complete() {
       await this.completeNode(this.nodeId)
+      this.$emit("complete")
     },
     async updateProgress(type, amountViewed) {
       const now = new Date()
@@ -234,6 +231,7 @@ export default {
   right: 0;
   opacity: 1;
   transform: translateY(0);
+  z-index: 100;
 }
 
 #spotlight-overlay {

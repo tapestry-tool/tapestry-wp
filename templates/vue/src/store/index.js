@@ -30,6 +30,10 @@ const store = new Vuex.Store({
     },
     settings: state => state.settings,
     tapestry: state => state,
+    getDirectChildren: state => id => {
+      const links = state.links
+      return links.filter(link => link.source.id == id).map(link => link.target.id)
+    },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
