@@ -1,7 +1,6 @@
 <template>
   <div :id="`module-${nodeId}`" class="wrapper">
     <tyde-stage
-      v-show="!lightbox.isOpen"
       :node-id="activeStage"
       @next="next"
     ></tyde-stage>

@@ -1,5 +1,5 @@
 <template>
-  <div class="question">
+  <div class="question" :class="{'question-h5p':recorderOpened, 'question-gf':formOpened}">
     <gravity-form
       v-if="formOpened"
       :id="formId"
@@ -54,6 +54,7 @@
 <script>
 import { mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
+import SpeechBubble from "../../SpeechBubble"
 import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
@@ -62,6 +63,7 @@ export default {
   name: "question",
   components: {
     AnswerButton,
+    SpeechBubble,
     Loading,
     GravityForm,
   },
@@ -157,7 +159,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 button {
   margin: auto;
 }
@@ -168,6 +170,10 @@ button {
   justify-content: space-between;
   height: 100%;
   width: 100%;
+
+  &.question-h5p {
+    max-width: 600px;
+  }
 }
 
 .question-title {

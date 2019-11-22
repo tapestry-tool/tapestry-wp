@@ -30,7 +30,7 @@ import { mapActions } from "vuex"
 import Question from "./Question"
 import Loading from "../../Loading"
 import Helpers from "../../../utils/Helpers"
-import BackgroundImg from "../../../assets/11-18-QuestionScreen.png"
+import BackgroundImg from "../../../assets/question-screen-bg.png"
 
 export default {
   name: "quiz-screen",

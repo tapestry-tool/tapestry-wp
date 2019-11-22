@@ -50,16 +50,16 @@ img {
 }
 
 .thumbnail-placeholder {
-  min-width: 250px;
-  min-height: 250px;
+  width: 250px;
+  height: 250px;
   background-color: gray;
+  float: left;
 }
 
 .log-details {
-  display: flex;
+  float: right;
   font-size: 20px;
-  margin: 0 35px;
-  flex-direction: column;
+  width: calc(100% - 280px);
   word-break: break-word;
 }
 
