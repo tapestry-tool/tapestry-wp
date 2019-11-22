@@ -38,6 +38,15 @@ interface ITapestryUserProgress
     public function complete();
 
     /**
+     * Set the question with the given id to be marked as 'completed'
+     * 
+     * @param Integer $questionId the question to mark
+     * 
+     * @return Null
+     */
+    public function completeQuestion($questionId);
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param String $h5pSettingsData stores volume,

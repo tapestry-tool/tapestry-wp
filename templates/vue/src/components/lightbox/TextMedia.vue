@@ -31,7 +31,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .article {
   padding: 0 15px;
   text-align: left;
@@ -54,7 +54,7 @@ export default {
 }
 </style>
 
-<style>
+<style lang="scss">
 .lightbox-text {
   padding: 0;
   margin-bottom: 1rem;

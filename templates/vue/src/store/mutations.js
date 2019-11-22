@@ -36,13 +36,10 @@ export function addNode(state, node) {
 
 export function updateNode(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  const oldNode = state.nodes[nodeIndex]
-
-  const newNode = { ...oldNode }
+  const thisNode = state.nodes[nodeIndex]
   Object.entries(payload.newNode).forEach(([key, value]) => {
-    newNode[key] = value
+    thisNode[key] = value
   })
-  state.nodes[nodeIndex] = newNode
   state.nodes = [...state.nodes]
 }
 
@@ -57,6 +54,12 @@ export function updateNodeCoordinates(state, payload) {
   Object.entries(payload.coordinates).forEach(([key, value]) => {
     node[key] = value
   })
+}
+
+export function completeQuestion(state, { nodeId, questionId }) {
+  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
+  const question = node.quiz.find(question => question.id === questionId)
+  question.completed = true
 }
 
 // links

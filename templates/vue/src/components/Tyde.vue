@@ -1,6 +1,7 @@
 <template>
   <div id="tyde">
     <tapestry />
+    <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
     <tyde-menu
       v-if="isMenuOpen"
       :logs="logs"
@@ -13,6 +14,7 @@
 
 <script>
 import Tapestry from "./Tapestry"
+import TydeModule from "./tyde/TydeModule"
 import TydeMenu from "./tyde/TydeMenu"
 import { mapGetters, mapMutations } from "vuex"
 
@@ -24,12 +26,38 @@ export default {
   components: {
     Tapestry,
     TydeMenu,
+    TydeModule,
   },
   data() {
     return {
       backgroundAudio: new Audio(TYDE_BACKGROUND_AUDIO_SRC),
       isMenuOpen: false,
+      showModule: false,
+      moduleId: null,
     }
+  },
+  mounted() {
+    window.addEventListener("start-module", evt => {
+      this.showModule = !this.showModule
+      this.moduleId = evt.detail
+    })
+    window.addEventListener("keydown", evt => {
+      if (evt.code === "Escape") {
+        const { el } = this.lightbox
+        if (el) {
+          if (this.isMenuOpen && el.currentTime < el.duration) {
+            el.play()
+          } else {
+            el.pause()
+          }
+        }
+        this.toggleMenu()
+      }
+    })
+    this.backgroundAudio.loop = true
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown")
   },
   computed: {
     ...mapGetters(["lightbox", "nodes"]),
@@ -58,22 +86,7 @@ export default {
         }
       }, [])
       return [...completedContents, ...completedActivities]
-    }
-  },
-  mounted() {
-    window.addEventListener("keydown", evt => {
-      if (evt.code === "Escape") {
-        const { el } = this.lightbox
-        if (el) {
-          this.isMenuOpen ? el.play() : el.pause()
-        }
-        this.toggleMenu()
-      }
-    })
-    this.backgroundAudio.loop = true
-  },
-  beforeDestroy() {
-    window.removeEventListener("keydown")
+    },
   },
   methods: {
     ...mapMutations(["closeLightbox"]),
@@ -81,7 +94,9 @@ export default {
       const { el } = this.lightbox
       this.toggleMenu()
       if (el) {
-        el.play()
+        if (el.currentTime < el.duration) {
+          el.play()
+        }
       }
     },
     returnToMap() {

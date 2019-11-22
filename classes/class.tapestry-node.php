@@ -31,6 +31,8 @@ class TapestryNode implements ITapestryNode
     private $hideProgress;
     private $hideMedia;
     private $skippable;
+    private $quiz;
+    private $fullscreen;
 
     /**
      * Constructor
@@ -65,6 +67,8 @@ class TapestryNode implements ITapestryNode
         $this->hideProgress = false;
         $this->hideMedia = false;
         $this->skippable = true;
+        $this->quiz = array();
+        $this->fullscreen = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -145,6 +149,12 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->skippable) && is_bool($node->skippable)) {
             $this->skippable = $node->skippable;
+        }
+        if (isset($node->quiz) && is_array($node->quiz)) {
+            $this->quiz = $node->quiz;
+        }
+        if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
+            $this->fullscreen = $node->fullscreen;
         }
     }
 
@@ -262,7 +272,9 @@ class TapestryNode implements ITapestryNode
             'hideTitle'     => $this->hideTitle,
             'hideProgress'  => $this->hideProgress,
             'hideMedia'     => $this->hideMedia,
-            'skippable'     => $this->skippable
+            'skippable'     => $this->skippable,
+            'quiz'          => $this->quiz,
+            'fullscreen'    => $this->fullscreen,
         ];
     }
 
@@ -272,7 +284,8 @@ class TapestryNode implements ITapestryNode
             'post_id'       => $nodePostId,
             'title'         => $node->title,
             'permissions'   => $node->permissions,
-            'coordinates'   => $node->coordinates
+            'coordinates'   => $node->coordinates,
+            'quiz'       => $node->quiz
         );
     }
 

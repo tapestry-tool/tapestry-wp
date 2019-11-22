@@ -1,23 +1,36 @@
 <template>
-  <video
-    ref="video"
-    class="video"
-    controls
-    @loadstart="handleLoad"
-    @loadedmetadata="setVideoTime"
-    @play="handlePlay"
-    @pause="handlePause"
-    @timeupdate="updateVideoProgress"
-  >
-    <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
-  </video>
+  <div class="container">
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
+    <video
+      ref="video"
+      class="video"
+      controls
+      autoplay
+      @loadeddata="handleLoad"
+      @play="handlePlay"
+      @pause="handlePause"
+      @timeupdate="updateVideoProgress"
+    >
+      <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
+    </video>
+  </div>
 </template>
 
 <script>
+import EndScreen from "./EndScreen"
+
 const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
   name: "video-media",
+  components: {
+    EndScreen,
+  },
   props: {
     node: {
       type: Object,
@@ -26,80 +39,133 @@ export default {
   },
   data() {
     return {
-      lastSaved: null,
+      showEndScreen: this.getInitialEndScreenState(),
     }
   },
-  mounted() {
-    setTimeout(() => {
-      this.$refs.video.play()
-      thisTapestryTool.recordAnalyticsEvent(
-        "app",
-        "auto-play",
-        "html5-video",
-        this.node.id
-      )
-    }, 1000)
-  },
   beforeDestroy() {
-    this.$refs.video.pause()
-    this.updateVideoProgress()
+    if (this.$refs.video) {
+      this.$refs.video.pause()
+      this.updateVideoProgress()
+    }
   },
   methods: {
-    handleLoad() {
-      const videoRect = this.$refs.video.getBoundingClientRect()
-      this.$emit("load", {
-        width: videoRect.width,
-        height: videoRect.height,
-        el: this.$refs.video,
-      })
+    rewatch() {
+      this.showEndScreen = false
+      if (this.$refs.video) {
+        this.$refs.video.currentTime = 0
+        this.$refs.video.play()
+      }
+    },
+    close() {
+      if (this.$refs.video) {
+        this.$refs.video.pause()
+        this.updateVideoProgress()
+      }
+      this.$emit("close")
+    },
+    getInitialEndScreenState() {
+      const progress = this.node.typeData.progress[0].value
+      if (progress >= 1) {
+        return true
+      }
+      if (this.$refs.video) {
+        const viewedAmount = progress * this.$refs.video.duration
+        return this.$refs.video.duration <= viewedAmount
+      }
+      return false
     },
     handlePlay() {
       const { id, mediaType } = this.node
-      const video = this.$refs.video
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
-        time: video.currentTime,
-      })
+      const video = this.$refs.video
+      if (video) {
+        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+          time: video.currentTime,
+        })
+      }
     },
     handlePause() {
       const { id, mediaType } = this.node
-      const video = this.$refs.video
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
-        time: video.currentTime,
-      })
-    },
-    setVideoTime() {
       const video = this.$refs.video
-      const viewedAmount = this.node.typeData.progress[0].value * video.duration
-      if (viewedAmount > 0 && viewedAmount !== video.duration) {
+      if (video) {
+        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+          time: video.currentTime,
+        })
+      }
+    },
+    handleLoad() {
+      const video = this.$refs.video
+      if (video) {
+        const videoRect = this.$refs.video.getBoundingClientRect()
+        this.$emit("load", {
+          width: videoRect.width,
+          height: videoRect.height,
+          el: this.$refs.video,
+        })
+
+        const progress = this.node.typeData.progress[0].value
+        const viewedAmount = progress * video.duration
         video.currentTime = viewedAmount
-      } else {
-        video.currentTime = 0
       }
     },
     updateVideoProgress() {
       const video = this.$refs.video
-      const amountViewed = video.currentTime / video.duration
-      const amountNotViewed = 1.0 - amountViewed
+      if (video) {
+        const amountViewed = video.currentTime / video.duration
+        const amountNotViewed = 1.0 - amountViewed
 
-      this.$emit("timeupdate", "video", amountViewed)
-      this.$set(this.node.typeData.progress[0], "value", amountViewed)
-      this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
+        this.$emit("timeupdate", "video", amountViewed)
+        this.$set(this.node.typeData.progress[0], "value", amountViewed)
+        this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
 
-      if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-        this.$set(this.node, "completed", true)
-        this.$emit("complete")
+        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+          this.$set(this.node, "completed", true)
+          this.$emit("complete")
+        }
+
+        if (amountViewed >= 1) {
+          this.showEndScreen = true
+        }
+
+        thisTapestryTool.updateChildren(this.node.id, video)
+        thisTapestryTool.updateProgressBars()
       }
-
-      thisTapestryTool.updateChildren(this.node.id, video)
-      thisTapestryTool.updateProgressBars()
     },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+}
+
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .video {
   width: 100%;
   height: auto;

@@ -31,7 +31,6 @@ function tapestryTool(config){
         COLOR_LINK = "#999",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        TIME_BETWEEN_SAVE_PROGRESS = 5,                         // Means the number of seconds between each save progress call
         NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
         MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
@@ -39,8 +38,7 @@ function tapestryTool(config){
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
         USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
         USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
-        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings",
-        ALLOW_SKIP_THRESHOLD = 0.95;
+        TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
 
     var // declared variables
         root, svg, links, nodes,                                // Basics
@@ -48,7 +46,7 @@ function tapestryTool(config){
         simulation,                                             // Force
         adjustedRadiusRatio = 1,                                // Radius adjusted for view mode
         tapestrySlug, 
-        saveProgress = true, progressLastSaved = new Date(),    // Saving Progress
+        saveProgress = true,                                    // Saving Progress
         enablePopupNodes = false, inViewMode = false,           // Pop-up nodes
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
@@ -200,13 +198,13 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
-        const reorderPermissions = permissions => {
-            const withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+        var reorderPermissions = permissions => {
+            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
             return [...withoutDuplicates];
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            const updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false })
+            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -960,6 +958,29 @@ function tapestryTool(config){
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 else return COLOR_BLANK_HOVER;
+            })
+            .on("click keydown", function (d) {
+                // this callback is not getting called for some reason
+                /* if (root === d.id && d.hideMedia) {
+                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
+                        )
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
+                } */
             });
     
         nodes.append("circle")
@@ -1040,6 +1061,7 @@ function tapestryTool(config){
                 .on("end", dragended)
             )
             .on("click keydown", function (d) {
+                // but this callback is getting called instead
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     root = d.id;
@@ -1052,16 +1074,25 @@ function tapestryTool(config){
                     // slider's maximum depth is set to the longest path from the new selected node
                     tapestryDepthSlider.max = findMaxDepth(root);
                     updateSvgDimensions();
-                }
-                else if (d.hideMedia) {
+                } else if (d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    dispatchEvent(
-                        new CustomEvent(
-                            'open-lightbox', 
-                            { detail: thisBtn.dataset.id }
+
+                    if (d.title === "Module 2") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
                         )
-                    );
-                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    } else {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'open-lightbox',
+                                { detail: thisBtn.dataset.id }
+                            )
+                        );
+                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    }
                 }
             });
     }
@@ -1222,7 +1253,8 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' + 
+                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
                     ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';
@@ -1366,6 +1398,9 @@ function tapestryTool(config){
 
     function updateViewedProgress() {
         path = nodes
+            .filter(function (d) {
+                return !d.hideProgress;
+            })
             .selectAll("path")
             .data(function (d, i) {
                 var data = d.typeData.progress;
@@ -1720,6 +1755,8 @@ function tapestryTool(config){
 
     /* Changes the node depending on horizontal/vertical view */
     function transposeNodes() {
+        // Do not transpose nodes for TYDE
+        return;
         for (var index in tapestry.dataset.nodes) {
             var temp_fx = tapestry.dataset.nodes[index].fy;
             tapestry.dataset.nodes[index].fy = tapestry.dataset.nodes[index].fx;
@@ -1879,6 +1916,7 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
+            var quizCompletionInfo = progressObj[id].quiz;
             var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
@@ -1888,6 +1926,16 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
+
+                var questions = tapestry.dataset.nodes[index].quiz;
+                if (quizCompletionInfo) {
+                    Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
+                        var question = questions.find(question => question.id === questionId);
+                        if (question) {
+                            question.completed = isCompleted;
+                        }
+                    })
+                }
                 tapestry.dataset.nodes[index].completed = completed;
             }
         }
@@ -1917,19 +1965,6 @@ function tapestryTool(config){
         })
         .fail(function(e) {
             console.error("Error with update user's node unlock property for node index", node.nodeIndex);
-            console.error(e);
-        });
-    }
-
-    function saveNodeAsSkippable(node) {
-        tapestry.dataset.nodes[node.index].skippable = true;
-        jQuery.post(USER_NODE_SKIPPED_URL, {
-            "post_id": config.wpPostId,
-            "node_id": node.id,
-            "skippable": true,
-        })
-        .fail(function (e) {
-            console.error("Error with update user's node skippable property for node index", node.nodeIndex);
             console.error(e);
         });
     }

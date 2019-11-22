@@ -4,20 +4,29 @@
     size="lg"
     class="text-muted"
     scrollable
-    :title="modalTitle"
     body-class="p-0"
   >
+    <template v-slot:modal-header="{ close }">
+      <div class="modal-header-row">
+        <h5>{{ modalTitle }}</h5>
+        <b-button size="sm" variant="outline-danger" @click="close()">
+          Close Modal
+        </b-button>
+      </div>
+      <div class="modal-header-row">
+        <b-alert
+          v-if="formErrors.length"
+          id="tapestry-modal-form-errors"
+          variant="danger"
+          show
+          v-html="formErrors"
+        ></b-alert>
+      </div>
+    </template>
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
           <div id="modal-content-details">
-            <b-alert
-              v-if="formErrors.length"
-              id="tapestry-modal-form-errors"
-              variant="danger"
-              show
-              v-html="formErrors"
-            ></b-alert>
             <b-form-group label="Title">
               <b-form-input
                 id="node-title"
@@ -162,6 +171,11 @@
                 Allow skipping video if user has not watched at least once
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.fullscreen">
+                Maximize video size to fit in the window
+              </b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab title="Permissions">
@@ -246,6 +260,7 @@
             </b-table-simple>
           </div>
         </b-tab>
+        <quiz-modal :node="node" />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -270,9 +285,13 @@
 
 <script>
 import Helpers from "../utils/Helpers"
+import QuizModal from "./node-modal/QuizModal"
 
 export default {
   name: "node-modal",
+  components: {
+    QuizModal,
+  },
   props: {
     node: {
       type: Object,
@@ -357,6 +376,8 @@ export default {
         { name: "hideProgress", value: this.node.hideProgress },
         { name: "hideMedia", value: this.node.hideMedia },
         { name: "skippable", value: this.node.skippable },
+        { name: "quiz", value: this.node.quiz || [] },
+        { name: "fullscreen", value: this.node.fullscreen },
       ]
     },
     nodeImageUrl() {
@@ -469,6 +490,11 @@ export default {
         )
       }
 
+      const quiz = this.node.quiz
+      if (!this.validateQuiz(quiz)) {
+        errMsgs.push("Please enter at least one answer ID for each question")
+      }
+
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
@@ -499,6 +525,11 @@ export default {
       }
 
       return errMsgs.join("<br>")
+    },
+    validateQuiz(quiz) {
+      return quiz.every(question => {
+        return Object.values(question.answers).some(value => value.length > 0)
+      })
     },
     addUserPermissionRow() {
       const userId = this.userId
@@ -536,6 +567,7 @@ table {
   border: none;
   padding-bottom: 0;
   margin-left: 5px;
+  flex-direction: column;
 }
 
 .modal-title {
@@ -544,10 +576,21 @@ table {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .form-control {
   padding: 15px;
   border: none;
   background: #f1f1f1;
+}
+
+.modal-header-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>
