@@ -192,7 +192,7 @@ function gf_button_shortcode($shortcode_string, $attributes, $content)
 function gf_button_ajax_get_form()
 {
     $form_id = isset($_GET['form_id']) ? absint($_GET['form_id']) : 0;
-    gravity_form($form_id, true, false, false, false, true);
+    gravity_form($form_id, false, false, false, false, true);
     die();
 }
 // End of Gravity Forms Pluggin

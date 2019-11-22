@@ -129,6 +129,14 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.question label.gfield_label {
+    font-weight: bold;
+    margin-top: 1em;
+    font-size: 1.3em;
+}
+</style>
+
 <style scoped>
 button {
   margin: auto;

@@ -89,6 +89,13 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_complete();
     }
 
+    /**
+     * Set the question with the given id to be marked as 'completed'
+     * 
+     * @param Integer $questionId the question to mark
+     * 
+     * @return Null
+     */
     public function completeQuestion($questionId)
     {
         $this->_checkUserAndPostId();
@@ -194,7 +201,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
 
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
-            foreach($nodeMetadata->quiz as $question) {
+            foreach ($nodeMetadata->quiz as $question) {
                 if (isset($question->id)) {
                     $quiz[$question->id] = false;
                 }
@@ -202,7 +209,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         if (isset($completed_values) && is_array($completed_values)) {
-            foreach($completed_values as $id => $completed) {
+            foreach ($completed_values as $id => $completed) {
                 $quiz[$id] = $completed;
             }
         }
