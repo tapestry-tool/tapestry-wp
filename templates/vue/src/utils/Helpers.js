@@ -71,4 +71,13 @@ export default class {
   static getImagePath(image) {
     return `${wpData.vue_uri}/${image.split("dist")[1]}`;
   }
+
+  static base64ToBlob(b64Data, contentType) {
+    const url = `data:${contentType};base64,${b64Data}`;
+    return new Promise((resolve, reject) => {
+      return fetch(url).then(response => {
+        resolve(response.blob());
+      })
+    })
+  }
 }
