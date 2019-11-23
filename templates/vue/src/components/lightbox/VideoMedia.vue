@@ -3,7 +3,6 @@
     <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <video
       ref="video"
-      class="video"
       controls
       autoplay
       @loadedmetadata="handleLoad"
@@ -132,23 +131,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.video {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: auto;
-}
-
 .container {
   position: relative;
   width: 100%;
   height: 100%;
   max-width: 100vw;
-}
-
-.video {
-  width: 100%;
-  height: auto;
+  
+  video {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
 }
 </style>
