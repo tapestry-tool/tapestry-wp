@@ -68,20 +68,14 @@ export default {
             const keys = Object.keys(q.answers)
             return keys.filter(key => q.answers[key]).map(key => {
               return {
-
+                type: "activity",
+                title: q.text,
+                nodeId: currentNode.id,
+                [key]: q.answers[key],
               }
             })
-            for (const [option, id] of answers) {
-              if (id) {
-                answerLogs.push({
-                  type: "activity",
-                  title: q.text,
-                  answerOption: option,
-                })
-              }
-            }
           })
-          return [...activities, ...completedQuestions]
+          return [...activities, ...completedQuestions.flat()]
         }
       }, [])
       return [...completedContents, ...completedActivities]
