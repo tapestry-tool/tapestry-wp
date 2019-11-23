@@ -328,7 +328,7 @@
 
 .mediaButtonLoading {
     color: transparent;
-    background-image: url(https://beta.tapestry-tool.com/wp-content/uploads/2018/11/loading-eclipse.svg);
+    background-image: url("img/loading-eclipse.svg");
     background-color: #666;
     border-radius: 100%;
     margin: 2% 2% 2% 3%;
@@ -339,6 +339,7 @@
 }
 
 /* ADD + EDIT NODE BUTTONS */
+
 .editNodeButton:hover,
 .editNodeButton:active,
 .addNodeButton:hover,
@@ -346,271 +347,8 @@
     transform: scale(1.15) translate(0, -21px);
 }
 
-.lightbox {
-    background-color: rgba(0, 0, 0, 0.8);
-    overflow: scroll;
-    position: fixed;
-    display: none;
-    opacity: 0;
-    z-index: 1;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    top: 0;
-    transition: all 1s !important;
-}
-
-.lightbox-container {
-    position: relative;
-    max-width: 960px;
-    margin: 7% auto;
-    display: block;
-    height: auto;
-    z-index: 10;
-}
-
-@media screen and (max-width: 768px) {
-    .lightbox-container {
-        margin-top: 10%;
-    }
-}
-
-@media screen and (max-width: 414px) {
-    .lightbox-container {
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        margin-top: 13%;
-    }
-}
-
-.lightbox-content {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
-}
-
-#lightbox-close-wrapper {
-    width: auto;
-    display: flex;
-    justify-content: flex-end;
-    background: none;
-    border: none;
-    outline: none;
-    position: absolute;
-    top: -37px;
-    right: -42px;
-    z-index: 20;
-}
-
-.lightbox-close {
-    background: #666;
-    color: white;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.2em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
-    transition: all 0.25s ease;
-    border: solid 2px #fff;
-}
-
-.lightbox-close:hover {
-    transform: scale(1.15);
-    background: #11a6d8;
-}
-
-.lightbox-close i {
-    background: none;
-}
-
-#instructions-wrapper {
-    max-width: 430px;
-    border: solid 1px #CCC;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 8px;
-    text-align:center; 
-    color: #666; 
-    margin: 0 auto 1em; 
-    float: none;
-    font-size: 0.8em;
-}
-
-@media (min-width:800px) {
-    #instructions-wrapper {
-        max-width: 230px;
-        position: absolute;
-        top: 45px;
-        right: 10px;
-    }
-}
-
-@media (min-width:1000px) {
-    #instructions-wrapper {
-        max-width: 430px;
-        right: 45px;
-    }
-}
-
-/* Add new node form */
-
 body {font-family: Arial, Helvetica, sans-serif; font-size: 16px;}
 * {box-sizing: border-box;}
-
-/* The popup form - hidden by default */
-.form-popup {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    right: 15px;
-    border: 3px solid #f1f1f1;
-    z-index: 9;
-}
-
-/* Add styles to the form container */
-.form-container {
-    padding: 3%;
-    background-color: white;
-    margin: 0 auto;
-}
-
-/* Full-width input fields */
-.form-container input[type=text],
-.form-container input[type=url], 
-.form-container input[type=file] {
-    width: 100%;
-    padding: 15px;
-    margin: 5px 0 22px 0;
-    border: none;
-    background: #f1f1f1;
-}
-
-/* Full-width input fields */
-.form-container textarea {
-    width: 100%;
-    padding: 15px;
-    margin: 10px 0 22px 0;
-    background: #f1f1f1;
-}
-
-/* When the inputs get focus, do something */
-.form-container input[type=text]:focus, .form-container input[type=password]:focus {
-    background-color: #ddd;
-    outline: none;
-}
-
-/* Set a style for the submit/login button */
-.form-container .btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 16px 20px;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-    opacity: 0.8;
-}
-
-#submit-add-new-node, #submit-add-root-node {
-    color: white;
-}
-
-#cancel-add-new-node, #tapestry-delete-node {
-    color: white;
-    background-color: #dc3545;
-}
-
-#add-node-error-msg {
-    color: #dc3545;
-    font-size: 15px;
-    margin-left: 4%;
-}
-
-/* Add some hover effects to buttons */
-.form-container .btn:hover, .open-button:hover {
-    opacity: 1;
-}
-
-.dropdown #mediaType {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 15px;
-    width: 50%;
-    height: 30px;
-}
-
-.dropdown #mediaFormat {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 15px;
-    width: 50%;
-    height: 30px;
-}
-
-#root-node-container {
-    padding-top: 40px;
-}
-/* Root Node button */
-#root-node-btn {
-    margin-top: 20vh;
-    text-align: center;
-    cursor: pointer;
-}
-
-#root-node-label {
-    text-align: center; 
-    font-size: 1.5em;
-    padding-top: 10px;
-}
-
-#root-node-btn:hover,
-#root-node-btn:active {
-    transform: scale(1.1);
-    color: #11a6d8;
-}
-
-.lightbox-form-section {
-    border-top: solid 1px #DDD;
-    margin: 20px -32px;
-    padding: 5px 32px;
-}
-
-.lightbox-form-section > h4 {
-    margin: 2rem 0;
-}
-
-#contents-details {
-    margin-top: 1rem;
-}
-
-/* Permissions Labels */
-
-#permissions-details > table td {
-    border-color: #ddd;
-    background: #eee;
-}
-#permissions-details > table th {
-    border-color: #eee;
-    background: #fafafa;
-}
-#permissions-details > table tfoot td {
-    background: #ddd;
-}
-#permissions-details input#user-number-input {
-    width: 70px;
-}
-#user-permissions-btn, 
-#group-permissions-btn {
-    padding: 4px 1rem;
-    color: white;
-}
-
-.permissions-plus {
-    margin-right: 4px;
-}
 
 input[type="checkbox"][disabled] {
     cursor: not-allowed;
@@ -618,8 +356,4 @@ input[type="checkbox"][disabled] {
 
 #mediaFormat[disabled], #mediaType[disabled]{
     cursor: not-allowed;
-}
-
-#locked-container {
-    margin-bottom: 10px;
 }

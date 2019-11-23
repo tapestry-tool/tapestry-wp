@@ -244,15 +244,13 @@
                         v-model="userId"
                         placeholder="Enter user ID"
                       ></b-form-input>
-                      <b-input-group-append>
-                        <b-button
-                          variant="secondary"
-                          @click="addUserPermissionRow()"
-                        >
-                          <span class="fas fa-plus permissions-plus"></span>
-                          User
-                        </b-button>
-                      </b-input-group-append>
+                      <b-button
+                        variant="secondary"
+                        @click="addUserPermissionRow()"
+                      >
+                        <span class="fas fa-plus mr-1"></span>
+                        User
+                      </b-button>
                     </b-input-group>
                   </b-td>
                 </b-tr>
@@ -549,16 +547,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /* Use non-scoped styles to overwrite WP theme styles */
-table th,
-table td {
-  word-break: unset;
-  border: none;
-}
-
 table {
   border: 1px solid #dee2e6;
+
+  th, td {
+    word-break: unset;
+    border: none;
+  }
 }
 
 /* overwrite bootstrap styles */

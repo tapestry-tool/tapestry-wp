@@ -4,7 +4,7 @@
     :class="{ 'full-screen': node.fullscreen }"
     :format="node.mediaFormat"
   >
-    <div v-if="canSkip" id="spotlight-overlay" @click="$emit('close')"></div>
+    <div v-if="canSkip" class="overlay" @click="$emit('close')"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -12,8 +12,8 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button v-if="canSkip" id="lightbox-close-wrapper" @click="$emit('close')">
-          <div class="lightbox-close">
+        <button v-if="canSkip" class="close-btn" @click="$emit('close')">
+          <div>
             <i class="fa fa-times"></i>
           </div>
         </button>
@@ -235,51 +235,128 @@ export default {
   right: 0;
   opacity: 1;
   transform: translateY(0);
-}
-
-#spotlight-overlay {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-}
-
-.content {
-  position: absolute;
-  top: 5vh;
-  left: 5vw;
-  height: 90vh;
-  width: 90vw;
   z-index: 100;
-  background-position: 0 0;
-  background-size: cover;
-  background-color: black;
-  box-shadow: 0 0 100px -40px #000;
-  border-radius: 15px;
-}
 
-.media-wrapper {
-  background: #000;
-  outline: none;
-  border-radius: 15px;
-  overflow: hidden;
-  height: 100%;
-}
+  .overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+  }
 
-.media-wrapper-embed {
-  background: white;
-}
+  .content {
+    position: absolute;
+    top: 5vh;
+    left: 5vw;
+    height: 90vh;
+    width: 90vw;
+    z-index: 100;
+    background-position: 0 0;
+    background-size: cover;
+    background-color: black;
+    box-shadow: 0 0 100px -40px #000;
+    border-radius: 15px;
 
-.content-text {
-  outline: none;
-  background: #eee;
-  color: #333;
-  padding: 1em;
-}
+    .media-wrapper {
+      background: #000;
+      outline: none;
+      border-radius: 15px;
+      overflow: hidden;
+      height: 100%;
+    }
+    .media-wrapper-embed {
+      background: white;
+    }
 
-.content-text .media-wrapper {
-  height: 100%;
-  overflow: scroll;
-  background: transparent;
+    &.content-text {
+      outline: none;
+      background: #eee;
+      color: #333;
+      padding: 1em;
+      
+      .media-wrapper {
+        height: 100%;
+        overflow: scroll;
+        background: transparent;
+      }
+    }
+  }
+
+  .close-btn {
+    width: auto;
+    display: flex;
+    justify-content: flex-end;
+    background: none;
+    border: none;
+    outline: none;
+    position: absolute;
+    top: -37px;
+    right: -42px;
+    z-index: 20;
+
+    > div {
+      background: #666;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
+      transition: all 0.25s ease;
+      border: solid 2px #fff;
+
+      &:hover {
+        transform: scale(1.15);
+        background: #11a6d8;
+      }
+
+      i {
+        background: none;
+      }
+    }
+  }
+
+  &.full-screen {
+    background: #000;
+
+    &[format="h5p"] #spotlight-content {
+      width: 100vw !important;
+      height: 100vh !important;
+      
+      iframe {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+    &[format="mp4"] #spotlight-content video {
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+    }
+
+    #spotlight-content {
+      top: 0 !important;
+      left: 0 !important;
+      width: auto !important;
+      height: auto !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      border-radius: 0;
+    }
+    
+    .close-btn {
+      top: 0 !important;
+      right: 0 !important;
+      z-index: 100;
+    }
+  }
 }
 </style>
 
@@ -293,44 +370,5 @@ export default {
 .lightbox-leave-to {
   opacity: 0;
   transform: translateY(32px);
-}
-
-#lightbox.full-screen {
-  background: #000;
-
-  #spotlight-content {
-    top: 0 !important;
-    left: 0 !important;
-    width: auto !important;
-    height: auto !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    border-radius: 0;
-  }
-}
-
-#lightbox[format="h5p"].full-screen #spotlight-content {
-  width: 100vw !important;
-  height: 100vh !important;
-}
-#lightbox[format="h5p"].full-screen #spotlight-content iframe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-#lightbox[format="mp4"].full-screen #spotlight-content video {
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-}
-
-#lightbox.full-screen #lightbox-close-wrapper {
-  top: 0 !important;
-  right: 0 !important;
-  z-index: 100;
 }
 </style>
