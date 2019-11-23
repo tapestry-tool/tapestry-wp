@@ -104,7 +104,7 @@ export default {
   align-items: flex-end;
   justify-content: space-between;
   padding: 24px;
-  padding-left: 25%;
+  padding-left: 40%;
   position: absolute;
   left: 0;
   top: 0;

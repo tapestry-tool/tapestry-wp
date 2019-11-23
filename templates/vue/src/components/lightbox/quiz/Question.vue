@@ -174,6 +174,18 @@ button {
   &.question-h5p {
     max-width: 600px;
   }
+
+  &.question-gf {
+    overflow: scroll;
+
+    textarea {
+      max-height: 180px !important;
+    }
+
+    .image-choices-choice-image-wrap img.image-choices-choice-image {
+      max-width: 100px;
+    }
+  }
 }
 
 .question-title {
