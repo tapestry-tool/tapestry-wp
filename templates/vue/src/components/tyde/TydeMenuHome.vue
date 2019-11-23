@@ -1,7 +1,7 @@
 <template>
-  <section>
+  <section id="tyde-menu-home">
     <nav>
-      <ul class="tabs">
+      <ul>
         <tyde-tab
           v-for="tab in tabs"
           :key="tab"
@@ -64,19 +64,22 @@ export default {
 }
 </script>
 
-<style scoped>
-.logs {
-  margin-top: 26px;
-  height: calc(100vh - 210px);
-  overflow-y: scroll;
-}
+<style lang="scss" scoped>
+#tyde-menu-home {
 
-.tabs {
-  display: flex;
-  font-size: 16px;
-  justify-content: left;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  nav ul {
+    display: flex;
+    font-size: 16px;
+    justify-content: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .logs {
+    margin-top: 26px;
+    height: calc(100vh - 210px);
+    overflow-y: scroll;
+  }
 }
 </style>

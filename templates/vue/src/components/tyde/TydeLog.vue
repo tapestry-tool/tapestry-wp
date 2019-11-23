@@ -44,47 +44,7 @@ export default {
 }
 </script>
 
-<style scoped>
-img {
-  max-width: 250px;
-}
-
-.thumbnail-placeholder {
-  width: 250px;
-  height: 250px;
-  background-color: gray;
-  float: left;
-}
-
-.log-details {
-  float: right;
-  font-size: 20px;
-  width: calc(100% - 280px);
-  word-break: break-word;
-}
-
-.log-details > h1::before {
-  content: none;
-}
-
-.log-details > p {
-  padding: unset;
-  line-height: 1.4em;
-  margin-bottom: 0;
-}
-
-.log-controls {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-left: auto;
-  /* Currently do not support favorites, so hiding this */
-  display: none;
-}
-.log-controls i {
-    font-size: 1.5em;
-}
-
+<style lang="scss" scoped>
 .log {
   background: var(--tapestry-med-gray);
   border: 1px solid var(--tapestry-light-gray);
@@ -94,5 +54,45 @@ img {
   padding: 24px;
   width: 100%;
   display: flex;
+  
+  img {
+    max-width: 250px;
+  }
+
+  .thumbnail-placeholder {
+    width: 250px;
+    height: 250px;
+    background-color: gray;
+    float: left;
+  }
+
+  .log-details {
+    float: right;
+    font-size: 20px;
+    width: calc(100% - 280px);
+    word-break: break-word;
+    > h1::before {
+      content: none;
+    }
+
+    > p {
+      padding: unset;
+      line-height: 1.4em;
+      margin-bottom: 0;
+    }
+  }
+
+  .log-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: auto;
+    /* Currently do not support favorites, so hiding this */
+    display: none;
+
+    i {
+      font-size: 1.5em;
+    }
+  }
 }
 </style>

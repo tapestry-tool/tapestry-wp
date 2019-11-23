@@ -1,7 +1,7 @@
 <template>
-  <div class="bubble">
+  <div class="speech-bubble">
     <slot></slot>
-    <div class="bubble-pointer" :style="{ backgroundImage: bubbleImage }"></div>
+    <div :style="{ backgroundImage: bubbleImage }"></div>
   </div>
 </template>
 
@@ -18,8 +18,8 @@ export default {
 }
 </script>
 
-<style scoped>
-.bubble {
+<style lang="scss" scoped>
+.speech-bubble {
   position: relative;
   border: 2px solid black;
   padding: 12px 16px;
@@ -27,24 +27,24 @@ export default {
   font-size: 28px;
   font-style: italic;
   line-height: 1.2;
-}
 
-.bubble-pointer {
-  position: absolute;
-  left: 10%;
-  bottom: -31px;
-  width: 46px;
-  height: 32px;
-  background-size: cover;
-}
+  &:after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    bottom: -2px;
+    width: 15px;
+    height: 2px;
+    background: black;
+  }
 
-.bubble:after {
-  content: "";
-  position: absolute;
-  left: 10%;
-  bottom: -2px;
-  width: 15px;
-  height: 2px;
-  background: black;
+  > div {
+    position: absolute;
+    left: 10%;
+    bottom: -31px;
+    width: 46px;
+    height: 32px;
+    background-size: cover;
+  }
 }
 </style>

@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tyde-button {
   position: relative;
   width: 60px;
@@ -37,31 +37,31 @@ export default {
   font-size: 30px;
   margin-right: 16px;
   transition: all 0.2s ease;
-}
 
-.tyde-button:last-child {
-  margin-right: 0;
-}
+    &:last-child {
+        margin-right: 0;
+    }
 
-.tyde-button:before {
-  content: "";
-  position: absolute;
-  top: -7px;
-  left: -7px;
-  right: -7px;
-  bottom: -7px;
-  background: transparent;
-  border: 3px solid var(--tapestry-light-gray);
-  border-radius: 50%;
-}
+    &:before {
+        content: "";
+        position: absolute;
+        top: -7px;
+        left: -7px;
+        right: -7px;
+        bottom: -7px;
+        background: transparent;
+        border: 3px solid var(--tapestry-light-gray);
+        border-radius: 50%;
+    }
 
-.tyde-button:focus {
-  outline: none;
-}
+    &:focus {
+        outline: none;
+    }
 
-.tyde-button:hover {
-  background: var(--tapestry-light-blue);
-  color: white;
-  transform: scale(1.1);
+    &:hover {
+        background: var(--tapestry-light-blue);
+        color: white;
+        transform: scale(1.1);
+    }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <li :class="['tab', { 'tab-active': isActive }]" @click="$emit('click')">
+  <li :class="['tab', { 'active': isActive }]" @click="$emit('click')">
     <i class="far fa-eye icon"></i>
     <slot></slot>
   </li>
@@ -18,11 +18,7 @@ export default {
 }
 </script>
 
-<style scoped>
-.icon {
-  font-size: 1.3em;
-  margin-bottom: 8px;
-}
+<style lang="scss" scoped>
 
 .tab {
   cursor: pointer;
@@ -35,10 +31,15 @@ export default {
   text-align: center;
   text-transform: uppercase;
   transition: all 0.2s ease;
-}
 
-.tab:hover,
-.tab-active {
-  opacity: 1;
+  &:hover,
+  &.active {
+    opacity: 1;
+  }
+
+  .icon {
+    font-size: 1.3em;
+    margin-bottom: 8px;
+  }
 }
 </style>

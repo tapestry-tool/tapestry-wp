@@ -1,5 +1,5 @@
 <template>
-  <div :id="`module-${nodeId}`" class="wrapper">
+  <div :id="`module-${nodeId}`" class="module-wrapper">
     <tyde-stage
       :node-id="activeStage"
       @next="next"
@@ -62,8 +62,8 @@ export default {
 }
 </script>
 
-<style scoped>
-.wrapper {
+<style lang="scss" scoped>
+.module-wrapper {
   background: white;
   position: fixed;
   top: 0;
