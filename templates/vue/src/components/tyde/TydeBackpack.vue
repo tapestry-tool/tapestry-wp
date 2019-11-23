@@ -53,7 +53,7 @@ export default {
       return `${wpData.vue_uri}/${BackpackIcon.split("dist")[1]}`
     },
     logs() {
-      return this.nodes.filter(node => node.completed).map(node => {
+      const completedContents = this.nodes.filter(node => node.completed).map(node => {
         return {
           type: "content",
           title: node.title,
@@ -62,6 +62,29 @@ export default {
           isFavourite: node.isFavourite,
         }
       })
+      const completedActivities = this.nodes.reduce((activities, currentNode) => {
+        if (currentNode.quiz) {
+          const completedQuestions = currentNode.quiz.filter(q => q.completed).map(q => {
+            const keys = Object.keys(q.answers)
+            return keys.filter(key => q.answers[key]).map(key => {
+              return {
+
+              }
+            })
+            for (const [option, id] of answers) {
+              if (id) {
+                answerLogs.push({
+                  type: "activity",
+                  title: q.text,
+                  answerOption: option,
+                })
+              }
+            }
+          })
+          return [...activities, ...completedQuestions]
+        }
+      }, [])
+      return [...completedContents, ...completedActivities]
     }
   },
   methods: {

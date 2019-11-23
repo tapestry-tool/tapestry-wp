@@ -1,6 +1,9 @@
 <template>
   <li class="log">
     <img v-if="log.imageURL" :src="log.imageURL" />
+    <div v-else-if="log.type === 'activity'">
+      <i :class="`fas fa-${icon} icon-fa`"></i>
+     </div>
     <div v-else class="thumbnail-placeholder"></div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
@@ -34,7 +37,10 @@ export default {
   computed: {
     favoriteClass() {
       return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
-    }
+    },
+    icon() {
+      return "tasks" || "microphone"
+    },
   },
   methods: {
     formatParagraph(str) {
