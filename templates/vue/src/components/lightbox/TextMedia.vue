@@ -1,7 +1,7 @@
 <template>
   <article class="article">
-    <h1 id="text-light-box-title">{{ node.title }}</h1>
-    <div class="html" v-html="html"></div>
+    <h1>{{ node.title }}</h1>
+    <div v-html="html"></div>
   </article>
 </template>
 
@@ -35,22 +35,22 @@ export default {
 .article {
   padding: 0 15px;
   text-align: left;
-}
 
-#text-light-box-title {
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin: 1em 0;
-}
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin: 1em 0;
 
-#text-light-box-title:before {
-  display: none;
-}
+    :before {
+      display: none;
+    }
+  }
 
-.html {
-  color: #47425d;
-  font-family: "Source Sans Pro", sans-serif;
-  font-size: 16px;
+  div {
+    color: #47425d;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 16px;
+  }
 }
 </style>
 
