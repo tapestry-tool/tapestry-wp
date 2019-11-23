@@ -109,6 +109,7 @@ export default {
         margin: 0;
         background: none;
         color: inherit;
+        align-self: flex-start;
 
         &:hover p {
           transform: translateY(-8px);
@@ -118,7 +119,7 @@ export default {
           width: 198px;
           height: 184px;
 
-          .img {
+          img {
             width: 90%;
             height: auto;
           }
@@ -126,11 +127,13 @@ export default {
 
         p {
           padding: 0;
-          margin: 0;
+          margin: 0.5em 0 0;
           font-family: inherit;
           color: inherit;
           font-size: 32px;
           transition: transform 0.2s ease-out;
+          line-height: 0.9em;
+          max-width: 200px;
         }
       }
     }

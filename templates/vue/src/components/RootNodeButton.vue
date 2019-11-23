@@ -1,8 +1,8 @@
 <template>
-  <div id="root-node-container">
-    <div id="root-node-btn" @click="showModal">
+  <div class="root-node-button">
+    <div @click="showModal">
       <i class="fas fa-plus-circle fa-5x"></i>
-      <div id="root-node-label">Add Root Node</div>
+      <div>Add Root Node</div>
     </div>
   </div>
 </template>
@@ -22,22 +22,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#root-node-btn {
-  margin-top: 20vh;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+#root-node-button {
+  padding-top: 40px;
 
-#root-node-label {
-  text-align: center;
-  font-size: 1.5em;
-  padding-top: 10px;
-}
+  > div {
+    margin-top: 20vh;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
 
-#root-node-btn:hover,
-#root-node-btn:active {
-  transform: scale(1.1);
-  color: #11a6d8;
+    &:hover, &:active {
+      transform: scale(1.1);
+      color: #11a6d8;
+    }
+    
+    > div {
+      text-align: center; 
+      font-size: 1.5em;
+      padding-top: 10px;
+    }
+  }
 }
 </style>

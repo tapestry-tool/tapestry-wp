@@ -8,7 +8,6 @@
     />
     <video
       ref="video"
-      class="video"
       controls
       autoplay
       @loadeddata="handleLoad"
@@ -137,37 +136,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.video {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: auto;
-}
-
 .container {
   position: relative;
   width: 100%;
   height: 100%;
   max-width: 100vw;
-}
-
-.video {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: auto;
-}
-
-.container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.video {
-  width: 100%;
-  height: auto;
+  
+  video {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
 }
 </style>

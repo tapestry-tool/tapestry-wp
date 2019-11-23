@@ -59,7 +59,7 @@ function enqueue_vue_app_build()
         'wpData', // javascript object that will made availabe to Vue.
         array( // wordpress data to be made available to the Vue app in 'wpData'
             'directory_uri' => plugin_dir_url(__FILE__) . 'vue/dist', // child theme directory path.
-            'vue_uri'  => $vueUrl,
+            'vue_uri'  => $vueUrl, // path to vue
             'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
             'app_path' => $post->post_name, // page where the custom page template is loaded.
             'post_categories' => get_terms(array(

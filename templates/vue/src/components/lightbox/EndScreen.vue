@@ -18,7 +18,7 @@
     <div class="button-container" :class="{'pt-4':!showQuizButton}">
       <button
         v-if="showQuizButton"
-        class="end-screen-button end-screen-button-quiz"
+        class="end-screen-button button-quiz"
         @click="showQuiz = true"
       >
         <i class="fas fa-question-circle"></i>
@@ -99,7 +99,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .end-screen {
   display: flex;
   flex-direction: column;
@@ -113,56 +113,55 @@ export default {
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
-
   padding: 24px;
   padding-left: 38%;
   padding-right: 64px;
-}
 
-.end-screen--hide {
-  opacity: 0;
-  pointer-events: none;
-}
+  &.end-screen--hide {
+    opacity: 0;
+    pointer-events: none;
+  }
 
-.end-screen-button {
-  background: none;
-  background-color: var(--tyde-blue);
-  padding: 4px 32px;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  color: white;
-  border-radius: 4px;
-  opacity: 1;
-  transition: opacity 0.1s ease-out;
-  font-size: 32px;
-  margin-bottom: 32px;
-}
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    padding-left: 96px;
+    margin-top: 64px;
+    
+    button {
+      background: none;
+      background-color: var(--tyde-blue);
+      padding: 4px 32px;
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      color: white;
+      border-radius: 4px;
+      opacity: 1;
+      transition: opacity 0.1s ease-out;
+      font-size: 32px;
+      margin-bottom: 32px;
 
-.end-screen-button:last-child {
-  margin-bottom: 0;
-}
+      &:last-child {
+        margin-right: 0;
+      }
 
-.end-screen-button-quiz {
-  background-color: var(--tyde-orange);
-}
+      &:hover {
+        opacity: 0.9;
+      }
 
-.end-screen-button:hover {
-  opacity: 0.9;
-}
+      .button-quiz {
+        background-color: var(--tyde-orange);
+      }
 
-.end-screen-button-text {
-  margin: 0;
-  padding: 0;
-  font-weight: 600;
-  margin-left: 32px;
-}
-
-.button-container {
-  display: flex;
-  flex-direction: column;
-  padding-left: 96px;
-  margin-top: 64px;
+      p {
+        margin: 0;
+        padding: 0;
+        font-weight: 600;
+        margin-left: 32px;
+      }
+    }
+  }
 }
 </style>
