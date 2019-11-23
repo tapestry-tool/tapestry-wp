@@ -1,10 +1,12 @@
 <template>
   <li class="log">
+    <div class="log-thumbnail">
     <img v-if="log.imageURL" :src="log.imageURL" />
-    <div v-else-if="log.type === 'activity'">
+      <div v-else-if="log.type === 'activity'" class="activity">
       <i :class="`fas fa-${icon} icon-fa`"></i>
      </div>
-    <div v-else class="thumbnail-placeholder"></div>
+      <div v-else class="default"></div>
+    </div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
       <p v-html="formatParagraph(log.description)" />
@@ -61,15 +63,28 @@ export default {
   width: 100%;
   display: flex;
   
-  img {
-    max-width: 250px;
+  .log-thumbnail {
+    width: 250px;
+    height: 225px;
+    float: left;
+    .activity {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f79621;
+      > i {
+        font-size: 100px;
+      }
+    }
+    .default {
+      height: 100%;
+      background-color: gray;
+    }
   }
 
-  .thumbnail-placeholder {
-    width: 250px;
-    height: 250px;
-    background-color: gray;
-    float: left;
+  img {
+    max-width: 250px;
   }
 
   .log-details {
