@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo "We are now running the linter on every commit. You can skip this with the '--no-verify' flag."
+echo "We are now linting on every commit. You can skip this with the '--no-verify' flag."
 
-cd templates/vue && npm run lint
+cd templates/vue && npm run lint -- --fix
