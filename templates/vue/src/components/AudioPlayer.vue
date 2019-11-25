@@ -1,9 +1,5 @@
 <template>
-  <audio controls="controls">
-    Your browser does not support the
-    <code>audio</code> element.
-    <source v-bind:src="audioSrc" />
-  </audio>
+  <audio controls v-bind:src="audioSrc"></audio>
 </template>
 
 <script>
@@ -12,7 +8,7 @@ export default {
   name: "audio-player",
   props: {
     audioSrc: {
-      type: Object,
+      type: String,
       required: true,
     },
   },
@@ -20,4 +16,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+audio {
+  width: 50%;
+  margin-top: 35px;
+}
 </style>
