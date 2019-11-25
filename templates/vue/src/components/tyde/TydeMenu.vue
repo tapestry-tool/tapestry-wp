@@ -23,7 +23,9 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
+
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
 import TydeMenuSettings from "./TydeMenuSettings"
@@ -52,6 +54,9 @@ export default {
       },
     }
   },
+  computed: {
+    ...mapState(["nodes"]),
+  },
   watch: {
     settings(newSettings, prevSettings) {
       if (newSettings.isAudioPlaying !== prevSettings.isAudioPlaying) {
@@ -60,10 +65,43 @@ export default {
     },
   },
   async mounted() {
-    const entries = await GravityFormsApi.getEntries(1)
+    const entries = await this.getAllEntries()
     console.log(entries)
   },
   methods: {
+    async getAllEntries() {
+      const nodesWithQuestions = this.nodes.filter(
+        node => node.quiz && node.quiz.length > 0
+      )
+      const populatedNodes = await Promise.all(
+        nodesWithQuestions.map(async node => {
+          const populatedQuestions = await Promise.all(
+            node.quiz.map(async question => {
+              const { checklistId, textId } = question.answers
+              const checklistAnswers = checklistId
+                ? await GravityFormsApi.getEntries(checklistId)
+                : []
+              const textAnswers = textId
+                ? await GravityFormsApi.getEntries(textId)
+                : []
+              return {
+                id: question.id,
+                answers: {
+                  text: textAnswers,
+                  checklist: checklistAnswers,
+                },
+              }
+            })
+          )
+          return { id: node.id, quiz: populatedQuestions }
+        })
+      )
+      const nodeQuizMap = {}
+      populatedNodes.forEach(node => {
+        nodeQuizMap[node.id] = node.quiz
+      })
+      return nodeQuizMap
+    },
     setActivePage(page) {
       this.activePage = page
     },

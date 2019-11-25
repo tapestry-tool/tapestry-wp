@@ -13,12 +13,16 @@ const request = (method, endpoint) => {
     )
 }
 
+/**
+ * Get entries for a given `formId`
+ * @param {string | number} formId
+ */
+const getEntries = formId => {
+  return request("GET", `/forms/${formId}/entries`).then(
+    response => response.entries
+  )
+}
+
 export default {
-  /**
-   * Get entries for a given `formId`
-   * @param {string | number} formId
-   */
-  getEntries: function(formId) {
-    return request("GET", `/forms/${formId}/entries`)
-  },
+  getEntries,
 }
