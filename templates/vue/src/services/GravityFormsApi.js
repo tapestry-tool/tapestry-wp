@@ -19,6 +19,6 @@ export default {
    * @param {string | number} formId
    */
   getEntries: function(formId) {
-    return request("GET", `/forms/${formId}`)
+    return request("GET", `/forms/${formId}/entries`)
   },
 }
