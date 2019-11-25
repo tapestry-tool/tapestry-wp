@@ -1,15 +1,20 @@
 <template>
   <li class="log">
     <div class="log-thumbnail">
-    <img v-if="log.imageURL" :src="log.imageURL" />
+      <img v-if="log.imageURL" :src="log.imageURL" />
       <div v-else-if="log.type === 'activity'" class="activity">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
-     </div>
+        <i :class="`fas fa-${icon} icon-fa`"></i>
+      </div>
       <div v-else class="default"></div>
     </div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
-      <p v-html="formatParagraph(log.description)" />
+      <div v-if="log.type === 'content'">
+        <p v-html="formatParagraph(log.description)" />
+      </div>
+      <div v-else-if="log.type === 'activity'">
+        <audio-player v-if="log.audioSrc" :audioSrc="log.audioSrc" />
+      </div>
     </div>
     <div class="log-controls">
       <i :class="favoriteClass" @click="favorite = !favorite"></i>
@@ -20,6 +25,8 @@
 
 <script>
 import TydeButton from "./TydeButton"
+import AudioPlayer from "@/components/AudioPlayer"
+
 export default {
   name: "tyde-log",
   props: {
@@ -35,13 +42,14 @@ export default {
   },
   components: {
     TydeButton,
+    AudioPlayer,
   },
   computed: {
     favoriteClass() {
       return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
     },
     icon() {
-      return "tasks" || "microphone"
+      return this.log.checklistId ? "tasks" : "microphone"
     },
   },
   methods: {
@@ -62,7 +70,7 @@ export default {
   padding: 24px;
   width: 100%;
   display: flex;
-  
+
   .log-thumbnail {
     width: 250px;
     height: 225px;
