@@ -21,8 +21,8 @@
 <script>
 import TydeLog from "./TydeLog"
 import TydeTab from "./TydeTab"
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
+import TapestryApi from "@/services/TapestryAPI"
 
 const TapestryApiClient = new TapestryApi(wpPostId)
 

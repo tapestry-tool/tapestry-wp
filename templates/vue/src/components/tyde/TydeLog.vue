@@ -61,6 +61,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .log {
   background: var(--tapestry-med-gray);
   border: 1px solid var(--tapestry-light-gray);
@@ -80,7 +82,7 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f79621;
+      background-color: $tyde-orange;
       > i {
         font-size: 100px;
       }
