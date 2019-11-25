@@ -17,15 +17,13 @@
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
     </div>
     <div class="continue">
-      <tyde-button
-        icon="arrow-right"
-        @click="$emit('continue')"
-      ></tyde-button>
+      <tyde-button icon="arrow-right" @click="$emit('continue')"></tyde-button>
     </div>
   </div>
 </template>
 
 <script>
+import GravityFormsApi from "@/services/GravityFormsApi"
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
 import TydeMenuSettings from "./TydeMenuSettings"
@@ -60,6 +58,10 @@ export default {
         this.$emit("audio-change")
       }
     },
+  },
+  async mounted() {
+    const entries = await GravityFormsApi.getEntries(1)
+    console.log(entries)
   },
   methods: {
     setActivePage(page) {
@@ -137,7 +139,7 @@ export default {
     bottom: 2em;
     right: 2em;
     z-index: 20;
-    
+
     tyde-button {
       width: 96px;
       height: 96px;
