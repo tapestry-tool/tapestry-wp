@@ -135,6 +135,41 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
+    /**
+     * Get all gravity form entries submitted by this user
+     * 
+     * @return String user entries in json format
+     */
+    public function getUserEntries($formId = 0)
+    {
+        $search_criteria['field_filters'][] = array(
+            'key'   => 'created_by',
+            'value' => $this->_userId
+        );
+        $entries = GFAPI::get_entries($formId, $search_criteria);
+        return $this->_formatEntries($entries);
+    }
+
+    private function _formatEntries($entries)
+    {
+        $formEntryMap = new stdClass();
+
+        foreach ($entries as $entry) {
+            $formId = $entry["form_id"];
+
+            if (property_exists($formEntryMap, $formId)) {
+                $latestEntry = $formEntryMap->$formId;
+                if ($entry["date_updated"] > $latestEntry["date_updated"]) {
+                    $formEntryMap->$formId = $entry;
+                }
+            } else {
+                $formEntryMap->$formId = $entry;
+            }
+        }
+
+        return $formEntryMap;
+    }
+
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
@@ -191,6 +226,8 @@ class TapestryUserProgress implements ITapestryUserProgress
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
         }
+
+        $progress->entries = $this->getUserEntries();
 
         return json_encode($progress);
     }
