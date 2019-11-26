@@ -27,7 +27,7 @@
         <div class="button-container">
           <answer-button
             v-if="hasId('textId')"
-            @click="openForm(question.answers.textId)"
+            @click="openForm(question.answers.textId, 'textId')"
           >
             text
           </answer-button>
@@ -41,7 +41,7 @@
           <answer-button
             v-if="hasId('checklistId')"
             icon="tasks"
-            @click="openForm(question.answers.checklistId)"
+            @click="openForm(question.answers.checklistId, 'checklistId')"
           >
             checklist
           </answer-button>
@@ -83,6 +83,7 @@ export default {
       formOpened: false,
       recorderOpened: false,
       formHtml: "",
+      formType: "",
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -108,7 +109,7 @@ export default {
         this.$emit('h5p-recorder-saver-loaded', { loadedH5pId })
       }
     },
-    async openForm(id) {
+    async openForm(id, answerType) {
       if (!id) {
         return
       }
@@ -117,6 +118,7 @@ export default {
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
       this.formId = id
+      this.formType = answerType
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -133,15 +135,14 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, formData, response }) {
+    handleFormSubmit({ id, success, response }) {
       if (!success) {
         delete window[`gf_submitting_${id}`]
         this.formHtml = response
         return
       }
-      // TODO: Save form submission somehow
       this.formOpened = false
-      this.$emit("form-submitted", this.question.id)
+      this.$emit("form-submitted", { questionId: this.question.id, formId: this.formId, answerType: this.formType })
     },
     hasId(label) {
       const id = this.question.answers[label]

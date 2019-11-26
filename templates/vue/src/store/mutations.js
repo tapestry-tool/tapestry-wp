@@ -56,12 +56,6 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
-export function completeQuestion(state, { nodeId, questionId }) {
-  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
-  const question = node.quiz.find(question => question.id === questionId)
-  question.completed = true
-}
-
 // links
 export function addLink(state, link) {
   state.links.push(link)
@@ -81,4 +75,19 @@ export function closeLightbox(state) {
 
 export function setLightboxEl(state, el) {
   state.lightboxEl = el
+}
+
+// quizzes
+export function completeQuestion(state, { nodeId, questionId }) {
+  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
+  const question = node.quiz.find(question => question.id === questionId)
+  question.completed = true
+}
+
+export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
+  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
+  const question = node.quiz.find(question => question.id === questionId)
+  const entries = question.entries || {}
+  entries[answerType] = entry
+  question.entries = entries
 }

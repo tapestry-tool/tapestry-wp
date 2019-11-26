@@ -23,6 +23,7 @@ export default {
       event.preventDefault()
 
       const form = this.$refs.formContainer.querySelector("form")
+      const formId = form.getAttribute("id").split("gform_")[1]
 
       const data = new FormData(form)
       const url = form.action
@@ -39,8 +40,8 @@ export default {
           this.$emit("submit", {
             id: this.id,
             success: this.isSubmitSuccessful(response),
-            formData: data,
             response: response.data,
+            formId,
           })
         )
     },
