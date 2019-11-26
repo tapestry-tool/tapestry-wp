@@ -84,11 +84,13 @@ export default {
     logs: {
       immediate: true,
       handler(newLogs) {
+        this.logsWithAnswers = []
         newLogs.forEach(async log => {
           if (log.audioId) {
             const audioSrc = await this.getAudioSrc(log.nodeId, log.audioId)
-            if (audioSrc)
+            if (audioSrc) {
               this.logsWithAnswers.push({ ...log, audioSrc })
+            }
           } else {
             this.logsWithAnswers.push({ ...log })
           }

@@ -142,7 +142,7 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions", "completeQuestion"]),
     async h5pRecorderSaverLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
@@ -166,11 +166,19 @@ export default {
             h5pId: this.loadedH5pId,
           }
           await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
+          this.setQuestionCompleted()
           this.recordedNodeIds.push(this.selectedNode.id)
         } catch (e) {
           console.error(e)
         }
       }
+    },
+    setQuestionCompleted() {
+      this.selectedNode.quiz.forEach(async q => {
+        if (q.answers && q.answers.audioId == this.loadedH5pId) {
+          await this.completeQuestion({ nodeId: this.selectedNode.id, questionId: q.id })
+        }
+      })
     },
     async loadH5PAudio(nodeMetaId, loadedH5pId) {
       try {
