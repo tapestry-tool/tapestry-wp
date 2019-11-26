@@ -12,9 +12,7 @@
       <div v-if="log.type === 'content'">
         <p v-html="formatParagraph(log.description)" />
       </div>
-      <div v-else-if="log.type === 'activity'">
-        <audio-player v-if="log.audioSrc" :audio-src="log.audioSrc" />
-      </div>
+      <tyde-activity v-else-if="log.type === 'activity'" :log="log" />
     </div>
     <div class="log-controls">
       <i :class="favoriteClass" @click="favorite = !favorite"></i>
@@ -24,14 +22,12 @@
 </template>
 
 <script>
-import TydeButton from "./TydeButton"
-import AudioPlayer from "@/components/AudioPlayer"
+import TydeActivity from "./TydeActivity"
 
 export default {
   name: "tyde-log",
   components: {
-    TydeButton,
-    AudioPlayer,
+    TydeActivity,
   },
   props: {
     log: {

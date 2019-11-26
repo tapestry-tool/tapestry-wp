@@ -53,7 +53,9 @@ const getAllEntries = async nodes => {
             id: question.id,
             answers: {
               text: textAnswer ? textAnswer[1] : null,
-              checklist: checklistAnswer ? checklistAnswer[1] : null,
+              checklist: checklistAnswer
+                ? parseChecklistAnswers(checklistAnswer)
+                : null,
             },
           }
         })
@@ -66,6 +68,12 @@ const getAllEntries = async nodes => {
     nodeQuizMap[node.id] = node.quiz
   })
   return nodeQuizMap
+}
+
+const parseChecklistAnswers = answers => {
+  const inputId = "1"
+  const keys = Object.keys(answers).filter(key => key.startsWith(inputId))
+  return keys.map(key => answers[key]).filter(answer => answer.length > 0)
 }
 
 export default {
