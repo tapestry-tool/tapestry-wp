@@ -88,6 +88,6 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
   const question = node.quiz.find(question => question.id === questionId)
   const entries = question.entries || {}
-  entries[answerType] = entry
+  entries[answerType] = Object.values(entry)[0]
   question.entries = entries
 }

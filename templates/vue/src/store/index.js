@@ -2,6 +2,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 
 import * as actions from "./actions"
+import * as getters from "./getters"
 import * as mutations from "./mutations"
 
 import Helpers from "../utils/Helpers"
@@ -23,6 +24,7 @@ const store = new Vuex.Store({
     lightboxEl: null,
   },
   getters: {
+    ...getters,
     selectedNode: state => {
       const { selectedNodeId } = state
       const node = state.nodes[Helpers.findNodeIndex(selectedNodeId, state)]

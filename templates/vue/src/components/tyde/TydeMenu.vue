@@ -5,8 +5,7 @@
       <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
       <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
     </div>
-    <loading v-if="loading" />
-    <div v-else class="content">
+    <div class="content">
       <h1>Captain's Log</h1>
       <tyde-menu-home v-if="activePage === 'home'" :logs="logs" />
       <tyde-menu-settings
@@ -24,7 +23,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import Loading from "@/components/Loading"
 
@@ -53,51 +52,11 @@ export default {
       settings: {
         isAudioPlaying: false,
       },
-      entries: {},
-      loading: false,
     }
   },
   computed: {
     ...mapState(["nodes"]),
-    completedQuestions() {
-      return this.nodes.filter(
-        node => node.quiz && node.quiz.some(question => question.completed)
-      )
-    },
-    logs() {
-      const completedContents = this.nodes
-        .filter(node => node.completed)
-        .map(node => {
-          return {
-            type: "content",
-            title: node.title,
-            imageURL: node.imageURL,
-            description: node.description,
-            isFavourite: node.isFavourite,
-          }
-        })
-      const completedActivities = this.nodes.reduce((activities, currentNode) => {
-        if (currentNode.quiz) {
-          const completedQuestions = currentNode.quiz
-            .filter(q => q.completed)
-            .map(q => {
-              const keys = Object.keys(q.answers)
-              return keys
-                .filter(key => q.answers[key])
-                .map(key => {
-                  return {
-                    type: "activity",
-                    title: q.text,
-                    nodeId: currentNode.id,
-                    [mapIdToKey[key]]: this.getAnswer(currentNode.id, q.id, key),
-                  }
-                })
-            })
-          return [...activities, ...completedQuestions.flat()]
-        }
-      }, [])
-      return [...completedContents, ...completedActivities]
-    },
+    ...mapGetters(["logs"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -106,26 +65,12 @@ export default {
       }
     },
   },
-  created() {
-    this.loading = this.completedQuestions.length > 0
-  },
-  async mounted() {
-    if (this.completedQuestions.length > 0) {
-      this.entries = await GravityFormsApi.getAllEntries(this.nodes)
-      this.loading = false
-    }
-  },
   methods: {
     setActivePage(page) {
       this.activePage = page
     },
     updateSettings(partialNewSettings) {
       this.settings = { ...this.settings, ...partialNewSettings }
-    },
-    getAnswer(nodeId, questionId, answerKey) {
-      const quiz = this.entries[nodeId]
-      const question = quiz.find(question => question.id === questionId)
-      return question.answers[mapIdToKey[answerKey]]
     },
   },
 }
