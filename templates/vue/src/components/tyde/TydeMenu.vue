@@ -5,7 +5,8 @@
       <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
       <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
     </div>
-    <div class="content">
+    <loading v-if="loading" />
+    <div v-else class="content">
       <h1>Captain's Log</h1>
       <tyde-menu-home v-if="activePage === 'home'" :logs="logs" />
       <tyde-menu-settings
@@ -25,26 +26,26 @@
 <script>
 import { mapState } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
+import Loading from "@/components/Loading"
 
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 
+const mapIdToKey = {
+  textId: "text",
+  checklistId: "checklist",
+}
+
 export default {
   name: "tyde-menu",
   components: {
+    Loading,
     TydeButton,
     TydeMenuHome,
     TydeMenuSettings,
     TydeMenuHelp,
-  },
-  props: {
-    logs: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -52,10 +53,51 @@ export default {
       settings: {
         isAudioPlaying: false,
       },
+      entries: {},
+      loading: false,
     }
   },
   computed: {
     ...mapState(["nodes"]),
+    completedQuestions() {
+      return this.nodes.filter(
+        node => node.quiz && node.quiz.some(question => question.completed)
+      )
+    },
+    logs() {
+      const completedContents = this.nodes
+        .filter(node => node.completed)
+        .map(node => {
+          return {
+            type: "content",
+            title: node.title,
+            imageURL: node.imageURL,
+            description: node.description,
+            isFavourite: node.isFavourite,
+          }
+        })
+      const completedActivities = this.nodes.reduce((activities, currentNode) => {
+        if (currentNode.quiz) {
+          const completedQuestions = currentNode.quiz
+            .filter(q => q.completed)
+            .map(q => {
+              const keys = Object.keys(q.answers)
+              return keys
+                .filter(key => q.answers[key])
+                .map(key => {
+                  return {
+                    type: "activity",
+                    title: q.text,
+                    nodeId: currentNode.id,
+                    [mapIdToKey[key]]: this.getAnswer(currentNode.id, q.id, key),
+                  }
+                })
+            })
+          return [...activities, ...completedQuestions.flat()]
+        }
+      }, [])
+      return [...completedContents, ...completedActivities]
+    },
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -64,49 +106,26 @@ export default {
       }
     },
   },
+  created() {
+    this.loading = this.completedQuestions.length > 0
+  },
   async mounted() {
-    const entries = await this.getAllEntries()
-    console.log(entries)
+    if (this.completedQuestions.length > 0) {
+      this.entries = await GravityFormsApi.getAllEntries(this.nodes)
+      this.loading = false
+    }
   },
   methods: {
-    async getAllEntries() {
-      const nodesWithQuestions = this.nodes.filter(
-        node => node.quiz && node.quiz.length > 0
-      )
-      const populatedNodes = await Promise.all(
-        nodesWithQuestions.map(async node => {
-          const populatedQuestions = await Promise.all(
-            node.quiz.map(async question => {
-              const { checklistId, textId } = question.answers
-              const checklistAnswers = checklistId
-                ? await GravityFormsApi.getEntries(checklistId)
-                : []
-              const textAnswers = textId
-                ? await GravityFormsApi.getEntries(textId)
-                : []
-              return {
-                id: question.id,
-                answers: {
-                  text: textAnswers,
-                  checklist: checklistAnswers,
-                },
-              }
-            })
-          )
-          return { id: node.id, quiz: populatedQuestions }
-        })
-      )
-      const nodeQuizMap = {}
-      populatedNodes.forEach(node => {
-        nodeQuizMap[node.id] = node.quiz
-      })
-      return nodeQuizMap
-    },
     setActivePage(page) {
       this.activePage = page
     },
     updateSettings(partialNewSettings) {
       this.settings = { ...this.settings, ...partialNewSettings }
+    },
+    getAnswer(nodeId, questionId, answerKey) {
+      const quiz = this.entries[nodeId]
+      const question = quiz.find(question => question.id === questionId)
+      return question.answers[mapIdToKey[answerKey]]
     },
   },
 }

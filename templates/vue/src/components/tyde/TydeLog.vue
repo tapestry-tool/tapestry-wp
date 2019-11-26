@@ -8,12 +8,12 @@
       <div v-else class="default"></div>
     </div>
     <div class="log-details">
-      <h1>{{log.title}}</h1>
+      <h1>{{ log.title }}</h1>
       <div v-if="log.type === 'content'">
         <p v-html="formatParagraph(log.description)" />
       </div>
       <div v-else-if="log.type === 'activity'">
-        <audio-player v-if="log.audioSrc" :audioSrc="log.audioSrc" />
+        <audio-player v-if="log.audioSrc" :audio-src="log.audioSrc" />
       </div>
     </div>
     <div class="log-controls">
@@ -29,6 +29,10 @@ import AudioPlayer from "@/components/AudioPlayer"
 
 export default {
   name: "tyde-log",
+  components: {
+    TydeButton,
+    AudioPlayer,
+  },
   props: {
     log: {
       type: Object,
@@ -40,13 +44,9 @@ export default {
       favorite: false,
     }
   },
-  components: {
-    TydeButton,
-    AudioPlayer,
-  },
   computed: {
     favoriteClass() {
-      return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
+      return this.favorite ? "fas fa-heart fa-2x" : "far fa-heart fa-2x"
     },
     icon() {
       return this.log.checklistId ? "tasks" : "microphone"
@@ -54,9 +54,9 @@ export default {
   },
   methods: {
     formatParagraph(str) {
-      return str.replace(/(?:\r\n|\r|\n)/g, '<br>')
+      return str.replace(/(?:\r\n|\r|\n)/g, "<br>")
     },
-  }
+  },
 }
 </script>
 

@@ -17,12 +17,58 @@ const request = (method, endpoint) => {
  * Get entries for a given `formId`
  * @param {string | number} formId
  */
-const getEntries = formId => {
-  return request("GET", `/forms/${formId}/entries`).then(
-    response => response.entries
+const getEntries = async formId => {
+  if (formId && formId.length) {
+    const response = await request("GET", `/forms/${formId}/entries`)
+    return response.entries || []
+  }
+  return []
+}
+
+const getLatestEntry = async formId => {
+  const entries = await getEntries(formId)
+  if (entries && entries.length) {
+    let latest = entries[0]
+    for (const entry of entries) {
+      const dateUpdated = new Date(entry.date_updated)
+      if (dateUpdated > new Date(latest.date_updated)) {
+        latest = entry
+      }
+    }
+    return latest
+  }
+  return null
+}
+
+const getAllEntries = async nodes => {
+  const nodesWithQuestions = nodes.filter(node => node.quiz && node.quiz.length > 0)
+  const populatedNodes = await Promise.all(
+    nodesWithQuestions.map(async node => {
+      const populatedQuestions = await Promise.all(
+        node.quiz.map(async question => {
+          const { checklistId, textId } = question.answers
+          const checklistAnswer = await getLatestEntry(checklistId)
+          const textAnswer = await getLatestEntry(textId)
+          return {
+            id: question.id,
+            answers: {
+              text: textAnswer ? textAnswer[1] : null,
+              checklist: checklistAnswer ? checklistAnswer[1] : null,
+            },
+          }
+        })
+      )
+      return { id: node.id, quiz: populatedQuestions }
+    })
   )
+  const nodeQuizMap = {}
+  populatedNodes.forEach(node => {
+    nodeQuizMap[node.id] = node.quiz
+  })
+  return nodeQuizMap
 }
 
 export default {
   getEntries,
+  getAllEntries,
 }
