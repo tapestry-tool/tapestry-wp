@@ -4,7 +4,7 @@ export function logs(state) {
     checklistId: "checklist",
   }
 
-  const contents = state.nodes.filter(node => node.completed).map(node => ({ type: "content", ...node }))
+  const contents = state.nodes.filter(node => node.completed).map(node => ({ type: "content", imageURL: node.imageURL, title: node.title, description: node.description }))
 
   const activities = []
   const nodesWithQuestions = state.nodes.filter(node => node.quiz && node.quiz.some(question => Object.keys(question.entries).length > 0))
