@@ -142,7 +142,13 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions", "completeQuestion"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "completeQuestion",
+    ]),
     async h5pRecorderSaverLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
@@ -176,7 +182,10 @@ export default {
     setQuestionCompleted() {
       this.selectedNode.quiz.forEach(async q => {
         if (q.answers && q.answers.audioId == this.loadedH5pId) {
-          await this.completeQuestion({ nodeId: this.selectedNode.id, questionId: q.id })
+          await this.completeQuestion({
+            nodeId: this.selectedNode.id,
+            questionId: q.id,
+          })
         }
       })
     },

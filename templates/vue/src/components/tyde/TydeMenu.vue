@@ -24,23 +24,15 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import GravityFormsApi from "@/services/GravityFormsApi"
-import Loading from "@/components/Loading"
 
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 
-const mapIdToKey = {
-  textId: "text",
-  checklistId: "checklist",
-}
-
 export default {
   name: "tyde-menu",
   components: {
-    Loading,
     TydeButton,
     TydeMenuHome,
     TydeMenuSettings,
