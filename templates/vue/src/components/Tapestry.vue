@@ -125,6 +125,13 @@ export default {
   },
   mounted() {
     // Set up event listeners to communicate with D3 elements
+    this.TapestryAPI.getAllH5PContents().then((res) => {
+      debugger
+      console.log(res)
+    }).catch(e => {
+      debugger
+      console.log(e)
+    })
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
