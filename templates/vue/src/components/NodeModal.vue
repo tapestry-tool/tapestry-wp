@@ -235,10 +235,7 @@
                         v-model="userId"
                         placeholder="Enter user ID"
                       ></b-form-input>
-                      <b-button
-                        variant="secondary"
-                        @click="addUserPermissionRow()"
-                      >
+                      <b-button variant="secondary" @click="addUserPermissionRow()">
                         <span class="fas fa-plus mr-1"></span>
                         User
                       </b-button>
@@ -527,7 +524,8 @@ export default {
 table {
   border: 1px solid #dee2e6;
 
-  th, td {
+  th,
+  td {
     word-break: unset;
     border: none;
   }

@@ -30,6 +30,7 @@ module.exports = {
     parser: "babel-eslint",
   },
   globals: {
+    wpApiSettings: "readonly",
     wpData: "readonly",
     wpPostId: "readonly",
     apiUrl: "readonly",
