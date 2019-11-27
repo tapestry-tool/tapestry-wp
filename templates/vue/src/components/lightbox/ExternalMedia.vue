@@ -29,10 +29,7 @@
         class="preview-image"
         :style="{ 'background-image': `url(${linkMetadata.image})` }"
       >
-        <a
-          :href="node.typeData.mediaURL"
-          target="blank"
-        ></a>
+        <a :href="node.typeData.mediaURL" target="blank"></a>
       </div>
       <div class="preview-content">
         <h1>
@@ -182,7 +179,7 @@ export default {
     &:hover {
       transform: scale(1.05);
     }
-    
+
     a {
       position: absolute;
       top: 0;
@@ -221,5 +218,4 @@ export default {
     }
   }
 }
-
 </style>
