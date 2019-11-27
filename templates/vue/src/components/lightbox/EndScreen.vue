@@ -1,5 +1,10 @@
 <template>
-  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"></quiz-screen>
+  <quiz-screen
+    v-if="showQuiz"
+    :node="node"
+    @close="showQuiz = false"
+    @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
+  ></quiz-screen>
   <div
     v-else
     :class="[
@@ -15,7 +20,7 @@
       <br />
       Do you wanna...
     </speech-bubble>
-    <div class="button-container" :class="{'pt-4':!showQuizButton}">
+    <div class="button-container" :class="{ 'pt-4': !showQuizButton }">
       <button
         v-if="showQuizButton"
         class="end-screen-button button-quiz"
@@ -28,11 +33,19 @@
         <i class="fas fa-play"></i>
         <p class="end-screen-button-text">Replay Video</p>
       </button>
-      <button class="end-screen-button" @click="$emit('close')" v-if="!showQuizButton">
+      <button
+        v-if="!showQuizButton"
+        class="end-screen-button"
+        @click="$emit('close')"
+      >
         <i class="fas fa-arrow-circle-right"></i>
         <p class="end-screen-button-text">Continue</p>
       </button>
-      <button class="end-screen-button" @click="$emit('close')" v-if="showQuizButton">
+      <button
+        v-if="showQuizButton"
+        class="end-screen-button"
+        @click="$emit('close')"
+      >
         <i class="fas fa-history"></i>
         <p class="end-screen-button-text">Come Back Later</p>
       </button>
@@ -87,7 +100,7 @@ export default {
     h5pRecorderSaverLoaded(event) {
       this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
-  }
+  },
 }
 </script>
 
@@ -127,7 +140,7 @@ export default {
     flex-direction: column;
     padding-left: 96px;
     margin-top: 64px;
-    
+
     button {
       background: none;
       background-color: var(--tyde-blue);

@@ -1,5 +1,5 @@
 <template>
-  <audio controls v-bind:src="audioSrc"></audio>
+  <audio controls :src="audioSrc"></audio>
 </template>
 
 <script>

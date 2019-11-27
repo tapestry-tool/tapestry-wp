@@ -82,7 +82,7 @@ export default {
           authenticated: ["read"],
         },
         quiz: [],
-        skippable: true
+        skippable: true,
       },
     }
   },

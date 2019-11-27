@@ -57,7 +57,10 @@ export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }
 
-export async function completeQuestion({ commit }, { answerType, formId, nodeId, questionId }) {
+export async function completeQuestion(
+  { commit },
+  { answerType, formId, nodeId, questionId }
+) {
   await client.completeQuestion(nodeId, questionId)
   const entry = await client.getUserEntry(formId)
   commit("completeQuestion", { nodeId, questionId })

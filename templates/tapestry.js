@@ -1897,8 +1897,6 @@ function tapestryTool(config){
             var unlocked = progressObj[id].unlocked;
             var quizCompletionInfo = progressObj[id].quiz;
             var completed = progressObj[id].completed;
-
-            console.log(quizCompletionInfo);
         
             var index = findNodeIndex(id);
             

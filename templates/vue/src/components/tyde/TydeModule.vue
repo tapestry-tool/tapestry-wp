@@ -1,9 +1,6 @@
 <template>
   <div :id="`module-${nodeId}`" class="module-wrapper">
-    <tyde-stage
-      :node-id="activeStage"
-      @next="next"
-    ></tyde-stage>
+    <tyde-stage :node-id="activeStage" @next="next"></tyde-stage>
   </div>
 </template>
 

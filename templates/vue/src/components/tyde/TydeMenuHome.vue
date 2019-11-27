@@ -61,21 +61,6 @@ export default {
       return this.logsWithAnswers
     },
   },
-  methods: {
-    setActiveTab(tab) {
-      this.activeTab = tab
-    },
-    async getAudioSrc(nodeId, audioId) {
-      try {
-        const audio = await TapestryApiClient.getH5PAudioFromServer(nodeId, audioId)
-        const blob = await Helpers.base64ToBlob(audio, 'audio/wav')
-        return URL.createObjectURL(blob)
-      } catch (e) {
-        console.error(e)
-        return ""
-      }
-    }
-  },
   watch: {
     /**
      * Further filter the logs to check if there are valid answers recorded
@@ -87,21 +72,34 @@ export default {
         newLogs.forEach(async log => {
           if (log.audioId) {
             const audioSrc = await this.getAudioSrc(log.nodeId, log.audioId)
-            if (audioSrc)
-              this.logsWithAnswers.push({ ...log, audioSrc })
+            if (audioSrc) this.logsWithAnswers.push({ ...log, audioSrc })
           } else {
             this.logsWithAnswers.push({ ...log })
           }
         })
+      },
+    },
+  },
+  methods: {
+    setActiveTab(tab) {
+      this.activeTab = tab
+    },
+    async getAudioSrc(nodeId, audioId) {
+      try {
+        const audio = await TapestryApiClient.getH5PAudioFromServer(nodeId, audioId)
+        const blob = await Helpers.base64ToBlob(audio, "audio/wav")
+        return URL.createObjectURL(blob)
+      } catch (e) {
+        console.error(e)
+        return ""
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 #tyde-menu-home {
-
   nav ul {
     display: flex;
     font-size: 16px;

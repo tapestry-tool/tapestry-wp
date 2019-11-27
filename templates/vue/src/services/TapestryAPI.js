@@ -108,7 +108,7 @@ export default class {
       params: {
         post_id: this.postId,
         form_id: formId,
-      }
+      },
     })
     return response.data
   }
