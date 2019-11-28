@@ -1,5 +1,4 @@
 export function logs(state) {
-  debugger
   const completedContents = state.nodes
     .filter(node => node.completed)
     .map(node => ({
