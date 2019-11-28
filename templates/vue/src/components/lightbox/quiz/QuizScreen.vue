@@ -10,7 +10,6 @@
       @form-opened="formOpened = true"
       @recorder-opened="recorderOpened = true"
       @form-submitted="handleFormSubmit"
-      @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
     ></question>
     <loading v-if="submittingForm" label="Submitting..." />
     <footer v-if="!formOpened && !recorderOpened" class="question-footer">
@@ -88,9 +87,6 @@ export default {
     },
     back() {
       this.$emit("close")
-    },
-    h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }
