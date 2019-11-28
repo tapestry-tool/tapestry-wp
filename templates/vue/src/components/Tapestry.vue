@@ -50,6 +50,7 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
+import H5PApi from "../services/H5PApi"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -124,14 +125,7 @@ export default {
     },
   },
   mounted() {
-    // Set up event listeners to communicate with D3 elements
-    this.TapestryAPI.getAllH5PContents().then((res) => {
-      debugger
-      console.log(res)
-    }).catch(e => {
-      debugger
-      console.log(e)
-    })
+    H5PApi.getAllContent().then(res => console.log(res))
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)

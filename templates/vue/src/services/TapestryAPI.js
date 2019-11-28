@@ -171,10 +171,4 @@ export default class {
     })
     return response
   }
-
-  async getAllH5PContents() {
-    const url = `${adminAjaxUrl}?action=h5p_contents`
-    const response = await axios.get(url)
-    return response
-  }
 }
