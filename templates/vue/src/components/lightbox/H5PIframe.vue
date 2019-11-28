@@ -76,19 +76,17 @@ export default {
     },
     async loadH5PAudio(nodeMetaId, loadedH5PRecorderId) {
       try {
+        const h5pAudioRecorder = document.getElementById("h5p")
         const audio = await this.TapestryAPI.getH5PAudioFromServer(
           nodeMetaId,
           loadedH5PRecorderId
         )
-        const h5pAudioRecorder = document.getElementById("h5p")
-        if (h5pAudioRecorder) {
+        if (audio && h5pAudioRecorder) {
           dispatchEvent(
             new CustomEvent("tapestry-get-h5p-audio", {
               detail: { audio },
             })
           )
-        } else {
-          console.error("H5P module is not loaded.")
         }
       } catch (e) {
         console.error(e)

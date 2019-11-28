@@ -28,6 +28,7 @@
 <script>
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
+import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 
@@ -39,13 +40,6 @@ export default {
     TydeMenuSettings,
     TydeMenuHelp,
   },
-  props: {
-    logs: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
   data() {
     return {
       activePage: "home",
@@ -53,6 +47,10 @@ export default {
         isAudioPlaying: false,
       },
     }
+  },
+  computed: {
+    ...mapState(["nodes"]),
+    ...mapGetters(["logs"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
