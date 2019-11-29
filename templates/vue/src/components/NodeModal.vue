@@ -72,11 +72,16 @@
               />
             </b-form-group>
             <b-form-group v-show="nodeType === 'h5p'" label="H5P Embed Link">
-              <b-form-select
+              <combobox :value="selectedH5pContent" :options="h5pContentOptions">
+                <template v-slot="slotProps">
+                  {{ slotProps.option.title }}
+                </template>
+              </combobox>
+              <!-- <b-form-select
                 id="all-h5p-contents"
                 :value="selectedH5PContent"
                 :options="h5pContents"
-              ></b-form-select>
+              ></b-form-select> -->
               <!-- <b-form-input
                 id="node-h5p-media-url"
                 v-model="node.typeData.mediaURL"
@@ -275,9 +280,13 @@
 
 <script>
 import Helpers from "../utils/Helpers"
+import Combobox from "./Combobox"
 
 export default {
   name: "node-modal",
+  components: {
+    Combobox,
+  },
   props: {
     node: {
       type: Object,
@@ -292,6 +301,11 @@ export default {
           ["add-new-node", "edit-node", "add-root-node", ""].indexOf(value) !== -1
         )
       },
+    },
+    h5pContentOptions: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     rootNodeTitle: {
       type: String,
@@ -315,6 +329,7 @@ export default {
         { value: "url-embed", text: "External Link" },
       ],
       h5pContents: [],
+      selectedH5pContent: 0,
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
