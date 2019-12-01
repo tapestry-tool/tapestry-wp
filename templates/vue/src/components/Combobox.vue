@@ -27,6 +27,11 @@ export default {
       required: false,
       default: null,
     },
+    itemValue: {
+      type: String,
+      required: false,
+      default: null,
+    },
     options: {
       type: Array,
       required: true,
@@ -44,11 +49,12 @@ export default {
   },
   computed: {
     text() {
-      return typeof this.value === "string"
-        ? this.value
-        : this.itemText
-        ? this.value[this.itemText]
-        : ""
+      if (typeof this.options[0] === "string") {
+        return this.value
+      }
+
+      const item = this.options.find(option => option[this.itemValue] === this.value)
+      return item ? item[this.itemText] : ""
     },
     visibleOptions() {
       if (this.inputValue === this.text) {
@@ -66,9 +72,12 @@ export default {
   },
   methods: {
     handleClick(option) {
-      this.$emit("input", option)
+      this.$emit("input", this.getValue(option))
       this.inputValue = option[this.itemText]
       this.$refs.input.blur()
+    },
+    getValue(option) {
+      return typeof option === "string" ? option : option[this.itemValue]
     },
   },
 }

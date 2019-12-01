@@ -71,11 +71,11 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" label="H5P Embed Link">
+            <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
               <combobox
-                v-model="selectedH5pContent"
+                v-model="node.typeData.mediaURL"
                 item-text="title"
-                :value="selectedH5pContent"
+                item-value="url"
                 :options="h5pContentOptions"
               >
                 <template v-slot="slotProps">
