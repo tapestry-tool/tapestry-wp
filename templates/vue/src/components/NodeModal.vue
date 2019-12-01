@@ -588,6 +588,7 @@ table {
 .h5p-content-option {
   display: flex;
   align-items: center;
+  text-transform: capitalize;
 
   code,
   p {
