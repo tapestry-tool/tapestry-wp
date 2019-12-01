@@ -53,8 +53,7 @@ export default {
       if (typeof this.options[0] === "string") {
         return this.value
       }
-
-      const item = this.options.find(option => option[this.itemValue] === this.value)
+      const item = this.options.find(option => option[this.itemValue] == this.value)
       return item ? item[this.itemText] : ""
     },
     visibleOptions() {
@@ -68,8 +67,12 @@ export default {
       return options.length ? options : this.options
     },
   },
-  created() {
-    this.inputValue = this.text
+  watch: {
+    value() {
+      if (this.inputValue.length === 0) {
+        this.inputValue = this.text
+      }
+    },
   },
   methods: {
     handleClick(option) {

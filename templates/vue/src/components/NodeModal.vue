@@ -416,8 +416,23 @@ export default {
         this.formErrors = ""
       }
     })
+    this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
+      if (modalId == "node-modal-container") {
+        const selectedContent = this.h5pContentOptions.find(content =>
+          this.filterContent(content)
+        )
+        this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+      }
+    })
   },
   methods: {
+    filterContent(content) {
+      if (this.node.mediaFormat !== "h5p") {
+        return false
+      }
+      const id = this.node.typeData.mediaURL.split("&id=")[1]
+      return content.id == id
+    },
     getMediaUrl() {
       if (this.nodeType !== "h5p") {
         return this.node.typeData && this.node.typeData.mediaURL
