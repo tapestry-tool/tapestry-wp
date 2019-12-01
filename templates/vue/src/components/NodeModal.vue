@@ -72,9 +72,17 @@
               />
             </b-form-group>
             <b-form-group v-show="nodeType === 'h5p'" label="H5P Embed Link">
-              <combobox :value="selectedH5pContent" :options="h5pContentOptions">
+              <combobox
+                v-model="selectedH5pContent"
+                item-text="title"
+                :value="selectedH5pContent"
+                :options="h5pContentOptions"
+              >
                 <template v-slot="slotProps">
-                  {{ slotProps.option.title }}
+                  <div>
+                    <code>{{ slotProps.option.id }}</code>
+                    <p>{{ slotProps.option.title }}</p>
+                  </div>
                 </template>
               </combobox>
               <!-- <b-form-select
@@ -328,8 +336,7 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
       ],
-      h5pContents: [],
-      selectedH5pContent: 0,
+      selectedH5pContent: "",
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
@@ -409,6 +416,9 @@ export default {
     })
   },
   methods: {
+    handleH5pValueChange(newValue) {
+      this.selectedH5pContent = newValue
+    },
     getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
     },
