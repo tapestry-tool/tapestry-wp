@@ -73,9 +73,9 @@
             </b-form-group>
             <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
               <combobox
-                v-model="node.typeData.mediaURL"
+                v-model="selectedH5pContent"
                 item-text="title"
-                item-value="url"
+                item-value="id"
                 :options="h5pContentOptions"
               >
                 <template v-slot="slotProps">
@@ -370,7 +370,7 @@ export default {
         { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
-          value: this.node.typeData && this.node.typeData.mediaURL,
+          value: this.getMediaUrl(),
         },
         {
           name: "textContent",
@@ -418,8 +418,13 @@ export default {
     })
   },
   methods: {
-    handleH5pValueChange(newValue) {
-      this.selectedH5pContent = newValue
+    getMediaUrl() {
+      if (this.nodeType !== "h5p") {
+        return this.node.typeData && this.node.typeData.mediaURL
+      }
+
+      const adminAjaxUrl = wpData.adminAjaxUrl
+      return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
     },
     getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
