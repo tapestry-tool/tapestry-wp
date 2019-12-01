@@ -6,10 +6,11 @@
       @focus="isMenuOpen = true"
       @blur="isMenuOpen = false"
     ></b-form-input>
-    <div v-if="isMenuOpen">
+    <div v-if="isMenuOpen" class="menu">
       <button
         v-for="option in visibleOptions"
         :key="option"
+        class="menu-button"
         @mousedown.prevent="handleClick(option)"
       >
         <slot :option="option">{{ option.toString() }}</slot>
@@ -82,3 +83,24 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.menu {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 1em;
+}
+
+.menu-button {
+  display: block;
+  padding: 12px;
+  margin: 0;
+  background: none;
+  color: inherit;
+  width: 100%;
+
+  &:hover {
+    background: #cce5ff;
+  }
+}
+</style>
