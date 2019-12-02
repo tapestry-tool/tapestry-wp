@@ -69,16 +69,19 @@ export default {
     logs: {
       immediate: true,
       handler(newLogs) {
-        this.logsWithAnswers = []
-        newLogs.forEach(async log => {
+        const promises = newLogs.map(log => {
           if (log.audioId) {
-            const audioSrc = await this.getAudioSrc(log.nodeId, log.audioId)
-            if (audioSrc) {
-              this.logsWithAnswers.push({ ...log, audioSrc })
-            }
+            return new Promise(resolve => {
+              this.getAudioSrc(log.nodeId, log.audioId).then(audioSrc => {
+                resolve({ ...log, audioSrc })
+              })
+            })
           } else {
-            this.logsWithAnswers.push({ ...log })
+            return Promise.resolve(log)
           }
+        })
+        Promise.all(promises).then(logsWithAnswers => {
+          this.logsWithAnswers = logsWithAnswers
         })
       },
     },
@@ -86,16 +89,6 @@ export default {
   methods: {
     setActiveTab(tab) {
       this.activeTab = tab
-    },
-    async getAudioSrc(nodeId, audioId) {
-      try {
-        const audio = await TapestryApiClient.getH5PAudioFromServer(nodeId, audioId)
-        const blob = await Helpers.base64ToBlob(audio, "audio/wav")
-        return URL.createObjectURL(blob)
-      } catch (e) {
-        console.error(e)
-        return ""
-      }
     },
   },
 }

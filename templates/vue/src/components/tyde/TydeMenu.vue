@@ -27,6 +27,7 @@ import { mapState, mapGetters } from "vuex"
 
 import TydeButton from "./TydeButton"
 import TydeMenuHome from "./TydeMenuHome"
+import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 

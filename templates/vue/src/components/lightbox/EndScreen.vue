@@ -1,10 +1,5 @@
 <template>
-  <quiz-screen
-    v-if="showQuiz"
-    :node="node"
-    @close="showQuiz = false"
-    @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
-  ></quiz-screen>
+  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" />
   <div
     v-else
     :class="[
@@ -94,11 +89,6 @@ export default {
     },
     backgroundUrl() {
       return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
-    },
-  },
-  methods: {
-    h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }

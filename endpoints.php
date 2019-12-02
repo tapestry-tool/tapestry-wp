@@ -842,7 +842,7 @@ function completeQuestionById($request)
 {
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
-    $questionId = $request['question'];
+    $questionId = $request['question_id'];
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
