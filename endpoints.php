@@ -11,6 +11,7 @@ require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 require_once __DIR__ . '/classes/class.tapestry-audio.php';
+require_once __DIR__ . '/classes/class.tapestry-form.php';
 require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -49,6 +50,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'   => $REST_API_GET_METHOD,
             'callback'  => 'getTapestry'
+        ]
+    ],
+    'GET_GF_FORMS'  => (object) [
+        'ROUTE'     => '/gf/forms',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'gfGetForms'
         ]
     ],
     'POST_TAPESTRY_GROUP' => (object) [
@@ -223,6 +231,16 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function gfGetForms()
+{
+    try {
+        $tapestryForms = new TapestryForm();
+        return $tapestryForms->getAll();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**

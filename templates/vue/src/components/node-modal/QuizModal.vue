@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import GravityFormsApi from "../../services/GravityFormsApi"
 import Helpers from "../../utils/Helpers"
 
 const defaultQuestion = {
@@ -100,6 +101,9 @@ export default {
     questions(newQuestions) {
       this.$set(this.node, "quiz", newQuestions)
     },
+  },
+  mounted() {
+    GravityFormsApi.getAllForms().then(res => console.log(res))
   },
   methods: {
     addQuestion() {
