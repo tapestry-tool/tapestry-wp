@@ -85,6 +85,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
+        quiz: [],
         skippable: true,
       },
     }
@@ -229,6 +230,7 @@ export default {
           authenticated: ["read"],
         },
         description: "",
+        quiz: [],
       }
     },
     addRootNode() {
@@ -376,6 +378,9 @@ export default {
             break
           case "permissions":
             newNodeEntry.permissions = fieldValue
+            break
+          case "quiz":
+            newNodeEntry.quiz = fieldValue
             break
           default:
             break

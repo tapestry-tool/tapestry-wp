@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
     <iframe
       id="h5p"
       ref="h5p"

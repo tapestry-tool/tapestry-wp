@@ -1,11 +1,16 @@
 <template>
   <div class="container">
-    <end-screen :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
     <video
       ref="video"
       controls
       autoplay
-      @loadedmetadata="handleLoad"
+      @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"
       @timeupdate="updateVideoProgress"
