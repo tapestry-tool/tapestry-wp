@@ -88,12 +88,10 @@
                 :options="h5pContentOptions"
               >
                 <template v-slot="slotProps">
-                  <div class="h5p-content-option">
-                    <p>
-                      <code>{{ slotProps.option.id }}</code>
-                      {{ slotProps.option.title }}
-                    </p>
-                  </div>
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
                 </template>
               </combobox>
               <!-- <b-form-select
@@ -627,26 +625,6 @@ table {
   padding: 15px;
   border: none;
   background: #f1f1f1;
-}
-
-.h5p-content-option {
-  display: flex;
-  align-items: center;
-  text-transform: capitalize;
-
-  code,
-  p {
-    margin: 0;
-    padding: 0;
-  }
-
-  p {
-    font-weight: normal;
-  }
-
-  code {
-    margin-right: 1em;
-  }
 }
 
 .modal-header-row {

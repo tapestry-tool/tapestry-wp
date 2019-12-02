@@ -29,22 +29,52 @@
           </b-form-group>
           <b-form-group label="Question Answer Types">
             <b-form-group label="Textbox Gravity Form ID">
-              <b-form-input
+              <combobox
                 v-model="question.answers.textId"
+                :options="formOptions"
+                item-text="title"
+                item-value="id"
                 @focus="wasFocused = true"
-              />
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
             </b-form-group>
             <b-form-group label="H5P Audio Recorder ID">
-              <b-form-input
+              <combobox
                 v-model="question.answers.audioId"
+                :options="h5pOptions"
+                item-text="title"
+                item-value="id"
                 @focus="wasFocused = true"
-              />
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
             </b-form-group>
             <b-form-group label="Checklist Gravity Form ID">
-              <b-form-input
+              <combobox
                 v-model="question.answers.checklistId"
+                :options="formOptions"
+                item-text="title"
+                item-value="id"
                 @focus="wasFocused = true"
-              />
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
             </b-form-group>
           </b-form-group>
           <b-form-invalid-feedback :state="isAnswerValid(question)">
@@ -63,7 +93,9 @@
 </template>
 
 <script>
+import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
+import H5PApi from "../../services/H5PApi"
 import Helpers from "../../utils/Helpers"
 
 const defaultQuestion = {
@@ -77,6 +109,9 @@ const defaultQuestion = {
 
 export default {
   name: "quiz-modal",
+  components: {
+    Combobox,
+  },
   props: {
     node: {
       type: Object,
@@ -86,6 +121,8 @@ export default {
   data() {
     return {
       canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
+      formOptions: [],
+      h5pOptions: [],
       questions: this.node.quiz,
       typeOptions: ["H5P Audio Recorder"],
       icons: ["microphone"],
@@ -102,8 +139,11 @@ export default {
       this.$set(this.node, "quiz", newQuestions)
     },
   },
-  mounted() {
-    GravityFormsApi.getAllForms().then(res => console.log(res))
+  async mounted() {
+    const forms = await GravityFormsApi.getAllForms()
+    const h5ps = await H5PApi.getAllContent()
+    this.formOptions = forms
+    this.h5pOptions = h5ps
   },
   methods: {
     addQuestion() {

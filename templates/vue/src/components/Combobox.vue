@@ -3,17 +3,19 @@
     <b-form-input
       ref="input"
       v-model="inputValue"
-      @focus="isMenuOpen = true"
+      @focus="handleFocus"
       @blur="isMenuOpen = false"
     ></b-form-input>
     <div v-if="isMenuOpen" class="menu">
       <button
         v-for="option in visibleOptions"
-        :key="option"
+        :key="option[itemValue]"
         class="menu-button"
         @mousedown.prevent="handleClick(option)"
       >
-        <slot :option="option">{{ option.toString() }}</slot>
+        <div class="menu-item">
+          <slot :option="option">{{ option.toString() }}</slot>
+        </div>
       </button>
     </div>
   </b-form-group>
@@ -80,6 +82,10 @@ export default {
       this.inputValue = option[this.itemText]
       this.$refs.input.blur()
     },
+    handleFocus() {
+      this.isMenuOpen = true
+      this.$emit("focus")
+    },
     getValue(option) {
       return typeof option === "string" ? option : option[this.itemValue]
     },
@@ -89,6 +95,7 @@ export default {
 
 <style lang="scss" scoped>
 .menu {
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-top: 1em;
@@ -104,6 +111,28 @@ export default {
 
   &:hover {
     background: #cce5ff;
+  }
+}
+</style>
+
+<style lang="scss">
+.menu-item {
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+
+  code,
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  p {
+    font-weight: normal;
+  }
+
+  code {
+    margin-right: 1em;
   }
 }
 </style>
