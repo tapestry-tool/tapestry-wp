@@ -3,8 +3,8 @@
     <b-form-input
       ref="input"
       v-model="inputValue"
+      @blur="handleBlur"
       @focus="handleFocus"
-      @blur="isMenuOpen = false"
     ></b-form-input>
     <div v-if="isMenuOpen" class="menu">
       <button
@@ -50,6 +50,7 @@ export default {
     return {
       isMenuOpen: false,
       inputValue: "",
+      selected: false,
     }
   },
   computed: {
@@ -86,13 +87,23 @@ export default {
     },
   },
   methods: {
+    handleBlur() {
+      this.isMenuOpen = false
+      // if user leaves focus and hasn't selected anything,
+      // revert to whatever the previous selection was.
+      if (this.inputValue !== this.text && !this.selected) {
+        this.inputValue = this.text
+      }
+    },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
       this.inputValue = option[this.itemText]
+      this.selected = true
       this.$refs.input.blur()
     },
     handleFocus() {
       this.isMenuOpen = true
+      this.selected = false
       this.$emit("focus")
     },
     getValue(option) {
