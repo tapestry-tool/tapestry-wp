@@ -637,4 +637,15 @@ table {
     margin-bottom: 0;
   }
 }
+
+.modal-header-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
 </style>

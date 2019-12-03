@@ -5,12 +5,19 @@
   >
     <gravity-form
       v-if="formOpened"
-      :id="formId"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
+    <iframe
+      v-else-if="recorderOpened"
+      ref="h5p"
+      allowfullscreen="false"
+      :src="h5pRecorderUrl"
+      frameBorder="0"
+      @load="handleLoad"
+    ></iframe>
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
-    <div v-if="!formOpened">
+    <div v-if="!formOpened && !recorderOpened">
       <h1 class="question-title">
         {{ question.text }}
       </h1>
@@ -23,7 +30,11 @@
           >
             text
           </answer-button>
-          <answer-button v-if="hasId('audioId')" icon="microphone">
+          <answer-button
+            v-if="hasId('audioId')"
+            icon="microphone"
+            @click="openRecorder(question.answers.audioId)"
+          >
             audio
           </answer-button>
           <answer-button
@@ -40,6 +51,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
@@ -66,17 +78,34 @@ export default {
   data() {
     return {
       formOpened: false,
+      recorderOpened: false,
       formHtml: "",
       formId: null,
       loadingForm: false,
+      h5pRecorderUrl: "",
     }
   },
   computed: {
+    ...mapGetters(["selectedNode"]),
     loadingText() {
       return this.formOpened ? "Submitting..." : "Loading form..."
     },
   },
   methods: {
+    openRecorder(id) {
+      if (id) {
+        this.recorderOpened = true
+        this.$emit("recorder-opened")
+        this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
+      }
+    },
+    handleLoad() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const loadedH5pId = h5pObj.instances[0].contentId
+      if (loadedH5pId) {
+        this.$emit("h5p-recorder-saver-loaded", { loadedH5pId })
+      }
+    },
     async openForm(id) {
       if (!id) {
         return
@@ -102,9 +131,9 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, response }) {
+    handleFormSubmit({ success, response }) {
       if (!success) {
-        delete window[`gf_submitting_${id}`]
+        delete window[`gf_submitting_${this.formId}`]
         this.formHtml = response
         return
       }

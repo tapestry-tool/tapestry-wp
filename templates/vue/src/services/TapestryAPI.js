@@ -164,7 +164,7 @@ export default class {
   }
 
   async getGravityForm(formId) {
-    const url = `${wpData.adminAjaxUrl}?action=gf_button_get_form&form_id=${formId}`
+    const url = `${adminAjaxUrl}?action=gf_button_get_form&form_id=${formId}`
     const response = await axios.get(url)
     return response
   }
