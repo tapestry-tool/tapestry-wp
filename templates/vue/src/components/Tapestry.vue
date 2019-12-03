@@ -39,7 +39,7 @@
       :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
-      @h5p-media-loaded="h5pMediaLoaded"
+      @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
     />
   </div>
 </template>
@@ -82,6 +82,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
+        quiz: [],
         skippable: true,
       },
     }
@@ -143,7 +144,7 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    async h5pMediaLoaded(event) {
+    async h5pRecorderSaverLoaded(event) {
       this.loadedH5pId = event.loadedH5pId
       const selectedNodeId = this.selectedNode.id
       if (
@@ -225,6 +226,7 @@ export default {
           authenticated: ["read"],
         },
         description: "",
+        quiz: [],
       }
     },
     addRootNode() {
@@ -372,6 +374,9 @@ export default {
             break
           case "permissions":
             newNodeEntry.permissions = fieldValue
+            break
+          case "quiz":
+            newNodeEntry.quiz = fieldValue
             break
           default:
             break

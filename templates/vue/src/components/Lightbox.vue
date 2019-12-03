@@ -53,7 +53,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
-            @h5p-media-loaded="h5pMediaLoaded"
+            @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
           />
         </div>
       </div>
@@ -219,8 +219,8 @@ export default {
         ...dimensions,
       }
     },
-    h5pMediaLoaded(event) {
-      this.$emit("h5p-media-loaded", { loadedH5pId: event.loadedH5pId })
+    h5pRecorderSaverLoaded(event) {
+      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }

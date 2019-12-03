@@ -90,6 +90,19 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
+     * Set the question with the given id to be marked as 'completed'
+     * 
+     * @param Integer $questionId the question to mark
+     * 
+     * @return Null
+     */
+    public function completeQuestion($questionId)
+    {
+        $this->_checkUserAndPostId();
+        $this->_completeQuestion($questionId);
+    }
+
+    /**
      * Update User's h5p video setting for a tapestry post
      *
      * @param   String  $h5pSettingsData stores volume,
@@ -137,6 +150,14 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
     }
 
+    private function _completeQuestion($questionId)
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
+        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
+        $quiz[$questionId] = true;
+        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
+    }
+
     private function _getUserProgress($nodeIdArr)
     {
         $progress = new stdClass();
@@ -166,9 +187,34 @@ class TapestryUserProgress implements ITapestryUserProgress
             } else {
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
+
+            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
+            $progress->$nodeId->quiz = $quiz;
         }
 
         return json_encode($progress);
+    }
+
+    private function _getQuizProgress($nodeId, $nodeMetadata)
+    {
+        $quiz = array();
+        $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
+
+        if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
+            foreach ($nodeMetadata->quiz as $question) {
+                if (isset($question->id)) {
+                    $quiz[$question->id] = false;
+                }
+            }
+        }
+
+        if (isset($completed_values) && is_array($completed_values)) {
+            foreach ($completed_values as $id => $completed) {
+                $quiz[$id] = $completed;
+            }
+        }
+
+        return count($quiz) > 0 ? $quiz : (object) $quiz;
     }
 
     private function _updateUserH5PSettings($h5pSettingsData)

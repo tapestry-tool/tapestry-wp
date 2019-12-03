@@ -1,5 +1,7 @@
 <template>
+  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"></quiz-screen>
   <div
+    v-else
     :class="[
       'end-screen',
       {
@@ -7,6 +9,10 @@
       },
     ]"
   >
+    <button v-if="showQuizButton" @click="showQuiz = true">
+      <i class="fas fa-question-circle fa-4x"></i>
+      <p>{{ buttonText }}</p>
+    </button>
     <button @click="$emit('rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
@@ -19,15 +25,43 @@
 </template>
 
 <script>
+import QuizScreen from "./quiz/QuizScreen"
+
 export default {
   name: "end-screen",
+  components: {
+    QuizScreen,
+  },
   props: {
+    node: {
+      type: Object,
+      required: true,
+    },
     show: {
       type: Boolean,
       required: false,
       default: true,
     },
   },
+  data() {
+    return {
+      showQuiz: false,
+    }
+  },
+  computed: {
+    showQuizButton() {
+      return Boolean(this.node.quiz && this.node.quiz.length)
+    },
+    buttonText() {
+      const allDone = this.node.quiz.every(question => question.completed)
+      return allDone ? "Retake Quiz" : "Take Quiz"
+    },
+  },
+  methods: {
+    h5pRecorderSaverLoaded(event) {
+      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
+    },
+  }
 }
 </script>
 
