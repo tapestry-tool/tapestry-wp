@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"/>
     <iframe
       id="h5p"
       ref="h5p"
@@ -98,19 +98,19 @@ export default {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const mediaProgress = this.node.typeData.progress[0].value
 
-      this.$emit("h5p-media-loaded", { loadedH5pId: h5pObj.instances[0].contentId })
+      // Check to see whether this is an H5P recorder
+      // If it is, we can emit an event to load the recorded audio (if exists)
+      // and terminate
+      if (h5pObj.instances[0].recorder) {
+        this.$emit('h5p-recorder-saver-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
+        return
+      }
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
         this.$emit("load", { el: h5pVideo })
 
         const settings = this.settings
-
-        // If h5pVideo is undefined, let's return
-        // This is because we don't have a separate type for H5P recorder
-        if (!h5pVideo) {
-          return
-        }
 
         let seeked = false
         let currentPlayedTime
@@ -221,6 +221,9 @@ export default {
           )
         }, 1000)
       }
+    },
+    h5pRecorderSaverLoaded(event) {
+      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }
