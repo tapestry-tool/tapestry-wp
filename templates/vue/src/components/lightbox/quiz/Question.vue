@@ -6,6 +6,7 @@
     <gravity-form
       v-if="formOpened"
       :id="formId"
+      :entry="formEntry"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
@@ -85,6 +86,7 @@ export default {
       recorderOpened: false,
       formHtml: "",
       formType: "",
+      formEntry: null,
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -112,6 +114,7 @@ export default {
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
       this.formId = id
+      this.formEntry = this.question.entries && this.question.entries[answerType]
       this.formType = answerType
 
       const TapestryApi = new TapestryAPI(wpPostId)
