@@ -28,7 +28,7 @@
             <b-form-input v-model="question.text" />
           </b-form-group>
           <b-form-group label="Question Answer Types">
-            <b-form-group label="Textbox Gravity Form ID">
+            <b-form-group label="Textbox Gravity Form">
               <combobox
                 v-model="question.answers.textId"
                 :options="formOptions"
@@ -44,7 +44,7 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group label="H5P Audio Recorder ID">
+            <b-form-group label="H5P Audio Recorder">
               <combobox
                 v-model="question.answers.audioId"
                 :options="h5pOptions"
@@ -60,7 +60,7 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group label="Checklist Gravity Form ID">
+            <b-form-group label="Checklist Gravity Form">
               <combobox
                 v-model="question.answers.checklistId"
                 :options="formOptions"

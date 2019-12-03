@@ -70,7 +70,7 @@ export default {
     },
   },
   watch: {
-    value() {
+    text() {
       if (this.inputValue.length === 0) {
         this.inputValue = this.text
       }
