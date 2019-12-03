@@ -1,14 +1,13 @@
 <template>
-    <div>
-        <input type="image" id="tyde-backpack-icon" :src="backpackUrl" @click="toggleMenu"/>
-        <tyde-menu
-        v-if="isMenuOpen"
-        :logs="logs"
-        @audio-change="toggleAudio"
-        @continue="continueTapestry"
-        @return-to-map="returnToMap"
-        />
-    </div>
+  <div>
+    <input type="image" id="tyde-backpack-icon" :src="backpackUrl" @click="toggleMenu"/>
+    <tyde-menu
+      v-if="isMenuOpen"
+      @audio-change="toggleAudio"
+      @continue="continueTapestry"
+      @return-to-map="returnToMap"
+    />
+  </div>
 </template>
 
 <script>
@@ -48,21 +47,10 @@ export default {
     this.backgroundAudio.loop = true
   },
   computed: {
-    ...mapGetters(["lightbox", "nodes"]),
+    ...mapGetters(["lightbox"]),
     backpackUrl() {
       return `${wpData.vue_uri}/${BackpackIcon.split("dist")[1]}`
     },
-    logs() {
-      return this.nodes.filter(node => node.completed).map(node => {
-        return {
-          type: "content",
-          title: node.title,
-          imageURL: node.imageURL,
-          description: node.description,
-          isFavourite: node.isFavourite,
-        }
-      })
-    }
   },
   methods: {
     ...mapMutations(["closeLightbox"]),

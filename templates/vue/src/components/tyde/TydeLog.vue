@@ -1,10 +1,20 @@
 <template>
   <li class="log">
-    <img v-if="log.imageURL" :src="log.imageURL" />
-    <div v-else class="thumbnail-placeholder"></div>
+    <div class="log-thumbnail">
+      <div v-if="log.imageURL" :class="log.type">
+        <img :src="log.imageURL" />
+        <i v-if="log.type === 'activity'" :class="`fas fa-${icon} icon-fa`"></i>
+      </div>
+      <div v-else class="default"></div>
+    </div>
     <div class="log-details">
       <h1>{{log.title}}</h1>
-      <p v-html="formatParagraph(log.description)" />
+      <div v-if="log.type === 'content'">
+        <p v-html="formatParagraph(log.description)" />
+      </div>
+      <div v-else-if="log.type === 'activity'">
+        <audio-player v-if="log.audioSrc" :audioSrc="log.audioSrc" />
+      </div>
     </div>
     <div class="log-controls">
       <i :class="favoriteClass" @click="favorite = !favorite"></i>
@@ -15,6 +25,8 @@
 
 <script>
 import TydeButton from "./TydeButton"
+import AudioPlayer from "@/components/AudioPlayer"
+
 export default {
   name: "tyde-log",
   props: {
@@ -30,11 +42,15 @@ export default {
   },
   components: {
     TydeButton,
+    AudioPlayer,
   },
   computed: {
     favoriteClass() {
       return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
-    }
+    },
+    icon() {
+      return this.log.checklistId ? "tasks" : "microphone"
+    },
   },
   methods: {
     formatParagraph(str) {
@@ -45,6 +61,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .log {
   background: var(--tapestry-med-gray);
   border: 1px solid var(--tapestry-light-gray);
@@ -54,16 +72,36 @@ export default {
   padding: 24px;
   width: 100%;
   display: flex;
-  
-  img {
-    max-width: 250px;
+
+  .log-thumbnail {
+    width: 250px;
+    height: 225px;
+    float: left;
+    .activity {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      > img {
+        filter: brightness(0.7) saturate(1.5);
+      }
+      > i {
+        font-size: 100px;
+        text-shadow: 2px 2px 100px #000;
+        position: absolute;
+        left: calc(50% - 35px);
+        top: calc(50% - 50px);
+      }
+    }
+    .default {
+      height: 100%;
+      background-color: gray;
+    }
   }
 
-  .thumbnail-placeholder {
-    width: 250px;
-    height: 250px;
-    background-color: gray;
-    float: left;
+  img {
+    max-width: 250px;
   }
 
   .log-details {
