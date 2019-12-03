@@ -1,7 +1,7 @@
 <template>
   <button :disabled="disabled" @click="$emit('click')">
     <span class="button">
-      <i :style="{visibility: completed ? 'visible' : 'hidden'}" class="fas fa-check"></i>
+      <i :class="`fas fa-check-circle ${visible}`"></i>
       <div v-if="isFaIcon" class="icon">
         <i :class="`fas fa-${icon} icon-fa`"></i>
       </div>
@@ -42,6 +42,9 @@ export default {
     textIcon() {
       return `${wpData.vue_uri}/${TextIcon.split("dist")[1]}`
     },
+    visible() {
+      return this.completed ? `visible` : `hidden`
+    }
   },
 }
 </script>
@@ -56,6 +59,15 @@ button {
   &:only-child {
     margin-right: 0;
   }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  color: white;
+  visibility: visible;
 }
 
 .button {
