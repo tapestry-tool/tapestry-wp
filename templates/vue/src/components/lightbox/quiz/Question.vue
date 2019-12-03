@@ -24,12 +24,14 @@
         <div class="button-container">
           <answer-button
             v-if="hasId('textId')"
+            :completed="true"
             @click="openForm(question.answers.textId)"
           >
             text
           </answer-button>
           <answer-button
             v-if="hasId('audioId')"
+            :completed="false"
             icon="microphone"
             @click="openRecorder(question.answers.audioId)"
           >
@@ -37,6 +39,7 @@
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
+            :completed="true"
             icon="tasks"
             @click="openForm(question.answers.checklistId)"
           >
