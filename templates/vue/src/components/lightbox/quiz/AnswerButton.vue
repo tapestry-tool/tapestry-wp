@@ -1,11 +1,15 @@
 <template>
-  <button :disabled="disabled" class="button" @click="$emit('click')">
-    <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
-    </div>
-    <img v-else :src="textIcon" class="icon" />
-    <slot></slot>
-    <i v-show="completed" class="fas fa-check"></i>
+  <button :disabled="disabled" @click="$emit('click')">
+    <span class="button">
+      <i :style="{visibility: completed ? 'visible' : 'hidden'}" class="fas fa-check"></i>
+      <div v-if="isFaIcon" class="icon">
+        <i :class="`fas fa-${icon} icon-fa`"></i>
+      </div>
+      <img v-else :src="textIcon" class="icon" />
+      <div>
+        <slot></slot>
+      </div>
+    </span>
   </button>
 </template>
 
@@ -43,35 +47,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.button {
+button {
   padding: 0;
   margin: 0;
-  background-color: #262626;
-  color: white;
-  width: 136px;
-  height: 144px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  transition: all 0.1s ease-out;
   margin-right: 24px;
-
+  background: black;
   &:last-child,
   &:only-child {
     margin-right: 0;
+  }
+}
+
+.button {
+  padding: 0;
+  background-color: #262626;
+  color: white;
+  width: 136px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  font-size: 24px;
+  transition: all 0.1s ease-out;
+
+  i:first-of-type {
+    align-self: flex-end;
   }
 
   &:hover {
     background-color: #11a6d8;
   }
+
+  > * {
+    margin-bottom: 16px;
+  }
 }
 
 .icon {
   height: 56px;
-  margin-bottom: 16px;
 
   &-fa {
     font-size: 56px;
