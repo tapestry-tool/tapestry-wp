@@ -20,6 +20,8 @@
 </template>
 
 <script>
+const MAX_OPTIONS_LENGTH = 15
+
 export default {
   name: "combobox",
   props: {
@@ -44,7 +46,7 @@ export default {
   },
   data() {
     return {
-      isMenuOpen: false,
+      isMenuOpen: true,
       inputValue: "",
     }
   },
@@ -62,15 +64,22 @@ export default {
       }
 
       const options = this.options.filter(option => {
-        return option.id == this.inputValue || option.title.includes(this.inputValue)
+        return (
+          option[this.itemValue] === this.inputValue ||
+          option[this.itemText].toLowerCase().includes(this.inputValue.toLowerCase())
+        )
       })
-      return options.length ? options : this.options
+      return options.length
+        ? options.length > MAX_OPTIONS_LENGTH
+          ? options.slice(0, MAX_OPTIONS_LENGTH)
+          : options
+        : this.options
     },
   },
   watch: {
-    value() {
+    text(newText) {
       if (this.inputValue.length === 0) {
-        this.inputValue = this.text
+        this.inputValue = newText
       }
     },
   },
@@ -90,16 +99,15 @@ export default {
 <style lang="scss" scoped>
 .menu {
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-top: 1em;
+  border-radius: 0 0 4px 4px;
 }
 
 .menu-button {
   display: block;
-  padding: 12px;
+  padding: 4px 8px;
   margin: 0;
   background: none;
-  color: inherit;
+  color: #495057;
   width: 100%;
 
   &:hover {

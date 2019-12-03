@@ -645,6 +645,7 @@ table {
   }
 
   code {
+    color: #495057;
     margin-right: 1em;
   }
 }
