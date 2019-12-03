@@ -16,6 +16,7 @@ export function logs(state) {
           return {
             type: "activity",
             title: q.text,
+            imageURL: currentNode.imageURL,
             nodeId: currentNode.id,
             [key]: q.answers[key],
           }

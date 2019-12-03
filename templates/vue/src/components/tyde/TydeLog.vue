@@ -1,9 +1,9 @@
 <template>
   <li class="log">
     <div class="log-thumbnail">
-      <img v-if="log.imageURL" :src="log.imageURL" />
-      <div v-else-if="log.type === 'activity'" class="activity">
-        <i :class="`fas fa-${icon} icon-fa`"></i>
+      <div v-if="log.imageURL" :class="log.type">
+        <img :src="log.imageURL" />
+        <i v-if="log.type === 'activity'" :class="`fas fa-${icon} icon-fa`"></i>
       </div>
       <div v-else class="default"></div>
     </div>
@@ -82,9 +82,16 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: $tyde-orange;
+      position: relative;
+      > img {
+        filter: brightness(0.7) saturate(1.5);
+      }
       > i {
         font-size: 100px;
+        text-shadow: 2px 2px 100px #000;
+        position: absolute;
+        left: calc(50% - 35px);
+        top: calc(50% - 50px);
       }
     }
     .default {
