@@ -11,20 +11,14 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "vue/component-name-in-template-casing": [
-      "error",
-      "kebab-case"
-    ],
-    "vue/name-property-casing": [
-      "error",
-      "kebab-case"
-    ],
+    "vue/component-name-in-template-casing": ["error", "kebab-case"],
+    "vue/name-property-casing": ["error", "kebab-case"],
     "vue/no-v-html": "off",
     "no-console": "off",
     "no-debugger": "off",
     "no-prototype-builtins": "off",
     "prettier/prettier": [
-      "error",
+      "warn",
       {
         "semi": false,
         "htmlWhitespaceSensitivity": "ignore",
@@ -37,6 +31,7 @@
     "parser": "babel-eslint"
   },
   "globals": {
+    "adminAjaxUrl": "readonly",
     "wpApiSettings": "readonly",
     "wpData": "readonly",
     "wpPostId": "readonly",
