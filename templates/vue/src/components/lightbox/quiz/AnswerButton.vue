@@ -5,6 +5,7 @@
     </div>
     <img v-else :src="textIcon" class="icon" />
     <slot></slot>
+    <i v-show="completed" class="fas fa-check"></i>
   </button>
 </template>
 
@@ -14,6 +15,11 @@ import TextIcon from "../../../assets/Aa.svg"
 export default {
   name: "answer-button",
   props: {
+    completed: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     disabled: {
       type: Boolean,
       required: false,
