@@ -3,7 +3,6 @@ export function logs(state) {
     textId: "text",
     checklistId: "checklist",
   }
-
   const contents = state.nodes
     .filter(node => node.completed)
     .map(node => ({
@@ -39,6 +38,7 @@ const getAnswer = (answerType, entry) => {
   const types = {
     textId: parseText,
     checklistId: parseChecklist,
+    audioId: ()=>{},
   }
   return types[answerType](entry)
 }

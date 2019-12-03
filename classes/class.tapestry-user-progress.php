@@ -246,7 +246,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 );
 
                 foreach ($question->answers as $type => $formId) {
-                    if ($formId !== "") {
+                    if ($formId !== "" && property_exists($entries, $formId)) {
                         $quiz[$question->id][$type] = $entries->$formId;
                     }
                 }

@@ -81,4 +81,13 @@ export default class {
       })
     })
   }
+
+  static base64ToBlob(b64Data, contentType) {
+    const url = `data:${contentType};base64,${b64Data}`;
+    return new Promise((resolve, reject) => {
+      return fetch(url).then(response => {
+        resolve(response.blob());
+      })
+    })
+  }
 }
