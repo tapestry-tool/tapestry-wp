@@ -64,15 +64,18 @@ export default {
       }
 
       const options = this.options.filter(option => {
-        return option.id == this.inputValue || option.title.includes(this.inputValue)
+        return (
+          option[this.itemValue] === this.inputValue ||
+          option[this.itemText].toLowerCase().includes(this.inputValue.toLowerCase())
+        )
       })
       return options.length ? options : this.options
     },
   },
   watch: {
-    text() {
+    text(newText) {
       if (this.inputValue.length === 0) {
-        this.inputValue = this.text
+        this.inputValue = newText
       }
     },
   },
