@@ -22,6 +22,8 @@
 </template>
 
 <script>
+const MAX_OPTIONS_LENGTH = 15
+
 export default {
   name: "combobox",
   props: {
@@ -69,7 +71,11 @@ export default {
           option[this.itemText].toLowerCase().includes(this.inputValue.toLowerCase())
         )
       })
-      return options.length ? options : this.options
+      return options.length
+        ? options.length > MAX_OPTIONS_LENGTH
+          ? options.slice(0, MAX_OPTIONS_LENGTH)
+          : options
+        : this.options
     },
   },
   watch: {
