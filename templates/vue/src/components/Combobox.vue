@@ -3,17 +3,19 @@
     <b-form-input
       ref="input"
       v-model="inputValue"
-      @focus="isMenuOpen = true"
-      @blur="isMenuOpen = false"
+      @blur="handleBlur"
+      @focus="handleFocus"
     ></b-form-input>
     <div v-if="isMenuOpen" class="menu">
       <button
         v-for="option in visibleOptions"
-        :key="option"
+        :key="option[itemValue]"
         class="menu-button"
         @mousedown.prevent="handleClick(option)"
       >
-        <slot :option="option">{{ option.toString() }}</slot>
+        <div class="menu-item">
+          <slot :option="option">{{ option.toString() }}</slot>
+        </div>
       </button>
     </div>
   </b-form-group>
@@ -48,6 +50,7 @@ export default {
     return {
       isMenuOpen: true,
       inputValue: "",
+      selected: false,
     }
   },
   computed: {
@@ -84,10 +87,24 @@ export default {
     },
   },
   methods: {
+    handleBlur() {
+      this.isMenuOpen = false
+      // if user leaves focus and hasn't selected anything,
+      // revert to whatever the previous selection was.
+      if (this.inputValue !== this.text && !this.selected) {
+        this.inputValue = this.text
+      }
+    },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
       this.inputValue = option[this.itemText]
+      this.selected = true
       this.$refs.input.blur()
+    },
+    handleFocus() {
+      this.isMenuOpen = true
+      this.selected = false
+      this.$emit("focus")
     },
     getValue(option) {
       return typeof option === "string" ? option : option[this.itemValue]
@@ -98,6 +115,7 @@ export default {
 
 <style lang="scss" scoped>
 .menu {
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 0 0 4px 4px;
 }
@@ -112,6 +130,29 @@ export default {
 
   &:hover {
     background: #cce5ff;
+  }
+}
+</style>
+
+<style lang="scss">
+.menu-item {
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+
+  code,
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  p {
+    font-weight: normal;
+  }
+
+  code {
+    color: #495057;
+    margin-right: 1em;
   }
 }
 </style>
