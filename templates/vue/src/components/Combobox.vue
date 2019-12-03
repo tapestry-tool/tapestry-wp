@@ -48,7 +48,7 @@ export default {
   },
   data() {
     return {
-      isMenuOpen: false,
+      isMenuOpen: true,
       inputValue: "",
       selected: false,
     }
@@ -117,16 +117,15 @@ export default {
 .menu {
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-top: 1em;
+  border-radius: 0 0 4px 4px;
 }
 
 .menu-button {
   display: block;
-  padding: 12px;
+  padding: 4px 8px;
   margin: 0;
   background: none;
-  color: inherit;
+  color: #495057;
   width: 100%;
 
   &:hover {
@@ -152,6 +151,7 @@ export default {
   }
 
   code {
+    color: #495057;
     margin-right: 1em;
   }
 }
