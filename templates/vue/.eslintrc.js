@@ -17,7 +17,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-prototype-builtins": "off",
     "prettier/prettier": [
-      "warn",
+      "error",
       {
         semi: false,
         htmlWhitespaceSensitivity: "ignore",
@@ -30,6 +30,7 @@ module.exports = {
     parser: "babel-eslint",
   },
   globals: {
+    adminAjaxUrl: "readonly",
     wpApiSettings: "readonly",
     wpData: "readonly",
     wpPostId: "readonly",
