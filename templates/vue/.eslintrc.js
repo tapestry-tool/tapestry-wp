@@ -17,7 +17,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-prototype-builtins": "off",
     "prettier/prettier": [
-      "warn",
+      "error",
       {
         semi: false,
         htmlWhitespaceSensitivity: "ignore",
