@@ -15,9 +15,9 @@ if (hasErrors) {
 }
 
 if (hasFixes) {
-  console.log("Errors found. Eslint will attempt to fix. Please recommit files.")
+  console.log("Lint errors found. ESLint will attempt to fix them. Please review changes and re-commit files.")
   CLIEngine.outputFixes(report)
-  console.log("Done.")
+  console.log("Lint fixes complete.")
   process.exit(1)
 }
 

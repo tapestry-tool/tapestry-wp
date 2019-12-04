@@ -11,4 +11,5 @@ echo "  newly linted files to the commit and then re-commit"
 echo "- You can skip the pre-commit hook altogether by adding "
 echo "  the the --no-verify flag"
 echo "*******************************************************\n"
+
 cd templates/vue && node lint.js
