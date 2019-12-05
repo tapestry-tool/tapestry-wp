@@ -17,7 +17,7 @@ export function logs(state) {
   const nodesWithQuestions = state.nodes.filter(
     node =>
       node.quiz &&
-      node.quiz.some(question => Object.keys(question.entries).length > 0)
+      node.quiz.some(question => question.entries && Object.keys(question.entries).length > 0)
   )
   nodesWithQuestions.forEach(node => {
     node.quiz.forEach(question => {
