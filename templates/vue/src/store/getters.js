@@ -2,6 +2,7 @@ export function logs(state) {
   const mapIdToKey = {
     textId: "text",
     checklistId: "checklist",
+    audioId: "audio"
   }
   const contents = state.nodes
     .filter(node => node.completed)
@@ -38,12 +39,14 @@ const getAnswer = (answerType, entry) => {
   const types = {
     textId: parseText,
     checklistId: parseChecklist,
-    audioId: ()=>{},
+    audioId: parseAudio
   }
   return types[answerType](entry)
 }
 
 const parseText = entry => entry[1]
+
+const parseAudio = entry => entry
 
 const parseChecklist = entry => {
   const inputId = "1"

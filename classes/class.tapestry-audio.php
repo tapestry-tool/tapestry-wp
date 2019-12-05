@@ -83,6 +83,16 @@ class TapestryAudio implements ITapestryAudio
         }
     }
 
+    public function audioExists() {
+        $filename = md5('tapestryPostId-' . $this->tapestryPostId . '-'
+            . 'nodeMetaId-' . $this->nodeMetaId . '-'
+            . 'h5pId-' . $this->h5pId . '-'
+            . 'userId-' . $this->userId)
+            . '.wav';
+        $upload_dir = wp_upload_dir();
+        return file_exists($upload_dir['basedir'] . '/tapestry/' . $this->userId . '/' . $filename);
+    }
+
     /**
      * Get all node IDs that have its audios recorded
      * 

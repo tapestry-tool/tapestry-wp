@@ -226,7 +226,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
         }
-
+        
         $progress->entries = $this->getUserEntries();
 
         return json_encode($progress);
@@ -245,9 +245,16 @@ class TapestryUserProgress implements ITapestryUserProgress
                     'completed' => false
                 );
 
-                foreach ($question->answers as $type => $formId) {
-                    if ($formId !== "" && property_exists($entries, $formId)) {
-                        $quiz[$question->id][$type] = $entries->$formId;
+                foreach ($question->answers as $type => $answerTypeId) {
+                    if ($answerTypeId !== "") {
+                        if ($type == 'audioId') {
+                            $TapestryAudio = new TapestryAudio($this->postId, $nodeId, $answerTypeId);
+                            if ($TapestryAudio->audioExists()) {
+                                $quiz[$question->id][$type] = $answerTypeId;
+                            }
+                        } else {
+                            $quiz[$question->id][$type] = $entries->$answerTypeId;
+                        }
                     }
                 }
             }
