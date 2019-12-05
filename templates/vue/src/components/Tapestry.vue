@@ -30,7 +30,6 @@
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
       :permissions-order="permissionsOrder"
-      :h5p-content-options="h5pContent"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -51,7 +50,6 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
-import H5PApi from "../services/H5PApi"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -66,7 +64,6 @@ export default {
     return {
       loadedH5pId: 0,
       recordedNodeIds: [],
-      h5pContent: [],
       TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
@@ -127,9 +124,7 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
-  async mounted() {
-    const h5pContent = await H5PApi.getAllContent()
-    this.h5pContent = h5pContent
+  mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)

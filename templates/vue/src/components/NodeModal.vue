@@ -300,6 +300,7 @@
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
+import H5PApi from "../services/H5PApi"
 
 export default {
   name: "node-modal",
@@ -322,11 +323,6 @@ export default {
         )
       },
     },
-    h5pContentOptions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
     rootNodeTitle: {
       type: String,
       required: false,
@@ -348,6 +344,7 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
       ],
+      h5pContentOptions: [],
       selectedH5pContent: "",
       formErrors: "",
       maxDescriptionLength: 250,
@@ -421,7 +418,8 @@ export default {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
   },
-  mounted() {
+  async mounted() {
+    this.h5pContentOptions = await H5PApi.getAllContent()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""

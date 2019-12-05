@@ -6,14 +6,13 @@
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
-    <div v-if="isMenuOpen" class="menu">
+    <div v-if="isOpen" class="combobox">
       <button
         v-for="option in visibleOptions"
         :key="option[itemValue]"
-        class="menu-button"
         @mousedown.prevent="handleClick(option)"
       >
-        <div class="menu-item">
+        <div class="combobox-item">
           <slot :option="option">{{ option.toString() }}</slot>
         </div>
       </button>
@@ -48,7 +47,7 @@ export default {
   },
   data() {
     return {
-      isMenuOpen: true,
+      isOpen: true,
       inputValue: "",
       selected: false,
     }
@@ -88,7 +87,7 @@ export default {
   },
   methods: {
     handleBlur() {
-      this.isMenuOpen = false
+      this.isOpen = false
       // if user leaves focus and hasn't selected anything,
       // revert to whatever the previous selection was.
       if (this.inputValue !== this.text && !this.selected) {
@@ -102,7 +101,7 @@ export default {
       this.$refs.input.blur()
     },
     handleFocus() {
-      this.isMenuOpen = true
+      this.isOpen = true
       this.selected = false
       this.$emit("focus")
     },
@@ -114,28 +113,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.menu {
+.combobox {
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 0 0 4px 4px;
-}
 
-.menu-button {
-  display: block;
-  padding: 4px 8px;
-  margin: 0;
-  background: none;
-  color: #495057;
-  width: 100%;
+  > button {
+    display: block;
+    padding: 4px 8px;
+    margin: 0;
+    background: none;
+    color: #495057;
+    width: 100%;
 
-  &:hover {
-    background: #cce5ff;
+    &:hover {
+      background: #cce5ff;
+    }
   }
 }
 </style>
 
 <style lang="scss">
-.menu-item {
+.combobox-item {
   display: flex;
   align-items: center;
   text-transform: capitalize;
