@@ -252,7 +252,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                             if ($TapestryAudio->audioExists()) {
                                 $quiz[$question->id][$type] = $answerTypeId;
                             }
-                        } else {
+                        } else if (property_exists($entries, $answerTypeId)) {
                             $quiz[$question->id][$type] = $entries->$answerTypeId;
                         }
                     }
