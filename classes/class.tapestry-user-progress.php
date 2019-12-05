@@ -226,7 +226,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
         }
-        
+
         $progress->entries = $this->getUserEntries();
 
         return json_encode($progress);

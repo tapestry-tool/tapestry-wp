@@ -46,7 +46,7 @@ const getAnswer = (answerType, entry) => {
 
 const parseText = entry => entry[1]
 
-const parseAudio = entry => entry
+const parseAudio = entry => { return { id: entry } }
 
 const parseChecklist = entry => {
   const inputId = "1"
