@@ -17,6 +17,5 @@ export default {
 <style lang="scss" scoped>
 audio {
   width: calc(100% - 30px);
-  margin-top: 35px;
 }
 </style>

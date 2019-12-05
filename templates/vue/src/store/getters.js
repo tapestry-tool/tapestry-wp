@@ -2,6 +2,7 @@ export function logs(state) {
   const mapIdToKey = {
     textId: "text",
     checklistId: "checklist",
+    audioId: "audio"
   }
   const contents = state.nodes
     .filter(node => node.completed)
@@ -16,7 +17,7 @@ export function logs(state) {
   const nodesWithQuestions = state.nodes.filter(
     node =>
       node.quiz &&
-      node.quiz.some(question => Object.keys(question.entries).length > 0)
+      node.quiz.some(question => question.entries && Object.keys(question.entries).length > 0)
   )
   nodesWithQuestions.forEach(node => {
     node.quiz.forEach(question => {
@@ -38,12 +39,14 @@ const getAnswer = (answerType, entry) => {
   const types = {
     textId: parseText,
     checklistId: parseChecklist,
-    audioId: ()=>{},
+    audioId: parseAudio
   }
   return types[answerType](entry)
 }
 
 const parseText = entry => entry[1]
+
+const parseAudio = entry => { return { id: entry } }
 
 const parseChecklist = entry => {
   const inputId = "1"

@@ -245,9 +245,16 @@ class TapestryUserProgress implements ITapestryUserProgress
                     'completed' => false
                 );
 
-                foreach ($question->answers as $type => $formId) {
-                    if ($formId !== "" && property_exists($entries, $formId)) {
-                        $quiz[$question->id][$type] = $entries->$formId;
+                foreach ($question->answers as $type => $gfOrH5pId) {
+                    if ($gfOrH5pId !== "") {
+                        if ($type == 'audioId') {
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            if ($tapestryAudio->audioExists()) {
+                                $quiz[$question->id][$type] = $gfOrH5pId;
+                            }
+                        } else if (property_exists($entries, $gfOrH5pId)) {
+                            $quiz[$question->id][$type] = $entries->$gfOrH5pId;
+                        }
                     }
                 }
             }
