@@ -122,7 +122,6 @@ export default {
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
-        console.log(h5pVideo)
         this.$emit("load", { el: h5pVideo })
 
         const settings = this.settings
