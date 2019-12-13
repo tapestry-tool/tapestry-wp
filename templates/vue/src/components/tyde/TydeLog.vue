@@ -2,9 +2,9 @@
   <li class="log">
     <div class="log-thumbnail">
       <div :class="log.type">
-        <img v-if="log.imageURL" :src="log.imageURL" />
+        <img v-if="log.imageURL" :src="log.imageURL" class="log-thumbnail-image" />
         <div v-else class="default"></div>
-        <i v-if="log.type === 'activity'" :class="`fas fa-${icon} icon-fa`"></i>
+        <tyde-icon v-if="log.type === 'activity'" :icon="icon" class="log-thumbnail-icon"></tyde-icon>
       </div>
     </div>
     <div class="log-details">
@@ -23,11 +23,13 @@
 
 <script>
 import TydeActivity from "./TydeActivity"
+import TydeIcon from "./TydeIcon"
 
 export default {
   name: "tyde-log",
   components: {
     TydeActivity,
+    TydeIcon
   },
   props: {
     log: {
@@ -45,7 +47,7 @@ export default {
       return this.favorite ? "fas fa-heart fa-2x" : "far fa-heart fa-2x"
     },
     icon() {
-      return this.log.checklistId ? "tasks" : "microphone"
+      return this.log.checklist ? "checklist" : this.log.text ? "text" : "audio"
     },
   },
   methods: {
@@ -79,20 +81,31 @@ export default {
       align-items: center;
       justify-content: center;
       position: relative;
-      > img {
-        filter: brightness(0.7) saturate(1.5);
-      }
-      > i {
-        font-size: 100px;
-        text-shadow: 2px 2px 100px #000;
-        position: absolute;
-        left: calc(50% - 35px);
-        top: calc(50% - 50px);
-      }
     }
     .default {
       height: 100%;
       background-color: gray;
+    }
+
+    &-image {
+      filter: brightness(0.7) saturate(1.5);
+    }
+
+    &-icon {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img.log-thumbnail-icon {
+      height: 100px;
+      width: auto;
+    }
+
+    i.log-thumbnail-icon {
+      font-size: 100px;
+      text-shadow: 2px 2px 100px #000;
     }
   }
 
