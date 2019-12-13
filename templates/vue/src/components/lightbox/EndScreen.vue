@@ -1,10 +1,5 @@
 <template>
-  <quiz-screen
-    v-if="showQuiz"
-    :node="node"
-    @close="showQuiz = false"
-    @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
-  ></quiz-screen>
+  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" />
   <div
     v-else
     :class="[
@@ -60,11 +55,6 @@ export default {
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Retake Quiz" : "Take Quiz"
-    },
-  },
-  methods: {
-    h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }
