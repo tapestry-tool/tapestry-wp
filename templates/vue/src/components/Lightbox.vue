@@ -53,7 +53,6 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
-            @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
           />
         </div>
       </div>
@@ -82,10 +81,6 @@ export default {
   props: {
     nodeId: {
       type: [String, Number],
-      required: true,
-    },
-    tapestryApiClient: {
-      type: Object,
       required: true,
     },
   },
@@ -218,9 +213,6 @@ export default {
         ...this.dimensions,
         ...dimensions,
       }
-    },
-    h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
     },
   },
 }

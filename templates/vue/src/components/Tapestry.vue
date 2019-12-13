@@ -36,7 +36,6 @@
     />
     <lightbox
       v-if="lightbox.isOpen"
-      :tapestry-api-client="TapestryAPI"
       :node-id="lightbox.id"
       @close="closeLightbox"
     />
