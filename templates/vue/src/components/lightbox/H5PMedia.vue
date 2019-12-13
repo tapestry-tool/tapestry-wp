@@ -116,6 +116,7 @@ export default {
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
+        console.log(h5pVideo)
         this.$emit("load", { el: h5pVideo })
 
         const settings = this.settings
@@ -219,19 +220,19 @@ export default {
             }
           }
         })
-        setTimeout(() => {
-          h5pVideo.play()
-          thisTapestryTool.recordAnalyticsEvent(
-            "app",
-            "auto-play",
-            "h5p-video",
-            this.node.id
-          )
-        }, 1000)
+        h5pVideo.play()
+        thisTapestryTool.recordAnalyticsEvent(
+          "app",
+          "auto-play",
+          "h5p-video",
+          this.node.id
+        )
       }
     },
     h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
+      this.$emit("h5p-recorder-saver-loaded", {
+        loadedH5pId: event.loadedH5pId,
+      })
     },
   },
 }
