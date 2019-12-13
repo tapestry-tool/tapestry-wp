@@ -44,7 +44,10 @@ const getAnswer = (answerType, entry) => {
   return types[answerType](entry)
 }
 
-const parseText = entry => entry[1]
+const parseText = entry => {
+  const text = entry[1]
+  return `<div>${text.replace("\n", "<br />")}</div>`
+}
 
 const parseAudio = entry => { return { id: entry } }
 
