@@ -66,6 +66,7 @@ export default {
     returnToMap() {
       this.closeLightbox()
       this.toggleMenu()
+      this.$emit("return-to-map")
     },
     toggleAudio() {
       if (this.backgroundAudio.paused) {
