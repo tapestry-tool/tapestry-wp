@@ -1,11 +1,11 @@
 <template>
   <li class="log">
     <div class="log-thumbnail">
-      <div v-if="log.imageURL" :class="log.type">
-        <img :src="log.imageURL" />
+      <div :class="log.type">
+        <img v-if="log.imageURL" :src="log.imageURL" />
+        <div v-else class="default"></div>
         <i v-if="log.type === 'activity'" :class="`fas fa-${icon} icon-fa`"></i>
       </div>
-      <div v-else class="default"></div>
     </div>
     <div class="log-details">
       <h1>{{ log.title }}</h1>
