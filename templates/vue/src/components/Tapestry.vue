@@ -27,7 +27,7 @@
     </div>
     <node-modal
       :node="populatedNode"
-      :parent="selectedNode"
+      :parent="parentNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
       :permissions-order="permissionsOrder"
@@ -66,6 +66,7 @@ export default {
       TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
+      parentNode: null,
       populatedNode: {
         title: "",
         description: "",
@@ -181,6 +182,7 @@ export default {
     },
     addNewNode() {
       this.modalType = "add-new-node"
+      this.parentNode = this.selectedNode
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
@@ -195,6 +197,7 @@ export default {
     },
     closeModal() {
       this.modalType = ""
+      this.parent = null
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {

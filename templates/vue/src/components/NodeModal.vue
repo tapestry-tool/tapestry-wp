@@ -346,7 +346,7 @@ export default {
   computed: {
     tydeTypeOptions() {
       const options = Object.values(nodeTypes)
-      if (this.modalType === "add-new-node") {
+      if (this.parent) {
         if (this.parent.tydeType === nodeTypes.MODULE) {
           // if parent is a module, only allow stage nodes
           return [nodeTypes.STAGE]
@@ -355,7 +355,9 @@ export default {
           return [nodeTypes.QUESTION_SET]
         }
       }
-      return options
+      return options.filter(
+        opt => opt !== nodeTypes.STAGE && opt !== nodeTypes.QUESTION_SET
+      )
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
@@ -439,7 +441,7 @@ export default {
   methods: {
     setInitialTydeType() {
       // only set node types if adding a new node
-      if (this.parent !== this.node) {
+      if (this.parent) {
         const parentType = this.parent.tydeType
         this.node.tydeType = parentType === nodeTypes.MODULE
           ? nodeTypes.STAGE
