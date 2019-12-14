@@ -438,12 +438,15 @@ export default {
   },
   methods: {
     setInitialTydeType() {
-      const parentType = this.parent.tydeType
-      this.node.tydeType = parentType === nodeTypes.MODULE
-        ? nodeTypes.STAGE
-        : parentType === nodeTypes.STAGE
-          ? nodeTypes.QUESTION_SET
-          : nodeTypes.REGULAR
+      // only set node types if adding a new node
+      if (this.parent !== this.node) {
+        const parentType = this.parent.tydeType
+        this.node.tydeType = parentType === nodeTypes.MODULE
+          ? nodeTypes.STAGE
+          : parentType === nodeTypes.STAGE
+            ? nodeTypes.QUESTION_SET
+            : nodeTypes.REGULAR
+      }
     },
     getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
