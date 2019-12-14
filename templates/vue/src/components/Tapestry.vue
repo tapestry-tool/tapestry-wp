@@ -27,6 +27,7 @@
     </div>
     <node-modal
       :node="populatedNode"
+      :parent="selectedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
       :permissions-order="permissionsOrder"

@@ -303,6 +303,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    parent: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    },
     modalType: {
       type: String,
       required: true,
@@ -340,7 +345,17 @@ export default {
   },
   computed: {
     tydeTypeOptions() {
-      return Object.values(nodeTypes)
+      const options = Object.values(nodeTypes)
+      if (this.modalType === "add-new-node") {
+        if (this.parent.tydeType === nodeTypes.MODULE) {
+          // if parent is a module, only allow stage nodes
+          return [nodeTypes.STAGE]
+        } else if (this.parent.tydeType === nodeTypes.STAGE) {
+          // if parent is a stage, only allow question sets
+          return [nodeTypes.QUESTION_SET]
+        }
+      }
+      return options
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
@@ -415,8 +430,21 @@ export default {
         this.formErrors = ""
       }
     })
+    this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
+      if (modalId == "node-modal-container") {
+        this.setInitialTydeType()
+      }
+    })
   },
   methods: {
+    setInitialTydeType() {
+      const parentType = this.parent.tydeType
+      this.node.tydeType = parentType === nodeTypes.MODULE
+        ? nodeTypes.STAGE
+        : parentType === nodeTypes.STAGE
+          ? nodeTypes.QUESTION_SET
+          : nodeTypes.REGULAR
+    },
     getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
     },
