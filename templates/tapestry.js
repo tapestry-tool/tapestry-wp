@@ -205,7 +205,7 @@ function tapestryTool(config){
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
             var updatedNode = fillEmptyFields(node, {
-                tydeType: "regular", 
+                tydeType: "Regular", 
                 skippable: true,
                 behaviour: "embed",
                 completed: false,

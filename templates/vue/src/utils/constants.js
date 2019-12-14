@@ -1,6 +1,6 @@
 export const nodeTypes = {
-  REGULAR: "regular",
-  MODULE: "module",
-  STAGE: "stage",
-  QUESTION_SET: "question-set"
+  REGULAR: "Regular",
+  MODULE: "Module",
+  STAGE: "Stage",
+  QUESTION_SET: "Question set"
 }

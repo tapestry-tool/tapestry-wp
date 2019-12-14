@@ -43,6 +43,12 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <b-form-group label="TYDE Node Type">
+              <b-form-select
+                v-model="node.tydeType"
+                :options="tydeTypeOptions"
+              ></b-form-select>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -283,6 +289,7 @@
 
 <script>
 import Helpers from "../utils/Helpers"
+import { nodeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
 
 export default {
@@ -332,6 +339,9 @@ export default {
     }
   },
   computed: {
+    tydeTypeOptions() {
+      return Object.values(nodeTypes)
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -376,6 +386,7 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "tydeType", value: this.node.tydeType }
       ]
     },
     nodeImageUrl() {
