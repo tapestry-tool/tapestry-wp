@@ -137,7 +137,6 @@ export default {
 .combobox-item {
   display: flex;
   align-items: center;
-  text-transform: capitalize;
 
   code,
   p {
