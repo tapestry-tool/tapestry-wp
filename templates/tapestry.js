@@ -1296,7 +1296,7 @@ function tapestryTool(config){
                 return NORMAL_RADIUS + ROOT_RADIUS_DIFF - 30;
             })
             .attr("style", function (d) {
-                return d.nodeType === "grandchild" || d.nodeType === "child" ? "visibility: hidden" : "visibility: visible";
+                return d.nodeType === "grandchild" || d.nodeType === "child" || d.tydeType === "Question set" ? "visibility: hidden" : "visibility: visible";
             })
             .attr("class", "mediaButton addNodeButton")
             .call(d3.drag()
