@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
       :node="node"
       :width="width"
@@ -12,6 +13,7 @@
 </template>
 
 <script>
+import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import H5PIframe from "./H5PIframe"
 
@@ -22,6 +24,7 @@ export default {
   components: {
     EndScreen,
     'h5p-iframe': H5PIframe,
+    Loading,
   },
   props: {
     node: {
@@ -43,6 +46,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       showEndScreen: false,
     }
   },
