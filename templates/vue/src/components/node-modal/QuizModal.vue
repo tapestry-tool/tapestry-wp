@@ -34,6 +34,7 @@
                 :options="formOptions"
                 item-text="title"
                 item-value="id"
+                empty-message="There are no forms available. Please add one in your WP dashboard."
                 @focus="wasFocused = true"
               >
                 <template v-slot="slotProps">
@@ -50,6 +51,7 @@
                 :options="h5pOptions"
                 item-text="title"
                 item-value="id"
+                empty-message="There's no H5P content yet. Please add one in your WP dashboard."
                 @focus="wasFocused = true"
               >
                 <template v-slot="slotProps">
@@ -66,6 +68,7 @@
                 :options="formOptions"
                 item-text="title"
                 item-value="id"
+                empty-message="There are no forms available. Please add one in your WP dashboard."
                 @focus="wasFocused = true"
               >
                 <template v-slot="slotProps">

@@ -6,7 +6,7 @@
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
-    <div v-if="isOpen" class="combobox">
+    <div v-if="isOpen && !showEmptyMessage" class="combobox">
       <button
         v-for="option in visibleOptions"
         :key="option[itemValue]"
@@ -16,6 +16,11 @@
           <slot :option="option">{{ option.toString() }}</slot>
         </div>
       </button>
+    </div>
+    <div v-if="isOpen && showEmptyMessage" class="combobox">
+      <div class="combobox-item empty-message">
+        <p>{{ emptyMessage }}</p>
+      </div>
     </div>
   </b-form-group>
 </template>
@@ -44,6 +49,11 @@ export default {
       type: [Object, String],
       required: true,
     },
+    emptyMessage: {
+      type: String,
+      required: false,
+      default: "Please add at least one option.",
+    },
   },
   data() {
     return {
@@ -59,6 +69,9 @@ export default {
       }
       const item = this.options.find(option => option[this.itemValue] == this.value)
       return item ? item[this.itemText] : ""
+    },
+    showEmptyMessage() {
+      return this.visibleOptions.length
     },
     visibleOptions() {
       if (this.inputValue === this.text) {
@@ -152,5 +165,11 @@ export default {
     color: #495057;
     margin-right: 1em;
   }
+}
+
+.empty-message {
+  justify-content: center;
+  padding: 4px 0;
+  color: #6c757d;
 }
 </style>
