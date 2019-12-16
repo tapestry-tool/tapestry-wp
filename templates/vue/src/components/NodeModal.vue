@@ -572,20 +572,26 @@ table {
 </style>
 
 <style lang="scss" scoped>
-.form-control {
-  padding: 15px;
-  border: none;
-  background: #f1f1f1;
-}
+#node-modal-container {
+  * {
+    outline: none;
+  }
 
-.modal-header-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
+  .form-control {
+    padding: 15px;
+    border: none;
+    background: #f1f1f1;
+  }
 
-  &:last-child {
-    margin-bottom: 0;
+  .modal-header-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 </style>

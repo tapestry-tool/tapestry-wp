@@ -1,5 +1,8 @@
 <template>
-  <div class="question" :class="{'question-h5p':recorderOpened, 'question-gf':formOpened}">
+  <div
+    class="question"
+    :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
+  >
     <gravity-form
       v-if="formOpened"
       :id="formId"
@@ -7,12 +10,12 @@
       @submit="handleFormSubmit"
     ></gravity-form>
     <iframe
-      ref="h5p"
       v-else-if="recorderOpened"
+      ref="h5p"
       allowfullscreen="false"
       :src="h5pRecorderUrl"
-      @load="handleLoad"
       frameBorder="0"
+      @load="handleLoad"
     ></iframe>
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
@@ -103,7 +106,7 @@ export default {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const loadedH5pId = h5pObj.instances[0].contentId
       if (loadedH5pId) {
-        this.$emit('h5p-recorder-saver-loaded', { loadedH5pId })
+        this.$emit("h5p-recorder-saver-loaded", { loadedH5pId })
       }
     },
     async openForm(id) {
@@ -131,7 +134,7 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, formData, response }) {
+    handleFormSubmit({ id, success, response }) {
       if (!success) {
         delete window[`gf_submitting_${id}`]
         this.formHtml = response
@@ -151,9 +154,9 @@ export default {
 
 <style lang="scss">
 .question label.gfield_label {
-    font-weight: bold;
-    margin-top: 1em;
-    font-size: 1.3em;
+  font-weight: bold;
+  margin-top: 1em;
+  font-size: 1.3em;
 }
 </style>
 

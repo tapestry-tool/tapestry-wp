@@ -1,6 +1,13 @@
 <template>
   <div class="container">
-    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"/>
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+      @h5p-recorder-saver-loaded="h5pRecorderSaverLoaded"
+    />
+    <loading v-if="isLoading" label="Loading H5P media..." />
     <iframe
       id="h5p"
       ref="h5p"
@@ -15,6 +22,7 @@
 </template>
 
 <script>
+import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
@@ -23,6 +31,7 @@ export default {
   name: "h5p-media",
   components: {
     EndScreen,
+    Loading,
   },
   props: {
     node: {
@@ -44,6 +53,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       showEndScreen: false,
     }
   },
@@ -65,6 +75,8 @@ export default {
       this.$emit("close")
     },
     handleLoad() {
+      this.isLoading = false
+
       $("iframe").each(function() {
         $(this)
           .data("ratio", this.height / this.width)
@@ -102,7 +114,9 @@ export default {
       // If it is, we can emit an event to load the recorded audio (if exists)
       // and terminate
       if (h5pObj.instances[0].recorder) {
-        this.$emit('h5p-recorder-saver-loaded', { loadedH5pId: h5pObj.instances[0].contentId })
+        this.$emit("h5p-recorder-saver-loaded", {
+          loadedH5pId: h5pObj.instances[0].contentId,
+        })
         return
       }
 
@@ -211,19 +225,19 @@ export default {
             }
           }
         })
-        setTimeout(() => {
-          h5pVideo.play()
-          thisTapestryTool.recordAnalyticsEvent(
-            "app",
-            "auto-play",
-            "h5p-video",
-            this.node.id
-          )
-        }, 1000)
+        h5pVideo.play()
+        thisTapestryTool.recordAnalyticsEvent(
+          "app",
+          "auto-play",
+          "h5p-video",
+          this.node.id
+        )
       }
     },
     h5pRecorderSaverLoaded(event) {
-      this.$emit("h5p-recorder-saver-loaded", { loadedH5pId: event.loadedH5pId })
+      this.$emit("h5p-recorder-saver-loaded", {
+        loadedH5pId: event.loadedH5pId,
+      })
     },
   },
 }
