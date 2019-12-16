@@ -12,6 +12,8 @@ class TapestryH5P implements ITapestryH5P
 
   public function get()
   {
-    return (object) []; // stub
+    global $wpdb;
+    $content = $wpdb->get_results("select id, title from wp_h5p_contents");
+    return $content;
   }
 }

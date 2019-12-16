@@ -12,6 +12,7 @@ require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 require_once __DIR__ . '/classes/class.tapestry-audio.php';
 require_once __DIR__ . '/classes/class.tapestry-form.php';
+require_once __DIR__ . '/classes/class.tapestry-h5p.php';
 require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -215,6 +216,13 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateUserH5PAudio',
         ]
     ],
+    'GET_ALL_H5P' => (object) [
+        'ROUTE' => '/h5p',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllH5P'
+        ]
+    ]
 ];
 
 /**
@@ -231,6 +239,16 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function getAllH5P()
+{
+    try {
+        $controller = new TapestryH5P();
+        return $controller->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 function gfGetForms()
