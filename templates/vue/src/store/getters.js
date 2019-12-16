@@ -46,7 +46,7 @@ const getAnswer = (answerType, entry) => {
 
 const parseText = entry => {
   const text = entry[1]
-  return `<div>${text.replace(/(?:\r\n|\r|\n)/g, "<br>")}</div>`
+  return text ? `<div>${text.replace(/(?:\r\n|\r|\n)/g, "<br>")}</div>` : ""
 }
 
 const parseAudio = entry => { return { id: entry } }
