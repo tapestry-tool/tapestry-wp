@@ -89,7 +89,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "lightbox"]),
+    ...mapGetters(["getParent", "selectedNode", "tapestry", "lightbox"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -121,6 +121,11 @@ export default {
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
+  },
+  watch: {
+    selectedNode() {
+      this.parentNode = this.getParent(this.selectedNode)
+    }
   },
   mounted() {
     // Set up event listeners to communicate with D3 elements

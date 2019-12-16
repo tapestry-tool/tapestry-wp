@@ -28,3 +28,10 @@ export function logs(state) {
 
   return [...completedContents, ...completedActivities]
 }
+
+export function getParent(state) {
+  return (id) => {
+    const link = state.links.find(l => l.target == id || l.target.id == id)
+    return link ? link.source : null
+  }
+}
