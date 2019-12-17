@@ -27,14 +27,14 @@
         <div class="button-container">
           <answer-button
             v-if="hasId('textId')"
-            :completed="!!question.entries.textId"
+            :completed="textFormCompleted"
             @click="openForm(question.answers.textId)"
           >
             text
           </answer-button>
           <answer-button
             v-if="hasId('audioId')"
-            :completed="!!question.entries.audioId"
+            :completed="audioRecorderCompleted"
             icon="microphone"
             @click="openRecorder(question.answers.audioId)"
           >
@@ -42,7 +42,7 @@
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
-            :completed="!!question.entries.checklistId"
+            :completed="checklistFormCompleted"
             icon="tasks"
             @click="openForm(question.answers.checklistId)"
           >
@@ -93,6 +93,15 @@ export default {
     loadingText() {
       return this.formOpened ? "Submitting..." : "Loading form..."
     },
+    textFormCompleted() {
+      return !!(this.question.entries && this.question.entries.textId)
+    },
+    checklistFormCompleted() {
+      return !!(this.question.entries && this.question.entries.checklistId)
+    },
+    audioRecorderCompleted() {
+      return !!(this.question.entries && this.question.entries.audioId)
+    }
   },
   methods: {
     openRecorder(id) {
