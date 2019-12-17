@@ -196,6 +196,18 @@ class Tapestry implements ITapestry
      */
     public function addLink($link)
     {
+        $controller = $this->getNode($link->source);
+        $parent = $controller->get();
+
+        $controller = $this->getNode($link->target);
+        $child = $controller->get();
+
+        $isValid = $this->validate($child->id, $child, $parent);
+
+        if (!$isValid) {
+            throw new TapestryError('INVALID_NODE_TYPE');
+        }
+
         array_push($this->links, $link);
         $this->_saveToDatabase();
         return $link;
@@ -267,28 +279,31 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
-    public function validate($nodeMetaId, $node)
+    public function validate($nodeMetaId, $node, $parent = null)
     {
         $type = $node->tydeType;
-        $parent;
+        $parentNode = $parent;
 
         if (!isset($type) || !is_string($type)) {
             return true; // for backwards compatibility
         }
 
-        foreach($this->links as $link) {
-            if ($link->target == $nodeMetaId) {
-                $node = new TapestryNode($this->postId, $link->source);
-                $parent = $node->get();
-                break;
+        // if parent is not passed, try to look for a parent
+        if (!isset($parentNode)) {
+            foreach($this->links as $link) {
+                if ($link->target == $nodeMetaId) {
+                    $node = new TapestryNode($this->postId, $link->source);
+                    $parentNode = $node->get();
+                    break;
+                }
             }
         }
 
-        if (!isset($parent)) {
+        if (!isset($parentNode)) {
             return $type == "Module" || $type == "Regular";
         }
 
-        $parentType = $parent->tydeType;
+        $parentType = $parentNode->tydeType;
         if ($parentType == "Module") {
             return $type == "Stage";
         } else if ($parentType == "Stage") {

@@ -492,8 +492,7 @@ function tapestryTool(config){
         }
     }
     
-    this.tapestryDeleteNode = function() {
-        var nodeId = root;
+    this.tapestryDeleteNode = function(nodeId = root) {
         if (nodeId === tapestry.dataset.rootId) {
             if (tapestry.dataset.nodes && tapestry.dataset.nodes.length > 1) {
                 alert("Root node can only be deleted if there are no other nodes in the tapestry.");

@@ -346,7 +346,7 @@ export default {
   computed: {
     tydeTypeOptions() {
       const options = Object.values(nodeTypes)
-      if (this.parent) {
+      /* if (this.parent) {
         if (this.parent.tydeType === nodeTypes.MODULE) {
           // if parent is a module, only allow stage nodes
           return [nodeTypes.STAGE]
@@ -357,7 +357,8 @@ export default {
       }
       return options.filter(
         opt => opt !== nodeTypes.STAGE && opt !== nodeTypes.QUESTION_SET
-      )
+      ) */
+      return options
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
