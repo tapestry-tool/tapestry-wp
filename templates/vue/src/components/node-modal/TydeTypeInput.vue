@@ -2,13 +2,18 @@
   <b-form-group label="TYDE Node Type">
     <b-form-select
       v-model="node.tydeType"
+      :disabled="showModuleWarning"
       :options="tydeTypeOptions"
     ></b-form-select>
+    <b-form-text v-if="showModuleWarning">
+      You cannot change the module type because the node still has stages as children.
+    </b-form-text>
   </b-form-group>
 </template>
 
 <script>
 import { nodeTypes } from "../../utils/constants"
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'tyde-type-input',
@@ -24,6 +29,10 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren"]),
+    hasChildren() {
+      return this.getDirectChildren(this.node.id).length > 0
+    },
     tydeTypeOptions() {
       const options = Object.values(nodeTypes)
       if (this.parent) {
@@ -35,10 +44,19 @@ export default {
           return [nodeTypes.QUESTION_SET]
         }
       }
-      return options.filter(
+      const normalOptions = options.filter(
         opt => opt !== nodeTypes.STAGE && opt !== nodeTypes.QUESTION_SET
       )
-    }
-  }
+
+      // if a module and has children, return only the module option.
+      if (this.hasChildren && this.node.tydeType === nodeTypes.MODULE) {
+        return [nodeTypes.MODULE]
+      }
+      return normalOptions
+    },
+    showModuleWarning() {
+      return this.hasChildren && this.node.tydeType === nodeTypes.MODULE
+    },
+  },
 }
 </script>

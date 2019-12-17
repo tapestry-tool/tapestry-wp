@@ -352,7 +352,7 @@ export default {
         if (!isRoot) {
           // Add link from parent node to this node
           const newLink = {
-            source: this.parentNode.id,
+            source: this.selectedNode.id,
             target: newNodeEntry.id,
             value: 1,
             type: "",
