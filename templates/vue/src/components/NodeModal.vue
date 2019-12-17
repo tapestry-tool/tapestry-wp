@@ -267,10 +267,12 @@
         v-show="modalType === 'edit-node'"
         size="sm"
         variant="danger"
+        :disabled="disableDeleteButton"
         @click="$emit('delete-node')"
       >
         Delete Node
       </b-button>
+      <p class="disable-message text-muted" v-if="disableDeleteButton">You cannot delete this node because this {{ node.tydeType }} node still has children.</p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
@@ -287,6 +289,7 @@ import Helpers from "../utils/Helpers"
 import { nodeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
+import { mapGetters } from 'vuex'
 
 export default {
   name: "node-modal",
@@ -341,6 +344,17 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren"]),
+    hasChildren() {
+      if (this.modalType === "edit-node") {
+        return this.getDirectChildren(this.node.id).length > 0
+      } else {
+        return false
+      }
+    },
+    disableDeleteButton() {
+      return (this.node.tydeType === nodeTypes.STAGE || this.node.tydeType === nodeTypes.MODULE) && this.hasChildren
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -600,6 +614,12 @@ table {
 </style>
 
 <style lang="scss" scoped>
+.disable-message {
+  font-size: 0.9em;
+  padding: 0;
+  margin: 0 0 0 8px;
+}
+
 .form-control {
   padding: 15px;
   border: none;
