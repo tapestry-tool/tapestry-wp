@@ -1,20 +1,18 @@
 <template>
   <li class="log">
     <div class="log-thumbnail">
-      <div v-if="log.imageURL" :class="log.type">
-        <img :src="log.imageURL" />
-        <i v-if="log.type === 'activity'" :class="`fas fa-${icon} icon-fa`"></i>
+      <div :class="log.type">
+        <img v-if="log.imageURL" :src="log.imageURL" class="log-thumbnail-image" />
+        <div v-else class="default"></div>
+        <tyde-icon v-if="log.type === 'activity'" :icon="icon" class="log-thumbnail-icon"></tyde-icon>
       </div>
-      <div v-else class="default"></div>
     </div>
     <div class="log-details">
-      <h1>{{log.title}}</h1>
+      <h1>{{ log.title }}</h1>
       <div v-if="log.type === 'content'">
         <p v-html="formatParagraph(log.description)" />
       </div>
-      <div v-else-if="log.type === 'activity'">
-        <audio-player v-if="log.audioSrc" :audioSrc="log.audioSrc" />
-      </div>
+      <tyde-activity v-else-if="log.type === 'activity'" :log="log" />
     </div>
     <div class="log-controls">
       <i :class="favoriteClass" @click="favorite = !favorite"></i>
@@ -24,11 +22,15 @@
 </template>
 
 <script>
-import TydeButton from "./TydeButton"
-import AudioPlayer from "@/components/AudioPlayer"
+import TydeActivity from "./TydeActivity"
+import TydeIcon from "./TydeIcon"
 
 export default {
   name: "tyde-log",
+  components: {
+    TydeActivity,
+    TydeIcon
+  },
   props: {
     log: {
       type: Object,
@@ -40,23 +42,19 @@ export default {
       favorite: false,
     }
   },
-  components: {
-    TydeButton,
-    AudioPlayer,
-  },
   computed: {
     favoriteClass() {
-      return this.favorite ? 'fas fa-heart fa-2x' : 'far fa-heart fa-2x'
+      return this.favorite ? "fas fa-heart fa-2x" : "far fa-heart fa-2x"
     },
     icon() {
-      return this.log.checklistId ? "tasks" : "microphone"
+      return this.log.checklist ? "checklist" : this.log.text ? "text" : "audio"
     },
   },
   methods: {
     formatParagraph(str) {
-      return str.replace(/(?:\r\n|\r|\n)/g, '<br>')
+      return str.replace(/(?:\r\n|\r|\n)/g, "<br>")
     },
-  }
+  },
 }
 </script>
 
@@ -83,20 +81,31 @@ export default {
       align-items: center;
       justify-content: center;
       position: relative;
-      > img {
-        filter: brightness(0.7) saturate(1.5);
-      }
-      > i {
-        font-size: 100px;
-        text-shadow: 2px 2px 100px #000;
-        position: absolute;
-        left: calc(50% - 35px);
-        top: calc(50% - 50px);
-      }
     }
     .default {
       height: 100%;
       background-color: gray;
+    }
+
+    &-image {
+      filter: brightness(0.7) saturate(1.5);
+    }
+
+    &-icon {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img.log-thumbnail-icon {
+      height: 100px;
+      width: auto;
+    }
+
+    i.log-thumbnail-icon {
+      font-size: 100px;
+      text-shadow: 2px 2px 100px #000;
     }
   }
 

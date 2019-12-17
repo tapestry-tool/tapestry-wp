@@ -264,7 +264,7 @@ export default {
       background: #eee;
       color: #333;
       padding: 1em;
-      
+
       .media-wrapper {
         height: 100%;
         overflow: scroll;
@@ -316,7 +316,7 @@ export default {
     &[format="h5p"] #spotlight-content {
       width: 100vw !important;
       height: 100vh !important;
-      
+
       iframe {
         position: absolute;
         top: 50%;
@@ -342,7 +342,7 @@ export default {
       height: 100vh !important;
       border-radius: 0;
     }
-    
+
     .close-btn {
       top: 0 !important;
       right: 0 !important;

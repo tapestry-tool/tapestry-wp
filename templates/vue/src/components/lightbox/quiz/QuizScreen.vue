@@ -73,9 +73,14 @@ export default {
   },
   methods: {
     ...mapActions(["completeQuestion"]),
-    async handleFormSubmit(questionId) {
+    async handleFormSubmit({ answerType, formId, questionId }) {
       this.submittingForm = true
-      await this.completeQuestion({ nodeId: this.node.id, questionId })
+      await this.completeQuestion({
+        nodeId: this.node.id,
+        answerType,
+        formId,
+        questionId,
+      })
       this.submittingForm = false
       this.formOpened = false
     },

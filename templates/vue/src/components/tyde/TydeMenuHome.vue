@@ -85,9 +85,9 @@ export default {
       immediate: true,
       handler(newLogs) {
         const promises = newLogs.map(log => {
-          if (log.audioId) {
+          if (log.audio && log.audio.id) {
             return new Promise(resolve => {
-              this.getAudioSrc(log.nodeId, log.audioId).then(audioSrc => {
+              this.getAudioSrc(log.nodeId, log.audio.id).then(audioSrc => {
                 resolve({ ...log, audioSrc })
               })
             })
@@ -106,7 +106,6 @@ export default {
 
 <style lang="scss" scoped>
 #tyde-menu-home {
-
   nav ul {
     display: flex;
     font-size: 16px;

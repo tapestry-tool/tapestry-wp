@@ -141,7 +141,7 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
-  
+
   video {
     position: absolute;
     left: 0;

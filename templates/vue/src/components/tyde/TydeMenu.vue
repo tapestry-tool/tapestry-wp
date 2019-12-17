@@ -17,10 +17,7 @@
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
     </div>
     <div class="continue">
-      <tyde-button
-        icon="arrow-right"
-        @click="$emit('continue')"
-      ></tyde-button>
+      <tyde-button icon="arrow-right" @click="$emit('continue')"></tyde-button>
     </div>
   </div>
 </template>
@@ -135,7 +132,7 @@ export default {
     bottom: 2em;
     right: 2em;
     z-index: 20;
-    
+
     tyde-button {
       width: 96px;
       height: 96px;
