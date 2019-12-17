@@ -1,22 +1,15 @@
 <template>
-  <div
-    class="question"
-    :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
-  >
+  <div class="question" :class="{'question-h5p':recorderOpened, 'question-gf':formOpened}">
     <gravity-form
       v-if="formOpened"
       :id="formId"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <iframe
+    <h5p-iframe
       v-else-if="recorderOpened"
-      ref="h5p"
-      allowfullscreen="false"
-      :src="h5pRecorderUrl"
-      frameBorder="0"
-      @load="handleLoad"
-    ></iframe>
+      :mediaURL="h5pRecorderUrl"
+    />
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
       <h1 class="question-title">
@@ -57,6 +50,7 @@ import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
+import H5PIframe from "../H5PIframe"
 
 export default {
   name: "question",
@@ -64,6 +58,7 @@ export default {
     AnswerButton,
     Loading,
     GravityForm,
+    'h5p-iframe': H5PIframe,
   },
   props: {
     question: {
@@ -97,13 +92,6 @@ export default {
         this.recorderOpened = true
         this.$emit("recorder-opened")
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
-      }
-    },
-    handleLoad() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const loadedH5pId = h5pObj.instances[0].contentId
-      if (loadedH5pId) {
-        this.$emit("h5p-recorder-saver-loaded", { loadedH5pId })
       }
     },
     async openForm(id) {
