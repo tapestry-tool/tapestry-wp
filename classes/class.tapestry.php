@@ -131,7 +131,7 @@ class Tapestry implements ITapestry
      * 
      * @return  Object  $node   Tapestry node
      */
-    public function addNode($node, $parentId)
+    public function addNode($node, $parentId = null)
     {
         $parent = null;
 

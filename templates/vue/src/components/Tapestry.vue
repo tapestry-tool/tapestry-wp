@@ -344,7 +344,7 @@ export default {
         // New node
         id = await this.addNode({
           newNode: newNodeEntry,
-          parentId: this.parentNode.id
+          parentId: this.parentNode && this.parentNode.id
         })
         newNodeEntry.id = id
         if (!isRoot) {
