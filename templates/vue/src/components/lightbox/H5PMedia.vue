@@ -3,10 +3,12 @@
     <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
     <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
+      ref="h5pIframe"
       :node="node"
       :width="width"
       :height="height"
       :settings="settings"
+      @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = true"
     />
   </div>
@@ -53,19 +55,11 @@ export default {
   methods: {
     rewatch() {
       this.showEndScreen = false
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const h5pVideo = h5pObj.instances[0].video
-      h5pVideo.seek(0)
-      h5pVideo.play()
+      this.$refs.h5pIframe.rewatch()
     },
     close() {
       this.showEndScreen = false
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const h5pVideo = h5pObj.instances[0].video
-      if (h5pVideo) {
-        h5pVideo.pause()
-      }
-      this.$emit("close")
+      this.$refs.h5pIframe.close()
     },
   },
 }

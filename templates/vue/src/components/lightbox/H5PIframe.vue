@@ -67,6 +67,20 @@ export default {
   },
   methods: {
     ...mapActions(["completeQuestion"]),
+    rewatch() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      h5pVideo.seek(0)
+      h5pVideo.play()
+    },
+    close() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      if (h5pVideo) {
+        h5pVideo.pause()
+      }
+      this.$emit("close")
+    },
     async h5pRecorderSaverIsLoaded() {
       if (this.loadedH5PRecorderId &&
         this.selectedNode.id &&
@@ -119,6 +133,8 @@ export default {
       })
     },
     handleLoad() {
+      this.$emit('is-loaded')
+
       $("iframe").each(function () {
         $(this)
           .data("ratio", this.height / this.width)
