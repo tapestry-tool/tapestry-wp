@@ -433,8 +433,13 @@ function updateTapestryNode($request)
         }
 
         $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
+        $isValid = $tapestry->validate($nodeMetaId, (object) $nodeData);
 
+        if (!$isValid) {
+            throw new TapestryError('INVALID_NODE_TYPE');
+        }
+
+        $node = $tapestry->getNode($nodeMetaId);
         $node->set((object) $nodeData);
         return $node->save();
     } catch (TapestryError $e) {

@@ -94,4 +94,12 @@ interface ITapestry
      * @return  Boolean true if there is no root node, false otherwise
      */
     public function isEmpty();
+
+    /**
+     * Ensures the node data is well formed. Checks against links to make sure
+     * the incoming type does not conflict with any parents.
+     * 
+     * @return  Boolean true if $node is valid
+     */
+    public function validate($nodeMetaId, $node);
 }

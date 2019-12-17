@@ -267,6 +267,41 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
+    public function validate($nodeMetaId, $node)
+    {
+        $type = $node->tydeType;
+        $parent;
+
+        if (!isset($type) || !is_string($type)) {
+            return true; // for backwards compatibility
+        }
+
+        foreach($this->links as $link) {
+            if ($link->target == $nodeMetaId) {
+                $node = new TapestryNode($this->postId, $link->source);
+                $parent = $node->get();
+                break;
+            }
+        }
+
+        if (!isset($parent)) {
+            return $type == "Module" || $type == "Regular";
+        }
+
+        $parentType = $parent->tydeType;
+        if ($parentType == "Module") {
+            return $type == "Stage";
+        } else if ($parentType == "Stage") {
+            return $type == "Question set";
+        } else if ($parentType == "Regular") {
+            return $type == "Module" || $type == "Regular";
+        } else {
+            // otherwise parent is a question set, so we shouldn't be able
+            // to get here in the first place.
+            return false;
+        }
+    }
+
     private function _loadFromDatabase()
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
