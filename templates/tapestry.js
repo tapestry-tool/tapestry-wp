@@ -1883,8 +1883,8 @@ function tapestryTool(config){
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
             var unlocked = progressObj[id].unlocked;
-            var completed = progressObj[id].completed;
             var quizCompletionInfo = progressObj[id].quiz;
+            var completed = progressObj[id].completed;
         
             var index = findNodeIndex(id);
             
@@ -1893,17 +1893,23 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
                 tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-                tapestry.dataset.nodes[index].completed = completed;
 
                 var questions = tapestry.dataset.nodes[index].quiz;
                 if (quizCompletionInfo) {
-                    Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
+                    Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
                         var question = questions.find(question => question.id === questionId);
                         if (question) {
-                            question.completed = isCompleted;
+                            question.completed = completionInfo.completed;
+                            question.entries = {};
+                            Object.entries(completionInfo).forEach(([key, value]) => {
+                                if (key !== "completed") {
+                                    question.entries[key] = value;
+                                }
+                            })
                         }
                     })
                 }
+                tapestry.dataset.nodes[index].completed = completed;
             }
         }
     
