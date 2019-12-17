@@ -1908,10 +1908,16 @@ function tapestryTool(config){
 
                 var questions = tapestry.dataset.nodes[index].quiz;
                 if (quizCompletionInfo) {
-                    Object.entries(quizCompletionInfo).forEach(([questionId, isCompleted]) => {
+                    Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
                         var question = questions.find(question => question.id === questionId);
                         if (question) {
-                            question.completed = isCompleted;
+                            question.completed = completionInfo.completed;
+                            question.entries = {};
+                            Object.entries(completionInfo).forEach(([key, value]) => {
+                                if (key !== "completed") {
+                                    question.entries[key] = value;
+                                }
+                            })
                         }
                     })
                 }

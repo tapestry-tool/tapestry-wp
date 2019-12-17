@@ -38,30 +38,30 @@ export default {
   margin-right: 16px;
   transition: all 0.2s ease;
 
-    &:last-child {
-        margin-right: 0;
-    }
+  &:last-child {
+    margin-right: 0;
+  }
 
-    &:before {
-        content: "";
-        position: absolute;
-        top: -7px;
-        left: -7px;
-        right: -7px;
-        bottom: -7px;
-        background: transparent;
-        border: 3px solid var(--tapestry-light-gray);
-        border-radius: 50%;
-    }
+  &:before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    right: -7px;
+    bottom: -7px;
+    background: transparent;
+    border: 3px solid var(--tapestry-light-gray);
+    border-radius: 50%;
+  }
 
-    &:focus {
-        outline: none;
-    }
+  &:focus {
+    outline: none;
+  }
 
-    &:hover {
-        background: var(--tapestry-light-blue);
-        color: white;
-        transform: scale(1.1);
-    }
+  &:hover {
+    background: var(--tapestry-light-blue);
+    color: white;
+    transform: scale(1.1);
+  }
 }
 </style>

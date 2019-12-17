@@ -1,6 +1,11 @@
 <template>
   <div>
-    <input type="image" id="tyde-backpack-icon" :src="backpackUrl" @click="toggleMenu"/>
+    <input
+      id="tyde-backpack-icon"
+      type="image"
+      :src="backpackUrl"
+      @click="toggleMenu"
+    />
     <tyde-menu
       v-if="isMenuOpen"
       @audio-change="toggleAudio"
@@ -30,7 +35,7 @@ export default {
       escMenuOpenListener: null,
     }
   },
-  mounted() {
+  async mounted() {
     this.escMenuOpenListener = window.addEventListener("keydown", evt => {
       if (evt.code === "Escape") {
         const { el } = this.lightbox
@@ -84,7 +89,6 @@ export default {
   },
 }
 </script>
-
 
 <style lang="scss" scoped>
 #tyde-backpack-icon {
