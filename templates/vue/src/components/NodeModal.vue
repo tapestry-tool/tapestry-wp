@@ -43,12 +43,7 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
-            <b-form-group label="TYDE Node Type">
-              <b-form-select
-                v-model="node.tydeType"
-                :options="tydeTypeOptions"
-              ></b-form-select>
-            </b-form-group>
+            <tyde-type-input :node="node" :parent="parent" />
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -291,11 +286,13 @@
 import Helpers from "../utils/Helpers"
 import { nodeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
+import TydeTypeInput from "./node-modal/TydeTypeInput"
 
 export default {
   name: "node-modal",
   components: {
     QuizModal,
+    TydeTypeInput
   },
   props: {
     node: {
@@ -344,21 +341,6 @@ export default {
     }
   },
   computed: {
-    tydeTypeOptions() {
-      const options = Object.values(nodeTypes)
-      if (this.parent) {
-        if (this.parent.tydeType === nodeTypes.MODULE) {
-          // if parent is a module, only allow stage nodes
-          return [nodeTypes.STAGE]
-        } else if (this.parent.tydeType === nodeTypes.STAGE) {
-          // if parent is a stage, only allow question sets
-          return [nodeTypes.QUESTION_SET]
-        }
-      }
-      return options.filter(
-        opt => opt !== nodeTypes.STAGE && opt !== nodeTypes.QUESTION_SET
-      )
-    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -424,7 +406,7 @@ export default {
   watch: {
     nodeImageUrl: function() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
-    },
+    }
   },
   mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
@@ -441,7 +423,7 @@ export default {
   methods: {
     setInitialTydeType() {
       // only set node types if adding a new node
-      if (this.parent) {
+      if (this.parent && (this.modalType === "add-new-node")) {
         const parentType = this.parent.tydeType
         this.node.tydeType = parentType === nodeTypes.MODULE
           ? nodeTypes.STAGE

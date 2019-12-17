@@ -182,6 +182,7 @@ export default {
     },
     addRootNode() {
       this.modalType = "add-root-node"
+      this.parentNode = null
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
@@ -193,6 +194,7 @@ export default {
     },
     editNode() {
       this.modalType = "edit-node"
+      this.parentNode = this.getParent(this.selectedNode.id)
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },
