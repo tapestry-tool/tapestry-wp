@@ -39,8 +39,8 @@ export default class {
    *
    * @return  {Object}
    */
-  async addNode(node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes`
+  async addNode(node, parentId) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes${parentId ? `?parent_id=${parentId}` : ''}`
     const response = await axios.post(url, node)
     return response
   }
@@ -115,10 +115,10 @@ export default class {
 
   /**
    * Upload audio to server
-   * 
+   *
    * @param   {Number}    nodeMetaId
    * @param   {String}    audio       base64 data string
-   * 
+   *
    * @return  {Object}
    */
   async uploadAudioToServer(nodeMetaId, audio) {
@@ -133,9 +133,9 @@ export default class {
 
   /**
    * Get audio from server
-   * 
+   *
    * @param   {Number}    nodeMetaId
-   * 
+   *
    * @return  {String}    audio       base64 data string
    */
   async getH5PAudioFromServer(nodeMetaId, h5pId) {
@@ -150,7 +150,7 @@ export default class {
 
   /**
    * Get H5P audio nodes that are recorded
-   * 
+   *
    * @return  {Array}    nodeIds       an array of node IDs
    */
   async getRecordedNodeIds() {

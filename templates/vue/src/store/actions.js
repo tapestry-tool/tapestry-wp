@@ -13,8 +13,8 @@ export async function updateH5pSettings({ commit }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit }, newNode) {
-  const response = await client.addNode(JSON.stringify(newNode))
+export async function addNode({ commit }, { newNode, parentId }) {
+  const response = await client.addNode(JSON.stringify(newNode), parentId)
 
   const nodeToAdd = { ...newNode }
   nodeToAdd.id = response.data.id

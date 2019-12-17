@@ -50,7 +50,7 @@ interface ITapestry
      * 
      * @return  Object  $node   Tapestry node
      */
-    public function addNode($node);
+    public function addNode($node, $parentId);
 
     /**
      * Add a new link
@@ -101,5 +101,7 @@ interface ITapestry
      * 
      * @return  Boolean true if $node is valid
      */
-    public function validate($nodeMetaId, $node);
+    public function validate($node, $parent);
+
+    public function getParent($nodeId);
 }

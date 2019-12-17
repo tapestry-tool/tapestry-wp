@@ -342,12 +342,15 @@ export default {
       let id
       if (!isEdit) {
         // New node
-        id = await this.addNode(newNodeEntry)
+        id = await this.addNode({
+          newNode: newNodeEntry,
+          parentId: this.parentNode.id
+        })
         newNodeEntry.id = id
         if (!isRoot) {
           // Add link from parent node to this node
           const newLink = {
-            source: this.selectedNode.id,
+            source: this.parentNode.id,
             target: newNodeEntry.id,
             value: 1,
             type: "",
