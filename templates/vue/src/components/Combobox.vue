@@ -98,6 +98,9 @@ export default {
       }
     },
   },
+  created() {
+    this.inputValue = this.text
+  },
   methods: {
     handleBlur() {
       this.isOpen = false
