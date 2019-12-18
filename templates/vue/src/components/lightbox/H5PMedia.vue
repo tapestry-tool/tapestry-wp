@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
     <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
       ref="h5pIframe"
@@ -19,13 +24,11 @@ import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import H5PIframe from "./H5PIframe"
 
-const ALLOW_SKIP_THRESHOLD = 0.95
-
 export default {
   name: "h5p-media",
   components: {
     EndScreen,
-    'h5p-iframe': H5PIframe,
+    "h5p-iframe": H5PIframe,
     Loading,
   },
   props: {
@@ -60,7 +63,7 @@ export default {
     close() {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
-      this.$emit('close')
+      this.$emit("close")
     },
   },
 }
