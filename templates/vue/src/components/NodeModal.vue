@@ -159,6 +159,11 @@
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.showInBackpack">
+                Show in backpack
+              </b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab
@@ -373,6 +378,7 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "showInBackpack", value: this.node.showInBackpack }
       ]
     },
     nodeImageUrl() {

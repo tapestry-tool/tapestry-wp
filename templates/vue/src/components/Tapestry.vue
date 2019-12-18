@@ -75,6 +75,7 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -162,6 +163,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -229,6 +231,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        showInBackpack: true,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -319,6 +322,8 @@ export default {
           case "quiz":
             newNodeEntry.quiz = fieldValue
             break
+          case "showInBackpack":
+            newNodeEntry.showInBackpack = fieldValue
           default:
             break
         }
