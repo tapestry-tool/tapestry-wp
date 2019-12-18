@@ -10,6 +10,11 @@ class TapestryForm implements ITapestryForm
     $this->postId = $postId;
   }
 
+  /**
+   * Returns the form object of all created forms
+   * 
+   * @return  Array
+   */
   public function getAll()
   {
     return GFAPI::get_forms();

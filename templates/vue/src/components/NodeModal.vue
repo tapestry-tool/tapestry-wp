@@ -95,17 +95,6 @@
                   </p>
                 </template>
               </combobox>
-              <!-- <b-form-select
-                id="all-h5p-contents"
-                :value="selectedH5PContent"
-                :options="h5pContents"
-              ></b-form-select> -->
-              <!-- <b-form-input
-                id="node-h5p-media-url"
-                v-model="node.typeData.mediaURL"
-                placeholder="Enter H5P Embed Link"
-                required
-              /> -->
             </b-form-group>
             <b-form-group
               v-show="nodeType === 'h5p'"

@@ -10,10 +10,15 @@ class TapestryH5P implements ITapestryH5P
     $this->postId = $postId;
   }
 
+  /**
+   * Returns the id and titles of all available h5p content
+   * 
+   * @return  Array   $content All available content 
+   */
   public function get()
   {
     global $wpdb;
-    $content = $wpdb->get_results("select id, title from wp_h5p_contents");
+    $content = $wpdb->get_results("select id, title from " . $wpdb->prefix . "h5p_contents");
     return $content;
   }
 }

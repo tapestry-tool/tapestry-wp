@@ -57,7 +57,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE'     => '/gf/forms',
         'ARGUMENTS' => [
             'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'gfGetForms'
+            'callback'  => 'getGfForms'
         ]
     ],
     'POST_TAPESTRY_GROUP' => (object) [
@@ -251,7 +251,7 @@ function getAllH5P()
     }
 }
 
-function gfGetForms()
+function getGfForms()
 {
     try {
         $tapestryForms = new TapestryForm();
