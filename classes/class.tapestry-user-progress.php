@@ -166,6 +166,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $formEntryMap->$formId = $entry;
             }
         }
+
         return $formEntryMap;
     }
 
@@ -243,6 +244,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $quiz[$question->id] = array(
                     'completed' => false
                 );
+
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
@@ -257,11 +259,13 @@ class TapestryUserProgress implements ITapestryUserProgress
                 }
             }
         }
+
         if (isset($completed_values) && is_array($completed_values)) {
             foreach ($completed_values as $id => $completed) {
                 $quiz[$id]['completed'] = $completed;
             }
         }
+
         return count($quiz) > 0 ? $quiz : (object) $quiz;
     }
 
