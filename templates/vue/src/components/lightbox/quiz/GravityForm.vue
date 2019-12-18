@@ -8,10 +8,6 @@ import axios from "axios"
 export default {
   name: "gravity-form",
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
     form: {
       type: String,
       required: true,
@@ -37,7 +33,6 @@ export default {
         })
         .then(response =>
           this.$emit("submit", {
-            id: this.id,
             success: this.isSubmitSuccessful(response),
             formData: data,
             response: response.data,

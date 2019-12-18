@@ -2,7 +2,6 @@
   <div class="question" :class="{'question-h5p':recorderOpened, 'question-gf':formOpened}">
     <gravity-form
       v-if="formOpened"
-      :id="formId"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
@@ -76,6 +75,7 @@ export default {
       formOpened: false,
       recorderOpened: false,
       formHtml: "",
+      formId: null,
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -119,9 +119,9 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, response }) {
+    handleFormSubmit({ success, response }) {
       if (!success) {
-        delete window[`gf_submitting_${id}`]
+        delete window[`gf_submitting_${this.formId}`]
         this.formHtml = response
         return
       }
