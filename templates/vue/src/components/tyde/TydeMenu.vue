@@ -68,6 +68,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap');
+
 #tyde-menu {
   width: 100vw;
   height: 100vh;
@@ -79,6 +81,10 @@ export default {
   color: white;
   z-index: 200;
   padding: 16px 80px;
+
+  * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
 
   .buttons {
     width: 100%;
