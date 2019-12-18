@@ -5,7 +5,6 @@
   >
     <gravity-form
       v-if="formOpened"
-      :id="formId"
       :entry="formEntry"
       :form="formHtml"
       @submit="handleFormSubmit"
@@ -82,6 +81,7 @@ export default {
       formHtml: "",
       formType: "",
       formEntry: null,
+      formId: null,
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -127,9 +127,9 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, response }) {
+    handleFormSubmit({ success, response }) {
       if (!success) {
-        delete window[`gf_submitting_${id}`]
+        delete window[`gf_submitting_${this.formId}`]
         this.formHtml = response
         return
       }

@@ -119,7 +119,6 @@ export default {
     },
   },
   mounted() {
-    // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)

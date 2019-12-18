@@ -71,6 +71,7 @@ function enqueue_vue_app_build()
             'nonce' => wp_create_nonce('wp_rest'),
             'gf_nonce' => wp_create_nonce('gf_api'),
             'wpUserId' => apply_filters('determine_current_user', false),
+            'adminAjaxUrl' => admin_url('admin-ajax.php')
         )
     );
 
