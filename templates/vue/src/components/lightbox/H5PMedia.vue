@@ -60,6 +60,7 @@ export default {
     close() {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
+      this.$emit('close')
     },
   },
 }

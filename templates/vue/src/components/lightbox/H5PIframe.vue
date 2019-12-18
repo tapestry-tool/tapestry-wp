@@ -79,7 +79,6 @@ export default {
       if (h5pVideo) {
         h5pVideo.pause()
       }
-      this.$emit("close")
     },
     async h5pRecorderSaverIsLoaded() {
       if (this.loadedH5PRecorderId &&

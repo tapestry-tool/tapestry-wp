@@ -1,7 +1,11 @@
 <template>
-  <div class="question" :class="{'question-h5p':recorderOpened, 'question-gf':formOpened}">
+  <div
+    class="question"
+    :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
+  >
     <gravity-form
       v-if="formOpened"
+      :entry="formEntry"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
@@ -19,7 +23,7 @@
         <div class="button-container">
           <answer-button
             v-if="hasId('textId')"
-            @click="openForm(question.answers.textId)"
+            @click="openForm(question.answers.textId, 'textId')"
           >
             text
           </answer-button>
@@ -33,7 +37,7 @@
           <answer-button
             v-if="hasId('checklistId')"
             icon="tasks"
-            @click="openForm(question.answers.checklistId)"
+            @click="openForm(question.answers.checklistId, 'checklistId')"
           >
             checklist
           </answer-button>
@@ -75,6 +79,8 @@ export default {
       formOpened: false,
       recorderOpened: false,
       formHtml: "",
+      formType: "",
+      formEntry: null,
       formId: null,
       loadingForm: false,
       h5pRecorderUrl: "",
@@ -94,7 +100,7 @@ export default {
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
-    async openForm(id) {
+    async openForm(id, answerType) {
       if (!id) {
         return
       }
@@ -103,6 +109,8 @@ export default {
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
       this.formId = id
+      this.formEntry = this.question.entries && this.question.entries[answerType]
+      this.formType = answerType
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -125,9 +133,12 @@ export default {
         this.formHtml = response
         return
       }
-      // TODO: Save form submission somehow
       this.formOpened = false
-      this.$emit("form-submitted", this.question.id)
+      this.$emit("form-submitted", {
+        questionId: this.question.id,
+        formId: this.formId,
+        answerType: this.formType,
+      })
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -149,6 +160,7 @@ export default {
 button {
   margin: auto;
 }
+
 .question {
   display: flex;
   flex-direction: column;

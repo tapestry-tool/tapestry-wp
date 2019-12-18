@@ -156,6 +156,7 @@ export default {
           id: Helpers.createUUID(),
           text: "",
           answers: { ...defaultQuestion.answers },
+          completed: false,
         },
       ]
     },
