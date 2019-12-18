@@ -145,13 +145,6 @@
                 required
               />
             </b-form-group>
-            <!-- <b-form-group>
-              <b-form-checkbox
-                value="false"
-                unchecked-value="true"
-                v-model="node.unlocked"
-              >Hide node until parent node is viewed</b-form-checkbox>
-            </b-form-group> -->
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">
                 Hide node title
@@ -195,11 +188,6 @@
                   <b-th>Read</b-th>
                   <b-th>Add</b-th>
                   <b-th>Edit</b-th>
-                  <!--
-                  <b-th>Add Submit</b-th>
-                  <b-th>Edit Submit</b-th>
-                  <b-th>Approve</b-th>
-                  -->
                 </b-tr>
               </b-thead>
               <b-tbody>
@@ -233,17 +221,6 @@
                       @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
-                  <!--
-                  <b-td>
-                    <b-form-checkbox value="add-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox value="edit-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox value="approve" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  -->
                 </b-tr>
                 <b-tr>
                   <b-td colspan="4">
