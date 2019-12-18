@@ -2,7 +2,7 @@
   <b-form-group label="TYDE Node Type">
     <b-form-select
       v-model="node.tydeType"
-      :disabled="showModuleWarning"
+      :disabled="disableSelect"
       :options="tydeTypeOptions"
     ></b-form-select>
     <b-form-text v-if="showModuleWarning">
@@ -57,6 +57,9 @@ export default {
     showModuleWarning() {
       return this.hasChildren && this.node.tydeType === nodeTypes.MODULE
     },
+    disableSelect() {
+      return this.tydeTypeOptions.length === 1
+    }
   },
 }
 </script>
