@@ -31,13 +31,14 @@ export default {
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover, &:active {
+    &:hover,
+    &:active {
       transform: scale(1.1);
       color: #11a6d8;
     }
-    
+
     > div {
-      text-align: center; 
+      text-align: center;
       font-size: 1.5em;
       padding-top: 10px;
     }

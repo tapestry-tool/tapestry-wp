@@ -151,7 +151,7 @@ export default {
       font-family: inherit;
       font-size: 2.5em;
       color: inherit;
-      
+
       &:hover {
         text-decoration: underline;
       }

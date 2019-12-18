@@ -5,16 +5,10 @@
     <div class="settings">
       <div class="setting">
         <h1>Music</h1>
-        <button
-          :class="{ 'active': settings.isAudioPlaying }"
-          @click="toggleAudio"
-        >
+        <button :class="{ active: settings.isAudioPlaying }" @click="toggleAudio">
           On
         </button>
-        <button
-          :class="{ 'active': !settings.isAudioPlaying }"
-          @click="toggleAudio"
-        >
+        <button :class="{ active: !settings.isAudioPlaying }" @click="toggleAudio">
           Off
         </button>
       </div>

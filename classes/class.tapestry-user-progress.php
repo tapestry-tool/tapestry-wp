@@ -135,6 +135,41 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
+    /**
+     * Get all gravity form entries submitted by this user
+     * 
+     * @return String user entries in json format
+     */
+    public function getUserEntries($formId = 0)
+    {
+        $search_criteria['field_filters'][] = array(
+            'key'   => 'created_by',
+            'value' => $this->_userId
+        );
+        $entries = GFAPI::get_entries($formId, $search_criteria);
+        return $this->_formatEntries($entries);
+    }
+
+    private function _formatEntries($entries)
+    {
+        $formEntryMap = new stdClass();
+
+        foreach ($entries as $entry) {
+            $formId = $entry["form_id"];
+
+            if (property_exists($formEntryMap, $formId)) {
+                $latestEntry = $formEntryMap->$formId;
+                if ($entry["date_updated"] > $latestEntry["date_updated"]) {
+                    $formEntryMap->$formId = $entry;
+                }
+            } else {
+                $formEntryMap->$formId = $entry;
+            }
+        }
+
+        return $formEntryMap;
+    }
+
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
@@ -192,6 +227,8 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->quiz = $quiz;
         }
 
+        $progress->entries = $this->getUserEntries();
+
         return json_encode($progress);
     }
 
@@ -200,17 +237,32 @@ class TapestryUserProgress implements ITapestryUserProgress
         $quiz = array();
         $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
 
+        $entries = $this->getUserEntries();
+
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
             foreach ($nodeMetadata->quiz as $question) {
-                if (isset($question->id)) {
-                    $quiz[$question->id] = false;
+                $quiz[$question->id] = array(
+                    'completed' => false
+                );
+
+                foreach ($question->answers as $type => $gfOrH5pId) {
+                    if ($gfOrH5pId !== "") {
+                        if ($type == 'audioId') {
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            if ($tapestryAudio->audioExists()) {
+                                $quiz[$question->id][$type] = $gfOrH5pId;
+                            }
+                        } else if (property_exists($entries, $gfOrH5pId)) {
+                            $quiz[$question->id][$type] = $entries->$gfOrH5pId;
+                        }
+                    }
                 }
             }
         }
 
         if (isset($completed_values) && is_array($completed_values)) {
             foreach ($completed_values as $id => $completed) {
-                $quiz[$id] = $completed;
+                $quiz[$id]['completed'] = $completed;
             }
         }
 

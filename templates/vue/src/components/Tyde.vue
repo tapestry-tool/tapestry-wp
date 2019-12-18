@@ -2,7 +2,7 @@
   <div id="tyde">
     <tapestry />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
-    <tyde-backpack />
+    <tyde-backpack @return-to-map="showModule = false" />
   </div>
 </template>
 

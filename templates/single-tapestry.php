@@ -67,7 +67,9 @@ function enqueue_vue_app_build()
                 'hide_empty' => true,
                 'fields' => 'names',
             )),
+            'gf_rest_url' => get_home_url() . '/gravityformsapi',
             'nonce' => wp_create_nonce('wp_rest'),
+            'gf_nonce' => wp_create_nonce('gf_api'),
             'wpUserId' => apply_filters('determine_current_user', false),
         )
     );

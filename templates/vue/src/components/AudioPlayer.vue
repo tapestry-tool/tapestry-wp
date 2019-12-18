@@ -1,5 +1,5 @@
 <template>
-  <audio controls v-bind:src="audioSrc"></audio>
+  <audio controls :src="audioSrc"></audio>
 </template>
 
 <script>
@@ -17,6 +17,5 @@ export default {
 <style lang="scss" scoped>
 audio {
   width: calc(100% - 30px);
-  margin-top: 35px;
 }
 </style>
