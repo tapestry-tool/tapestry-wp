@@ -153,8 +153,10 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _formatEntries($entries)
     {
         $formEntryMap = new stdClass();
+
         foreach ($entries as $entry) {
             $formId = $entry["form_id"];
+
             if (property_exists($formEntryMap, $formId)) {
                 $latestEntry = $formEntryMap->$formId;
                 if ($entry["date_updated"] > $latestEntry["date_updated"]) {
@@ -224,6 +226,8 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->quiz = $quiz;
         }
 
+        $progress->entries = $this->getUserEntries();
+
         return json_encode($progress);
     }
 
@@ -231,7 +235,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $quiz = array();
         $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
+
         $entries = $this->getUserEntries();
+
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
             foreach ($nodeMetadata->quiz as $question) {
                 $quiz[$question->id] = array(

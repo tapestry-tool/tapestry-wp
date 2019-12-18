@@ -5,18 +5,14 @@
   >
     <gravity-form
       v-if="formOpened"
-      :id="formId"
+      :entry="formEntry"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <iframe
+    <h5p-iframe
       v-else-if="recorderOpened"
-      ref="h5p"
-      allowfullscreen="false"
-      :src="h5pRecorderUrl"
-      frameBorder="0"
-      @load="handleLoad"
-    ></iframe>
+      :mediaURL="h5pRecorderUrl"
+    />
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
       <h1 class="question-title">
@@ -28,7 +24,7 @@
           <answer-button
             v-if="hasId('textId')"
             :completed="textFormCompleted"
-            @click="openForm(question.answers.textId)"
+            @click="openForm(question.answers.textId, 'textId')"
           >
             text
           </answer-button>
@@ -44,7 +40,7 @@
             v-if="hasId('checklistId')"
             :completed="checklistFormCompleted"
             icon="tasks"
-            @click="openForm(question.answers.checklistId)"
+            @click="openForm(question.answers.checklistId, 'checklistId')"
           >
             checklist
           </answer-button>
@@ -60,6 +56,7 @@ import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
 import Loading from "../../Loading"
 import TapestryAPI from "../../../services/TapestryAPI"
+import H5PIframe from "../H5PIframe"
 
 export default {
   name: "question",
@@ -67,6 +64,7 @@ export default {
     AnswerButton,
     Loading,
     GravityForm,
+    'h5p-iframe': H5PIframe,
   },
   props: {
     question: {
@@ -84,6 +82,9 @@ export default {
       formOpened: false,
       recorderOpened: false,
       formHtml: "",
+      formType: "",
+      formEntry: null,
+      formId: null,
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -111,14 +112,7 @@ export default {
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
-    handleLoad() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const loadedH5pId = h5pObj.instances[0].contentId
-      if (loadedH5pId) {
-        this.$emit("h5p-recorder-saver-loaded", { loadedH5pId })
-      }
-    },
-    async openForm(id) {
+    async openForm(id, answerType) {
       if (!id) {
         return
       }
@@ -127,6 +121,8 @@ export default {
       delete window[`gf_submitting_${id}`]
       this.formHtml = ""
       this.formId = id
+      this.formEntry = this.question.entries && this.question.entries[answerType]
+      this.formType = answerType
 
       const TapestryApi = new TapestryAPI(wpPostId)
       try {
@@ -143,15 +139,18 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, response }) {
+    handleFormSubmit({ success, response }) {
       if (!success) {
-        delete window[`gf_submitting_${id}`]
+        delete window[`gf_submitting_${this.formId}`]
         this.formHtml = response
         return
       }
-      // TODO: Save form submission somehow
       this.formOpened = false
-      this.$emit("form-submitted", this.question.id)
+      this.$emit("form-submitted", {
+        questionId: this.question.id,
+        formId: this.formId,
+        answerType: this.formType,
+      })
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -173,6 +172,7 @@ export default {
 button {
   margin: auto;
 }
+
 .question {
   display: flex;
   flex-direction: column;

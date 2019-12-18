@@ -36,6 +36,7 @@ const store = new Vuex.Store({
     },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
+    nodes: state => state.nodes,
     lightbox: state => ({
       id: state.lightboxId,
       isOpen: state.isLightboxOpen,

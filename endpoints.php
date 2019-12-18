@@ -11,6 +11,8 @@ require_once __DIR__ . '/classes/class.tapestry-node.php';
 require_once __DIR__ . '/classes/class.tapestry-group.php';
 require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 require_once __DIR__ . '/classes/class.tapestry-audio.php';
+require_once __DIR__ . '/classes/class.tapestry-form.php';
+require_once __DIR__ . '/classes/class.tapestry-h5p.php';
 require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -49,6 +51,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'   => $REST_API_GET_METHOD,
             'callback'  => 'getTapestry'
+        ]
+    ],
+    'GET_GF_FORMS'  => (object) [
+        'ROUTE'     => '/gf/forms',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getGfForms'
         ]
     ],
     'POST_TAPESTRY_GROUP' => (object) [
@@ -137,11 +146,17 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'GET_TAPESTRY_USER_PROGRESS' => (object) [
-
         'ROUTE'     => 'users/progress',
         'ARGUMENTS' => [
             'methods'               => $REST_API_GET_METHOD,
             'callback'              => 'getUserProgressByPostId',
+        ]
+    ],
+    'GET_TAPESTRY_USER_ENTRY'   => (object) [
+        'ROUTE'     => 'users/entries',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getUserEntry',
         ]
     ],
     'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
@@ -207,6 +222,13 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateUserH5PAudio',
         ]
     ],
+    'GET_ALL_H5P' => (object) [
+        'ROUTE' => '/h5p',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getAllH5P'
+        ]
+    ]
 ];
 
 /**
@@ -223,6 +245,26 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function getAllH5P()
+{
+    try {
+        $controller = new TapestryH5P();
+        return $controller->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getGfForms()
+{
+    try {
+        $tapestryForms = new TapestryForm();
+        return $tapestryForms->getAll();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 /**
@@ -739,6 +781,23 @@ function updateTapestryNodeCoordinates($request)
 
         $node->set((object) ['coordinates' => $coordinates]);
         return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * 
+ */
+function getUserEntry($request)
+{
+    $postId = $request['post_id'];
+    $nodeMetaId = $request['node_id'];
+    $formId = $request['form_id'];
+
+    try {
+        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
+        return $userProgress->getUserEntries($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

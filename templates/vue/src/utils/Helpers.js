@@ -72,4 +72,9 @@ export default class {
   static getImagePath(image) {
     return `${wpData.vue_uri}/${image.split("dist")[1]}`
   }
+
+  // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
+  static decodeHTMLChars(str) {
+    return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
+  }
 }
