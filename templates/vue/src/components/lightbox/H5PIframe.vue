@@ -127,7 +127,12 @@ export default {
     setQuestionCompleted() {
       this.selectedNode.quiz.forEach(async q => {
         if (q.answers && q.answers.audioId == this.loadedH5PRecorderId) {
-          await this.completeQuestion({ nodeId: this.selectedNode.id, questionId: q.id })
+          await this.completeQuestion({ 
+            nodeId: this.selectedNode.id,
+            questionId: q.id,
+            answerType: "audioId",
+            audioId: this.loadedH5PRecorderId
+          })
         }
       })
     },
