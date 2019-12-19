@@ -70,7 +70,7 @@ class TapestryNode implements ITapestryNode
         $this->skippable = true;
         $this->quiz = array();
         $this->fullscreen = false;
-        $this->tydeType = 'regular';
+        $this->tydeType = 'Regular';
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
