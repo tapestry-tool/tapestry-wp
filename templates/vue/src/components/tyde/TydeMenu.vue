@@ -4,6 +4,7 @@
       <tyde-button icon="cog" @click="setActivePage('settings')"></tyde-button>
       <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
       <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
+      <tyde-button class="close-button" icon="times" @click="$emit('continue')"></tyde-button>
     </div>
     <div class="content">
       <h1>Captain's Log</h1>
@@ -15,9 +16,6 @@
         @settings-change="updateSettings"
       />
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
-    </div>
-    <div class="continue">
-      <tyde-button icon="arrow-right" @click="$emit('continue')"></tyde-button>
     </div>
   </div>
 </template>
@@ -127,17 +125,9 @@ export default {
     }
   }
 
-  .continue {
-    position: fixed;
-    bottom: 2em;
-    right: 2em;
-    z-index: 20;
-
-    tyde-button {
-      width: 96px;
-      height: 96px;
-      font-size: 56px;
-    }
+  .close-button {
+    margin-left: auto;
+    z-index: 10;
   }
 }
 </style>
