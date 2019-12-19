@@ -61,7 +61,7 @@
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video URL"
+              :label="videoLabel"
             >
               <b-form-input
                 id="node-video-media-url"
@@ -69,6 +69,9 @@
                 placeholder="Enter URL for MP4 Video"
                 required
               />
+              <b-form-text v-if="showVideoDescription">
+                This video should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
@@ -342,6 +345,16 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren"]),
+    videoLabel() {
+      const labels = {
+        [nodeTypes.STAGE]: "Pre-stage video",
+        [nodeTypes.MODULE]: "Module completion video"
+      }
+      return labels[this.node.tydeType] || "Video URL"
+    },
+    showVideoDescription() {
+      return this.node.tydeType === nodeTypes.STAGE || this.node.tydeType === nodeTypes.MODULE
+    },
     hasChildren() {
       if (this.modalType === "edit-node") {
         return this.getDirectChildren(this.node.id).length > 0
