@@ -5,19 +5,36 @@ describe("Author side", () => {
     cy.login("admin")
   })
 
-  afterEach(() => {
+  /* afterEach(() => {
     cy.logout()
-  })
+  }) */
 
-  describe("General", () => {
+  describe("General", function() {
     it.only("Should be able to add a root node", () => {
       cy.server()
+      cy.fixture("node").as("nodeData")
+      cy.fixture("empty").as("emptyTapestry")
 
       // stub out the get request to tapestries
-      cy.route("GET", `${API_URL}/tapestries/*`, "fixture:empty.json")
+      cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
+      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
 
       cy.visitTapestry()
-      cy.wait(500)
+
+      // open add node modal
+      cy.get("#root-node-button > div").click()
+      cy.get("#node-modal-container").should("exist")
+
+      cy.get("@nodeData")
+        .then(data => {
+          cy.get("#node-title").type(data.title)
+          cy.get("#node-description").type(data.description)
+          cy.get("#node-media-type").select(data.mediaType)
+          cy.get("#node-text-content").type(data.typeData.textContent)
+          cy.contains("Submit").click()
+
+          cy.get(`#node-${data.id}`).should("exist")
+        })
     })
 
     it("Should be able to add multiple child nodes", () => {})
