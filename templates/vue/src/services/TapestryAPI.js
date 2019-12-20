@@ -133,13 +133,9 @@ export default class {
    * @return  {Object}
    */
   async uploadAudioToServer(nodeMetaId, audio) {
-    try {
-      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${audio.h5pId}`
-      const response = await axios.post(url, audio.blob)
-      return response
-    } catch (e) {
-      throw e
-    }
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${audio.h5pId}`
+    const response = await axios.post(url, audio.blob)
+    return response
   }
 
   /**
@@ -150,13 +146,9 @@ export default class {
    * @return  {String}    audio       base64 data string
    */
   async getH5PAudioFromServer(nodeMetaId, h5pId) {
-    try {
-      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${h5pId}`
-      const response = await axios.get(url)
-      return response.data
-    } catch (e) {
-      throw e
-    }
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${h5pId}`
+    const response = await axios.get(url)
+    return response.data
   }
 
   /**
@@ -165,13 +157,9 @@ export default class {
    * @return  {Array}    nodeIds       an array of node IDs
    */
   async getRecordedNodeIds() {
-    try {
-      const url = `${apiUrl}/tapestries/${this.postId}/recorded-audio-nodes`
-      const response = await axios.get(url)
-      return response.data
-    } catch (e) {
-      throw e
-    }
+    const url = `${apiUrl}/tapestries/${this.postId}/recorded-audio-nodes`
+    const response = await axios.get(url)
+    return response.data
   }
 
   async completeNode(nodeId) {
