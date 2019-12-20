@@ -24,10 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+import { getTapestryUrl } from "./utils"
+
 Cypress.Commands.add("visitTapestry", name => {
   return cy.visit(getTapestryUrl(name))
 })
-
-const SITE_URL = 'http://localhost:8888'
-
-const getTapestryUrl = name => `${SITE_URL}/tapestry/${name}`
