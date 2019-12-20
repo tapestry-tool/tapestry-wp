@@ -1,6 +1,25 @@
+import { API_URL } from "../support/utils"
+
 describe("Author side", () => {
+  beforeEach(() => {
+    cy.login("admin")
+  })
+
+  afterEach(() => {
+    cy.logout()
+  })
+
   describe("General", () => {
-    it("Should be able to add a root node", () => {})
+    it.only("Should be able to add a root node", () => {
+      cy.server()
+
+      // stub out the get request to tapestries
+      cy.route("GET", `${API_URL}/tapestries/*`, "fixture:empty.json")
+
+      cy.visitTapestry()
+      cy.wait(500)
+    })
+
     it("Should be able to add multiple child nodes", () => {})
     it("New nodes should be draggable and viewable", () => {})
     it("Should be able to delete a leaf node", () => {})

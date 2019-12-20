@@ -24,8 +24,30 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import { getTapestryUrl } from "./utils"
+import { getTapestryUrl, SITE_URL } from "./utils"
+import roles from "./roles"
 
-Cypress.Commands.add("visitTapestry", name => {
+Cypress.Commands.add("visitTapestry", (name = "test") => {
   return cy.visit(getTapestryUrl(name))
+})
+
+Cypress.Commands.add("login", role => {
+  const user = roles[role]
+  cy.visit(`${SITE_URL}/wp-admin/`)
+
+  cy.wait(100)
+  cy.get("#user_login").type(user.username)
+
+  cy.wait(100)
+  cy.get("#user_pass").type(user.password)
+
+  cy.get("#wp-submit").click()
+})
+
+Cypress.Commands.add("logout", () => {
+  cy.visit(`${SITE_URL}/wp-admin/`)
+
+  // force true is used because cypress does not have a way to
+  // simulate hover events.
+  cy.get("#wp-admin-bar-logout > a").click({ force: true })
 })
