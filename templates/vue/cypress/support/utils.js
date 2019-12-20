@@ -9,3 +9,5 @@ export const API_URL = `${SITE_URL}/wp-json/tapestry-tool/v1`
  * @param {string} name name of the tapestry
  */
 export const getTapestryUrl = name => `${SITE_URL}/tapestry/${name}`
+
+export const getStore = () => cy.window().its('app.$store')

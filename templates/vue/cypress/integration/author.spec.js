@@ -1,24 +1,21 @@
-import { API_URL } from "../support/utils"
+import { API_URL, getStore } from "../support/utils"
 
 describe("Author side", () => {
-  beforeEach(() => {
+  before(() => {
     cy.login("admin")
-  })
 
-  /* afterEach(() => {
-    cy.logout()
-  }) */
+    cy.server()
+    cy.fixture("node").as("nodeData")
+    cy.fixture("empty").as("emptyTapestry")
+
+    // stub out the get request to tapestries
+    cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
+    cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
+    cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
+  })
 
   describe("General", function() {
     it.only("Should be able to add a root node", () => {
-      cy.server()
-      cy.fixture("node").as("nodeData")
-      cy.fixture("empty").as("emptyTapestry")
-
-      // stub out the get request to tapestries
-      cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
-      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
-
       cy.visitTapestry()
 
       // open add node modal
@@ -34,6 +31,8 @@ describe("Author side", () => {
           cy.contains("Submit").click()
 
           cy.get(`#node-${data.id}`).should("exist")
+          getStore().its('state.nodes').should("have.length", 1)
+          getStore().its('state.nodes.0.id').should("equal", data.id)
         })
     })
 

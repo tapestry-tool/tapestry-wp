@@ -7,8 +7,13 @@ import "bootstrap-vue/dist/bootstrap-vue.css"
 
 Vue.use(BootstrapVue)
 
-new Vue({
+const app = new Vue({
   el: "#tapestry-container",
   store,
   render: h => h(App),
 })
+
+// expose app to allow testing of Vuex store
+if (window.Cypress) {
+  window.app = app
+}
