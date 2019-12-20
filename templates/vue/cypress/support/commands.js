@@ -27,10 +27,6 @@
 import { getTapestryUrl, SITE_URL } from "./utils"
 import roles from "./roles"
 
-Cypress.Commands.add("visitTapestry", (name = "test") => {
-  return cy.visit(getTapestryUrl(name))
-})
-
 Cypress.Commands.add("login", role => {
   const user = roles[role]
   cy.visit(`${SITE_URL}/wp-admin/`)

@@ -11,3 +11,7 @@ export const API_URL = `${SITE_URL}/wp-json/tapestry-tool/v1`
 export const getTapestryUrl = name => `${SITE_URL}/tapestry/${name}`
 
 export const getStore = () => cy.window().its('app.$store')
+
+export const visitTapestry = (name = "empty") => cy.visit(getTapestryUrl(name))
+
+export const setupTapestry = fixture => cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
