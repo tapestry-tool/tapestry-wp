@@ -1,4 +1,4 @@
-import { API_URL, getStore, visitTapestry, fillNodeForm, generateLink } from "../support/utils"
+import { API_URL, getStore, visitTapestry, fillNodeForm, generateLink, getByTestId } from "../support/utils"
 
 describe("Author side", () => {
   beforeEach(() => {
@@ -122,9 +122,45 @@ describe("Author side", () => {
 
   describe("Node appearance", () => {
     it("Should show a thumbnail if a thumbnail url is passed", () => {})
-    it("Should hide node title if its input is checked", () => {})
-    it("Should hide progress bar if its input is checked", () => {})
-    it("Should hide media button if its input is checked", () => {})
+
+    describe.only("Appearance options", () => {
+      beforeEach(() => {
+        cy.server()
+        cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+        visitTapestry()
+
+        cy.get("#editNodeIcon1").click()
+        cy.contains("Appearance").click()
+      })
+
+      const setup = (prop, testId) => {
+        cy.get("@nodeData")
+          .then(data => {
+            const copy = { ...data }
+            copy[prop] = true
+            cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
+            cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
+          })
+
+        getByTestId(testId).check({ force: true })
+        cy.contains("Submit").click()
+      }
+
+      it("Should hide node title", () => {
+        setup("hideTitle", "hide-title")
+        cy.get(".meta").should("not.exist")
+      })
+
+      it("Should hide progress bar", () => {
+        setup("hideProgress", "hide-progress-bar")
+        cy.get("#node-1 path").should("not.exist")
+      })
+
+      it("Should hide media button", () => {
+        setup("hideMedia", "hide-media")
+        cy.get("#mediaButton1").should("be.hidden")
+      })
+    })
   })
 
   describe("Node permissions", () => {

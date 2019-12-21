@@ -133,7 +133,7 @@
         <b-tab title="Appearance">
           <div id="modal-appearance">
             <b-form-group>
-              <b-form-checkbox v-model="addThumbnail">
+              <b-form-checkbox v-model="addThumbnail" data-testid="add-thumbnail">
                 Add a thumbnail
               </b-form-checkbox>
             </b-form-group>
@@ -142,21 +142,25 @@
                 id="node-image-url"
                 v-model="node.imageURL"
                 placeholder="Enter the URL for the thumbnail"
+                data-testid="add-thumbnail-input"
                 required
               />
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideTitle">
+              <b-form-checkbox v-model="node.hideTitle" data-testid="hide-title">
                 Hide node title
               </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideProgress">
+              <b-form-checkbox
+                v-model="node.hideProgress"
+                data-testid="hide-progress-bar"
+              >
                 Hide progress bar
               </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideMedia">
+              <b-form-checkbox v-model="node.hideMedia" data-testid="hide-media">
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
