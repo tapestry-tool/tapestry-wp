@@ -11,17 +11,20 @@ describe("Author side", () => {
   })
 
   describe("General", function() {
-    it("Should be able to add a root node", () => {
+    it.only("Should be able to add and move nodes", () => {
       cy.server()
 
       // stub out the get request to tapestries
       cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
-      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
-      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
 
       visitTapestry()
 
-      // open add node modal
+      /* --- Add root node --- */
+      // TODO: Abstract this to an addNode function
+
+      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
+      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
+
       cy.get("#root-node-button > div").click()
       cy.get("#node-modal-container").should("exist")
 
@@ -34,15 +37,9 @@ describe("Author side", () => {
           getStore().its('state.nodes').should("have.length", 1)
           getStore().its('state.nodes.0.id').should("equal", data.id)
         })
-    })
 
-    it.only("Should be able to add multiple child nodes", () => {
-      cy.fixture("tapestries/oneNode").as("singleTapestry")
-      cy.server()
-
-      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
-
-      visitTapestry()
+      /* --- Add child node --- */
+      // TODO: Refactor this to use addNode function above
 
       cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@textNodeOne")
       cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@textNodeOne")
@@ -68,9 +65,17 @@ describe("Author side", () => {
 
           getStore().its('state.links').should("have.length", 1)
         })
+
+      /* --- Move child node --- */
+      /* cy.get("@textNodeOne")
+        .then(data => {
+          cy.get(`#node-${data.id}`)
+            .trigger("mousedown", { which: 1 })
+            .trigger("mousemove", { clientX: 30, clientY: 100 })
+            .trigger("mouseup")
+        }) */
     })
 
-    it("New nodes should be draggable and viewable", () => {})
     it("Should be able to delete a leaf node", () => {})
     it("Should be able to delete a link if the nodes its connected to have at least one other link connected to it", () => {})
   })
