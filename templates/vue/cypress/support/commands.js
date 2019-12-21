@@ -24,17 +24,17 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import { getTapestryUrl, SITE_URL } from "./utils"
+import { SITE_URL } from "./utils"
 import roles from "./roles"
 
 Cypress.Commands.add("login", role => {
   const user = roles[role]
   cy.visit(`${SITE_URL}/wp-admin/`)
 
-  cy.wait(100)
+  cy.wait(200)
   cy.get("#user_login").type(user.username)
 
-  cy.wait(100)
+  cy.wait(200)
   cy.get("#user_pass").type(user.password)
 
   cy.get("#wp-submit").click()

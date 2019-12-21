@@ -1,35 +1,34 @@
-import { API_URL, getStore, visitTapestry } from "../support/utils"
+import { API_URL, getStore, visitTapestry, fillNodeForm, generateLink } from "../support/utils"
 
 describe("Author side", () => {
   beforeEach(() => {
     cy.login("admin")
 
-    cy.server()
-    cy.fixture("node").as("nodeData")
-    cy.fixture("empty").as("emptyTapestry")
+    cy.fixture("nodes/root").as("nodeData")
+    cy.fixture("nodes/text1").as("textNodeOne")
 
-    // stub out the get request to tapestries
-    cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
-    cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
-    cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
-
-    visitTapestry()
+    cy.fixture("tapestries/empty").as("emptyTapestry")
   })
 
   describe("General", function() {
     it("Should be able to add a root node", () => {
+      cy.server()
+
+      // stub out the get request to tapestries
+      cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
+      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
+      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
+
+      visitTapestry()
+
       // open add node modal
       cy.get("#root-node-button > div").click()
       cy.get("#node-modal-container").should("exist")
 
+      fillNodeForm("@nodeData")
+
       cy.get("@nodeData")
         .then(data => {
-          cy.get("#node-title").type(data.title)
-          cy.get("#node-description").type(data.description)
-          cy.get("#node-media-type").select(data.mediaType)
-          cy.get("#node-text-content").type(data.typeData.textContent)
-          cy.contains("Submit").click()
-
           cy.get("#node-modal-container").should("not.exist")
           cy.get(`#node-${data.id}`).should("exist")
           getStore().its('state.nodes').should("have.length", 1)
@@ -38,32 +37,36 @@ describe("Author side", () => {
     })
 
     it.only("Should be able to add multiple child nodes", () => {
-      cy.get("#root-node-button > div").click()
+      cy.fixture("tapestries/oneNode").as("singleTapestry")
+      cy.server()
 
-      cy.get("@nodeData")
-        .then(data => {
-          cy.get("#node-title").type(data.title)
-          cy.get("#node-description").type(data.description)
-          cy.get("#node-media-type").select(data.mediaType)
-          cy.get("#node-text-content").type(data.typeData.textContent)
-          cy.contains("Submit").click()
+      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+
+      visitTapestry()
+
+      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@textNodeOne")
+      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@textNodeOne")
+
+      getStore()
+        .its('state.nodes.0.id')
+        .then(id => {
+          cy.get("@textNodeOne")
+            .then(node => {
+              cy.route("POST", `${API_URL}/tapestries/**/links`, generateLink(id, node.id))
+            })
         })
 
       cy.get("#addNodeIcon1").click()
       cy.get("#node-modal-container").should("exist")
+      fillNodeForm("@textNodeOne")
 
-      cy.get("@nodeData")
+      cy.get("@textNodeOne")
         .then(data => {
-          data.id = 2
-          cy.get("#node-title").type(data.title)
-          cy.get("#node-description").type(data.description)
-          cy.get("#node-media-type").select(data.mediaType)
-          cy.get("#node-text-content").type(data.typeData.textContent)
-          cy.contains("Submit").click()
-
           cy.get(`#node-${data.id}`).should("exist")
           getStore().its('state.nodes').should("have.length", 2)
           getStore().its('state.nodes.1.id').should("equal", data.id)
+
+          getStore().its('state.links').should("have.length", 1)
         })
     })
 

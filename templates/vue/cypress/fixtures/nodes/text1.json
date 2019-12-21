@@ -1,0 +1,50 @@
+{
+  "id": 2,
+  "author": 1,
+  "type": "tapestry_node",
+  "size": "",
+  "title": "Text Node",
+  "status": "publish",
+  "imageURL": "",
+  "mediaType": "text",
+  "mediaFormat": "",
+  "unlocked": true,
+  "mediaDuration": 0,
+  "description": "I am a text node",
+  "behaviour": "embed",
+  "typeData": {
+    "linkMetadata": null,
+    "progress": [
+      {
+        "group": "viewed",
+        "value": 0
+      },
+      {
+        "group": "unviewed",
+        "value": 1
+      }
+    ],
+    "mediaURL": "",
+    "mediaWidth": 960,
+    "mediaHeight": 600,
+    "textContent": "abcd"
+  },
+  "coordinates": {
+    "x": 3000,
+    "y": 3000
+  },
+  "permissions": {
+    "public": [
+      "read"
+    ],
+    "authenticated": [
+      "read"
+    ]
+  },
+  "hideTitle": false,
+  "hideProgress": false,
+  "hideMedia": false,
+  "skippable": true,
+  "quiz": [],
+  "fullscreen": false
+}
