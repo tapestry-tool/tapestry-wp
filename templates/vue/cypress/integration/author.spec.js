@@ -81,7 +81,43 @@ describe("Author side", () => {
   })
 
   describe("Node content", () => {
-    it("Should be able to edit content fields and see the changes applied", () => {})
+    it("Should be able to edit content fields and see the changes applied", () => {
+      cy.server()
+      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+      visitTapestry()
+
+      const newText = "New edit!"
+
+      cy.get("#mediaButtonIcon1").click()
+      getStore()
+        .its("state.nodes.0")
+        .then(root => {
+          cy.contains(root.typeData.textContent).should("exist")
+          cy.get("#lightbox .close-btn").click()
+
+          const copy = { ...root }
+          copy.typeData = { textContent: newText }
+          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
+          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
+        })
+
+      cy.get("#editNodeIcon1").click()
+      cy.get("#node-modal-container").should("exist")
+
+      cy.get("#node-text-content").clear().type(newText)
+      cy.contains("Submit").click()
+      cy.get("#node-modal-container").should("not.exist")
+
+      // should update in vuex store
+      getStore()
+        .its("state.nodes.0")
+        .its("typeData")
+        .should("include", { textContent: newText })
+
+      // should update in lightbox
+      cy.get("#mediaButtonIcon1").click()
+      cy.contains(newText).should("exist")
+    })
   })
 
   describe("Node appearance", () => {
