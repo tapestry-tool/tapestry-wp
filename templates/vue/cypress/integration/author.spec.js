@@ -8,10 +8,11 @@ describe("Author side", () => {
     cy.fixture("nodes/text1").as("textNodeOne")
 
     cy.fixture("tapestries/empty").as("emptyTapestry")
+    cy.fixture("tapestries/oneNode").as("singleTapestry")
   })
 
   describe("General", function() {
-    it.only("Should be able to add and move nodes", () => {
+    it("Should be able to add and delete nodes", () => {
       cy.server()
 
       // stub out the get request to tapestries
@@ -66,18 +67,17 @@ describe("Author side", () => {
           getStore().its('state.links').should("have.length", 1)
         })
 
-      /* --- Move child node --- */
-      /* cy.get("@textNodeOne")
-        .then(data => {
-          cy.get(`#node-${data.id}`)
-            .trigger("mousedown", { which: 1 })
-            .trigger("mousemove", { clientX: 30, clientY: 100 })
-            .trigger("mouseup")
-        }) */
+      /* --- Delete leaf node --- */
+      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+      cy.route("DELETE", `${API_URL}/tapestries/**/nodes/*`, {})
+
+      cy.get("#node-2").click()
+      cy.get("#editNodeIcon2").click()
+      cy.contains("Delete Node").click()
+      getStore().its('state.nodes').should("have.length", 1)
     })
 
-    it("Should be able to delete a leaf node", () => {})
-    it("Should be able to delete a link if the nodes its connected to have at least one other link connected to it", () => {})
+    it.skip("Should be able to delete a link if the nodes its connected to have at least one other link connected to it", () => {})
   })
 
   describe("Node content", () => {
