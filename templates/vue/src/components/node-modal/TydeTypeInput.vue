@@ -6,27 +6,28 @@
       :options="tydeTypeOptions"
     ></b-form-select>
     <b-form-text v-if="showModuleWarning">
-      You cannot change the module type because the node still has stages as children.
+      You cannot change the module type because the node still has stages as
+      children.
     </b-form-text>
   </b-form-group>
 </template>
 
 <script>
 import { nodeTypes } from "../../utils/constants"
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex"
 
 export default {
-  name: 'tyde-type-input',
+  name: "tyde-type-input",
   props: {
     node: {
       type: Object,
-      required: true
+      required: true,
     },
     parent: {
       type: Object,
       required: false,
-      default: null
-    }
+      default: null,
+    },
   },
   computed: {
     ...mapGetters(["getDirectChildren"]),
@@ -59,7 +60,7 @@ export default {
     },
     disableSelect() {
       return this.tydeTypeOptions.length === 1
-    }
+    },
   },
 }
 </script>

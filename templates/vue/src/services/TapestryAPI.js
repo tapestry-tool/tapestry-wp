@@ -40,7 +40,9 @@ export default class {
    * @return  {Object}
    */
   async addNode(node, parentId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes${parentId ? `?parent_id=${parentId}` : ''}`
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes${
+      parentId ? `?parent_id=${parentId}` : ""
+    }`
     const response = await axios.post(url, node)
     return response
   }

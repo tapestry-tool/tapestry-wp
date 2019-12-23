@@ -4,7 +4,11 @@
       <div :class="log.type">
         <img v-if="log.imageURL" :src="log.imageURL" class="log-thumbnail-image" />
         <div v-else class="default"></div>
-        <tyde-icon v-if="log.type === 'activity'" :icon="icon" class="log-thumbnail-icon"></tyde-icon>
+        <tyde-icon
+          v-if="log.type === 'activity'"
+          :icon="icon"
+          class="log-thumbnail-icon"
+        ></tyde-icon>
       </div>
     </div>
     <div class="log-details">
@@ -29,7 +33,7 @@ export default {
   name: "tyde-log",
   components: {
     TydeActivity,
-    TydeIcon
+    TydeIcon,
   },
   props: {
     log: {

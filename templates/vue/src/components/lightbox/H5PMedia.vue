@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <end-screen :node="node" :show="showEndScreen" @rewatch="rewatch" @close="close" />
+    <end-screen
+      :node="node"
+      :show="showEndScreen"
+      @rewatch="rewatch"
+      @close="close"
+    />
     <h5p-iframe
       :node="node"
       :width="width"
@@ -21,7 +26,7 @@ export default {
   name: "h5p-media",
   components: {
     EndScreen,
-    'h5p-iframe': H5PIframe,
+    "h5p-iframe": H5PIframe,
   },
   props: {
     node: {

@@ -269,7 +269,10 @@
       >
         Delete Node
       </b-button>
-      <p class="disable-message text-muted" v-if="disableDeleteButton">You cannot delete this node because this {{ node.tydeType }} node still has children.</p>
+      <p v-if="disableDeleteButton" class="disable-message text-muted">
+        You cannot delete this node because this {{ node.tydeType }} node still has
+        children.
+      </p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
@@ -286,13 +289,13 @@ import Helpers from "../utils/Helpers"
 import { nodeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex"
 
 export default {
   name: "node-modal",
   components: {
     QuizModal,
-    TydeTypeInput
+    TydeTypeInput,
   },
   props: {
     node: {
@@ -303,7 +306,7 @@ export default {
     parent: {
       type: Object,
       required: false,
-      default: () => ({})
+      default: () => ({}),
     },
     modalType: {
       type: String,
@@ -350,7 +353,11 @@ export default {
       }
     },
     disableDeleteButton() {
-      return (this.node.tydeType === nodeTypes.STAGE || this.node.tydeType === nodeTypes.MODULE) && this.hasChildren
+      return (
+        (this.node.tydeType === nodeTypes.STAGE ||
+          this.node.tydeType === nodeTypes.MODULE) &&
+        this.hasChildren
+      )
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
@@ -396,7 +403,7 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
-        { name: "tydeType", value: this.node.tydeType }
+        { name: "tydeType", value: this.node.tydeType },
       ]
     },
     nodeImageUrl() {
@@ -417,7 +424,7 @@ export default {
   watch: {
     nodeImageUrl: function() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
-    }
+    },
   },
   mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
@@ -434,11 +441,12 @@ export default {
   methods: {
     setInitialTydeType() {
       // only set node types if adding a new node
-      if (this.parent && (this.modalType === "add-new-node")) {
+      if (this.parent && this.modalType === "add-new-node") {
         const parentType = this.parent.tydeType
-        this.node.tydeType = parentType === nodeTypes.MODULE
-          ? nodeTypes.STAGE
-          : parentType === nodeTypes.STAGE
+        this.node.tydeType =
+          parentType === nodeTypes.MODULE
+            ? nodeTypes.STAGE
+            : parentType === nodeTypes.STAGE
             ? nodeTypes.QUESTION_SET
             : nodeTypes.REGULAR
       }

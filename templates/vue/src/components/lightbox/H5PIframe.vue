@@ -3,7 +3,7 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="node.typeData && node.typeData.mediaURL || mediaURL"
+    :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
     :width="width"
     :height="height"
     @load="handleLoad"
@@ -22,12 +22,16 @@ export default {
     node: {
       type: Object,
       required: false,
-      default: () => { return {} }
+      default: () => {
+        return {}
+      },
     },
     settings: {
       type: Object,
       required: false,
-      default: () => { return {} }
+      default: () => {
+        return {}
+      },
     },
     width: {
       type: Number,
@@ -39,7 +43,14 @@ export default {
     },
     mediaURL: {
       type: String,
-      required: false
+      required: false,
+    },
+  },
+  data() {
+    return {
+      recordedNodeIds: [],
+      loadedH5PRecorderId: 0,
+      TapestryAPI: new TapestryApi(wpPostId),
     }
   },
   async mounted() {
@@ -50,27 +61,25 @@ export default {
   },
   beforeDestroy() {
     // Detach listener to event dispatched by H5P Audio Recorder lib
-    window.removeEventListener("tapestry-h5p-audio-recorder", this.saveH5PAudioToServer)
-  },
-  data() {
-    return {
-      recordedNodeIds: [],
-      loadedH5PRecorderId: 0,
-      TapestryAPI: new TapestryApi(wpPostId),
-    }
+    window.removeEventListener(
+      "tapestry-h5p-audio-recorder",
+      this.saveH5PAudioToServer
+    )
   },
   computed: {
     ...mapGetters(["selectedNode"]),
-    userLoggedIn: function () {
+    userLoggedIn: function() {
       return wpApiSettings && wpApiSettings.userLoggedIn === "true"
     },
   },
   methods: {
     ...mapActions(["completeQuestion"]),
     async h5pRecorderSaverIsLoaded() {
-      if (this.loadedH5PRecorderId &&
+      if (
+        this.loadedH5PRecorderId &&
         this.selectedNode.id &&
-        this.recordedNodeIds.includes(this.selectedNode.id)) {
+        this.recordedNodeIds.includes(this.selectedNode.id)
+      ) {
         await this.loadH5PAudio(this.selectedNode.id, this.loadedH5PRecorderId)
       }
     },
@@ -114,20 +123,23 @@ export default {
     setQuestionCompleted() {
       this.selectedNode.quiz.forEach(async q => {
         if (q.answers && q.answers.audioId == this.loadedH5PRecorderId) {
-          await this.completeQuestion({ nodeId: this.selectedNode.id, questionId: q.id })
+          await this.completeQuestion({
+            nodeId: this.selectedNode.id,
+            questionId: q.id,
+          })
         }
       })
     },
     handleLoad() {
-      $("iframe").each(function () {
+      $("iframe").each(function() {
         $(this)
           .data("ratio", this.height / this.width)
           // Remove the hardcoded width & height attributes
           .removeAttr("width")
           .removeAttr("height")
       })
-      const setIframeDimensions = function () {
-        $("iframe").each(function () {
+      const setIframeDimensions = function() {
+        $("iframe").each(function() {
           // Get the parent container's width
           var width = $(this)
             .parent()
@@ -162,7 +174,6 @@ export default {
 
       const mediaProgress = this.node.typeData.progress[0].value
 
-
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
         this.$emit("load", { el: h5pVideo })
@@ -192,7 +203,7 @@ export default {
                   }
 
                   if (amountViewed >= 1) {
-                    this.$emit('show-end-screen')
+                    this.$emit("show-end-screen")
                   }
                 } else {
                   clearInterval(updateVideoInterval)
@@ -220,7 +231,7 @@ export default {
                   h5pVideo.seek(viewedAmount)
                 }
                 if (viewedAmount === videoDuration) {
-                  this.$emit('show-end-screen')
+                  this.$emit("show-end-screen")
                 }
                 seeked = true
               }
@@ -279,9 +290,8 @@ export default {
         }, 1000)
       }
     },
-  }
+  },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

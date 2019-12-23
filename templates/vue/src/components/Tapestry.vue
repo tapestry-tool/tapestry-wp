@@ -35,11 +35,7 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox
-      v-if="lightbox.isOpen"
-      :node-id="lightbox.id"
-      @close="closeLightbox"
-    />
+    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -84,7 +80,7 @@ export default {
         },
         quiz: [],
         skippable: true,
-        tydeType: nodeTypes.REGULAR
+        tydeType: nodeTypes.REGULAR,
       },
     }
   },
@@ -125,7 +121,7 @@ export default {
   watch: {
     selectedNode() {
       this.parentNode = this.getParent(this.selectedNode)
-    }
+    },
   },
   mounted() {
     // Set up event listeners to communicate with D3 elements
@@ -145,7 +141,13 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions", "completeQuestion"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "completeQuestion",
+    ]),
     async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
@@ -177,7 +179,7 @@ export default {
         },
         description: "",
         quiz: [],
-        tydeType: nodeTypes.REGULAR
+        tydeType: nodeTypes.REGULAR,
       }
     },
     addRootNode() {
@@ -346,7 +348,7 @@ export default {
         // New node
         id = await this.addNode({
           newNode: newNodeEntry,
-          parentId: this.parentNode && this.parentNode.id
+          parentId: this.parentNode && this.parentNode.id,
         })
         newNodeEntry.id = id
         if (!isRoot) {

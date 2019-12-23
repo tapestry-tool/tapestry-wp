@@ -10,10 +10,7 @@
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <h5p-iframe
-      v-else-if="recorderOpened"
-      :mediaURL="h5pRecorderUrl"
-    />
+    <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
       <speech-bubble class="question-title">
@@ -67,7 +64,7 @@ export default {
     SpeechBubble,
     Loading,
     GravityForm,
-    'h5p-iframe': H5PIframe,
+    "h5p-iframe": H5PIframe,
   },
   props: {
     question: {
