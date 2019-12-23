@@ -34,11 +34,7 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox
-      v-if="lightbox.isOpen"
-      :node-id="lightbox.id"
-      @close="closeLightbox"
-    />
+    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
