@@ -206,6 +206,7 @@
                       v-model="node.permissions[rowName]"
                       value="read"
                       :disabled="isPermissionDisabled(rowName, 'read')"
+                      :data-testid="`${rowName}-read`"
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
@@ -214,6 +215,7 @@
                       v-model="node.permissions[rowName]"
                       value="add"
                       :disabled="isPermissionDisabled(rowName, 'add')"
+                      :data-testid="`${rowName}-add`"
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
@@ -222,6 +224,7 @@
                       v-model="node.permissions[rowName]"
                       value="edit"
                       :disabled="isPermissionDisabled(rowName, 'edit')"
+                      :data-testid="`${rowName}-edit`"
                       @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>

@@ -164,8 +164,38 @@ describe("Author side", () => {
   })
 
   describe("Node permissions", () => {
-    it("Should hide node and associated links if user does not have read access", () => {})
-    it("Should hide edit button if user does not have write access", () => {})
+    it.only("Should hide node and associated links if user does not have read access", () => {
+      cy.server()
+      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+      visitTapestry()
+
+      getStore()
+        .its('state.nodes.0')
+        .then(node => {
+          const copy = { ...node }
+          copy.permissions = {
+            public: [],
+            authenticated: []
+          }
+          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
+          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
+        })
+
+      cy.get("#editNodeIcon1").click()
+      cy.contains("Permissions").click()
+      getByTestId("public-read").uncheck({ force: true })
+      cy.contains("Submit").click()
+    })
+
+    it("Should hide edit button if user does not have write access", () => {
+      cy.server()
+      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
+      visitTapestry()
+
+      cy.get("#editNodeIcon1").click()
+      cy.contains("Permissions").click()
+    })
+
     it("Should hide add button if user does not have add access", () => {})
   })
 })
