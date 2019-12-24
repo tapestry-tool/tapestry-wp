@@ -400,6 +400,9 @@ export default {
     nodeImageUrl: function() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
+    selectedH5pContent() {
+      this.node.typeData.mediaURL = this.getMediaUrl()
+    },
   },
   async mounted() {
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
