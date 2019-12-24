@@ -118,7 +118,14 @@
                 item-value="id"
                 empty-message="There are no forms available. Please add one in your WP dashboard."
                 :options="gravityFormOptions"
-              ></combobox>
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'url-embed'"
@@ -403,6 +410,9 @@ export default {
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
     },
+    selectedGravityFormContent(id) {
+      this.node.typeData.mediaURL = id
+    },
   },
   async mounted() {
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
@@ -417,6 +427,12 @@ export default {
         const selectedContent = this.h5pContentOptions.find(content =>
           this.filterContent(content)
         )
+        if (this.node.mediaType === "gravity-form") {
+          const selectedForm = this.gravityFormOptions.find(form => {
+            return form.id === this.node.typeData.mediaURL
+          })
+          this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
+        }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
       }
     })
