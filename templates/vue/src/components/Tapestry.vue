@@ -270,6 +270,9 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
+            } else {
+              newNodeEntry.mediaType = "gravity-form"
+              newNodeEntry.mediaFormat = "embed"
             }
             break
           case "textContent":

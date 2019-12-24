@@ -109,6 +109,18 @@
               />
             </b-form-group>
             <b-form-group
+              v-show="node.mediaType === 'gravity-form'"
+              label="Gravity Form"
+            >
+              <combobox
+                v-model="selectedGravityFormContent"
+                item-text="title"
+                item-value="id"
+                empty-message="There are no forms available. Please add one in your WP dashboard."
+                :options="gravityFormOptions"
+              ></combobox>
+            </b-form-group>
+            <b-form-group
               v-show="node.mediaType === 'url-embed'"
               label="External Link"
             >
@@ -268,6 +280,7 @@ import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
+import GravityFormsApi from "../services/GravityFormsApi"
 
 export default {
   name: "node-modal",
@@ -310,8 +323,11 @@ export default {
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
+        { value: "gravity-form", text: "Gravity Form" },
       ],
+      gravityFormOptions: [],
       h5pContentOptions: [],
+      selectedGravityFormContent: "",
       selectedH5pContent: "",
       formErrors: "",
       maxDescriptionLength: 250,
@@ -386,6 +402,7 @@ export default {
     },
   },
   async mounted() {
+    this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
