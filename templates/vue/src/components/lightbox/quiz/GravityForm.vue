@@ -1,24 +1,49 @@
 <template>
-  <div ref="formContainer" @submit="handleSubmit" v-html="form"></div>
+  <loading v-if="loading" label="Loading form..." />
+  <div v-else ref="formContainer" @submit="handleSubmit" v-html="html"></div>
 </template>
 
 <script>
 import axios from "axios"
+import Loading from "@/components/Loading"
+import GravityFormsApi from "@/services/GravityFormsApi"
 
 export default {
   name: "gravity-form",
+  components: {
+    Loading,
+  },
   props: {
-    form: {
+    id: {
       type: String,
       required: true,
     },
-    entry: {
-      type: Object,
-      required: false,
-      default: null,
+    type: {
+      type: String,
+      required: true,
     },
   },
-  mounted() {
+  data() {
+    return {
+      html: "",
+      loading: true,
+    }
+  },
+  watch: {
+    id(newId) {
+      GravityFormsApi.getFormHtml(newId).then(html => (this.html = html))
+    },
+    entry() {
+      this.populateForm()
+    },
+  },
+  async mounted() {
+    delete window[`gf_submitting_${this.id}`]
+
+    const html = await GravityFormsApi.getFormHtml(this.id)
+    this.html = html
+    this.loading = false
+
     if (this.entry) {
       this.populateForm()
     }

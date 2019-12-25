@@ -5,12 +5,11 @@
   >
     <gravity-form
       v-if="formOpened"
-      :entry="formEntry"
-      :form="formHtml"
+      :id="formId"
+      :type="formType"
       @submit="handleFormSubmit"
     ></gravity-form>
     <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
-    <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
       <h1 class="question-title">
         {{ question.text }}
@@ -48,15 +47,12 @@
 import { mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
-import Loading from "../../Loading"
-import TapestryAPI from "../../../services/TapestryAPI"
 import H5PIframe from "../H5PIframe"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    Loading,
     GravityForm,
     "h5p-iframe": H5PIframe,
   },
@@ -74,12 +70,9 @@ export default {
   data() {
     return {
       formOpened: false,
-      recorderOpened: false,
-      formHtml: "",
-      formType: "",
-      formEntry: null,
       formId: null,
-      loadingForm: false,
+      formType: "",
+      recorderOpened: false,
       h5pRecorderUrl: "",
     }
   },
@@ -97,32 +90,10 @@ export default {
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
-    async openForm(id, answerType) {
-      if (!id) {
-        return
-      }
-
-      // Clear previous form data
-      delete window[`gf_submitting_${id}`]
-      this.formHtml = ""
+    openForm(id, answerType) {
       this.formId = id
-      this.formEntry = this.question.entries && this.question.entries[answerType]
       this.formType = answerType
-
-      const TapestryApi = new TapestryAPI(wpPostId)
-      try {
-        this.loadingForm = true
-        const response = await TapestryApi.getGravityForm(id)
-        this.loadingForm = false
-        if (response) {
-          this.formHtml = response.data
-          this.formOpened = true
-          this.$emit("form-opened")
-        }
-      } catch (e) {
-        this.loadingForm = false
-        console.error(e)
-      }
+      this.formOpened = true
     },
     handleFormSubmit({ success, response }) {
       if (!success) {
