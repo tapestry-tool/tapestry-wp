@@ -47,7 +47,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
-import GravityForm from "./GravityForm"
+import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
 
