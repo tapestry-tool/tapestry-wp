@@ -19,4 +19,20 @@ class TapestryForm implements ITapestryForm
   {
     return GFAPI::get_forms();
   }
+
+  /**
+   * Get the latest entry for the given form id for
+   * the current logged in user.
+   * 
+   * @return Object the corresponding entry
+   */
+  public function getEntry($formId)
+  {
+    $userId = apply_filters('determine_current_user', false);
+    $search_criteria['field_filters'][] = array(
+      'key'   => 'created_by',
+      'value' => $userId
+    );
+    return GFAPI::get_entries($formId, $search_criteria);
+  }
 }

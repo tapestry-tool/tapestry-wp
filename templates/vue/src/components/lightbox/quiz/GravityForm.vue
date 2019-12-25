@@ -1,6 +1,13 @@
 <template>
-  <loading v-if="loading" label="Loading form..." />
-  <div v-else ref="formContainer" @submit="handleSubmit" v-html="html"></div>
+  <div>
+    <loading v-show="loading" label="Loading form..." />
+    <div
+      v-show="!loading"
+      ref="formContainer"
+      @submit="handleSubmit"
+      v-html="html"
+    ></div>
+  </div>
 </template>
 
 <script>
@@ -25,6 +32,7 @@ export default {
   },
   data() {
     return {
+      entry: null,
       html: "",
       loading: true,
     }
@@ -33,15 +41,16 @@ export default {
     id(newId) {
       GravityFormsApi.getFormHtml(newId).then(html => (this.html = html))
     },
-    entry() {
-      this.populateForm()
-    },
   },
   async mounted() {
     delete window[`gf_submitting_${this.id}`]
 
     const html = await GravityFormsApi.getFormHtml(this.id)
     this.html = html
+
+    const entry = await GravityFormsApi.getFormEntry(this.id)
+    this.entry = entry
+
     this.loading = false
 
     if (this.entry) {
