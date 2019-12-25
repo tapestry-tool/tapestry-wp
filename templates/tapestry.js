@@ -2213,6 +2213,10 @@ function getIconClass(mediaType, action) {
             classStr = classStrStart + 'play fa-text';
             break;
 
+        case "gravity-form":
+            classStr = classStrStart + 'tasks';
+            break;
+
         case "url-embed":
             classStr = classStrStart + 'window-maximize';
             break;
