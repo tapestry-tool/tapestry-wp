@@ -9,6 +9,7 @@
       :type="formType"
       @submit="handleFormSubmit"
     ></gravity-form>
+    <loading v-if="loading" label="Submitting..." />
     <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
     <div v-if="!formOpened && !recorderOpened">
       <h1 class="question-title">
@@ -44,9 +45,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "./GravityForm"
+import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
 
 export default {
@@ -54,6 +56,7 @@ export default {
   components: {
     AnswerButton,
     GravityForm,
+    Loading,
     "h5p-iframe": H5PIframe,
   },
   props: {
@@ -74,15 +77,14 @@ export default {
       formType: "",
       recorderOpened: false,
       h5pRecorderUrl: "",
+      loading: false,
     }
   },
   computed: {
     ...mapGetters(["selectedNode"]),
-    loadingText() {
-      return this.formOpened ? "Submitting..." : "Loading form..."
-    },
   },
   methods: {
+    ...mapActions(["completeQuestion"]),
     openRecorder(id) {
       if (id) {
         this.recorderOpened = true
@@ -95,18 +97,16 @@ export default {
       this.formType = answerType
       this.formOpened = true
     },
-    handleFormSubmit({ success, response }) {
-      if (!success) {
-        delete window[`gf_submitting_${this.formId}`]
-        this.formHtml = response
-        return
-      }
+    async handleFormSubmit() {
       this.formOpened = false
-      this.$emit("form-submitted", {
-        questionId: this.question.id,
-        formId: this.formId,
+      this.loading = true
+      await this.completeQuestion({
+        nodeId: this.selectedNode.id,
         answerType: this.formType,
+        formId: this.formId,
+        questionId: this.question.id,
       })
+      this.loading = false
     },
     hasId(label) {
       const id = this.question.answers[label]

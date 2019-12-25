@@ -70,13 +70,18 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then(response =>
-          this.$emit("submit", {
-            success: this.isSubmitSuccessful(response),
-            response: response.data,
-            formId,
-          })
-        )
+        .then(response => {
+          if (!this.isSubmitSuccessful(response)) {
+            delete window[`gf_submitting_${this.id}`]
+            this.html = response.data
+          } else {
+            this.$emit("submit", {
+              success: this.isSubmitSuccessful(response),
+              response: response.data,
+              formId,
+            })
+          }
+        })
     },
     isSubmitSuccessful(response) {
       return response.data.includes("gform_confirmation_message")
