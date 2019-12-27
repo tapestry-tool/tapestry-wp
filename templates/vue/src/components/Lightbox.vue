@@ -56,10 +56,11 @@
             @close="$emit('close')"
           />
           <gravity-form
-            v-if="node.mediaType === 'gravity-form'"
+            v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
             :id="node.typeData.mediaURL"
-            @submit="complete"
+            @submit="handleFormSubmit"
           ></gravity-form>
+          <completion-screen v-if="showCompletionScreen" />
         </div>
       </div>
     </transition>
@@ -73,6 +74,7 @@ import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
 import Helpers from "../utils/Helpers"
+import CompletionScreen from "./lightbox/quiz/CompletionScreen"
 import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
 
 const SAVE_INTERVAL = 5
@@ -80,6 +82,7 @@ const SAVE_INTERVAL = 5
 export default {
   name: "lightbox",
   components: {
+    CompletionScreen,
     VideoMedia,
     TextMedia,
     ExternalMedia,
@@ -100,6 +103,7 @@ export default {
         left: 50,
       },
       timeSinceLastSaved: new Date(),
+      showCompletionScreen: false,
     }
   },
   computed: {
@@ -187,6 +191,10 @@ export default {
   methods: {
     ...mapMutations(["setLightboxEl"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleFormSubmit() {
+      this.showCompletionScreen = true
+      this.complete()
+    },
     handleLoad({ width, height, el }) {
       if (width && height) {
         this.updateDimensions({ width, height })
