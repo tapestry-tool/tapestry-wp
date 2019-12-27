@@ -3,7 +3,16 @@
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <completion-screen v-if="showCompletionScreen" />
+    <completion-screen v-if="showCompletionScreen">
+      <button v-if="hasNext" class="button-completion" @click="next">
+        <i class="fas fa-arrow-circle-right fa-4x"></i>
+        <p>Next question</p>
+      </button>
+      <button v-else class="button-completion" @click="$emit('close', true)">
+        <i class="far fa-times-circle fa-4x"></i>
+        <p>Done</p>
+      </button>
+    </completion-screen>
     <question
       v-else
       :question="activeQuestion"
@@ -11,7 +20,10 @@
       @recorder-opened="recorderOpened = true"
       @submit="showCompletionScreen = true"
     ></question>
-    <footer v-if="!formOpened && !recorderOpened" class="question-footer">
+    <footer
+      v-if="!formOpened && !recorderOpened && !showCompletionScreen"
+      class="question-footer"
+    >
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -66,9 +78,11 @@ export default {
   },
   methods: {
     next() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex++
     },
     prev() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex--
     },
     back() {
@@ -101,6 +115,31 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.button-completion {
+  background: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: inherit;
+  margin-right: 3em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    color: #11a6d8;
+  }
+
+  p {
+    margin: 1em auto 0;
+    padding: 0;
+    font-weight: 600;
+  }
 }
 
 .button-nav {
