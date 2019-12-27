@@ -3,14 +3,18 @@
     class="question"
     :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
   >
+    <loading v-if="loading" label="Submitting..." />
     <gravity-form
       v-if="formOpened"
       :id="formId"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <loading v-if="loading" label="Submitting..." />
-    <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
-    <div v-if="!formOpened && !recorderOpened">
+    <h5p-iframe
+      v-else-if="recorderOpened"
+      :media-u-r-l="h5pRecorderUrl"
+      @submit="$emit('submit')"
+    />
+    <div v-else>
       <h1 class="question-title">
         {{ question.text }}
       </h1>
@@ -63,11 +67,6 @@ export default {
       type: Object,
       required: true,
     },
-    currentStep: {
-      type: String,
-      required: false,
-      default: "1/1",
-    },
   },
   data() {
     return {
@@ -106,6 +105,7 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
+      this.$emit("submit")
     },
     hasId(label) {
       const id = this.question.answers[label]

@@ -1,5 +1,5 @@
 <template>
-  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" />
+  <quiz-screen v-if="showQuiz" :node="node" @close="handleClose" />
   <div
     v-else
     :class="[
@@ -55,6 +55,14 @@ export default {
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Retake Quiz" : "Take Quiz"
+    },
+  },
+  methods: {
+    handleClose(closeLightbox = false) {
+      this.showQuiz = false
+      if (closeLightbox) {
+        this.$emit("close")
+      }
     },
   },
 }
