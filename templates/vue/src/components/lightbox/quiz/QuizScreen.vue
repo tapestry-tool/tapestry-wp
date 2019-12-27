@@ -7,7 +7,6 @@
     <question
       v-else
       :question="activeQuestion"
-      :current-step="currentQuestionText"
       @form-opened="formOpened = true"
       @recorder-opened="recorderOpened = true"
       @submit="showCompletionScreen = true"
