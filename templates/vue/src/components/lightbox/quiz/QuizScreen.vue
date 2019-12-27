@@ -3,11 +3,14 @@
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
+    <completion-screen v-if="showCompletionScreen" />
     <question
+      v-else
       :question="activeQuestion"
       :current-step="currentQuestionText"
       @form-opened="formOpened = true"
       @recorder-opened="recorderOpened = true"
+      @submit="showCompletionScreen = true"
     ></question>
     <footer v-if="!formOpened && !recorderOpened" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
@@ -23,10 +26,12 @@
 
 <script>
 import Question from "./Question"
+import CompletionScreen from "./CompletionScreen"
 
 export default {
   name: "quiz-screen",
   components: {
+    CompletionScreen,
     Question,
   },
   props: {
@@ -40,6 +45,7 @@ export default {
       activeQuestionIndex: 0,
       formOpened: false,
       recorderOpened: false,
+      showCompletionScreen: false,
     }
   },
   computed: {

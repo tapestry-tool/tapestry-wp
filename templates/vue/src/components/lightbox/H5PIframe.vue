@@ -127,6 +127,7 @@ export default {
           }
           await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
           this.setQuestionCompleted()
+          this.$emit("submit")
           this.recordedNodeIds.push(this.selectedNode.id)
         } catch (e) {
           console.error(e)
