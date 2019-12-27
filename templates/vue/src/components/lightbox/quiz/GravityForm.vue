@@ -59,7 +59,6 @@ export default {
       event.preventDefault()
 
       const form = this.$refs.formContainer.querySelector("form")
-      const formId = form.getAttribute("id").split("gform_")[1]
 
       const data = new FormData(form)
       const url = form.action
@@ -75,11 +74,7 @@ export default {
             delete window[`gf_submitting_${this.id}`]
             this.html = response.data
           } else {
-            this.$emit("submit", {
-              success: this.isSubmitSuccessful(response),
-              response: response.data,
-              formId,
-            })
+            this.$emit("submit")
           }
         })
     },

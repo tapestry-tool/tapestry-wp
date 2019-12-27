@@ -6,7 +6,6 @@
     <gravity-form
       v-if="formOpened"
       :id="formId"
-      :type="formType"
       @submit="handleFormSubmit"
     ></gravity-form>
     <loading v-if="loading" label="Submitting..." />
