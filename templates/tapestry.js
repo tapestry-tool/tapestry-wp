@@ -1247,12 +1247,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            dispatchEvent(
-                new CustomEvent(
-                    'open-lightbox', 
-                    { detail: thisBtn.dataset.id }
-                )
-            );
+            location.href += `nodes/${thisBtn.dataset.id}`
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
