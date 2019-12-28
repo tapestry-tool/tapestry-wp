@@ -161,6 +161,16 @@ export default {
       }
     },
   },
+  watch: {
+    isTapestryLoaded() {
+      this.dimensions = {
+        ...this.dimensions,
+        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
+        width: this.lightboxDimensions.width,
+        height: this.lightboxDimensions.height,
+      }
+    },
+  },
   async mounted() {
     this.isLoaded = true
     this.dimensions = {
@@ -211,6 +221,7 @@ export default {
       await this.$store.dispatch("updateH5pSettings", newSettings)
     },
     updateDimensions(dimensions) {
+      console.log(dimensions)
       this.dimensions = {
         ...this.dimensions,
         ...dimensions,
