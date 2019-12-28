@@ -5,7 +5,7 @@
     :class="{ 'full-screen': node.fullscreen }"
     :format="node.mediaFormat"
   >
-    <div v-if="canSkip" class="overlay" @click="$emit('close')"></div>
+    <div v-if="canSkip" class="overlay" @click="close"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -13,7 +13,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button v-if="canSkip" class="close-btn" @click="$emit('close')">
+        <button v-if="canSkip" class="close-btn" @click="close">
           <div>
             <i class="fa fa-times"></i>
           </div>
@@ -35,7 +35,7 @@
             @load="handleLoad"
             @complete="complete"
             @timeupdate="updateProgress"
-            @close="$emit('close')"
+            @close="close"
           />
           <external-media
             v-if="node.mediaFormat === 'embed'"
@@ -54,7 +54,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
-            @close="$emit('close')"
+            @close="close"
           />
         </div>
       </div>
@@ -169,7 +169,7 @@ export default {
       this.applyDimensions()
     },
   },
-  async mounted() {
+  mounted() {
     this.isLoaded = true
     this.applyDimensions()
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
@@ -184,6 +184,9 @@ export default {
   methods: {
     ...mapMutations(["setLightboxEl"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    close() {
+      this.$router.push("/")
+    },
     handleLoad({ width, height, el }) {
       if (width && height) {
         this.updateDimensions({ width, height })
