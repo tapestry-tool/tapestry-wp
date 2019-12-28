@@ -41,6 +41,11 @@ export default {
       showEndScreen: this.getInitialEndScreenState(),
     }
   },
+  watch: {
+    node() {
+      this.handleLoad()
+    },
+  },
   beforeDestroy() {
     if (this.$refs.video) {
       this.$refs.video.pause()
@@ -94,6 +99,18 @@ export default {
       }
     },
     handleLoad() {
+      this.updateDimensions()
+      this.seek()
+    },
+    seek() {
+      const video = this.$refs.video
+      if (video) {
+        const progress = this.node.typeData.progress[0].value
+        const viewedAmount = progress * video.duration
+        video.currentTime = viewedAmount
+      }
+    },
+    updateDimensions() {
       const video = this.$refs.video
       if (video) {
         const videoRect = this.$refs.video.getBoundingClientRect()
@@ -102,10 +119,6 @@ export default {
           height: videoRect.height,
           el: this.$refs.video,
         })
-
-        const progress = this.node.typeData.progress[0].value
-        const viewedAmount = progress * video.duration
-        video.currentTime = viewedAmount
       }
     },
     updateVideoProgress() {
