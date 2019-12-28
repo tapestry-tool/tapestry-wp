@@ -21,6 +21,7 @@ const store = new Vuex.Store({
     lightboxId: null,
     isLightboxOpen: false,
     lightboxEl: null,
+    isTapestryLoaded: false,
   },
   getters: {
     selectedNode: state => {

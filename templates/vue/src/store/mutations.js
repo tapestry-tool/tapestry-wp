@@ -1,10 +1,9 @@
 import Helpers from "../utils/Helpers"
 
 export function init(state, dataset) {
-  Object.entries(dataset).forEach(([key, value]) => {
-    state[key] = value
-  })
+  setDataset(state, dataset)
   state.selectedNodeId = dataset.rootId
+  state.isTapestryLoaded = true
 }
 
 export function setDataset(state, dataset) {

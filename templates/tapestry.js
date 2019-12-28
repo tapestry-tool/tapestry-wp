@@ -1366,31 +1366,33 @@ function tapestryTool(config){
     }
 
     function updateViewedProgress() {
-        path = nodes
-            .filter(function (d) {
-                return !d.hideProgress;
-            })
-            .selectAll("path")
-            .data(function (d, i) {
-                var data = d.typeData.progress;
-                data.forEach(function (e) {
-                    e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
+        if (nodes) {
+            path = nodes
+                .filter(function (d) {
+                    return !d.hideProgress;
                 })
-                return pieGenerator(data, i);
-            });
-    
-        path.transition().duration(750).attrTween("d", arcTween);
-    
-        path.enter()
-            .append("path")
-            .attr("fill", "transparent")
-            .attr("class", function (d) {
-                if (d.data.extra.nodeType === "grandchild")
-                    return "grandchild";
-            })
-            .attr("d", function (d) {
-                return arcGenerator(adjustProgressBarRadii(d));
-            });
+                .selectAll("path")
+                .data(function (d, i) {
+                    var data = d.typeData.progress;
+                    data.forEach(function (e) {
+                        e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
+                    })
+                    return pieGenerator(data, i);
+                });
+        
+            path.transition().duration(750).attrTween("d", arcTween);
+        
+            path.enter()
+                .append("path")
+                .attr("fill", "transparent")
+                .attr("class", function (d) {
+                    if (d.data.extra.nodeType === "grandchild")
+                        return "grandchild";
+                })
+                .attr("d", function (d) {
+                    return arcGenerator(adjustProgressBarRadii(d));
+                });
+        }
     }
     
     function arcTween(a) {
