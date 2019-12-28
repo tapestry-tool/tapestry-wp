@@ -75,19 +75,15 @@ export default class {
 
   static base64ToBlob(b64Data, contentType) {
     const url = `data:${contentType};base64,${b64Data}`
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       return fetch(url).then(response => {
         resolve(response.blob())
       })
     })
   }
 
-  static base64ToBlob(b64Data, contentType) {
-    const url = `data:${contentType};base64,${b64Data}`;
-    return new Promise((resolve, reject) => {
-      return fetch(url).then(response => {
-        resolve(response.blob());
-      })
-    })
+  // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
+  static decodeHTMLChars(str) {
+    return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="root-node-button">
+  <div id="root-node-button">
     <div @click="showModal">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
@@ -26,6 +26,7 @@ export default {
   padding-top: 40px;
 
   > div {
+    display: inline-block;
     margin-top: 20vh;
     text-align: center;
     cursor: pointer;
