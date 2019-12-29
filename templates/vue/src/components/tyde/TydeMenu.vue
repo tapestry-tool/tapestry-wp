@@ -7,7 +7,11 @@
     </div>
     <div class="content">
       <h1>Captain's Log</h1>
-      <tyde-menu-home v-if="activePage === 'home'" :logs="logs" />
+      <tyde-menu-home
+        v-if="activePage === 'home'"
+        :logs="logs"
+        @close="$emit('continue')"
+      />
       <tyde-menu-settings
         v-if="activePage === 'settings'"
         :settings="settings"

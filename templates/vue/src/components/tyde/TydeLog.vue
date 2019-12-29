@@ -16,6 +16,9 @@
       <div v-if="log.type === 'content'">
         <p v-html="formatParagraph(log.description)" />
       </div>
+      <button v-if="log.type === 'content'" @click="rewatchNode(log.nodeId)">
+        Rewatch
+      </button>
       <tyde-activity v-else-if="log.type === 'activity'" :log="log" />
     </div>
     <div class="log-controls">
@@ -57,6 +60,10 @@ export default {
   methods: {
     formatParagraph(str) {
       return str.replace(/(?:\r\n|\r|\n)/g, "<br>")
+    },
+    rewatchNode(id) {
+      this.$emit("close")
+      this.$router.push(`/nodes/${id}`)
     },
   },
 }
