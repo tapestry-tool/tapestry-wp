@@ -16,8 +16,12 @@
       <div v-if="log.type === 'content'">
         <p v-html="formatParagraph(log.description)" />
       </div>
-      <button v-if="log.type === 'content'" @click="rewatchNode(log.nodeId)">
-        Rewatch
+      <button
+        v-if="log.type === 'content'"
+        class="rewatch-button"
+        @click="rewatchNode(log.nodeId)"
+      >
+        <i class="fas fa-redo fa-2x"></i>
       </button>
       <tyde-activity v-else-if="log.type === 'activity'" :log="log" />
     </div>
@@ -73,6 +77,7 @@ export default {
 @import "@/assets/styles/tyde-colors.scss";
 
 .log {
+  position: relative;
   background: var(--tapestry-med-gray);
   border: 1px solid var(--tapestry-light-gray);
   margin: 0;
@@ -151,6 +156,15 @@ export default {
     i {
       font-size: 1.5em;
     }
+  }
+
+  .rewatch-button {
+    background: none;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    border-radius: 50%;
+    color: white;
   }
 }
 </style>
