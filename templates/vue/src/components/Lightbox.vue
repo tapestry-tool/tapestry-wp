@@ -68,7 +68,7 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import Helpers from "../utils/Helpers"
-import { mapGetters, mapState, mapActions } from "vuex"
+import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
 
 const SAVE_INTERVAL = 5
 
@@ -166,6 +166,7 @@ export default {
       this.applyDimensions()
     },
     nodeId() {
+      this.setLightbox(null)
       this.applyDimensions()
     },
   },
@@ -180,13 +181,16 @@ export default {
       progress: this.node && this.node.typeData.progress[0].value,
     })
     thisTapestryTool.exitViewMode()
+    this.setLightbox(null)
   },
   methods: {
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapMutations(["setLightbox"]),
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
+    handleLoad({ width, height, el }) {
+      this.setLightbox(el)
       if (width && height) {
         this.updateDimensions({ width, height })
       }

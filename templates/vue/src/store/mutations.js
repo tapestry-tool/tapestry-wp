@@ -28,6 +28,10 @@ export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
+export function setLightbox(state, el) {
+  state.lightbox = el
+}
+
 // nodes
 export function addNode(state, node) {
   state.nodes.push(node)
