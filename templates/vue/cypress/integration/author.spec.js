@@ -1,4 +1,11 @@
-import { API_URL, getStore, visitTapestry, fillNodeForm, generateLink, getByTestId } from "../support/utils"
+import {
+  API_URL,
+  getStore,
+  visitTapestry,
+  fillNodeForm,
+  generateLink,
+  getByTestId,
+} from "../support/utils"
 
 describe("Author side", () => {
   beforeEach(() => {
@@ -31,41 +38,56 @@ describe("Author side", () => {
 
       fillNodeForm("@nodeData")
 
-      cy.get("@nodeData")
-        .then(data => {
-          cy.get("#node-modal-container").should("not.exist")
-          cy.get(`#node-${data.id}`).should("exist")
-          getStore().its('state.nodes').should("have.length", 1)
-          getStore().its('state.nodes.0.id').should("equal", data.id)
-        })
+      cy.get("@nodeData").then(data => {
+        cy.get("#node-modal-container").should("not.exist")
+        cy.get(`#node-${data.id}`).should("exist")
+        getStore()
+          .its("state.nodes")
+          .should("have.length", 1)
+        getStore()
+          .its("state.nodes.0.id")
+          .should("equal", data.id)
+      })
 
       /* --- Add child node --- */
       // TODO: Refactor this to use addNode function above
 
       cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@textNodeOne")
-      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@textNodeOne")
+      cy.route(
+        "PUT",
+        `${API_URL}/tapestries/**/nodes/**/permissions`,
+        "@textNodeOne"
+      )
 
       getStore()
-        .its('state.nodes.0.id')
+        .its("state.nodes.0.id")
         .then(id => {
-          cy.get("@textNodeOne")
-            .then(node => {
-              cy.route("POST", `${API_URL}/tapestries/**/links`, generateLink(id, node.id))
-            })
+          cy.get("@textNodeOne").then(node => {
+            cy.route(
+              "POST",
+              `${API_URL}/tapestries/**/links`,
+              generateLink(id, node.id)
+            )
+          })
         })
 
       cy.get("#addNodeIcon1").click()
       cy.get("#node-modal-container").should("exist")
       fillNodeForm("@textNodeOne")
 
-      cy.get("@textNodeOne")
-        .then(data => {
-          cy.get(`#node-${data.id}`).should("exist")
-          getStore().its('state.nodes').should("have.length", 2)
-          getStore().its('state.nodes.1.id').should("equal", data.id)
+      cy.get("@textNodeOne").then(data => {
+        cy.get(`#node-${data.id}`).should("exist")
+        getStore()
+          .its("state.nodes")
+          .should("have.length", 2)
+        getStore()
+          .its("state.nodes.1.id")
+          .should("equal", data.id)
 
-          getStore().its('state.links').should("have.length", 1)
-        })
+        getStore()
+          .its("state.links")
+          .should("have.length", 1)
+      })
 
       /* --- Delete leaf node --- */
       cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
@@ -74,7 +96,9 @@ describe("Author side", () => {
       cy.get("#node-2").click()
       cy.get("#editNodeIcon2").click()
       cy.contains("Delete Node").click()
-      getStore().its('state.nodes').should("have.length", 1)
+      getStore()
+        .its("state.nodes")
+        .should("have.length", 1)
     })
 
     it.skip("Should be able to delete a link if the nodes its connected to have at least one other link connected to it", () => {})
@@ -98,13 +122,19 @@ describe("Author side", () => {
           const copy = { ...root }
           copy.typeData = { textContent: newText }
           cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
-          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
+          cy.route(
+            "PUT",
+            `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`,
+            copy
+          )
         })
 
       cy.get("#editNodeIcon1").click()
       cy.get("#node-modal-container").should("exist")
 
-      cy.get("#node-text-content").clear().type(newText)
+      cy.get("#node-text-content")
+        .clear()
+        .type(newText)
       cy.contains("Submit").click()
       cy.get("#node-modal-container").should("not.exist")
 
@@ -134,13 +164,16 @@ describe("Author side", () => {
       })
 
       const setup = (prop, testId) => {
-        cy.get("@nodeData")
-          .then(data => {
-            const copy = { ...data }
-            copy[prop] = true
-            cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
-            cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
-          })
+        cy.get("@nodeData").then(data => {
+          const copy = { ...data }
+          copy[prop] = true
+          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
+          cy.route(
+            "PUT",
+            `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`,
+            copy
+          )
+        })
 
         getByTestId(testId).check({ force: true })
         cy.contains("Submit").click()
@@ -170,15 +203,19 @@ describe("Author side", () => {
       visitTapestry()
 
       getStore()
-        .its('state.nodes.0')
+        .its("state.nodes.0")
         .then(node => {
           const copy = { ...node }
           copy.permissions = {
             public: [],
-            authenticated: []
+            authenticated: [],
           }
           cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}`, copy)
-          cy.route("PUT", `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`, copy)
+          cy.route(
+            "PUT",
+            `${API_URL}/tapestries/**/nodes/${copy.id}/permissions`,
+            copy
+          )
         })
 
       cy.get("#editNodeIcon1").click()

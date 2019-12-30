@@ -5,6 +5,7 @@ module.exports = {
   },
   extends: [
     "plugin:vue/recommended",
+    "plugin:cypress/recommended",
     "eslint:recommended",
     "prettier/vue",
     "plugin:prettier/recommended",
