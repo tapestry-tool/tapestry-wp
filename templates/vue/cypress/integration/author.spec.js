@@ -8,15 +8,30 @@ import {
 } from "../support/utils"
 
 describe("Author side", () => {
+  before(() => {
+    cy.login("admin")
+    cy.contains("Tapestries").click()
+    cy.contains("Add New").click({ force: true })
+
+    cy.wait(150)
+    cy.get("#post-title-0").type("testing", { force: true })
+
+    cy.wait(150)
+    cy.contains("Publish…").click()
+    cy.contains("Publish").click({ force: true })
+  })
+
   beforeEach(() => {
     cy.login("admin")
 
-    cy.fixture("nodes/root").as("nodeData")
+    /* cy.fixture("nodes/root").as("nodeData")
     cy.fixture("nodes/text1").as("textNodeOne")
 
     cy.fixture("tapestries/empty").as("emptyTapestry")
-    cy.fixture("tapestries/oneNode").as("singleTapestry")
+    cy.fixture("tapestries/oneNode").as("singleTapestry") */
   })
+
+  it.only("Test add new", () => {})
 
   describe("General", function() {
     it("Should be able to add and delete nodes", () => {
@@ -153,7 +168,7 @@ describe("Author side", () => {
   describe("Node appearance", () => {
     it("Should show a thumbnail if a thumbnail url is passed", () => {})
 
-    describe.only("Appearance options", () => {
+    describe("Appearance options", () => {
       beforeEach(() => {
         cy.server()
         cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
@@ -197,7 +212,7 @@ describe("Author side", () => {
   })
 
   describe("Node permissions", () => {
-    it.only("Should hide node and associated links if user does not have read access", () => {
+    it("Should hide node and associated links if user does not have read access", () => {
       cy.server()
       cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
       visitTapestry()

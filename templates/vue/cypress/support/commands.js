@@ -41,8 +41,6 @@ Cypress.Commands.add("login", role => {
 })
 
 Cypress.Commands.add("logout", () => {
-  cy.visit(`${SITE_URL}/wp-admin/`)
-
   // force true is used because cypress does not have a way to
   // simulate hover events.
   cy.get("#wp-admin-bar-logout > a").click({ force: true })

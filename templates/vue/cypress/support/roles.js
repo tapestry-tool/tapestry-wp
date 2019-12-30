@@ -1,6 +1,6 @@
 export default {
   admin: {
-    username: 'admin',
-    password: 'Tapestry123!'
-  }
+    username: "admin",
+    password: "Tapestry123",
+  },
 }
