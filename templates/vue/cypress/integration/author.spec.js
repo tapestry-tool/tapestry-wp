@@ -7,31 +7,33 @@ import {
   getByTestId,
 } from "../support/utils"
 
+const TEST_TAPESTRY_NAME = "testing"
+
 describe("Author side", () => {
   before(() => {
     cy.login("admin")
     cy.contains("Tapestries").click()
-    cy.contains("Add New").click({ force: true })
+    cy.get(".page-title-action").click()
 
     cy.wait(150)
-    cy.get("#post-title-0").type("testing", { force: true })
+    cy.get("#post-title-0").type(TEST_TAPESTRY_NAME, { force: true })
 
     cy.wait(150)
     cy.contains("Publish…").click()
-    cy.contains("Publish").click({ force: true })
+    cy.get(".editor-post-publish-panel__header-publish-button button").click()
+
+    // wait until wordpress publishes the tapestry
+    cy.contains("is now live")
   })
 
   beforeEach(() => {
-    cy.login("admin")
-
-    /* cy.fixture("nodes/root").as("nodeData")
-    cy.fixture("nodes/text1").as("textNodeOne")
-
-    cy.fixture("tapestries/empty").as("emptyTapestry")
-    cy.fixture("tapestries/oneNode").as("singleTapestry") */
+    visitTapestry(TEST_TAPESTRY_NAME)
   })
 
-  it.only("Test add new", () => {})
+  it.only("Test add new", () => {
+    cy.get("#root-node-button > div").click()
+    cy.get("#node-modal-container").should("exist")
+  })
 
   describe("General", function() {
     it("Should be able to add and delete nodes", () => {
