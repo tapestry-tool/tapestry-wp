@@ -5,6 +5,8 @@ import {
   fillNodeForm,
   generateLink,
   getByTestId,
+  openRootNodeModal,
+  getModal,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = "testing"
@@ -30,30 +32,28 @@ describe("Author side", () => {
     visitTapestry(TEST_TAPESTRY_NAME)
   })
 
-  it.only("Test add new", () => {
-    cy.get("#root-node-button > div").click()
-    cy.get("#node-modal-container").should("exist")
-  })
-
   describe("General", function() {
+    it.only("Should be able to add a root node", () => {
+      const node = {
+        title: "Root",
+        description: "I am a root node",
+        mediaType: "text",
+        textContent: "Abcd",
+      }
+
+      openRootNodeModal()
+      getModal().should("exist")
+
+      cy.get("#node-title").type(node.title)
+      cy.get("#node-description").type(node.description)
+      cy.get("#node-media-type").select(node.mediaType)
+      cy.get("#node-text-content").type(node.textContent)
+    })
+
     it("Should be able to add and delete nodes", () => {
-      cy.server()
-
-      // stub out the get request to tapestries
-      cy.route("GET", `${API_URL}/tapestries/*`, "@emptyTapestry")
-
-      visitTapestry()
-
       /* --- Add root node --- */
-      // TODO: Abstract this to an addNode function
-
-      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@nodeData")
-      cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`, "@nodeData")
-
-      cy.get("#root-node-button > div").click()
-      cy.get("#node-modal-container").should("exist")
-
-      fillNodeForm("@nodeData")
+      openRootNodeModal()
+      getModal().should("exist")
 
       cy.get("@nodeData").then(data => {
         cy.get("#node-modal-container").should("not.exist")
