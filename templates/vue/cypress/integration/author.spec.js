@@ -7,6 +7,8 @@ import {
   getByTestId,
   openRootNodeModal,
   getModal,
+  submitModal,
+  SITE_URL,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = "testing"
@@ -26,6 +28,15 @@ describe("Author side", () => {
 
     // wait until wordpress publishes the tapestry
     cy.contains("is now live")
+  })
+
+  after(() => {
+    cy.visit(`${SITE_URL}/wp-admin/`)
+    cy.contains("Tapestries").click()
+    cy.get("td")
+      .contains(TEST_TAPESTRY_NAME)
+      .click()
+    cy.contains("Move to trash").click()
   })
 
   beforeEach(() => {
@@ -48,6 +59,11 @@ describe("Author side", () => {
       cy.get("#node-description").type(node.description)
       cy.get("#node-media-type").select(node.mediaType)
       cy.get("#node-text-content").type(node.textContent)
+
+      submitModal()
+      getModal().should("not.exist")
+
+      cy.contains(node.title).should("exist")
     })
 
     it("Should be able to add and delete nodes", () => {

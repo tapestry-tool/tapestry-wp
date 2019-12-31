@@ -47,6 +47,8 @@ export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
 
 export const getModal = () => cy.get("#node-modal-container")
 
+export const submitModal = () => cy.contains("Submit").click()
+
 export const addRootNode = fixture => {
   cy.get("#root-node-button > div").click()
   fillNodeForm(fixture)
