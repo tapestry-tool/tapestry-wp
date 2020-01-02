@@ -10,7 +10,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint 'src/**/*.{js,vue}'",
     "lint:fix": "npm run lint -- --fix",
-    "test:open": "cypress open",
+    "test:open": "cypress open --config watchForFileChanges=false",
     "test": "cypress run"
   },
   "dependencies": {
