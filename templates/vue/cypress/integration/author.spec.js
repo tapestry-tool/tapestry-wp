@@ -10,6 +10,8 @@ import {
   submitModal,
   SITE_URL,
   addNode,
+  openAddNodeModal,
+  openEditNodeModal,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = "testing"
@@ -29,6 +31,7 @@ describe("Author side", () => {
 
     // wait until wordpress publishes the tapestry
     cy.contains("is now live")
+    cy.logout()
   })
 
   after(() => {
@@ -41,11 +44,12 @@ describe("Author side", () => {
   })
 
   beforeEach(() => {
+    cy.login("admin")
     visitTapestry(TEST_TAPESTRY_NAME)
   })
 
-  describe("General", function() {
-    it.only("Should be able to add a root node", () => {
+  describe.only("General", function() {
+    it("Should be able to add a root node", () => {
       const node = {
         title: "Root",
         description: "I am a root node",
@@ -74,75 +78,62 @@ describe("Author side", () => {
         })
     })
 
-    it("Should be able to add and delete nodes", () => {
-      /* --- Add root node --- */
-      openRootNodeModal()
-      getModal().should("exist")
-
-      cy.get("@nodeData").then(data => {
-        cy.get("#node-modal-container").should("not.exist")
-        cy.get(`#node-${data.id}`).should("exist")
-        getStore()
-          .its("state.nodes")
-          .should("have.length", 1)
-        getStore()
-          .its("state.nodes.0.id")
-          .should("equal", data.id)
-      })
-
-      /* --- Add child node --- */
-      // TODO: Refactor this to use addNode function above
-
-      cy.route("POST", `${API_URL}/tapestries/**/nodes`, "@textNodeOne")
-      cy.route(
-        "PUT",
-        `${API_URL}/tapestries/**/nodes/**/permissions`,
-        "@textNodeOne"
-      )
+    it("Should be able to add child nodes", () => {
+      const nodes = [
+        {
+          title: "Child 1",
+          description: "I am a child 1",
+          mediaType: "text",
+          textContent: "Abcd",
+        },
+        {
+          title: "Child 2",
+          description: "I am a child 2",
+          mediaType: "text",
+          textContent: "Abcd",
+        },
+      ]
 
       getStore()
         .its("state.nodes.0.id")
-        .then(id => {
-          cy.get("@textNodeOne").then(node => {
-            cy.route(
-              "POST",
-              `${API_URL}/tapestries/**/links`,
-              generateLink(id, node.id)
-            )
+        .then(rootId => {
+          cy.server()
+          nodes.forEach(node => {
+            cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+
+            openAddNodeModal(rootId)
+            getByTestId("node-title").type(node.title)
+            getByTestId("node-description").type(node.description)
+            getByTestId("node-mediaType").select(node.mediaType)
+            getByTestId("node-textContent").type(node.textContent)
+            submitModal()
+
+            cy.wait("@postNode")
+              .its("response.body.id")
+              .then(id => {
+                cy.get(`#node-${id}`).should("exist")
+                cy.contains(node.title).should("exist")
+              })
           })
         })
-
-      cy.get("#addNodeIcon1").click()
-      cy.get("#node-modal-container").should("exist")
-      fillNodeForm("@textNodeOne")
-
-      cy.get("@textNodeOne").then(data => {
-        cy.get(`#node-${data.id}`).should("exist")
-        getStore()
-          .its("state.nodes")
-          .should("have.length", 2)
-        getStore()
-          .its("state.nodes.1.id")
-          .should("equal", data.id)
-
-        getStore()
-          .its("state.links")
-          .should("have.length", 1)
-      })
-
-      /* --- Delete leaf node --- */
-      cy.route("GET", `${API_URL}/tapestries/*`, "@singleTapestry")
-      cy.route("DELETE", `${API_URL}/tapestries/**/nodes/*`, {})
-
-      cy.get("#node-2").click()
-      cy.get("#editNodeIcon2").click()
-      cy.contains("Delete Node").click()
-      getStore()
-        .its("state.nodes")
-        .should("have.length", 1)
     })
 
-    it.skip("Should be able to delete a link if the nodes its connected to have at least one other link connected to it", () => {})
+    it("Should be able to delete child nodes", () => {
+      getStore()
+        .its("state.nodes")
+        .should("have.length", 3)
+
+      getStore()
+        .its("state.nodes.1.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/delete node/i).click()
+          cy.get(`#node-${id}`).should("not.exist")
+          getStore()
+            .its("state.nodes")
+            .should("have.length", 2)
+        })
+    })
   })
 
   describe("Node content", () => {

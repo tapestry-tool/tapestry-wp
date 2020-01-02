@@ -45,6 +45,16 @@ export const addEmptyTapestry = (name = "test") => {
 
 export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
 
+export const openAddNodeModal = id => {
+  cy.get(`#node-${id}`).click({ force: true })
+  cy.get(`#addNodeIcon${id}`).click()
+}
+
+export const openEditNodeModal = id => {
+  cy.get(`#node-${id}`).click({ force: true })
+  cy.get(`#editNodeIcon${id}`).click()
+}
+
 export const getModal = () => cy.get("#node-modal-container")
 
 export const submitModal = () => cy.contains("Submit").click()
