@@ -36,7 +36,7 @@ describe("Author side", () => {
     cy.get("td")
       .contains(TEST_TAPESTRY_NAME)
       .click()
-    cy.contains("Move to trash").click()
+    cy.contains(/move to trash/i).click()
   })
 
   beforeEach(() => {
