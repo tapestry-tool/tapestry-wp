@@ -9,6 +9,7 @@ import {
   getModal,
   submitModal,
   SITE_URL,
+  addNode,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = "testing"
@@ -52,18 +53,25 @@ describe("Author side", () => {
         textContent: "Abcd",
       }
 
+      cy.server()
+      cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+
       openRootNodeModal()
       getModal().should("exist")
 
-      cy.get("#node-title").type(node.title)
-      cy.get("#node-description").type(node.description)
-      cy.get("#node-media-type").select(node.mediaType)
-      cy.get("#node-text-content").type(node.textContent)
+      getByTestId("node-title").type(node.title)
+      getByTestId("node-description").type(node.description)
+      getByTestId("node-mediaType").select(node.mediaType)
+      getByTestId("node-textContent").type(node.textContent)
 
       submitModal()
-      getModal().should("not.exist")
-
-      cy.contains(node.title).should("exist")
+      cy.wait("@postNode")
+        .its("response.body.id")
+        .then(id => {
+          getModal().should("not.exist")
+          cy.get(`#node-${id}`).should("exist")
+          cy.contains(node.title).should("exist")
+        })
     })
 
     it("Should be able to add and delete nodes", () => {
