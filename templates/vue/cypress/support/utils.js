@@ -67,3 +67,5 @@ export const addRootNode = fixture => {
 export const generateLink = (source, target) => ({ source, target })
 
 export const getByTestId = id => cy.get(`[data-testid=${id}]`)
+
+export const getNode = id => cy.get(`#node-${id}`)
