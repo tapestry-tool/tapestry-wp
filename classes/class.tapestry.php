@@ -136,8 +136,7 @@ class Tapestry implements ITapestry
         $parent = null;
 
         if (isset($parentId)) {
-            $controller = $this->getNode($parentId);
-            $parent = $controller->get();
+            $parent = $this->getNode($parentId)->get();
         }
 
         if (!$this->validate($node, $parent)) {
@@ -207,11 +206,8 @@ class Tapestry implements ITapestry
      */
     public function addLink($link)
     {
-        $controller = $this->getNode($link->source);
-        $parent = $controller->get();
-
-        $controller = $this->getNode($link->target);
-        $child = $controller->get();
+        $parent = $this->getNode($link->source)->get();
+        $child = $this->getNode($link->target)->get();
 
         $isValid = $this->validate($child, $parent);
 
@@ -290,25 +286,29 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
-    public function validate($node, $parent = null)
+    public function validateNode($node, $parent = null)
     {
-        $type = $node->tydeType;
+        $tydeType = $node->tydeType;
 
-        if (!isset($type) || !is_string($type)) {
+        if (!isset($tydeType) || !is_string($tydeType)) {
             return true; // for backwards compatibility
         }
 
         if (!isset($parent)) {
-            return $type == "Module" || $type == "Regular";
+            return $tydeType == "Module" || $tydeType == "Regular";
         }
 
         $parentType = $parent->tydeType;
+        if (!isset($parentType)) {
+            return true;
+        }
+
         if ($parentType == "Module") {
-            return $type == "Stage";
+            return $tydeType == "Stage";
         } else if ($parentType == "Stage") {
-            return $type == "Question set";
+            return $tydeType == "Question set";
         } else if ($parentType == "Regular") {
-            return $type == "Module" || $type == "Regular";
+            return $tydeType == "Module" || $tydeType == "Regular";
         } else {
             // otherwise parent is a question set, so we shouldn't be able
             // to get here in the first place.
@@ -316,7 +316,7 @@ class Tapestry implements ITapestry
         }
     }
 
-    public function getParent($nodeId)
+    public function getNodeParent($nodeId)
     {
         $parent = null;
 

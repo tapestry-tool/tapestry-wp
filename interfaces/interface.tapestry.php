@@ -45,9 +45,6 @@ interface ITapestry
 
     /**
      * Add a new node
-     * Note: (Narendra) I changed the signature of this function to
-     * allow the Tapestry class to validate the node before it gets
-     * saved to the DB.
      * 
      * @param   Object  $node       Tapestry node
      * @param   Number  $parentId   ID or parent, may be null

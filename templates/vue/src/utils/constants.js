@@ -1,4 +1,4 @@
-export const nodeTypes = {
+export const tydeTypes = {
   REGULAR: "Regular",
   MODULE: "Module",
   STAGE: "Stage",

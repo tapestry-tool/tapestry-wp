@@ -46,7 +46,7 @@ import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
 import Lightbox from "./Lightbox"
-import { nodeTypes } from "@/utils/constants"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   name: "tapestry",
@@ -80,7 +80,7 @@ export default {
         },
         quiz: [],
         skippable: true,
-        tydeType: nodeTypes.REGULAR,
+        tydeType: tydeTypes.REGULAR,
       },
     }
   },
@@ -179,7 +179,7 @@ export default {
         },
         description: "",
         quiz: [],
-        tydeType: nodeTypes.REGULAR,
+        tydeType: tydeTypes.REGULAR,
       }
     },
     addRootNode() {
@@ -245,7 +245,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
-        tydeType: nodeTypes.REGULAR,
+        tydeType: tydeTypes.REGULAR,
         coordinates: {
           x: 3000,
           y: 3000,

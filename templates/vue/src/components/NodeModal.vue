@@ -286,7 +286,7 @@
 
 <script>
 import Helpers from "../utils/Helpers"
-import { nodeTypes } from "../utils/constants"
+import { tydeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import { mapGetters } from "vuex"
@@ -354,8 +354,8 @@ export default {
     },
     disableDeleteButton() {
       return (
-        (this.node.tydeType === nodeTypes.STAGE ||
-          this.node.tydeType === nodeTypes.MODULE) &&
+        (this.node.tydeType === tydeTypes.STAGE ||
+          this.node.tydeType === tydeTypes.MODULE) &&
         this.hasChildren
       )
     },
@@ -444,11 +444,11 @@ export default {
       if (this.parent && this.modalType === "add-new-node") {
         const parentType = this.parent.tydeType
         this.node.tydeType =
-          parentType === nodeTypes.MODULE
-            ? nodeTypes.STAGE
-            : parentType === nodeTypes.STAGE
-            ? nodeTypes.QUESTION_SET
-            : nodeTypes.REGULAR
+          parentType === tydeTypes.MODULE
+            ? tydeTypes.STAGE
+            : parentType === tydeTypes.STAGE
+            ? tydeTypes.QUESTION_SET
+            : tydeTypes.REGULAR
       }
     },
     getPermissionRowIndex(rowName) {

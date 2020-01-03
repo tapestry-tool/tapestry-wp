@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { nodeTypes } from "../../utils/constants"
+import { tydeTypes } from "../../utils/constants"
 import { mapGetters } from "vuex"
 
 export default {
@@ -35,28 +35,28 @@ export default {
       return this.getDirectChildren(this.node.id).length > 0
     },
     tydeTypeOptions() {
-      const options = Object.values(nodeTypes)
+      const options = Object.values(tydeTypes)
       if (this.parent) {
-        if (this.parent.tydeType === nodeTypes.MODULE) {
+        if (this.parent.tydeType === tydeTypes.MODULE) {
           // if parent is a module, only allow stage nodes
-          return [nodeTypes.STAGE]
-        } else if (this.parent.tydeType === nodeTypes.STAGE) {
+          return [tydeTypes.STAGE]
+        } else if (this.parent.tydeType === tydeTypes.STAGE) {
           // if parent is a stage, only allow question sets
-          return [nodeTypes.QUESTION_SET]
+          return [tydeTypes.QUESTION_SET]
         }
       }
       const normalOptions = options.filter(
-        opt => opt !== nodeTypes.STAGE && opt !== nodeTypes.QUESTION_SET
+        opt => opt !== tydeTypes.STAGE && opt !== tydeTypes.QUESTION_SET
       )
 
       // if a module and has children, return only the module option.
-      if (this.hasChildren && this.node.tydeType === nodeTypes.MODULE) {
-        return [nodeTypes.MODULE]
+      if (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) {
+        return [tydeTypes.MODULE]
       }
       return normalOptions
     },
     showModuleWarning() {
-      return this.hasChildren && this.node.tydeType === nodeTypes.MODULE
+      return this.hasChildren && this.node.tydeType === tydeTypes.MODULE
     },
     disableSelect() {
       return this.tydeTypeOptions.length === 1
