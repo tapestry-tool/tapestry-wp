@@ -97,7 +97,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .quiz-screen {
   display: flex;
   background-size: cover;
@@ -144,6 +144,7 @@ export default {
 
   &:disabled {
     opacity: 0.6;
+    pointer-events: none;
     cursor: not-allowed;
   }
 
@@ -160,6 +161,7 @@ export default {
   position: absolute;
   top: 24px;
   left: 24px;
+  z-index: 20;
 }
 
 .question-step {

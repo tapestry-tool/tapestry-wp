@@ -61,21 +61,6 @@ export default {
       return this.logsWithAnswers
     },
   },
-  methods: {
-    setActiveTab(tab) {
-      this.activeTab = tab
-    },
-    async getAudioSrc(nodeId, audioId) {
-      try {
-        const audio = await TapestryApiClient.getH5PAudioFromServer(nodeId, audioId)
-        const blob = await Helpers.base64ToBlob(audio, 'audio/wav')
-        return URL.createObjectURL(blob)
-      } catch (e) {
-        console.error(e)
-        return ""
-      }
-    }
-  },
   watch: {
     /**
      * Further filter the logs to check if there are valid answers recorded
@@ -98,9 +83,24 @@ export default {
         Promise.all(promises).then(logsWithAnswers => {
           this.logsWithAnswers = logsWithAnswers
         })
+      },
+    },
+  },
+  methods: {
+    setActiveTab(tab) {
+      this.activeTab = tab
+    },
+    async getAudioSrc(nodeId, audioId) {
+      try {
+        const audio = await TapestryApiClient.getH5PAudioFromServer(nodeId, audioId)
+        const blob = await Helpers.base64ToBlob(audio, "audio/wav")
+        return URL.createObjectURL(blob)
+      } catch (e) {
+        console.error(e)
+        return ""
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -35,11 +35,7 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox
-      v-if="lightbox.isOpen"
-      :node-id="lightbox.id"
-      @close="closeLightbox"
-    />
+    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -50,7 +46,7 @@ import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
 import Lightbox from "./Lightbox"
-import { nodeTypes } from "@/utils/constants"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   name: "tapestry",
@@ -78,13 +74,14 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
         },
         quiz: [],
         skippable: true,
-        tydeType: nodeTypes.REGULAR
+        tydeType: tydeTypes.REGULAR,
       },
     }
   },
@@ -125,10 +122,9 @@ export default {
   watch: {
     selectedNode() {
       this.parentNode = this.getParent(this.selectedNode)
-    }
+    },
   },
   mounted() {
-    // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
@@ -145,7 +141,13 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions", "completeQuestion"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "completeQuestion",
+    ]),
     async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
@@ -171,13 +173,14 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
         },
         description: "",
         quiz: [],
-        tydeType: nodeTypes.REGULAR
+        tydeType: tydeTypes.REGULAR,
       }
     },
     addRootNode() {
@@ -232,7 +235,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -243,7 +249,8 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
-        tydeType: nodeTypes.REGULAR,
+        tydeType: tydeTypes.REGULAR,
+        showInBackpack: true,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -336,6 +343,10 @@ export default {
             break
           case "tydeType":
             newNodeEntry.tydeType = fieldValue
+            break
+          case "showInBackpack":
+            newNodeEntry.showInBackpack = fieldValue
+            break
           default:
             break
         }
@@ -346,7 +357,7 @@ export default {
         // New node
         id = await this.addNode({
           newNode: newNodeEntry,
-          parentId: this.parentNode && this.parentNode.id
+          parentId: this.parentNode && this.parentNode.id,
         })
         newNodeEntry.id = id
         if (!isRoot) {

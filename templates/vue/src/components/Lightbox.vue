@@ -53,6 +53,7 @@
             @update-settings="updateH5pSettings"
             @timeupdate="updateProgress"
             @complete="complete"
+            @close="$emit('close')"
           />
         </div>
       </div>

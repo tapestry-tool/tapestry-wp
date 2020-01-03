@@ -45,9 +45,6 @@ interface ITapestry
 
     /**
      * Add a new node
-     * Note: (Narendra) I changed the signature of this function to
-     * allow the Tapestry class to validate the node before it gets
-     * saved to the DB.
      * 
      * @param   Object  $node       Tapestry node
      * @param   Number  $parentId   ID or parent, may be null
@@ -105,7 +102,12 @@ interface ITapestry
      * 
      * @return  Boolean true if $node is valid
      */
-    public function validate($node, $parent);
+    public function validateNode($node, $parent);
 
-    public function getParent($nodeId);
+    /**
+     * Returns the parent of the given $nodeId.
+     * 
+     * @return  Object the parent node, if it exists.
+     */
+    public function getNodeParent($nodeId);
 }

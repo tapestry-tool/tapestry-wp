@@ -2,10 +2,10 @@ export function logs(state) {
   const mapIdToKey = {
     textId: "text",
     checklistId: "checklist",
-    audioId: "audio"
+    audioId: "audio",
   }
   const contents = state.nodes
-    .filter(node => node.completed)
+    .filter(node => node.completed && node.showInBackpack)
     .map(node => ({
       type: "content",
       imageURL: node.imageURL,
@@ -17,7 +17,9 @@ export function logs(state) {
   const nodesWithQuestions = state.nodes.filter(
     node =>
       node.quiz &&
-      node.quiz.some(question => question.entries && Object.keys(question.entries).length > 0)
+      node.quiz.some(
+        question => question.entries && Object.keys(question.entries).length > 0
+      )
   )
   nodesWithQuestions.forEach(node => {
     node.quiz.forEach(question => {
@@ -39,7 +41,7 @@ const getAnswer = (answerType, entry) => {
   const types = {
     textId: parseText,
     checklistId: parseChecklist,
-    audioId: parseAudio
+    audioId: parseAudio,
   }
   return types[answerType](entry)
 }
@@ -49,7 +51,9 @@ const parseText = entry => {
   return text ? `<div>${text.replace(/(?:\r\n|\r|\n)/g, "<br>")}</div>` : ""
 }
 
-const parseAudio = entry => { return { id: entry } }
+const parseAudio = entry => {
+  return { id: entry }
+}
 
 const parseChecklist = entry => {
   const inputId = "1"
@@ -58,7 +62,7 @@ const parseChecklist = entry => {
 }
 
 export function getParent(state) {
-  return (id) => {
+  return id => {
     const link = state.links.find(l => l.target == id || l.target.id == id)
     return link ? link.source : null
   }
