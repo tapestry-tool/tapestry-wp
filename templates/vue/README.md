@@ -25,3 +25,11 @@ To get link previews working for the "External Link" content type, you will need
 2. Once logged in, press "Generate new access key" on the top right corner and copy the key
 3. In this directory (vue), make a copy of the `config-sample.js` file and rename it to `config.js` (if it doesn't exist yet)
 4. Open the `config.js` file and paste the API key as the value of the `LINK_PREVIEW_API_KEY` variable
+
+## Git Config
+
+You need to adjust your git config so the automatic linting process works correctly. To do this run the following command:
+
+```
+git config core.hooksPath .githooks
+```

@@ -5,15 +5,11 @@
   >
     <gravity-form
       v-if="formOpened"
-      :id="formId"
       :entry="formEntry"
       :form="formHtml"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <h5p-iframe
-      v-else-if="recorderOpened"
-      :mediaURL="h5pRecorderUrl"
-    />
+    <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
     <loading v-if="loadingForm" class="loading" :label="loadingText" />
     <div v-if="!formOpened && !recorderOpened">
       <speech-bubble class="question-title">
@@ -67,7 +63,7 @@ export default {
     SpeechBubble,
     Loading,
     GravityForm,
-    'h5p-iframe': H5PIframe,
+    "h5p-iframe": H5PIframe,
   },
   props: {
     question: {
@@ -87,6 +83,7 @@ export default {
       formHtml: "",
       formType: "",
       formEntry: null,
+      formId: null,
       loadingForm: false,
       h5pRecorderUrl: "",
     }
@@ -132,9 +129,9 @@ export default {
         console.error(e)
       }
     },
-    handleFormSubmit({ id, success, response }) {
+    handleFormSubmit({ success, response }) {
       if (!success) {
-        delete window[`gf_submitting_${id}`]
+        delete window[`gf_submitting_${this.formId}`]
         this.formHtml = response
         return
       }

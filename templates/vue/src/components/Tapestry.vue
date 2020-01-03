@@ -34,11 +34,7 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox
-      v-if="lightbox.isOpen"
-      :node-id="lightbox.id"
-      @close="closeLightbox"
-    />
+    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -119,7 +115,6 @@ export default {
     },
   },
   mounted() {
-    // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
@@ -136,7 +131,7 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions", "completeQuestion"]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
