@@ -45,12 +45,21 @@ export async function updateNodeProgress({ commit }, payload) {
   commit("updateNodeProgress", { id, progress })
 }
 
-export async function completeNode({ commit }, nodeId) {
+export async function completeNode({ commit, getters }, nodeId) {
   await client.completeNode(nodeId)
   commit("updateNode", {
     id: nodeId,
     newNode: { completed: true },
   })
+
+  const node = getters.getNode(nodeId)
+  if (node.mediaType !== "video") {
+    commit("updateNodeProgress", {
+      id: nodeId,
+      progress: 1,
+    })
+    thisTapestryTool.updateProgressBars()
+  }
 }
 
 export function updateNodePermissions(_, payload) {

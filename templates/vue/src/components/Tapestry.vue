@@ -74,6 +74,7 @@ export default {
         mediaDuration: "",
         imageURL: "",
         unlocked: true,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -124,7 +125,6 @@ export default {
     },
   },
   mounted() {
-    // Set up event listeners to communicate with D3 elements
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
@@ -173,6 +173,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -234,7 +235,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -246,6 +250,7 @@ export default {
         skippable: true,
         fullscreen: false,
         tydeType: tydeTypes.REGULAR,
+        showInBackpack: true,
         coordinates: {
           x: 3000,
           y: 3000,
@@ -338,6 +343,10 @@ export default {
             break
           case "tydeType":
             newNodeEntry.tydeType = fieldValue
+            break
+          case "showInBackpack":
+            newNodeEntry.showInBackpack = fieldValue
+            break
           default:
             break
         }

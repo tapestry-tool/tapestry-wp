@@ -209,7 +209,8 @@ function tapestryTool(config){
                 skippable: true,
                 behaviour: "embed",
                 completed: false,
-                quiz: [] 
+                quiz: [],
+                showInBackpack: true
             })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 

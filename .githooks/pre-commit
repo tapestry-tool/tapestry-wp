@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "\n*******************************************************"
+echo "Pre-commit hook: Linting templates/vue folder... "
+echo ""
+echo "Notes:"
+echo "- This will automatically lint files"
+echo "- If any linting is done, commit will fail. To commit"
+echo "  with the newly linted files, you need to add the"
+echo "  newly linted files to the commit and then re-commit"
+echo "- You can skip the pre-commit hook altogether by adding "
+echo "  the the --no-verify flag"
+echo "*******************************************************\n"
+
+cd templates/vue && node lint.js

@@ -81,13 +81,21 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" label="H5P Embed Link">
-              <b-form-input
-                id="node-h5p-media-url"
-                v-model="node.typeData.mediaURL"
-                placeholder="Enter H5P Embed Link"
-                required
-              />
+            <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
+              <combobox
+                v-model="selectedH5pContent"
+                item-text="title"
+                item-value="id"
+                empty-message="There's no H5P content yet. Please add one in your WP dashboard."
+                :options="h5pContentOptions"
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
             </b-form-group>
             <b-form-group
               v-show="nodeType === 'h5p'"
@@ -138,13 +146,6 @@
                 required
               />
             </b-form-group>
-            <!-- <b-form-group>
-              <b-form-checkbox
-                value="false"
-                unchecked-value="true"
-                v-model="node.unlocked"
-              >Hide node until parent node is viewed</b-form-checkbox>
-            </b-form-group> -->
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">
                 Hide node title
@@ -158,6 +159,11 @@
             <b-form-group>
               <b-form-checkbox v-model="node.hideMedia">
                 Hide media button
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.showInBackpack">
+                Show in backpack
               </b-form-checkbox>
             </b-form-group>
           </div>
@@ -188,11 +194,6 @@
                   <b-th>Read</b-th>
                   <b-th>Add</b-th>
                   <b-th>Edit</b-th>
-                  <!--
-                  <b-th>Add Submit</b-th>
-                  <b-th>Edit Submit</b-th>
-                  <b-th>Approve</b-th>
-                  -->
                 </b-tr>
               </b-thead>
               <b-tbody>
@@ -226,17 +227,6 @@
                       @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>
-                  <!--
-                  <b-td>
-                    <b-form-checkbox value="add-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox value="edit-submit" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox value="approve" v-model="node.permissions[rowName]"></b-form-checkbox>
-                  </b-td>
-                  -->
                 </b-tr>
                 <b-tr>
                   <b-td colspan="4">
@@ -290,10 +280,13 @@ import { tydeTypes } from "../utils/constants"
 import QuizModal from "./node-modal/QuizModal"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import { mapGetters } from "vuex"
+import Combobox from "./Combobox"
+import H5PApi from "../services/H5PApi"
 
 export default {
   name: "node-modal",
   components: {
+    Combobox,
     QuizModal,
     TydeTypeInput,
   },
@@ -338,6 +331,8 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
       ],
+      h5pContentOptions: [],
+      selectedH5pContent: "",
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
@@ -384,7 +379,7 @@ export default {
         { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
-          value: this.node.typeData && this.node.typeData.mediaURL,
+          value: this.getMediaUrl(),
         },
         {
           name: "textContent",
@@ -404,6 +399,7 @@ export default {
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
         { name: "tydeType", value: this.node.tydeType },
+        { name: "showInBackpack", value: this.node.showInBackpack },
       ]
     },
     nodeImageUrl() {
@@ -426,7 +422,8 @@ export default {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
   },
-  mounted() {
+  async mounted() {
+    this.h5pContentOptions = await H5PApi.getAllContent()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
@@ -435,6 +432,10 @@ export default {
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.setInitialTydeType()
+        const selectedContent = this.h5pContentOptions.find(content =>
+          this.filterContent(content)
+        )
+        this.selectedH5pContent = selectedContent ? selectedContent.id : ""
       }
     })
   },
@@ -450,6 +451,21 @@ export default {
             ? tydeTypes.QUESTION_SET
             : tydeTypes.REGULAR
       }
+    },
+    filterContent(content) {
+      if (this.node.mediaFormat !== "h5p") {
+        return false
+      }
+      const id = this.node.typeData.mediaURL.split("&id=")[1]
+      return content.id == id
+    },
+    getMediaUrl() {
+      if (this.nodeType !== "h5p") {
+        return this.node.typeData && this.node.typeData.mediaURL
+      }
+
+      const adminAjaxUrl = wpData.adminAjaxUrl
+      return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
     },
     getPermissionRowIndex(rowName) {
       return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
@@ -620,26 +636,32 @@ table {
 </style>
 
 <style lang="scss" scoped>
-.disable-message {
-  font-size: 0.9em;
-  padding: 0;
-  margin: 0 0 0 8px;
-}
+#node-modal-container {
+  * {
+    outline: none;
+  }
 
-.form-control {
-  padding: 15px;
-  border: none;
-  background: #f1f1f1;
-}
+  .form-control {
+    padding: 15px;
+    border: none;
+    background: #f1f1f1;
+  }
 
-.modal-header-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
+  .disable-message {
+    font-size: 0.9em;
+    padding: 0;
+    margin: 0 0 0 8px;
+  }
 
-  &:last-child {
-    margin-bottom: 0;
+  .modal-header-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 </style>

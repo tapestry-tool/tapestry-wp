@@ -5,7 +5,7 @@ export function logs(state) {
     audioId: "audio",
   }
   const contents = state.nodes
-    .filter(node => node.completed)
+    .filter(node => node.completed && node.showInBackpack)
     .map(node => ({
       type: "content",
       imageURL: node.imageURL,
