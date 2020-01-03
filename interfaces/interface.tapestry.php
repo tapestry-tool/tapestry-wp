@@ -102,7 +102,12 @@ interface ITapestry
      * 
      * @return  Boolean true if $node is valid
      */
-    public function validate($node, $parent);
+    public function validateNode($node, $parent);
 
-    public function getParent($nodeId);
+    /**
+     * Returns the parent of the given $nodeId.
+     * 
+     * @return  Object the parent node, if it exists.
+     */
+    public function getNodeParent($nodeId);
 }

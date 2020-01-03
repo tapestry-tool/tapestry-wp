@@ -139,7 +139,7 @@ class Tapestry implements ITapestry
             $parent = $this->getNode($parentId)->get();
         }
 
-        if (!$this->validate($node, $parent)) {
+        if (!$this->validateNode($node, $parent)) {
             throw new TapestryError("INVALID_NODE_TYPE");
         }
 
