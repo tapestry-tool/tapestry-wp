@@ -76,7 +76,7 @@ export default {
   background: black;
   color: white;
   z-index: 200;
-  padding: 16px 80px;
+  padding: 16px 15px;
 
   .buttons {
     width: 100%;
@@ -94,10 +94,10 @@ export default {
 
     h1 {
       position: absolute;
-      right: 1.5em;
-      top: -63px;
+      right: 2.5em;
+      top: -78px;
       padding: 16px 3em;
-      line-height: 1;
+      line-height: 44px;
       margin: 0;
       font-weight: 900;
       font-size: 30px;
@@ -126,7 +126,9 @@ export default {
   }
 
   .close-button {
-    margin-left: auto;
+    position: absolute;
+    right: 15px;
+    top: 17px;
     z-index: 10;
   }
 }
