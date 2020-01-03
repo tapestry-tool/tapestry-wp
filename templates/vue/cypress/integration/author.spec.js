@@ -2,17 +2,16 @@ import {
   API_URL,
   getStore,
   visitTapestry,
-  fillNodeForm,
-  generateLink,
   getByTestId,
   openRootNodeModal,
   getModal,
   submitModal,
-  SITE_URL,
-  addNode,
   openAddNodeModal,
   openEditNodeModal,
   getNode,
+  getMediaButton,
+  getEditNodeButton,
+  getAddNodeButton,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = "testing"
@@ -36,7 +35,7 @@ describe("Author side", () => {
   })
 
   after(() => {
-    cy.visit(`${SITE_URL}/wp-admin/`)
+    cy.login("admin")
     cy.contains("Tapestries").click()
     cy.get("td")
       .contains(TEST_TAPESTRY_NAME)
@@ -170,6 +169,21 @@ describe("Author side", () => {
           })
       })
 
+      // uncheck hidden options when done
+      after(() => {
+        visitTapestry(TEST_TAPESTRY_NAME)
+        getStore()
+          .its("state.nodes.0.id")
+          .then(id => {
+            openEditNodeModal(id)
+            cy.contains(/appearance/i).click()
+          })
+        const ids = ["hide-title", "hide-progress", "hide-media"]
+        ids.forEach(id => {
+          getByTestId(`node-appearance-${id}`).uncheck({ force: true })
+        })
+      })
+
       const setup = prop => {
         getByTestId(`node-appearance-${prop}`).check({ force: true })
         submitModal()
@@ -201,16 +215,71 @@ describe("Author side", () => {
         setup("hide-media")
         getStore()
           .its("state.nodes.0.id")
-          .then(id => cy.get(`#mediaButton${id}`).should("be.hidden"))
+          .then(id => getMediaButton(id).should("be.hidden"))
       })
     })
   })
 
   describe("Node permissions", () => {
-    it("Should hide node and associated links if user does not have read access", () => {})
+    it("Should hide node and associated links if user does not have read access", () => {
+      getStore()
+        .its("state.nodes.1.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/permissions/i).click()
+          getByTestId("node-permissions-public-read").uncheck({ force: true })
+          submitModal()
 
-    it("Should hide edit button if user does not have write access", () => {})
+          cy.logout()
+          visitTapestry(TEST_TAPESTRY_NAME)
 
-    it("Should hide add button if user does not have add access", () => {})
+          getNode(id).should("not.exist")
+        })
+    })
+
+    it("Should hide edit button if user does not have write access", () => {
+      getStore()
+        .its("state.nodes.1.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/permissions/i).click()
+          getByTestId("node-permissions-public-read").check({ force: true })
+          getByTestId("node-permissions-authenticated-edit").check({ force: true })
+          submitModal()
+
+          cy.logout()
+          visitTapestry(TEST_TAPESTRY_NAME)
+          getNode(id).click()
+          getEditNodeButton(id).should("not.exist")
+
+          cy.login("subscriber")
+          visitTapestry(TEST_TAPESTRY_NAME)
+          getNode(id).click()
+          getEditNodeButton(id).should("exist")
+        })
+    })
+
+    it("Should hide add button if user does not have add access", () => {
+      getStore()
+        .its("state.nodes.1.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/permissions/i).click()
+          getByTestId("node-permissions-authenticated-add").check({ force: true })
+          submitModal()
+
+          cy.logout()
+          visitTapestry(TEST_TAPESTRY_NAME)
+          getNode(id).click()
+          getAddNodeButton(id).should("not.exist")
+
+          cy.login("subscriber")
+          visitTapestry(TEST_TAPESTRY_NAME)
+          getNode(id).click()
+          getAddNodeButton(id).should("exist")
+
+          cy.logout()
+        })
+    })
   })
 })

@@ -47,12 +47,12 @@ export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
 
 export const openAddNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
-  cy.get(`#addNodeIcon${id}`).click()
+  getAddNodeButton(id).click()
 }
 
 export const openEditNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
-  cy.get(`#editNodeIcon${id}`).click()
+  getEditNodeButton(id).click()
 }
 
 export const getModal = () => cy.get("#node-modal-container")
@@ -63,6 +63,12 @@ export const addRootNode = fixture => {
   cy.get("#root-node-button > div").click()
   fillNodeForm(fixture)
 }
+
+export const getMediaButton = id => cy.get(`#mediaButton${id}`)
+
+export const getAddNodeButton = id => cy.get(`#addNodeIcon${id}`)
+
+export const getEditNodeButton = id => cy.get(`#editNodeIcon${id}`)
 
 export const generateLink = (source, target) => ({ source, target })
 
