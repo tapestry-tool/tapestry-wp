@@ -157,33 +157,51 @@ describe("Author side", () => {
   })
 
   describe("Node appearance", () => {
-    it("Should show a thumbnail if a thumbnail url is passed", () => {})
+    beforeEach(() => {
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/appearance/i).click()
+        })
+    })
+
+    // uncheck hidden options when done
+    after(() => {
+      visitTapestry(TEST_TAPESTRY_NAME)
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/appearance/i).click()
+        })
+      const ids = ["hide-title", "hide-progress", "hide-media"]
+      ids.forEach(id => {
+        getByTestId(`node-appearance-${id}`).uncheck({ force: true })
+      })
+    })
+
+    it("Should show a thumbnail if a thumbnail url is passed", () => {
+      const url =
+        "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg"
+
+      getByTestId("node-appearance-add-thumbnail").check({ force: true })
+      getByTestId("node-imageUrl")
+        .clear()
+        .type(url)
+      submitModal()
+
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => {
+          getNode(id)
+            .get("image")
+            .should("have.attr", "href")
+            .should("equal", url)
+        })
+    })
 
     describe("Appearance options", () => {
-      beforeEach(() => {
-        getStore()
-          .its("state.nodes.0.id")
-          .then(id => {
-            openEditNodeModal(id)
-            cy.contains(/appearance/i).click()
-          })
-      })
-
-      // uncheck hidden options when done
-      after(() => {
-        visitTapestry(TEST_TAPESTRY_NAME)
-        getStore()
-          .its("state.nodes.0.id")
-          .then(id => {
-            openEditNodeModal(id)
-            cy.contains(/appearance/i).click()
-          })
-        const ids = ["hide-title", "hide-progress", "hide-media"]
-        ids.forEach(id => {
-          getByTestId(`node-appearance-${id}`).uncheck({ force: true })
-        })
-      })
-
       const setup = prop => {
         getByTestId(`node-appearance-${prop}`).check({ force: true })
         submitModal()
