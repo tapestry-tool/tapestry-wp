@@ -75,3 +75,5 @@ export const generateLink = (source, target) => ({ source, target })
 export const getByTestId = id => cy.get(`[data-testid=${id}]`)
 
 export const getNode = id => cy.get(`#node-${id}`)
+
+export const getLightbox = () => cy.get("#lightbox")
