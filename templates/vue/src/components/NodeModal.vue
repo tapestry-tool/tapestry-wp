@@ -84,7 +84,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
+            <b-form-group v-show="nodeType === 'h5p'" :label="h5pLabel">
               <combobox
                 v-model="selectedH5pContent"
                 item-text="title"
@@ -99,6 +99,9 @@
                   </p>
                 </template>
               </combobox>
+              <b-form-text v-if="showVideoDescription">
+                This H5P should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="nodeType === 'h5p'"
@@ -345,10 +348,17 @@ export default {
     ...mapGetters(["getDirectChildren", "getNode"]),
     videoLabel() {
       const labels = {
-        [tydeTypes.STAGE]: "Pre-stage video",
-        [tydeTypes.MODULE]: "Module completion video"
+        [tydeTypes.STAGE]: "Pre-Stage Video URL",
+        [tydeTypes.MODULE]: "Module Completion Video URL"
       }
       return labels[this.node.tydeType] || "Video URL"
+    },
+    h5pLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage H5P Content",
+        [tydeTypes.MODULE]: "Module Completion H5P Content"
+      }
+      return labels[this.node.tydeType] || "H5P Content"
     },
     showVideoDescription() {
       return this.node.tydeType === tydeTypes.STAGE || this.node.tydeType === tydeTypes.MODULE
