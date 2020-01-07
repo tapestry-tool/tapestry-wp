@@ -205,7 +205,6 @@ function tapestryTool(config){
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
             var updatedNode = fillEmptyFields(node, {
-                tydeType: "Regular", 
                 skippable: true,
                 behaviour: "embed",
                 completed: false,
@@ -217,6 +216,7 @@ function tapestryTool(config){
                 { authenticated: ["read"] }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            updatedNode.tydeType = updatedNode.tydeType || "Regular";
             return updatedNode
         });
 

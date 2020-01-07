@@ -2,10 +2,9 @@
   <b-form-group label="TYDE Node Type">
     <b-form-select
       v-model="node.tydeType"
-      :disabled="disableSelect"
       :options="tydeTypeOptions"
     ></b-form-select>
-    <b-form-text v-if="showModuleWarning">
+    <b-form-text v-if="disableModuleChange">
       You cannot change the module type because the node still has stages as
       children.
     </b-form-text>
@@ -30,7 +29,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDirectChildren"]),
+    ...mapGetters(["getDirectChildren", "getNode"]),
     hasChildren() {
       return this.getDirectChildren(this.node.id).length > 0
     },
@@ -48,18 +47,20 @@ export default {
       const normalOptions = options.filter(
         opt => opt !== tydeTypes.STAGE && opt !== tydeTypes.QUESTION_SET
       )
-
-      // if a module and has children, return only the module option.
-      if (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) {
-        return [tydeTypes.MODULE]
+      if (this.node.tydeType === tydeTypes.MODULE) {
+        return this.disableModuleChange
+          ? [tydeTypes.MODULE]
+          : [tydeTypes.REGULAR, tydeTypes.MODULE]
       }
       return normalOptions
     },
-    showModuleWarning() {
-      return this.hasChildren && this.node.tydeType === tydeTypes.MODULE
-    },
-    disableSelect() {
-      return this.tydeTypeOptions.length === 1
+    disableModuleChange() {
+      const children = this.getDirectChildren(this.node.id)
+      return (
+        this.hasChildren &&
+        this.node.tydeType === tydeTypes.MODULE &&
+        children.map(this.getNode).every(node => node.tydeType === tydeTypes.STAGE)
+      )
     },
   },
 }

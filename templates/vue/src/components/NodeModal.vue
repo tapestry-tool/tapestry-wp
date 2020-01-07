@@ -279,12 +279,12 @@
 
 <script>
 import Helpers from "../utils/Helpers"
-import { tydeTypes } from "../utils/constants"
-import QuizModal from "./node-modal/QuizModal"
-import TydeTypeInput from "./node-modal/TydeTypeInput"
-import { mapGetters } from "vuex"
 import Combobox from "./Combobox"
+import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
+import { mapGetters } from "vuex"
+import { tydeTypes } from "../utils/constants"
+import TydeTypeInput from "./node-modal/TydeTypeInput"
 
 export default {
   name: "node-modal",
@@ -342,7 +342,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren"]),
+    ...mapGetters(["getDirectChildren", "getNode"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-stage video",
@@ -361,10 +361,17 @@ export default {
       }
     },
     disableDeleteButton() {
+      const children = this.getDirectChildren(this.node.id)
       return (
-        (this.node.tydeType === tydeTypes.STAGE ||
-          this.node.tydeType === tydeTypes.MODULE) &&
-        this.hasChildren
+        (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) ||
+        (this.node.tydeType === tydeTypes.STAGE &&
+          children
+            .map(this.getNode)
+            .every(node =>
+              (node.tydeType === this.node.tydeType) === tydeTypes.MODULE
+                ? tydeTypes.STAGE
+                : tydeTypes.QUESTION_SET
+            ))
       )
     },
     nodeType() {
