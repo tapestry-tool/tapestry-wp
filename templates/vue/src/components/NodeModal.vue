@@ -345,13 +345,13 @@ export default {
     ...mapGetters(["getDirectChildren"]),
     videoLabel() {
       const labels = {
-        [nodeTypes.STAGE]: "Pre-stage video",
-        [nodeTypes.MODULE]: "Module completion video"
+        [tydeTypes.STAGE]: "Pre-stage video",
+        [tydeTypes.MODULE]: "Module completion video"
       }
       return labels[this.node.tydeType] || "Video URL"
     },
     showVideoDescription() {
-      return this.node.tydeType === nodeTypes.STAGE || this.node.tydeType === nodeTypes.MODULE
+      return this.node.tydeType === tydeTypes.STAGE || this.node.tydeType === tydeTypes.MODULE
     },
     hasChildren() {
       if (this.modalType === "edit-node") {
