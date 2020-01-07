@@ -48,15 +48,19 @@ export default {
         opt => opt !== tydeTypes.STAGE && opt !== tydeTypes.QUESTION_SET
       )
       if (this.node.tydeType === tydeTypes.MODULE) {
-        return this.disableModuleChange ? [tydeTypes.MODULE] : [tydeTypes.REGULAR, tydeTypes.MODULE]
+        return this.disableModuleChange
+          ? [tydeTypes.MODULE]
+          : [tydeTypes.REGULAR, tydeTypes.MODULE]
       }
       return normalOptions
     },
     disableModuleChange() {
       const children = this.getDirectChildren(this.node.id)
-      return this.hasChildren
-        && this.node.tydeType === tydeTypes.MODULE
-        && children.map(this.getNode).every(node => node.tydeType === tydeTypes.STAGE)
+      return (
+        this.hasChildren &&
+        this.node.tydeType === tydeTypes.MODULE &&
+        children.map(this.getNode).every(node => node.tydeType === tydeTypes.STAGE)
+      )
     },
   },
 }

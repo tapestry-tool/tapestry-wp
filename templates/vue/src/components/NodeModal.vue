@@ -339,7 +339,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren"]),
+    ...mapGetters(["getDirectChildren", "getNode"]),
     hasChildren() {
       if (this.modalType === "edit-node") {
         return this.getDirectChildren(this.node.id).length > 0
@@ -348,10 +348,17 @@ export default {
       }
     },
     disableDeleteButton() {
+      const children = this.getDirectChildren(this.node.id)
       return (
-        (this.node.tydeType === tydeTypes.STAGE ||
-          this.node.tydeType === tydeTypes.MODULE) &&
-        this.hasChildren
+        (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) ||
+        (this.node.tydeType === tydeTypes.STAGE &&
+          children
+            .map(this.getNode)
+            .every(node =>
+              (node.tydeType === this.node.tydeType) === tydeTypes.MODULE
+                ? tydeTypes.STAGE
+                : tydeTypes.QUESTION_SET
+            ))
       )
     },
     nodeType() {
