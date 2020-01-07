@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-node-permissions.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
+require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
  * Add/update/retrieve a Tapestry
@@ -295,7 +296,7 @@ class Tapestry implements ITapestry
         }
 
         if (!isset($parent)) {
-            return $tydeType == "Module" || $tydeType == "Regular";
+            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
         }
 
         $parentType = $parent->tydeType;
@@ -303,12 +304,12 @@ class Tapestry implements ITapestry
             return true;
         }
 
-        if ($parentType == "Module") {
-            return $tydeType == "Stage";
-        } else if ($parentType == "Stage") {
-            return $tydeType == "Question set";
-        } else if ($parentType == "Regular") {
-            return $tydeType == "Module" || $tydeType == "Regular";
+        if ($parentType == TydeTypes::MODULE) {
+            return $tydeType == TydeTypes::STAGE;
+        } else if ($parentType == TydeTypes::STAGE) {
+            return $tydeType == TydeTypes::QUESTION_SET;
+        } else if ($parentType == TydeTypes::REGULAR) {
+            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
         } else {
             // otherwise parent is a question set, so we shouldn't be able
             // to get here in the first place.
