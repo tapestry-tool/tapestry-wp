@@ -34,11 +34,7 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox
-      v-if="lightbox.isOpen"
-      :node-id="lightbox.id"
-      @close="closeLightbox"
-    />
+    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -48,6 +44,8 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
+import { getLinkMetadata } from "../services/LinkPreviewApi"
+import Helpers from "../utils/Helpers"
 import Lightbox from "./Lightbox"
 
 export default {
@@ -323,6 +321,29 @@ export default {
         }
       }
 
+      if (
+        newNodeEntry.mediaFormat === "embed" &&
+        newNodeEntry.behaviour !== "embed"
+      ) {
+        if (
+          !isEdit ||
+          shouldFetch(newNodeEntry.typeData.mediaURL, this.selectedNode)
+        ) {
+          const url = newNodeEntry.typeData.mediaURL
+          const { data } = await getLinkMetadata(url)
+          newNodeEntry.typeData.linkMetadata = data
+
+          let shouldChange = true
+          if (newNodeEntry.imageURL) {
+            shouldChange = confirm("Change thumbnail to new image?")
+          }
+
+          if (shouldChange) {
+            newNodeEntry.imageURL = data.image
+          }
+        }
+      }
+
       let id
       if (!isEdit) {
         // New node
@@ -376,6 +397,14 @@ export default {
       thisTapestryTool.reinitialize()
     }, */
   },
+}
+
+const shouldFetch = (url, selectedNode) => {
+  if (!selectedNode.typeData.linkMetadata) {
+    return true
+  }
+  const oldUrl = selectedNode.typeData.linkMetadata.url
+  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 </script>
 

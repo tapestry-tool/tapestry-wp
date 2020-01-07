@@ -44,7 +44,7 @@ export default {
     },
     visible() {
       return this.completed ? `visible` : `hidden`
-    }
+    },
   },
 }
 </script>
