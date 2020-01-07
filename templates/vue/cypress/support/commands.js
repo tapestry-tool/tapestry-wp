@@ -24,7 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import { SITE_URL } from "./utils"
+import { SITE_URL, getMediaButton } from "./utils"
 import roles from "./roles"
 
 Cypress.Commands.add("login", role => {
@@ -44,4 +44,9 @@ Cypress.Commands.add("logout", () => {
   // force true is used because cypress does not have a way to
   // simulate hover events.
   cy.get("#wp-admin-bar-logout > a").click({ force: true })
+})
+
+Cypress.Commands.add("openLightbox", id => {
+  getMediaButton(id).click()
+  return cy.get("#lightbox")
 })

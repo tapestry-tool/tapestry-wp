@@ -77,3 +77,12 @@ export const getByTestId = id => cy.get(`[data-testid=${id}]`)
 export const getNode = id => cy.get(`#node-${id}`)
 
 export const getLightbox = () => cy.get("#lightbox")
+
+export const findNode = pred =>
+  getStore()
+    .its("state.nodes")
+    .then(nodes => nodes.find(pred))
+
+export const normalizeUrl = url => {
+  return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
+}
