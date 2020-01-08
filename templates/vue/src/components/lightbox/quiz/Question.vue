@@ -187,9 +187,10 @@ button {
 
 .question-title {
   position: relative;
-  font-size: 48px;
+  font-size: 28px;
   font-weight: 600 !important;
   padding-top: 16px;
+  padding-left: 100px;
   margin-bottom: 36px;
 }
 
@@ -199,7 +200,6 @@ button {
 
 .question-content {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
