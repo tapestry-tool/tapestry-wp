@@ -99,8 +99,9 @@ export default {
   },
   methods: {
     back() {
-      const wasOpened = this.formOpened
+      const wasOpened = this.formOpened || this.recorderOpened
       this.formOpened = false
+      this.recorderOpened = false
       if (!wasOpened) {
         this.$emit("back")
       }
