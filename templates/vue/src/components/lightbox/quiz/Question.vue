@@ -23,12 +23,14 @@
         <div class="button-container">
           <answer-button
             v-if="hasId('textId')"
+            :completed="textFormCompleted"
             @click="openForm(question.answers.textId, 'textId')"
           >
             text
           </answer-button>
           <answer-button
             v-if="hasId('audioId')"
+            :completed="audioRecorderCompleted"
             icon="microphone"
             @click="openRecorder(question.answers.audioId)"
           >
@@ -36,6 +38,7 @@
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
+            :completed="checklistFormCompleted"
             icon="tasks"
             @click="openForm(question.answers.checklistId, 'checklistId')"
           >
@@ -90,6 +93,15 @@ export default {
     ...mapGetters(["selectedNode"]),
     loadingText() {
       return this.formOpened ? "Submitting..." : "Loading form..."
+    },
+    textFormCompleted() {
+      return !!(this.question.entries && this.question.entries.textId)
+    },
+    checklistFormCompleted() {
+      return !!(this.question.entries && this.question.entries.checklistId)
+    },
+    audioRecorderCompleted() {
+      return !!(this.question.entries && this.question.entries.audioId)
     },
   },
   watch: {
@@ -190,9 +202,10 @@ button {
 
 .question-title {
   position: relative;
-  font-size: 48px;
+  font-size: 28px;
   font-weight: 600 !important;
   padding-top: 16px;
+  padding-left: 100px;
   margin-bottom: 36px;
 }
 
@@ -202,7 +215,6 @@ button {
 
 .question-content {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
