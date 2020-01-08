@@ -4,6 +4,7 @@
       <tyde-button icon="cog" @click="setActivePage('settings')"></tyde-button>
       <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
       <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
+      <tyde-button class="close-button" icon="times" @click="$emit('continue')"></tyde-button>
     </div>
     <div class="content">
       <h1>Captain's Log</h1>
@@ -19,9 +20,6 @@
         @settings-change="updateSettings"
       />
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
-    </div>
-    <div class="continue">
-      <tyde-button icon="arrow-right" @click="$emit('continue')"></tyde-button>
     </div>
   </div>
 </template>
@@ -72,6 +70,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap');
+
 #tyde-menu {
   width: 100vw;
   height: 100vh;
@@ -82,7 +82,11 @@ export default {
   background: black;
   color: white;
   z-index: 200;
-  padding: 16px 80px;
+  padding: 16px 15px;
+
+  * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
 
   .buttons {
     width: 100%;
@@ -100,10 +104,10 @@ export default {
 
     h1 {
       position: absolute;
-      right: 1.5em;
-      top: -63px;
+      right: 2.5em;
+      top: -78px;
       padding: 16px 3em;
-      line-height: 1;
+      line-height: 44px;
       margin: 0;
       font-weight: 900;
       font-size: 30px;
@@ -131,17 +135,11 @@ export default {
     }
   }
 
-  .continue {
-    position: fixed;
-    bottom: 2em;
-    right: 2em;
-    z-index: 20;
-
-    tyde-button {
-      width: 96px;
-      height: 96px;
-      font-size: 56px;
-    }
+  .close-button {
+    position: absolute;
+    right: 15px;
+    top: 17px;
+    z-index: 10;
   }
 }
 </style>
