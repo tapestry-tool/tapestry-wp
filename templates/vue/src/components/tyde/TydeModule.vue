@@ -50,8 +50,10 @@ export default {
   methods: {
     ...mapMutations(["openLightbox", "closeLightbox"]),
     next() {
-      this.activeStageIndex++
-      if (this.activeStageIndex >= this.stages.length) {
+      if (this.activeStageIndex < this.stages.length - 1) {
+        this.activeStageIndex++
+      } else {
+        this.openLightbox(this.nodeId)
         this.$emit("done")
       }
     },
