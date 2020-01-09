@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div class="gf-container">
     <loading v-show="loading" label="Loading form..." />
     <div
       v-show="!loading"
       ref="formContainer"
+      class="gf-form-container"
       @submit="handleSubmit"
       v-html="html"
     ></div>
@@ -103,3 +104,17 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.gf-container {
+  width: 100%;
+  height: 100%;
+}
+
+.gf-form-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

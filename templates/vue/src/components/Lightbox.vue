@@ -37,7 +37,7 @@
             @close="$emit('close')"
           />
           <external-media
-            v-if="node.mediaFormat === 'embed'"
+            v-if="node.mediaType === 'url-embed'"
             :node="node"
             :dimensions="dimensions"
             @mounted="updateDimensions"
@@ -55,6 +55,12 @@
             @complete="complete"
             @close="$emit('close')"
           />
+          <gravity-form
+            v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
+            :id="node.typeData.mediaURL"
+            @submit="handleFormSubmit"
+          ></gravity-form>
+          <completion-screen v-if="showCompletionScreen" />
         </div>
       </div>
     </transition>
@@ -66,7 +72,9 @@ import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
+import GravityForm from "./lightbox/GravityForm"
 import Helpers from "../utils/Helpers"
+import CompletionScreen from "./lightbox/quiz/CompletionScreen"
 import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
 
 const SAVE_INTERVAL = 5
@@ -74,9 +82,11 @@ const SAVE_INTERVAL = 5
 export default {
   name: "lightbox",
   components: {
+    CompletionScreen,
     VideoMedia,
     TextMedia,
     ExternalMedia,
+    GravityForm,
     "h5p-media": H5PMedia,
   },
   props: {
@@ -93,6 +103,7 @@ export default {
         left: 50,
       },
       timeSinceLastSaved: new Date(),
+      showCompletionScreen: false,
     }
   },
   computed: {
@@ -180,6 +191,10 @@ export default {
   methods: {
     ...mapMutations(["setLightboxEl"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleFormSubmit() {
+      this.showCompletionScreen = true
+      this.complete()
+    },
     handleLoad({ width, height, el }) {
       if (width && height) {
         this.updateDimensions({ width, height })
