@@ -140,6 +140,8 @@ export default {
           await this.completeQuestion({
             nodeId: this.selectedNode.id,
             questionId: q.id,
+            answerType: "audioId",
+            audioId: this.loadedH5PRecorderId,
           })
         }
       })
