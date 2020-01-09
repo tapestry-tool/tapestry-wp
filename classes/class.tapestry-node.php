@@ -33,6 +33,7 @@ class TapestryNode implements ITapestryNode
     private $skippable;
     private $quiz;
     private $fullscreen;
+    private $tydeType;
     private $showInBackpack;
 
     /**
@@ -70,6 +71,7 @@ class TapestryNode implements ITapestryNode
         $this->skippable = true;
         $this->quiz = array();
         $this->fullscreen = false;
+        $this->tydeType = '';
         $this->showInBackpack = true;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
@@ -157,6 +159,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
+        }
+        if (isset($node->tydeType) && is_string($node->tydeType)) {
+            $this->tydeType = $node->tydeType;
         }
         if (isset($node->showInBackpack) && is_bool($node->showInBackpack)) {
             $this->showInBackpack = $node->showInBackpack;
@@ -280,6 +285,7 @@ class TapestryNode implements ITapestryNode
             'skippable'     => $this->skippable,
             'quiz'          => $this->quiz,
             'fullscreen'    => $this->fullscreen,
+            'tydeType'      => $this->tydeType,
             'showInBackpack'=> $this->showInBackpack
         ];
     }

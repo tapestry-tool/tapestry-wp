@@ -46,11 +46,12 @@ interface ITapestry
     /**
      * Add a new node
      * 
-     * @param   Object  $node   Tapestry node
+     * @param   Object  $node       Tapestry node
+     * @param   Number  $parentId   ID or parent, may be null
      * 
      * @return  Object  $node   Tapestry node
      */
-    public function addNode($node);
+    public function addNode($node, $parentId = null);
 
     /**
      * Add a new link
@@ -94,4 +95,19 @@ interface ITapestry
      * @return  Boolean true if there is no root node, false otherwise
      */
     public function isEmpty();
+
+    /**
+     * Ensures the node data is well formed. Checks against links to make sure
+     * the incoming type does not conflict with any parents.
+     * 
+     * @return  Boolean true if $node is valid
+     */
+    public function validateNode($node, $parent);
+
+    /**
+     * Returns the parent of the given $nodeId.
+     * 
+     * @return  Object the parent node, if it exists.
+     */
+    public function getNodeParent($nodeId);
 }

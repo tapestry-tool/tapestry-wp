@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-node-permissions.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
+require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
  * Add/update/retrieve a Tapestry
@@ -131,8 +132,18 @@ class Tapestry implements ITapestry
      * 
      * @return  Object  $node   Tapestry node
      */
-    public function addNode($node)
+    public function addNode($node, $parentId = null)
     {
+        $parent = null;
+
+        if (isset($parentId)) {
+            $parent = $this->getNode($parentId)->get();
+        }
+
+        if (!$this->validateNode($node, $parent)) {
+            throw new TapestryError("INVALID_NODE_TYPE");
+        }
+
         $tapestryNode = new TapestryNode($this->postId);
         $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
@@ -196,6 +207,15 @@ class Tapestry implements ITapestry
      */
     public function addLink($link)
     {
+        $parent = $this->getNode($link->source)->get();
+        $child = $this->getNode($link->target)->get();
+
+        $isValid = $this->validateNode($child, $parent);
+
+        if (!$isValid) {
+            throw new TapestryError('INVALID_NODE_TYPE');
+        }
+
         array_push($this->links, $link);
         $this->_saveToDatabase();
         return $link;
@@ -265,6 +285,51 @@ class Tapestry implements ITapestry
     public function isEmpty()
     {
         return empty($this->rootId);
+    }
+
+    public function validateNode($node, $parent = null)
+    {
+        $tydeType = $node->tydeType;
+
+        if (!isset($tydeType) || !is_string($tydeType)) {
+            return true; // for backwards compatibility
+        }
+
+        if (!isset($parent)) {
+            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
+        }
+
+        $parentType = $parent->tydeType;
+        if (!isset($parentType)) {
+            return true;
+        }
+
+        if ($parentType == TydeTypes::MODULE) {
+            return $tydeType == TydeTypes::STAGE;
+        } else if ($parentType == TydeTypes::STAGE) {
+            return $tydeType == TydeTypes::QUESTION_SET;
+        } else if ($parentType == TydeTypes::REGULAR) {
+            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
+        } else {
+            // otherwise parent is a question set, so we shouldn't be able
+            // to get here in the first place.
+            return false;
+        }
+    }
+
+    public function getNodeParent($nodeId)
+    {
+        $parent = null;
+
+        foreach($this->links as $link) {
+            if ($link->target == $nodeId) {
+                $node = new TapestryNode($this->postId, $link->source);
+                $parent = $node->get();
+                break;
+            }
+        }
+
+        return $parent;
     }
 
     private function _loadFromDatabase()

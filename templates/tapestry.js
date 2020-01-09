@@ -204,12 +204,19 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [], showInBackpack: true })
+            var updatedNode = fillEmptyFields(node, {
+                skippable: true,
+                behaviour: "embed",
+                completed: false,
+                quiz: [],
+                showInBackpack: true
+            })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            updatedNode.tydeType = updatedNode.tydeType || "Regular";
             return updatedNode
         });
 
@@ -486,8 +493,7 @@ function tapestryTool(config){
         }
     }
     
-    this.tapestryDeleteNode = function() {
-        var nodeId = root;
+    this.tapestryDeleteNode = function(nodeId = root) {
         if (nodeId === tapestry.dataset.rootId) {
             if (tapestry.dataset.nodes && tapestry.dataset.nodes.length > 1) {
                 alert("Root node can only be deleted if there are no other nodes in the tapestry.");
@@ -1290,7 +1296,7 @@ function tapestryTool(config){
                 return NORMAL_RADIUS + ROOT_RADIUS_DIFF - 30;
             })
             .attr("style", function (d) {
-                return d.nodeType === "grandchild" || d.nodeType === "child" ? "visibility: hidden" : "visibility: visible";
+                return d.nodeType === "grandchild" || d.nodeType === "child" || d.tydeType === "Question set" ? "visibility: hidden" : "visibility: visible";
             })
             .attr("class", "mediaButton addNodeButton")
             .call(d3.drag()

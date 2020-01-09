@@ -43,6 +43,7 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <tyde-type-input :node="node" :parent="parent" />
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -60,7 +61,7 @@
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video URL"
+              :label="videoLabel"
             >
               <b-form-input
                 id="node-video-media-url"
@@ -68,6 +69,9 @@
                 placeholder="Enter URL for MP4 Video"
                 required
               />
+              <b-form-text v-if="showVideoDescription">
+                This video should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
@@ -80,7 +84,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
+            <b-form-group v-show="nodeType === 'h5p'" :label="h5pLabel">
               <combobox
                 v-model="selectedH5pContent"
                 item-text="title"
@@ -95,6 +99,9 @@
                   </p>
                 </template>
               </combobox>
+              <b-form-text v-if="showVideoDescription">
+                This H5P should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="nodeType === 'h5p'"
@@ -253,10 +260,15 @@
         v-show="modalType === 'edit-node'"
         size="sm"
         variant="danger"
+        :disabled="disableDeleteButton"
         @click="$emit('delete-node')"
       >
         Delete Node
       </b-button>
+      <p v-if="disableDeleteButton" class="disable-message text-muted">
+        You cannot delete this node because this {{ node.tydeType }} node still has
+        children.
+      </p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
@@ -273,15 +285,24 @@ import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
+import { mapGetters } from "vuex"
+import { tydeTypes } from "../utils/constants"
+import TydeTypeInput from "./node-modal/TydeTypeInput"
 
 export default {
   name: "node-modal",
   components: {
     Combobox,
     QuizModal,
+    TydeTypeInput,
   },
   props: {
     node: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    parent: {
       type: Object,
       required: false,
       default: () => ({}),
@@ -324,6 +345,45 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren", "getNode"]),
+    videoLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage Video URL",
+        [tydeTypes.MODULE]: "Module Completion Video URL"
+      }
+      return labels[this.node.tydeType] || "Video URL"
+    },
+    h5pLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage H5P Content",
+        [tydeTypes.MODULE]: "Module Completion H5P Content"
+      }
+      return labels[this.node.tydeType] || "H5P Content"
+    },
+    showVideoDescription() {
+      return this.node.tydeType === tydeTypes.STAGE || this.node.tydeType === tydeTypes.MODULE
+    },
+    hasChildren() {
+      if (this.modalType === "edit-node") {
+        return this.getDirectChildren(this.node.id).length > 0
+      } else {
+        return false
+      }
+    },
+    disableDeleteButton() {
+      const children = this.getDirectChildren(this.node.id)
+      return (
+        (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) ||
+        (this.node.tydeType === tydeTypes.STAGE &&
+          children
+            .map(this.getNode)
+            .every(node =>
+              (node.tydeType === this.node.tydeType) === tydeTypes.MODULE
+                ? tydeTypes.STAGE
+                : tydeTypes.QUESTION_SET
+            ))
+      )
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -368,7 +428,8 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
-        { name: "showInBackpack", value: this.node.showInBackpack }
+        { name: "tydeType", value: this.node.tydeType },
+        { name: "showInBackpack", value: this.node.showInBackpack },
       ]
     },
     nodeImageUrl() {
@@ -400,6 +461,7 @@ export default {
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
+        this.setInitialTydeType()
         const selectedContent = this.h5pContentOptions.find(content =>
           this.filterContent(content)
         )
@@ -408,6 +470,18 @@ export default {
     })
   },
   methods: {
+    setInitialTydeType() {
+      // only set node types if adding a new node
+      if (this.parent && this.modalType === "add-new-node") {
+        const parentType = this.parent.tydeType
+        this.node.tydeType =
+          parentType === tydeTypes.MODULE
+            ? tydeTypes.STAGE
+            : parentType === tydeTypes.STAGE
+            ? tydeTypes.QUESTION_SET
+            : tydeTypes.REGULAR
+      }
+    },
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
         return false
@@ -603,6 +677,12 @@ table {
     background: #f1f1f1;
   }
 
+  .disable-message {
+    font-size: 0.9em;
+    padding: 0;
+    margin: 0 0 0 8px;
+  }
+
   .modal-header-row {
     display: flex;
     justify-content: space-between;
@@ -612,28 +692,6 @@ table {
     &:last-child {
       margin-bottom: 0;
     }
-  }
-}
-
-.modal-header-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.modal-header-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
   }
 }
 </style>
