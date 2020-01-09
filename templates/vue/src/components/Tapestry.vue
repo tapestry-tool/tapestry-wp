@@ -272,6 +272,9 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
+            } else {
+              newNodeEntry.mediaType = "wp-post"
+              newNodeEntry.mediaFormat = ""
             }
             break
           case "textContent":
