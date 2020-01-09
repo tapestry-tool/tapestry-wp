@@ -2085,6 +2085,11 @@ function tapestryTool(config){
     
         // CHECK 5: If we are currently in view mode & if the node will be viewable in that case
         if (node.nodeType === "grandchild" && inViewMode) return false;
+
+        // CHECK 6: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
+        if ((node.tydeType === "Stage" || node.tydeType === "Question set") && !config.wpCanEditTapestry) {
+            return false;
+        }
     
         // If it passes all the checks, return true!
         return true;
