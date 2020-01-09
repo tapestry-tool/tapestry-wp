@@ -1,24 +1,54 @@
 <template>
-  <div ref="formContainer" @submit="handleSubmit" v-html="form"></div>
+  <div>
+    <loading v-show="loading" label="Loading form..." />
+    <div
+      v-show="!loading"
+      ref="formContainer"
+      @submit="handleSubmit"
+      v-html="html"
+    ></div>
+  </div>
 </template>
 
 <script>
 import axios from "axios"
+import Loading from "@/components/Loading"
+import GravityFormsApi from "@/services/GravityFormsApi"
 
 export default {
   name: "gravity-form",
+  components: {
+    Loading,
+  },
   props: {
-    form: {
+    id: {
       type: String,
       required: true,
     },
-    entry: {
-      type: Object,
-      required: false,
-      default: null,
+  },
+  data() {
+    return {
+      entry: null,
+      html: "",
+      loading: true,
+    }
+  },
+  watch: {
+    id(newId) {
+      GravityFormsApi.getFormHtml(newId).then(html => (this.html = html))
     },
   },
-  mounted() {
+  async mounted() {
+    delete window[`gf_submitting_${this.id}`]
+
+    const html = await GravityFormsApi.getFormHtml(this.id)
+    this.html = html
+
+    const entry = await GravityFormsApi.getFormEntry(this.id)
+    this.entry = entry
+
+    this.loading = false
+
     if (this.entry) {
       this.populateForm()
     }
@@ -29,7 +59,6 @@ export default {
       event.preventDefault()
 
       const form = this.$refs.formContainer.querySelector("form")
-      const formId = form.getAttribute("id").split("gform_")[1]
 
       const data = new FormData(form)
       const url = form.action
@@ -40,13 +69,14 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then(response =>
-          this.$emit("submit", {
-            success: this.isSubmitSuccessful(response),
-            response: response.data,
-            formId,
-          })
-        )
+        .then(response => {
+          if (!this.isSubmitSuccessful(response)) {
+            delete window[`gf_submitting_${this.id}`]
+            this.html = response.data
+          } else {
+            this.$emit("submit")
+          }
+        })
     },
     isSubmitSuccessful(response) {
       return response.data.includes("gform_confirmation_message")
