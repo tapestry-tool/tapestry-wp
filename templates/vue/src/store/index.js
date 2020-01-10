@@ -18,7 +18,7 @@ const store = new Vuex.Store({
     settings: {},
     h5pSettings: {},
     selectedNodeId: null,
-    isTapestryLoaded: false,
+    tapestryIsLoaded: false,
   },
   getters: {
     selectedNode: state => {

@@ -10,13 +10,12 @@
       ref="video"
       controls
       autoplay
+      :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"
       @timeupdate="updateVideoProgress"
-    >
-      <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
-    </video>
+    ></video>
   </div>
 </template>
 

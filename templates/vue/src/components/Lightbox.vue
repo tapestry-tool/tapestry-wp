@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isTapestryLoaded"
+    v-if="tapestryIsLoaded"
     id="lightbox"
     :class="{ 'full-screen': node.fullscreen }"
     :format="node.mediaFormat"
@@ -97,7 +97,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "isTapestryLoaded"]),
+    ...mapState(["h5pSettings", "tapestryIsLoaded"]),
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
@@ -162,7 +162,7 @@ export default {
     },
   },
   watch: {
-    isTapestryLoaded() {
+    tapestryIsLoaded() {
       this.applyDimensions()
     },
     nodeId() {

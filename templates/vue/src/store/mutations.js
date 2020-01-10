@@ -3,7 +3,7 @@ import Helpers from "../utils/Helpers"
 export function init(state, dataset) {
   setDataset(state, dataset)
   state.selectedNodeId = dataset.rootId
-  state.isTapestryLoaded = true
+  state.tapestryIsLoaded = true
 }
 
 export function setDataset(state, dataset) {
