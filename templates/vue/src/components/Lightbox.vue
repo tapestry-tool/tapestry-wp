@@ -178,11 +178,13 @@ export default {
     },
     nodeId() {
       this.applyDimensions()
+      thisTapestryTool.selectNode(Number(this.nodeId))
     },
   },
   mounted() {
     this.isLoaded = true
     this.applyDimensions()
+    thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
   },
   async beforeDestroy() {
