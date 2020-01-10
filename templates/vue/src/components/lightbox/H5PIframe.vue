@@ -27,7 +27,7 @@ export default {
       },
     },
     settings: {
-      type: Object,
+      type: [Object, String],
       required: false,
       default: () => {
         return {}
@@ -60,6 +60,7 @@ export default {
     window.addEventListener("tapestry-h5p-audio-recorder", this.saveH5PAudioToServer)
   },
   beforeDestroy() {
+    this.handlePause(this.node)
     // Detach listener to event dispatched by H5P Audio Recorder lib
     window.removeEventListener(
       "tapestry-h5p-audio-recorder",
@@ -70,6 +71,11 @@ export default {
     ...mapGetters(["selectedNode"]),
     userLoggedIn: function() {
       return wpApiSettings && wpApiSettings.userLoggedIn === "true"
+    },
+  },
+  watch: {
+    node(_, oldNode) {
+      this.handlePause(oldNode)
     },
   },
   methods: {
@@ -144,6 +150,20 @@ export default {
             audioId: this.loadedH5PRecorderId,
           })
         }
+      })
+    },
+    handlePlay(node) {
+      const { id, mediaType } = node
+      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
+      thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
+        time: node.typeData.progress[0].value * node.mediaDuration,
+      })
+    },
+    handlePause(node) {
+      const { id, mediaType } = node
+      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
+      thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+        time: node.typeData.progress[0].value * node.mediaDuration,
       })
     },
     handleLoad() {
@@ -253,17 +273,7 @@ export default {
                 }
                 seeked = true
               }
-
-              const { id, mediaType } = this.node
-              thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-              thisTapestryTool.recordAnalyticsEvent(
-                "user",
-                "play",
-                "h5p-video",
-                id,
-                { time: h5pVideo.getCurrentTime() }
-              )
-
+              this.handlePlay(this.node)
               break
             }
 
@@ -277,15 +287,7 @@ export default {
                 time: h5pVideo.getCurrentTime(),
               }
               seeked = true
-              const { id, mediaType } = this.node
-              thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-              thisTapestryTool.recordAnalyticsEvent(
-                "user",
-                "pause",
-                "h5p-video",
-                id,
-                { time: h5pVideo.getCurrentTime() }
-              )
+              this.handlePause(this.node)
               this.$emit("update-settings", newSettings)
               break
             }

@@ -12,8 +12,8 @@
       autoplay
       :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
-      @play="handlePlay"
-      @pause="handlePause"
+      @play="handlePlay(node)"
+      @pause="handlePause(node)"
       @timeupdate="updateVideoProgress"
     ></video>
   </div>
@@ -41,7 +41,8 @@ export default {
     }
   },
   watch: {
-    node() {
+    node(newNode, oldNode) {
+      this.handlePause(oldNode)
       this.handleLoad()
     },
   },
@@ -77,8 +78,8 @@ export default {
       }
       return false
     },
-    handlePlay() {
-      const { id, mediaType } = this.node
+    handlePlay(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
@@ -87,8 +88,8 @@ export default {
         })
       }
     },
-    handlePause() {
-      const { id, mediaType } = this.node
+    handlePause(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
