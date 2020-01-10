@@ -125,6 +125,25 @@
               />
             </b-form-group>
             <b-form-group
+              v-show="node.mediaType === 'gravity-form'"
+              label="Gravity Form"
+            >
+              <combobox
+                v-model="selectedGravityFormContent"
+                item-text="title"
+                item-value="id"
+                empty-message="There are no forms available. Please add one in your WP dashboard."
+                :options="gravityFormOptions"
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
+            </b-form-group>
+            <b-form-group
               v-show="node.mediaType === 'url-embed'"
               label="External Link"
             >
@@ -285,6 +304,7 @@ import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
 import WordpressApi from "../services/WordpressApi"
+import GravityFormsApi from "../services/GravityFormsApi"
 
 export default {
   name: "node-modal",
@@ -328,8 +348,11 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
+        { value: "gravity-form", text: "Gravity Form" },
       ],
+      gravityFormOptions: [],
       h5pContentOptions: [],
+      selectedGravityFormContent: "",
       selectedH5pContent: "",
       wpPosts: [],
       formErrors: "",
@@ -406,8 +429,12 @@ export default {
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
     },
+    selectedGravityFormContent(id) {
+      this.node.typeData.mediaURL = id
+    },
   },
   async mounted() {
+    this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
     this.wpPosts = await WordpressApi.getPosts()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
@@ -420,6 +447,12 @@ export default {
         const selectedContent = this.h5pContentOptions.find(content =>
           this.filterContent(content)
         )
+        if (this.node.mediaType === "gravity-form") {
+          const selectedForm = this.gravityFormOptions.find(form => {
+            return form.id === this.node.typeData.mediaURL
+          })
+          this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
+        }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
       }
     })

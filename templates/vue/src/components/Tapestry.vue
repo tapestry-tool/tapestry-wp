@@ -275,9 +275,12 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
-            } else {
+            } else if (fieldValue === "wp-post") {
               newNodeEntry.mediaType = "wp-post"
               newNodeEntry.mediaFormat = ""
+            } else if (fieldValue === "gravity-form") {
+              newNodeEntry.mediaType = "gravity-form"
+              newNodeEntry.mediaFormat = "embed"
             }
             break
           case "textContent":
