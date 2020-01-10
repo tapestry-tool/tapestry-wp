@@ -55,6 +55,7 @@
             @complete="complete"
             @close="$emit('close')"
           />
+          <post-media v-if="node.mediaType === 'wp-post'" :node="node" />
         </div>
       </div>
     </transition>
@@ -66,6 +67,7 @@ import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
+import PostMedia from "./lightbox/PostMedia"
 import Helpers from "../utils/Helpers"
 import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
 
@@ -77,6 +79,7 @@ export default {
     VideoMedia,
     TextMedia,
     ExternalMedia,
+    PostMedia,
     "h5p-media": H5PMedia,
   },
   props: {

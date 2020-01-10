@@ -327,7 +327,7 @@ export default {
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
-        { value: "wp-post", text: "Wordpress Post" }
+        { value: "wp-post", text: "Wordpress Post" },
       ],
       h5pContentOptions: [],
       selectedH5pContent: "",
