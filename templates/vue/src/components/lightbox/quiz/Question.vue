@@ -6,15 +6,18 @@
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
+    <loading v-if="loading" label="Submitting..." />
     <gravity-form
       v-if="formOpened"
-      :entry="formEntry"
-      :form="formHtml"
+      :id="formId"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <h5p-iframe v-else-if="recorderOpened" :media-u-r-l="h5pRecorderUrl" />
-    <loading v-if="loadingForm" class="loading" :label="loadingText" />
-    <div v-if="!formOpened && !recorderOpened">
+    <h5p-iframe
+      v-else-if="recorderOpened"
+      :media-u-r-l="h5pRecorderUrl"
+      @submit="$emit('submit')"
+    />
+    <div v-else>
       <h1 class="question-title">
         {{ question.text }}
       </h1>
@@ -51,19 +54,18 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
-import GravityForm from "./GravityForm"
+import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
-import TapestryAPI from "../../../services/TapestryAPI"
 import H5PIframe from "../H5PIframe"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    Loading,
     GravityForm,
+    Loading,
     "h5p-iframe": H5PIframe,
   },
   props: {
@@ -71,29 +73,19 @@ export default {
       type: Object,
       required: true,
     },
-    currentStep: {
-      type: String,
-      required: false,
-      default: "1/1",
-    },
   },
   data() {
     return {
       formOpened: false,
-      recorderOpened: false,
-      formHtml: "",
-      formType: "",
-      formEntry: null,
       formId: null,
-      loadingForm: false,
+      formType: "",
+      recorderOpened: false,
       h5pRecorderUrl: "",
+      loading: false,
     }
   },
   computed: {
     ...mapGetters(["selectedNode"]),
-    loadingText() {
-      return this.formOpened ? "Submitting..." : "Loading form..."
-    },
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)
     },
@@ -110,6 +102,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["completeQuestion"]),
     back() {
       const wasOpened = this.formOpened || this.recorderOpened
       this.formOpened = false
@@ -125,44 +118,22 @@ export default {
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
-    async openForm(id, answerType) {
-      if (!id) {
-        return
-      }
-
-      // Clear previous form data
-      delete window[`gf_submitting_${id}`]
-      this.formHtml = ""
+    openForm(id, answerType) {
       this.formId = id
-      this.formEntry = this.question.entries && this.question.entries[answerType]
       this.formType = answerType
-
-      const TapestryApi = new TapestryAPI(wpPostId)
-      try {
-        this.loadingForm = true
-        const response = await TapestryApi.getGravityForm(id)
-        this.loadingForm = false
-        if (response) {
-          this.formHtml = response.data
-          this.formOpened = true
-        }
-      } catch (e) {
-        this.loadingForm = false
-        console.error(e)
-      }
+      this.formOpened = true
     },
-    handleFormSubmit({ success, response }) {
-      if (!success) {
-        delete window[`gf_submitting_${this.formId}`]
-        this.formHtml = response
-        return
-      }
+    async handleFormSubmit() {
       this.formOpened = false
-      this.$emit("form-submitted", {
-        questionId: this.question.id,
-        formId: this.formId,
+      this.loading = true
+      await this.completeQuestion({
+        nodeId: this.selectedNode.id,
         answerType: this.formType,
+        formId: this.formId,
+        questionId: this.question.id,
       })
+      this.loading = false
+      this.$emit("submit")
     },
     hasId(label) {
       const id = this.question.answers[label]

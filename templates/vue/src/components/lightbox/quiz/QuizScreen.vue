@@ -1,16 +1,27 @@
 <template>
   <div class="quiz-screen">
+    <completion-screen v-if="showCompletionScreen">
+      <button v-if="hasNext" class="button-completion" @click="next">
+        <i class="fas fa-arrow-circle-right fa-4x"></i>
+        <p>Next question</p>
+      </button>
+      <button v-else class="button-completion" @click="$emit('close', true)">
+        <i class="far fa-times-circle fa-4x"></i>
+        <p>Done</p>
+      </button>
+    </completion-screen>
     <question
-      v-if="!submittingForm"
+      v-else
       :question="activeQuestion"
-      :current-step="currentQuestionText"
       @form-toggled="toggleForm"
       @recorder-opened="recorderOpened = true"
-      @form-submitted="handleFormSubmit"
+      @submit="handleFormSubmit"
       @back="$emit('close')"
     ></question>
-    <loading v-if="submittingForm" label="Submitting..." />
-    <footer v-if="!formOpened && !recorderOpened" class="question-footer">
+    <footer
+      v-if="!formOpened && !recorderOpened && !showCompletionScreen"
+      class="question-footer"
+    >
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -23,15 +34,14 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
 import Question from "./Question"
-import Loading from "../../Loading"
+import CompletionScreen from "./CompletionScreen"
 
 export default {
   name: "quiz-screen",
   components: {
+    CompletionScreen,
     Question,
-    Loading,
   },
   props: {
     node: {
@@ -44,7 +54,7 @@ export default {
       activeQuestionIndex: 0,
       formOpened: false,
       recorderOpened: false,
-      submittingForm: false,
+      showCompletionScreen: false,
     }
   },
   computed: {
@@ -65,22 +75,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeQuestion"]),
-    async handleFormSubmit({ answerType, formId, questionId }) {
-      this.submittingForm = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType,
-        formId,
-        questionId,
-      })
-      this.submittingForm = false
-      this.formOpened = false
-    },
     next() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex++
     },
     prev() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex--
     },
     toggleForm(val) {
@@ -113,6 +113,31 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.button-completion {
+  background: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: inherit;
+  margin-right: 3em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    color: #11a6d8;
+  }
+
+  p {
+    margin: 1em auto 0;
+    padding: 0;
+    font-weight: 600;
+  }
 }
 
 .button-nav {
