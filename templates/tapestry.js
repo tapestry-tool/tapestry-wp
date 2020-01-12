@@ -2075,7 +2075,7 @@ function tapestryTool(config){
         // TODO: CHECK 1: If user is authorized to view it
     
         // CHECK 2: Always show root node
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
+        if (node.tydeType === "" && (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== ""))) return true;
     
         // CHECK 3: If the user has unlocked the node
         if (!node.accessible && !viewLockedCheckbox.checked) return false;
