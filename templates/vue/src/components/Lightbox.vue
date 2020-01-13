@@ -9,7 +9,13 @@
       <div
         v-if="isLoaded"
         id="spotlight-content"
-        :class="['content', { 'content-text': node.mediaType === 'text' }]"
+        :class="[
+          'content',
+          {
+            'content-text':
+              node.mediaType === 'text' || node.mediaType === 'wp-post',
+          },
+        ]"
         :style="lightboxContentStyles"
       >
         <button v-if="canSkip" class="close-btn" @click="$emit('close')">

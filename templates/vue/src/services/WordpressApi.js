@@ -5,12 +5,21 @@ const API_URL = `${wpData.rest_url}/wp/v2`
 async function getPosts() {
   return axios.get(`${API_URL}/posts`).then(res => {
     const { data } = res
-    return data.map(post => ({
-      ...post,
-      content: post.content.rendered,
-      title: post.title.rendered,
-    }))
+    return data.map(parsePost)
   })
 }
 
-export default { getPosts }
+async function getPostById(id) {
+  return axios
+    .get(`${API_URL}/posts/?filter[p]=${id}`)
+    .then(res => res.data[0])
+    .then(parsePost)
+}
+
+export default { getPosts, getPostById }
+
+const parsePost = post => ({
+  ...post,
+  content: post.content.rendered,
+  title: post.title.rendered,
+})

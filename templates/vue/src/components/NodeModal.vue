@@ -53,9 +53,9 @@
             </b-form-group>
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
-                v-model="node.typeData.textContent"
+                v-model="node.typeData.mediaURL"
                 item-text="title"
-                item-value="content"
+                item-value="id"
                 empty-message="There are no posts yet. Please add one in your WP dashboard."
                 :options="wpPosts"
               >
@@ -354,6 +354,7 @@ export default {
       h5pContentOptions: [],
       selectedGravityFormContent: "",
       selectedH5pContent: "",
+      selectedWpPost: "",
       wpPosts: [],
       formErrors: "",
       maxDescriptionLength: 250,
