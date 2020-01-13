@@ -15,7 +15,7 @@
       :question="activeQuestion"
       @form-toggled="toggleForm"
       @recorder-opened="recorderOpened = true"
-      @submit="handleFormSubmit"
+      @submit="showCompletionScreen = true"
       @back="$emit('close')"
     ></question>
     <footer
