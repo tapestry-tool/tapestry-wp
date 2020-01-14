@@ -340,6 +340,10 @@
     box-shadow: 0 0 0 2px #666 inset;
 }
 
+.textMediaButtonIcon:after {
+    content: "Aa";
+}
+
 /* ADD + EDIT NODE BUTTONS */
 
 .editNodeButton:hover,

@@ -2210,7 +2210,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'play fa-text';
+            classStr = 'textMediaButtonIcon';
             break;
 
         case "gravity-form":
