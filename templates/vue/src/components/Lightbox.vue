@@ -264,6 +264,21 @@ export default {
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
 
+    ::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 7px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: rgba(0,0,0,.5);
+      box-shadow: 0 0 1px rgba(255,255,255,.5);
+    }
+
+    ::-webkit-scrollbar-corner {
+      display: none;
+    }
+
     .media-wrapper {
       background: #000;
       outline: none;
