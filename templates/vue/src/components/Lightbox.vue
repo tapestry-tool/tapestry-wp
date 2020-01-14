@@ -60,6 +60,7 @@
             :id="node.typeData.mediaURL"
             @submit="handleFormSubmit"
           ></gravity-form>
+          <accordion-media v-if="node.mediaType === 'accordion'" />
           <completion-screen v-if="showCompletionScreen" />
         </div>
       </div>
@@ -68,6 +69,7 @@
 </template>
 
 <script>
+import AccordionMedia from "./lightbox/AccordionMedia"
 import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
@@ -82,6 +84,7 @@ const SAVE_INTERVAL = 5
 export default {
   name: "lightbox",
   components: {
+    AccordionMedia,
     CompletionScreen,
     VideoMedia,
     TextMedia,
