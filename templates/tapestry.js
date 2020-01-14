@@ -1218,7 +1218,7 @@ function tapestryTool(config){
             .append("svg:foreignObject")
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
-                    ' class="' + getIconClass(d.mediaType, 'play') + ' mediaButtonIcon"' +
+                    ' class="' + ' mediaButtonIcon"' +
                     ' data-id="' + d.id + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
@@ -1226,7 +1226,7 @@ function tapestryTool(config){
                     ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
-                    ' data-media-height="' + d.typeData.mediaHeight + '"><\/i>';
+                    ' data-media-height="' + d.typeData.mediaHeight + '">Aa<\/i>';
             })
             .attr("id", function (d) {
                 return "mediaButton" + d.id;
