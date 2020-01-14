@@ -215,7 +215,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -272,9 +275,12 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
-            } else {
+            } else if (fieldValue === "gravity-form") {
               newNodeEntry.mediaType = "gravity-form"
               newNodeEntry.mediaFormat = "embed"
+            } else {
+              newNodeEntry.mediaType = fieldValue
+              newNodeEntry.mediaFormat = ""
             }
             break
           case "textContent":

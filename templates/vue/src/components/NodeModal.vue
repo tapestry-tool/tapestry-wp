@@ -51,6 +51,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
+            <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'text'" label="Text content">
               <b-form-textarea
                 id="node-text-content"
@@ -288,10 +289,12 @@ import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
 import GravityFormsApi from "../services/GravityFormsApi"
+import AccordionForm from "./node-modal/AccordionForm"
 
 export default {
   name: "node-modal",
   components: {
+    AccordionForm,
     Combobox,
     QuizModal,
   },
@@ -331,6 +334,7 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "gravity-form", text: "Gravity Form" },
+        { value: "accordion", text: "Accordion" },
       ],
       gravityFormOptions: [],
       h5pContentOptions: [],
