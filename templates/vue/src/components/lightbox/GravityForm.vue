@@ -50,6 +50,8 @@ export default {
 
     this.loading = false
 
+    this.disableAutocomplete()
+
     if (this.entry) {
       this.populateForm()
     }
@@ -100,6 +102,20 @@ export default {
       } else if (input.type === "checkbox") {
         input.checked = input.value === value
       }
+    },
+    // Disables autocomplete of GravityForms by targetting generated ids
+    disableAutocomplete() {
+      const allInputs = document.getElementsByTagName("input")
+      // Use splice to convert HTMLCollection to Array per: https://stackoverflow.com/a/222847
+      var formInputs = Array.prototype.slice.call(allInputs).filter(input =>
+        // All GravityForm inputs are enumerated with the input_ prefix
+        input.id.startsWith("input_")
+      )
+
+      formInputs.forEach(input => {
+        // Manually sets autocomplete flag for each element of form
+        input.autocomplete = "off"
+      })
     },
   },
 }
