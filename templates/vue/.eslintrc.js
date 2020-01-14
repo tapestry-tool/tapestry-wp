@@ -16,6 +16,7 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-prototype-builtins": "off",
+    "linebreak-style": "off",
     "prettier/prettier": [
       "error",
       {
@@ -23,6 +24,7 @@ module.exports = {
         htmlWhitespaceSensitivity: "ignore",
         printWidth: 85,
         trailingComma: "es5",
+        endOfLine: "auto"
       },
     ],
   },
