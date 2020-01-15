@@ -342,6 +342,11 @@
 
 .textMediaButtonIcon:after {
     content: "Aa";
+    font-size: 0.8em;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: -2px;
+    margin-left: -2px;
 }
 
 /* ADD + EDIT NODE BUTTONS */
