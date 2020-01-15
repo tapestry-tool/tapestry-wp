@@ -210,6 +210,17 @@ function tapestryTool(config){
                 { authenticated: ["read"] }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+
+            if (node.mediaType === "accordion") {
+                const directChildren = this.dataset.links.filter(link => {
+                    return link.source == node.id
+                }).map(link => link.target)
+                directChildren.forEach(childId => {
+                    const child = this.dataset.nodes[findNodeIndex(childId)]
+                    child.presentationStyle = "accordion-row"
+                })
+            }
+
             return updatedNode
         });
 
@@ -247,7 +258,7 @@ function tapestryTool(config){
 
         links = createLinks();
         nodes = createNodes();
-    
+
         filterTapestry(true);
         
         //---------------------------------------------------
@@ -2055,6 +2066,8 @@ function tapestryTool(config){
     function getViewable(node) {
     
         // TODO: CHECK 1: If user is authorized to view it
+
+        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 2: Always show root node
         if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;

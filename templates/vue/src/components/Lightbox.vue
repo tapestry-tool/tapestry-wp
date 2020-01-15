@@ -60,7 +60,7 @@
             :id="node.typeData.mediaURL"
             @submit="handleFormSubmit"
           ></gravity-form>
-          <accordion-media v-if="node.mediaType === 'accordion'" />
+          <accordion-media v-if="node.mediaType === 'accordion'" :node="node" />
           <completion-screen v-if="showCompletionScreen" />
         </div>
       </div>
