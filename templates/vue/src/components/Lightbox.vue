@@ -180,6 +180,8 @@ export default {
       height: this.lightboxDimensions.height,
     }
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
+    let elem = document.querySelector('body')
+    elem.style.overflow = "hidden"
   },
   async beforeDestroy() {
     await this.updateNodeProgress({
@@ -187,6 +189,8 @@ export default {
       progress: this.node && this.node.typeData.progress[0].value,
     })
     thisTapestryTool.exitViewMode()
+    let elem = document.querySelector('body')
+    elem.style.overflow = "auto"
   },
   methods: {
     ...mapMutations(["setLightboxEl"]),
