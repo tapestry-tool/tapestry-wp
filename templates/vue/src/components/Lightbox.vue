@@ -263,6 +263,9 @@ export default {
     background-color: black;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
+    scrollbar-color: rgba(0,0,0,.5) rgba(255,255,255,.5) ;
+    scrollbar-width: 7px;
+    -ms-overflow-style:scrollbar;
 
     ::-webkit-scrollbar {
       -webkit-appearance: none;
