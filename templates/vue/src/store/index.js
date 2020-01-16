@@ -19,9 +19,7 @@ const store = new Vuex.Store({
     settings: {},
     h5pSettings: {},
     selectedNodeId: null,
-    lightboxId: null,
-    isLightboxOpen: false,
-    lightboxEl: null,
+    tapestryIsLoaded: false,
   },
   getters: {
     ...getters,

@@ -68,10 +68,17 @@ export function updateNodePermissions(_, payload) {
 
 export async function completeQuestion(
   { commit },
-  { answerType, formId, nodeId, questionId }
+  { answerType, formId, audioId, nodeId, questionId }
 ) {
   await client.completeQuestion(nodeId, questionId)
-  const entry = await client.getUserEntry(formId)
+
+  let entry
+  if (answerType === "audioId" && audioId) {
+    entry = { audioId }
+  } else {
+    entry = await client.getUserEntry(formId)
+  }
+
   commit("completeQuestion", { nodeId, questionId })
   commit("updateEntry", { answerType, entry, nodeId, questionId })
 }

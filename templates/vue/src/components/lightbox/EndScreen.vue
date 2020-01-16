@@ -1,5 +1,5 @@
 <template>
-  <quiz-screen v-if="showQuiz" :node="node" @close="showQuiz = false" />
+  <quiz-screen v-if="showQuiz" :node="node" @close="handleClose" />
   <div
     v-else
     :class="[
@@ -89,6 +89,14 @@ export default {
     },
     backgroundUrl() {
       return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
+    },
+  },
+  methods: {
+    handleClose(closeLightbox = false) {
+      this.showQuiz = false
+      if (closeLightbox) {
+        this.$emit("close")
+      }
     },
   },
 }

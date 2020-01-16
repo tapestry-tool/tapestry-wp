@@ -35,7 +35,6 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -45,8 +44,9 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
-import Lightbox from "./Lightbox"
 import { tydeTypes } from "@/utils/constants"
+import { getLinkMetadata } from "../services/LinkPreviewApi"
+import Helpers from "../utils/Helpers"
 
 export default {
   name: "tapestry",
@@ -54,7 +54,6 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
-    Lightbox,
   },
   data() {
     return {
@@ -86,7 +85,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getParent", "selectedNode", "tapestry", "lightbox"]),
+    ...mapGetters(["getParent", "selectedNode", "tapestry"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -129,26 +128,17 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
-    window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
   },
   methods: {
     ...mapMutations([
       "init",
-      "openLightbox",
-      "closeLightbox",
       "setDataset",
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions([
-      "addNode",
-      "addLink",
-      "updateNode",
-      "updateNodePermissions",
-      "completeQuestion",
-    ]),
-    async tapestryUpdated(event) {
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
@@ -297,6 +287,9 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
+            } else {
+              newNodeEntry.mediaType = "gravity-form"
+              newNodeEntry.mediaFormat = "embed"
             }
             break
           case "textContent":
@@ -349,6 +342,29 @@ export default {
             break
           default:
             break
+        }
+      }
+
+      if (
+        newNodeEntry.mediaFormat === "embed" &&
+        newNodeEntry.behaviour !== "embed"
+      ) {
+        if (
+          !isEdit ||
+          shouldFetch(newNodeEntry.typeData.mediaURL, this.selectedNode)
+        ) {
+          const url = newNodeEntry.typeData.mediaURL
+          const { data } = await getLinkMetadata(url)
+          newNodeEntry.typeData.linkMetadata = data
+
+          let shouldChange = true
+          if (newNodeEntry.imageURL) {
+            shouldChange = confirm("Change thumbnail to new image?")
+          }
+
+          if (shouldChange) {
+            newNodeEntry.imageURL = data.image
+          }
         }
       }
 
@@ -408,6 +424,14 @@ export default {
       thisTapestryTool.reinitialize()
     }, */
   },
+}
+
+const shouldFetch = (url, selectedNode) => {
+  if (!selectedNode.typeData.linkMetadata) {
+    return true
+  }
+  const oldUrl = selectedNode.typeData.linkMetadata.url
+  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 </script>
 
