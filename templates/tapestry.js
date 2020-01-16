@@ -2222,6 +2222,10 @@ function getIconClass(mediaType, action) {
             classStr = classStrStart + 'window-maximize';
             break;
 
+        case "wp-post":
+            classStr = "fab fa-wordpress-simple";
+            break;
+
         default:
             classStr = classStrStart + 'exclamation';
             break;
