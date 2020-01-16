@@ -1949,8 +1949,6 @@ function tapestryTool(config){
         root = rootId;
         var children = getChildren(root, tapestryDepth - 2),
             grandchildren = getChildren(root, tapestryDepth - 1);
-
-        console.log(typeof rootId, rootId, children)
     
         for (var i in tapestry.dataset.nodes) {
             var node = tapestry.dataset.nodes[i];
