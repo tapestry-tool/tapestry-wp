@@ -206,11 +206,10 @@ button {
 }
 
 .loading {
-  background: white;
+  background: #111;
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0.9;
   z-index: 30;
 }
 
