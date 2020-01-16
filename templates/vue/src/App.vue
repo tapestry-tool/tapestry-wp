@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <tapestry />
+    <router-view></router-view>
   </div>
 </template>
 

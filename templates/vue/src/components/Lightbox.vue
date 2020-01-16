@@ -1,10 +1,11 @@
 <template>
   <div
+    v-if="tapestryIsLoaded"
     id="lightbox"
     :class="{ 'full-screen': node.fullscreen }"
     :format="node.mediaFormat"
   >
-    <div v-if="canSkip" class="overlay" @click="$emit('close')"></div>
+    <div v-if="canSkip" class="overlay" @click="close"></div>
     <transition name="lightbox">
       <div
         v-if="isLoaded"
@@ -12,7 +13,7 @@
         :class="['content', { 'content-text': node.mediaType === 'text' }]"
         :style="lightboxContentStyles"
       >
-        <button v-if="canSkip" class="close-btn" @click="$emit('close')">
+        <button v-if="canSkip" class="close-btn" @click="close">
           <div>
             <i class="fa fa-times"></i>
           </div>
@@ -21,6 +22,7 @@
           :node-id="nodeId"
           :dimensions="dimensions"
           @load="handleLoad"
+          @close="close"
         />
       </div>
     </transition>
@@ -30,7 +32,7 @@
 <script>
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
-import { mapGetters, mapState, mapMutations } from "vuex"
+import { mapGetters, mapState } from "vuex"
 
 export default {
   name: "lightbox",
@@ -55,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings"]),
+    ...mapState(["h5pSettings", "tapestryIsLoaded"]),
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
@@ -119,31 +121,45 @@ export default {
       }
     },
   },
+  watch: {
+    tapestryIsLoaded() {
+      this.applyDimensions()
+    },
+    nodeId() {
+      this.applyDimensions()
+      thisTapestryTool.selectNode(Number(this.nodeId))
+    },
+  },
   mounted() {
     this.isLoaded = true
-    this.dimensions = {
-      ...this.dimensions,
-      left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-      width: this.lightboxDimensions.width,
-      height: this.lightboxDimensions.height,
-    }
+    this.applyDimensions()
+    thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
   },
   methods: {
-    ...mapMutations(["setLightboxEl"]),
-    handleLoad({ width, height, el }) {
+    close() {
+      this.$router.push("/")
+    },
+    handleLoad({ width, height }) {
       if (width && height) {
         this.updateDimensions({ width, height })
       }
-      this.setLightboxEl(el)
     },
     updateDimensions(dimensions) {
       this.dimensions = {
         ...this.dimensions,
         ...dimensions,
+      }
+    },
+    applyDimensions() {
+      this.dimensions = {
+        ...this.dimensions,
+        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
+        width: this.lightboxDimensions.width,
+        height: this.lightboxDimensions.height,
       }
     },
   },
