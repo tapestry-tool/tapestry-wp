@@ -39,8 +39,10 @@ export default class {
    *
    * @return  {Object}
    */
-  async addNode(node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes`
+  async addNode(node, parentId) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes${
+      parentId ? `?parent_id=${parentId}` : ""
+    }`
     const response = await axios.post(url, node)
     return response
   }
@@ -171,12 +173,6 @@ export default class {
   async completeQuestion(nodeId, questionId) {
     const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     const response = await axios.post(url)
-    return response
-  }
-
-  async getGravityForm(formId) {
-    const url = `${adminAjaxUrl}?action=gf_button_get_form&form_id=${formId}`
-    const response = await axios.get(url)
     return response
   }
 

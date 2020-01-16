@@ -61,3 +61,10 @@ const parseChecklist = entry => {
   const keys = Object.keys(entry).filter(key => key.startsWith(inputId))
   return keys.map(key => entry[key]).filter(answer => answer.length > 0)
 }
+
+export function getParent(state) {
+  return id => {
+    const link = state.links.find(l => l.target == id || l.target.id == id)
+    return link ? link.source : null
+  }
+}

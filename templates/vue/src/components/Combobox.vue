@@ -71,7 +71,7 @@ export default {
       return item ? item[this.itemText] : ""
     },
     showEmptyMessage() {
-      return this.visibleOptions.length
+      return this.visibleOptions.length === 0
     },
     visibleOptions() {
       if (this.inputValue === this.text) {
@@ -97,6 +97,9 @@ export default {
         this.inputValue = newText
       }
     },
+  },
+  created() {
+    this.inputValue = this.text
   },
   methods: {
     handleBlur() {

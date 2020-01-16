@@ -204,12 +204,19 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [], showInBackpack: true })
+            var updatedNode = fillEmptyFields(node, {
+                skippable: true,
+                behaviour: "embed",
+                completed: false,
+                quiz: [],
+                showInBackpack: true
+            })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
+            updatedNode.tydeType = updatedNode.tydeType || "Regular";
             return updatedNode
         });
 
@@ -271,6 +278,19 @@ function tapestryTool(config){
 
     this.resetNodeCache = function() {
         childrenOfNodeAtDepth = {}
+    }
+
+    this.selectNode = function(id) {
+        root = id
+        tapestry.resetNodeCache();
+        resizeNodes(id);
+        addDepthToNodes(id, 0, []);
+
+        dispatchEvent(new CustomEvent('change-selected-node', { detail: id }));
+
+        // slider's maximum depth is set to the longest path from the new selected node
+        tapestryDepthSlider.max = findMaxDepth(id);
+        updateSvgDimensions();
     }
 
     /**
@@ -486,8 +506,7 @@ function tapestryTool(config){
         }
     }
     
-    this.tapestryDeleteNode = function() {
-        var nodeId = root;
+    this.tapestryDeleteNode = function(nodeId = root) {
         if (nodeId === tapestry.dataset.rootId) {
             if (tapestry.dataset.nodes && tapestry.dataset.nodes.length > 1) {
                 alert("Root node can only be deleted if there are no other nodes in the tapestry.");
@@ -1062,16 +1081,7 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    root = d.id;
-                    tapestry.resetNodeCache();
-                    resizeNodes(d.id);
-                    addDepthToNodes(root, 0, []);
-
-                    dispatchEvent(new CustomEvent('change-selected-node', {detail: root}));
-
-                    // slider's maximum depth is set to the longest path from the new selected node
-                    tapestryDepthSlider.max = findMaxDepth(root);
-                    updateSvgDimensions();
+                    tapestry.selectNode(d.id)
                 }
             });
     }
@@ -1285,7 +1295,7 @@ function tapestryTool(config){
                 return NORMAL_RADIUS + ROOT_RADIUS_DIFF - 30;
             })
             .attr("style", function (d) {
-                return d.nodeType === "grandchild" || d.nodeType === "child" ? "visibility: hidden" : "visibility: visible";
+                return d.nodeType === "grandchild" || d.nodeType === "child" || d.tydeType === "Question set" ? "visibility: hidden" : "visibility: visible";
             })
             .attr("class", "mediaButton addNodeButton")
             .call(d3.drag()
@@ -2066,7 +2076,7 @@ function tapestryTool(config){
         // TODO: CHECK 1: If user is authorized to view it
     
         // CHECK 2: Always show root node
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
+        if (node.tydeType === "" && (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== ""))) return true;
     
         // CHECK 3: If the user has unlocked the node
         if (!node.accessible && !viewLockedCheckbox.checked) return false;
@@ -2076,6 +2086,11 @@ function tapestryTool(config){
     
         // CHECK 5: If we are currently in view mode & if the node will be viewable in that case
         if (node.nodeType === "grandchild" && inViewMode) return false;
+
+        // CHECK 6: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
+        if ((node.tydeType === "Stage" || node.tydeType === "Question set") && !config.wpCanEditTapestry) {
+            return false;
+        }
     
         // If it passes all the checks, return true!
         return true;
@@ -2219,7 +2234,11 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'play fa-text';
+            classStr = 'textMediaButtonIcon';
+            break;
+
+        case "gravity-form":
+            classStr = classStrStart + 'tasks';
             break;
 
         case "url-embed":

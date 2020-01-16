@@ -1,10 +1,13 @@
 <template>
-  <button :disabled="disabled" class="button" @click="$emit('click')">
+  <button class="button" :disabled="disabled" @click="$emit('click')">
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
     <img v-else :src="textIcon" class="icon" />
-    <slot></slot>
+    <div>
+      <slot></slot>
+    </div>
   </button>
 </template>
 
@@ -14,6 +17,11 @@ import TextIcon from "../../../assets/Aa.svg"
 export default {
   name: "answer-button",
   props: {
+    completed: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     disabled: {
       type: Boolean,
       required: false,
@@ -43,29 +51,36 @@ export default {
   background-color: var(--tyde-orange);
   color: white;
   width: 136px;
-  height: 144px;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: 24px;
   transition: all 0.1s ease-out;
-  margin-right: 24px;
+  margin-right: 16px;
 
-  &:last-child,
-  &:only-child {
+  &:last-child {
     margin-right: 0;
+  }
+
+  i {
+    color: white;
+
+    &:first-of-type {
+      align-self: flex-end;
+    }
   }
 
   &:hover {
     background-color: var(--tyde-orange-light);
   }
+
+  > * {
+    margin-bottom: 16px;
+  }
 }
 
 .icon {
   height: 56px;
-  margin-bottom: 16px;
 
   &-fa {
     font-size: 56px;

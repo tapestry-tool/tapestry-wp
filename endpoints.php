@@ -228,6 +228,13 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getAllH5P'
         ]
+    ],
+    'GET_FORM_ENTRY' => (object) [
+        'ROUTE' => '/gf/entries',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getGfEntry'
+        ]
     ]
 ];
 
@@ -262,6 +269,17 @@ function getGfForms()
     try {
         $tapestryForms = new TapestryForm();
         return $tapestryForms->getAll();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getGfEntry($request)
+{
+    $formId = $request['form_id'];
+    try {
+        $controller = new TapestryForm();
+        return $controller->getEntry($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -314,6 +332,7 @@ function addTapestry($request)
 function addTapestryNode($request)
 {
     $postId = $request['tapestryPostId'];
+    $parentId = $request['parent_id'];
     $node = json_decode($request->get_body());
     // TODO: JSON validations should happen here
     // make sure that we can only accept one node object at a time
@@ -333,7 +352,7 @@ function addTapestryNode($request)
             }
         }
 
-        return $tapestry->addNode($node);
+        return $tapestry->addNode($node, $parentId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -475,8 +494,13 @@ function updateTapestryNode($request)
         }
 
         $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
+        $isValid = $tapestry->validateNode((object) $nodeData, $tapestry->getNodeParent($nodeMetaId));
 
+        if (!$isValid) {
+            throw new TapestryError('INVALID_NODE_TYPE');
+        }
+
+        $node = $tapestry->getNode($nodeMetaId);
         $node->set((object) $nodeData);
         return $node->save();
     } catch (TapestryError $e) {

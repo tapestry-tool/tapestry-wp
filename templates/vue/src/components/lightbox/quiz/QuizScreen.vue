@@ -1,18 +1,28 @@
 <template>
   <div class="quiz-screen" :style="{ backgroundImage }">
-    <button class="button-nav button-nav-menu" @click="back">
-      <i class="fas fa-arrow-left"></i>
-    </button>
+    <completion-screen v-if="showCompletionScreen">
+      <button v-if="hasNext" class="button-completion" @click="next">
+        <i class="fas fa-arrow-circle-right fa-4x"></i>
+        <p>Next question</p>
+      </button>
+      <button v-else class="button-completion" @click="$emit('close', true)">
+        <i class="far fa-times-circle fa-4x"></i>
+        <p>Done</p>
+      </button>
+    </completion-screen>
     <question
-      v-if="!submittingForm"
+      v-else
       :question="activeQuestion"
       :current-step="currentQuestionText"
-      @form-opened="formOpened = true"
-      @recorder-opened="recorderOpened = true"
-      @form-submitted="handleFormSubmit"
+      @form-toggled="toggleForm"
+      @recorder-toggled="toggleRecorder"
+      @submit="showCompletionScreen = true"
+      @back="$emit('close')"
     ></question>
-    <loading v-if="submittingForm" label="Submitting..." />
-    <footer v-if="!formOpened && !recorderOpened" class="question-footer">
+    <footer
+      v-if="!formOpened && !recorderOpened && !showCompletionScreen"
+      class="question-footer"
+    >
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -25,17 +35,16 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
 import Question from "./Question"
-import Loading from "../../Loading"
 import Helpers from "../../../utils/Helpers"
 import BackgroundImg from "../../../assets/question-screen-bg.png"
+import CompletionScreen from "./CompletionScreen"
 
 export default {
   name: "quiz-screen",
   components: {
+    CompletionScreen,
     Question,
-    Loading,
   },
   props: {
     node: {
@@ -48,7 +57,7 @@ export default {
       activeQuestionIndex: 0,
       formOpened: false,
       recorderOpened: false,
-      submittingForm: false,
+      showCompletionScreen: false,
     }
   },
   computed: {
@@ -72,26 +81,19 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeQuestion"]),
-    async handleFormSubmit({ answerType, formId, questionId }) {
-      this.submittingForm = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType,
-        formId,
-        questionId,
-      })
-      this.submittingForm = false
-      this.formOpened = false
-    },
     next() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex++
     },
     prev() {
+      this.showCompletionScreen = false
       this.activeQuestionIndex--
     },
-    back() {
-      this.$emit("close")
+    toggleForm(val) {
+      this.formOpened = val
+    },
+    toggleRecorder(val) {
+      this.recorderOpened = val
     },
   },
 }
@@ -124,6 +126,31 @@ export default {
   align-items: center;
 }
 
+.button-completion {
+  background: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: inherit;
+  margin-right: 3em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    color: #11a6d8;
+  }
+
+  p {
+    margin: 1em auto 0;
+    padding: 0;
+    font-weight: 600;
+  }
+}
+
 .button-nav {
   border-radius: 50%;
   height: 56px;
@@ -134,6 +161,7 @@ export default {
   justify-content: center;
   font-size: 40px;
   color: white;
+  margin: 0;
   margin-right: 12px;
   opacity: 1;
   transition: opacity 0.1s ease-out;

@@ -27,6 +27,7 @@
     </div>
     <node-modal
       :node="populatedNode"
+      :parent="parentNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
       :permissions-order="permissionsOrder"
@@ -43,6 +44,9 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
+import { tydeTypes } from "@/utils/constants"
+import { getLinkMetadata } from "../services/LinkPreviewApi"
+import Helpers from "../utils/Helpers"
 
 export default {
   name: "tapestry",
@@ -57,6 +61,7 @@ export default {
       TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
+      parentNode: null,
       populatedNode: {
         title: "",
         description: "",
@@ -75,11 +80,12 @@ export default {
         },
         quiz: [],
         skippable: true,
+        tydeType: tydeTypes.REGULAR,
       },
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["getParent", "selectedNode", "tapestry"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -110,6 +116,11 @@ export default {
     },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
+  },
+  watch: {
+    selectedNode() {
+      this.parentNode = this.getParent(this.selectedNode)
     },
   },
   mounted() {
@@ -159,20 +170,24 @@ export default {
         },
         description: "",
         quiz: [],
+        tydeType: tydeTypes.REGULAR,
       }
     },
     addRootNode() {
       this.modalType = "add-root-node"
+      this.parentNode = null
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
     addNewNode() {
       this.modalType = "add-new-node"
+      this.parentNode = this.selectedNode
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
     editNode() {
       this.modalType = "edit-node"
+      this.parentNode = this.getParent(this.selectedNode.id)
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },
@@ -182,6 +197,7 @@ export default {
     },
     closeModal() {
       this.modalType = ""
+      this.parent = null
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {
@@ -209,7 +225,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -220,6 +239,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        tydeType: tydeTypes.REGULAR,
         showInBackpack: true,
         coordinates: {
           x: 3000,
@@ -267,6 +287,9 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
+            } else {
+              newNodeEntry.mediaType = "gravity-form"
+              newNodeEntry.mediaFormat = "embed"
             }
             break
           case "textContent":
@@ -311,17 +334,47 @@ export default {
           case "quiz":
             newNodeEntry.quiz = fieldValue
             break
+          case "tydeType":
+            newNodeEntry.tydeType = fieldValue
+            break
           case "showInBackpack":
             newNodeEntry.showInBackpack = fieldValue
+            break
           default:
             break
+        }
+      }
+
+      if (
+        newNodeEntry.mediaFormat === "embed" &&
+        newNodeEntry.behaviour !== "embed"
+      ) {
+        if (
+          !isEdit ||
+          shouldFetch(newNodeEntry.typeData.mediaURL, this.selectedNode)
+        ) {
+          const url = newNodeEntry.typeData.mediaURL
+          const { data } = await getLinkMetadata(url)
+          newNodeEntry.typeData.linkMetadata = data
+
+          let shouldChange = true
+          if (newNodeEntry.imageURL) {
+            shouldChange = confirm("Change thumbnail to new image?")
+          }
+
+          if (shouldChange) {
+            newNodeEntry.imageURL = data.image
+          }
         }
       }
 
       let id
       if (!isEdit) {
         // New node
-        id = await this.addNode(newNodeEntry)
+        id = await this.addNode({
+          newNode: newNodeEntry,
+          parentId: this.parentNode && this.parentNode.id,
+        })
         newNodeEntry.id = id
         if (!isRoot) {
           // Add link from parent node to this node
@@ -371,6 +424,14 @@ export default {
       thisTapestryTool.reinitialize()
     }, */
   },
+}
+
+const shouldFetch = (url, selectedNode) => {
+  if (!selectedNode.typeData.linkMetadata) {
+    return true
+  }
+  const oldUrl = selectedNode.typeData.linkMetadata.url
+  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 </script>
 

@@ -13,8 +13,8 @@ export async function updateH5pSettings({ commit }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit }, newNode) {
-  const response = await client.addNode(JSON.stringify(newNode))
+export async function addNode({ commit }, { newNode, parentId }) {
+  const response = await client.addNode(JSON.stringify(newNode), parentId)
 
   const nodeToAdd = { ...newNode }
   nodeToAdd.id = response.data.id
@@ -68,10 +68,17 @@ export function updateNodePermissions(_, payload) {
 
 export async function completeQuestion(
   { commit },
-  { answerType, formId, nodeId, questionId }
+  { answerType, formId, audioId, nodeId, questionId }
 ) {
   await client.completeQuestion(nodeId, questionId)
-  const entry = await client.getUserEntry(formId)
+
+  let entry
+  if (answerType === "audioId" && audioId) {
+    entry = { audioId }
+  } else {
+    entry = await client.getUserEntry(formId)
+  }
+
   commit("completeQuestion", { nodeId, questionId })
   commit("updateEntry", { answerType, entry, nodeId, questionId })
 }

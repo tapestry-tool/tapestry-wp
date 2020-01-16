@@ -4,7 +4,11 @@
       <tyde-button icon="cog" @click="setActivePage('settings')"></tyde-button>
       <tyde-button icon="globe-asia" @click="$emit('return-to-map')"></tyde-button>
       <tyde-button icon="question" @click="setActivePage('help')"></tyde-button>
-      <tyde-button class="close-button" icon="times" @click="$emit('continue')"></tyde-button>
+      <tyde-button
+        class="close-button"
+        icon="times"
+        @click="$emit('continue')"
+      ></tyde-button>
     </div>
     <div class="content">
       <h1>Captain's Log</h1>
@@ -70,7 +74,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap");
 
 #tyde-menu {
   width: 100vw;
@@ -85,7 +89,8 @@ export default {
   padding: 16px 15px;
 
   * {
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 
   .buttons {

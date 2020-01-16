@@ -10,13 +10,12 @@
       ref="video"
       controls
       autoplay
+      :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
-      @play="handlePlay"
-      @pause="handlePause"
+      @play="handlePlay(node)"
+      @pause="handlePause(node)"
       @timeupdate="updateVideoProgress"
-    >
-      <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
-    </video>
+    ></video>
   </div>
 </template>
 
@@ -42,7 +41,8 @@ export default {
     }
   },
   watch: {
-    node() {
+    node(newNode, oldNode) {
+      this.handlePause(oldNode)
       this.handleLoad()
     },
   },
@@ -78,8 +78,8 @@ export default {
       }
       return false
     },
-    handlePlay() {
-      const { id, mediaType } = this.node
+    handlePlay(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
@@ -88,8 +88,8 @@ export default {
         })
       }
     },
-    handlePause() {
-      const { id, mediaType } = this.node
+    handlePause(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
@@ -154,6 +154,7 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+  z-index: 0;
 
   video {
     position: absolute;
@@ -161,6 +162,7 @@ export default {
     top: 0;
     width: 100%;
     height: auto;
+    z-index: 0;
   }
 }
 </style>
