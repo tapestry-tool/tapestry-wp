@@ -11,7 +11,7 @@ import Loading from "../Loading"
 import WordpressApi from "../../services/WordpressApi"
 
 export default {
-  name: "post-media",
+  name: "wp-post-media",
   components: {
     Loading,
   },

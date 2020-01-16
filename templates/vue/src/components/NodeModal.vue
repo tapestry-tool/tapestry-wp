@@ -56,7 +56,7 @@
                 v-model="node.typeData.mediaURL"
                 item-text="title"
                 item-value="id"
-                empty-message="There are no posts yet. Please add one in your WP dashboard."
+                empty-message="There are no Wordpress posts yet. Please add one in your WP dashboard."
                 :options="wpPosts"
               >
                 <template v-slot="slotProps">
