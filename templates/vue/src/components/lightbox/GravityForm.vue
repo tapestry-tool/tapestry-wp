@@ -107,7 +107,7 @@ export default {
     disableAutocomplete() {
       const allInputs = document.getElementsByTagName("input")
       // Use splice to convert HTMLCollection to Array per: https://stackoverflow.com/a/222847
-      var formInputs = Array.prototype.slice.call(allInputs).filter(input =>
+      const formInputs = Array.from(allInputs).filter(input =>
         // All GravityForm inputs are enumerated with the input_ prefix
         input.id.startsWith("input_")
       )
