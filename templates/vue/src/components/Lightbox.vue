@@ -17,77 +17,25 @@
             <i class="fa fa-times"></i>
           </div>
         </button>
-        <div
-          :class="[
-            'media-wrapper',
-            { 'media-wrapper-embed': node.mediaFormat === 'embed' },
-          ]"
-        >
-          <text-media
-            v-if="node.mediaType === 'text'"
-            :node="node"
-            @complete="complete"
-          />
-          <video-media
-            v-if="node.mediaFormat === 'mp4'"
-            :node="node"
-            @load="handleLoad"
-            @complete="complete"
-            @timeupdate="updateProgress"
-            @close="$emit('close')"
-          />
-          <external-media
-            v-if="node.mediaType === 'url-embed'"
-            :node="node"
-            :dimensions="dimensions"
-            @mounted="updateDimensions"
-            @complete="complete"
-          />
-          <h5p-media
-            v-if="node.mediaFormat === 'h5p'"
-            :node="node"
-            :width="dimensions.width"
-            :height="dimensions.height"
-            :settings="h5pSettings"
-            @load="handleLoad"
-            @update-settings="updateH5pSettings"
-            @timeupdate="updateProgress"
-            @complete="complete"
-            @close="$emit('close')"
-          />
-          <gravity-form
-            v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
-            :id="node.typeData.mediaURL"
-            @submit="handleFormSubmit"
-          ></gravity-form>
-          <completion-screen v-if="showCompletionScreen" />
-        </div>
+        <tapestry-media
+          :node-id="nodeId"
+          :dimensions="dimensions"
+          @load="handleLoad"
+        />
       </div>
     </transition>
   </div>
 </template>
 
 <script>
-import TextMedia from "./lightbox/TextMedia"
-import VideoMedia from "./lightbox/VideoMedia"
-import ExternalMedia from "./lightbox/ExternalMedia"
-import H5PMedia from "./lightbox/H5PMedia"
-import GravityForm from "./lightbox/GravityForm"
+import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
-import CompletionScreen from "./lightbox/quiz/CompletionScreen"
-import { mapGetters, mapState, mapActions, mapMutations } from "vuex"
-
-const SAVE_INTERVAL = 5
+import { mapGetters, mapState, mapMutations } from "vuex"
 
 export default {
   name: "lightbox",
   components: {
-    CompletionScreen,
-    VideoMedia,
-    TextMedia,
-    ExternalMedia,
-    GravityForm,
-    "h5p-media": H5PMedia,
+    TapestryMedia,
   },
   props: {
     nodeId: {
@@ -171,7 +119,7 @@ export default {
       }
     },
   },
-  async mounted() {
+  mounted() {
     this.isLoaded = true
     this.dimensions = {
       ...this.dimensions,
@@ -181,48 +129,16 @@ export default {
     }
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
-      id: this.nodeId,
-      progress: this.node && this.node.typeData.progress[0].value,
-    })
+  beforeDestroy() {
     thisTapestryTool.exitViewMode()
   },
   methods: {
     ...mapMutations(["setLightboxEl"]),
-    ...mapActions(["completeNode", "updateNodeProgress"]),
-    handleFormSubmit() {
-      this.showCompletionScreen = true
-      this.complete()
-    },
     handleLoad({ width, height, el }) {
       if (width && height) {
         this.updateDimensions({ width, height })
       }
       this.setLightboxEl(el)
-    },
-    async complete() {
-      await this.completeNode(this.nodeId)
-      this.$emit("complete")
-    },
-    async updateProgress(type, amountViewed) {
-      const now = new Date()
-      const secondsDiff = Math.abs(
-        (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
-      )
-
-      if (secondsDiff > SAVE_INTERVAL) {
-        await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-
-        if (type === "h5p") {
-          await this.updateH5pSettings(this.h5pSettings)
-        }
-
-        this.timeSinceLastSaved = now
-      }
-    },
-    async updateH5pSettings(newSettings) {
-      await this.$store.dispatch("updateH5pSettings", newSettings)
     },
     updateDimensions(dimensions) {
       this.dimensions = {
@@ -263,17 +179,6 @@ export default {
     background-color: black;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
-
-    .media-wrapper {
-      background: #000;
-      outline: none;
-      border-radius: 15px;
-      overflow: hidden;
-      height: 100%;
-    }
-    .media-wrapper-embed {
-      background: white;
-    }
 
     &.content-text {
       outline: none;
