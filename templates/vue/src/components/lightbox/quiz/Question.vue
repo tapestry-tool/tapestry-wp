@@ -78,6 +78,11 @@ export default {
       type: Object,
       required: true,
     },
+    currentStep: {
+      type: String,
+      required: false,
+      default: "1/1",
+    },
   },
   data() {
     return {
@@ -104,6 +109,9 @@ export default {
   watch: {
     formOpened(val) {
       this.$emit("form-toggled", val)
+    },
+    recorderOpened(val) {
+      this.$emit("recorder-toggled", val)
     },
   },
   methods: {
@@ -239,7 +247,7 @@ button {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: var(--tyde-blue);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -251,7 +259,7 @@ button {
   transition: all 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    opacity: 0.8;
   }
 
   &:disabled {

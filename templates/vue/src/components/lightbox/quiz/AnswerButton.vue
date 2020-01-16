@@ -1,18 +1,13 @@
 <template>
-  <button :disabled="disabled" @click="$emit('click')">
-    <span class="button">
-      <i
-        class="fas fa-check-circle"
-        :class="completed ? 'visible' : 'invisible'"
-      ></i>
-      <div v-if="isFaIcon" class="icon">
-        <i :class="`fas fa-${icon} icon-fa`"></i>
-      </div>
-      <img v-else :src="textIcon" class="icon" />
-      <div>
-        <slot></slot>
-      </div>
-    </span>
+  <button class="button" :disabled="disabled" @click="$emit('click')">
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
+    <div v-if="isFaIcon" class="icon">
+      <i :class="`fas fa-${icon} icon-fa`"></i>
+    </div>
+    <img v-else :src="textIcon" class="icon" />
+    <div>
+      <slot></slot>
+    </div>
   </button>
 </template>
 
@@ -50,7 +45,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button {
+.button {
   padding: 0;
   margin: 0;
   background-color: var(--tyde-orange);
@@ -61,6 +56,11 @@ button {
   flex-direction: column;
   font-size: 24px;
   transition: all 0.1s ease-out;
+  margin-right: 16px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   i {
     color: white;

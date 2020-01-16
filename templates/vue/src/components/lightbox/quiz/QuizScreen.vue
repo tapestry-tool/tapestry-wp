@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-screen">
+  <div class="quiz-screen" :style="{ backgroundImage }">
     <completion-screen v-if="showCompletionScreen">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
@@ -13,8 +13,9 @@
     <question
       v-else
       :question="activeQuestion"
+      :current-step="currentQuestionText"
       @form-toggled="toggleForm"
-      @recorder-opened="recorderOpened = true"
+      @recorder-toggled="toggleRecorder"
       @submit="showCompletionScreen = true"
       @back="$emit('close')"
     ></question>
@@ -90,6 +91,9 @@ export default {
     },
     toggleForm(val) {
       this.formOpened = val
+    },
+    toggleRecorder(val) {
+      this.recorderOpened = val
     },
   },
 }
