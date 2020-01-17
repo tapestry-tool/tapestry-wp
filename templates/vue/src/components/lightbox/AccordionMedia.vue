@@ -5,26 +5,53 @@
       <button @click="toggle(String(row.id))">{{ row.title }}</button>
       <b-collapse :id="String(row.id)" :accordion="`accordion-${node.id}`">
         <tapestry-media :node-id="row.id" :dimensions="dimensions" />
-        <button v-if="row.completed">Finished?</button>
+        <button v-if="row.completed" @click="showCompletion = true">
+          Finished?
+        </button>
       </b-collapse>
     </div>
+    <tapestry-modal
+      v-if="showCompletion"
+      :allow-close="false"
+      @close="showCompletion = false"
+    >
+      <h1>{{ node.typeData.confirmationTitleText }}</h1>
+      <p>{{ node.typeData.confirmationBodyText }}</p>
+      <div class="button-container">
+        <button class="button-completion" @click="$emit('close', true)">
+          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+          <p>{{ node.typeData.continueButtonText }}</p>
+        </button>
+        <button class="button-completion" @click="showCompletion = false">
+          <i class="far fa-times-circle fa-4x"></i>
+          <p>{{ node.typeData.cancelLinkText }}</p>
+        </button>
+      </div>
+    </tapestry-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex"
 import TapestryMedia from "../TapestryMedia"
+import TapestryModal from "../TapestryModal"
 
 export default {
   name: "accordion-media",
   components: {
     TapestryMedia,
+    TapestryModal,
   },
   props: {
     node: {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      showCompletion: false,
+    }
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
@@ -62,5 +89,36 @@ export default {
   ::-webkit-scrollbar-track {
     background-color: black;
   }
+}
+
+.button-completion {
+  background: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: inherit;
+  margin-right: 2em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    color: #11a6d8;
+  }
+
+  p {
+    margin: 1em auto 0;
+    padding: 0;
+    font-weight: 600;
+  }
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

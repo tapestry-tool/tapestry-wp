@@ -15,13 +15,26 @@
 </template>
 
 <script>
+const defaultStyles = {
+  top: "150px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  width: "600px",
+  height: "400px",
+  color: "#fff",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+}
+
 export default {
   name: "tapestry-modal",
   props: {
     contentContainerStyle: {
       type: Object,
       required: false,
-      default: () => {},
+      default: () => defaultStyles,
     },
     allowClose: {
       type: Boolean,

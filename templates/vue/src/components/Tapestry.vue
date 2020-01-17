@@ -242,6 +242,11 @@ export default {
         newNodeEntry.coordinates.y = this.selectedNode.y
       }
 
+      newNodeEntry.typeData = {
+        ...newNodeEntry.typeData,
+        ...this.populatedNode.typeData,
+      }
+
       var appearsAt = 0
       for (var i = 0; i < formData.length; i++) {
         var fieldName = formData[i].name
