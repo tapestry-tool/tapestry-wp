@@ -1,9 +1,9 @@
 <template>
-  <div ref="container">
+  <div ref="container" class="media-container">
     <h1 class="title">{{ node.title }}</h1>
-    <div v-for="row in rows" :key="row.id" no-body>
-      <b-button block @click="toggle(row.id)">{{ row.title }}</b-button>
-      <b-collapse :id="row.id" :accordion="`accordion-${node.id}`">
+    <div v-for="row in rows" :key="row.id">
+      <button @click="toggle(String(row.id))">{{ row.title }}</button>
+      <b-collapse :id="String(row.id)" :accordion="`accordion-${node.id}`">
         <tapestry-media :node-id="row.id" :dimensions="dimensions" />
       </b-collapse>
     </div>
@@ -50,5 +50,16 @@ export default {
 <style lang="scss" scoped>
 .title {
   color: #fff;
+}
+
+.media-container {
+  height: 100%;
+  overflow: scroll;
+  scrollbar-color: auto black;
+  scrollbar-width: none;
+
+  ::-webkit-scrollbar-track {
+    background-color: black;
+  }
 }
 </style>

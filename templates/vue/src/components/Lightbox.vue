@@ -10,7 +10,13 @@
       <div
         v-if="isLoaded"
         id="spotlight-content"
-        :class="['content', { 'content-text': node.mediaType === 'text' }]"
+        :class="[
+          'content',
+          {
+            'content-text': node.mediaType === 'text',
+            'content-accordion': node.mediaType === 'accordion',
+          },
+        ]"
         :style="lightboxContentStyles"
       >
         <button v-if="canSkip" class="close-btn" @click="close">
@@ -18,7 +24,8 @@
             <i class="fa fa-times"></i>
           </div>
         </button>
-        <accordion-media v-if="node.mediaType === 'accordion'" :node="node" />
+        <div v-if="!nodeId"><slot></slot></div>
+        <accordion-media v-else-if="node.mediaType === 'accordion'" :node="node" />
         <tapestry-media
           v-else
           :node-id="nodeId"
@@ -46,7 +53,8 @@ export default {
   props: {
     nodeId: {
       type: [String, Number],
-      required: true,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -199,6 +207,10 @@ export default {
     background-color: black;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
+
+    &-accordion {
+      padding: 24px;
+    }
 
     &.content-text {
       outline: none;
