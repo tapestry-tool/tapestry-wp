@@ -52,6 +52,22 @@
               ></b-form-select>
             </b-form-group>
             <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
+            <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
+              <combobox
+                v-model="node.typeData.mediaURL"
+                item-text="title"
+                item-value="id"
+                empty-message="There are no Wordpress posts yet. Please add one in your WP dashboard."
+                :options="wpPosts"
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    <code>{{ slotProps.option.id }}</code>
+                    {{ slotProps.option.title }}
+                  </p>
+                </template>
+              </combobox>
+            </b-form-group>
             <b-form-group v-show="node.mediaType === 'text'" label="Text content">
               <b-form-textarea
                 id="node-text-content"
@@ -288,6 +304,7 @@ import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import H5PApi from "../services/H5PApi"
+import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 
@@ -333,6 +350,7 @@ export default {
         { value: "video", text: "Video" },
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
+        { value: "wp-post", text: "Wordpress Post" },
         { value: "gravity-form", text: "Gravity Form" },
         { value: "accordion", text: "Accordion" },
       ],
@@ -340,6 +358,8 @@ export default {
       h5pContentOptions: [],
       selectedGravityFormContent: "",
       selectedH5pContent: "",
+      selectedWpPost: "",
+      wpPosts: [],
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
@@ -421,6 +441,7 @@ export default {
   async mounted() {
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
+    this.wpPosts = await WordpressApi.getPosts()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
