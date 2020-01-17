@@ -18,7 +18,9 @@
             <i class="fa fa-times"></i>
           </div>
         </button>
+        <accordion-media v-if="node.mediaType === 'accordion'" :node="node" />
         <tapestry-media
+          v-else
           :node-id="nodeId"
           :dimensions="dimensions"
           @load="handleLoad"
@@ -30,6 +32,7 @@
 </template>
 
 <script>
+import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
 import { mapGetters, mapState } from "vuex"
@@ -37,6 +40,7 @@ import { mapGetters, mapState } from "vuex"
 export default {
   name: "lightbox",
   components: {
+    AccordionMedia,
     TapestryMedia,
   },
   props: {
