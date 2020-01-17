@@ -284,6 +284,19 @@ function tapestryTool(config){
         childrenOfNodeAtDepth = {}
     }
 
+    this.selectNode = function(id) {
+        root = id
+        tapestry.resetNodeCache();
+        resizeNodes(id);
+        addDepthToNodes(id, 0, []);
+
+        dispatchEvent(new CustomEvent('change-selected-node', { detail: id }));
+
+        // slider's maximum depth is set to the longest path from the new selected node
+        tapestryDepthSlider.max = findMaxDepth(id);
+        updateSvgDimensions();
+    }
+
     /**
      * Helper function to fill in default fields of a node if
      * they do not exist.
@@ -1063,16 +1076,7 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    root = d.id;
-                    tapestry.resetNodeCache();
-                    resizeNodes(d.id);
-                    addDepthToNodes(root, 0, []);
-
-                    dispatchEvent(new CustomEvent('change-selected-node', {detail: root}));
-
-                    // slider's maximum depth is set to the longest path from the new selected node
-                    tapestryDepthSlider.max = findMaxDepth(root);
-                    updateSvgDimensions();
+                    tapestry.selectNode(d.id)
                 }
             });
     }
@@ -1258,12 +1262,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            dispatchEvent(
-                new CustomEvent(
-                    'open-lightbox', 
-                    { detail: thisBtn.dataset.id }
-                )
-            );
+            location.href += `nodes/${thisBtn.dataset.id}`
             recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
         });
     
@@ -1377,31 +1376,33 @@ function tapestryTool(config){
     }
 
     function updateViewedProgress() {
-        path = nodes
-            .filter(function (d) {
-                return !d.hideProgress;
-            })
-            .selectAll("path")
-            .data(function (d, i) {
-                var data = d.typeData.progress;
-                data.forEach(function (e) {
-                    e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
+        if (nodes) {
+            path = nodes
+                .filter(function (d) {
+                    return !d.hideProgress;
                 })
-                return pieGenerator(data, i);
-            });
-    
-        path.transition().duration(750).attrTween("d", arcTween);
-    
-        path.enter()
-            .append("path")
-            .attr("fill", "transparent")
-            .attr("class", function (d) {
-                if (d.data.extra.nodeType === "grandchild")
-                    return "grandchild";
-            })
-            .attr("d", function (d) {
-                return arcGenerator(adjustProgressBarRadii(d));
-            });
+                .selectAll("path")
+                .data(function (d, i) {
+                    var data = d.typeData.progress;
+                    data.forEach(function (e) {
+                        e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
+                    })
+                    return pieGenerator(data, i);
+                });
+        
+            path.transition().duration(750).attrTween("d", arcTween);
+        
+            path.enter()
+                .append("path")
+                .attr("fill", "transparent")
+                .attr("class", function (d) {
+                    if (d.data.extra.nodeType === "grandchild")
+                        return "grandchild";
+                })
+                .attr("d", function (d) {
+                    return arcGenerator(adjustProgressBarRadii(d));
+                });
+        }
     }
     
     function arcTween(a) {
@@ -2223,7 +2224,7 @@ function getIconClass(mediaType, action) {
             break;
             
         case "text":
-            classStr = classStrStart + 'play fa-text';
+            classStr = 'textMediaButtonIcon';
             break;
 
         case "gravity-form":

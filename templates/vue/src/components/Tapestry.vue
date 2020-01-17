@@ -34,7 +34,6 @@
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
     />
-    <lightbox v-if="lightbox.isOpen" :node-id="lightbox.id" @close="closeLightbox" />
   </div>
 </template>
 
@@ -46,7 +45,6 @@ import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
 import { getLinkMetadata } from "../services/LinkPreviewApi"
 import Helpers from "../utils/Helpers"
-import Lightbox from "./Lightbox"
 
 export default {
   name: "tapestry",
@@ -54,7 +52,6 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
-    Lightbox,
   },
   data() {
     return {
@@ -83,7 +80,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "lightbox"]),
+    ...mapGetters(["selectedNode", "tapestry"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -121,20 +118,17 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
-    window.addEventListener("open-lightbox", evt => this.openLightbox(evt.detail))
   },
   methods: {
     ...mapMutations([
       "init",
-      "openLightbox",
-      "closeLightbox",
       "setDataset",
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    async tapestryUpdated(event) {
+    tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
