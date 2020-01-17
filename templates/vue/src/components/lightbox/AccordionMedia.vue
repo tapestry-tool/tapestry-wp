@@ -5,6 +5,7 @@
       <button @click="toggle(String(row.id))">{{ row.title }}</button>
       <b-collapse :id="String(row.id)" :accordion="`accordion-${node.id}`">
         <tapestry-media :node-id="row.id" :dimensions="dimensions" />
+        <button v-if="row.completed">Finished?</button>
       </b-collapse>
     </div>
   </div>
