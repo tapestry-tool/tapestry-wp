@@ -1,10 +1,10 @@
 export default {
   admin: {
-    username: "admin",
-    password: "Tapestry123!",
+    username: Cypress.env("ADMIN_USERNAME"),
+    password: Cypress.env("ADMIN_PASSWORD"),
   },
   subscriber: {
-    username: "narendras",
-    password: ")%AbNZgppS)uNvxT5)OdgzhX",
+    username: Cypress.env("SUBCRIBER_USERNAME"),
+    password: Cypress.env("SUBCRIBER_PASSWORD"),
   },
 }

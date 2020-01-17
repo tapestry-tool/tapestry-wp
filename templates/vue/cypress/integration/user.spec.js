@@ -7,7 +7,7 @@ import {
   getLightbox,
 } from "../support/utils"
 
-const TEST_TAPESTRY_NAME = "testing-user"
+const TEST_TAPESTRY_NAME = Cypress.env("USER_TAPESTRY_NAME")
 
 describe("User side", () => {
   beforeEach(() => {

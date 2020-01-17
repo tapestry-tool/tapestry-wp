@@ -1,1 +1,11 @@
-{}
+{
+    "env": {
+        "DEV_URL": "http://localhost:8888",
+        "TEST_TAPESTRY_NAME": "testing",
+        "USER_TAPESTRY_NAME": "testing-user",
+        "ADMIN_USERNAME": "admin",
+        "ADMIN_PASSWORD": "Tapestry123!",
+        "SUBSCRIBER_USERNAME": "narendras",
+        "SUBSCRIBER_PASSWORD": ")%AbNZgppS)uNvxT5)OdgzhX"
+    }
+}
