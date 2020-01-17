@@ -126,7 +126,7 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  background: #000;
+  background: inherit;
   outline: none;
   border-radius: 15px;
   overflow: hidden;
