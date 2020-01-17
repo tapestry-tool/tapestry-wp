@@ -1,9 +1,13 @@
 <template>
   <div ref="container" class="media-container">
     <h1 class="title">{{ node.title }}</h1>
-    <div v-for="row in rows" :key="row.id">
-      <button @click="toggle(String(row.id))">{{ row.title }}</button>
-      <b-collapse :id="String(row.id)" :accordion="`accordion-${node.id}`">
+    <div v-for="(row, index) in rows" :key="row.id">
+      <button @click="toggle(index)">{{ row.title }}</button>
+      <b-collapse
+        :id="String(row.id)"
+        :accordion="`accordion-${node.id}`"
+        :visible="index === activeIndex"
+      >
         <tapestry-media :node-id="row.id" :dimensions="dimensions" />
         <button v-if="row.completed" @click="showCompletion = true">
           Finished?
@@ -18,7 +22,7 @@
       <h1>{{ node.typeData.confirmationTitleText }}</h1>
       <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
-        <button class="button-completion" @click="$emit('close', true)">
+        <button v-if="hasNext" class="button-completion" @click="next">
           <i class="far fa-arrow-alt-circle-right fa-4x"></i>
           <p>{{ node.typeData.continueButtonText }}</p>
         </button>
@@ -50,11 +54,15 @@ export default {
   },
   data() {
     return {
+      activeIndex: -1,
       showCompletion: false,
     }
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    hasNext() {
+      return this.activeIndex < this.rows.length - 1
+    },
     rows() {
       return this.getDirectChildren(this.node.id).map(this.getNode)
     },
@@ -68,8 +76,16 @@ export default {
     },
   },
   methods: {
-    toggle(id) {
-      this.$root.$emit("bv::toggle::collapse", id)
+    toggle(index) {
+      if (this.activeIndex === index) {
+        this.activeIndex = -1
+      } else {
+        this.activeIndex = index
+      }
+    },
+    next() {
+      this.showCompletion = false
+      this.activeIndex++
     },
   },
 }
