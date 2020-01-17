@@ -33,3 +33,37 @@ You need to adjust your git config so the automatic linting process works correc
 ```
 git config core.hooksPath .githooks
 ```
+
+## Testing Setup
+
+The testing framework that we use, Cypress, needs to be configured with some environment variables. In the `cypress.json` file, you should see something like:
+
+```json
+{
+    "env": {
+        "DEV_URL": "http://localhost:8888",
+        "TEST_TAPESTRY_NAME": "testing",
+        "USER_TAPESTRY_NAME": "testing-user",
+        "ADMIN_USERNAME": "admin",
+        "ADMIN_PASSWORD": "Tapestry123!",
+        "SUBSCRIBER_USERNAME": "narendras",
+        "SUBSCRIBER_PASSWORD": ")%AbNZgppS)uNvxT5)OdgzhX"
+    }
+}
+```
+
+Change the variables to match your own settings.
+
+* `DEV_URL` is the url of your local site.
+* `TEST_TAPESTRY_NAME` is the name of a new tapestry that is automatically made (and deleted) during the authoring tests.
+* `USER_TAPESTRY_NAME` is the name of the tapestry that is used for the user-side tests.
+* `ADMIN_USERNAME` is the name of a user in your Wordpress that has admin privileges.
+* `ADMIN_PASSWORD` is the password of the above user.
+* `SUBSCRIBER_USERNAME` is the name of a user in your Wordpress that has subscriber privileges.
+* `SUBSCRIBER_PASSWORD` is the password of the above user.
+
+Once that is done, run the following command to open the test GUI:
+
+```
+npm install && npm run test:open
+```
