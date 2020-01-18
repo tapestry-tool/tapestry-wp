@@ -4,7 +4,7 @@
     id="lightbox"
     :class="{
       'full-screen': node.fullscreen,
-      'content-text': node.mediaType === 'text',
+      'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
@@ -74,7 +74,7 @@ export default {
         return Object.assign(styles, { padding: "24px" })
       }
 
-      if (this.node.mediaType === "text") {
+      if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "#eee",
           color: "#333",

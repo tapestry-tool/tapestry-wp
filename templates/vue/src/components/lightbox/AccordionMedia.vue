@@ -8,7 +8,11 @@
         :accordion="`accordion-${node.id}`"
         :visible="index === activeIndex"
       >
-        <tapestry-media :node-id="row.id" :dimensions="dimensions" />
+        <tapestry-media
+          :node-id="row.id"
+          :dimensions="dimensions"
+          @complete="updateProgress"
+        />
         <button v-if="row.completed" @click="showCompletion = true">
           Finished?
         </button>
@@ -36,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapActions } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 
@@ -76,6 +80,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["updateNodeProgress"]),
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
@@ -86,6 +91,15 @@ export default {
     next() {
       this.showCompletion = false
       this.activeIndex++
+    },
+    updateProgress() {
+      const numNodes = this.rows.length
+      const completedSoFar = this.rows.filter(node => node.completed).length
+      this.updateNodeProgress({
+        id: this.node.id,
+        progress: (completedSoFar + 1) / numNodes,
+      })
+      thisTapestryTool.updateProgressBars()
     },
   },
 }
