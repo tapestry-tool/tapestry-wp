@@ -147,12 +147,7 @@
               v-show="node.mediaType === 'url-embed'"
               label="External Link"
             >
-              <b-form-input
-                id="node-embed-media-duration"
-                v-model="node.typeData.mediaURL"
-                placeholder="Enter embed link (starting with http)"
-                required
-              />
+              <file-upload v-model="node.typeData.mediaURL" inputId="node-embed-media-duration" placeholderText="Enter embed link (starting with http)" />
             </b-form-group>
             <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
               <b-form-radio-group
@@ -173,12 +168,7 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addThumbnail">
-              <b-form-input
-                id="node-image-url"
-                v-model="node.imageURL"
-                placeholder="Enter the URL for the thumbnail"
-                required
-              />
+              <file-upload v-model="node.imageURL" inputId="node-image-url" placeholderText="Enter the URL for the thumbnail" />
             </b-form-group>
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">
@@ -302,6 +292,7 @@
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
+import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
@@ -311,6 +302,7 @@ export default {
   components: {
     Combobox,
     QuizModal,
+    FileUpload,
   },
   props: {
     node: {
