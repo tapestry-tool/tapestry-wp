@@ -146,7 +146,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             'key'   => 'created_by',
             'value' => $this->_userId
         );
-        $entries = GFAPI::get_entries($formId, $search_criteria);
+        $entries = class_exists("GFAPI") ? GFAPI::get_entries($formId, $search_criteria) : [];
         return $this->_formatEntries($entries);
     }
 
