@@ -1,23 +1,23 @@
 <template>
   <div ref="container" class="media-container">
     <h1 class="title">{{ node.title }}</h1>
-    <div v-for="(row, index) in rows" :key="row.id">
-      <button @click="toggle(index)">{{ row.title }}</button>
-      <b-collapse
-        :id="String(row.id)"
-        :accordion="`accordion-${node.id}`"
-        :visible="index === activeIndex"
-      >
-        <tapestry-media
-          :node-id="row.id"
-          :dimensions="dimensions"
-          @complete="updateProgress"
-        />
-        <button v-if="row.completed" @click="showCompletion = true">
-          Finished?
-        </button>
-      </b-collapse>
-    </div>
+    <accordion-row
+      v-for="(row, index) in rows"
+      :key="row.id"
+      :visible="index === activeIndex"
+    >
+      <template v-slot:trigger>
+        <button @click="toggle(index)">{{ row.title }}</button>
+      </template>
+      <tapestry-media
+        :node-id="row.id"
+        :dimensions="dimensions"
+        @complete="updateProgress"
+      />
+      <button v-if="row.completed" @click="showCompletion = true">
+        Finished?
+      </button>
+    </accordion-row>
     <tapestry-modal
       v-if="showCompletion"
       :allow-close="false"
@@ -43,12 +43,14 @@
 import { mapGetters, mapActions } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
+import AccordionRow from "../AccordionRow"
 
 export default {
   name: "accordion-media",
   components: {
     TapestryMedia,
     TapestryModal,
+    AccordionRow,
   },
   props: {
     node: {
