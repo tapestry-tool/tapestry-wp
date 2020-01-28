@@ -9,7 +9,7 @@
       <template v-slot:trigger>
         <button
           class="button-row"
-          :disabled="lockRows && disabledForm >= 0 && index > disabledFrom"
+          :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
           @click="toggle(index)"
         >
           <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
