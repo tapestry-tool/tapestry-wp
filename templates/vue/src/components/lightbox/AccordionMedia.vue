@@ -7,12 +7,14 @@
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
-        <button @click="toggle(index)">{{ row.title }}</button>
+        <button :disabled="lockRows && index > disabledFrom" @click="toggle(index)">
+          {{ row.title }}
+        </button>
       </template>
       <tapestry-media
         :node-id="row.id"
         :dimensions="dimensions"
-        @complete="updateProgress"
+        @complete="updateProgress(row.id)"
       />
       <button v-if="row.completed" @click="showCompletion = true">
         Finished?
@@ -60,7 +62,7 @@ export default {
   },
   data() {
     return {
-      activeIndex: -1,
+      activeIndex: 0,
       showCompletion: false,
     }
   },
@@ -79,6 +81,12 @@ export default {
       }
       const rect = box.getBoundingClientRect()
       return { width: rect.width, height: rect.height }
+    },
+    lockRows() {
+      return this.node.typeData.lockRows
+    },
+    disabledFrom() {
+      return this.rows.findIndex(node => !node.completed)
     },
   },
   methods: {
@@ -108,6 +116,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+button[disabled] {
+  opacity: 0.8;
+}
+
 .title {
   color: #fff;
 }
