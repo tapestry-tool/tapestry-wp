@@ -9,7 +9,7 @@
       <template v-slot:trigger>
         <button
           class="button-row"
-          :disabled="lockRows && index > disabledFrom"
+          :disabled="lockRows && disabledForm >= 0 && index > disabledFrom"
           @click="toggle(index)"
         >
           {{ row.title }}
@@ -211,5 +211,6 @@ button[disabled] {
   padding: 0;
   width: 56px;
   height: 56px;
+  z-index: 10;
 }
 </style>
