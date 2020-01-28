@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <tyde />
+    <router-view></router-view>
   </div>
 </template>
 

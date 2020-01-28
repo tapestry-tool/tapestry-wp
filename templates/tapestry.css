@@ -340,6 +340,15 @@
     box-shadow: 0 0 0 2px #666 inset;
 }
 
+.textMediaButtonIcon:after {
+    content: "Aa";
+    font-size: 0.8em;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: -2px;
+    margin-left: -2px;
+}
+
 /* ADD + EDIT NODE BUTTONS */
 
 .editNodeButton:hover,

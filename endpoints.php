@@ -228,6 +228,13 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getAllH5P'
         ]
+    ],
+    'GET_FORM_ENTRY' => (object) [
+        'ROUTE' => '/gf/entries',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getGfEntry'
+        ]
     ]
 ];
 
@@ -262,6 +269,17 @@ function getGfForms()
     try {
         $tapestryForms = new TapestryForm();
         return $tapestryForms->getAll();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getGfEntry($request)
+{
+    $formId = $request['form_id'];
+    try {
+        $controller = new TapestryForm();
+        return $controller->getEntry($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
