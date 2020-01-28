@@ -12,6 +12,7 @@
           :disabled="lockRows && disabledForm >= 0 && index > disabledFrom"
           @click="toggle(index)"
         >
+          <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
           {{ row.title }}
         </button>
       </template>
@@ -19,6 +20,7 @@
         :node-id="row.id"
         :dimensions="dimensions"
         @complete="updateProgress(row.id)"
+        @close="toggle(index)"
       />
       <button v-if="row.completed" @click="showCompletion = true">
         Finished?
@@ -192,13 +194,20 @@ button[disabled] {
 }
 
 .button-row {
+  display: flex;
+  align-items: center;
   background: none;
-  padding: 8px;
+  padding: 8px 16px;
   margin: 0;
   width: 100%;
   border-radius: 4px;
   background-color: #262626;
   margin-bottom: 8px;
+  text-align: left;
+
+  i {
+    margin-right: 8px;
+  }
 }
 
 .button-scroll-top {

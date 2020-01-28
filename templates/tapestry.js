@@ -2245,6 +2245,10 @@ function getIconClass(mediaType, action) {
             classStr = "fab fa-wordpress-simple";
             break;
 
+        case "accordion":
+            classStr = "fas fa-bars";
+            break;
+
         default:
             classStr = classStrStart + 'exclamation';
             break;
