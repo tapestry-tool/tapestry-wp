@@ -42,6 +42,9 @@
         </button>
       </div>
     </tapestry-modal>
+    <button class="button-scroll-top" @click="scrollToTop">
+      <i class="fas fa-chevron-up fa-2x"></i>
+    </button>
   </div>
 </template>
 
@@ -96,6 +99,12 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    scrollToTop() {
+      const el = this.$refs.container
+      if (el) {
+        el.scrollTop = 0
+      }
+    },
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
@@ -190,5 +199,17 @@ button[disabled] {
   border-radius: 4px;
   background-color: #262626;
   margin-bottom: 8px;
+}
+
+.button-scroll-top {
+  cursor: pointer;
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  background: #262626;
+  border-radius: 50%;
+  padding: 0;
+  width: 56px;
+  height: 56px;
 }
 </style>

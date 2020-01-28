@@ -212,13 +212,19 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
+                const accordionProgress = []
                 const directChildren = this.dataset.links.filter(link => {
                     return link.source == node.id
                 }).map(link => link.target)
                 directChildren.forEach(childId => {
                     const child = this.dataset.nodes[findNodeIndex(childId)]
                     child.presentationStyle = "accordion-row"
+                    
+                    if (child.completed) {
+                        accordionProgress.push(childId)
+                    }
                 })
+                updatedNode.accordionProgress = accordionProgress
             }
 
             return updatedNode
