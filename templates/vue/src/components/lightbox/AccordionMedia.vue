@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
@@ -94,7 +94,8 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNodeProgress"]),
+    ...mapMutations(["updateNode"]),
+    ...mapActions(["completeNode", "updateNodeProgress"]),
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
@@ -106,14 +107,23 @@ export default {
       this.showCompletion = false
       this.activeIndex++
     },
-    updateProgress() {
-      const numNodes = this.rows.length
-      const completedSoFar = this.rows.filter(node => node.completed).length
-      this.updateNodeProgress({
-        id: this.node.id,
-        progress: (completedSoFar + 1) / numNodes,
-      })
-      thisTapestryTool.updateProgressBars()
+    updateProgress(rowId) {
+      const { accordionProgress } = this.node
+      if (!accordionProgress.includes(rowId)) {
+        accordionProgress.push(rowId)
+        this.updateNodeProgress({
+          id: this.node.id,
+          progress: accordionProgress.length / this.rows.length,
+        })
+        this.updateNode({
+          id: this.node.id,
+          newNode: { accordionProgress },
+        })
+
+        if (accordionProgress.length === this.rows.length) {
+          this.completeNode(this.node.id)
+        }
+      }
     },
   },
 }
