@@ -7,7 +7,11 @@
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
-        <button :disabled="lockRows && index > disabledFrom" @click="toggle(index)">
+        <button
+          class="button-row"
+          :disabled="lockRows && index > disabledFrom"
+          @click="toggle(index)"
+        >
           {{ row.title }}
         </button>
       </template>
@@ -117,11 +121,13 @@ export default {
 
 <style lang="scss" scoped>
 button[disabled] {
-  opacity: 0.8;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .title {
   color: #fff;
+  margin-bottom: 1em;
 }
 
 .media-container {
@@ -164,5 +170,15 @@ button[disabled] {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.button-row {
+  background: none;
+  padding: 8px;
+  margin: 0;
+  width: 100%;
+  border-radius: 4px;
+  background-color: #262626;
+  margin-bottom: 8px;
 }
 </style>

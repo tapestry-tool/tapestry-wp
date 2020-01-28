@@ -1,7 +1,7 @@
 <template>
   <div>
     <div><slot name="trigger"></slot></div>
-    <div v-if="visible"><slot></slot></div>
+    <div v-if="visible" class="content"><slot></slot></div>
   </div>
 </template>
 
@@ -16,3 +16,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.content {
+  padding-bottom: 16px;
+}
+</style>
