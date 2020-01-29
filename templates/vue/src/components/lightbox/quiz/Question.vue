@@ -78,6 +78,11 @@ export default {
       type: Object,
       required: true,
     },
+    currentStep: {
+      type: String,
+      required: false,
+      default: "1/1",
+    },
   },
   data() {
     return {
