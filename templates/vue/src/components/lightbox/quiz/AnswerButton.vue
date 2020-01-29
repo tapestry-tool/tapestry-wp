@@ -45,7 +45,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.button {
+button {
   padding: 0;
   margin: 0;
   background-color: var(--tyde-orange);
@@ -72,6 +72,10 @@ export default {
 
   &:hover {
     background-color: var(--tyde-orange-light);
+  }
+
+  > * {
+    margin-bottom: 16px;
   }
 
   > * {

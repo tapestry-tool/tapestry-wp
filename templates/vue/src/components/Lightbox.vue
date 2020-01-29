@@ -1,35 +1,29 @@
 <template>
-  <div
+  <tapestry-modal
     v-if="tapestryIsLoaded"
     id="lightbox"
-    :class="{ 'full-screen': node.fullscreen }"
-    :format="node.mediaFormat"
+    :class="{
+      'full-screen': node.fullscreen,
+      'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
+    }"
+    :content-container-style="lightboxContentStyles"
+    :allow-close="canSkip"
+    @close="close"
   >
-    <div v-if="canSkip" class="overlay" @click="close"></div>
-    <transition name="lightbox">
-      <div
-        v-if="isLoaded"
-        id="spotlight-content"
-        :class="['content', { 'content-text': node.mediaType === 'text' }]"
-        :style="lightboxContentStyles"
-      >
-        <button v-if="canSkip" class="close-btn" @click="close">
-          <div>
-            <i class="fa fa-times"></i>
-          </div>
-        </button>
-        <tapestry-media
-          :node-id="nodeId"
-          :dimensions="dimensions"
-          @load="handleLoad"
-          @close="close"
-        />
-      </div>
-    </transition>
-  </div>
+    <accordion-media v-if="node.mediaType === 'accordion'" :node="node" />
+    <tapestry-media
+      v-else
+      :node-id="nodeId"
+      :dimensions="dimensions"
+      @load="handleLoad"
+      @close="close"
+    />
+  </tapestry-modal>
 </template>
 
 <script>
+import TapestryModal from "./TapestryModal"
+import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
 import { mapGetters, mapState } from "vuex"
@@ -37,12 +31,15 @@ import { mapGetters, mapState } from "vuex"
 export default {
   name: "lightbox",
   components: {
+    AccordionMedia,
     TapestryMedia,
+    TapestryModal,
   },
   props: {
     nodeId: {
       type: [String, Number],
-      required: true,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -66,12 +63,26 @@ export default {
       return this.node.completed || this.node.skippable !== false
     },
     lightboxContentStyles() {
-      return {
+      const styles = {
         top: this.dimensions.top + "px",
         left: this.dimensions.left + "px",
         width: this.dimensions.width + "px",
         height: this.dimensions.height + "px",
       }
+
+      if (this.node.mediaType === "accordion") {
+        return Object.assign(styles, { padding: "24px" })
+      }
+
+      if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
+        return Object.assign(styles, {
+          background: "#eee",
+          color: "#333",
+          padding: "1em",
+        })
+      }
+
+      return styles
     },
     lightboxDimensions() {
       const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
@@ -246,7 +257,9 @@ export default {
       }
     }
   }
+}
 
+#lightbox {
   &.full-screen {
     background: #000;
 
@@ -286,18 +299,5 @@ export default {
       z-index: 100;
     }
   }
-}
-</style>
-
-<style lang="scss">
-.lightbox-enter-active,
-.lightbox-leave-active {
-  transition: all 1s;
-}
-
-.lightbox-enter,
-.lightbox-leave-to {
-  opacity: 0;
-  transform: translateY(32px);
 }
 </style>

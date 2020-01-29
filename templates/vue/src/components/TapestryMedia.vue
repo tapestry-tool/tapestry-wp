@@ -5,16 +5,12 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
     ]"
   >
-    <text-media
-      v-if="node.mediaType === 'text'"
-      :node="node"
-      @complete="completeNode(nodeId)"
-    />
+    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :node="node"
       @load="handleLoad"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @timeupdate="updateProgress"
       @close="$emit('close')"
     />
@@ -23,7 +19,7 @@
       :node="node"
       :dimensions="dimensions"
       @mounted="handleLoad"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
@@ -34,7 +30,7 @@
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @close="$emit('close')"
     />
     <gravity-form
@@ -42,6 +38,7 @@
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
     ></gravity-form>
+    <wp-post-media v-if="node.mediaType === 'wp-post'" :node="node"></wp-post-media>
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -53,6 +50,7 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
+import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz/CompletionScreen"
 
 const SAVE_INTERVAL = 5
@@ -65,6 +63,7 @@ export default {
     ExternalMedia,
     "h5p-media": H5PMedia,
     GravityForm,
+    WpPostMedia,
     CompletionScreen,
   },
   props: {
@@ -99,7 +98,7 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
-      this.completeNode(this.nodeId)
+      this.complete()
     },
     handleLoad(args) {
       this.$emit("load", args)
@@ -119,6 +118,10 @@ export default {
 
         this.timeSinceLastSaved = now
       }
+    },
+    async complete() {
+      await this.completeNode(this.nodeId)
+      this.$emit("complete")
     },
   },
 }

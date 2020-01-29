@@ -260,6 +260,11 @@ export default {
         newNodeEntry.coordinates.y = this.selectedNode.y
       }
 
+      newNodeEntry.typeData = {
+        ...newNodeEntry.typeData,
+        ...this.populatedNode.typeData,
+      }
+
       var appearsAt = 0
       for (var i = 0; i < formData.length; i++) {
         var fieldName = formData[i].name
@@ -287,9 +292,12 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
-            } else {
+            } else if (fieldValue === "gravity-form") {
               newNodeEntry.mediaType = "gravity-form"
               newNodeEntry.mediaFormat = "embed"
+            } else {
+              newNodeEntry.mediaType = fieldValue
+              newNodeEntry.mediaFormat = ""
             }
             break
           case "textContent":

@@ -217,6 +217,23 @@ function tapestryTool(config){
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
             updatedNode.tydeType = updatedNode.tydeType || "Regular";
+
+            if (node.mediaType === "accordion") {
+                const accordionProgress = []
+                const directChildren = this.dataset.links.filter(link => {
+                    return link.source == node.id
+                }).map(link => link.target)
+                directChildren.forEach(childId => {
+                    const child = this.dataset.nodes[findNodeIndex(childId)]
+                    child.presentationStyle = "accordion-row"
+                    
+                    if (child.completed) {
+                        accordionProgress.push(childId)
+                    }
+                })
+                updatedNode.accordionProgress = accordionProgress
+            }
+
             return updatedNode
         });
 
@@ -254,7 +271,7 @@ function tapestryTool(config){
 
         links = createLinks();
         nodes = createNodes();
-    
+
         filterTapestry(true);
         
         //---------------------------------------------------
@@ -2074,6 +2091,8 @@ function tapestryTool(config){
     function getViewable(node) {
     
         // TODO: CHECK 1: If user is authorized to view it
+
+        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 2: Always show root node
         if (node.tydeType === "" && (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== ""))) return true;
@@ -2243,6 +2262,14 @@ function getIconClass(mediaType, action) {
 
         case "url-embed":
             classStr = classStrStart + 'window-maximize';
+            break;
+
+        case "wp-post":
+            classStr = "fab fa-wordpress-simple";
+            break;
+
+        case "accordion":
+            classStr = "fas fa-bars";
             break;
 
         default:

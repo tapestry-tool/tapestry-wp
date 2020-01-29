@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="video-container">
     <end-screen
       :node="node"
       :show="showEndScreen"
@@ -149,7 +149,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.video-container {
   position: relative;
   width: 100%;
   height: 100%;
@@ -157,9 +157,6 @@ export default {
   z-index: 0;
 
   video {
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
     height: auto;
     z-index: 0;
