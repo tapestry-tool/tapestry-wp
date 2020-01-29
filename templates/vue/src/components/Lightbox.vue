@@ -71,7 +71,7 @@ export default {
       }
 
       if (this.node.mediaType === "accordion") {
-        return Object.assign(styles, { padding: "24px" })
+        return Object.assign(styles, { background: "white" })
       }
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {

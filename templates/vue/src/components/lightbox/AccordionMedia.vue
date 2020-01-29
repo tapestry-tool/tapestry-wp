@@ -156,6 +156,7 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
+  padding: 0 48px;
 
   ::-webkit-scrollbar-track {
     background-color: black;
@@ -197,11 +198,11 @@ button[disabled] {
   display: flex;
   align-items: center;
   background: none;
-  padding: 8px 16px;
+  padding: 24px;
   margin: 0;
   width: 100%;
   border-radius: 4px;
-  background-color: #262626;
+  background-color: #643493;
   margin-bottom: 8px;
   text-align: left;
 
