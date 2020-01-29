@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div class="container">
     <div><slot name="trigger"></slot></div>
-    <div v-if="visible" class="content"><slot></slot></div>
+    <div v-if="visible" class="content"><slot name="content"></slot></div>
+    <div v-if="visible"><slot name="footer"></slot></div>
   </div>
 </template>
 
@@ -18,7 +19,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.content {
-  padding-bottom: 16px;
+.container {
+  background: #262626;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>

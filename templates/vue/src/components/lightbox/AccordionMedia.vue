@@ -16,15 +16,19 @@
           {{ row.title }}
         </button>
       </template>
-      <tapestry-media
-        :node-id="row.id"
-        :dimensions="dimensions"
-        @complete="updateProgress(row.id)"
-        @close="toggle(index)"
-      />
-      <button v-if="row.completed" @click="showCompletion = true">
-        Finished?
-      </button>
+      <template v-slot:content>
+        <tapestry-media
+          :node-id="row.id"
+          :dimensions="dimensions"
+          @complete="updateProgress(row.id)"
+          @close="toggle(index)"
+        />
+      </template>
+      <template v-slot:footer>
+        <button v-if="row.completed" @click="showCompletion = true">
+          Finished?
+        </button>
+      </template>
     </accordion-row>
     <tapestry-modal
       v-if="showCompletion"
@@ -198,12 +202,9 @@ button[disabled] {
   display: flex;
   align-items: center;
   background: none;
-  padding: 24px;
   margin: 0;
+  padding: 0;
   width: 100%;
-  border-radius: 4px;
-  background-color: #643493;
-  margin-bottom: 8px;
   text-align: left;
 
   i {
