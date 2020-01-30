@@ -2,6 +2,7 @@
   <div ref="container" class="media-container">
     <header class="header" :style="headerBackground">
       <h1 class="title">{{ node.title }}</h1>
+      <img :src="node.imageURL" />
     </header>
     <accordion-row
       v-for="(row, index) in rows"
@@ -244,6 +245,13 @@ export default {
   padding: 24px 48px;
   background-size: cover;
   border-radius: 8px 8px 0px 0px;
+  display: flex;
+  justify-content: space-between;
+
+  img {
+    height: 96px;
+    margin: -24px 0;
+  }
 }
 
 .title {
