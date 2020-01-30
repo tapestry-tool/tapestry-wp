@@ -42,6 +42,7 @@
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
     ></gravity-form>
+    <wp-post-media v-if="node.mediaType === 'wp-post'" :node="node"></wp-post-media>
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -53,6 +54,7 @@ import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
+import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz/CompletionScreen"
 
 const SAVE_INTERVAL = 5
@@ -65,6 +67,7 @@ export default {
     ExternalMedia,
     "h5p-media": H5PMedia,
     GravityForm,
+    WpPostMedia,
     CompletionScreen,
   },
   props: {
