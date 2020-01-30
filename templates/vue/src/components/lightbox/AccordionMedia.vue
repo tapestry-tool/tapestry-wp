@@ -61,18 +61,18 @@
     <tapestry-modal
       v-if="showCompletion"
       :allow-close="false"
+      :content-container-style="confirmationStyles"
       @close="showCompletion = false"
     >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
         <button v-if="hasNext" class="button-completion" @click="next">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
+          {{ node.typeData.continueButtonText }}
         </button>
-        <button class="button-completion" @click="showCompletion = false">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
+        <button
+          class="button-completion button-completion-cancel"
+          @click="showCompletion = false"
+        >
+          {{ node.typeData.cancelLinkText }}
         </button>
       </div>
     </tapestry-modal>
@@ -90,6 +90,7 @@ import AccordionRow from "../AccordionRow"
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
+import AccordionConfirmation from "../../assets/accordion-confirmation.png"
 
 export default {
   name: "accordion-media",
@@ -113,6 +114,26 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    confirmationStyles() {
+      return {
+        backgroundColor: "white",
+        backgroundImage: `url(${Helpers.getImagePath(AccordionConfirmation)})`,
+        backgroundOrigin: "content-box",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "contain",
+        padding: "32px 64px",
+        top: "150px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "800px",
+        height: "500px",
+        color: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        justifyContent: "center",
+      }
+    },
     headerBackground() {
       return { backgroundImage: `url(${Helpers.getImagePath(AccordionHeader)})` }
     },
@@ -213,34 +234,37 @@ button[disabled] {
 }
 
 .button-completion {
-  background: none;
-  padding: 0;
+  display: block;
+  width: 100%;
+  background: #3fa9f5;
+  padding: 16px 24px;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: inherit;
-  margin-right: 2em;
+  color: white;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.5em;
+  margin-bottom: 24px;
 
   &:last-child {
-    margin-right: 0;
+    margin-bottom: 0;
   }
 
   &:hover {
-    color: #11a6d8;
+    opacity: 0.9;
+  }
+
+  &-cancel {
+    background: #9fd4fa;
   }
 
   p {
-    margin: 1em auto 0;
     padding: 0;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 
 .button-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 250px;
 }
 
 .button-row {
