@@ -1,13 +1,18 @@
 <template>
-  <button class="button" :disabled="disabled" @click="$emit('click')">
-    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
-    <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
-    </div>
-    <img v-else :src="textIcon" class="icon" />
-    <div>
-      <slot></slot>
-    </div>
+  <button :disabled="disabled" @click="$emit('click')">
+    <span class="button">
+      <i
+        class="fas fa-check-circle"
+        :class="completed ? 'visible' : 'invisible'"
+      ></i>
+      <div v-if="isFaIcon" class="icon">
+        <i :class="`fas fa-${icon} icon-fa`"></i>
+      </div>
+      <img v-else :src="textIcon" class="icon" />
+      <div>
+        <slot></slot>
+      </div>
+    </span>
   </button>
 </template>
 
@@ -48,6 +53,15 @@ export default {
 button {
   padding: 0;
   margin: 0;
+  margin-right: 16px;
+  &:last-child,
+  &:only-child {
+    margin-right: 0;
+  }
+}
+
+.button {
+  padding: 0;
   background-color: var(--tyde-orange);
   color: white;
   width: 136px;
@@ -56,11 +70,6 @@ button {
   flex-direction: column;
   font-size: 24px;
   transition: all 0.1s ease-out;
-  margin-right: 16px;
-
-  &:last-child {
-    margin-right: 0;
-  }
 
   i {
     color: white;

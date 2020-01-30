@@ -997,9 +997,7 @@ function tapestryTool(config){
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-
-                    if (d.title === "Module 2") {
+                    if (d.tydeType === "Module") {
                         dispatchEvent(
                             new CustomEvent(
                                 'start-module',
@@ -1007,13 +1005,7 @@ function tapestryTool(config){
                             )
                         )
                     } else {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'open-lightbox',
-                                { detail: thisBtn.dataset.id }
-                            )
-                        );
-                        recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                        goToNode(d.id)
                     }
                 }
             });
@@ -1284,8 +1276,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            location.href += `nodes/${thisBtn.dataset.id}`
-            recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+            goToNode(thisBtn.dataset.id)
         });
     
         // Append addNodeButton
@@ -1321,7 +1312,7 @@ function tapestryTool(config){
                 })
                 .on('drag',function(){  
                     linkToDragStarted = true;
-                    nodeLinkLine.setAttribute('x1',linkFromNode.x);
+                    nodeLinkLine.setAttribute('x1',linkFromNode.x - 20);
                     nodeLinkLine.setAttribute('y1',linkFromNode.y + MAX_RADIUS - 10);
                     nodeLinkLine.setAttribute('x2',d3.event.x);
                     nodeLinkLine.setAttribute('y2',d3.event.y + MAX_RADIUS - 10);
@@ -1378,6 +1369,11 @@ function tapestryTool(config){
         $('.editNodeButton').click(function(){
             dispatchEvent(new CustomEvent("edit-node"))
         });
+    }
+
+    function goToNode(nodeId) {
+        location.href += `nodes/${nodeId}`
+        recordAnalyticsEvent('user', 'open', 'lightbox', nodeId);
     }
 
     function getVideoDuration(seconds) {
