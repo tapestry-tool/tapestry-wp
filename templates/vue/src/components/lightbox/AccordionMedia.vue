@@ -202,8 +202,10 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  margin: 0 -48px;
-  margin-bottom: 32px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   color: white;
   text-align: left;
   padding: 24px 48px;
