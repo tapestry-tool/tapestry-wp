@@ -3,7 +3,7 @@
     <span class="button">
       <i
         class="fas fa-check-circle"
-        :class="this.completed ? 'visible' : 'invisible'"
+        :class="completed ? 'visible' : 'invisible'"
       ></i>
       <div v-if="isFaIcon" class="icon">
         <i :class="`fas fa-${icon} icon-fa`"></i>
