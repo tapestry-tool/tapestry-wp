@@ -15,7 +15,10 @@
           <div class="button-row-icon">
             <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
           </div>
-          {{ row.title }}
+          <div>
+            <p class="button-row-title">{{ row.title }}</p>
+            <p class="button-row-description">{{ row.description }}</p>
+          </div>
         </button>
       </template>
       <template v-slot:content>
@@ -217,7 +220,23 @@ button[disabled] {
     justify-content: center;
     width: 48px;
     height: 48px;
-    margin-right: 8px;
+    margin-right: 24px;
+  }
+
+  p {
+    display: block;
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+    font-size: 1.2em;
+  }
+
+  &-title {
+    font-weight: bold;
+  }
+
+  &-description {
+    font-weight: 400;
   }
 }
 
