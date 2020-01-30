@@ -18,7 +18,7 @@
 <script>
 import TydeMenu from "./TydeMenu"
 import BackpackIcon from "@/assets/backpack.svg"
-import { mapGetters, mapMutations } from "vuex"
+import { mapState } from "vuex"
 
 const TYDE_BACKGROUND_AUDIO_SRC =
   "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file
@@ -38,12 +38,14 @@ export default {
   async mounted() {
     this.escMenuOpenListener = window.addEventListener("keydown", evt => {
       if (evt.code === "Escape") {
-        const { el } = this.lightbox
-        if (el) {
-          if (this.isMenuOpen && el.currentTime < el.duration) {
-            el.play()
+        if (this.lightbox) {
+          if (
+            this.isMenuOpen &&
+            this.lightbox.currentTime < this.lightbox.duration
+          ) {
+            this.lightbox.play()
           } else {
-            el.pause()
+            this.lightbox.pause()
           }
         }
         this.toggleMenu()
@@ -52,24 +54,25 @@ export default {
     this.backgroundAudio.loop = true
   },
   computed: {
-    ...mapGetters(["lightbox"]),
+    ...mapState(["lightbox"]),
     backpackUrl() {
       return `${wpData.vue_uri}/${BackpackIcon.split("dist")[1]}`
     },
   },
+  beforeDestroy() {
+    window.removeEventListener(this.escMenuOpenListener)
+  },
   methods: {
-    ...mapMutations(["closeLightbox"]),
     continueTapestry() {
-      const { el } = this.lightbox
       this.toggleMenu()
-      if (el) {
-        if (el.currentTime < el.duration) {
-          el.play()
+      if (this.lightbox) {
+        if (this.lightbox.currentTime < this.lightbox.duration) {
+          this.lightbox.play()
         }
       }
     },
     returnToMap() {
-      this.closeLightbox()
+      this.$router.push("/")
       this.toggleMenu()
       this.$emit("return-to-map")
     },
@@ -83,9 +86,6 @@ export default {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen
     },
-  },
-  beforeDestroy() {
-    window.removeEventListener(this.escMenuOpenListener)
   },
 }
 </script>

@@ -13,7 +13,7 @@
       :width="width"
       :height="height"
       :settings="settings"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @show-end-screen="showEndScreen = true"
     />
   </div>
@@ -64,6 +64,10 @@ export default {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
       this.$emit("close")
+    },
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load", { el: this.$refs.h5pIframe })
     },
   },
 }

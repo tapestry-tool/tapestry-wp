@@ -144,6 +144,7 @@ export default {
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
+    this.setLightbox(null)
   },
   methods: {
     close() {

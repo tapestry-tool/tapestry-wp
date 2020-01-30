@@ -13,7 +13,12 @@
       </ul>
     </nav>
     <ul class="logs">
-      <tyde-log v-for="log in visibleLogs" :key="log.name" :log="log" />
+      <tyde-log
+        v-for="log in visibleLogs"
+        :key="log.name"
+        :log="log"
+        @close="$emit('close')"
+      />
     </ul>
   </section>
 </template>

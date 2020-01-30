@@ -11,6 +11,7 @@ export function logs(state) {
       imageURL: node.imageURL,
       title: node.title,
       description: node.description,
+      nodeId: node.id,
     }))
 
   const activities = []

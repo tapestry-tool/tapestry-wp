@@ -71,6 +71,11 @@ button {
   flex-direction: column;
   font-size: 24px;
   transition: all 0.1s ease-out;
+  margin-right: 16px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   i {
     color: white;
