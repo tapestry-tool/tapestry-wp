@@ -1305,7 +1305,7 @@ function tapestryTool(config){
                 })
                 .on('drag',function(){  
                     linkToDragStarted = true;
-                    nodeLinkLine.setAttribute('x1',linkFromNode.x);
+                    nodeLinkLine.setAttribute('x1',linkFromNode.x - 20);
                     nodeLinkLine.setAttribute('y1',linkFromNode.y + MAX_RADIUS - 10);
                     nodeLinkLine.setAttribute('x2',d3.event.x);
                     nodeLinkLine.setAttribute('y2',d3.event.y + MAX_RADIUS - 10);
