@@ -1,6 +1,8 @@
 <template>
   <div ref="container" class="media-container">
-    <h1 class="title">{{ node.title }}</h1>
+    <header class="header" :style="headerBackground">
+      <h1 class="title">{{ node.title }}</h1>
+    </header>
     <accordion-row
       v-for="(row, index) in rows"
       :key="row.id"
@@ -86,6 +88,8 @@ import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
 import TydeIcon from "../tyde/TydeIcon"
+import Helpers from "../../utils/Helpers"
+import AccordionHeader from "../../assets/accordion-header.png"
 
 export default {
   name: "accordion-media",
@@ -109,6 +113,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    headerBackground() {
+      return { backgroundImage: `url(${Helpers.getImagePath(AccordionHeader)})` }
+    },
     hasNext() {
       return this.activeIndex < this.rows.length - 1
     },
@@ -173,14 +180,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
+.header {
+  margin: 0 -48px;
+  margin-bottom: 32px;
+  color: white;
+  text-align: left;
+  padding: 24px 48px;
+  background-size: cover;
+  border-radius: 8px 8px 0px 0px;
 }
 
 .title {
-  color: #fff;
-  margin-bottom: 1em;
+  font-weight: 700;
+  margin: 0;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .media-container {
@@ -188,7 +205,7 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
-  padding: 0 48px;
+  padding: 0 48px 32px 48px;
 
   ::-webkit-scrollbar-track {
     background-color: black;
