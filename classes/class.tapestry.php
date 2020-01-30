@@ -300,7 +300,7 @@ class Tapestry implements ITapestry
         }
 
         $parentType = $parent->tydeType;
-        if (!isset($parentType)) {
+        if (!isset($parentType) || $parentType == "") {
             return true;
         }
 
