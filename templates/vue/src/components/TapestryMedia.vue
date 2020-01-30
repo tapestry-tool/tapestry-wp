@@ -4,12 +4,12 @@
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
     ]"
+    :style="containerStyles"
   >
     <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :node="node"
-      :width="dimensions.width"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -26,7 +26,6 @@
       v-if="node.mediaFormat === 'h5p'"
       :node="node"
       :width="dimensions.width"
-      :height="dimensions.height"
       :settings="h5pSettings"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
@@ -75,6 +74,11 @@ export default {
     dimensions: {
       type: Object,
       required: true,
+    },
+    containerStyles: {
+      type: Object,
+      required: false,
+      default: () => {},
     },
   },
   data() {

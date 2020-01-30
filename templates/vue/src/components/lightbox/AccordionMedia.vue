@@ -41,12 +41,15 @@
         </button>
       </template>
       <template v-slot:content>
-        <tapestry-media
-          :node-id="row.id"
-          :dimensions="dimensions"
-          @complete="updateProgress(row.id)"
-          @close="toggle(index)"
-        />
+        <div :style="rowContainerStyles(row)">
+          <tapestry-media
+            :node-id="row.id"
+            :dimensions="dimensions"
+            :container-styles="mediaContainerStyles(row)"
+            @complete="updateProgress(row.id)"
+            @close="toggle(index)"
+          />
+        </div>
       </template>
       <template v-slot:footer>
         <button
@@ -91,6 +94,7 @@ import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
+import WatchVideoBackground from "../../assets/blort-watch-video.png"
 
 export default {
   name: "accordion-media",
@@ -189,6 +193,23 @@ export default {
     next() {
       this.showCompletion = false
       this.activeIndex++
+    },
+    rowContainerStyles(row) {
+      return row.mediaType === "video"
+        ? {
+            backgroundImage: `url(${Helpers.getImagePath(WatchVideoBackground)})`,
+            backgroundOrigin: "content-box",
+            backgroundPosition: "right",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "contain",
+            padding: "32px",
+          }
+        : {}
+    },
+    mediaContainerStyles(row) {
+      return row.mediaType === "video"
+        ? { width: this.dimensions.width + "px", borderRadius: 0 }
+        : {}
     },
     updateProgress(rowId) {
       const { accordionProgress } = this.node
