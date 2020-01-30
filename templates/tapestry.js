@@ -982,7 +982,7 @@ function tapestryTool(config){
                 if (root === d.id && d.hideMedia) {
                     var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
 
-                    if (d.title === "Module 2") {
+                    if (d.tydeType === "Module") {
                         dispatchEvent(
                             new CustomEvent(
                                 'start-module',
