@@ -9,6 +9,7 @@
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :node="node"
+      :width="dimensions.width"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"

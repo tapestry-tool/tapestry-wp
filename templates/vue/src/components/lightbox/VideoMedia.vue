@@ -11,6 +11,7 @@
       controls
       autoplay
       :src="node.typeData.mediaURL"
+      :style="videoStyles"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
       @pause="handlePause(node)"
@@ -34,11 +35,23 @@ export default {
       type: Object,
       required: true,
     },
+    width: {
+      type: [Number, String],
+      required: false,
+      default: "100%",
+    },
   },
   data() {
     return {
       showEndScreen: this.getInitialEndScreenState(),
     }
+  },
+  computed: {
+    videoStyles() {
+      return {
+        width: typeof this.width === "number" ? `${this.width}px` : this.width,
+      }
+    },
   },
   watch: {
     node(newNode, oldNode) {

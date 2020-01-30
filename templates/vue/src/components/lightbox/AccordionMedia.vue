@@ -110,6 +110,7 @@ export default {
     return {
       activeIndex: 0,
       showCompletion: false,
+      isMounted: false,
     }
   },
   computed: {
@@ -144,12 +145,20 @@ export default {
       return this.getDirectChildren(this.node.id).map(this.getNode)
     },
     dimensions() {
-      const box = this.$refs.container
-      if (!box) {
-        return {}
+      if (!this.isMounted) {
+        return {
+          width: 0,
+          height: 0,
+        }
       }
+
+      const box = this.$refs.container
       const rect = box.getBoundingClientRect()
-      return { width: rect.width, height: rect.height }
+      const activeRow = this.rows[this.activeIndex >= 0 && this.activeIndex]
+      if (activeRow.mediaType !== "video") {
+        return { width: rect.width, height: rect.height }
+      }
+      return { width: 400, height: 400 }
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -157,6 +166,9 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(node => !node.completed)
     },
+  },
+  mounted() {
+    this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
