@@ -19,6 +19,23 @@
             <p class="button-row-title">{{ row.title }}</p>
             <p class="button-row-description">{{ row.description }}</p>
           </div>
+          <div class="icon-container">
+            <tyde-icon
+              v-if="row.mediaType === 'gravity-form'"
+              class="icon icon-activity"
+              icon="activity"
+            ></tyde-icon>
+            <tyde-icon
+              v-if="row.completed"
+              class="icon"
+              icon="checkmark"
+            ></tyde-icon>
+            <tyde-icon
+              v-if="lockRows && disabledFrom >= 0 && index > disabledFrom"
+              class="icon"
+              icon="lock"
+            ></tyde-icon>
+          </div>
         </button>
       </template>
       <template v-slot:content>
@@ -64,6 +81,7 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import TydeIcon from "../tyde/TydeIcon"
 
 export default {
   name: "accordion-media",
@@ -71,6 +89,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    TydeIcon,
   },
   props: {
     node: {
@@ -238,6 +257,19 @@ button[disabled] {
   &-description {
     font-weight: 400;
   }
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+
+  &-activity {
+    width: 52px;
+  }
+}
+
+.icon-container {
+  margin-left: auto;
 }
 
 .button-scroll-top {
