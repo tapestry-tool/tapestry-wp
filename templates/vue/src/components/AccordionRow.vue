@@ -20,9 +20,9 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  background: #262626;
-  border-radius: 4px;
-  padding: 8px 16px;
+  background: #643493;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 8px;
 
   &:last-child {

@@ -12,7 +12,9 @@
           :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
           @click="toggle(index)"
         >
-          <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+          <div class="button-row-icon">
+            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+          </div>
           {{ row.title }}
         </button>
       </template>
@@ -207,7 +209,14 @@ button[disabled] {
   width: 100%;
   text-align: left;
 
-  i {
+  &-icon {
+    background: #b29ac9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
     margin-right: 8px;
   }
 }
