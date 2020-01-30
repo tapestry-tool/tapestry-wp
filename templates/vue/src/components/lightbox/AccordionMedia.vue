@@ -47,7 +47,11 @@
         />
       </template>
       <template v-slot:footer>
-        <button v-if="row.completed" @click="showCompletion = true">
+        <button
+          v-if="row.completed"
+          class="button-finished"
+          @click="showCompletion = true"
+        >
           Finished?
         </button>
       </template>
@@ -71,7 +75,7 @@
       </div>
     </tapestry-modal>
     <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up fa-2x"></i>
+      <i class="fas fa-chevron-up"></i>
     </button>
   </div>
 </template>
@@ -272,12 +276,24 @@ button[disabled] {
   margin-left: auto;
 }
 
+.button-finished {
+  background: #bbd8ee;
+  border-radius: 16px;
+  margin: 0;
+  padding: 8px 36px;
+  color: #026c93;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
 .button-scroll-top {
   cursor: pointer;
   position: absolute;
   right: 24px;
   bottom: 24px;
-  background: #262626;
+  background: white;
+  border: 2px solid #3fa9f5;
+  color: #3fa9f5;
   border-radius: 50%;
   padding: 0;
   width: 56px;
