@@ -29,4 +29,12 @@ export default {
     margin-bottom: 0;
   }
 }
+
+.content {
+  background: white;
+  border-radius: 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  box-shadow: 4px 8px 8px rgba(0, 0, 0, 0.16);
+}
 </style>
