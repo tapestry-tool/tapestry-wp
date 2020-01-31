@@ -9,35 +9,20 @@
       :width="dimensions.width"
       :height="dimensions.height"
     ></iframe>
-    <div v-if="fetching" class="spinners">
-      <b-spinner
-        type="grow"
-        variant="secondary"
-        small
-        style="margin: 5px 5px 5px 20px;"
-      ></b-spinner>
-      <b-spinner
-        type="grow"
-        variant="primary"
-        small
-        style="margin: 5px;"
-      ></b-spinner>
-      <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
-    </div>
     <div v-else class="preview">
       <div
         class="preview-image"
-        :style="{ 'background-image': `url(${linkMetadata.image})` }"
+        :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
       >
         <a :href="node.typeData.mediaURL" target="blank"></a>
       </div>
       <div class="preview-content">
         <h1>
           <a :href="node.typeData.mediaURL" target="blank">
-            {{ linkMetadata.title }}
+            {{ node.typeData.linkMetadata.title }}
           </a>
         </h1>
-        <p>{{ linkMetadata.description }}</p>
+        <p>{{ node.typeData.linkMetadata.description }}</p>
         <p>
           <a :href="node.typeData.mediaURL" target="blank">Open link</a>
         </p>
@@ -47,9 +32,7 @@
 </template>
 
 <script>
-import { getLinkMetadata } from "../../services/LinkPreviewApi"
 import Helpers from "../../utils/Helpers"
-import { mapActions } from "vuex"
 
 const MIN_MEDIA_WIDTH = 700
 const MIN_MEDIA_HEIGHT = 500
@@ -66,27 +49,9 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      linkMetadata: {},
-      error: null,
-      fetching: false,
-    }
-  },
   computed: {
     normalizedUrl() {
       return Helpers.normalizeUrl(this.node.typeData.mediaURL)
-    },
-    shouldFetch() {
-      if (!this.node.typeData.linkMetadata) {
-        return true
-      }
-      const { url } = this.node.typeData.linkMetadata
-      const mediaUrl = Helpers.normalizeUrl(this.node.typeData.mediaURL)
-      if (!url.startsWith(mediaUrl)) {
-        return true
-      }
-      return false
     },
     containerStyles() {
       const { width, height } = this.adjustedDimensions
@@ -110,41 +75,8 @@ export default {
     },
   },
   async mounted() {
-    if (this.node.behaviour !== "embed") {
-      if (this.shouldFetch) {
-        this.fetchLinkData(this.node.typeData.mediaURL)
-      } else {
-        this.linkMetadata = this.node.typeData.linkMetadata
-      }
-    }
     this.$emit("mounted", this.adjustedDimensions)
     this.$emit("complete")
-  },
-  methods: {
-    ...mapActions(["updateNode"]),
-    async fetchLinkData(url) {
-      this.fetching = true
-
-      const { data, error } = await getLinkMetadata(url)
-      this.fetching = false
-      if (error) {
-        this.error = error
-      } else {
-        this.linkMetadata = data
-        this.node.typeData.linkMetadata = this.linkMetadata
-
-        let shouldChange = true
-        if (this.node.imageURL) {
-          shouldChange = confirm("Change thumbnail to new image?")
-        }
-
-        if (shouldChange) {
-          this.node.imageURL = this.linkMetadata.image
-          thisTapestryTool.updateNodeImage(this.node.id, this.node.imageURL)
-        }
-        this.updateNode({ id: this.node.id, newNode: this.node })
-      }
-    },
   },
 }
 </script>
