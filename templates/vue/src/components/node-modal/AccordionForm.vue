@@ -35,13 +35,13 @@ export default {
   mounted() {
     // set node defaults
     this.node.typeData = {
-      ...this.node.typeData,
       lockRows: false,
       finishButtonText: "Finish",
       confirmationTitleText: "Section Complete!",
       confirmationBodyText: "Would you like to continue?",
       continueButtonText: "Continue",
       cancelLinkText: "Cancel",
+      ...this.node.typeData,
     }
   },
 }

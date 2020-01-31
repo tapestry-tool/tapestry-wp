@@ -326,7 +326,6 @@ import { tydeTypes } from "../utils/constants"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
-import WordpressApi from "../services/WordpressApi"
 import AccordionForm from "./node-modal/AccordionForm"
 
 export default {

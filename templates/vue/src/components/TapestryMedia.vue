@@ -38,7 +38,11 @@
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <wp-post-media v-if="node.mediaType === 'wp-post'" :node="node"></wp-post-media>
+    <wp-post-media
+      v-if="node.mediaType === 'wp-post'"
+      :node="node"
+      @complete="complete"
+    ></wp-post-media>
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
