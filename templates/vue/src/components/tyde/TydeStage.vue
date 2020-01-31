@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex"
+import { mapGetters } from "vuex"
 
 export default {
   name: "tyde-stage",
@@ -35,7 +35,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren", "lightbox"]),
+    ...mapGetters(["getNode", "getDirectChildren"]),
     done() {
       return this.questions.every(question => question.completed)
     },
@@ -53,12 +53,17 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["openLightbox", "closeLightbox"]),
     getImageStyles(index) {
       if (index === 0 || index === 3) {
         return { width: "70%" }
       }
       return {}
+    },
+    openLightbox(id) {
+      this.$router.push(`/nodes/${id}`)
+    },
+    closeLightbox() {
+      this.$router.push(`/`)
     },
   },
 }

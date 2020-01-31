@@ -25,7 +25,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren", "lightbox"]),
+    ...mapGetters(["getNode", "getDirectChildren"]),
     node() {
       return this.getNode(this.nodeId)
     },
@@ -35,10 +35,13 @@ export default {
     activeStage() {
       return this.stages[this.activeStageIndex]
     },
+    isLightboxOpen() {
+      return this.$route.path.includes("nodes")
+    },
   },
   watch: {
     activeStage(newStage) {
-      if (this.lightbox.isOpen) {
+      if (this.isLightboxOpen) {
         this.closeLightbox()
       }
       this.openLightbox(newStage)
@@ -49,6 +52,12 @@ export default {
   },
   methods: {
     ...mapMutations(["openLightbox", "closeLightbox"]),
+    openLightbox(id) {
+      this.$router.push(`/nodes/${id}`)
+    },
+    closeLightbox() {
+      this.$router.push(`/`)
+    },
     next() {
       if (this.activeStageIndex < this.stages.length - 1) {
         this.activeStageIndex++
