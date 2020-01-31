@@ -1,5 +1,5 @@
 <template>
-  <div class="external-media-container" :style="containerStyles">
+  <div class="external-media-container">
     <iframe
       v-if="node.behaviour === 'embed'"
       id="external"
@@ -34,9 +34,6 @@
 <script>
 import Helpers from "../../utils/Helpers"
 
-const MIN_MEDIA_WIDTH = 700
-const MIN_MEDIA_HEIGHT = 500
-
 export default {
   name: "external-media",
   props: {
@@ -53,41 +50,16 @@ export default {
     normalizedUrl() {
       return Helpers.normalizeUrl(this.node.typeData.mediaURL)
     },
-    containerStyles() {
-      const { width, height } = this.adjustedDimensions
-      return {
-        width: width + "px",
-        height: height + "px",
-      }
-    },
-    adjustedDimensions() {
-      const width = Math.max(this.dimensions.width, MIN_MEDIA_WIDTH)
-      const height = Math.max(this.dimensions.height, MIN_MEDIA_HEIGHT)
-      const left =
-        width === this.dimensions.width
-          ? this.dimensions.left
-          : this.dimensions.left - (MIN_MEDIA_WIDTH - this.dimensions.width) / 2
-      return {
-        width,
-        height,
-        left,
-      }
-    },
   },
   async mounted() {
-    this.$emit("mounted", this.adjustedDimensions)
     this.$emit("complete")
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.spinners {
-  width: 100%;
+.external-media-container {
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .preview {
