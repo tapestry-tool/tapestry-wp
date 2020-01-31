@@ -124,8 +124,6 @@ export default {
       const allImages = imageContainer.childNodes
       const allImagesArray = Array.from(allImages)
       allImagesArray.forEach(image => {
-        console.log("adding onclick")
-        console.log(image.childNodes[1].parentElement)
         image.childNodes[1].addEventListener("click", function() {
           this.parentElement.classList.toggle("image-choices-choice-selected")
         })
