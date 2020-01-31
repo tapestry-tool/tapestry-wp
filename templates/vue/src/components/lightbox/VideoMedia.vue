@@ -34,6 +34,11 @@ export default {
       type: Object,
       required: true,
     },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -70,7 +75,7 @@ export default {
     getInitialEndScreenState() {
       const progress = this.node.typeData.progress[0].value
       if (progress >= 1) {
-        return true
+        return this.allowEndScreen
       }
       if (this.$refs.video) {
         const viewedAmount = progress * this.$refs.video.duration
@@ -136,7 +141,7 @@ export default {
           this.$emit("complete")
         }
 
-        if (amountViewed >= 1) {
+        if (amountViewed >= 1 && this.allowEndScreen) {
           this.showEndScreen = true
         }
 

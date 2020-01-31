@@ -15,7 +15,7 @@
       :settings="settings"
       @complete="$emit('complete')"
       @is-loaded="handleLoad"
-      @show-end-screen="showEndScreen = true"
+      @show-end-screen="showEndScreen = allowEndScreen"
     />
   </div>
 </template>
@@ -48,6 +48,11 @@ export default {
     height: {
       type: Number,
       required: true,
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {

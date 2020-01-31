@@ -10,6 +10,7 @@
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :node="node"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -27,6 +28,7 @@
       :node="node"
       :width="dimensions.width"
       :settings="h5pSettings"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
@@ -83,6 +85,11 @@ export default {
       type: Object,
       required: false,
       default: () => {},
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {

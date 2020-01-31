@@ -44,6 +44,7 @@
       <template v-slot:content>
         <div :style="rowContainerStyles(row)">
           <tapestry-media
+            :allow-end-screen="false"
             :node-id="row.id"
             :dimensions="dimensions"
             :container-styles="mediaContainerStyles(row)"
