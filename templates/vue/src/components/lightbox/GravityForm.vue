@@ -51,6 +51,8 @@ export default {
     this.loading = false
 
     this.disableAutocomplete()
+    // this.injectImageScripts()
+    this.styleImageUI()
 
     if (this.entry) {
       this.populateForm()
@@ -115,6 +117,31 @@ export default {
       formInputs.forEach(input => {
         // Manually sets autocomplete flag for each element of form
         input.autocomplete = "off"
+      })
+    },
+    styleImageUI() {
+      const imageContainer = document.querySelector(".gfield_checkbox")
+      const allImages = imageContainer.childNodes
+      const allImagesArray = Array.from(allImages)
+      allImagesArray.forEach(image => {
+        console.log("adding onclick")
+        console.log(image.childNodes[1].parentElement)
+        image.childNodes[1].addEventListener("click", function() {
+          this.parentElement.classList.toggle("image-choices-choice-selected")
+        })
+        image.childNodes[1].addEventListener("focus", function() {
+          this.parentElement.classList.add("image-choices-choice-focus")
+        })
+        image.childNodes[1].addEventListener("blur", function() {
+          this.parentElement.classList.remove("image-choices-choice-focus")
+        })
+        image.addEventListener("mouseover", function() {
+          this.classList.add("image-choices-choice-hover")
+        })
+        image.addEventListener("mouseout", function() {
+          this.classList.remove("image-choices-choice-hover")
+        })
+        image.classList.add("image-choices-choice")
       })
     },
   },
