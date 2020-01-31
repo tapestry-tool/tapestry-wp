@@ -991,14 +991,7 @@ function tapestryTool(config){
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    var thisBtn = $('#node-' + d.id + ' .mediaButton > i')[0];
-                    dispatchEvent(
-                        new CustomEvent(
-                            'open-lightbox', 
-                            { detail: thisBtn.dataset.id }
-                        )
-                    );
-                    recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+                    goToNode(d.id)
                 }
             });
     
@@ -1268,8 +1261,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            location.href += `nodes/${thisBtn.dataset.id}`
-            recordAnalyticsEvent('user', 'open', 'lightbox', thisBtn.dataset.id);
+            goToNode(thisBtn.dataset.id)
         });
     
         // Append addNodeButton
@@ -1362,6 +1354,11 @@ function tapestryTool(config){
         $('.editNodeButton').click(function(){
             dispatchEvent(new CustomEvent("edit-node"))
         });
+    }
+
+    function goToNode(nodeId) {
+        location.href += `nodes/${nodeId}`
+        recordAnalyticsEvent('user', 'open', 'lightbox', nodeId);
     }
 
     function getVideoDuration(seconds) {
