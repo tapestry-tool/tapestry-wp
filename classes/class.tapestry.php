@@ -311,9 +311,9 @@ class Tapestry implements ITapestry
         } else if ($parentType == TydeTypes::REGULAR) {
             return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
         } else {
-            // otherwise parent is a question set, so we shouldn't be able
-            // to get here in the first place.
-            return false;
+            // otherwise parent is a question set, so only valid if parent
+            // is an accordion
+            return $parent->mediaType == "accordion";
         }
     }
 
