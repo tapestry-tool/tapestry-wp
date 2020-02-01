@@ -38,6 +38,7 @@ export default {
     this.loading = false
     this.title = post.title
     this.content = post.content
+    this.$emit("complete")
   },
 }
 </script>
