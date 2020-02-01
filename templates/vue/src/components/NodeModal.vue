@@ -211,11 +211,15 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          v-if="
+            node.mediaType === 'h5p' ||
+              node.mediaType === 'video' ||
+              node.mediaType === 'accordion'
+          "
           title="Behaviour"
         >
           <div id="modal-behaviour">
-            <b-form-group>
+            <b-form-group v-if="node.mediaType !== 'accordion'">
               <b-form-checkbox v-model="node.skippable">
                 Allow skipping video if user has not watched at least once
               </b-form-checkbox>
