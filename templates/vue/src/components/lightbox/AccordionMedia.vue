@@ -164,7 +164,7 @@ export default {
       if (activeRow.mediaType !== "video") {
         return { width: rect.width, height: rect.height }
       }
-      return { width: 400, height: 400 }
+      return { width: this.node.fullscreen ? 600 : 400, height: 400 }
     },
     lockRows() {
       return this.node.typeData.lockRows

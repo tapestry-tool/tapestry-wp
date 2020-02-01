@@ -7,7 +7,12 @@
         :class="['content', contentContainerClass]"
         :style="contentContainerStyle"
       >
-        <button v-if="allowClose" class="close-btn" @click="$emit('close')">
+        <button
+          v-if="allowClose"
+          class="close-btn"
+          :style="closeButtonStyle"
+          @click="$emit('close')"
+        >
           <div>
             <i class="fa fa-times"></i>
           </div>
@@ -39,6 +44,11 @@ export default {
       type: Object,
       required: false,
       default: () => defaultStyles,
+    },
+    closeButtonStyle: {
+      type: Object,
+      required: false,
+      default: () => {},
     },
     contentContainerClass: {
       type: String,
