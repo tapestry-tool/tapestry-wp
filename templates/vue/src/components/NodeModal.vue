@@ -147,7 +147,11 @@
               v-show="node.mediaType === 'url-embed'"
               label="External Link"
             >
-              <file-upload v-model="node.typeData.mediaURL" inputId="node-embed-media-duration" placeholderText="Enter embed link (starting with http)" />
+              <file-upload
+                v-model="node.typeData.mediaURL"
+                inputId="node-embed-media-duration"
+                placeholderText="Enter embed link (starting with http)"
+                value="node.typeData.mediaURL" />
             </b-form-group>
             <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
               <b-form-radio-group
@@ -168,7 +172,11 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addThumbnail">
-              <file-upload v-model="node.imageURL" inputId="node-image-url" placeholderText="Enter the URL for the thumbnail" />
+              <file-upload
+                v-model="node.imageURL"
+                inputId="node-image-url"
+                placeholderText="Enter the URL for the thumbnail"
+                value="node.imageURL" />
             </b-form-group>
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">

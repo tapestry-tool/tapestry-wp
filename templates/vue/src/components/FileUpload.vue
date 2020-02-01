@@ -3,47 +3,31 @@
     <b-row>
         <b-col>
           <b-form-file
-            ref= "file-input"
-            class= "mb-2"
-            placeholder= "Choose a file or drop it here..."
-            drop-placeholder= "Drop file here..."
-            v-model= "file"
+            name="async-upload"
+            class="image-file mb-2"
+            placeholder="Choose a file or drop it here..."
+            drop-placeholder="Drop file here..."
+            @change="uploadFile"
+            required
           >
           </b-form-file>
         </b-col>
-        <b-col cols="1">
-          <h4>OR</h4>
+        <b-col sm="1" class="divider">
+          <h6>OR</h6>
         </b-col>
         <b-col>
-          <b-form-input
-            :id= inputId
-            :placeholder= placeholderText
-            :value= "file !== '' ? file.name : null"
-            required
-          />
+          <b-row>
+            <b-form-input
+              :id="inputId"
+              :placeholder="placeholderText"
+              v-model="curUrl"
+              value="value"
+              required
+            />
+          </b-row>
         </b-col>
     </b-row>
   </b-container>
-  <!-- <div>
-    <b-form-file
-      ref="file-input"
-      class="mb-2"
-      placeholder="Choose a file or drop it here..."
-      drop-placeholder="Drop file here...">
-    </b-form-file>
-    <b-form-input
-      id="node-embed-media-duration"
-      v-model="node.typeData.mediaURL"
-      placeholder="Enter embed link (starting with http)"
-      required
-    />
-    <b-form-input
-      id="node-image-url"
-      v-model="node.imageURL"
-      placeholder="Enter the URL for the thumbnail"
-      required
-    />
-  </div> -->
 </template>
 
 <script>
@@ -58,24 +42,65 @@ export default {
     placeholderText: {
       type: String,
       required: true,
+    },
+    value: {
+      type: String,
+      required: false
     }
   },
 
   data() {
-    return {
-      file: "",
-      link: ""
+    return{
+      curUrl: "",
     }
   },
-  // props: {
-  //   field: {
-  //     type: String,
-  //     required: true,
-  //   },
-  // },
+
+  methods: {
+    uploadFile(event) {
+      var formData = new FormData()
+      formData.append('action', 'upload-attachment')
+      formData.append('async-upload', event.target.files[0])
+      formData.append('name', event.target.files[0].name)
+      formData.append('_wpnonce', wpData.file_upload_nonce)
+
+      let that = this
+
+      $.ajax({
+        url: wpData.upload_url,
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        type: 'POST'
+      }).success(function(resp) {
+        that.curUrl = resp.data.url
+      });
+    },
+  },
+  watch: {
+    curUrl(url) {
+      this.$emit('input', url)
+      console.log("Emitting Change")
+    }
+  },
 }
 </script>
+<style lang="scss" scoped>
+  .image-file {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: middle;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    padding-left: 30px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 
-<style>
-
+  .divider {
+    text-align: center;
+    vertical-align: center;
+    padding: 10px;
+  }
 </style>
