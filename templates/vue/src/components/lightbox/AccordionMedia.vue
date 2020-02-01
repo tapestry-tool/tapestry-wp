@@ -70,7 +70,7 @@
       @close="showCompletion = false"
     >
       <div class="button-container">
-        <button v-if="hasNext" class="button-completion" @click="next">
+        <button class="button-completion" @click="next">
           {{ node.typeData.continueButtonText }}
         </button>
         <button
@@ -194,7 +194,11 @@ export default {
     },
     next() {
       this.showCompletion = false
-      this.activeIndex++
+      if (this.hasNext) {
+        this.activeIndex++
+      } else {
+        this.$emit("close")
+      }
     },
     rowContainerStyles(row) {
       return row.mediaType === "video"
