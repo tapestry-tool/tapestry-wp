@@ -5,7 +5,6 @@
     frameborder="0"
     :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
     :width="width"
-    :height="height"
     @load="handleLoad"
   ></iframe>
 </template>
