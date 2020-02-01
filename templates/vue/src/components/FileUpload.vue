@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import axios from "axios"
 
 export default {
   name: "file-upload",
@@ -64,16 +65,17 @@ export default {
 
       let that = this
 
-      $.ajax({
-        url: wpData.upload_url,
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        type: 'POST'
-      }).success(function(resp) {
-        that.$emit('input', resp.data.url)
-      });
+      axios
+        .post( wpData.upload_url, formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        )
+        .then(response => {
+          that.$emit('input', response.data.data.url)
+        })
     },
   },
 }
