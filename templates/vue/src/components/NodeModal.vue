@@ -144,16 +144,15 @@
               </combobox>
             </b-form-group>
             <b-form-group
-              v-show="node.mediaType === 'url-embed'"
+              v-if="node.mediaType === 'url-embed'"
               label="External Link"
             >
               <file-upload
                 v-model="node.typeData.mediaURL"
                 inputId="node-embed-media-duration"
-                placeholderText="Enter embed link (starting with http)"
-                value="node.typeData.mediaURL" />
+                placeholderText="Enter embed link (starting with http)"/>
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
+            <b-form-group v-if="node.mediaType === 'url-embed'" label="Behaviour">
               <b-form-radio-group
                 id="external-link-behaviour"
                 v-model="node.behaviour"
@@ -175,8 +174,7 @@
               <file-upload
                 v-model="node.imageURL"
                 inputId="node-image-url"
-                placeholderText="Enter the URL for the thumbnail"
-                value="node.imageURL" />
+                placeholderText="Enter the URL for the thumbnail"/>
             </b-form-group>
             <b-form-group>
               <b-form-checkbox v-model="node.hideTitle">
