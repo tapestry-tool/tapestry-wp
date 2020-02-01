@@ -29,8 +29,7 @@
       v-if="node.mediaFormat === 'h5p'"
       :node="node"
       :width="dimensions.width"
-      :height="dimensions.height"
-      :settings="h5pSettings"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
@@ -115,10 +114,6 @@ export default {
 
       if (secondsDiff > SAVE_INTERVAL) {
         await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-
-        if (type === "h5p") {
-          await this.updateH5pSettings(this.h5pSettings)
-        }
 
         this.timeSinceLastSaved = now
       }

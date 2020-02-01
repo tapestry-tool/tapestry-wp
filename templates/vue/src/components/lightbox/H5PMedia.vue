@@ -12,7 +12,7 @@
       :node="node"
       :width="width"
       :height="height"
-      :settings="settings"
+      @complete="$emit('complete')"
       @is-loaded="handleLoad"
       @show-end-screen="showEndScreen = true"
     />
@@ -38,7 +38,8 @@ export default {
     },
     settings: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => {},
     },
     width: {
       type: Number,
@@ -46,7 +47,8 @@ export default {
     },
     height: {
       type: Number,
-      required: true,
+      required: false,
+      default: undefined,
     },
   },
   data() {
