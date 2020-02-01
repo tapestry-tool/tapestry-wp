@@ -20,8 +20,8 @@
             <b-form-input
               :id="inputId"
               :placeholder="placeholderText"
-              v-model="curUrl"
-              value="value"
+              :value="value"
+              @input="$emit('input', $event.target.value)"
               required
             />
           </b-row>
@@ -51,7 +51,6 @@ export default {
 
   data() {
     return{
-      curUrl: "",
     }
   },
 
@@ -73,15 +72,9 @@ export default {
         dataType: 'json',
         type: 'POST'
       }).success(function(resp) {
-        that.curUrl = resp.data.url
+        that.$emit('input', resp.data.url)
       });
     },
-  },
-  watch: {
-    curUrl(url) {
-      this.$emit('input', url)
-      console.log("Emitting Change")
-    }
   },
 }
 </script>
