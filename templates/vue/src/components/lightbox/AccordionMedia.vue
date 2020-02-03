@@ -77,6 +77,7 @@ export default {
     return {
       activeIndex: 0,
       showCompletion: false,
+      isMounted: false,
     }
   },
   computed: {
@@ -88,10 +89,13 @@ export default {
       return this.getDirectChildren(this.node.id).map(this.getNode)
     },
     dimensions() {
-      const box = this.$refs.container
-      if (!box) {
-        return {}
+      if (!this.isMounted) {
+        return {
+          height: 0,
+          width: 0,
+        }
       }
+      const box = this.$refs.container
       const rect = box.getBoundingClientRect()
       return { width: rect.width, height: rect.height }
     },

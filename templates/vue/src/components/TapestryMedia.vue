@@ -79,6 +79,11 @@ export default {
       type: Object,
       required: true,
     },
+    h5pSettings: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {

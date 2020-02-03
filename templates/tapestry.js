@@ -204,7 +204,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, { skippable: true, behaviour: "embed", completed: false, quiz: [] })
+            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -212,19 +212,13 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
-                const accordionProgress = []
                 const directChildren = this.dataset.links.filter(link => {
                     return link.source == node.id
                 }).map(link => link.target)
                 directChildren.forEach(childId => {
                     const child = this.dataset.nodes[findNodeIndex(childId)]
                     child.presentationStyle = "accordion-row"
-                    
-                    if (child.completed) {
-                        accordionProgress.push(childId)
-                    }
                 })
-                updatedNode.accordionProgress = accordionProgress
             }
 
             return updatedNode
@@ -1925,6 +1919,21 @@ function tapestryTool(config){
                     })
                 }
                 tapestry.dataset.nodes[index].completed = completed;
+
+                var node = tapestry.dataset.nodes[index];
+                if (node.mediaType === "accordion") {
+                    var accordionProgress = []
+                    var directChildren = this.dataset.links.filter(link => {
+                        return link.source == node.id
+                    }).map(link => link.target)
+                    directChildren.forEach(childId => {
+                        const child = tapestry.dataset.nodes[findNodeIndex(childId)]
+                        if (child.completed) {
+                            accordionProgress.push(childId)
+                        }
+                    })
+                    node.accordionProgress = accordionProgress
+                }
             }
         }
     
