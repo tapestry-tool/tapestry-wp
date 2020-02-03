@@ -14,7 +14,7 @@ import {
   getAddNodeButton,
 } from "../support/utils"
 
-const TEST_TAPESTRY_NAME = Cypress.env("TEST_TAPESTRY_NAME")
+const TEST_TAPESTRY_NAME = "testing"
 
 describe("Author side", () => {
   before(() => {
