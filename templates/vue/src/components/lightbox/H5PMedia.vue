@@ -13,6 +13,7 @@
       :width="width"
       :height="height"
       :settings="settings"
+      @complete="$emit('complete')"
       @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = true"
     />
