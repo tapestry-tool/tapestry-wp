@@ -41,7 +41,7 @@ The testing framework that we use, Cypress, needs to be configured with some env
 ```json
 {
     "env": {
-        "DEV_URL": "http://localhost:8888",
+        "BASE_URL": "http://localhost:8888",
         "USER_TAPESTRY_NAME": "testing-user",
         "ADMIN_USERNAME": "admin_user",
         "ADMIN_PASSWORD": "admin_pass",
@@ -53,7 +53,7 @@ The testing framework that we use, Cypress, needs to be configured with some env
 
 Copy the file to `cypress.json` and change the variables to match your own settings.
 
-* `DEV_URL` is the url of your local site.
+* `BASE_URL` is the url of your local site.
 * `USER_TAPESTRY_NAME` is the name of the tapestry that is used for the user-side tests.
 * `ADMIN_USERNAME` is the name of a user in your Wordpress that has admin privileges.
 * `ADMIN_PASSWORD` is the password of the above user.

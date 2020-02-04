@@ -1,6 +1,6 @@
 {
     "env": {
-        "DEV_URL": "http://localhost:8888",
+        "BASE_URL": "http://localhost:8888",
         "TEST_TAPESTRY_NAME": "testing",
         "USER_TAPESTRY_NAME": "testing-user",
         "ADMIN_USERNAME": "admin_user",

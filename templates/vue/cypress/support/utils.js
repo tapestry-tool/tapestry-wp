@@ -1,7 +1,7 @@
 // TODO: Add node generator
 // TODO: Add link generator
 
-export const SITE_URL = Cypress.env("DEV_URL")
+export const SITE_URL = Cypress.env("BASE_URL")
 
 export const API_URL = `${SITE_URL}/wp-json/tapestry-tool/v1`
 
