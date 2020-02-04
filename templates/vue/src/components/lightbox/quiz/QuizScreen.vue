@@ -1,8 +1,5 @@
 <template>
   <div class="quiz-screen">
-    <button class="button-nav button-nav-menu" @click="back">
-      <i class="fas fa-arrow-left"></i>
-    </button>
     <completion-screen v-if="showCompletionScreen">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
@@ -16,9 +13,10 @@
     <question
       v-else
       :question="activeQuestion"
-      @form-opened="formOpened = true"
+      @form-toggled="toggleForm"
       @recorder-opened="recorderOpened = true"
       @submit="showCompletionScreen = true"
+      @back="$emit('close')"
     ></question>
     <footer
       v-if="!formOpened && !recorderOpened && !showCompletionScreen"
@@ -85,8 +83,8 @@ export default {
       this.showCompletionScreen = false
       this.activeQuestionIndex--
     },
-    back() {
-      this.$emit("close")
+    toggleForm(val) {
+      this.formOpened = val
     },
   },
 }
@@ -152,6 +150,7 @@ export default {
   justify-content: center;
   font-size: 40px;
   color: white;
+  margin: 0;
   margin-right: 12px;
   opacity: 1;
   transition: all 0.1s ease-out;
@@ -169,17 +168,6 @@ export default {
   &:last-child {
     margin-right: 0;
   }
-}
-
-.button-nav-menu {
-  width: 80px;
-  height: 80px;
-  font-size: 56px;
-
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
 }
 
 .question-step {

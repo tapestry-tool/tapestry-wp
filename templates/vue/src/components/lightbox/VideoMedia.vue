@@ -10,13 +10,12 @@
       ref="video"
       controls
       autoplay
+      :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
-      @play="handlePlay"
-      @pause="handlePause"
+      @play="handlePlay(node)"
+      @pause="handlePause(node)"
       @timeupdate="updateVideoProgress"
-    >
-      <source id="video-source" :src="node.typeData.mediaURL" type="video/mp4" />
-    </video>
+    ></video>
   </div>
 </template>
 
@@ -40,6 +39,12 @@ export default {
     return {
       showEndScreen: this.getInitialEndScreenState(),
     }
+  },
+  watch: {
+    node(newNode, oldNode) {
+      this.handlePause(oldNode)
+      this.handleLoad()
+    },
   },
   beforeDestroy() {
     if (this.$refs.video) {
@@ -73,8 +78,8 @@ export default {
       }
       return false
     },
-    handlePlay() {
-      const { id, mediaType } = this.node
+    handlePlay(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
@@ -83,8 +88,8 @@ export default {
         })
       }
     },
-    handlePause() {
-      const { id, mediaType } = this.node
+    handlePause(node) {
+      const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
@@ -94,6 +99,18 @@ export default {
       }
     },
     handleLoad() {
+      this.updateDimensions()
+      this.seek()
+    },
+    seek() {
+      const video = this.$refs.video
+      if (video) {
+        const progress = this.node.typeData.progress[0].value
+        const viewedAmount = progress * video.duration
+        video.currentTime = viewedAmount
+      }
+    },
+    updateDimensions() {
       const video = this.$refs.video
       if (video) {
         const videoRect = this.$refs.video.getBoundingClientRect()
@@ -102,10 +119,6 @@ export default {
           height: videoRect.height,
           el: this.$refs.video,
         })
-
-        const progress = this.node.typeData.progress[0].value
-        const viewedAmount = progress * video.duration
-        video.currentTime = viewedAmount
       }
     },
     updateVideoProgress() {

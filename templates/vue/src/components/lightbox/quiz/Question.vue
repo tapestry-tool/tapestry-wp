@@ -3,6 +3,9 @@
     class="question"
     :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
   >
+    <button class="button-nav button-nav-menu" @click="back">
+      <i class="fas fa-arrow-left"></i>
+    </button>
     <loading v-if="loading" label="Submitting..." />
     <gravity-form
       v-if="formOpened"
@@ -93,8 +96,21 @@ export default {
       return !!(this.question.entries && this.question.entries.audioId)
     },
   },
+  watch: {
+    formOpened(val) {
+      this.$emit("form-toggled", val)
+    },
+  },
   methods: {
     ...mapActions(["completeQuestion"]),
+    back() {
+      const wasOpened = this.formOpened || this.recorderOpened
+      this.formOpened = false
+      this.recorderOpened = false
+      if (!wasOpened) {
+        this.$emit("back")
+      }
+    },
     openRecorder(id) {
       if (id) {
         this.recorderOpened = true
@@ -190,11 +206,51 @@ button {
 }
 
 .loading {
-  background: white;
+  background: #111;
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0.9;
   z-index: 30;
+}
+
+.button-nav {
+  border-radius: 50%;
+  height: 56px;
+  width: 56px;
+  background: #262626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  margin: 0;
+  margin-right: 12px;
+  opacity: 1;
+  transition: all 0.1s ease-out;
+
+  &:hover {
+    background: #11a6d8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.button-nav-menu {
+  width: 80px;
+  height: 80px;
+  font-size: 56px;
+
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 20;
 }
 </style>
