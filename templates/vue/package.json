@@ -9,7 +9,9 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint 'src/**/*.{js,vue}'",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "test:open": "cypress open --config watchForFileChanges=false",
+    "test": "cypress run"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -33,9 +35,11 @@
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
+    "cypress": "^3.8.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-loader": "^3.0.2",
+    "eslint-plugin-cypress": "^2.8.1",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.2.3",
     "file-loader": "^1.1.4",
