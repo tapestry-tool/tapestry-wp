@@ -141,13 +141,11 @@ export default {
     this.applyDimensions()
     thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
-    let elem = document.querySelector('body')
-    elem.style.overflow = "hidden"
+    document.querySelector('body').style.overflow = "hidden"
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
-    let elem = document.querySelector('body')
-    elem.style.overflow = "auto"
+    document.querySelector('body').style.overflow = "auto"
   },
   methods: {
     close() {
