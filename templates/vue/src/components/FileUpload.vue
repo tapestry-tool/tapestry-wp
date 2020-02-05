@@ -5,14 +5,13 @@
         <b-form-file
           ref="file"
           name="async-upload"
-          class="image-file mb-2"
+          class="image-file"
           placeholder="Choose a file or drop it here..."
           drop-placeholder="Drop file here..."
           required
           @change="uploadFile"
-        >
-          >
-        </b-form-file>
+        ></b-form-file>
+        <progress max="100" :value.prop="uploadPercentage"></progress>
       </b-col>
       <b-col sm="1" class="divider">
         <h6>OR</h6>
@@ -20,17 +19,13 @@
       <b-col>
         <b-row>
           <b-form-input
-            :id="inputId"
-            :placeholder="placeholderText"
+            :placeholder="placeholder"
             :value="value"
             required
             @input="$emit('input', $event)"
           />
         </b-row>
       </b-col>
-    </b-row>
-    <b-row>
-      <progress max="100" :value.prop="uploadPercentage"></progress>
     </b-row>
   </b-container>
 </template>
@@ -41,11 +36,7 @@ import axios from "axios"
 export default {
   name: "file-upload",
   props: {
-    inputId: {
-      type: String,
-      required: true,
-    },
-    placeholderText: {
+    placeholder: {
       type: String,
       required: true,
     },
@@ -89,14 +80,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .image-file {
-  display: inline-block;
   overflow: hidden;
-  vertical-align: middle;
-  width: 100%;
-  position: absolute;
-  left: 0;
-  padding-left: 30px;
-  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
@@ -110,9 +94,10 @@ progress[value] {
   /* Reset the default appearance */
   -webkit-appearance: none;
   appearance: none;
-
-  width: 250px;
-  height: 20px;
+  width: 100%;
+  height: 5px;
+  position: relative;
+  top: -25%;
 }
 
 progress[value]::-webkit-progress-bar {
