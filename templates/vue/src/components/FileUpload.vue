@@ -11,7 +11,11 @@
           required
           @change="uploadFile"
         ></b-form-file>
-        <progress max="100" :value.prop="uploadPercentage"></progress>
+        <progress
+          v-if="isUploading"
+          max="100"
+          :value.prop="uploadPercentage"
+        ></progress>
       </b-col>
       <b-col sm="1" class="divider">
         <h6>OR</h6>
@@ -49,6 +53,7 @@ export default {
   data() {
     return {
       uploadPercentage: 0,
+      isUploading: false,
     }
   },
 
@@ -66,6 +71,7 @@ export default {
             "Content-Type": "multipart/form-data",
           },
           onUploadProgress: progressEvent => {
+            this.isUploading = true
             this.uploadPercentage = parseInt(
               Math.round((progressEvent.loaded / progressEvent.total) * 100)
             )
