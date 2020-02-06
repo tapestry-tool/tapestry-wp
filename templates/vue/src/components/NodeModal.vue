@@ -223,6 +223,14 @@
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="node.fullscreen"
+                data-testid="node-behaviour-fullscreen"
+              >
+                Maximize video size to fit in the window
+              </b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab
@@ -236,14 +244,6 @@
                 data-testid="node-behaviour-skippable"
               >
                 Allow skipping video if user has not watched at least once
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.fullscreen"
-                data-testid="node-behaviour-fullscreen"
-              >
-                Maximize video size to fit in the window
               </b-form-checkbox>
             </b-form-group>
           </div>
