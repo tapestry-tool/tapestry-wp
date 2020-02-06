@@ -31,6 +31,7 @@
               <b-form-input
                 id="node-title"
                 v-model="node.title"
+                data-testid="node-title"
                 placeholder="Enter title"
                 autofocus
                 required
@@ -40,6 +41,7 @@
               <b-form-textarea
                 id="node-description"
                 v-model="node.description"
+                data-testid="node-description"
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
@@ -47,6 +49,7 @@
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
+                data-testid="node-mediaType"
                 :value="nodeType"
                 :options="mediaTypes"
                 @change="handleTypeChange"
@@ -73,6 +76,7 @@
               <b-form-textarea
                 id="node-text-content"
                 v-model="node.typeData.textContent"
+                data-testid="node-textContent"
                 placeholder="Enter text here"
               ></b-form-textarea>
             </b-form-group>
@@ -83,6 +87,7 @@
               <b-form-input
                 id="node-video-media-url"
                 v-model="node.typeData.mediaURL"
+                data-testid="node-videoUrl"
                 placeholder="Enter URL for MP4 Video"
                 required
               />
@@ -97,6 +102,7 @@
               <b-form-input
                 id="node-video-media-duration"
                 v-model="node.mediaDuration"
+                data-testid="node-videoDuration"
                 placeholder="Enter duration (in seconds)"
                 required
               />
@@ -128,6 +134,7 @@
               <b-form-input
                 id="node-h5p-media-duration"
                 v-model="node.mediaDuration"
+                data-testid="node-h5pDuration"
                 placeholder="Enter duration (in seconds)"
                 required
               />
@@ -158,6 +165,7 @@
               <b-form-input
                 id="node-embed-media-duration"
                 v-model="node.typeData.mediaURL"
+                data-testid="node-linkUrl"
                 placeholder="Enter embed link (starting with http)"
                 required
               />
@@ -167,8 +175,15 @@
                 id="external-link-behaviour"
                 v-model="node.behaviour"
               >
-                <b-form-radio value="embed">Embed in Tapestry</b-form-radio>
-                <b-form-radio value="new-window">Open in a New Window</b-form-radio>
+                <b-form-radio value="embed" data-testid="node-linkBehaviour-embed">
+                  Embed in Tapestry
+                </b-form-radio>
+                <b-form-radio
+                  value="new-window"
+                  data-testid="node-linkBehaviour-new-window"
+                >
+                  Open in a New Window
+                </b-form-radio>
               </b-form-radio-group>
             </b-form-group>
           </div>
@@ -176,7 +191,10 @@
         <b-tab title="Appearance">
           <div id="modal-appearance">
             <b-form-group>
-              <b-form-checkbox v-model="addThumbnail">
+              <b-form-checkbox
+                v-model="addThumbnail"
+                data-testid="node-appearance-add-thumbnail"
+              >
                 Add a thumbnail
               </b-form-checkbox>
             </b-form-group>
@@ -184,22 +202,32 @@
               <b-form-input
                 id="node-image-url"
                 v-model="node.imageURL"
+                data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
                 required
               />
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideTitle">
+              <b-form-checkbox
+                v-model="node.hideTitle"
+                data-testid="node-appearance-hide-title"
+              >
                 Hide node title
               </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideProgress">
+              <b-form-checkbox
+                v-model="node.hideProgress"
+                data-testid="node-appearance-hide-progress"
+              >
                 Hide progress bar
               </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.hideMedia">
+              <b-form-checkbox
+                v-model="node.hideMedia"
+                data-testid="node-appearance-hide-media"
+              >
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
@@ -220,12 +248,18 @@
         >
           <div id="modal-behaviour">
             <b-form-group v-if="node.mediaType !== 'accordion'">
-              <b-form-checkbox v-model="node.skippable">
+              <b-form-checkbox
+                v-model="node.skippable"
+                data-testid="node-behaviour-skippable"
+              >
                 Allow skipping video if user has not watched at least once
               </b-form-checkbox>
             </b-form-group>
             <b-form-group>
-              <b-form-checkbox v-model="node.fullscreen">
+              <b-form-checkbox
+                v-model="node.fullscreen"
+                data-testid="node-behaviour-fullscreen"
+              >
                 Maximize video size to fit in the window
               </b-form-checkbox>
             </b-form-group>
@@ -254,6 +288,7 @@
                       v-model="node.permissions[rowName]"
                       value="read"
                       :disabled="isPermissionDisabled(rowName, 'read')"
+                      :data-testid="`node-permissions-${rowName}-read`"
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
@@ -262,6 +297,7 @@
                       v-model="node.permissions[rowName]"
                       value="add"
                       :disabled="isPermissionDisabled(rowName, 'add')"
+                      :data-testid="`node-permissions-${rowName}-add`"
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
@@ -270,6 +306,7 @@
                       v-model="node.permissions[rowName]"
                       value="edit"
                       :disabled="isPermissionDisabled(rowName, 'edit')"
+                      :data-testid="`node-permissions-${rowName}-edit`"
                       @change="updatePermissions($event, rowName, 'edit')"
                     ></b-form-checkbox>
                   </b-td>

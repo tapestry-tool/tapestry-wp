@@ -168,9 +168,11 @@ export default {
     this.applyDimensions()
     thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
+    document.querySelector("body").style.overflow = "hidden"
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
+    document.querySelector("body").style.overflow = "auto"
   },
   methods: {
     close() {
@@ -316,9 +318,9 @@ export default {
     }
 
     .close-btn {
-      top: 0 !important;
-      right: 0 !important;
-      z-index: 100;
+      position: fixed;
+      top: 50px;
+      right: 50px;
     }
   }
 }

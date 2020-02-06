@@ -48,7 +48,7 @@ export default {
     closeButtonStyle: {
       type: Object,
       required: false,
-      default: () => {},
+      default: () => ({}),
     },
     contentContainerClass: {
       type: String,

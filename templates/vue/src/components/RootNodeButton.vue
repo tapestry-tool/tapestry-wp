@@ -1,6 +1,6 @@
 <template>
   <div id="root-node-button">
-    <div @click="showModal">
+    <div data-testid="root-node-button" @click="showModal">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
