@@ -227,12 +227,17 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          v-if="
+            node.mediaType === 'h5p' ||
+              node.mediaType === 'video' ||
+              node.mediaType === 'accordion'
+          "
           title="Behaviour"
         >
           <div id="modal-behaviour">
             <b-form-group>
               <b-form-checkbox
+                v-if="node.mediaType !== 'accordion'"
                 v-model="node.skippable"
                 data-testid="node-behaviour-skippable"
               >

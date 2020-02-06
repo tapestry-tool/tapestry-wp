@@ -8,6 +8,7 @@
     <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
+      :autoplay="autoplay"
       :node="node"
       @load="handleLoad"
       @complete="complete"
@@ -23,6 +24,7 @@
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
+      :autoplay="autoplay"
       :node="node"
       :width="dimensions.width"
       :height="dimensions.height"
@@ -83,6 +85,11 @@ export default {
       type: Object,
       required: false,
       default: () => ({}),
+    },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {

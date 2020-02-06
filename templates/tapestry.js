@@ -1923,7 +1923,7 @@ function tapestryTool(config){
                 var node = tapestry.dataset.nodes[index];
                 if (node.mediaType === "accordion") {
                     var accordionProgress = []
-                    var directChildren = this.dataset.links.filter(link => {
+                    var directChildren = tapestry.dataset.links.filter(link => {
                         return link.source == node.id
                     }).map(link => link.target)
                     directChildren.forEach(childId => {

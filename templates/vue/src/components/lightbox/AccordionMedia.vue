@@ -20,6 +20,7 @@
         <tapestry-media
           :node-id="row.id"
           :dimensions="dimensions"
+          :autoplay="false"
           @complete="updateProgress(row.id)"
           @close="toggle(index)"
         />
