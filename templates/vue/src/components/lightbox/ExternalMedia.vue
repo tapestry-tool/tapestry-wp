@@ -6,8 +6,6 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
-      :width="dimensions.width"
-      :height="dimensions.height"
     ></iframe>
     <div v-else class="preview">
       <div
@@ -121,5 +119,10 @@ export default {
       font-family: inherit;
     }
   }
+}
+
+#external {
+  width: 100%;
+  height: 100%;
 }
 </style>

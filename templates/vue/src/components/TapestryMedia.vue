@@ -28,7 +28,6 @@
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
       :node="node"
-      :width="dimensions.width"
       :settings="h5pSettings"
       :allow-end-screen="allowEndScreen"
       @load="handleLoad"

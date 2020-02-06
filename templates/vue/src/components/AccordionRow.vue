@@ -35,6 +35,7 @@ export default {
 }
 
 .content {
+  position: relative;
   background: white;
   border-radius: 16px;
   margin-top: 24px;

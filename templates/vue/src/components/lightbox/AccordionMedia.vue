@@ -42,16 +42,14 @@
         </button>
       </template>
       <template v-slot:content>
-        <div :style="rowContainerStyles(row)">
-          <tapestry-media
-            :allow-end-screen="false"
-            :node-id="row.id"
-            :dimensions="dimensions"
-            :container-styles="mediaContainerStyles(row)"
-            @complete="updateProgress(row.id)"
-            @close="toggle(index)"
-          />
-        </div>
+        <tapestry-media
+          :allow-end-screen="false"
+          :autoplay="false"
+          :node-id="row.id"
+          :dimensions="dimensions"
+          @complete="updateProgress(row.id)"
+          @close="toggle(index)"
+        />
       </template>
       <template v-slot:footer>
         <button
@@ -96,7 +94,6 @@ import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
-import WatchVideoBackground from "../../assets/blort-watch-video.png"
 
 export default {
   name: "accordion-media",
@@ -160,11 +157,7 @@ export default {
 
       const box = this.$refs.container
       const rect = box.getBoundingClientRect()
-      const activeRow = this.rows[this.activeIndex >= 0 && this.activeIndex]
-      if (activeRow.mediaType !== "video") {
-        return { width: rect.width, height: rect.height }
-      }
-      return { width: this.node.fullscreen ? 600 : 400, height: 400 }
+      return { width: rect.width, height: rect.height }
     },
     lockRows() {
       return this.node.typeData.lockRows
@@ -199,23 +192,6 @@ export default {
       } else {
         this.$emit("close")
       }
-    },
-    rowContainerStyles(row) {
-      return row.mediaType === "video"
-        ? {
-            backgroundImage: `url(${Helpers.getImagePath(WatchVideoBackground)})`,
-            backgroundOrigin: "content-box",
-            backgroundPosition: "right",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "contain",
-            padding: "32px",
-          }
-        : {}
-    },
-    mediaContainerStyles(row) {
-      return row.mediaType === "video"
-        ? { width: this.dimensions.width + "px", borderRadius: 0 }
-        : {}
     },
     updateProgress(rowId) {
       const { accordionProgress } = this.node
