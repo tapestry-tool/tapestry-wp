@@ -71,10 +71,7 @@
         <button class="button-completion" @click="next">
           {{ node.typeData.continueButtonText }}
         </button>
-        <button
-          class="button-completion button-completion-cancel"
-          @click="showCompletion = false"
-        >
+        <button class="button-completion" @click="showCompletion = false">
           {{ node.typeData.cancelLinkText }}
         </button>
       </div>
@@ -275,10 +272,6 @@ button[disabled] {
 
   &:hover {
     opacity: 0.9;
-  }
-
-  &-cancel {
-    background: #9fd4fa;
   }
 
   p {
