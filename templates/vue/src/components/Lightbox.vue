@@ -11,7 +11,11 @@
     :allow-close="canSkip"
     @close="close"
   >
-    <accordion-media v-if="node.mediaType === 'accordion'" :node="node" />
+    <accordion-media
+      v-if="node.mediaType === 'accordion'"
+      :node="node"
+      @close="close"
+    />
     <tapestry-media
       v-else
       :node-id="nodeId"

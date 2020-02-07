@@ -26,7 +26,7 @@
         />
       </template>
       <template v-slot:footer>
-        <button v-if="row.completed" @click="showCompletion = true">
+        <button v-if="row.completed" @click="next">
           Finished?
         </button>
       </template>
@@ -39,7 +39,7 @@
       <h1>{{ node.typeData.confirmationTitleText }}</h1>
       <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
-        <button v-if="hasNext" class="button-completion" @click="next">
+        <button class="button-completion" @click="$emit('close')">
           <i class="far fa-arrow-alt-circle-right fa-4x"></i>
           <p>{{ node.typeData.continueButtonText }}</p>
         </button>
@@ -124,8 +124,11 @@ export default {
       }
     },
     next() {
-      this.showCompletion = false
-      this.activeIndex++
+      if (this.hasNext) {
+        this.activeIndex++
+      } else {
+        this.showCompletion = true
+      }
     },
     updateProgress(rowId) {
       const { accordionProgress } = this.node
