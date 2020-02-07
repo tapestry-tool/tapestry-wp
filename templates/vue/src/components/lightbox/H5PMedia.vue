@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <end-screen
+      v-if="showEndScreen"
       :node="node"
-      :show="showEndScreen"
       @rewatch="rewatch"
       @close="close"
     />

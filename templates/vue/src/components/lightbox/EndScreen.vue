@@ -37,11 +37,6 @@ export default {
       type: Object,
       required: true,
     },
-    show: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   data() {
     return {
@@ -83,11 +78,6 @@ export default {
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
-
-  &.end-screen--hide {
-    opacity: 0;
-    pointer-events: none;
-  }
 
   button {
     background: none;
