@@ -52,11 +52,7 @@
         />
       </template>
       <template v-slot:footer>
-        <button
-          v-if="row.completed"
-          class="button-finished"
-          @click="showCompletion = true"
-        >
+        <button v-if="row.completed" class="button-finished" @click="next">
           Finished?
         </button>
       </template>
@@ -68,7 +64,7 @@
       @close="showCompletion = false"
     >
       <div class="button-container">
-        <button class="button-completion" @click="next">
+        <button class="button-completion" @click="$emit('close')">
           {{ node.typeData.continueButtonText }}
         </button>
         <button class="button-completion" @click="showCompletion = false">
@@ -183,11 +179,10 @@ export default {
       }
     },
     next() {
-      this.showCompletion = false
       if (this.hasNext) {
         this.activeIndex++
       } else {
-        this.$emit("close")
+        this.showCompletion = true
       }
     },
     updateProgress(rowId) {
