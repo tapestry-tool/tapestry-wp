@@ -1,5 +1,5 @@
 <template>
-  <quiz-screen v-if="showQuiz" :node="node" @close="handleClose" />
+  <quiz-screen v-if="showQuiz" :id="node.id" @close="handleClose" />
   <div
     v-else
     :class="[
