@@ -13,6 +13,7 @@
     <question
       v-else
       :question="activeQuestion"
+      :node="node"
       @submit="showCompletionScreen = true"
       @back="$emit('close')"
     ></question>
