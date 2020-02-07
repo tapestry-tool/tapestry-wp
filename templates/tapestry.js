@@ -2211,6 +2211,7 @@ function getIconClass(mediaType, action) {
             classStr = 'textMediaButtonIcon';
             break;
 
+        case "activity":
         case "gravity-form":
             classStr = classStrStart + 'tasks';
             break;
