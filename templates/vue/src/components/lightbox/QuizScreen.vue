@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="$emit('close', true)">
+      <button v-else class="button-completion" @click="$emit('close')">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -15,7 +15,7 @@
       :question="activeQuestion"
       :node="node"
       @submit="showCompletionScreen = true"
-      @back="$emit('close')"
+      @back="$emit('back')"
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import Question from "./Question"
-import CompletionScreen from "./CompletionScreen"
+import Question from "./quiz-screen/Question"
+import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
 
 export default {

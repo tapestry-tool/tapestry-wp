@@ -5,6 +5,13 @@
       :node="node"
       @rewatch="rewatch"
       @close="close"
+      @show-quiz="openQuiz"
+    />
+    <quiz-screen
+      v-else-if="showQuizScreen"
+      :id="node.id"
+      @back="back"
+      @close="close"
     />
     <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
@@ -24,6 +31,7 @@
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import H5PIframe from "./H5PIframe"
+import QuizScreen from "./QuizScreen"
 
 export default {
   name: "h5p-media",
@@ -31,6 +39,7 @@ export default {
     EndScreen,
     "h5p-iframe": H5PIframe,
     Loading,
+    QuizScreen,
   },
   props: {
     node: {
@@ -54,9 +63,14 @@ export default {
     return {
       isLoading: true,
       showEndScreen: false,
+      showQuizScreen: false,
     }
   },
   methods: {
+    openQuiz() {
+      this.showEndScreen = false
+      this.showQuizScreen = true
+    },
     rewatch() {
       this.showEndScreen = false
       this.$refs.h5pIframe.rewatch()
@@ -65,6 +79,10 @@ export default {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
       this.$emit("close")
+    },
+    back() {
+      this.showQuizScreen = false
+      this.showEndScreen = true
     },
   },
 }

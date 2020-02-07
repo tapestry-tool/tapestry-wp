@@ -1,15 +1,6 @@
 <template>
-  <quiz-screen v-if="showQuiz" :id="node.id" @close="handleClose" />
-  <div
-    v-else
-    :class="[
-      'end-screen',
-      {
-        'end-screen--hide': !show,
-      },
-    ]"
-  >
-    <button v-if="showQuizButton" @click="showQuiz = true">
+  <div class="end-screen">
+    <button v-if="showQuizButton" @click="$emit('show-quiz')">
       <i class="fas fa-question-circle fa-4x"></i>
       <p>{{ buttonText }}</p>
     </button>
@@ -25,23 +16,13 @@
 </template>
 
 <script>
-import QuizScreen from "./quiz/QuizScreen"
-
 export default {
   name: "end-screen",
-  components: {
-    QuizScreen,
-  },
   props: {
     node: {
       type: Object,
       required: true,
     },
-  },
-  data() {
-    return {
-      showQuiz: false,
-    }
   },
   computed: {
     showQuizButton() {
@@ -50,14 +31,6 @@ export default {
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Retake Quiz" : "Take Quiz"
-    },
-  },
-  methods: {
-    handleClose(closeLightbox = false) {
-      this.showQuiz = false
-      if (closeLightbox) {
-        this.$emit("close")
-      }
     },
   },
 }
