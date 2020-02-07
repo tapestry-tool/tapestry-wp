@@ -47,6 +47,12 @@
       :node="node"
       @complete="completeNode(nodeId)"
     ></wp-post-media>
+    <quiz-media
+      v-if="node.mediaType === 'activity'"
+      :node="node"
+      @complete="completeNode(nodeId)"
+      @close="$emit('close')"
+    />
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -59,7 +65,8 @@ import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
-import CompletionScreen from "./lightbox/quiz/CompletionScreen"
+import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
+import QuizMedia from "./lightbox/QuizMedia"
 
 const SAVE_INTERVAL = 5
 
@@ -73,6 +80,7 @@ export default {
     GravityForm,
     WpPostMedia,
     CompletionScreen,
+    QuizMedia,
   },
   props: {
     nodeId: {
