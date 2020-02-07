@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
@@ -73,6 +73,10 @@ export default {
       type: Object,
       required: true,
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -85,7 +89,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode"]),
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)
     },
@@ -127,7 +130,7 @@ export default {
       this.formOpened = false
       this.loading = true
       await this.completeQuestion({
-        nodeId: this.selectedNode.id,
+        nodeId: this.node.id,
         answerType: this.formType,
         formId: this.formId,
         questionId: this.question.id,
