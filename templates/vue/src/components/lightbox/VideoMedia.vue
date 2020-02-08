@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="video-container">
+    <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       :node="node"
       :show="showEndScreen"
@@ -9,7 +10,7 @@
     <video
       ref="video"
       controls
-      autoplay
+      :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
@@ -21,6 +22,7 @@
 
 <script>
 import EndScreen from "./EndScreen"
+import PlayScreen from "./PlayScreen"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -28,15 +30,22 @@ export default {
   name: "video-media",
   components: {
     EndScreen,
+    PlayScreen,
   },
   props: {
     node: {
       type: Object,
       required: true,
     },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
+      showPlayScreen: !this.autoplay,
       showEndScreen: this.getInitialEndScreenState(),
     }
   },
@@ -53,6 +62,12 @@ export default {
     }
   },
   methods: {
+    play() {
+      if (this.$refs.video) {
+        this.showPlayScreen = false
+        this.$refs.video.play()
+      }
+    },
     rewatch() {
       this.showEndScreen = false
       if (this.$refs.video) {
@@ -149,18 +164,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.video-container {
   position: relative;
   width: 100%;
   height: 100%;
   max-width: 100vw;
 
   video {
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
-    height: auto;
   }
 }
 </style>
