@@ -13,7 +13,8 @@
       :width="width"
       :height="height"
       :settings="settings"
-      @is-loaded="handleLoad"
+      @complete="$emit('complete')"
+      @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = true"
     />
   </div>

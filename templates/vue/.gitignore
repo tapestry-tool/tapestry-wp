@@ -3,6 +3,7 @@ dist/
 npm-debug.log
 yarn-error.log
 config.js
+cypress.json
 
 # Editor directories and files
 .DS_Store
