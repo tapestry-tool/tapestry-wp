@@ -26,8 +26,8 @@
         />
       </template>
       <template v-slot:footer>
-        <button v-if="row.completed" @click="next">
-          Finished?
+        <button v-if="row.completed" class="mt-2" @click="next">
+          {{ node.typeData.finishButtonText }}
         </button>
       </template>
     </accordion-row>

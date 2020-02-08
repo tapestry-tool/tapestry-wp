@@ -85,11 +85,11 @@ export default {
       }
 
       if (this.node.fullscreen) {
-        styles.position = "relative"
-        styles.height = "100%"
-        styles.width = "auto"
         styles.top = "auto"
         styles.left = "auto"
+        styles.width = "auto"
+        styles.height = "100%"
+        styles.position = "relative"
       }
 
       if (this.node.mediaType === "accordion") {
