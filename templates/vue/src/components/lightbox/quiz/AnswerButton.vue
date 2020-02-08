@@ -51,7 +51,6 @@ export default {
 
 <style lang="scss" scoped>
 button {
-  background: #fff;
   padding: 0;
   margin: 0;
   margin-right: 16px;
@@ -87,6 +86,10 @@ button {
 
   &:hover {
     background-color: var(--tyde-orange-light);
+  }
+
+  > * {
+    margin-bottom: 16px;
   }
 
   > * {

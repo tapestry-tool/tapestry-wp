@@ -4,17 +4,16 @@
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
     ]"
+    :style="containerStyles"
   >
-    <text-media
-      v-if="node.mediaType === 'text'"
-      :node="node"
-      @complete="completeNode(nodeId)"
-    />
+    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
+      :autoplay="autoplay"
       :node="node"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @timeupdate="updateProgress"
       @close="$emit('close')"
     />
@@ -23,18 +22,20 @@
       :node="node"
       :dimensions="dimensions"
       @mounted="handleLoad"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
+      :autoplay="autoplay"
       :node="node"
       :width="dimensions.width"
       :height="dimensions.height"
       :settings="h5pSettings"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @close="$emit('close')"
     />
     <gravity-form
@@ -42,7 +43,11 @@
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <wp-post-media v-if="node.mediaType === 'wp-post'" :node="node"></wp-post-media>
+    <wp-post-media
+      v-if="node.mediaType === 'wp-post'"
+      :node="node"
+      @complete="complete"
+    ></wp-post-media>
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -79,6 +84,26 @@ export default {
       type: Object,
       required: true,
     },
+    containerStyles: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    h5pSettings: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -102,7 +127,7 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
-      this.completeNode(this.nodeId)
+      this.complete()
     },
     handleLoad(args) {
       this.$emit("load", args)
@@ -123,13 +148,17 @@ export default {
         this.timeSinceLastSaved = now
       }
     },
+    async complete() {
+      await this.completeNode(this.nodeId)
+      this.$emit("complete")
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .media-wrapper {
-  background: #000;
+  background: inherit;
   outline: none;
   border-radius: 15px;
   overflow: hidden;

@@ -205,6 +205,7 @@ function tapestryTool(config){
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
             var updatedNode = fillEmptyFields(node, {
+                accordionProgress: [],
                 skippable: true,
                 behaviour: "embed",
                 completed: false,
@@ -217,6 +218,17 @@ function tapestryTool(config){
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
             updatedNode.tydeType = updatedNode.tydeType || "Regular";
+
+            if (node.mediaType === "accordion") {
+                const accordionRowIds = this.dataset.links.filter(link => {
+                    return link.source == node.id || link.target == node.id
+                }).map(link => link.target == node.id ? link.source : link.target)
+                accordionRowIds.forEach(accordionRowId => {
+                    const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
+                    accordionRow.presentationStyle = "accordion-row"
+                })
+            }
+
             return updatedNode
         });
 
@@ -254,7 +266,7 @@ function tapestryTool(config){
 
         links = createLinks();
         nodes = createNodes();
-    
+
         filterTapestry(true);
         
         //---------------------------------------------------
@@ -1286,7 +1298,15 @@ function tapestryTool(config){
                 return NORMAL_RADIUS + ROOT_RADIUS_DIFF - 30;
             })
             .attr("style", function (d) {
-                return d.nodeType === "grandchild" || d.nodeType === "child" || d.tydeType === "Question set" ? "visibility: hidden" : "visibility: visible";
+                if (d.tydeType === "Question set" && d.mediaType !== "accordion") {
+                    return "visibility: hidden";
+                }
+
+                if (d.nodeType === "grandchild" || d.nodeType === "child") {
+                    return "visibility: hidden";
+                }
+
+                return "visibility: visible";
             })
             .attr("class", "mediaButton addNodeButton")
             .call(d3.drag()
@@ -1925,6 +1945,21 @@ function tapestryTool(config){
                     })
                 }
                 tapestry.dataset.nodes[index].completed = completed;
+
+                var node = tapestry.dataset.nodes[index];
+                if (node.mediaType === "accordion") {
+                    var accordionProgress = []
+                    var accordionRowIds = tapestry.dataset.links.filter(link => {
+                        return link.source == node.id || link.target == node.id
+                    }).map(link => link.target == node.id ? link.source : link.target)
+                    accordionRowIds.forEach(accordionRowId => {
+                        const accordionRow = tapestry.dataset.nodes[findNodeIndex(accordionRowId)]
+                        if (accordionRow.completed) {
+                            accordionProgress.push(accordionRowId)
+                        }
+                    })
+                    node.accordionProgress = accordionProgress
+                }
             }
         }
     
@@ -2070,6 +2105,8 @@ function tapestryTool(config){
     function getViewable(node) {
     
         // TODO: CHECK 1: If user is authorized to view it
+
+        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 2: Always show root node
         if (node.tydeType === "" && (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== ""))) return true;
@@ -2243,6 +2280,10 @@ function getIconClass(mediaType, action) {
 
         case "wp-post":
             classStr = "fab fa-wordpress-simple";
+            break;
+
+        case "accordion":
+            classStr = "fas fa-bars";
             break;
 
         default:

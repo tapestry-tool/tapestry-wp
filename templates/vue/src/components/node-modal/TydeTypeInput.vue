@@ -36,12 +36,18 @@ export default {
     tydeTypeOptions() {
       const options = Object.values(tydeTypes)
       if (this.parent) {
-        if (this.parent.tydeType === tydeTypes.MODULE) {
-          // if parent is a module, only allow stage nodes
-          return [tydeTypes.STAGE]
-        } else if (this.parent.tydeType === tydeTypes.STAGE) {
-          // if parent is a stage, only allow question sets
-          return [tydeTypes.QUESTION_SET]
+        switch (this.parent.tydeType) {
+          case tydeTypes.MODULE:
+            return [tydeTypes.STAGE]
+          case tydeTypes.STAGE:
+            return [tydeTypes.QUESTION_SET]
+          case tydeTypes.QUESTION_SET:
+            if (this.parent.mediaType === "accordion") {
+              return [tydeTypes.REGULAR]
+            }
+            break
+          default:
+            break
         }
       }
       const normalOptions = options.filter(
