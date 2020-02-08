@@ -55,6 +55,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
+            <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
                 v-model="node.typeData.mediaURL"
@@ -238,12 +239,17 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          v-if="
+            node.mediaType === 'h5p' ||
+              node.mediaType === 'video' ||
+              node.mediaType === 'accordion'
+          "
           title="Behaviour"
         >
           <div id="modal-behaviour">
             <b-form-group>
               <b-form-checkbox
+                v-if="node.mediaType !== 'accordion'"
                 v-model="node.skippable"
                 data-testid="node-behaviour-skippable"
               >
@@ -362,10 +368,12 @@ import { tydeTypes } from "../utils/constants"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
+import AccordionForm from "./node-modal/AccordionForm"
 
 export default {
   name: "node-modal",
   components: {
+    AccordionForm,
     Combobox,
     QuizModal,
     TydeTypeInput,
@@ -412,6 +420,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "gravity-form", text: "Gravity Form" },
+        { value: "accordion", text: "Accordion" },
       ],
       gravityFormOptions: [],
       h5pContentOptions: [],
