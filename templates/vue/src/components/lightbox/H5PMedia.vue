@@ -16,7 +16,7 @@
       :height="height"
       :settings="settings"
       @complete="$emit('complete')"
-      @is-loaded="handleLoad"
+      @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = allowEndScreen"
     />
   </div>
@@ -80,10 +80,6 @@ export default {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
       this.$emit("close")
-    },
-    handleLoad() {
-      this.isLoading = false
-      this.$emit("load", { el: this.$refs.h5pIframe })
     },
     play() {
       this.showPlayScreen = false

@@ -220,12 +220,12 @@ function tapestryTool(config){
             updatedNode.tydeType = updatedNode.tydeType || "Regular";
 
             if (node.mediaType === "accordion") {
-                const directChildren = this.dataset.links.filter(link => {
-                    return link.source == node.id
-                }).map(link => link.target)
-                directChildren.forEach(childId => {
-                    const child = this.dataset.nodes[findNodeIndex(childId)]
-                    child.presentationStyle = "accordion-row"
+                const accordionRowIds = this.dataset.links.filter(link => {
+                    return link.source == node.id || link.target == node.id
+                }).map(link => link.target == node.id ? link.source : link.target)
+                accordionRowIds.forEach(accordionRowId => {
+                    const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
+                    accordionRow.presentationStyle = "accordion-row"
                 })
             }
 
@@ -1949,13 +1949,13 @@ function tapestryTool(config){
                 var node = tapestry.dataset.nodes[index];
                 if (node.mediaType === "accordion") {
                     var accordionProgress = []
-                    var directChildren = tapestry.dataset.links.filter(link => {
-                        return link.source == node.id
-                    }).map(link => link.target)
-                    directChildren.forEach(childId => {
-                        const child = tapestry.dataset.nodes[findNodeIndex(childId)]
-                        if (child.completed) {
-                            accordionProgress.push(childId)
+                    var accordionRowIds = tapestry.dataset.links.filter(link => {
+                        return link.source == node.id || link.target == node.id
+                    }).map(link => link.target == node.id ? link.source : link.target)
+                    accordionRowIds.forEach(accordionRowId => {
+                        const accordionRow = tapestry.dataset.nodes[findNodeIndex(accordionRowId)]
+                        if (accordionRow.completed) {
+                            accordionProgress.push(accordionRowId)
                         }
                     })
                     node.accordionProgress = accordionProgress

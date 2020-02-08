@@ -85,11 +85,11 @@ export default {
       }
 
       if (this.node.fullscreen) {
-        styles.position = "relative"
-        styles.height = "100%"
-        styles.width = "auto"
         styles.top = "auto"
         styles.left = "auto"
+        styles.width = "auto"
+        styles.height = "100%"
+        styles.position = "relative"
       }
 
       if (this.node.mediaType === "accordion") {
@@ -202,84 +202,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  opacity: 1;
-  transform: translateY(0);
-  z-index: 100;
-
-  .overlay {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-  }
-
-  .content {
-    position: absolute;
-    top: 5vh;
-    left: 5vw;
-    height: 90vh;
-    width: 90vw;
-    z-index: 100;
-    background-position: 0 0;
-    background-size: cover;
-    background-color: black;
-    box-shadow: 0 0 100px -40px #000;
-    border-radius: 15px;
-
-    &.content-text {
-      outline: none;
-      background: #eee;
-      color: #333;
-      padding: 1em;
-
-      .media-wrapper {
-        height: 100%;
-        overflow: scroll;
-        background: transparent;
-      }
-    }
-  }
-
-  .close-btn {
-    width: auto;
-    display: flex;
-    justify-content: flex-end;
-    background: none;
-    border: none;
-    outline: none;
-    position: absolute;
-    top: -37px;
-    right: -42px;
-    z-index: 20;
-
-    > div {
-      background: #666;
-      color: white;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 1.2em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
-      transition: all 0.25s ease;
-      border: solid 2px #fff;
-
-      &:hover {
-        transform: scale(1.15);
-        background: #11a6d8;
-      }
-
-      i {
-        background: none;
-      }
-    }
+.content-text {
+  .media-wrapper {
+    overflow: scroll;
   }
 }
 

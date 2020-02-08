@@ -4,6 +4,7 @@
     ref="h5p"
     frameborder="0"
     :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
+    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -326,6 +327,6 @@ export default {
 
 <style lang="scss" scoped>
 #h5p {
-  width: 100%;
+  width: 100% !important;
 }
 </style>

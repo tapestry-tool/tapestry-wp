@@ -178,8 +178,6 @@ export default {
 
   video {
     width: 100%;
-    height: auto;
-    z-index: 0;
   }
 }
 </style>

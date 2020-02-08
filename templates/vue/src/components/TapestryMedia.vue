@@ -28,6 +28,8 @@
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
       :node="node"
+      :width="dimensions.width"
+      :height="dimensions.height"
       :settings="h5pSettings"
       :allow-end-screen="allowEndScreen"
       @load="handleLoad"
@@ -156,6 +158,7 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
+  background: inherit;
   outline: none;
   border-radius: 15px;
   overflow: hidden;

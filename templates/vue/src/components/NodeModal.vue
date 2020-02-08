@@ -249,6 +249,7 @@
           <div id="modal-behaviour">
             <b-form-group v-if="node.mediaType !== 'accordion'">
               <b-form-checkbox
+                v-if="node.mediaType !== 'accordion'"
                 v-model="node.skippable"
                 data-testid="node-behaviour-skippable"
               >
