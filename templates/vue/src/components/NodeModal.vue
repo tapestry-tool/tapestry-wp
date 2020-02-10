@@ -182,6 +182,7 @@
         </b-tab>
         <b-tab title="Appearance">
           <div id="modal-appearance">
+            <h6 class="mb-3 text-muted">Node Appearance</h6>
             <b-form-group>
               <b-form-checkbox
                 v-model="addThumbnail"
@@ -223,12 +224,13 @@
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
+            <h6 class="mt-4 mb-3 text-muted">Content Appearance</h6>
             <b-form-group>
               <b-form-checkbox
                 v-model="node.fullscreen"
                 data-testid="node-behaviour-fullscreen"
               >
-                Maximize video size to fit in the window
+                Open content in fullscreen
               </b-form-checkbox>
             </b-form-group>
           </div>
