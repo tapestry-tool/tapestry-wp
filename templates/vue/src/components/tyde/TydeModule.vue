@@ -54,11 +54,9 @@ export default {
     ...mapMutations(["openLightbox", "closeLightbox"]),
     openLightbox(id) {
       this.$router.push(`/nodes/${id}`)
-      document.querySelector("body").style.overflow = "hidden"
     },
     closeLightbox() {
       this.$router.push(`/`)
-      document.querySelector("body").style.overflow = "auto"
     },
     next() {
       if (this.activeStageIndex < this.stages.length - 1) {
