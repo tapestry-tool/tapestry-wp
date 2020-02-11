@@ -75,6 +75,13 @@ export default {
             this.uploadPercentage = parseInt(
               Math.round((progressEvent.loaded / progressEvent.total) * 100)
             )
+            if (this.uploadPercentage === 100) {
+              const self = this
+              setTimeout(function() {
+                self.isUploading = false
+                self.uploadPercentage = 0
+              }, 2000)
+            }
           },
         })
         .then(response => {
