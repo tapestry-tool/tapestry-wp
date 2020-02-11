@@ -319,6 +319,7 @@
           </div>
         </b-tab>
         <quiz-modal :node="node" />
+        <conditions-form :node="node" />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -349,6 +350,7 @@ import H5PApi from "../services/H5PApi"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
+import ConditionsForm from "./node-modal/ConditionsForm"
 
 export default {
   name: "node-modal",
@@ -356,6 +358,7 @@ export default {
     AccordionForm,
     Combobox,
     QuizModal,
+    ConditionsForm,
   },
   props: {
     node: {
