@@ -209,7 +209,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -239,6 +242,11 @@ export default {
         newNodeEntry.coordinates.y = this.selectedNode.y
       }
 
+      newNodeEntry.typeData = {
+        ...newNodeEntry.typeData,
+        ...this.populatedNode.typeData,
+      }
+
       var appearsAt = 0
       for (var i = 0; i < formData.length; i++) {
         var fieldName = formData[i].name
@@ -266,12 +274,12 @@ export default {
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
-            } else if (fieldValue === "wp-post") {
-              newNodeEntry.mediaType = "wp-post"
-              newNodeEntry.mediaFormat = ""
             } else if (fieldValue === "gravity-form") {
               newNodeEntry.mediaType = "gravity-form"
               newNodeEntry.mediaFormat = "embed"
+            } else {
+              newNodeEntry.mediaType = fieldValue
+              newNodeEntry.mediaFormat = ""
             }
             break
           case "textContent":
