@@ -5,11 +5,13 @@ module.exports = {
   },
   extends: [
     "plugin:vue/recommended",
+    "plugin:cypress/recommended",
     "eslint:recommended",
     "prettier/vue",
     "plugin:prettier/recommended",
   ],
   rules: {
+    "cypress/no-unnecessary-waiting": "off",
     "vue/component-name-in-template-casing": ["error", "kebab-case"],
     "vue/name-property-casing": ["error", "kebab-case"],
     "vue/no-v-html": "off",
