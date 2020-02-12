@@ -13,6 +13,7 @@ class TapestryNode implements ITapestryNode
     private $nodePostId;
     private $nodeMetaId;
     private $author;
+    private $conditions;
     private $type;
     private $size;
     private $title;
@@ -49,6 +50,7 @@ class TapestryNode implements ITapestryNode
         $this->nodeMetaId = (int) $nodeMetaId;
 
         $this->author = wp_get_current_user()->ID;
+        $this->conditions = [];
         $this->size = '';
         $this->title = '';
         $this->status = '';
@@ -155,6 +157,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
+        }
+        if (isset($node->conditions) && is_array($node->conditions)) {
+            $this->conditions = $node->conditions;
         }
     }
 
@@ -275,6 +280,7 @@ class TapestryNode implements ITapestryNode
             'skippable'     => $this->skippable,
             'quiz'          => $this->quiz,
             'fullscreen'    => $this->fullscreen,
+            'conditions'    => $this->conditions
         ];
     }
 
