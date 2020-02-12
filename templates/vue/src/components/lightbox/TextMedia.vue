@@ -33,7 +33,8 @@ export default {
   h1 {
     font-size: 1.75rem;
     font-weight: 500;
-    margin: 1em 0;
+    margin: 1em auto;
+    max-width: 700px;
 
     :before {
       display: none;
@@ -45,6 +46,8 @@ export default {
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
     white-space: pre;
+    max-width: 700px;
+    margin: 0 auto;
   }
 }
 </style>
