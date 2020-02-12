@@ -1,5 +1,5 @@
 <template>
-  <button class="tyde-button" @click="$emit('click')">
+  <button class="tyde-button" @click="$emit('click')" :style="cssProps">
     <i :class="iconClass"></i>
     <slot></slot>
   </button>
@@ -13,10 +13,17 @@ export default {
       type: String,
       required: true,
     },
+    label: {
+      type: String
+    },
   },
   computed: {
     iconClass: function() {
       return `fas fa-${this.icon}`
+    },
+    cssProps() { return {
+      '--button-label': `" ${this.label}"`,
+      }
     },
   },
 }
@@ -25,33 +32,37 @@ export default {
 <style lang="scss" scoped>
 .tyde-button {
   position: relative;
-  width: 60px;
+  width: auto;
   height: 60px;
-  border-radius: 50%;
+  border-radius: 30px;
   display: flex;
   align-items: center;
-  justify-content: center;
   color: black;
-  border: 4px solid black;
   background: white;
   font-size: 30px;
   margin-right: 16px;
   transition: all 0.2s ease;
 
+  i {
+    margin-right: 8px;
+    margin-left: 0px;
+    margin-bottom: 2px;
+    padding: 0px;
+  }
+
   &:last-child {
+
+    i {
+      margin: 0px;
+    }
+
+    justify-content: center;
     margin-right: 0;
   }
 
-  &:before {
-    content: "";
-    position: absolute;
-    top: -7px;
-    left: -7px;
-    right: -7px;
-    bottom: -7px;
+  &:after {
     background: transparent;
-    border: 3px solid var(--tapestry-light-gray);
-    border-radius: 50%;
+    content: var(--button-label);
   }
 
   &:focus {
