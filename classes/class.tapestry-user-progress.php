@@ -189,7 +189,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
-        $quiz[$questionId] = true;
+        $quiz->$questionId = true;
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }
 

@@ -5,7 +5,6 @@
     frameborder="0"
     :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
     :width="width"
-    :height="height"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -37,13 +36,14 @@ export default {
       type: Number,
       required: false,
     },
-    height: {
-      type: Number,
-      required: false,
-    },
     mediaURL: {
       type: String,
       required: false,
+    },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -80,6 +80,13 @@ export default {
   },
   methods: {
     ...mapActions(["completeQuestion"]),
+    play() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      if (h5pVideo) {
+        h5pVideo.play()
+      }
+    },
     rewatch() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -214,6 +221,7 @@ export default {
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
+        const videoDuration = h5pVideo.getDuration()
         this.$emit("load", { el: h5pVideo })
 
         const settings = this.settings
@@ -221,10 +229,11 @@ export default {
         let seeked = false
         let currentPlayedTime
 
+        h5pVideo.seek(mediaProgress * videoDuration)
+
         h5pVideo.on("stateChange", event => {
           switch (event.data) {
             case h5pObj.Video.PLAYING: {
-              const videoDuration = h5pVideo.getDuration()
               const updateVideoInterval = setInterval(() => {
                 if (
                   currentPlayedTime !== h5pVideo.getCurrentTime() &&
@@ -299,15 +308,17 @@ export default {
             }
           }
         })
-        setTimeout(() => {
-          h5pVideo.play()
-          thisTapestryTool.recordAnalyticsEvent(
-            "app",
-            "auto-play",
-            "h5p-video",
-            this.node.id
-          )
-        }, 1000)
+        if (this.autoplay) {
+          setTimeout(() => {
+            h5pVideo.play()
+            thisTapestryTool.recordAnalyticsEvent(
+              "app",
+              "auto-play",
+              "h5p-video",
+              this.node.id
+            )
+          }, 1000)
+        }
       }
     },
   },

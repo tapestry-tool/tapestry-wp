@@ -13,6 +13,7 @@
     <question
       v-else
       :question="activeQuestion"
+      :node="node"
       @form-toggled="toggleForm"
       @recorder-opened="recorderOpened = true"
       @submit="showCompletionScreen = true"

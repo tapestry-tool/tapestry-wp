@@ -43,6 +43,7 @@ export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
   await client.updateUserProgress(id, progress)
   commit("updateNodeProgress", { id, progress })
+  thisTapestryTool.updateProgressBars()
 }
 
 export async function completeNode({ commit, getters }, nodeId) {
