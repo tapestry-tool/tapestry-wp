@@ -53,10 +53,12 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     nodeOptions() {
-      return this.nodes.map(node => ({
-        value: node.id,
-        text: node.title,
-      }))
+      return this.nodes
+        .filter(node => node.id !== this.node.id)
+        .map(node => ({
+          value: node.id,
+          text: node.title,
+        }))
     },
     conditionOptions() {
       return [

@@ -431,6 +431,7 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
+        { name: "conditions", value: this.node.conditions || [] },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
