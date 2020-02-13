@@ -91,5 +91,7 @@ export default {
   height: 100%;
   max-width: 100vw;
   padding: 0;
+  border-radius: 15px;
+  overflow: hidden;
 }
 </style>

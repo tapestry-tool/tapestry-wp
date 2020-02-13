@@ -169,6 +169,8 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+  border-radius: 15px;
+  overflow: hidden;
 
   video {
     width: 100%;
