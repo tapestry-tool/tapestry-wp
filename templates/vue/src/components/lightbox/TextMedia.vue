@@ -1,7 +1,7 @@
 <template>
   <article class="article">
     <h1>{{ node.title }}</h1>
-    <div v-html="html"></div>
+    <div v-html="content"></div>
   </article>
 </template>
 
@@ -15,14 +15,8 @@ export default {
     },
   },
   computed: {
-    html() {
-      const content = this.node.typeData.textContent
-      let htmlText = ""
-      const paragraphs = content.split("\n\n")
-      paragraphs.forEach(text => {
-        htmlText += `<p class="lightbox-text">${text.replace("\n", "<br>")}</p>`
-      })
-      return htmlText
+    content() {
+      return this.node.typeData.textContent
     },
   },
   mounted() {
@@ -39,7 +33,8 @@ export default {
   h1 {
     font-size: 1.75rem;
     font-weight: 500;
-    margin: 1em 0;
+    margin: 1em auto;
+    max-width: 700px;
 
     :before {
       display: none;
@@ -50,6 +45,9 @@ export default {
     color: #47425d;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
+    white-space: pre;
+    max-width: 700px;
+    margin: 0 auto;
   }
 }
 </style>
