@@ -10,8 +10,11 @@
       v-for="(condition, idx) in conditions"
       :key="`${condition.type}-${idx}`"
       bg-variant="light"
-      class="mb-2"
+      class="mb-2 condition-container"
     >
+      <button class="condition-close-button" @click="removeCondition(idx)">
+        <i class="fas fa-times"></i>
+      </button>
       <b-form-group label="Node">
         <b-form-select
           v-model="condition.value"
@@ -81,6 +84,25 @@ export default {
     addCondition() {
       this.conditions.push({ ...baseCondition })
     },
+    removeCondition(idx) {
+      this.conditions.splice(idx, 1)
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.condition-container {
+  position: relative;
+}
+
+.condition-close-button {
+  background: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+</style>
