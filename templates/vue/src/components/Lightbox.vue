@@ -204,7 +204,7 @@ export default {
 <style lang="scss" scoped>
 .content-text {
   .media-wrapper {
-    overflow: scroll;
+    overflow-y: scroll;
   }
 }
 
