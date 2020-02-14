@@ -168,11 +168,11 @@ export default {
     this.applyDimensions()
     thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
-    document.querySelector("body").classList.add("lightbox-open")
+    document.querySelector("body").classList.add("tapestry-lightbox-open")
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
-    document.querySelector("body").classList.remove("lightbox-open")
+    document.querySelector("body").classList.remove("tapestry-lightbox-open")
   },
   methods: {
     close() {
@@ -202,7 +202,7 @@ export default {
 </script>
 
 <style>
-.lightbox-open {
+body.tapestry-lightbox-open {
   overflow: hidden;
 }
 </style>

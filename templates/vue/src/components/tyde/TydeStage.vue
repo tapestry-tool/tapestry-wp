@@ -53,10 +53,10 @@ export default {
     },
   },
   mounted() {
-    document.querySelector("body").classList.add("stage-open")
+    document.querySelector("body").classList.add("tapestry-stage-open")
   },
   beforeDestroy() {
-    document.querySelector("body").classList.remove("stage-open")
+    document.querySelector("body").classList.remove("tapestry-stage-open")
   },
   methods: {
     getImageStyles(index) {
@@ -81,7 +81,7 @@ export default {
   --tyde-border-green: #39b54a;
 }
 
-.stage-open {
+body.tapestry-stage-open {
   overflow: hidden;
 }
 </style>
