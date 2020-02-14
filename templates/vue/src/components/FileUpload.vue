@@ -1,6 +1,23 @@
 <template>
   <b-container fluid>
-    <b-row>
+    <b-row v-if="isUploading">
+      <b-col class="uploadLabel">
+        <p v-if="doneUploading">Uploading Done! Click submit to save changes</p>
+        <p v-else>Upload in progress ...</p>
+      </b-col>
+      <b-col cols="3">
+        <b-button v-if="doneUploading" size="sm" variant="light" @click="reset">
+          Confirm
+        </b-button>
+        <b-button v-else size="sm" variant="secondary" @click="reset">
+          Cancel
+        </b-button>
+      </b-col>
+      <b-col class="progressBar">
+        <progress max="100" :value.prop="uploadPercentage"></progress>
+      </b-col>
+    </b-row>
+    <b-row v-else>
       <b-col>
         <b-form-file
           ref="file"
@@ -8,27 +25,22 @@
           class="image-file"
           placeholder="Choose a file or drop it here..."
           drop-placeholder="Drop file here..."
+          :disabled="isUploading"
           required
           @change="uploadFile"
         ></b-form-file>
-        <progress
-          v-if="isUploading"
-          max="100"
-          :value.prop="uploadPercentage"
-        ></progress>
       </b-col>
       <b-col sm="1" class="divider">
         <h6>OR</h6>
       </b-col>
       <b-col>
-        <b-row>
-          <b-form-input
-            :placeholder="placeholder"
-            :value="value"
-            required
-            @input="$emit('input', $event)"
-          />
-        </b-row>
+        <b-form-input
+          :placeholder="placeholder"
+          :value="value"
+          :disabled="isUploading"
+          required
+          @input="$emit('input', $event)"
+        />
       </b-col>
     </b-row>
   </b-container>
@@ -54,6 +66,7 @@ export default {
     return {
       uploadPercentage: 0,
       isUploading: false,
+      doneUploading: false,
     }
   },
 
@@ -72,21 +85,24 @@ export default {
           },
           onUploadProgress: progressEvent => {
             this.isUploading = true
-            this.uploadPercentage = parseInt(
-              Math.round((progressEvent.loaded / progressEvent.total) * 100)
-            )
-            if (this.uploadPercentage === 100) {
-              const self = this
-              setTimeout(function() {
-                self.isUploading = false
-                self.uploadPercentage = 0
-              }, 2000)
-            }
+            setTimeout(() => {
+              this.uploadPercentage = parseInt(
+                Math.round((progressEvent.loaded / progressEvent.total) * 100)
+              )
+              if (this.uploadPercentage === 100) {
+                this.doneUploading = true
+              }
+            }, 2000)
           },
         })
         .then(response => {
           this.$emit("input", response.data.data.url)
         })
+    },
+    reset() {
+      this.doneUploading = false
+      this.isUploading = false
+      this.uploadPercentage = 0
     },
   },
 }
@@ -103,14 +119,23 @@ export default {
   padding: 10px;
 }
 
+.progressBar {
+  padding-top: 1%;
+}
+
+.uploadLabel {
+  font-family: Arial, Helvetica, sans-serif;
+  padding-top: 0.8%;
+  margin-left: -5%;
+}
+
 progress[value] {
   /* Reset the default appearance */
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 5px;
+  height: 20px;
   position: relative;
-  top: -25%;
 }
 
 progress[value]::-webkit-progress-bar {
