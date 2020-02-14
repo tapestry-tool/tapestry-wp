@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="media-container">
+  <div ref="container" class="media-container" @scroll="handleScroll">
+    <div
+      v-if="scrollHeight > clientHeight"
+      id="scrollbar"
+      :style="scrollbarStyles"
+    ></div>
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
@@ -23,6 +28,7 @@
           :autoplay="false"
           @complete="updateProgress(row.id)"
           @close="toggle(index)"
+          @load="updateScrollValues"
         />
       </template>
       <template v-slot:footer>
@@ -79,6 +85,9 @@ export default {
       activeIndex: 0,
       showCompletion: false,
       isMounted: false,
+      scrollHeight: 0,
+      scrollTop: 0,
+      clientHeight: 0,
     }
   },
   computed: {
@@ -106,10 +115,33 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(node => !node.completed)
     },
+    scrollbarStyles() {
+      const scrollDiff = this.scrollHeight - this.clientHeight
+      return {
+        transform: `translateY(${(this.scrollTop / scrollDiff) *
+          this.clientHeight}px)`,
+      }
+    },
+  },
+  mounted() {
+    this.isMounted = true
+    this.updateScrollValues()
+  },
+  updated() {
+    this.updateScrollValues()
   },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    updateScrollValues() {
+      this.$nextTick(() => {
+        this.scrollHeight = this.$el.scrollHeight
+        this.clientHeight = this.$el.clientHeight
+      })
+    },
+    handleScroll() {
+      this.scrollTop = this.$el.scrollTop
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -153,6 +185,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#scrollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 20px;
+  background: gray;
+}
+
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;

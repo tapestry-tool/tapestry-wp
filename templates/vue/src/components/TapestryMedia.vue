@@ -33,6 +33,7 @@
     v-else-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
     :id="node.typeData.mediaURL"
     @submit="handleFormSubmit"
+    @load="$emit('load')"
   ></gravity-form>
   <wp-post-media
     v-else-if="node.mediaType === 'wp-post'"
