@@ -38,6 +38,7 @@
   <wp-post-media
     v-else-if="node.mediaType === 'wp-post'"
     :node="node"
+    @load="$emit('load')"
     @complete="completeNode(nodeId)"
   ></wp-post-media>
   <completion-screen v-else-if="showCompletionScreen" />

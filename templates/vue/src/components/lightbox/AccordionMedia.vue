@@ -1,10 +1,6 @@
 <template>
-  <div ref="container" class="media-container" @scroll="handleScroll">
-    <div
-      v-if="scrollHeight > clientHeight"
-      id="scrollbar"
-      :style="scrollbarStyles"
-    ></div>
+  <div ref="container" class="media-container">
+    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
@@ -66,6 +62,7 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import Scrollbar from "../Scrollbar"
 
 export default {
   name: "accordion-media",
@@ -73,6 +70,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    Scrollbar,
   },
   props: {
     node: {
@@ -86,7 +84,6 @@ export default {
       showCompletion: false,
       isMounted: false,
       scrollHeight: 0,
-      scrollTop: 0,
       clientHeight: 0,
     }
   },
@@ -115,13 +112,6 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(node => !node.completed)
     },
-    scrollbarStyles() {
-      const scrollDiff = this.scrollHeight - this.clientHeight
-      return {
-        transform: `translateY(${(this.scrollTop / scrollDiff) *
-          this.clientHeight}px)`,
-      }
-    },
   },
   mounted() {
     this.isMounted = true
@@ -138,9 +128,6 @@ export default {
         this.scrollHeight = this.$el.scrollHeight
         this.clientHeight = this.$el.clientHeight
       })
-    },
-    handleScroll() {
-      this.scrollTop = this.$el.scrollTop
     },
     scrollToTop() {
       const el = this.$refs.container
@@ -185,15 +172,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#scrollbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 12px;
-  height: 20px;
-  background: gray;
-}
-
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
