@@ -1,18 +1,30 @@
 <template>
   <article class="article">
+    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
     <h1>{{ node.title }}</h1>
     <div v-html="content"></div>
   </article>
 </template>
 
 <script>
+import Scrollbar from "@/components/Scrollbar"
+
 export default {
   name: "text-media",
+  components: {
+    Scrollbar,
+  },
   props: {
     node: {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      scrollHeight: 0,
+      clientHeight: 0,
+    }
   },
   computed: {
     content() {
@@ -21,14 +33,21 @@ export default {
   },
   mounted() {
     this.$emit("complete")
+    this.$nextTick(() => {
+      this.scrollHeight = this.$el.scrollHeight
+      this.clientHeight = this.$el.clientHeight
+    })
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .article {
+  height: 100%;
   padding: 0 15px;
   text-align: left;
+  overflow: scroll;
+  scrollbar-width: none;
 
   h1 {
     font-size: 1.75rem;
