@@ -1,6 +1,7 @@
 <template>
   <loading v-if="loading" />
-  <div v-else class="article">
+  <div v-else ref="post" class="article">
+    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
     <h1 class="article-title">{{ title }}</h1>
     <article v-html="content"></article>
   </div>
@@ -9,11 +10,13 @@
 <script>
 import Loading from "../Loading"
 import WordpressApi from "../../services/WordpressApi"
+import Scrollbar from "@/components/Scrollbar"
 
 export default {
   name: "wp-post-media",
   components: {
     Loading,
+    Scrollbar,
   },
   props: {
     node: {
@@ -26,6 +29,8 @@ export default {
       loading: true,
       title: "",
       content: "",
+      scrollHeight: 0,
+      clientHeight: 0,
     }
   },
   computed: {
@@ -40,6 +45,12 @@ export default {
     this.content = post.content
     this.$emit("complete")
     this.$emit("load")
+
+    this.$nextTick(() => {
+      const post = this.$refs.post
+      this.scrollHeight = post.scrollHeight
+      this.clientHeight = post.clientHeight
+    })
   },
 }
 </script>
