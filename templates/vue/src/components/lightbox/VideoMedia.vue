@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="video-container">
+    <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -16,7 +17,7 @@
     <video
       ref="video"
       controls
-      autoplay
+      :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
@@ -29,6 +30,7 @@
 <script>
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
+import PlayScreen from "./PlayScreen"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -37,15 +39,22 @@ export default {
   components: {
     EndScreen,
     QuizScreen,
+    PlayScreen,
   },
   props: {
     node: {
       type: Object,
       required: true,
     },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
+      showPlayScreen: !this.autoplay,
       showEndScreen: this.getInitialEndScreenState(),
       showQuizScreen: false,
     }
@@ -66,6 +75,12 @@ export default {
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true
+    },
+    play() {
+      if (this.$refs.video) {
+        this.showPlayScreen = false
+        this.$refs.video.play()
+      }
     },
     rewatch() {
       this.showEndScreen = false
@@ -167,18 +182,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.video-container {
   position: relative;
   width: 100%;
   height: 100%;
   max-width: 100vw;
 
   video {
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
-    height: auto;
   }
 }
 </style>

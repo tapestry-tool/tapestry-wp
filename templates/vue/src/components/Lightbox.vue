@@ -1,41 +1,34 @@
 <template>
-  <div
+  <tapestry-modal
     v-if="tapestryIsLoaded"
     id="lightbox"
-    :class="{ 'full-screen': node.fullscreen }"
-    :format="node.mediaFormat"
+    :class="{
+      'full-screen': node.fullscreen,
+      'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
+    }"
+    :content-container-style="lightboxContentStyles"
+    :close-button-style="closeButtonStyles"
+    :allow-close="canSkip"
+    @close="close"
   >
-    <div v-if="canSkip" class="overlay" @click="close"></div>
-    <transition name="lightbox">
-      <div
-        v-if="isLoaded"
-        id="spotlight-content"
-        :class="[
-          'content',
-          {
-            'content-text':
-              node.mediaType === 'text' || node.mediaType === 'wp-post',
-          },
-        ]"
-        :style="lightboxContentStyles"
-      >
-        <button v-if="canSkip" class="close-btn" @click="close">
-          <div>
-            <i class="fa fa-times"></i>
-          </div>
-        </button>
-        <tapestry-media
-          :node-id="nodeId"
-          :dimensions="dimensions"
-          @load="handleLoad"
-          @close="close"
-        />
-      </div>
-    </transition>
-  </div>
+    <accordion-media
+      v-if="node.mediaType === 'accordion'"
+      :node="node"
+      @close="close"
+    />
+    <tapestry-media
+      v-else
+      :node-id="nodeId"
+      :dimensions="dimensions"
+      @load="handleLoad"
+      @close="close"
+    />
+  </tapestry-modal>
 </template>
 
 <script>
+import TapestryModal from "./TapestryModal"
+import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
 import { mapGetters, mapState } from "vuex"
@@ -43,12 +36,15 @@ import { mapGetters, mapState } from "vuex"
 export default {
   name: "lightbox",
   components: {
+    AccordionMedia,
     TapestryMedia,
+    TapestryModal,
   },
   props: {
     nodeId: {
       type: [String, Number],
-      required: true,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -71,13 +67,44 @@ export default {
     canSkip() {
       return this.node.completed || this.node.skippable !== false
     },
+    closeButtonStyles() {
+      return this.node.fullscreen
+        ? {
+            position: "fixed",
+            top: "16px",
+            right: "16px",
+          }
+        : {}
+    },
     lightboxContentStyles() {
-      return {
+      const styles = {
         top: this.dimensions.top + "px",
         left: this.dimensions.left + "px",
         width: this.dimensions.width + "px",
         height: this.dimensions.height + "px",
       }
+
+      if (this.node.fullscreen) {
+        styles.top = "auto"
+        styles.left = "auto"
+        styles.width = "auto"
+        styles.height = "100%"
+        styles.position = "relative"
+      }
+
+      if (this.node.mediaType === "accordion") {
+        return Object.assign(styles, { padding: "24px" })
+      }
+
+      if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
+        return Object.assign(styles, {
+          background: "#eee",
+          color: "#333",
+          padding: "1em",
+        })
+      }
+
+      return styles
     },
     lightboxDimensions() {
       const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
@@ -141,11 +168,11 @@ export default {
     this.applyDimensions()
     thisTapestryTool.selectNode(Number(this.nodeId))
     thisTapestryTool.changeToViewMode(this.lightboxDimensions)
-    document.querySelector('body').style.overflow = "hidden"
+    document.querySelector("body").style.overflow = "hidden"
   },
   beforeDestroy() {
     thisTapestryTool.exitViewMode()
-    document.querySelector('body').style.overflow = "auto"
+    document.querySelector("body").style.overflow = "auto"
   },
   methods: {
     close() {
@@ -175,86 +202,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.content-text {
+  .media-wrapper {
+    overflow: scroll;
+  }
+}
+
 #lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  opacity: 1;
-  transform: translateY(0);
-  z-index: 100;
-
-  .overlay {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-  }
-
-  .content {
-    position: absolute;
-    top: 5vh;
-    left: 5vw;
-    height: 90vh;
-    width: 90vw;
-    z-index: 100;
-    background-position: 0 0;
-    background-size: cover;
-    background-color: black;
-    box-shadow: 0 0 100px -40px #000;
-    border-radius: 15px;
-
-    &.content-text {
-      outline: none;
-      background: #eee;
-      color: #333;
-      padding: 1em;
-
-      .media-wrapper {
-        height: 100%;
-        overflow: scroll;
-        background: transparent;
-      }
-    }
-  }
-
-  .close-btn {
-    width: auto;
-    display: flex;
-    justify-content: flex-end;
-    background: none;
-    border: none;
-    outline: none;
-    position: absolute;
-    top: -37px;
-    right: -42px;
-    z-index: 20;
-
-    > div {
-      background: #666;
-      color: white;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 1.2em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
-      transition: all 0.25s ease;
-      border: solid 2px #fff;
-
-      &:hover {
-        transform: scale(1.15);
-        background: #11a6d8;
-      }
-
-      i {
-        background: none;
-      }
-    }
-  }
-
   &.full-screen {
     background: #000;
 
@@ -289,23 +243,10 @@ export default {
     }
 
     .close-btn {
-      top: 0 !important;
-      right: 0 !important;
-      z-index: 100;
+      position: fixed;
+      top: 50px;
+      right: 50px;
     }
   }
-}
-</style>
-
-<style lang="scss">
-.lightbox-enter-active,
-.lightbox-leave-active {
-  transition: all 1s;
-}
-
-.lightbox-enter,
-.lightbox-leave-to {
-  opacity: 0;
-  transform: translateY(32px);
 }
 </style>

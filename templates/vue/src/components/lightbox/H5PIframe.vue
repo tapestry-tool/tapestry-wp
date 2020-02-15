@@ -5,14 +5,13 @@
     frameborder="0"
     :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
     :width="width"
-    :height="height"
     @load="handleLoad"
   ></iframe>
 </template>
 
 <script>
 import TapestryApi from "@/services/TapestryAPI"
-import { mapGetters, mapActions } from "vuex"
+import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -37,13 +36,14 @@ export default {
       type: Number,
       required: false,
     },
-    height: {
-      type: Number,
-      required: false,
-    },
     mediaURL: {
       type: String,
       required: false,
+    },
+    autoplay: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -52,6 +52,16 @@ export default {
       loadedH5PRecorderId: 0,
       TapestryAPI: new TapestryApi(wpPostId),
     }
+  },
+  computed: {
+    userLoggedIn: function() {
+      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
+    },
+  },
+  watch: {
+    node(_, oldNode) {
+      this.handlePause(oldNode)
+    },
   },
   async mounted() {
     this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
@@ -67,19 +77,15 @@ export default {
       this.saveH5PAudioToServer
     )
   },
-  computed: {
-    ...mapGetters(["selectedNode"]),
-    userLoggedIn: function() {
-      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
-    },
-  },
-  watch: {
-    node(_, oldNode) {
-      this.handlePause(oldNode)
-    },
-  },
   methods: {
     ...mapActions(["completeQuestion"]),
+    play() {
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pVideo = h5pObj.instances[0].video
+      if (h5pVideo) {
+        h5pVideo.play()
+      }
+    },
     rewatch() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -96,10 +102,10 @@ export default {
     async h5pRecorderSaverIsLoaded() {
       if (
         this.loadedH5PRecorderId &&
-        this.selectedNode.id &&
-        this.recordedNodeIds.includes(this.selectedNode.id)
+        this.node.id &&
+        this.recordedNodeIds.includes(this.node.id)
       ) {
-        await this.loadH5PAudio(this.selectedNode.id, this.loadedH5PRecorderId)
+        await this.loadH5PAudio(this.node.id, this.loadedH5PRecorderId)
       }
     },
     async loadH5PAudio(nodeMetaId, loadedH5PRecorderId) {
@@ -131,20 +137,20 @@ export default {
             blob: encodedH5PAudio,
             h5pId: this.loadedH5PRecorderId,
           }
-          await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
+          await this.TapestryAPI.uploadAudioToServer(this.node.id, audio)
           this.setQuestionCompleted()
           this.$emit("submit")
-          this.recordedNodeIds.push(this.selectedNode.id)
+          this.recordedNodeIds.push(this.node.id)
         } catch (e) {
           console.error(e)
         }
       }
     },
     setQuestionCompleted() {
-      this.selectedNode.quiz.forEach(async q => {
+      this.node.quiz.forEach(async q => {
         if (q.answers && q.answers.audioId == this.loadedH5PRecorderId) {
           await this.completeQuestion({
-            nodeId: this.selectedNode.id,
+            nodeId: this.node.id,
             questionId: q.id,
             answerType: "audioId",
             audioId: this.loadedH5PRecorderId,
@@ -214,6 +220,7 @@ export default {
 
       if (this.node.mediaType === "video") {
         const h5pVideo = h5pObj.instances[0].video
+        const videoDuration = h5pVideo.getDuration()
         this.$emit("load", { el: h5pVideo })
 
         const settings = this.settings
@@ -221,10 +228,11 @@ export default {
         let seeked = false
         let currentPlayedTime
 
+        h5pVideo.seek(mediaProgress * videoDuration)
+
         h5pVideo.on("stateChange", event => {
           switch (event.data) {
             case h5pObj.Video.PLAYING: {
-              const videoDuration = h5pVideo.getDuration()
               const updateVideoInterval = setInterval(() => {
                 if (
                   currentPlayedTime !== h5pVideo.getCurrentTime() &&
@@ -299,15 +307,17 @@ export default {
             }
           }
         })
-        setTimeout(() => {
-          h5pVideo.play()
-          thisTapestryTool.recordAnalyticsEvent(
-            "app",
-            "auto-play",
-            "h5p-video",
-            this.node.id
-          )
-        }, 1000)
+        if (this.autoplay) {
+          setTimeout(() => {
+            h5pVideo.play()
+            thisTapestryTool.recordAnalyticsEvent(
+              "app",
+              "auto-play",
+              "h5p-video",
+              this.node.id
+            )
+          }, 1000)
+        }
       }
     },
   },
