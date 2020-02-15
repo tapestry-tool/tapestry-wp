@@ -45,7 +45,7 @@ export default {
     color: #47425d;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
-    white-space: pre;
+    white-space: pre-wrap;
     max-width: 700px;
     margin: 0 auto;
   }

@@ -99,11 +99,6 @@ export default {
       return !!(this.question.entries && this.question.entries.audioId)
     },
   },
-  watch: {
-    formOpened(val) {
-      this.$emit("form-toggled", val)
-    },
-  },
   methods: {
     ...mapActions(["completeQuestion"]),
     back() {
@@ -117,7 +112,6 @@ export default {
     openRecorder(id) {
       if (id) {
         this.recorderOpened = true
-        this.$emit("recorder-opened")
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
