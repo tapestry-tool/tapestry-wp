@@ -1,22 +1,40 @@
 <template>
   <b-container fluid>
-    <b-row v-if="isUploading">
-      <b-col class="uploadLabel">
-        <p v-if="doneUploading">Uploading Done! Click submit to save changes</p>
-        <p v-else>Upload in progress ...</p>
-      </b-col>
-      <b-col cols="3">
-        <b-button v-if="doneUploading" size="sm" variant="light" @click="reset">
-          Confirm
-        </b-button>
-        <b-button v-else size="sm" variant="secondary" @click="reset">
-          Cancel
-        </b-button>
-      </b-col>
-      <b-col class="progressBar">
-        <progress max="100" :value.prop="uploadPercentage"></progress>
-      </b-col>
-    </b-row>
+    <div v-if="isUploading" class="upload-container">
+      <b-row>
+        <b-col
+          cols="auto"
+          class="upload-label mr-auto text-muted"
+        >
+          <p v-if="doneUploading">
+            Upload complete. Press the "Submit" button to save your changes
+          </p>
+          <p v-else>Upload in progress ...</p>
+        </b-col>
+        <b-col cols="auto">
+          <b-button
+            v-if="doneUploading"
+            size="sm"
+            variant="secondary"
+            @click="reset"
+          >
+            OK
+          </b-button>
+          <b-button v-else size="sm" variant="secondary" @click="reset">
+            Cancel
+          </b-button>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col class="progress-wrapper">
+          <b-progress
+            :value="uploadPercentage"
+            :max="100"
+            :animated="uploadPercentage < 100"
+          ></b-progress>
+        </b-col>
+      </b-row>
+    </div>
     <b-row v-else>
       <b-col>
         <b-form-file
@@ -119,43 +137,16 @@ export default {
   padding: 10px;
 }
 
-.progressBar {
-  padding-top: 1%;
+.upload-container {
+  padding-left: 9px;
 }
 
-.uploadLabel {
+.upload-label {
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9em;
   padding-top: 0.8%;
-  margin-left: -5%;
-}
-
-progress[value] {
-  /* Reset the default appearance */
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 20px;
-  position: relative;
-}
-
-progress[value]::-webkit-progress-bar {
-  background-color: #eee;
-  border-radius: 2px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-}
-
-progress[value]::-webkit-progress-value {
-  background-image: -webkit-linear-gradient(
-      -45deg,
-      transparent 33%,
-      rgba(0, 0, 0, 0.1) 33%,
-      rgba(0, 0, 0, 0.1) 66%,
-      transparent 66%
-    ),
-    -webkit-linear-gradient(top, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.25)),
-    -webkit-linear-gradient(left, #09c, #31e24d);
-
-  border-radius: 2px;
-  background-size: 35px 20px, 100% 100%, 100% 100%;
+  p {
+    padding-left: 0;
+  }
 }
 </style>
