@@ -152,18 +152,16 @@
               </combobox>
             </b-form-group>
             <b-form-group
-              v-show="node.mediaType === 'url-embed'"
+              v-if="node.mediaType === 'url-embed'"
               label="External Link"
             >
-              <b-form-input
-                id="node-embed-media-duration"
+              <file-upload
                 v-model="node.typeData.mediaURL"
                 data-testid="node-linkUrl"
                 placeholder="Enter embed link (starting with http)"
-                required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
+            <b-form-group v-if="node.mediaType === 'url-embed'" label="Behaviour">
               <b-form-radio-group
                 id="external-link-behaviour"
                 v-model="node.behaviour"
@@ -193,12 +191,10 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addThumbnail">
-              <b-form-input
-                id="node-image-url"
+              <file-upload
                 v-model="node.imageURL"
                 data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
-                required
               />
             </b-form-group>
             <b-form-group>
@@ -347,6 +343,7 @@
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
+import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
@@ -358,6 +355,7 @@ export default {
     AccordionForm,
     Combobox,
     QuizModal,
+    FileUpload,
   },
   props: {
     node: {
