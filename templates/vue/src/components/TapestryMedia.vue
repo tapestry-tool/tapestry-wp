@@ -57,7 +57,7 @@ import ExternalMedia from "./lightbox/ExternalMedia"
 import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
-import CompletionScreen from "./lightbox/quiz/CompletionScreen"
+import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 
 const SAVE_INTERVAL = 5
 

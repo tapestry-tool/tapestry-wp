@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="$emit('close', true)">
+      <button v-else class="button-completion" @click="$emit('close')">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -14,15 +14,10 @@
       v-else
       :question="activeQuestion"
       :node="node"
-      @form-toggled="toggleForm"
-      @recorder-opened="recorderOpened = true"
       @submit="showCompletionScreen = true"
-      @back="$emit('close')"
+      @back="$emit('back')"
     ></question>
-    <footer
-      v-if="!formOpened && !recorderOpened && !showCompletionScreen"
-      class="question-footer"
-    >
+    <footer v-if="!showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -35,8 +30,9 @@
 </template>
 
 <script>
-import Question from "./Question"
-import CompletionScreen from "./CompletionScreen"
+import Question from "./quiz-screen/Question"
+import CompletionScreen from "./quiz-screen/CompletionScreen"
+import { mapGetters } from "vuex"
 
 export default {
   name: "quiz-screen",
@@ -45,20 +41,22 @@ export default {
     Question,
   },
   props: {
-    node: {
-      type: Object,
+    id: {
+      type: [Number, String],
       required: true,
     },
   },
   data() {
     return {
       activeQuestionIndex: 0,
-      formOpened: false,
-      recorderOpened: false,
       showCompletionScreen: false,
     }
   },
   computed: {
+    ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.id)
+    },
     quiz() {
       return this.node.quiz
     },
@@ -83,9 +81,6 @@ export default {
     prev() {
       this.showCompletionScreen = false
       this.activeQuestionIndex--
-    },
-    toggleForm(val) {
-      this.formOpened = val
     },
   },
 }
