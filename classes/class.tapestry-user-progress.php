@@ -68,17 +68,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set 'unlocked' status of a Tapestry Node for this User to true
-     *
-     * @return Null
-     */
-    public function unlockNode() 
-    {
-        $this->_checkUserAndPostId();
-        $this->_unlockNode();
-    }
-
-    /**
      * Set 'completed' status of a Tapestry Node for this User to true
      * 
      * @return Null
@@ -175,11 +164,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
     }
 
-    private function _unlockNode() 
-    {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $this->nodeMetaId, true);
-    }
-
     private function _complete()
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
@@ -205,16 +189,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->progress = (float) $progress_value;
             } else {
                 $progress->$nodeId->progress = 0;
-            }
-
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $default_unlocked_status = isset($nodeMetadata->unlocked) && $nodeMetadata->unlocked ? true : false;
-            $unlocked_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $nodeId, true);
-            if ($unlocked_value !== null) {
-                $progress->$nodeId->unlocked = $unlocked_value;
-            } else {
-                $progress->$nodeId->unlocked = $default_unlocked_status;
-            }           
+            }         
 
             $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
             if ($completed_value !== null) {
@@ -223,6 +198,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
 
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
         }

@@ -1433,7 +1433,7 @@ function tapestryTool(config){
         const childrenData = getChildrenData(id)
         for (var i = 0; i < childrenData.length; i++) {
             if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
-                saveNodeAsUnlocked(childrenData[i]);
+                // saveNodeAsUnlocked(childrenData[i]);
                 setAccessibleStatus();
                 filterTapestry();
             }

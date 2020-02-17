@@ -448,7 +448,6 @@ export default {
           name: "imageURL",
           value: this.node.imageURL || "",
         },
-        { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },

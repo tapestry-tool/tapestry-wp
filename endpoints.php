@@ -166,13 +166,6 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateProgressByNodeId',
         ]
     ],
-    'UPDATE_TAPESTRY_USER_UNLOCKED' => (object) [
-        'ROUTE'     => 'users/unlocked',
-        'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'unlockByNodeId'
-        ]
-    ],
     'UPDATE_TAPESTRY_USER_COMPLETED'  => (object) [
         'ROUTE'     => 'users/completed',
         'ARGUMENTS' => [
@@ -837,27 +830,6 @@ function updateProgressByNodeId($request)
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
         $userProgress->updateUserProgress($progressValue);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Set unlocked status of a single node for the current user to true by passing in node id and post id
- * Example: /wp-json/tapestry-tool/v1/users/unlocked?post_id=44&node_id=1
- * 
- * @param Object $request HTTP request
- * 
- * @return null
- */
-function unlockByNodeId($request)
-{
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
-
-    try {
-        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->unlockNode();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -18,7 +18,6 @@ class TapestryNode implements ITapestryNode
     private $size;
     private $title;
     private $status;
-    private $unlocked;
     private $behaviour;
     private $typeData;
     private $imageURL;
@@ -57,7 +56,6 @@ class TapestryNode implements ITapestryNode
         $this->imageURL = '';
         $this->mediaType = '';
         $this->mediaFormat = '';
-        $this->unlocked = true;
         $this->mediaDuration = 0;
         $this->description = '';
         $this->behaviour = 'embed';
@@ -112,9 +110,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
-        }
-        if (isset($node->unlocked) && is_bool($node->unlocked)) {
-            $this->unlocked = $node->unlocked;
         }
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
@@ -267,7 +262,6 @@ class TapestryNode implements ITapestryNode
             'imageURL'      => $this->imageURL,
             'mediaType'     => $this->mediaType,
             'mediaFormat'   => $this->mediaFormat,
-            'unlocked'      => $this->unlocked,
             'mediaDuration' => $this->mediaDuration,
             'description'   => $this->description,
             'behaviour'     => $this->behaviour,
@@ -317,9 +311,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
-        }
-        if (isset($nodeMetadata->meta_value->unlocked)) {
-            $nodeData->unlocked = $nodeMetadata->meta_value->unlocked;
         }
         return $nodeData;
     }

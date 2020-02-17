@@ -69,7 +69,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -147,7 +146,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -218,7 +216,6 @@ export default {
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
         },
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -297,9 +294,6 @@ export default {
             if (fieldValue) {
               newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
-            break
-          case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot
             break
           case "hideTitle":
             newNodeEntry.hideTitle = fieldValue
