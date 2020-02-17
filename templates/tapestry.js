@@ -112,7 +112,7 @@ function tapestryTool(config){
                 // TODO: REMOVE THIS LINE WHEN WE HAVE LOCKING FUNCTIONALITY WORKING AGAIN
                 // Note: We will need to go through the existing modules wherever this is deployed
                 // and save the nodes to be unlocked when this feature is deployed again
-                tapestry.dataset.nodes[i].unlocked = true;
+                //tapestry.dataset.nodes[i].unlocked = true;
             }
         }
 
@@ -212,9 +212,7 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
-                const accordionRowIds = this.dataset.links.filter(link => {
-                    return link.source == node.id || link.target == node.id
-                }).map(link => link.target == node.id ? link.source : link.target)
+                const accordionRowIds = getChildren(node.id, 0)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
@@ -1891,7 +1889,6 @@ function tapestryTool(config){
         for (var id in progressObj) {
             var amountViewed = progressObj[id].progress;
             var amountUnviewed = 1.00 - amountViewed;
-            var unlocked = progressObj[id].unlocked;
             var quizCompletionInfo = progressObj[id].quiz;
             var completed = progressObj[id].completed;
         
@@ -1901,7 +1898,6 @@ function tapestryTool(config){
                 //Update the dataset with new values
                 tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                 tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-                tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
 
                 var questions = tapestry.dataset.nodes[index].quiz;
                 if (quizCompletionInfo) {
@@ -1937,14 +1933,14 @@ function tapestryTool(config){
             }
         }
     
-        if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
+        /* if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
                 if (tapestry.dataset.nodes[i].id == tapestry.dataset.rootId) {
                     tapestry.dataset.nodes[i].unlocked = true;
                     break;
                 }
             }
-        }
+        } */
     
         dispatchEvent(new CustomEvent("tapestry-updated", {
             detail: { dataset: tapestry.dataset }
@@ -2021,20 +2017,30 @@ function tapestryTool(config){
     
     /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
     function setUnlocked() {
-        // this is here because the other unlock fix wasn't working for some reason.
-        tapestry.dataset.nodes.forEach(node => {
-            node.unlocked = true
-        });
-        /* var parentIndex;
-        for (var i = 0; i < tapestry.dataset.links.length; i++) {
-            
-            childIndex = findNodeIndex(tapestry.dataset.links[i].target.id);
-            parentIndex = findNodeIndex(tapestry.dataset.links[i].source.id);
-    
-            if (tapestry.dataset.links[i].appearsAt <= (tapestry.dataset.nodes[parentIndex].typeData.progress[0].value * tapestry.dataset.nodes[parentIndex].mediaDuration)) {
-                tapestry.dataset.nodes[childIndex].unlocked = true;
+        const conditionTypes = {
+            NODE_COMPLETED: "node_completed",
+        }
+
+        const { nodes } = tapestry.dataset
+        nodes.forEach(node => {
+            const { conditions } = node
+            conditions.forEach(condition => {
+                switch (condition.type) {
+                    case conditionTypes.NODE_COMPLETED: {
+                        const dependent = nodes[findNodeIndex(condition.value)]
+                        condition.fulfilled = dependent.completed
+                        break
+                    }
+                    default:
+                        condition.fulfilled = false
+                        break
+                }
+            })
+
+            if (conditions.every(cond => cond.fulfilled)) {
+                node.unlocked = true
             }
-        } */
+        })
     }
     
     /**
