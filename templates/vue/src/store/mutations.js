@@ -55,6 +55,15 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
+export function fulfillNodeCondition(state, { id, condition }) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  const toFulfill = node.conditions.find(
+    cond => cond.type === condition.type && cond.value === condition.value
+  )
+  toFulfill.fulfilled = true
+  state.nodes = [...state.nodes]
+}
+
 // links
 export function addLink(state, link) {
   state.links.push(link)
