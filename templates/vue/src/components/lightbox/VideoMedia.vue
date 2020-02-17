@@ -134,6 +134,7 @@ export default {
     handleLoad() {
       this.updateDimensions()
       this.seek()
+      this.$emit("load")
     },
     seek() {
       const video = this.$refs.video

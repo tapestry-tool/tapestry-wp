@@ -22,10 +22,11 @@ export default {
   },
   computed: {
     styles() {
-      const scrollDiff = this.scrollHeight - this.clientHeight
+      const offset =
+        (this.scrollTop / (this.scrollHeight - this.clientHeight)) *
+        (this.clientHeight - 48)
       return {
-        transform: `translateY(${(this.scrollTop / scrollDiff) *
-          this.clientHeight}px)`,
+        transform: `translateY(${offset}px)`,
       }
     },
   },

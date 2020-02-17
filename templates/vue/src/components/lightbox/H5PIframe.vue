@@ -173,9 +173,7 @@ export default {
       })
     },
     handleLoad() {
-      this.$emit("is-loaded")
-
-      $("iframe").each(function() {
+      /* $("iframe").each(function() {
         $(this)
           .data("ratio", this.height / this.width)
           // Remove the hardcoded width & height attributes
@@ -203,7 +201,7 @@ export default {
         })
       }
       $(window).resize(setIframeDimensions)
-      setIframeDimensions()
+      setIframeDimensions() */
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const loadedH5PId = h5pObj.instances[0].contentId
@@ -319,6 +317,7 @@ export default {
           }, 1000)
         }
       }
+      this.$emit("is-loaded")
     },
   },
 }

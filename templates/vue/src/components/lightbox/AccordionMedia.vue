@@ -1,6 +1,27 @@
 <template>
   <div ref="container" class="media-container">
     <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
+    <tapestry-modal
+      v-if="showCompletion"
+      :allow-close="false"
+      @close="showCompletion = false"
+    >
+      <h1>{{ node.typeData.confirmationTitleText }}</h1>
+      <p>{{ node.typeData.confirmationBodyText }}</p>
+      <div class="button-container">
+        <button class="button-completion" @click="$emit('close')">
+          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+          <p>{{ node.typeData.continueButtonText }}</p>
+        </button>
+        <button class="button-completion" @click="showCompletion = false">
+          <i class="far fa-times-circle fa-4x"></i>
+          <p>{{ node.typeData.cancelLinkText }}</p>
+        </button>
+      </div>
+    </tapestry-modal>
+    <button class="button-scroll-top" @click="scrollToTop">
+      <i class="fas fa-chevron-up fa-2x"></i>
+    </button>
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
@@ -33,27 +54,6 @@
         </button>
       </template>
     </accordion-row>
-    <tapestry-modal
-      v-if="showCompletion"
-      :allow-close="false"
-      @close="showCompletion = false"
-    >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
-      <div class="button-container">
-        <button class="button-completion" @click="$emit('close')">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
-        </button>
-        <button class="button-completion" @click="showCompletion = false">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
-        </button>
-      </div>
-    </tapestry-modal>
-    <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up fa-2x"></i>
-    </button>
   </div>
 </template>
 
@@ -187,6 +187,7 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
+  padding: 24px;
 
   ::-webkit-scrollbar-track {
     background-color: black;

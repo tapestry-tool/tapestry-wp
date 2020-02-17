@@ -23,7 +23,7 @@
       :height="height"
       :settings="settings"
       @complete="$emit('complete')"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @show-end-screen="showEndScreen = true"
     />
   </div>
@@ -77,6 +77,10 @@ export default {
     }
   },
   methods: {
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load")
+    },
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true

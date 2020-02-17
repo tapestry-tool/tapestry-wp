@@ -92,10 +92,6 @@ export default {
         styles.position = "relative"
       }
 
-      if (this.node.mediaType === "accordion") {
-        return Object.assign(styles, { padding: "24px" })
-      }
-
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "#eee",
