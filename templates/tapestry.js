@@ -2036,10 +2036,7 @@ function tapestryTool(config){
                         break
                 }
             })
-
-            if (conditions.every(cond => cond.fulfilled)) {
-                node.unlocked = true
-            }
+            node.unlocked = conditions.every(cond => cond.fulfilled)
         })
     }
     
