@@ -1,6 +1,10 @@
 <template>
   <article class="article">
-    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
+    <scrollbar
+      :scroll-height="scrollHeight"
+      :scroll-top="scrollTop"
+      :client-height="clientHeight"
+    />
     <h1>{{ node.title }}</h1>
     <div v-html="content"></div>
   </article>
@@ -23,6 +27,7 @@ export default {
   data() {
     return {
       scrollHeight: 0,
+      scrollTop: 0,
       clientHeight: 0,
     }
   },
@@ -37,6 +42,11 @@ export default {
       this.scrollHeight = this.$el.scrollHeight
       this.clientHeight = this.$el.clientHeight
     })
+  },
+  methods: {
+    handleScroll() {
+      this.scrollTop = this.$el.scrollTop
+    },
   },
 }
 </script>

@@ -1,6 +1,10 @@
 <template>
-  <div ref="container" class="media-container">
-    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
+  <div ref="container" class="media-container" @scroll="handleScroll">
+    <scrollbar
+      :scroll-height="scrollHeight"
+      :scroll-top="scrollTop"
+      :client-height="clientHeight"
+    />
     <tapestry-modal
       v-if="showCompletion"
       :allow-close="false"
@@ -84,6 +88,7 @@ export default {
       showCompletion: false,
       isMounted: false,
       scrollHeight: 0,
+      scrollTop: 0,
       clientHeight: 0,
     }
   },
@@ -128,6 +133,9 @@ export default {
         this.scrollHeight = this.$el.scrollHeight
         this.clientHeight = this.$el.clientHeight
       })
+    },
+    handleScroll() {
+      this.scrollTop = this.$refs.container.scrollTop
     },
     scrollToTop() {
       const el = this.$refs.container

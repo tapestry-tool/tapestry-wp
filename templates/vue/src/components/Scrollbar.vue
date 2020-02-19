@@ -6,6 +6,10 @@
 export default {
   name: "scrollbar",
   props: {
+    scrollTop: {
+      type: Number,
+      required: true,
+    },
     scrollHeight: {
       type: Number,
       required: true,
@@ -15,11 +19,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      scrollTop: 0,
-    }
-  },
   computed: {
     styles() {
       const offset =
@@ -28,17 +27,6 @@ export default {
       return {
         transform: `translateY(${offset}px)`,
       }
-    },
-  },
-  mounted() {
-    this.$parent.$el.addEventListener("scroll", this.handleScroll)
-  },
-  beforeDestroy() {
-    this.$parent.$el.removeEventListener("scroll", this.handleScroll)
-  },
-  methods: {
-    handleScroll() {
-      this.scrollTop = this.$parent.$el.scrollTop
     },
   },
 }

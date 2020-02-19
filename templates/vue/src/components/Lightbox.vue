@@ -96,7 +96,6 @@ export default {
         return Object.assign(styles, {
           background: "#eee",
           color: "#333",
-          padding: "1em",
         })
       }
 
@@ -174,8 +173,9 @@ export default {
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
-      if (width && height) {
+    handleLoad(opts) {
+      if (opts && opts.width && opts.height) {
+        const { width, height } = opts
         this.updateDimensions({ width, height })
       }
     },

@@ -1,7 +1,11 @@
 <template>
   <loading v-if="loading" />
-  <div v-else ref="post" class="article">
-    <scrollbar :scroll-height="scrollHeight" :client-height="clientHeight" />
+  <div v-else ref="post" class="article" @scroll="handleScroll">
+    <scrollbar
+      :scroll-height="scrollHeight"
+      :scroll-top="scrollTop"
+      :client-height="clientHeight"
+    />
     <h1 class="article-title">{{ title }}</h1>
     <article v-html="content"></article>
   </div>
@@ -30,6 +34,7 @@ export default {
       title: "",
       content: "",
       scrollHeight: 0,
+      scrollTop: 0,
       clientHeight: 0,
     }
   },
@@ -52,13 +57,21 @@ export default {
       this.clientHeight = post.clientHeight
     })
   },
+  methods: {
+    handleScroll() {
+      this.scrollTop = this.$refs.post.scrollTop
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .article {
-  padding: 25px;
+  padding: 32px;
   text-align: left;
+  height: 100%;
+  overflow: scroll;
+  scrollbar-width: none;
 
   &-title {
     font-size: 1.75rem;
