@@ -54,6 +54,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
+            <quiz-modal v-if="node.mediaType === 'activity'" :node="node" />
             <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
@@ -316,7 +317,12 @@
             </b-table-simple>
           </div>
         </b-tab>
-        <quiz-modal :node="node" />
+        <b-tab
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          title="Quiz"
+        >
+          <quiz-modal :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -394,6 +400,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "gravity-form", text: "Gravity Form" },
+        { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
       gravityFormOptions: [],
