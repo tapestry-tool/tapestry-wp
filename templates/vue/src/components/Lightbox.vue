@@ -201,7 +201,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 body.tapestry-lightbox-open {
   overflow: hidden;
 }
