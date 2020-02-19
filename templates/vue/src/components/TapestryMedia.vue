@@ -53,6 +53,7 @@ import H5PMedia from "./lightbox/H5PMedia"
 import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
+import QuizMedia from "./lightbox/QuizMedia"
 
 const SAVE_INTERVAL = 5
 
@@ -66,6 +67,7 @@ export default {
     GravityForm,
     WpPostMedia,
     CompletionScreen,
+    QuizMedia,
   },
   props: {
     nodeId: {
