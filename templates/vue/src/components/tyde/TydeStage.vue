@@ -52,6 +52,12 @@ export default {
       return childrenIds.map(id => this.getNode(id))
     },
   },
+  mounted() {
+    document.querySelector("body").classList.add("tapestry-stage-open")
+  },
+  beforeDestroy() {
+    document.querySelector("body").classList.remove("tapestry-stage-open")
+  },
   methods: {
     getImageStyles(index) {
       if (index === 0 || index === 3) {
@@ -73,6 +79,10 @@ export default {
 :root {
   --tyde-green: #205a27;
   --tyde-border-green: #39b54a;
+}
+
+body.tapestry-stage-open {
+  overflow: hidden;
 }
 </style>
 
