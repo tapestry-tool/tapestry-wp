@@ -14,7 +14,7 @@
       v-else
       :question="activeQuestion"
       :node="node"
-      @submit="showCompletionScreen = true"
+      @submit="handleSubmit"
       @back="$emit('back')"
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
@@ -74,6 +74,10 @@ export default {
     },
   },
   methods: {
+    handleSubmit() {
+      this.showCompletionScreen = true
+      this.$emit("submit")
+    },
     next() {
       this.showCompletionScreen = false
       this.activeQuestionIndex++
