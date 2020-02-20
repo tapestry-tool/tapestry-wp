@@ -2024,13 +2024,15 @@ function tapestryTool(config){
         const { nodes } = tapestry.dataset
         nodes.forEach(node => {
             const { conditions } = node
-            let nodeDependents = []
             conditions.forEach(condition => {
-                const dependent = nodes[findNodeIndex(condition.value)]
-                nodeDependents.push(dependent)
+                const dependency = nodes[findNodeIndex(condition.value)]
+                let nodeDependents = dependency.dependents
+                nodeDependents.push(condition)
+                dependency.dependents = nodeDependents
                 switch (condition.type) {
                     case conditionTypes.NODE_COMPLETED: {
-                        condition.fulfilled = dependent.completed
+                        
+                        condition.fulfilled = dependency.completed
                         break
                     }
                     default:
@@ -2039,7 +2041,6 @@ function tapestryTool(config){
                 }
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
-            node.dependents = nodeDependents
         })
     }
     
