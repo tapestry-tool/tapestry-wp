@@ -212,9 +212,7 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
-                const accordionRowIds = this.dataset.links.filter(link => {
-                    return link.source == node.id || link.target == node.id
-                }).map(link => link.target == node.id ? link.source : link.target)
+                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
