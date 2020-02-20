@@ -111,7 +111,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -135,8 +135,7 @@ export default {
         this.timeSinceLastSaved = now
       }
     },
-    async complete() {
-      await this.completeNode(this.nodeId)
+    complete() {
       this.$emit("complete")
     },
   },
