@@ -204,14 +204,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, {
-                accordionProgress: [],
-                skippable: true,
-                behaviour: "embed",
-                completed: false,
-                quiz: [],
-                showInBackpack: true
-            })
+            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [], showInBackpack: true })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -2270,6 +2263,7 @@ function getIconClass(mediaType, action) {
             classStr = 'textMediaButtonIcon';
             break;
 
+        case "activity":
         case "gravity-form":
             classStr = classStrStart + 'tasks';
             break;

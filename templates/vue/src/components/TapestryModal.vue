@@ -2,11 +2,7 @@
   <div class="modal-container">
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
-      <div
-        v-if="load"
-        :class="['content', contentContainerClass]"
-        :style="contentContainerStyle"
-      >
+      <div v-if="load" class="content" :style="contentContainerStyle">
         <button
           v-if="allowClose"
           class="close-btn"
@@ -47,13 +43,8 @@ export default {
     },
     closeButtonStyle: {
       type: Object,
-      required: false,
+      reuired: false,
       default: () => ({}),
-    },
-    contentContainerClass: {
-      type: String,
-      required: false,
-      default: "",
     },
     allowClose: {
       type: Boolean,

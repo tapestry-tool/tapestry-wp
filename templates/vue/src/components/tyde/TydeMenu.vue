@@ -1,9 +1,21 @@
 <template>
   <div id="tyde-menu">
     <div class="buttons">
-      <tyde-button icon="cog" label="Settings" @click="setActivePage('settings')"></tyde-button>
-      <tyde-button icon="globe-asia" label="Map" @click="$emit('return-to-map')"></tyde-button>
-      <tyde-button icon="question" label="Help" @click="setActivePage('help')"></tyde-button>
+      <tyde-button
+        icon="cog"
+        label="Settings"
+        @click="setActivePage('settings')"
+      ></tyde-button>
+      <tyde-button
+        icon="globe-asia"
+        label="Map"
+        @click="$emit('return-to-map')"
+      ></tyde-button>
+      <tyde-button
+        icon="question"
+        label="Help"
+        @click="setActivePage('help')"
+      ></tyde-button>
       <tyde-button
         class="close-button"
         icon="times"
@@ -146,12 +158,11 @@ export default {
     top: 17px;
     z-index: 10;
     width: 60px !important;
-    border-radius: 50%  !important;
+    border-radius: 50% !important;
   }
 
   .close-button::after {
     content: "" !important;
   }
-
 }
 </style>

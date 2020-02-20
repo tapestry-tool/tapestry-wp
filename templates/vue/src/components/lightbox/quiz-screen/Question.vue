@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions } from "vuex"
 import AnswerButton from "./AnswerButton"
 import SpeechBubble from "../../SpeechBubble"
 import GravityForm from "../GravityForm"
@@ -83,6 +83,10 @@ export default {
       required: false,
       default: "1/1",
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -95,7 +99,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode"]),
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)
     },
@@ -104,14 +107,6 @@ export default {
     },
     audioRecorderCompleted() {
       return !!(this.question.entries && this.question.entries.audioId)
-    },
-  },
-  watch: {
-    formOpened(val) {
-      this.$emit("form-toggled", val)
-    },
-    recorderOpened(val) {
-      this.$emit("recorder-toggled", val)
     },
   },
   methods: {
@@ -127,7 +122,6 @@ export default {
     openRecorder(id) {
       if (id) {
         this.recorderOpened = true
-        this.$emit("recorder-opened")
         this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
       }
     },
@@ -140,7 +134,7 @@ export default {
       this.formOpened = false
       this.loading = true
       await this.completeQuestion({
-        nodeId: this.selectedNode.id,
+        nodeId: this.node.id,
         answerType: this.formType,
         formId: this.formId,
         questionId: this.question.id,

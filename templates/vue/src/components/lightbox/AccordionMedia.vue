@@ -147,7 +147,6 @@ export default {
           height: 0,
         }
       }
-
       const box = this.$refs.container
       const rect = box.getBoundingClientRect()
       return { width: rect.width, height: rect.height }
