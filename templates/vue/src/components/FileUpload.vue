@@ -50,6 +50,7 @@
       </b-col>
       <b-col>
         <b-form-input
+          data-testid="node-imageUrl"
           :placeholder="placeholder"
           :value="value"
           :disabled="isUploading"

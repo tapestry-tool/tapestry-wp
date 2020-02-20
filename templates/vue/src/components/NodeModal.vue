@@ -201,7 +201,6 @@
             <b-form-group v-if="addThumbnail">
               <file-upload
                 v-model="node.imageURL"
-                data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>

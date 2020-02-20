@@ -99,7 +99,7 @@ describe("Author side", () => {
         .then(rootId => {
           cy.server()
           nodes.forEach(node => {
-            cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+            cy.route("POST", `${API_URL}/tapestries/**/nodes*`).as("postNode")
 
             openAddNodeModal(rootId)
             getByTestId("node-title").type(node.title)
