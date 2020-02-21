@@ -20,7 +20,6 @@
       :autoplay="autoplay"
       :node="node"
       :width="width"
-      :height="height"
       :settings="settings"
       @complete="$emit('complete')"
       @is-loaded="handleLoad"

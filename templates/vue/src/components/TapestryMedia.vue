@@ -41,6 +41,12 @@
     @load="$emit('load')"
     @complete="completeNode(nodeId)"
   ></wp-post-media>
+  <quiz-media
+    v-else-if="node.mediaType === 'activity'"
+    :node="node"
+    @complete="completeNode(nodeId)"
+    @close="$emit('close')"
+  />
   <completion-screen v-else-if="showCompletionScreen" />
 </template>
 
