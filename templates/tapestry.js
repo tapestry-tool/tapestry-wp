@@ -29,6 +29,7 @@ function tapestryTool(config){
         COLOR_BLANK_HOVER = "#cdd5d9",
         COLOR_GRANDCHILD = "#CCC",
         COLOR_LINK = "#999",
+        COLOR_LOCKED = "#8a8a8c",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
         NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
@@ -960,6 +961,8 @@ function tapestryTool(config){
                     return "transparent";
                 else if (d.nodeType === "grandchild")
                     return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
                 else return COLOR_STROKE;
             })
             .attr("width", function (d) {
@@ -977,13 +980,17 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
+                if (!d.accessible)
+                    return COLOR_LOCKED;
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
-                else return COLOR_BLANK_HOVER;
+                return COLOR_BLANK_HOVER;
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    goToNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
                 }
             });
     
@@ -1067,7 +1074,9 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    tapestry.selectNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        tapestry.selectNode(d.id)
+                    }
                 }
             });
     }
@@ -1123,6 +1132,8 @@ function tapestryTool(config){
                         return "transparent";
                     else if (d.nodeType === "grandchild") 
                         return COLOR_GRANDCHILD;
+                    else if (!d.accessible)
+                        return COLOR_LINK;
                     else return COLOR_STROKE;
                 })
                 .attr("width", function (d) {
@@ -1138,9 +1149,11 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
+                    if (!d.accessible)
+                        return COLOR_LOCKED;
                     if (d.imageURL.length)
                         return "url('#node-thumb-" + d.id + "')";
-                    else return COLOR_BLANK_HOVER;
+                    return COLOR_BLANK_HOVER;
                 })
                 .attr("stroke-width", function (d) {
                     if (!d.hideProgress) {
@@ -1222,10 +1235,14 @@ function tapestryTool(config){
                 return getViewable(d);
             })
             .append("svg:foreignObject")
+            .attr("data-unlocked", function (d) {
+                return d.accessible;
+            })
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
-                    ' class="' + getIconClass(d.mediaType, 'play') + ' mediaButtonIcon"' +
+                    ' class="' + (d.accessible ? getIconClass(d.mediaType, 'play') : 'fas fa-lock') + ' mediaButtonIcon"' +
                     ' data-id="' + d.id + '"' + 
+                    ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
                     ' data-thumb="' + d.imageURL + '"' +
@@ -1253,7 +1270,9 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            goToNode(thisBtn.dataset.id)
+            if (thisBtn.dataset.unlocked === "true") {
+                goToNode(thisBtn.dataset.id);
+            }
         });
     
         // Append addNodeButton
@@ -1374,7 +1393,7 @@ function tapestryTool(config){
         if (nodes) {
             path = nodes
                 .filter(function (d) {
-                    return !d.hideProgress;
+                    return !d.hideProgress && d.accessible;
                 })
                 .selectAll("path")
                 .data(function (d, i) {
@@ -1769,6 +1788,8 @@ function tapestryTool(config){
             return "transparent";
         if (node.nodeType === "grandchild")
             return COLOR_GRANDCHILD;
+        if (!node.accessible)
+            return COLOR_LOCKED;
         if (node.imageURL.length === 0)
             return COLOR_BLANK;
         return COLOR_STROKE;
@@ -2082,14 +2103,14 @@ function tapestryTool(config){
     function getViewable(node) {
     
         // TODO: CHECK 1: If user is authorized to view it
+        if (config.wpCanEditTapestry) {
+            return true;
+        }
 
         if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 2: Always show root node
         if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
-    
-        // CHECK 3: If the user has unlocked the node
-        if (!node.accessible && !viewLockedCheckbox.checked) return false;
     
         // CHECK 4: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
