@@ -63,6 +63,16 @@ export async function completeNode({ commit, getters }, nodeId) {
   }
 }
 
+export function updateDependents({ commit, getters }, nodeId) {
+  const node = getters.getNode(nodeId)
+  node.dependents.forEach(element => {
+    commit("fulfillNodeCondition", {
+      id: element.id,
+      condition: element.condition,
+    })
+  })
+}
+
 export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }

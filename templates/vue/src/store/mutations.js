@@ -60,8 +60,10 @@ export function fulfillNodeCondition(state, { id, condition }) {
   const toFulfill = node.conditions.find(
     cond => cond.type === condition.type && cond.value === condition.value
   )
-  toFulfill.fulfilled = true
-  state.nodes = [...state.nodes]
+  if (toFulfill) {
+    toFulfill.fulfilled = true
+    state.nodes = [...state.nodes]
+  }
 }
 
 // links

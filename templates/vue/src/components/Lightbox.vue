@@ -177,9 +177,10 @@ export default {
     document.querySelector("body").style.overflow = "auto"
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateDependents"]),
     complete() {
       this.completeNode(this.nodeId)
+      this.updateDependents(this.nodeId)
     },
     close() {
       this.$router.push("/")
