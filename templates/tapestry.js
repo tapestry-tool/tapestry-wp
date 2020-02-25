@@ -205,7 +205,7 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [] })
+            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [], dependents: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -2046,10 +2046,13 @@ function tapestryTool(config){
         nodes.forEach(node => {
             const { conditions } = node
             conditions.forEach(condition => {
+                const dependency = nodes[findNodeIndex(condition.value)]
+                let nodeDependents = dependency.dependents
+                nodeDependents.push({id: node.id, condition: condition})
+                dependency.dependents = nodeDependents
                 switch (condition.type) {
                     case conditionTypes.NODE_COMPLETED: {
-                        const dependent = nodes[findNodeIndex(condition.value)]
-                        condition.fulfilled = dependent.completed
+                        condition.fulfilled = dependency.completed
                         break
                     }
                     default:
