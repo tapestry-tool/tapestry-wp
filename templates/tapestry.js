@@ -1016,6 +1016,10 @@ function tapestryTool(config){
             })
             .attr("fill", function (d) {
                 return getNodeColor(d);
+            }).on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    goToNode(d.id)
+                }
             });
     
         /* Attach images to be used within each node */
@@ -1204,6 +1208,11 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    goToNode(d.id)
+                }
+            })
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
