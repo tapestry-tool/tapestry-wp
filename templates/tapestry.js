@@ -2073,7 +2073,7 @@ function tapestryTool(config){
     
         // If no node passed in, assume root node
         if (typeof node == "undefined") {
-            node = getNodeById(root);
+            node = tapestry.dataset.nodes[0]
         }
     
         // If no node passed in, use max depth
