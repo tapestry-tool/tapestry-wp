@@ -2027,11 +2027,10 @@ function tapestryTool(config){
             conditions.forEach(condition => {
                 const dependency = nodes[findNodeIndex(condition.value)]
                 let nodeDependents = dependency.dependents
-                nodeDependents.push(condition)
+                nodeDependents.push({id: node.id, condition: condition})
                 dependency.dependents = nodeDependents
                 switch (condition.type) {
                     case conditionTypes.NODE_COMPLETED: {
-                        
                         condition.fulfilled = dependency.completed
                         break
                     }
