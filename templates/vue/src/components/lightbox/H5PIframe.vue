@@ -11,7 +11,7 @@
 
 <script>
 import TapestryApi from "@/services/TapestryAPI"
-import { mapGetters, mapActions } from "vuex"
+import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -53,6 +53,16 @@ export default {
       TapestryAPI: new TapestryApi(wpPostId),
     }
   },
+  computed: {
+    userLoggedIn: function() {
+      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
+    },
+  },
+  watch: {
+    node(_, oldNode) {
+      this.handlePause(oldNode)
+    },
+  },
   async mounted() {
     this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
 
@@ -66,17 +76,6 @@ export default {
       "tapestry-h5p-audio-recorder",
       this.saveH5PAudioToServer
     )
-  },
-  computed: {
-    ...mapGetters(["selectedNode"]),
-    userLoggedIn: function() {
-      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
-    },
-  },
-  watch: {
-    node(_, oldNode) {
-      this.handlePause(oldNode)
-    },
   },
   methods: {
     ...mapActions(["completeQuestion"]),
@@ -103,10 +102,10 @@ export default {
     async h5pRecorderSaverIsLoaded() {
       if (
         this.loadedH5PRecorderId &&
-        this.selectedNode.id &&
-        this.recordedNodeIds.includes(this.selectedNode.id)
+        this.node.id &&
+        this.recordedNodeIds.includes(this.node.id)
       ) {
-        await this.loadH5PAudio(this.selectedNode.id, this.loadedH5PRecorderId)
+        await this.loadH5PAudio(this.node.id, this.loadedH5PRecorderId)
       }
     },
     async loadH5PAudio(nodeMetaId, loadedH5PRecorderId) {
@@ -138,20 +137,20 @@ export default {
             blob: encodedH5PAudio,
             h5pId: this.loadedH5PRecorderId,
           }
-          await this.TapestryAPI.uploadAudioToServer(this.selectedNode.id, audio)
+          await this.TapestryAPI.uploadAudioToServer(this.node.id, audio)
           this.setQuestionCompleted()
           this.$emit("submit")
-          this.recordedNodeIds.push(this.selectedNode.id)
+          this.recordedNodeIds.push(this.node.id)
         } catch (e) {
           console.error(e)
         }
       }
     },
     setQuestionCompleted() {
-      this.selectedNode.quiz.forEach(async q => {
+      this.node.quiz.forEach(async q => {
         if (q.answers && q.answers.audioId == this.loadedH5PRecorderId) {
           await this.completeQuestion({
-            nodeId: this.selectedNode.id,
+            nodeId: this.node.id,
             questionId: q.id,
             answerType: "audioId",
             audioId: this.loadedH5PRecorderId,

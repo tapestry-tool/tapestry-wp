@@ -1,15 +1,5 @@
 <template>
-  <quiz-screen v-if="showQuiz" :node="node" @close="handleClose" />
-  <div
-    v-else
-    :class="[
-      'end-screen',
-      {
-        'end-screen--hide': !show,
-      },
-    ]"
-    :style="{ backgroundImage: backgroundUrl }"
-  >
+  <div class="end-screen" :style="{ backgroundImage: backgroundUrl }">
     <speech-bubble v-if="showQuizButton">
       We've got a question for you!
       <br />
@@ -19,7 +9,7 @@
       <button
         v-if="showQuizButton"
         class="end-screen-button button-quiz"
-        @click="showQuiz = true"
+        @click="$emit('show-quiz')"
       >
         <i class="fas fa-question-circle"></i>
         <p class="end-screen-button-text">{{ buttonText }}</p>
@@ -54,13 +44,11 @@
 
 <script>
 import SpeechBubble from "../SpeechBubble"
-import QuizScreen from "./quiz/QuizScreen"
 import EndScreenBg from "../../assets/end-screen-bg.png"
 
 export default {
   name: "end-screen",
   components: {
-    QuizScreen,
     SpeechBubble,
   },
   props: {
@@ -68,16 +56,6 @@ export default {
       type: Object,
       required: true,
     },
-    show: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-  },
-  data() {
-    return {
-      showQuiz: false,
-    }
   },
   computed: {
     showQuizButton() {
@@ -89,14 +67,6 @@ export default {
     },
     backgroundUrl() {
       return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
-    },
-  },
-  methods: {
-    handleClose(closeLightbox = false) {
-      this.showQuiz = false
-      if (closeLightbox) {
-        this.$emit("close")
-      }
     },
   },
 }
@@ -127,11 +97,6 @@ export default {
   padding: 24px;
   padding-left: 38%;
   padding-right: 64px;
-
-  &.end-screen--hide {
-    opacity: 0;
-    pointer-events: none;
-  }
 
   .button-container {
     display: flex;

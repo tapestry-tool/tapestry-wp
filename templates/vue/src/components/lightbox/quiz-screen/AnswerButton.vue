@@ -1,18 +1,13 @@
 <template>
-  <button :disabled="disabled" @click="$emit('click')">
-    <span class="button">
-      <i
-        class="fas fa-check-circle"
-        :class="completed ? 'visible' : 'invisible'"
-      ></i>
-      <div v-if="isFaIcon" class="icon">
-        <i :class="`fas fa-${icon} icon-fa`"></i>
-      </div>
-      <img v-else :src="textIcon" class="icon" />
-      <div>
-        <slot></slot>
-      </div>
-    </span>
+  <button class="button" :disabled="disabled" @click="$emit('click')">
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
+    <div v-if="isFaIcon" class="icon">
+      <i :class="`fas fa-${icon} icon-fa`"></i>
+    </div>
+    <img v-else :src="textIcon" class="icon" />
+    <div>
+      <slot></slot>
+    </div>
   </button>
 </template>
 

@@ -2,9 +2,16 @@
   <div class="container">
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
+      v-if="showEndScreen"
       :node="node"
-      :show="showEndScreen"
       @rewatch="rewatch"
+      @close="close"
+      @show-quiz="openQuiz"
+    />
+    <quiz-screen
+      v-else-if="showQuizScreen"
+      :id="node.id"
+      @back="back"
       @close="close"
     />
     <loading v-if="isLoading" label="Loading H5P media..." />
@@ -27,6 +34,7 @@ import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
 import H5PIframe from "./H5PIframe"
+import QuizScreen from "./QuizScreen"
 
 export default {
   name: "h5p-media",
@@ -34,6 +42,7 @@ export default {
     EndScreen,
     "h5p-iframe": H5PIframe,
     Loading,
+    QuizScreen,
     PlayScreen,
   },
   props: {
@@ -68,10 +77,15 @@ export default {
     return {
       isLoading: true,
       showEndScreen: false,
+      showQuizScreen: false,
       showPlayScreen: !this.autoplay,
     }
   },
   methods: {
+    openQuiz() {
+      this.showEndScreen = false
+      this.showQuizScreen = true
+    },
     rewatch() {
       this.showEndScreen = false
       this.$refs.h5pIframe.rewatch()
@@ -80,6 +94,10 @@ export default {
       this.showEndScreen = false
       this.$refs.h5pIframe.close()
       this.$emit("close")
+    },
+    back() {
+      this.showQuizScreen = false
+      this.showEndScreen = true
     },
     play() {
       this.showPlayScreen = false

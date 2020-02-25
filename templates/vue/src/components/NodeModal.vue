@@ -55,6 +55,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
+            <quiz-modal v-if="node.mediaType === 'activity'" :node="node" />
             <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
@@ -159,18 +160,16 @@
               </combobox>
             </b-form-group>
             <b-form-group
-              v-show="node.mediaType === 'url-embed'"
+              v-if="node.mediaType === 'url-embed'"
               label="External Link"
             >
-              <b-form-input
-                id="node-embed-media-duration"
+              <file-upload
                 v-model="node.typeData.mediaURL"
                 data-testid="node-linkUrl"
                 placeholder="Enter embed link (starting with http)"
-                required
               />
             </b-form-group>
-            <b-form-group v-show="node.mediaType === 'url-embed'" label="Behaviour">
+            <b-form-group v-if="node.mediaType === 'url-embed'" label="Behaviour">
               <b-form-radio-group
                 id="external-link-behaviour"
                 v-model="node.behaviour"
@@ -190,6 +189,7 @@
         </b-tab>
         <b-tab title="Appearance">
           <div id="modal-appearance">
+            <h6 class="mb-3 text-muted">Node Appearance</h6>
             <b-form-group>
               <b-form-checkbox
                 v-model="addThumbnail"
@@ -199,12 +199,9 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addThumbnail">
-              <b-form-input
-                id="node-image-url"
+              <file-upload
                 v-model="node.imageURL"
-                data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
-                required
               />
             </b-form-group>
             <b-form-group>
@@ -236,6 +233,15 @@
                 Show in backpack
               </b-form-checkbox>
             </b-form-group>
+            <h6 class="mt-4 mb-3 text-muted">Content Appearance</h6>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="node.fullscreen"
+                data-testid="node-behaviour-fullscreen"
+              >
+                Open content in fullscreen
+              </b-form-checkbox>
+            </b-form-group>
           </div>
         </b-tab>
         <b-tab
@@ -247,21 +253,13 @@
           title="Behaviour"
         >
           <div id="modal-behaviour">
-            <b-form-group v-if="node.mediaType !== 'accordion'">
+            <b-form-group>
               <b-form-checkbox
                 v-if="node.mediaType !== 'accordion'"
                 v-model="node.skippable"
                 data-testid="node-behaviour-skippable"
               >
                 Allow skipping video if user has not watched at least once
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.fullscreen"
-                data-testid="node-behaviour-fullscreen"
-              >
-                Maximize video size to fit in the window
               </b-form-checkbox>
             </b-form-group>
           </div>
@@ -330,7 +328,12 @@
             </b-table-simple>
           </div>
         </b-tab>
-        <quiz-modal :node="node" />
+        <b-tab
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          title="Quiz"
+        >
+          <quiz-modal :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -362,6 +365,7 @@
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
+import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
 import { mapGetters } from "vuex"
 import { tydeTypes } from "../utils/constants"
@@ -377,6 +381,7 @@ export default {
     Combobox,
     QuizModal,
     TydeTypeInput,
+    FileUpload,
   },
   props: {
     node: {
@@ -420,6 +425,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "gravity-form", text: "Gravity Form" },
+        { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
       gravityFormOptions: [],
@@ -701,7 +707,7 @@ export default {
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter a H5P URL")
+          errMsgs.push("Please select an H5P content for this node")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
           errMsgs.push("Please enter numeric value for H5P Video Duration")

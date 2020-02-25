@@ -1,5 +1,5 @@
 <template>
-  <button class="tyde-button" @click="$emit('click')" :style="cssProps">
+  <button class="tyde-button" :style="cssProps" @click="$emit('click')">
     <i :class="iconClass"></i>
     <slot></slot>
   </button>
@@ -14,15 +14,16 @@ export default {
       required: true,
     },
     label: {
-      type: String
+      type: String,
     },
   },
   computed: {
     iconClass: function() {
       return `fas fa-${this.icon}`
     },
-    cssProps() { return {
-      '--button-label': `" ${this.label}"`,
+    cssProps() {
+      return {
+        "--button-label": `" ${this.label}"`,
       }
     },
   },
@@ -51,7 +52,6 @@ export default {
   }
 
   &:last-child {
-
     i {
       margin: 0px;
     }
