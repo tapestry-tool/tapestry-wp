@@ -1270,7 +1270,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            if (thisBtn.dataset.unlocked === "true") {
+            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry) {
                 goToNode(thisBtn.dataset.id);
             }
         });
@@ -2076,7 +2076,8 @@ function tapestryTool(config){
     
         // If no node passed in, assume root node
         if (typeof node == "undefined") {
-            node = tapestry.dataset.nodes[0]
+            node = getNodeById(root);
+            parentNodeId = root
         }
     
         // If no node passed in, use max depth
@@ -2084,27 +2085,25 @@ function tapestryTool(config){
             depth = findMaxDepth(node.id);
         }
 
-        tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = node.unlocked && parentIsAccessible;
+        const isAccessible = node.unlocked && parentIsAccessible;
+        tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = isAccessible;
     
-        getChildren(node.id, 0).forEach (childNodeId => {
+        console.log([node.title, depth, parentNodeId, parentIsAccessible], isAccessible)
+        const children = getChildren(node.id, 0)
+        children.forEach(childNodeId => {
             var thisNode = getNodeById(childNodeId);
-    
-            // Do not traverse up the parent
-            if (parentNodeId != thisNode.id) {
-                // A node is accessible only if it's unlocked and its parent is accessible
-                var isAccessible = thisNode.unlocked && parentIsAccessible;
-                tapestry.dataset.nodes[findNodeIndex(thisNode.id)].accessible = isAccessible;
-                if (depth > 0) {
-                    // Keep going deeper in
-                    setAccessibleStatus(thisNode, depth-1, node.id, isAccessible);
-                }
+            if (parentNodeId != thisNode.id && depth > 0) {
+                setAccessibleStatus(thisNode, depth-1, node.id, isAccessible);
             }
         });
     }
     
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
-    
+
+        // CHECK 4: If the node is currently in view (ie: root/child/grandchild)
+        if (node.nodeType === "") return false;
+
         // TODO: CHECK 1: If user is authorized to view it
         if (config.wpCanEditTapestry) {
             return true;
@@ -2114,9 +2113,6 @@ function tapestryTool(config){
     
         // CHECK 2: Always show root node
         if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
-    
-        // CHECK 4: If the node is currently in view (ie: root/child/grandchild)
-        if (node.nodeType === "") return false;
     
         // CHECK 5: If we are currently in view mode & if the node will be viewable in that case
         if (node.nodeType === "grandchild" && inViewMode) return false;

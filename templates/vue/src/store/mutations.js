@@ -62,7 +62,6 @@ export function fulfillNodeCondition(state, { id, condition }) {
   )
   if (toFulfill) {
     toFulfill.fulfilled = true
-    state.nodes = [...state.nodes]
   }
 }
 
