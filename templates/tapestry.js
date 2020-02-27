@@ -1457,6 +1457,11 @@ function tapestryTool(config){
         }
     }
 
+    this.reload = () => {
+        setAccessibleStatus();
+        filterTapestry();
+    }
+
     this.updateProgressBars = updateViewedProgress;
 
     this.recordAnalyticsEvent = recordAnalyticsEvent;
@@ -2076,8 +2081,7 @@ function tapestryTool(config){
     
         // If no node passed in, assume root node
         if (typeof node == "undefined") {
-            node = getNodeById(root);
-            parentNodeId = root
+            node = tapestry.dataset.nodes[0];
         }
     
         // If no node passed in, use max depth
@@ -2087,8 +2091,6 @@ function tapestryTool(config){
 
         const isAccessible = node.unlocked && parentIsAccessible;
         tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = isAccessible;
-    
-        console.log([node.title, depth, parentNodeId, parentIsAccessible], isAccessible)
         const children = getChildren(node.id, 0)
         children.forEach(childNodeId => {
             var thisNode = getNodeById(childNodeId);
