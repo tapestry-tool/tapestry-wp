@@ -359,3 +359,24 @@ input[type="checkbox"][disabled] {
 #mediaFormat[disabled], #mediaType[disabled]{
     cursor: not-allowed;
 }
+
+.tapestry-tooltip {
+    pointer-events: none;
+    position: absolute;
+    background: black;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transform: translateX(50%);
+}
+
+.tapestry-tooltip::after {
+    position: absolute;
+    background: black;
+    content: "";
+    width: 8px;
+    height: 8px;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+}

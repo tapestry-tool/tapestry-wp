@@ -1053,16 +1053,9 @@ function tapestryTool(config){
 
         /* Add path and button */
         buildPathAndButton();
-    
-        nodes.on("mouseover", function(thisNode){
-            if (linkToDragStarted) {
-                linkToNode = thisNode;
-            }
-        }).on("mouseout", function(){
-            if (linkToDragStarted) {
-                linkToNode = undefined;
-            }
-        });
+
+        // Create tooltip for all locked nodes
+        applyListeners(nodes);
     
         /* Add dragging and node selection functionality to the node */
         nodes
@@ -1079,6 +1072,48 @@ function tapestryTool(config){
                     }
                 }
             });
+    }
+
+    function applyListeners(nodes) {
+        // Remove (potentially) old listeners
+        nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
+
+        // Apply link related listeners
+        nodes.on("mouseover", function (thisNode) {
+            if (linkToDragStarted) {
+                linkToNode = thisNode;
+            }
+        }).on("mouseout", function () {
+            if (linkToDragStarted) {
+                linkToNode = undefined;
+            }
+        });
+
+        // Apply tooltip
+        const tooltip = createTooltip();
+        nodes
+            .filter(d => !d.accessible)
+            .on("mouseover", function (d) {
+                const rect = this.getBoundingClientRect();
+                tooltip
+                    .style("opacity", 1)
+                    .html(getTooltipText(d))
+                    .style("left", `${rect.left + window.scrollX}px`)
+                    .style("top", `${rect.top + window.scrollY - 220}px`);
+            })
+            .on("mouseleave", () => tooltip.style("opacity", 0));
+    }
+
+    function createTooltip() {
+        return d3
+            .select("#tapestry")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tapestry-tooltip");
+    }
+
+    function getTooltipText(node) {
+        return `Node: ${node.id}`;
     }
 
     function rebuildNodeContents() {
@@ -1463,6 +1498,7 @@ function tapestryTool(config){
 
     this.reload = () => {
         setAccessibleStatus();
+        applyListeners(nodes);
         filterTapestry();
     }
 
