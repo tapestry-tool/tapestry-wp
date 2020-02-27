@@ -1188,6 +1188,10 @@ function tapestryTool(config){
     }
     
     function buildPathAndButton() {
+        nodes.selectAll(".mediaButton").remove();
+        nodes.selectAll(".editNodeButton").remove();
+        nodes.selectAll(".addNodeButton").remove();
+        nodes.selectAll(".metaWrapper").remove();
     
         /* Add progress pie inside each node */
         pieGenerator = d3.pie().sort(null).value(function (d) {
