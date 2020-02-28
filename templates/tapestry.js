@@ -1099,13 +1099,25 @@ function tapestryTool(config){
             .filter(d => !d.accessible)
             .on("mouseover", function (d) {
                 const rect = this.getBoundingClientRect();
+                const tooltipBox = tooltip.node().getBoundingClientRect();
+                const { left, top } = getTooltipPos(tooltipBox, rect);
                 tooltip
                     .style("opacity", 1)
                     .html(getTooltipHtml(d))
-                    .style("left", `${rect.left + window.scrollX}px`)
-                    .style("top", `${rect.top + window.scrollY - 220}px`)
+                    .style("left", `${left}px`)
+                    .style("top", `${top}px`)
             })
             .on("mouseleave", () => tooltip.style("opacity", 0));
+    }
+
+    function getTooltipPos(tooltipRect, containerRect) {
+        const tooltipWidth = tooltipRect.width;
+        const containerWidth = containerRect.width;
+        const offset = (containerWidth - tooltipWidth) / 2;
+        return {
+            left: containerRect.left + window.scrollX + offset,
+            top: containerRect.top + window.scrollY - (tooltipRect.height + containerRect.height) + 16
+        }
     }
 
     function createTooltip() {
