@@ -4,7 +4,7 @@ export default {
     password: Cypress.env("ADMIN_PASSWORD"),
   },
   subscriber: {
-    username: Cypress.env("SUBCRIBER_USERNAME"),
-    password: Cypress.env("SUBCRIBER_PASSWORD"),
+    username: Cypress.env("SUBSCRIBER_USERNAME"),
+    password: Cypress.env("SUBSCRIBER_PASSWORD"),
   },
 }
