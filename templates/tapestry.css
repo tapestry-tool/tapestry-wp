@@ -367,7 +367,7 @@ input[type="checkbox"][disabled] {
     color: white;
     padding: 8px 12px;
     border-radius: 8px;
-    transform: translateX(50%);
+    text-align: left;
 }
 
 .tapestry-tooltip::after {
@@ -379,4 +379,16 @@ input[type="checkbox"][disabled] {
     bottom: -4px;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);
+}
+
+.tapestry-tooltip ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+
+.tapestry-tooltip li {
+    margin: 0;
+    padding: 0;
 }

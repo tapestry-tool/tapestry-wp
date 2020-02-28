@@ -80,6 +80,10 @@ function tapestryTool(config){
         nodeLinkLine.setAttribute("stroke", COLOR_ACTIVE);
         nodeLinkLine.setAttribute("stroke-width", LINK_THICKNESS);
 
+    const conditionTypes = {
+        NODE_COMPLETED: "node_completed",
+    }
+
     /****************************************************
      * INITIALIZATION
      ****************************************************/
@@ -1097,9 +1101,9 @@ function tapestryTool(config){
                 const rect = this.getBoundingClientRect();
                 tooltip
                     .style("opacity", 1)
-                    .html(getTooltipText(d))
+                    .html(getTooltipHtml(d))
                     .style("left", `${rect.left + window.scrollX}px`)
-                    .style("top", `${rect.top + window.scrollY - 220}px`);
+                    .style("top", `${rect.top + window.scrollY - 220}px`)
             })
             .on("mouseleave", () => tooltip.style("opacity", 0));
     }
@@ -1112,8 +1116,25 @@ function tapestryTool(config){
             .attr("class", "tapestry-tooltip");
     }
 
-    function getTooltipText(node) {
-        return `Node: ${node.id}`;
+    function getTooltipHtml(node) {
+        const str = "To unlock this node: <br />";
+        const wrapper = document.createElement("ul");
+        node.conditions.forEach(cond => {
+            if (!cond.fulfilled) {
+                const listItem = document.createElement("li");
+                switch (cond.type) {
+                    case conditionTypes.NODE_COMPLETED: {
+                        const node = getNodeById(cond.value);
+                        listItem.innerText = `Complete "${node.title}"`;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                wrapper.appendChild(listItem);
+            }
+        })
+        return str + wrapper.outerHTML;
     }
 
     function rebuildNodeContents() {
@@ -2083,10 +2104,6 @@ function tapestryTool(config){
     
     /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
     function setUnlocked() {
-        const conditionTypes = {
-            NODE_COMPLETED: "node_completed",
-        }
-
         const { nodes } = tapestry.dataset
         nodes.forEach(node => {
             const { conditions } = node
