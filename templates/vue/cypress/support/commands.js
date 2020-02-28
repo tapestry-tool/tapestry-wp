@@ -30,13 +30,9 @@ import roles from "./roles"
 Cypress.Commands.add("login", role => {
   const user = roles[role]
   cy.visit(`${SITE_URL}/wp-admin/`)
-
-  cy.wait(200)
+  cy.wait(100)
   cy.get("#user_login").type(user.username)
-
-  cy.wait(200)
   cy.get("#user_pass").type(user.password)
-
   cy.get("#wp-submit").click()
 })
 
@@ -49,4 +45,12 @@ Cypress.Commands.add("logout", () => {
 Cypress.Commands.add("openLightbox", id => {
   getMediaButton(id).click()
   return cy.get("#lightbox")
+})
+
+Cypress.Commands.add("deleteTapestry", name => {
+  cy.contains("Tapestries").click()
+  cy.get("td")
+    .contains(name)
+    .click()
+  cy.contains(/move to trash/i).click()
 })
