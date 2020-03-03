@@ -36,7 +36,7 @@
       </b-row>
     </div>
     <b-row v-else>
-      <b-col>
+      <b-col class="px-0">
         <b-form-file
           ref="file"
           name="async-upload"
@@ -49,9 +49,9 @@
         ></b-form-file>
       </b-col>
       <b-col sm="1" class="divider">
-        <h6>OR</h6>
+        <h6 class="text-muted">OR</h6>
       </b-col>
-      <b-col>
+      <b-col class="px-0">
         <b-form-input
           :placeholder="placeholder"
           :value="value"

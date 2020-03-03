@@ -136,6 +136,8 @@ export default {
     canAddQuestion(isAdding) {
       if (isAdding && !this.questions.length) {
         this.addQuestion()
+      } else if (!isAdding && this.questions.length) {
+        this.questions = []
       }
     },
     questions(newQuestions) {
