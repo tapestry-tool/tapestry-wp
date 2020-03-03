@@ -49,10 +49,10 @@ export default {
       this.scrollTop = this.$el.scrollTop
     },
     handleScrollDrag(evt) {
-      let newValue = evt
-      if (evt < 0) {
+      let newValue = evt * this.$el.scrollTopMax
+      if (newValue < 0) {
         newValue = 0
-      } else if (evt > this.$el.scrollTopMax) {
+      } else if (newValue > this.$el.scrollTopMax) {
         newValue = this.$el.scrollTopMax
       }
       this.scrollTop = newValue

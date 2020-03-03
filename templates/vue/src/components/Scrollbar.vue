@@ -39,7 +39,8 @@ export default {
       document.body.style.userSelect = "none"
       const box = this.$el.getBoundingClientRect()
       const handleDrag = evt => {
-        this.$emit("scrollchange", evt.clientY - box.top)
+        const offset = (evt.clientY - box.top) / this.clientHeight
+        this.$emit("scrollchange", offset)
       }
       document.addEventListener("mousemove", handleDrag)
       document.addEventListener(

@@ -63,10 +63,10 @@ export default {
       this.scrollTop = this.$refs.post.scrollTop
     },
     handleScrollDrag(evt) {
-      let newValue = evt
-      if (evt < 0) {
+      let newValue = evt * this.$refs.post.scrollTopMax
+      if (newValue < 0) {
         newValue = 0
-      } else if (evt > this.$refs.post.scrollTopMax) {
+      } else if (newValue > this.$refs.post.scrollTopMax) {
         newValue = this.$refs.post.scrollTopMax
       }
       this.scrollTop = newValue
