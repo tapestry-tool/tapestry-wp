@@ -1099,12 +1099,12 @@ function tapestryTool(config){
         nodes
             .filter(d => !d.accessible)
             .on("mouseover", function (d) {
+                tooltip.html(getTooltipHtml(d))
                 const rect = this.getBoundingClientRect();
                 const tooltipBox = tooltip.node().getBoundingClientRect();
                 const { left, top } = getTooltipPos(tooltipBox, rect);
                 tooltip
                     .style("opacity", 1)
-                    .html(getTooltipHtml(d))
                     .style("left", `${left}px`)
                     .style("top", `${top}px`)
             })
