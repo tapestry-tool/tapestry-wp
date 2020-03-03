@@ -130,7 +130,9 @@ export default {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
     handleScrollDrag(evt) {
-      let newValue = evt * this.$refs.container.scrollTopMax
+      const container = this.$refs.container.getBoundingClientRect()
+      const offset = (evt - container.top) / this.clientHeight
+      let newValue = offset * this.$refs.container.scrollTopMax
       if (newValue < 0) {
         newValue = 0
       } else if (newValue > this.$refs.container.scrollTopMax) {

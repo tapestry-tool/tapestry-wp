@@ -63,7 +63,9 @@ export default {
       this.scrollTop = this.$refs.post.scrollTop
     },
     handleScrollDrag(evt) {
-      let newValue = evt * this.$refs.post.scrollTopMax
+      const container = this.$refs.post.getBoundingClientRect()
+      const offset = (evt - container.top) / this.clientHeight
+      let newValue = offset * this.$refs.post.scrollTopMax
       if (newValue < 0) {
         newValue = 0
       } else if (newValue > this.$refs.post.scrollTopMax) {

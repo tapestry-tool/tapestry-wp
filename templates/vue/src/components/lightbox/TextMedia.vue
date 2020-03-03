@@ -49,7 +49,9 @@ export default {
       this.scrollTop = this.$el.scrollTop
     },
     handleScrollDrag(evt) {
-      let newValue = evt * this.$el.scrollTopMax
+      const container = this.$el.getBoundingClientRect()
+      const offset = (evt - container.top) / this.clientHeight
+      let newValue = offset * this.$el.scrollTopMax
       if (newValue < 0) {
         newValue = 0
       } else if (newValue > this.$el.scrollTopMax) {

@@ -34,14 +34,16 @@ export default {
       }
     },
   },
+  mounted() {
+    document.addEventListener("keydown", this.handleKeydown.bind(this))
+  },
+  beforeDestroy() {
+    document.removeEventListener("keydown", this.handleKeydown.bind(this))
+  },
   methods: {
     handleDragStart() {
       document.body.style.userSelect = "none"
-      const box = this.$el.getBoundingClientRect()
-      const handleDrag = evt => {
-        const offset = (evt.clientY - box.top) / this.clientHeight
-        this.$emit("scrollchange", offset)
-      }
+      const handleDrag = evt => this.$emit("scrollchange", evt.clientY)
       document.addEventListener("mousemove", handleDrag)
       document.addEventListener(
         "mouseup",
@@ -51,6 +53,26 @@ export default {
         },
         { once: true }
       )
+    },
+    handleKeydown(evt) {
+      const SCROLL_INCREMENT = 40
+      if (this.$el.getBoundingClientRect) {
+        const box = this.$el.getBoundingClientRect()
+        switch (evt.which) {
+          case 38: {
+            // ArrowUp
+            this.$emit("scrollchange", box.top - SCROLL_INCREMENT)
+            break
+          }
+          case 40: {
+            // ArrowDown
+            this.$emit("scrollchange", box.bottom + SCROLL_INCREMENT)
+            break
+          }
+          default:
+            break
+        }
+      }
     },
   },
 }
