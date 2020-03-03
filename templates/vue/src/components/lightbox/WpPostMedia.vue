@@ -5,6 +5,7 @@
       :scroll-height="scrollHeight"
       :scroll-top="scrollTop"
       :client-height="clientHeight"
+      @scrollchange="handleScrollDrag"
     />
     <h1 class="article-title">{{ title }}</h1>
     <article v-html="content"></article>
@@ -60,6 +61,16 @@ export default {
   methods: {
     handleScroll() {
       this.scrollTop = this.$refs.post.scrollTop
+    },
+    handleScrollDrag(evt) {
+      let newValue = evt
+      if (evt < 0) {
+        newValue = 0
+      } else if (evt > this.$refs.post.scrollTopMax) {
+        newValue = this.$refs.post.scrollTopMax
+      }
+      this.scrollTop = newValue
+      this.$refs.post.scrollTop = newValue
     },
   },
 }

@@ -36,14 +36,17 @@ export default {
   },
   methods: {
     handleDragStart() {
+      document.body.style.userSelect = "none"
+      const box = this.$el.getBoundingClientRect()
       const handleDrag = evt => {
-        console.log(evt)
+        this.$emit("scrollchange", evt.clientY - box.top)
       }
       document.addEventListener("mousemove", handleDrag)
       document.addEventListener(
         "mouseup",
         () => {
           document.removeEventListener("mousemove", handleDrag)
+          document.body.style.userSelect = ""
         },
         { once: true }
       )
