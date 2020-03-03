@@ -536,6 +536,7 @@ function tapestryTool(config){
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                 method: API_DELETE_METHOD,
                 success: function() {
+                    updateDependentListAfterDelete(nodeId);
                     location.reload();
                 },
                 error: function(e) {
@@ -2040,6 +2041,23 @@ function tapestryTool(config){
                 }
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
+        })
+    }
+
+    /**
+     * when node is being deleted, iterate over conditions to find nodes which it is depends on and update their dependents list to remove deleted node
+     * @param {integer} nodeId
+     */
+    function updateDependentListAfterDelete(nodeId) {
+        const { nodes } = tapestry.dataset
+        const node = nodes[findNodeIndex(nodeId)];
+        const { conditions } = node;
+        conditions.forEach(condition => {
+            const dependency = nodes[findNodeIndex(condition.value)];
+            const updatedDependentList = dependency.dependents.filter(dep => {
+                return dep.id != nodeId;
+            });
+            dependency.dependents = updatedDependentList;
         })
     }
     
