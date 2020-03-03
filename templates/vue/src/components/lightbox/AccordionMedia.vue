@@ -4,6 +4,7 @@
       :scroll-height="scrollHeight"
       :scroll-top="scrollTop"
       :client-height="clientHeight"
+      @scrollchange="handleScrollDrag"
     />
     <tapestry-modal
       v-if="showCompletion"
@@ -128,6 +129,16 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleScrollDrag(evt) {
+      let newValue = evt
+      if (evt < 0) {
+        newValue = 0
+      } else if (evt > this.$refs.container.scrollTopMax) {
+        newValue = this.$refs.container.scrollTopMax
+      }
+      this.scrollTop = newValue
+      this.$refs.container.scrollTop = newValue
+    },
     updateScrollValues() {
       this.$nextTick(() => {
         this.scrollHeight = this.$el.scrollHeight

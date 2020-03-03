@@ -1,9 +1,10 @@
 <template>
-  <article class="article">
+  <article class="article" @scroll="handleScroll">
     <scrollbar
       :scroll-height="scrollHeight"
       :scroll-top="scrollTop"
       :client-height="clientHeight"
+      @scrollchange="handleScrollDrag"
     />
     <h1>{{ node.title }}</h1>
     <div v-html="content"></div>
@@ -46,6 +47,16 @@ export default {
   methods: {
     handleScroll() {
       this.scrollTop = this.$el.scrollTop
+    },
+    handleScrollDrag(evt) {
+      let newValue = evt
+      if (evt < 0) {
+        newValue = 0
+      } else if (evt > this.$el.scrollTopMax) {
+        newValue = this.$el.scrollTopMax
+      }
+      this.scrollTop = newValue
+      this.$el.scrollTop = newValue
     },
   },
 }
