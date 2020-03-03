@@ -71,6 +71,12 @@ export default {
   text-align: left;
   overflow: scroll;
   scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 
   h1 {
     font-size: 1.75rem;

@@ -206,12 +206,13 @@ button[disabled] {
 .media-container {
   height: 100%;
   overflow: scroll;
-  scrollbar-color: auto black;
-  scrollbar-width: none;
   padding: 24px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
-  ::-webkit-scrollbar-track {
-    background-color: black;
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 }
 

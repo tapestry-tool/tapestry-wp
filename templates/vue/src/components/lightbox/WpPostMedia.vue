@@ -85,6 +85,12 @@ export default {
   height: 100%;
   overflow: scroll;
   scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 
   &-title {
     font-size: 1.75rem;
