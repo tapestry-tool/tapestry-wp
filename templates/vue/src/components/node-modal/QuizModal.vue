@@ -1,5 +1,5 @@
 <template>
-  <b-tab title="Quiz">
+  <div>
     <b-form-group>
       <b-form-checkbox v-model="canAddQuestion">Add Question</b-form-checkbox>
     </b-form-group>
@@ -92,7 +92,7 @@
         Add Question
       </b-button>
     </b-row>
-  </b-tab>
+  </div>
 </template>
 
 <script>
@@ -136,6 +136,8 @@ export default {
     canAddQuestion(isAdding) {
       if (isAdding && !this.questions.length) {
         this.addQuestion()
+      } else if (!isAdding && this.questions.length) {
+        this.questions = []
       }
     },
     questions(newQuestions) {

@@ -212,7 +212,7 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
-                const accordionRowIds = getChildren(node.id, 0)
+                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
@@ -1015,6 +1015,10 @@ function tapestryTool(config){
             })
             .attr("fill", function (d) {
                 return getNodeColor(d);
+            }).on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    goToNode(d.id)
+                }
             });
     
         /* Attach images to be used within each node */
@@ -1203,6 +1207,11 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    goToNode(d.id)
+                }
+            })
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
@@ -2263,6 +2272,7 @@ function getIconClass(mediaType, action) {
             classStr = 'textMediaButtonIcon';
             break;
 
+        case "activity":
         case "gravity-form":
             classStr = classStrStart + 'tasks';
             break;

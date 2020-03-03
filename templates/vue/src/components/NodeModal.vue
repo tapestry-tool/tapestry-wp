@@ -1,28 +1,21 @@
 <template>
   <b-modal
     id="node-modal-container"
+    :title="modalTitle"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
   >
-    <template v-slot:modal-header="{ close }">
-      <div class="modal-header-row">
-        <h5>{{ modalTitle }}</h5>
-        <b-button size="sm" variant="outline-danger" @click="close()">
-          Close Modal
-        </b-button>
-      </div>
-      <div class="modal-header-row">
-        <b-alert
-          v-if="formErrors.length"
-          id="tapestry-modal-form-errors"
-          variant="danger"
-          show
-          v-html="formErrors"
-        ></b-alert>
-      </div>
-    </template>
+    <div class="modal-header-row">
+      <b-alert
+        v-if="formErrors.length"
+        id="tapestry-modal-form-errors"
+        variant="danger"
+        show
+        v-html="formErrors"
+      ></b-alert>
+    </div>
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
@@ -54,6 +47,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
+            <quiz-modal v-if="node.mediaType === 'activity'" :node="node" />
             <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
@@ -83,7 +77,7 @@
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
               label="Video URL"
             >
-              <b-form-input
+              <file-upload
                 id="node-video-media-url"
                 v-model="node.typeData.mediaURL"
                 data-testid="node-videoUrl"
@@ -397,6 +391,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "gravity-form", text: "Gravity Form" },
+        { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
       gravityFormOptions: [],
@@ -683,11 +678,25 @@ table {
   padding-bottom: 0;
   margin-left: 5px;
   flex-direction: column;
+
+  button.close {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.nav-link:focus {
+  outline: none;
 }
 </style>
 
@@ -707,7 +716,7 @@ table {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 
     &:last-child {
       margin-bottom: 0;
