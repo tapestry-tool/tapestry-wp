@@ -24,11 +24,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      isDragging: false,
-    }
-  },
   computed: {
     styles() {
       const offset =
@@ -39,31 +34,19 @@ export default {
       }
     },
   },
-  watch: {
-    isDragging(val) {
-      console.log(val)
-    },
-  },
   methods: {
     handleDragStart() {
-      this.isDragging = true
-
       const handleDrag = evt => {
         console.log(evt)
       }
-
       document.addEventListener("mousemove", handleDrag)
       document.addEventListener(
         "mouseup",
         () => {
-          this.isDragging = false
           document.removeEventListener("mousemove", handleDrag)
         },
         { once: true }
       )
-    },
-    handleDragStop() {
-      this.isDragging = false
     },
   },
 }
