@@ -1,3 +1,4 @@
+/// <reference types="Cypress" />
 import {
   API_URL,
   getStore,
