@@ -212,6 +212,7 @@
 
 .node {
     cursor: pointer;
+    z-index: 0;
 }
 
 .node .meta {
@@ -349,7 +350,7 @@
 
 /* ADD + EDIT NODE BUTTONS */
 
-body {font-family: Arial, Helvetica, sans-serif; font-size: 16px;}
+body {font-family: Arial, Helvetica, sans-serif; font-size: 16px; z-index: 0;}
 * {box-sizing: border-box;}
 
 input[type="checkbox"][disabled] {
@@ -365,17 +366,21 @@ input[type="checkbox"][disabled] {
     position: absolute;
     background: black;
     color: white;
-    padding: 8px 12px;
+    padding: 12px 16px;
     border-radius: 8px;
     text-align: left;
+    font-size: 22px;
+    width: 100%;
+    bottom: 8px;
+    z-index: 10;
 }
 
 .tapestry-tooltip::after {
     position: absolute;
     background: black;
     content: "";
-    width: 8px;
-    height: 8px;
+    width: 16px;
+    height: 16px;
     bottom: -4px;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);

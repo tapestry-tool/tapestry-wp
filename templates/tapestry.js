@@ -1056,6 +1056,21 @@ function tapestryTool(config){
                 return d.imageURL;
             });
 
+        nodes
+            .filter(d => !d.accessible)
+            .append("foreignObject")
+            .attr("class", "tooltip-wrapper")
+            .style("position", "relative")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .attr("width", d => getRadius(d) * 2 + 48)
+            .attr("height", d => getRadius(d) * 2)
+            .attr("x", d => -(getRadius(d) + 24))
+            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .append("xhtml:div")
+            .attr("class", "tapestry-tooltip")
+            .html(getTooltipHtml)
+
         /* Add path and button */
         buildPathAndButton();
 
@@ -1079,12 +1094,21 @@ function tapestryTool(config){
             });
     }
 
+    function reloadTooltips() {
+        nodes
+            .filter(d => !d.accessible)
+            .select(".tapestry-tooltip")
+            .html(getTooltipHtml)
+    }
+
     function applyListeners(nodes) {
         // Remove (potentially) old listeners
         nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
 
         // Apply link related listeners
         nodes.on("mouseover", function (thisNode) {
+            // Place this node at the end of the svg so that it's on top
+            $(this).insertAfter($(this).parent().children().last())
             if (linkToDragStarted) {
                 linkToNode = thisNode;
             }
@@ -1094,21 +1118,17 @@ function tapestryTool(config){
             }
         });
 
-        // Apply tooltip
-        const tooltip = createTooltip();
         nodes
             .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
-                tooltip.html(getTooltipHtml(d))
-                const rect = this.getBoundingClientRect();
-                const tooltipBox = tooltip.node().getBoundingClientRect();
-                const { left, top } = getTooltipPos(tooltipBox, rect);
-                tooltip
-                    .style("opacity", 1)
-                    .style("left", `${left}px`)
-                    .style("top", `${top}px`)
+            .on("mouseover", function () {
+                $(this).insertAfter($(this).parent().children().last())
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                wrapper.style.opacity = 1;
             })
-            .on("mouseleave", () => tooltip.style("opacity", 0));
+            .on("mouseleave", function () {
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                wrapper.style.opacity = 0;
+            })
     }
 
     function getTooltipPos(tooltipRect, containerRect) {
@@ -1532,9 +1552,12 @@ function tapestryTool(config){
 
     this.reload = () => {
         setAccessibleStatus();
+        reloadTooltips();
         applyListeners(nodes);
         filterTapestry();
     }
+
+    this.reloadTooltips = reloadTooltips
 
     this.updateProgressBars = updateViewedProgress;
 
