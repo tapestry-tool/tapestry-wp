@@ -235,6 +235,13 @@ $REST_API_ENDPOINTS = [
             'methods'   => $REST_API_GET_METHOD,
             'callback'  => 'getGfEntry'
         ]
+    ],
+    'LOGIN' => (object) [
+        'ROUTE' => '/login',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_POST_METHOD,
+            'callback'  => 'login'
+        ]
     ]
 ];
 
@@ -252,6 +259,22 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function login($request)
+{
+    $params = json_decode($request->get_body());
+    $credentials = array('user_login' => $params->username, 'user_password' => $params->password, 'remember' => true);
+    $user = wp_signon($credentials, false);
+    if (is_wp_error($user)) {
+        return $user;
+    } else {
+        wp_set_current_user($user->ID, $user->user_login);
+        wp_set_auth_cookie($user->ID, true, false);
+        if (is_user_logged_in()) {
+            return true;
+        }
+    }
 }
 
 function getAllH5P()

@@ -24,16 +24,12 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import { SITE_URL, getMediaButton } from "./utils"
+import { getMediaButton, API_URL } from "./utils"
 import roles from "./roles"
 
 Cypress.Commands.add("login", role => {
-  const user = roles[role]
-  cy.visit(`${SITE_URL}/wp-admin/`)
-  cy.wait(100)
-  cy.get("#user_login").type(user.username)
-  cy.get("#user_pass").type(user.password)
-  cy.get("#wp-submit").click()
+  const { username, password } = roles[role]
+  cy.request("POST", `${API_URL}/login`, { username, password })
 })
 
 Cypress.Commands.add("logout", () => {

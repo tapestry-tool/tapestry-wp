@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
 import {
+  SITE_URL,
   API_URL,
   getStore,
   visitTapestry,
@@ -21,6 +22,7 @@ const TEST_TAPESTRY_NAME = "testing"
 describe("Author side", () => {
   before(() => {
     cy.login("admin")
+    cy.visit(`${SITE_URL}/wp-admin`)
     cy.contains("Tapestries").click()
     cy.get(".page-title-action").click()
 
@@ -33,11 +35,11 @@ describe("Author side", () => {
 
     // wait until wordpress publishes the tapestry
     cy.contains("is now live")
-    cy.logout()
   })
 
   after(() => {
     cy.login("admin")
+    cy.visit(`${SITE_URL}/wp-admin`)
     cy.contains("Tapestries").click()
     cy.get("td")
       .contains(TEST_TAPESTRY_NAME)
@@ -203,9 +205,11 @@ describe("Author side", () => {
           "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg"
 
         getByTestId("node-appearance-add-thumbnail").check({ force: true })
-        getByTestId("node-imageUrl")
-          .clear()
-          .type(url)
+        getByTestId("node-imageUrl").within(() => {
+          cy.get('[name="text-input"]')
+            .clear()
+            .type(url)
+        })
         submitModal()
 
         getStore()
@@ -282,12 +286,12 @@ describe("Author side", () => {
 
           cy.logout()
           visitTapestry(TEST_TAPESTRY_NAME)
-          getNode(id).click()
+          getNode(id).click({ force: true })
           getEditNodeButton(id).should("not.exist")
 
           cy.login("subscriber")
           visitTapestry(TEST_TAPESTRY_NAME)
-          getNode(id).click()
+          getNode(id).click({ force: true })
           getEditNodeButton(id).should("exist")
         })
     })
@@ -303,12 +307,12 @@ describe("Author side", () => {
 
           cy.logout()
           visitTapestry(TEST_TAPESTRY_NAME)
-          getNode(id).click()
+          getNode(id).click({ force: true })
           getAddNodeButton(id).should("not.exist")
 
           cy.login("subscriber")
           visitTapestry(TEST_TAPESTRY_NAME)
-          getNode(id).click()
+          getNode(id).click({ force: true })
           getAddNodeButton(id).should("exist")
 
           cy.logout()
