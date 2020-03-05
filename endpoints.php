@@ -35,7 +35,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestry',
-            'permission_callback'   => 'TapestryPermissions::postTapestry'
+        ]
+    ],
+    'DELETE_TAPESTRY' => (object) [
+        'ROUTE'     => '/tapestries',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_DELETE_METHOD,
+            'callback'  => 'deleteTapestry'
         ]
     ],
     'PUT_TAPESTRY_SETTINGS' => (object) [
@@ -242,6 +248,13 @@ $REST_API_ENDPOINTS = [
             'methods'   => $REST_API_POST_METHOD,
             'callback'  => 'login'
         ]
+    ],
+    'LOGOUT' => (object) [
+        'ROUTE' => '/logout',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => function() { wp_logout(); }
+        ]
     ]
 ];
 
@@ -270,10 +283,10 @@ function login($request)
         return $user;
     } else {
         wp_set_current_user($user->ID, $user->user_login);
-        wp_set_auth_cookie($user->ID, true, false);
         if (is_user_logged_in()) {
-            return true;
+            return wp_create_nonce('wp_rest');
         }
+        return false;
     }
 }
 
@@ -336,13 +349,32 @@ function getTapestry($request)
 function addTapestry($request)
 {
     $tapestryData = json_decode($request->get_body());
-    $tapestry = new Tapestry();
-    try {
-        $tapestry->set($tapestryData);
-        return $tapestry->save();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    if (!get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
+        $postId = wp_insert_post(array(
+            'comment_status'    => 'closed',
+            'ping_status'       => 'closed',
+            'post_status'       => 'publish',
+            'post_title'        => $tapestryData->title,
+            'post_type'         => 'tapestry'
+        ), true);
+        if (is_wp_error($postId)) {
+            return $post;
+        }
+        $tapestry = new Tapestry($postId);
+        try {
+            $tapestry->set($tapestryData);
+            return $tapestry->save();
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
     }
+}
+
+function deleteTapestry($request)
+{
+    $params = json_decode($request->get_body());
+    $post = get_page_by_title($params->title, 'OBJECT', 'tapestry');
+    return wp_delete_post($post->ID);
 }
 
 /**

@@ -35,7 +35,7 @@ Cypress.Commands.add("login", role => {
 Cypress.Commands.add("logout", () => {
   // force true is used because cypress does not have a way to
   // simulate hover events.
-  cy.get("#wp-admin-bar-logout > a").click({ force: true })
+  cy.request(`${API_URL}/logout`)
 })
 
 Cypress.Commands.add("openLightbox", id => {
@@ -43,10 +43,20 @@ Cypress.Commands.add("openLightbox", id => {
   return cy.get("#lightbox")
 })
 
-Cypress.Commands.add("deleteTapestry", name => {
-  cy.contains("Tapestries").click()
-  cy.get("td")
-    .contains(name)
-    .click()
-  cy.contains(/move to trash/i).click()
+Cypress.Commands.add("addTapestry", title => {
+  cy.login("admin")
+  cy.request({
+    url: `${API_URL}/tapestries`,
+    body: { title },
+    method: "POST",
+  })
+})
+
+Cypress.Commands.add("deleteTapestry", title => {
+  cy.login("admin")
+  cy.request({
+    url: `${API_URL}/tapestries`,
+    body: { title },
+    method: "DELETE",
+  })
 })

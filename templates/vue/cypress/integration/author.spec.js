@@ -21,30 +21,11 @@ const TEST_TAPESTRY_NAME = "testing"
 
 describe("Author side", () => {
   before(() => {
-    cy.login("admin")
-    cy.visit(`${SITE_URL}/wp-admin`)
-    cy.contains("Tapestries").click()
-    cy.get(".page-title-action").click()
-
-    cy.wait(150)
-    cy.get("#post-title-0").type(TEST_TAPESTRY_NAME, { force: true })
-
-    cy.wait(150)
-    cy.contains("Publish…").click()
-    cy.get(".editor-post-publish-panel__header-publish-button button").click()
-
-    // wait until wordpress publishes the tapestry
-    cy.contains("is now live")
+    cy.addTapestry(TEST_TAPESTRY_NAME)
   })
 
   after(() => {
-    cy.login("admin")
-    cy.visit(`${SITE_URL}/wp-admin`)
-    cy.contains("Tapestries").click()
-    cy.get("td")
-      .contains(TEST_TAPESTRY_NAME)
-      .click()
-    cy.contains(/move to trash/i).click()
+    cy.deleteTapestry(TEST_TAPESTRY_NAME)
   })
 
   beforeEach(() => {
