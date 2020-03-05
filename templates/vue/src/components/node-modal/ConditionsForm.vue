@@ -1,9 +1,10 @@
 <template>
   <div>
-    <label class="mb-3">
-      <input v-model="lock" type="checkbox" />
-      <span>Prevent access until specified conditions are met</span>
-    </label>
+    <b-form-group class="mb-3">
+      <b-form-checkbox v-model="lock">
+        Prevent access until specified conditions are met
+      </b-form-checkbox>
+    </b-form-group>
     <div v-if="lock">
       <b-card
         v-for="(condition, idx) in conditions"
@@ -82,6 +83,7 @@ export default {
   watch: {
     conditions(val) {
       this.node.conditions = val
+      this.lock = val.length > 0
     },
   },
   mounted() {
