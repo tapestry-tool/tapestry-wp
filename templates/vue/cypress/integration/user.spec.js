@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+
 import {
   visitTapestry,
   getStore,

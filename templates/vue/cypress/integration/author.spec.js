@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+
 import {
   API_URL,
   getStore,
@@ -49,8 +50,8 @@ describe("Author side", () => {
     visitTapestry(TEST_TAPESTRY_NAME)
   })
 
-  describe("General", function() {
-    it("Should be able to add a root node", () => {
+  describe("Basic Node Management", function() {
+    it("Should be able to add and see a root node", () => {
       const node = {
         title: "Root",
         description: "I am a root node",
@@ -78,6 +79,12 @@ describe("Author side", () => {
           cy.contains(node.title).should("exist")
         })
     })
+
+    it("Should be able to open content with the media button", () => {})
+
+    it("Should be able to open author menu with the edit button", () => {})
+
+    it("Should be able to open new node menu with the add button", () => {})
 
     it("Should be able to add child nodes", () => {
       const nodes = [
@@ -119,22 +126,13 @@ describe("Author side", () => {
         })
     })
 
-    it("Should be able to delete child nodes", () => {
-      getStore()
-        .its("state.nodes")
-        .should("have.length", 3)
+    it("Should be able to view all nodes", () => {})
 
-      getStore()
-        .its("state.nodes.1.id")
-        .then(id => {
-          openEditNodeModal(id)
-          cy.contains(/delete node/i).click()
-          getNode(id).should("not.exist")
-          getStore()
-            .its("state.nodes")
-            .should("have.length", 2)
-        })
-    })
+    it("Should be able to add a link between two nodes", () => {})
+
+    it("Should be able to delete a leaf node", () => {})
+
+    it("Should be able to delete a link if the connected nodes have at least one other link connected to them", () => {})
   })
 
   describe("Node content", () => {
@@ -155,58 +153,70 @@ describe("Author side", () => {
           cy.contains(newTitle).should("exist")
         })
     })
+
+    it("Should be able to add a text node and verify that the text matches what was entered", () => {})
+
+    it("Should be able to add a video url and length and have the video load", () => {})
+
+    it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {})
+
+    it("Should be able to add a Gravity Form and have the form be visible", () => {})
+
+    it("Should be able to upload content to an external link node and have that content be visible", () => {})
+
+    it("Should be able to add an external link node and have it show a summary of the external page", () => {})
   })
 
   describe("Node appearance", () => {
-    beforeEach(() => {
-      getStore()
-        .its("state.nodes.0.id")
-        .then(id => {
-          openEditNodeModal(id)
-          cy.contains(/appearance/i).click()
-        })
-    })
-
-    // uncheck hidden options when done
-    after(() => {
-      visitTapestry(TEST_TAPESTRY_NAME)
-      getStore()
-        .its("state.nodes.0.id")
-        .then(id => {
-          openEditNodeModal(id)
-          cy.contains(/appearance/i).click()
-        })
-      const ids = ["hide-title", "hide-progress", "hide-media"]
-      ids.forEach(id => {
-        getByTestId(`node-appearance-${id}`).uncheck({ force: true })
-      })
-    })
-
-    it("Should show a thumbnail if a thumbnail url is passed", () => {
-      const url =
-        "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg"
-
-      getByTestId("node-appearance-add-thumbnail").check({ force: true })
-      getByTestId("node-imageUrl")
-        .clear()
-        .type(url)
-      submitModal()
-
-      getStore()
-        .its("state.nodes.0.id")
-        .then(id => {
-          getNode(id)
-            .get("image")
-            .should("have.attr", "href")
-            .should("equal", url)
-        })
-    })
-
     describe("Appearance options", () => {
+      beforeEach(() => {
+        getStore()
+          .its("state.nodes.0.id")
+          .then(id => {
+            openEditNodeModal(id)
+            cy.contains(/appearance/i).click()
+          })
+      })
+
+      // uncheck hidden options when done
+      after(() => {
+        visitTapestry(TEST_TAPESTRY_NAME)
+        getStore()
+          .its("state.nodes.0.id")
+          .then(id => {
+            openEditNodeModal(id)
+            cy.contains(/appearance/i).click()
+          })
+        const ids = ["hide-title", "hide-progress", "hide-media"]
+        ids.forEach(id => {
+          getByTestId(`node-appearance-${id}`).uncheck({ force: true })
+        })
+      })
+
       const setup = prop => {
         getByTestId(`node-appearance-${prop}`).check({ force: true })
         submitModal()
       }
+
+      it("Should show a thumbnail if a thumbnail url is passed", () => {
+        const url =
+          "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg"
+
+        getByTestId("node-appearance-add-thumbnail").check({ force: true })
+        getByTestId("node-imageUrl")
+          .clear()
+          .type(url)
+        submitModal()
+
+        getStore()
+          .its("state.nodes.0.id")
+          .then(id => {
+            getNode(id)
+              .get("image")
+              .should("have.attr", "href")
+              .should("equal", url)
+          })
+      })
 
       it("Should hide node title", () => {
         setup("hide-title")
@@ -237,6 +247,10 @@ describe("Author side", () => {
           .then(id => getMediaButton(id).should("be.hidden"))
       })
     })
+
+    it("Should be able to open lightbox by clicking on center of node if media button is hidden", () => {})
+
+    it("Should show content in full screen if that option is checked", () => {})
   })
 
   describe("Node permissions", () => {
