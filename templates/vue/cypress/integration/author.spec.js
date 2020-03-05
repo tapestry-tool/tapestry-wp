@@ -1,7 +1,6 @@
 /// <reference types="Cypress" />
 
 import {
-  SITE_URL,
   API_URL,
   getStore,
   visitTapestry,
@@ -20,20 +19,19 @@ import {
 const TEST_TAPESTRY_NAME = "testing"
 
 describe("Author side", () => {
-  before(() => {
-    cy.addTapestry(TEST_TAPESTRY_NAME)
-  })
+  before(() => cy.addTapestry(TEST_TAPESTRY_NAME))
 
-  after(() => {
-    cy.deleteTapestry(TEST_TAPESTRY_NAME)
-  })
+  after(() => cy.deleteTapestry(TEST_TAPESTRY_NAME))
 
   beforeEach(() => {
     cy.login("admin")
+    cy.server()
+    cy.route("GET", `${API_URL}/tapestries/*`).as("getTapestry")
     visitTapestry(TEST_TAPESTRY_NAME)
+    cy.wait("@getTapestry")
   })
 
-  describe("Basic Node Management", function() {
+  describe.only("Basic Node Management", function() {
     it("Should be able to add and see a root node", () => {
       const node = {
         title: "Root",
@@ -63,11 +61,29 @@ describe("Author side", () => {
         })
     })
 
-    it("Should be able to open content with the media button", () => {})
+    it("Should be able to open content with the media button", () => {
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => cy.openLightbox(id).should("exist"))
+    })
 
-    it("Should be able to open author menu with the edit button", () => {})
+    it("Should be able to open author menu with the edit button", () => {
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/edit node/i).should("exist")
+        })
+    })
 
-    it("Should be able to open new node menu with the add button", () => {})
+    it("Should be able to open new node menu with the add button", () => {
+      getStore()
+        .its("state.nodes.0.id")
+        .then(id => {
+          openAddNodeModal(id)
+          cy.contains(/add/i).should("exist")
+        })
+    })
 
     it("Should be able to add child nodes", () => {
       const nodes = [
@@ -109,13 +125,30 @@ describe("Author side", () => {
         })
     })
 
-    it("Should be able to view all nodes", () => {})
-
-    it("Should be able to add a link between two nodes", () => {})
-
-    it("Should be able to delete a leaf node", () => {})
+    // Skip this test and the next because of incompatibility between D3 and Cypress
+    it("Should be able to add a link between two nodes", () => {
+      /* cy.contains(/loading/i).should("not.exist")
+      getStore()
+        .its("state.nodes")
+        .then(nodes => {
+          const [, childOne, childTwo] = nodes
+          cy.get(`#addNodeIcon${childOne.id}`).drag(`#node-${childTwo.id}`, {
+            force: true,
+          })
+        }) */
+    })
 
     it("Should be able to delete a link if the connected nodes have at least one other link connected to them", () => {})
+
+    it("Should be able to delete a leaf node", () => {
+      getStore()
+        .its("state.nodes.2.id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/delete/i).click()
+          getNode(id).should("not.exist")
+        })
+    })
   })
 
   describe("Node content", () => {
