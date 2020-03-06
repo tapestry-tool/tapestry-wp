@@ -16,7 +16,7 @@ import {
   getAddNodeButton,
 } from "../support/utils"
 
-const TEST_TAPESTRY_NAME = "testing"
+const TEST_TAPESTRY_NAME = "cypress"
 
 describe("Author side", () => {
   before(() => cy.addTapestry(TEST_TAPESTRY_NAME))
@@ -25,13 +25,21 @@ describe("Author side", () => {
 
   beforeEach(() => {
     cy.login("admin")
-    cy.server()
-    cy.route("GET", `${API_URL}/tapestries/*`).as("getTapestry")
     visitTapestry(TEST_TAPESTRY_NAME)
-    cy.wait("@getTapestry")
+    // Wait for tapestry to load
+    cy.contains(/loading/i).should("not.exist")
   })
 
-  describe.only("Basic Node Management", function() {
+  describe("Basic Node Management", function() {
+    after(() => {
+      cy.getNodeByIndex(0).addChild({
+        title: "Child 2",
+        description: "I am a child 2",
+        mediaType: "text",
+        textContent: "Abcd",
+      })
+    })
+
     it("Should be able to add and see a root node", () => {
       const node = {
         title: "Root",
@@ -100,45 +108,13 @@ describe("Author side", () => {
           textContent: "Abcd",
         },
       ]
-
-      getStore()
-        .its("state.nodes.0.id")
-        .then(rootId => {
-          cy.server()
-          nodes.forEach(node => {
-            cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
-
-            openAddNodeModal(rootId)
-            getByTestId("node-title").type(node.title)
-            getByTestId("node-description").type(node.description)
-            getByTestId("node-mediaType").select(node.mediaType)
-            getByTestId("node-textContent").type(node.textContent)
-            submitModal()
-
-            cy.wait("@postNode")
-              .its("response.body.id")
-              .then(id => {
-                getNode(id).should("exist")
-                cy.contains(node.title).should("exist")
-              })
-          })
-        })
+      nodes.forEach(node => cy.getNodeByIndex(0).addChild(node))
     })
 
     // Skip this test and the next because of incompatibility between D3 and Cypress
-    it("Should be able to add a link between two nodes", () => {
-      /* cy.contains(/loading/i).should("not.exist")
-      getStore()
-        .its("state.nodes")
-        .then(nodes => {
-          const [, childOne, childTwo] = nodes
-          cy.get(`#addNodeIcon${childOne.id}`).drag(`#node-${childTwo.id}`, {
-            force: true,
-          })
-        }) */
-    })
+    // it("Should be able to add a link between two nodes", () => {}) */
 
-    it("Should be able to delete a link if the connected nodes have at least one other link connected to them", () => {})
+    // it("Should be able to delete a link if the connected nodes have at least one other link connected to them", () => {})
 
     it("Should be able to delete a leaf node", () => {
       getStore()
@@ -170,17 +146,45 @@ describe("Author side", () => {
         })
     })
 
-    it("Should be able to add a text node and verify that the text matches what was entered", () => {})
+    describe("Media Types", function() {
+      beforeEach(function() {
+        getStore()
+          .its("state.nodes.2.id")
+          .then(id => {
+            openEditNodeModal(id)
+            cy.wrap(id).as("id")
+          })
+      })
 
-    it("Should be able to add a video url and length and have the video load", () => {})
+      const setup = mediaType => getByTestId("node-mediaType").select(mediaType)
 
-    it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {})
+      it("Should be able to add a text node and verify that the text matches what was entered", function() {
+        setup("text")
 
-    it("Should be able to add a Gravity Form and have the form be visible", () => {})
+        cy.server()
+        cy.route("PUT", `${API_URL}/tapestries/**/nodes/*`).as("editNode")
 
-    it("Should be able to upload content to an external link node and have that content be visible", () => {})
+        const content = "Hello world!"
+        getByTestId("node-textContent")
+          .clear()
+          .type(content)
+        submitModal()
 
-    it("Should be able to add an external link node and have it show a summary of the external page", () => {})
+        cy.wait("@editNode")
+        cy.openLightbox(this.id)
+        cy.contains(content).should("exist")
+      })
+
+      it("Should be able to add a video url and length and have the video load", () => {})
+
+      it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {})
+
+      it("Should be able to add a Gravity Form and have the form be visible", () => {})
+
+      it("Should be able to upload content to an external link node and have that content be visible", () => {})
+
+      it("Should be able to add an external link node and have it show a summary of the external page", () => {})
+    })
   })
 
   describe("Node appearance", () => {
@@ -276,10 +280,15 @@ describe("Author side", () => {
       getStore()
         .its("state.nodes.1.id")
         .then(id => {
+          cy.server()
+          cy.route("PUT", `${API_URL}/tapestries/**/*`).as("putRequest")
+
           openEditNodeModal(id)
           cy.contains(/permissions/i).click()
           getByTestId("node-permissions-public-read").uncheck({ force: true })
           submitModal()
+
+          cy.wait(["@putRequest", "@putRequest"])
 
           cy.logout()
           visitTapestry(TEST_TAPESTRY_NAME)

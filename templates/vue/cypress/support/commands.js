@@ -1,5 +1,12 @@
-import "@4tw/cypress-drag-drop"
-import { getMediaButton, API_URL } from "./utils"
+import {
+  getMediaButton,
+  API_URL,
+  getStore,
+  openAddNodeModal,
+  getByTestId,
+  submitModal,
+  getNode,
+} from "./utils"
 import roles from "./roles"
 
 Cypress.Commands.add("login", role => {
@@ -7,11 +14,7 @@ Cypress.Commands.add("login", role => {
   cy.request("POST", `${API_URL}/login`, { username, password })
 })
 
-Cypress.Commands.add("logout", () => {
-  // force true is used because cypress does not have a way to
-  // simulate hover events.
-  cy.request(`${API_URL}/logout`)
-})
+Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 
 Cypress.Commands.add("openLightbox", id => {
   getMediaButton(id).click()
@@ -35,3 +38,25 @@ Cypress.Commands.add("deleteTapestry", title => {
     method: "DELETE",
   })
 })
+
+Cypress.Commands.add("getNodeByIndex", idx => getStore().its(`state.nodes.${idx}`))
+
+Cypress.Commands.add(
+  "addChild",
+  { prevSubject: true },
+  (parent, { mediaType, ...rest }) => {
+    cy.server()
+    cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+
+    openAddNodeModal(parent.id)
+    getByTestId("node-mediaType").select(mediaType)
+    Object.entries(rest).forEach(([testId, value]) => {
+      getByTestId(`node-${testId}`).type(value)
+    })
+    submitModal()
+
+    cy.wait("@postNode")
+      .its("response.body.id")
+      .then(id => getNode(id).should("exist"))
+  }
+)
