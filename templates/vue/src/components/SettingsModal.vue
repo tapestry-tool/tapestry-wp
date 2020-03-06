@@ -36,6 +36,8 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+        </b-tab>
+        <b-tab title="TYDE">
           <b-form-group
             label="Spaceship Cockpit Background"
             description="Add a background for the spaceship cockpit"
