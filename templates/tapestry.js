@@ -1069,10 +1069,12 @@ function tapestryTool(config){
 
         nodes
             .filter(d => !d.accessible)
-            .on("mouseover", function () {
+            .on("mouseover", function (d) {
                 $(this).insertAfter($(this).parent().children().last())
-                const wrapper = this.querySelector(".tooltip-wrapper");
-                wrapper.style.opacity = 1;
+                if (d.nodeType !== "grandchild") {
+                    const wrapper = this.querySelector(".tooltip-wrapper");
+                    wrapper.style.opacity = 1;
+                }
             })
             .on("mouseleave", function () {
                 const wrapper = this.querySelector(".tooltip-wrapper");
@@ -1083,21 +1085,28 @@ function tapestryTool(config){
     function getTooltipHtml(node) {
         const str = "To unlock this node: <br />";
         const wrapper = document.createElement("ul");
-        node.conditions.forEach(cond => {
-            if (!cond.fulfilled) {
-                const listItem = document.createElement("li");
-                switch (cond.type) {
-                    case conditionTypes.NODE_COMPLETED: {
-                        const node = getNodeById(cond.value);
-                        listItem.innerText = `Complete "${node.title}"`;
-                        break;
+
+        if (node.conditions.length === 0) {
+            const listItem = document.createElement("li");
+            listItem.innerText = "Complete this parent.";
+            wrapper.appendChild(listItem);
+        } else {
+            node.conditions.forEach(cond => {
+                if (!cond.fulfilled) {
+                    const listItem = document.createElement("li");
+                    switch (cond.type) {
+                        case conditionTypes.NODE_COMPLETED: {
+                            const node = getNodeById(cond.value);
+                            listItem.innerText = `Complete "${node.title}"`;
+                            break;
+                        }
+                        default:
+                            break;
                     }
-                    default:
-                        break;
+                    wrapper.appendChild(listItem);
                 }
-                wrapper.appendChild(listItem);
-            }
-        })
+            })
+        }
         return str + wrapper.outerHTML;
     }
 
