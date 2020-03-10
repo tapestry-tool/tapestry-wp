@@ -173,7 +173,6 @@ export default {
           this.showEndScreen = true
         }
 
-        thisTapestryTool.updateChildren(this.node.id, video)
         thisTapestryTool.updateProgressBars()
       }
     },

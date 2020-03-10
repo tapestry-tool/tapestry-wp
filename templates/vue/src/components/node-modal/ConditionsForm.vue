@@ -94,15 +94,15 @@ export default {
 <style lang="scss" scoped>
 .condition-container {
   position: relative;
-}
 
-.condition-close-button {
-  background: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  color: rgba(0, 0, 0, 0.5);
+  .condition-close-button {
+    background: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    color: rgba(0, 0, 0, 0.5);
+  }
 }
 </style>

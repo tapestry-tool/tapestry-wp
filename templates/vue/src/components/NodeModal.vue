@@ -310,7 +310,12 @@
             </b-table-simple>
           </div>
         </b-tab>
-        <quiz-modal :node="node" />
+        <b-tab
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          title="Quiz"
+        >
+          <quiz-modal :node="node" />
+        </b-tab>
         <conditions-form :node="node" />
       </b-tabs>
     </b-container>
