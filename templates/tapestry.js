@@ -1026,6 +1026,13 @@ function tapestryTool(config){
             })
             .attr("fill", function (d) {
                 return getNodeColor(d);
+            })
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
+                }
             });
     
         /* Attach images to be used within each node */
@@ -1129,24 +1136,6 @@ function tapestryTool(config){
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 wrapper.style.opacity = 0;
             })
-    }
-
-    function getTooltipPos(tooltipRect, containerRect) {
-        const tooltipWidth = tooltipRect.width;
-        const containerWidth = containerRect.width;
-        const offset = (containerWidth - tooltipWidth) / 2;
-        return {
-            left: containerRect.left + window.scrollX + offset,
-            top: containerRect.top + window.scrollY - (tooltipRect.height + containerRect.height) + 16
-        }
-    }
-
-    function createTooltip() {
-        return d3
-            .select("#tapestry")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tapestry-tooltip");
     }
 
     function getTooltipHtml(node) {
@@ -1265,12 +1254,6 @@ function tapestryTool(config){
                     return getRadius(d) * 2;
                 });
     
-        // Remove elements and add them back in
-        nodes.selectAll(".mediaButton").remove();
-        nodes.selectAll(".editNodeButton").remove();
-        nodes.selectAll(".addNodeButton").remove();
-        nodes.selectAll(".metaWrapper").remove();
-        nodes.selectAll("path").remove();
         setTimeout(function(){
             buildPathAndButton();
         }, TRANSITION_DURATION);
@@ -1308,6 +1291,13 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
+            .on("click keydown", function (d) {
+                if (root === d.id && d.hideMedia) {
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
+                }
+            });
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
@@ -2213,18 +2203,19 @@ function tapestryTool(config){
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
 
-        // CHECK 4: If the node is currently in view (ie: root/child/grandchild)
+        // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
 
-        // TODO: CHECK 1: If user is authorized to view it
+        // CHECK 2: If user can edit the tapestry
         if (config.wpCanEditTapestry) {
             return true;
         }
-
-        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
-        // CHECK 2: Always show root node
+        // CHECK 3: If node is the root node or is currently selected
         if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
+
+        // CHECK 4: If node is an accordion row and user is not the author
+        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 5: If we are currently in view mode & if the node will be viewable in that case
         if (node.nodeType === "grandchild" && inViewMode) return false;
