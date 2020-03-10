@@ -1210,6 +1210,7 @@ function tapestryTool(config){
         nodes.selectAll(".addNodeButton").remove();
         nodes.selectAll(".metaWrapper").remove();
         nodes.selectAll(".tooltip-wrapper").remove();
+        nodes.selectAll("path").remove();
 
         setTimeout(function(){
             renderTooltips();
@@ -1892,6 +1893,12 @@ function tapestryTool(config){
         return maxDepth;
     }
 
+    function getNeighbours(id) {
+        return tapestry.dataset.links
+            .filter(link => link.source.id === id || link.target.id === id)
+            .map(link => link.source.id === id ? link.target.id : link.source.id)
+    }
+
     /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
     function getChildren(id, depth = tapestryDepth, visited = []) {
@@ -2123,34 +2130,25 @@ function tapestryTool(config){
     }
     
     /**
-     * Recursively sets the accessible status of the given node and its children up to the given depth
-     * @param {object} node 
-     * @param {integer} depth 
+     * Sets the accessible status of all nodes starting with the root node
      */
-    function setAccessibleStatus(node, depth, parentNodeId, parentIsAccessible = true){
+    function setAccessibleStatus(id = tapestry.dataset.nodes[0].id, visited = new Set(), parentIsAccessible = true) {
         if (tapestry.dataset.nodes.length == 0) {
             return;
         }
-    
-        // If no node passed in, assume root node
-        if (typeof node == "undefined") {
-            node = tapestry.dataset.nodes[0];
-        }
-    
-        // If no node passed in, use max depth
-        if (typeof depth == "undefined") {
-            depth = findMaxDepth(node.id);
-        }
 
+        visited.add(id);
+        const node = getNodeById(id);
         const isAccessible = node.unlocked && parentIsAccessible;
-        tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = isAccessible;
-        const children = getChildren(node.id, 0)
-        children.forEach(childNodeId => {
-            var thisNode = getNodeById(childNodeId);
-            if (parentNodeId != thisNode.id && depth > 0) {
-                setAccessibleStatus(thisNode, depth-1, node.id, isAccessible);
-            }
-        });
+        node.accessible = isAccessible;
+
+        const children = getNeighbours(id)
+        children
+            .filter(child => !visited.has(child))
+            .forEach(child => {
+                visited.add(child);
+                setAccessibleStatus(child, visited, isAccessible);
+            })
     }
     
     // ALL the checks for whether a certain node is viewable
