@@ -52,7 +52,6 @@ function tapestryTool(config){
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
         tapestryDepth = 4,                                      // Default depth of Tapestry
-        viewLockedCheckbox = {'checked': false}, 
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -389,41 +388,6 @@ function tapestryTool(config){
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
-        
-        //--------------------------------------------------
-        // Checkbox to view locked nodes (logged in users only)
-        //--------------------------------------------------
-        
-        // Create wrapper div
-        var viewLockedCheckboxWrapper = document.createElement("div");
-        viewLockedCheckboxWrapper.id = "tapestry-view-locked-checkbox-wrapper";
-        
-        // Create label element
-        var viewLockedLabel = document.createElement("label");
-        viewLockedLabel.innerHTML = " View locked nodes";
-        setAttributes(viewLockedLabel,{
-            forHtml:"tapestry-view-locked-checkbox"
-        });
-        
-        // Create input element
-        viewLockedCheckbox = document.createElement("input");
-        setAttributes(viewLockedCheckbox,{
-            type:"checkbox",
-            value:"1",
-            id: "tapestry-view-locked-checkbox"
-        });
-        viewLockedCheckbox.onchange = function() {
-            filterTapestry();
-            updateSvgDimensions();
-        };
-
-        viewLockedCheckboxWrapper.appendChild(viewLockedCheckbox);
-        viewLockedCheckboxWrapper.appendChild(viewLockedLabel);
-        
-        if (config.wpUserId) {
-            // Append the new element in its wrapper to the tapestry container
-            tapestryControlsDiv.appendChild(viewLockedCheckboxWrapper);
-        }
 
         function hideShowControls() {
 
@@ -434,18 +398,7 @@ function tapestryTool(config){
                 settingsButton.style.marginLeft = "10px";
             }
 
-            // Hide this if there are no locked nodes
-            var lockedNodesExist = false;
-            var nodes = tapestry.dataset.nodes;
-            for (let i = 0; i < nodes.length; i++) {
-                if (!nodes[i].unlocked) {
-                    lockedNodesExist = true;
-                    break;
-                }
-            }
-            viewLockedCheckboxWrapper.style.display = lockedNodesExist ? "flex" : "none";
-
-            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider || showSettings) ? "flex" : "none";
+            tapestryControlsDiv.style.display = (showDepthSlider || showSettings) ? "flex" : "none";
         }
         hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 
@@ -1297,7 +1250,7 @@ function tapestryTool(config){
                         goToNode(d.id)
                     }
                 }
-            });
+            })
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
