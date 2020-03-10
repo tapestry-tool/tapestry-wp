@@ -32,13 +32,10 @@ function tapestryTool(config){
         COLOR_LOCKED = "#8a8a8c",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
-        NODE_UNLOCK_TIMEFRAME = 2,                              // Time in seconds. User should be within 2 seconds of appearsAt time for unlocked nodes
         MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
         API_PUT_METHOD = 'PUT',
         API_DELETE_METHOD = 'DELETE',
         USER_NODE_PROGRESS_URL = config.apiUrl + "/users/progress",
-        USER_NODE_UNLOCKED_URL = config.apiUrl + "/users/unlocked",
-        USER_NODE_SKIPPED_URL = config.apiUrl + "/users/skipped",
         TAPESTRY_H5P_SETTINGS_URL = config.apiUrl + "/users/h5psettings";
 
     var // declared variables
@@ -111,12 +108,6 @@ function tapestryTool(config){
                 if (tapestry.dataset.nodes[i].id == tapestry.dataset.rootId) {
                     tapestry.dataset.nodes[i].unlocked = true;
                 }
-
-                // TEMPORARY BUG FIX: All nodes were getting saved as locked
-                // TODO: REMOVE THIS LINE WHEN WE HAVE LOCKING FUNCTIONALITY WORKING AGAIN
-                // Note: We will need to go through the existing modules wherever this is deployed
-                // and save the nodes to be unlocked when this feature is deployed again
-                //tapestry.dataset.nodes[i].unlocked = true;
             }
         }
 
@@ -1482,18 +1473,6 @@ function tapestryTool(config){
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
 
-    // unlocks children based on video progress
-    this.updateChildren = function(id, video) {
-        const childrenData = getChildrenData(id)
-        for (var i = 0; i < childrenData.length; i++) {
-            if (Math.abs(childrenData[i].appearsAt - video.currentTime) <= NODE_UNLOCK_TIMEFRAME && video.paused === false && !tapestry.dataset.nodes[childrenData[i].nodeIndex].unlocked) {
-                // saveNodeAsUnlocked(childrenData[i]);
-                setAccessibleStatus();
-                filterTapestry();
-            }
-        }
-    }
-
     this.reload = () => {
         setAccessibleStatus();
         renderTooltips();
@@ -2006,33 +1985,10 @@ function tapestryTool(config){
             }
         }
     
-        /* if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
-            for (var i=0; i<tapestry.dataset.nodes.length; i++) {
-                if (tapestry.dataset.nodes[i].id == tapestry.dataset.rootId) {
-                    tapestry.dataset.nodes[i].unlocked = true;
-                    break;
-                }
-            }
-        } */
-    
         dispatchEvent(new CustomEvent("tapestry-updated", {
             detail: { dataset: tapestry.dataset }
         }))
         return true;
-    }
-    
-    /* For saving the "unlocked" status of the given node as true for the current user */
-    function saveNodeAsUnlocked(node) {
-        tapestry.dataset.nodes[node.nodeIndex].unlocked = true;
-        jQuery.post(USER_NODE_UNLOCKED_URL, {
-            "post_id": config.wpPostId,
-            "node_id": node.id,
-            "unlocked": true,
-        })
-        .fail(function(e) {
-            console.error("Error with update user's node unlock property for node index", node.nodeIndex);
-            console.error(e);
-        });
     }
     
     /* For setting the "type" field of nodes in dataset */
@@ -2212,23 +2168,6 @@ function tapestryTool(config){
 
     function canEditLink(d) {
         return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
-    }
-    
-    // Get data from child needed for knowing whether it is unlocked or not
-    function getChildrenData(parentId) {
-        var childrenData = [];
-        for (var i = 0; i < tapestry.dataset.links.length; i++) {
-            var source = typeof tapestry.dataset.links[i].source === 'object' ? tapestry.dataset.links[i].source.id : tapestry.dataset.links[i].source;
-            if (source == parentId) {
-                childrenData.push({
-                    "id": tapestry.dataset.links[i].target.id,
-                    "nodeIndex": findNodeIndex(tapestry.dataset.links[i].target.id),
-                    "appearsAt": tapestry.dataset.links[i].appearsAt
-                });
-            }
-        }
-    
-        return childrenData;
     }
     
 } // END OF TAPESTRY TOOL CLASS
