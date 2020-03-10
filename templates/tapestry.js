@@ -199,6 +199,11 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
+            /**
+             * Dependents refer to all nodes who rely on this node in some way.
+             * e.g. if Node B is locked until Node A is completed, then Node B
+             *      is a dependent of Node A.
+             */
             var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [], dependents: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
@@ -207,7 +212,7 @@ function tapestryTool(config){
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
             if (node.mediaType === "accordion") {
-                const accordionRowIds = getChildren(node.id, 0)
+                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
@@ -2264,6 +2269,7 @@ function getIconClass(mediaType, action) {
             classStr = 'textMediaButtonIcon';
             break;
 
+        case "activity":
         case "gravity-form":
             classStr = classStrStart + 'tasks';
             break;
