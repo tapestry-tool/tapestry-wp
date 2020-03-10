@@ -173,7 +173,6 @@ button {
   font-size: 28px;
   font-weight: 600 !important;
   padding-top: 16px;
-  padding-left: 100px;
   margin-bottom: 36px;
 }
 

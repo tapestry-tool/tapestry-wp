@@ -8,12 +8,11 @@
             description="Add a background image to the page where this tapestry
               appears."
           >
-            <b-form-input
+            <file-upload
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
               autofocus
-              required
             />
           </b-form-group>
           <b-form-group
@@ -57,8 +56,12 @@
 
 <script>
 import { mapGetters } from "vuex"
+import FileUpload from "./FileUpload"
 export default {
   name: "settings-modal",
+  components: {
+    FileUpload,
+  },
   props: {
     wpCanEditTapestry: {
       type: Boolean,
