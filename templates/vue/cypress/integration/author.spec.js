@@ -112,7 +112,7 @@ describe("Author side", () => {
     })
 
     // Skip this test and the next because of incompatibility between D3 and Cypress
-    // it("Should be able to add a link between two nodes", () => {}) */
+    // it("Should be able to add a link between two nodes", () => {})
 
     // it("Should be able to delete a link if the connected nodes have at least one other link connected to them", () => {})
 
@@ -156,13 +156,14 @@ describe("Author side", () => {
           })
       })
 
-      const setup = mediaType => getByTestId("node-mediaType").select(mediaType)
+      const setup = mediaType => {
+        getByTestId("node-mediaType").select(mediaType)
+        cy.server()
+        cy.route("PUT", `${API_URL}/tapestries/**/nodes/*`).as("editNode")
+      }
 
       it("Should be able to add a text node and verify that the text matches what was entered", function() {
         setup("text")
-
-        cy.server()
-        cy.route("PUT", `${API_URL}/tapestries/**/nodes/*`).as("editNode")
 
         const content = "Hello world!"
         getByTestId("node-textContent")
@@ -175,9 +176,50 @@ describe("Author side", () => {
         cy.contains(content).should("exist")
       })
 
-      it("Should be able to add a video url and length and have the video load", () => {})
+      it("Should be able to add a video url and length and have the video load", function() {
+        setup("video")
+        const url =
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+        const duration = 15
+        getByTestId("node-videoUrl")
+          .clear()
+          .type(url)
+        getByTestId("node-videoDuration")
+          .clear()
+          .type(duration)
+        submitModal()
 
-      it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {})
+        cy.wait("@editNode")
+        cy.openLightbox(this.id)
+        cy.get("video").should("have.attr", "src", url)
+      })
+
+      it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", function() {
+        setup("video")
+
+        cy.contains(/quiz/i).click()
+        getByTestId("add-question-checkbox").click({ force: true })
+        getByTestId(`question-title-0`)
+          .clear()
+          .type("What's your name?")
+        getByTestId(`question-answer-textbox-0`)
+          .click()
+          .within(() => {
+            cy.contains(/test form/i).click()
+          })
+        submitModal()
+
+        cy.wait("@editNode")
+        cy.openLightbox(this.id)
+        cy.get("video").then(el => {
+          el.get(0).currentTime = 15
+          cy.contains(/take quiz/i).click()
+          cy.contains(/text/i)
+            .parent()
+            .click()
+          cy.contains(/what's your name/i).should("exist")
+        })
+      })
 
       it("Should be able to add a Gravity Form and have the form be visible", () => {})
 
