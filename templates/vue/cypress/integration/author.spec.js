@@ -221,11 +221,42 @@ describe("Author side", () => {
         })
       })
 
-      it("Should be able to add a Gravity Form and have the form be visible", () => {})
+      it("Should be able to add a Gravity Form and have the form be visible", function() {
+        setup("gravity-form")
 
-      it("Should be able to upload content to an external link node and have that content be visible", () => {})
+        getByTestId("combobox-gravity-form")
+          .click()
+          .within(() => {
+            cy.contains(/test form/i).click()
+          })
+        submitModal()
 
-      it("Should be able to add an external link node and have it show a summary of the external page", () => {})
+        cy.wait("@editNode")
+        cy.openLightbox(this.id)
+        cy.contains(/what's your name/i).should("exist")
+      })
+
+      // Skipping because of drag and drop
+      // it("Should be able to upload content to an external link node and have that content be visible", () => {})
+
+      it("Should be able to add an external link node and have it show a summary of the external page", function() {
+        setup("url-embed")
+
+        const url =
+          "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678"
+        const title = "5 JavaScript Tricks That Are Good To Know"
+        getByTestId("node-linkUrl").within(() => {
+          cy.get("[name=text-input]")
+            .clear()
+            .type(url)
+        })
+        getByTestId("node-linkBehaviour-new-window").click({ force: true })
+        submitModal()
+
+        cy.wait("@editNode")
+        cy.openLightbox(this.id)
+        cy.contains(title).should("exist")
+      })
     })
   })
 
@@ -312,9 +343,23 @@ describe("Author side", () => {
       })
     })
 
-    it("Should be able to open lightbox by clicking on center of node if media button is hidden", () => {})
+    it("Should be able to open lightbox by clicking on center of node if media button is hidden", () => {
+      cy.server()
+      cy.route("PUT", `${API_URL}/tapestries/**/nodes/*`).as("editNode")
 
-    it("Should show content in full screen if that option is checked", () => {})
+      cy.getNodeByIndex(0)
+        .its("id")
+        .then(id => {
+          openEditNodeModal(id)
+          cy.contains(/appearance/i).click()
+          getByTestId(`node-appearance-hide-media`).check({ force: true })
+          submitModal()
+
+          cy.wait("@editNode")
+          getNode(id).click()
+          cy.get("#lightbox").should("exist")
+        })
+    })
   })
 
   describe("Node permissions", () => {

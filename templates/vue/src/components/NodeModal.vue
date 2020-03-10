@@ -139,6 +139,7 @@
             >
               <combobox
                 v-model="selectedGravityFormContent"
+                data-testid="combobox-gravity-form"
                 item-text="title"
                 item-value="id"
                 empty-message="There are no forms available. Please add one in your WP dashboard."
