@@ -297,6 +297,7 @@ function tapestryTool(config){
         // slider's maximum depth is set to the longest path from the new selected node
         tapestryDepthSlider.max = findMaxDepth(id);
         updateSvgDimensions();
+        renderTooltips()
     }
 
     /**
@@ -1016,20 +1017,7 @@ function tapestryTool(config){
                 return d.imageURL;
             });
 
-        nodes
-            .filter(d => !d.accessible)
-            .append("foreignObject")
-            .attr("class", "tooltip-wrapper")
-            .style("position", "relative")
-            .style("pointer-events", "none")
-            .style("opacity", 0)
-            .attr("width", d => getRadius(d) * 2 + 48)
-            .attr("height", d => getRadius(d) * 2)
-            .attr("x", d => -(getRadius(d) + 24))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
-            .append("xhtml:div")
-            .attr("class", "tapestry-tooltip")
-            .html(getTooltipHtml)
+        renderTooltips();
 
         /* Add path and button */
         buildPathAndButton();
@@ -1054,10 +1042,20 @@ function tapestryTool(config){
             });
     }
 
-    function reloadTooltips() {
+    function renderTooltips() {
         nodes
             .filter(d => !d.accessible)
-            .select(".tapestry-tooltip")
+            .append("foreignObject")
+            .attr("class", "tooltip-wrapper")
+            .style("position", "relative")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .attr("width", d => Math.min(getRadius(d) * 2 + 48, 300))
+            .attr("height", d => getRadius(d) * 2)
+            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
+            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .append("xhtml:div")
+            .attr("class", "tapestry-tooltip")
             .html(getTooltipHtml)
     }
 
@@ -1207,17 +1205,19 @@ function tapestryTool(config){
                     return getRadius(d) * 2;
                 });
     
+        nodes.selectAll(".mediaButton").remove();
+        nodes.selectAll(".editNodeButton").remove();
+        nodes.selectAll(".addNodeButton").remove();
+        nodes.selectAll(".metaWrapper").remove();
+        nodes.selectAll(".tooltip-wrapper").remove();
+
         setTimeout(function(){
+            renderTooltips();
             buildPathAndButton();
         }, TRANSITION_DURATION);
     }
     
     function buildPathAndButton() {
-        nodes.selectAll(".mediaButton").remove();
-        nodes.selectAll(".editNodeButton").remove();
-        nodes.selectAll(".addNodeButton").remove();
-        nodes.selectAll(".metaWrapper").remove();
-    
         /* Add progress pie inside each node */
         pieGenerator = d3.pie().sort(null).value(function (d) {
             return d.value;
@@ -1495,12 +1495,12 @@ function tapestryTool(config){
 
     this.reload = () => {
         setAccessibleStatus();
-        reloadTooltips();
+        renderTooltips();
         applyListeners(nodes);
         filterTapestry();
     }
 
-    this.reloadTooltips = reloadTooltips
+    this.reloadTooltips = renderTooltips
 
     this.updateProgressBars = updateViewedProgress;
 
