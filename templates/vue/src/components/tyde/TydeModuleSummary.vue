@@ -7,7 +7,16 @@
           <b-list-group flush>
             <b-list-group-item v-for="stage in stages" :key="stage.node.id">
               <h4 class="mx-0">{{ stage.node.title }}</h4>
-              <div class="grid">
+              <p v-if="stage.topics.length === 0">
+                You haven't completed a topic yet.
+              </p>
+              <div
+                v-else
+                :class="{
+                  center: stage.topics.length < 4,
+                  grid: stage.topics.length >= 4,
+                }"
+              >
                 <b-button
                   v-for="topic in stage.topics"
                   :key="topic.id"
@@ -39,16 +48,15 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getContent", "getActivities"]),
     module() {
       return this.getNode(this.moduleId)
     },
     stages() {
-      const children = this.getDirectChildren(this.moduleId)
-      return children.map(child => ({
-        node: this.getNode(child),
-        topics: this.getDirectChildren(child).map(this.getNode),
-      }))
+      return this.getContent(this.moduleId)
+    },
+    activities() {
+      return this.getActivities(this.moduleId)
     },
   },
   methods: {
@@ -60,6 +68,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.center {
+  display: flex;
+  justify-content: center;
+
+  > * {
+    margin-right: 16px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
 .grid {
   display: grid;
   grid-gap: 16px;
