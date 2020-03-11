@@ -104,10 +104,6 @@ function tapestryTool(config){
                 if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
                     tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
                 }
-                // always unlock root node
-                if (tapestry.dataset.nodes[i].id == tapestry.dataset.rootId) {
-                    tapestry.dataset.nodes[i].unlocked = true;
-                }
             }
         }
 
@@ -1013,13 +1009,10 @@ function tapestryTool(config){
                 return d.imageURL;
             });
 
-        renderTooltips();
-
         /* Add path and button */
         buildPathAndButton();
 
-        // Create tooltip for all locked nodes
-        applyListeners(nodes);
+        setNodeListeners(nodes);
     
         /* Add dragging and node selection functionality to the node */
         nodes
@@ -1055,18 +1048,26 @@ function tapestryTool(config){
             .html(getTooltipHtml)
     }
 
-    function applyListeners(nodes) {
+    function setNodeListeners(nodes) {
+
+        // Create tooltip for all locked nodes
+        renderTooltips();
+
         // Remove (potentially) old listeners
         nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
 
-        // Apply link related listeners
         nodes.on("mouseover", function (thisNode) {
-            // Place this node at the end of the svg so that it's on top
+
+            // Place this node at the end of the svg so that it appears on top
             $(this).insertAfter($(this).parent().children().last())
+
+            // Mark this node as the node to link to (potentially)
             if (linkToDragStarted) {
                 linkToNode = thisNode;
             }
         }).on("mouseout", function () {
+
+            // Unmark this node as the node to link to
             if (linkToDragStarted) {
                 linkToNode = undefined;
             }
@@ -1075,13 +1076,19 @@ function tapestryTool(config){
         nodes
             .filter(d => !d.accessible)
             .on("mouseover", function (d) {
+
+                // Place this node at the end of the svg so that it appears on top
                 $(this).insertAfter($(this).parent().children().last())
+
+                // Show unlock conditions tooltip
                 if (d.nodeType !== "grandchild") {
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     wrapper.style.opacity = 1;
                 }
             })
             .on("mouseleave", function () {
+
+                // Hide unlock conditions tooltip
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 wrapper.style.opacity = 0;
             })
@@ -1282,7 +1289,7 @@ function tapestryTool(config){
             })
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
-                    ' class="' + (d.accessible ? getIconClass(d.mediaType, 'play') : 'fas fa-lock') + ' mediaButtonIcon"' +
+                    ' class="' + getIconClass(d.mediaType, 'play', d.accessible) + ' mediaButtonIcon"' +
                     ' data-id="' + d.id + '"' + 
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
@@ -1489,8 +1496,7 @@ function tapestryTool(config){
 
     this.reload = () => {
         setAccessibleStatus();
-        renderTooltips();
-        applyListeners(nodes);
+        setNodeListeners(nodes);
         filterTapestry();
     }
 
@@ -2250,10 +2256,14 @@ function updateMediaIcon(id, mediaType, action) {
 }
 
 // Helper function for getting the name for the Font Awesome icons
-function getIconClass(mediaType, action) {
+function getIconClass(mediaType, action, accessible=true) {
 
     var classStrStart = 'fas fa-';
     var classStr = '';
+
+    if (!accessible) {
+        return classStrStart + 'lock';
+    }
 
     if (action == 'loading') {
         return 'mediaButtonLoading';
