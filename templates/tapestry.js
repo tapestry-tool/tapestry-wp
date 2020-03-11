@@ -2102,23 +2102,30 @@ function tapestryTool(config){
     /**
      * Sets the accessible status of all nodes starting with the root node
      */
-    function setAccessibleStatus(id = tapestry.dataset.nodes[0].id, visited = new Set(), parentIsAccessible = true) {
+    function setAccessibleStatus() {
         if (tapestry.dataset.nodes.length == 0) {
             return;
         }
 
-        visited.add(id);
-        const node = getNodeById(id);
-        const isAccessible = node.unlocked && parentIsAccessible;
-        node.accessible = isAccessible;
+        tapestry.dataset.nodes.forEach(node => {
+            node.accessible = false;
+        });
 
-        const children = getNeighbours(id)
-        children
-            .filter(child => !visited.has(child))
-            .forEach(child => {
-                visited.add(child);
-                setAccessibleStatus(child, visited, isAccessible);
-            })
+        function recursivelySetAccessible(id, visited) {
+            visited.add(id);
+            const node = getNodeById(id);
+            node.accessible = node.unlocked;
+            if (node.accessible) {
+                getNeighbours(id)
+                    .filter(child => !visited.has(child))
+                    .forEach(child => {
+                        visited.add(child);
+                        recursivelySetAccessible(child, visited);
+                    })
+            }
+        }
+
+        recursivelySetAccessible(tapestry.dataset.nodes[0].id, new Set());
     }
     
     // ALL the checks for whether a certain node is viewable

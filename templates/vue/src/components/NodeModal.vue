@@ -319,7 +319,6 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
-        <conditions-form :node="node" />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
