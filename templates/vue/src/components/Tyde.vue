@@ -1,21 +1,26 @@
 <template>
   <div id="tyde">
     <tapestry />
-    <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
+    <tyde-module-summary
+      v-if="showModule"
+      :module-id="moduleId"
+      @done="showModule = false"
+    />
     <tyde-backpack @return-to-map="showModule = false" />
   </div>
 </template>
 
 <script>
 import Tapestry from "./Tapestry"
-import TydeModule from "./tyde/TydeModule"
+// import TydeModule from "./tyde/TydeModule"
+import TydeModuleSummary from "./tyde/TydeModuleSummary"
 import TydeBackpack from "./tyde/TydeBackpack"
 
 export default {
   name: "tyde",
   components: {
     Tapestry,
-    TydeModule,
+    TydeModuleSummary,
     TydeBackpack,
   },
   data() {
