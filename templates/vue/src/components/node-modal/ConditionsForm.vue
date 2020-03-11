@@ -1,34 +1,41 @@
 <template>
-  <b-tab title="Unlock Conditions">
-    <b-row class="mx-0 mb-3">
-      <b-button variant="primary" @click="addCondition">
-        <i class="fas fa-plus icon"></i>
-        Add Condition
-      </b-button>
-    </b-row>
-    <b-card
-      v-for="(condition, idx) in conditions"
-      :key="`${condition.type}-${idx}`"
-      bg-variant="light"
-      class="mb-2 condition-container"
-    >
-      <button class="condition-close-button" @click="removeCondition(idx)">
-        <i class="fas fa-times"></i>
-      </button>
-      <b-form-group label="Node">
-        <b-form-select
-          v-model="condition.value"
-          :options="nodeOptions"
-        ></b-form-select>
-      </b-form-group>
-      <b-form-group label="Condition">
-        <b-form-select
-          v-model="condition.type"
-          :options="conditionOptions"
-        ></b-form-select>
-      </b-form-group>
-    </b-card>
-  </b-tab>
+  <div>
+    <b-form-group class="mb-3">
+      <b-form-checkbox v-model="lock">
+        Prevent access until specified conditions are met
+      </b-form-checkbox>
+    </b-form-group>
+    <div v-if="lock">
+      <b-card
+        v-for="(condition, idx) in conditions"
+        :key="`${condition.type}-${idx}`"
+        bg-variant="light"
+        class="mb-2 condition-container"
+      >
+        <button class="condition-close-button" @click="removeCondition(idx)">
+          <i class="fas fa-times"></i>
+        </button>
+        <b-form-group label="Node">
+          <b-form-select
+            v-model="condition.value"
+            :options="nodeOptions"
+          ></b-form-select>
+        </b-form-group>
+        <b-form-group label="Condition">
+          <b-form-select
+            v-model="condition.type"
+            :options="conditionOptions"
+          ></b-form-select>
+        </b-form-group>
+      </b-card>
+      <b-row class="mx-0 mb-3">
+        <b-button variant="primary" @click="addCondition">
+          <i class="fas fa-plus icon"></i>
+          Add Condition
+        </b-button>
+      </b-row>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -50,6 +57,7 @@ export default {
   },
   data() {
     return {
+      lock: false,
       conditions: [],
     }
   },
@@ -75,14 +83,16 @@ export default {
   watch: {
     conditions(val) {
       this.node.conditions = val
+      this.lock = val.length > 0
     },
   },
   mounted() {
     this.conditions = this.node.conditions || []
   },
   methods: {
-    addCondition() {
+    addCondition(e) {
       this.conditions.push({ ...baseCondition })
+      e.target.blur()
     },
     removeCondition(idx) {
       this.conditions.splice(idx, 1)

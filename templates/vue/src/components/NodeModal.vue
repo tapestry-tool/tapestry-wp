@@ -246,7 +246,8 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Permissions">
+        <b-tab title="Access">
+          <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
               <b-thead>
@@ -309,6 +310,8 @@
               </b-tbody>
             </b-table-simple>
           </div>
+          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+          <conditions-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -316,7 +319,6 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
-        <conditions-form :node="node" />
       </b-tabs>
     </b-container>
     <template slot="modal-footer">

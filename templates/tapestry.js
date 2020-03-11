@@ -29,6 +29,7 @@ function tapestryTool(config){
         COLOR_BLANK_HOVER = "#cdd5d9",
         COLOR_GRANDCHILD = "#CCC",
         COLOR_LINK = "#999",
+        COLOR_LOCKED = "#8a8a8c",
         COLOR_SECONDARY_LINK = "transparent",
         CSS_OPTIONAL_LINK = "stroke-dasharray: 30, 15;",
         MIN_TAPESTRY_WIDTH_FACTOR = 1.5,                        // This limits how big the nodes can get when there is only a few of them
@@ -48,7 +49,6 @@ function tapestryTool(config){
         tapestryDimensionsBeforeDrag, nodeBeforeDrag,
         h5pVideoSettings = {},
         tapestryDepth = 4,                                      // Default depth of Tapestry
-        viewLockedCheckbox = {'checked': false}, 
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -75,6 +75,10 @@ function tapestryTool(config){
         nodeLinkLine.setAttribute('id','tapestry-node-link-line');
         nodeLinkLine.setAttribute("stroke", COLOR_ACTIVE);
         nodeLinkLine.setAttribute("stroke-width", LINK_THICKNESS);
+
+    const conditionTypes = {
+        NODE_COMPLETED: "node_completed",
+    }
 
     /****************************************************
      * INITIALIZATION
@@ -285,6 +289,7 @@ function tapestryTool(config){
         // slider's maximum depth is set to the longest path from the new selected node
         tapestryDepthSlider.max = findMaxDepth(id);
         updateSvgDimensions();
+        renderTooltips()
     }
 
     /**
@@ -376,41 +381,6 @@ function tapestryTool(config){
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
-        
-        //--------------------------------------------------
-        // Checkbox to view locked nodes (logged in users only)
-        //--------------------------------------------------
-        
-        // Create wrapper div
-        var viewLockedCheckboxWrapper = document.createElement("div");
-        viewLockedCheckboxWrapper.id = "tapestry-view-locked-checkbox-wrapper";
-        
-        // Create label element
-        var viewLockedLabel = document.createElement("label");
-        viewLockedLabel.innerHTML = " View locked nodes";
-        setAttributes(viewLockedLabel,{
-            forHtml:"tapestry-view-locked-checkbox"
-        });
-        
-        // Create input element
-        viewLockedCheckbox = document.createElement("input");
-        setAttributes(viewLockedCheckbox,{
-            type:"checkbox",
-            value:"1",
-            id: "tapestry-view-locked-checkbox"
-        });
-        viewLockedCheckbox.onchange = function() {
-            filterTapestry();
-            updateSvgDimensions();
-        };
-
-        viewLockedCheckboxWrapper.appendChild(viewLockedCheckbox);
-        viewLockedCheckboxWrapper.appendChild(viewLockedLabel);
-        
-        if (config.wpUserId) {
-            // Append the new element in its wrapper to the tapestry container
-            tapestryControlsDiv.appendChild(viewLockedCheckboxWrapper);
-        }
 
         function hideShowControls() {
 
@@ -421,18 +391,7 @@ function tapestryTool(config){
                 settingsButton.style.marginLeft = "10px";
             }
 
-            // Hide this if there are no locked nodes
-            var lockedNodesExist = false;
-            var nodes = tapestry.dataset.nodes;
-            for (let i = 0; i < nodes.length; i++) {
-                if (!nodes[i].unlocked) {
-                    lockedNodesExist = true;
-                    break;
-                }
-            }
-            viewLockedCheckboxWrapper.style.display = lockedNodesExist ? "flex" : "none";
-
-            tapestryControlsDiv.style.display = (lockedNodesExist || showDepthSlider || showSettings) ? "flex" : "none";
+            tapestryControlsDiv.style.display = (showDepthSlider || showSettings) ? "flex" : "none";
         }
         hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 
@@ -953,6 +912,8 @@ function tapestryTool(config){
                     return "transparent";
                 else if (d.nodeType === "grandchild")
                     return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
                 else return COLOR_STROKE;
             })
             .attr("width", function (d) {
@@ -970,13 +931,17 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
+                if (!d.accessible)
+                    return COLOR_LOCKED;
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
-                else return COLOR_BLANK_HOVER;
+                return COLOR_BLANK_HOVER;
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    goToNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
                 }
             });
     
@@ -1007,9 +972,12 @@ function tapestryTool(config){
             })
             .attr("fill", function (d) {
                 return getNodeColor(d);
-            }).on("click keydown", function (d) {
+            })
+            .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    goToNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
                 }
             });
     
@@ -1043,16 +1011,8 @@ function tapestryTool(config){
 
         /* Add path and button */
         buildPathAndButton();
-    
-        nodes.on("mouseover", function(thisNode){
-            if (linkToDragStarted) {
-                linkToNode = thisNode;
-            }
-        }).on("mouseout", function(){
-            if (linkToDragStarted) {
-                linkToNode = undefined;
-            }
-        });
+
+        setNodeListeners(nodes);
     
         /* Add dragging and node selection functionality to the node */
         nodes
@@ -1064,9 +1024,102 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    tapestry.selectNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        tapestry.selectNode(d.id)
+                    }
                 }
             });
+    }
+
+    function renderTooltips() {
+        nodes
+            .filter(d => !d.accessible)
+            .append("foreignObject")
+            .attr("class", "tooltip-wrapper")
+            .style("position", "relative")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .attr("width", d => Math.min(getRadius(d) * 2 + 48, 300))
+            .attr("height", d => getRadius(d) * 2)
+            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
+            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .append("xhtml:div")
+            .attr("class", "tapestry-tooltip")
+            .html(getTooltipHtml)
+    }
+
+    function setNodeListeners(nodes) {
+
+        // Create tooltip for all locked nodes
+        renderTooltips();
+
+        // Remove (potentially) old listeners
+        nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
+
+        nodes.on("mouseover", function (thisNode) {
+
+            // Place this node at the end of the svg so that it appears on top
+            $(this).insertAfter($(this).parent().children().last())
+
+            // Mark this node as the node to link to (potentially)
+            if (linkToDragStarted) {
+                linkToNode = thisNode;
+            }
+        }).on("mouseout", function () {
+
+            // Unmark this node as the node to link to
+            if (linkToDragStarted) {
+                linkToNode = undefined;
+            }
+        });
+
+        nodes
+            .filter(d => !d.accessible)
+            .on("mouseover", function (d) {
+
+                // Place this node at the end of the svg so that it appears on top
+                $(this).insertAfter($(this).parent().children().last())
+
+                // Show unlock conditions tooltip
+                if (d.nodeType !== "grandchild") {
+                    const wrapper = this.querySelector(".tooltip-wrapper");
+                    wrapper.style.opacity = 1;
+                }
+            })
+            .on("mouseleave", function () {
+
+                // Hide unlock conditions tooltip
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                wrapper.style.opacity = 0;
+            })
+    }
+
+    function getTooltipHtml(node) {
+        const str = "To unlock this node: <br />";
+        const wrapper = document.createElement("ul");
+
+        if (node.conditions.length === 0) {
+            const listItem = document.createElement("li");
+            listItem.innerText = "Complete this parent.";
+            wrapper.appendChild(listItem);
+        } else {
+            node.conditions.forEach(cond => {
+                if (!cond.fulfilled) {
+                    const listItem = document.createElement("li");
+                    switch (cond.type) {
+                        case conditionTypes.NODE_COMPLETED: {
+                            const node = getNodeById(cond.value);
+                            listItem.innerText = `Complete "${node.title}"`;
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    wrapper.appendChild(listItem);
+                }
+            })
+        }
+        return str + wrapper.outerHTML;
     }
 
     function rebuildNodeContents() {
@@ -1120,6 +1173,8 @@ function tapestryTool(config){
                         return "transparent";
                     else if (d.nodeType === "grandchild") 
                         return COLOR_GRANDCHILD;
+                    else if (!d.accessible)
+                        return COLOR_LINK;
                     else return COLOR_STROKE;
                 })
                 .attr("width", function (d) {
@@ -1135,9 +1190,11 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
+                    if (!d.accessible)
+                        return COLOR_LOCKED;
                     if (d.imageURL.length)
                         return "url('#node-thumb-" + d.id + "')";
-                    else return COLOR_BLANK_HOVER;
+                    return COLOR_BLANK_HOVER;
                 })
                 .attr("stroke-width", function (d) {
                     if (!d.hideProgress) {
@@ -1160,19 +1217,20 @@ function tapestryTool(config){
                     return getRadius(d) * 2;
                 });
     
-        // Remove elements and add them back in
         nodes.selectAll(".mediaButton").remove();
         nodes.selectAll(".editNodeButton").remove();
         nodes.selectAll(".addNodeButton").remove();
         nodes.selectAll(".metaWrapper").remove();
+        nodes.selectAll(".tooltip-wrapper").remove();
         nodes.selectAll("path").remove();
+
         setTimeout(function(){
+            renderTooltips();
             buildPathAndButton();
         }, TRANSITION_DURATION);
     }
     
     function buildPathAndButton() {
-    
         /* Add progress pie inside each node */
         pieGenerator = d3.pie().sort(null).value(function (d) {
             return d.value;
@@ -1201,7 +1259,9 @@ function tapestryTool(config){
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    goToNode(d.id)
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        goToNode(d.id)
+                    }
                 }
             })
             .append("xhtml:div")
@@ -1224,10 +1284,14 @@ function tapestryTool(config){
                 return getViewable(d);
             })
             .append("svg:foreignObject")
+            .attr("data-unlocked", function (d) {
+                return d.accessible;
+            })
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
-                    ' class="' + getIconClass(d.mediaType, 'play') + ' mediaButtonIcon"' +
+                    ' class="' + getIconClass(d.mediaType, 'play', d.accessible) + ' mediaButtonIcon"' +
                     ' data-id="' + d.id + '"' + 
+                    ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
                     ' data-thumb="' + d.imageURL + '"' +
@@ -1255,7 +1319,9 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            goToNode(thisBtn.dataset.id)
+            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry) {
+                goToNode(thisBtn.dataset.id);
+            }
         });
     
         // Append addNodeButton
@@ -1376,7 +1442,7 @@ function tapestryTool(config){
         if (nodes) {
             path = nodes
                 .filter(function (d) {
-                    return !d.hideProgress;
+                    return !d.hideProgress && d.accessible;
                 })
                 .selectAll("path")
                 .data(function (d, i) {
@@ -1427,6 +1493,14 @@ function tapestryTool(config){
     /****************************************************
      * MEDIA RELATED FUNCTIONS
      ****************************************************/
+
+    this.reload = () => {
+        setAccessibleStatus();
+        setNodeListeners(nodes);
+        filterTapestry();
+    }
+
+    this.reloadTooltips = renderTooltips
 
     this.updateProgressBars = updateViewedProgress;
 
@@ -1759,6 +1833,8 @@ function tapestryTool(config){
             return "transparent";
         if (node.nodeType === "grandchild")
             return COLOR_GRANDCHILD;
+        if (!node.accessible)
+            return COLOR_LOCKED;
         if (node.imageURL.length === 0)
             return COLOR_BLANK;
         return COLOR_STROKE;
@@ -1814,6 +1890,12 @@ function tapestryTool(config){
         });
     
         return maxDepth;
+    }
+
+    function getNeighbours(id) {
+        return tapestry.dataset.links
+            .filter(link => link.source.id === id || link.target.id === id)
+            .map(link => link.source.id === id ? link.target.id : link.source.id)
     }
 
     /* Find children based on depth.
@@ -1984,10 +2066,6 @@ function tapestryTool(config){
     
     /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
     function setUnlocked() {
-        const conditionTypes = {
-            NODE_COMPLETED: "node_completed",
-        }
-
         const { nodes } = tapestry.dataset
         nodes.forEach(node => {
             const { conditions } = node
@@ -2028,58 +2106,50 @@ function tapestryTool(config){
     }
     
     /**
-     * Recursively sets the accessible status of the given node and its children up to the given depth
-     * @param {object} node 
-     * @param {integer} depth 
+     * Sets the accessible status of all nodes starting with the root node
      */
-    function setAccessibleStatus(node, depth, parentNodeId, parentIsAccessible = true){
+    function setAccessibleStatus() {
         if (tapestry.dataset.nodes.length == 0) {
             return;
         }
-    
-        // If no node passed in, assume root node
-        if (typeof node == "undefined") {
-            node = getNodeById(root);
-        }
-    
-        // If no node passed in, use max depth
-        if (typeof depth == "undefined") {
-            depth = findMaxDepth(node.id);
+
+        tapestry.dataset.nodes.forEach(node => {
+            node.accessible = false;
+        });
+
+        function recursivelySetAccessible(id, visited) {
+            visited.add(id);
+            const node = getNodeById(id);
+            node.accessible = node.unlocked;
+            if (node.accessible) {
+                getNeighbours(id)
+                    .filter(child => !visited.has(child))
+                    .forEach(child => {
+                        visited.add(child);
+                        recursivelySetAccessible(child, visited);
+                    })
+            }
         }
 
-        tapestry.dataset.nodes[findNodeIndex(node.id)].accessible = node.unlocked && parentIsAccessible;
-    
-        getChildren(node.id, 0).forEach (childNodeId => {
-            var thisNode = getNodeById(childNodeId);
-    
-            // Do not traverse up the parent
-            if (parentNodeId != thisNode.id) {
-                // A node is accessible only if it's unlocked and its parent is accessible
-                var isAccessible = thisNode.unlocked && parentIsAccessible;
-                tapestry.dataset.nodes[findNodeIndex(thisNode.id)].accessible = isAccessible;
-                if (depth > 0) {
-                    // Keep going deeper in
-                    setAccessibleStatus(thisNode, depth-1, node.id, isAccessible);
-                }
-            }
-        });
+        recursivelySetAccessible(tapestry.dataset.nodes[0].id, new Set());
     }
     
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
-    
-        // TODO: CHECK 1: If user is authorized to view it
 
-        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
-    
-        // CHECK 2: Always show root node
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
-    
-        // CHECK 3: If the user has unlocked the node
-        if (!node.accessible && !viewLockedCheckbox.checked) return false;
-    
-        // CHECK 4: If the node is currently in view (ie: root/child/grandchild)
+        // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
+
+        // CHECK 2: If user can edit the tapestry
+        if (config.wpCanEditTapestry) {
+            return true;
+        }
+    
+        // CHECK 3: If node is the root node or is currently selected
+        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
+
+        // CHECK 4: If node is an accordion row and user is not the author
+        if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
     
         // CHECK 5: If we are currently in view mode & if the node will be viewable in that case
         if (node.nodeType === "grandchild" && inViewMode) return false;
@@ -2186,10 +2256,14 @@ function updateMediaIcon(id, mediaType, action) {
 }
 
 // Helper function for getting the name for the Font Awesome icons
-function getIconClass(mediaType, action) {
+function getIconClass(mediaType, action, accessible=true) {
 
     var classStrStart = 'fas fa-';
     var classStr = '';
+
+    if (!accessible) {
+        return classStrStart + 'lock';
+    }
 
     if (action == 'loading') {
         return 'mediaButtonLoading';

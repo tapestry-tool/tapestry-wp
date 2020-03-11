@@ -71,7 +71,7 @@ export function updateDependents({ commit, getters }, nodeId) {
       condition: element.condition,
     })
   })
-  thisTapestryTool.reinitialize()
+  thisTapestryTool.reloadTooltips()
 }
 
 export function updateNodePermissions(_, payload) {

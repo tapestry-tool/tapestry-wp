@@ -212,6 +212,7 @@
 
 .node {
     cursor: pointer;
+    z-index: 0;
 }
 
 .node .meta {
@@ -300,9 +301,16 @@
     border: 4px solid #fff;
 }
 
-.mediaButton:hover,
-.mediaButton:active {
-    transform: scale(1.15) translate(0, 21px);
+.mediaButton > i.fa-lock {
+    font-size: 28px;
+}
+
+.mediaButton:hover:not([data-unlocked=false]),
+.mediaButton:active:not([data-unlocked=false]) {
+    transform: scale(1.05);
+}
+
+.mediaButton:hover:not([data-unlocked=false]) > i {
     background: #11a6d8;
 }
 
@@ -317,15 +325,6 @@
     position: absolute;
     color: #333;
     font-size: 21px;
-}
-
-.mediaButton > i[data-media-type="text"]:not(.mediaButtonLoading) {
-    background: #666;
-    color: #fff;
-    font-size: 35px;
-}
-.mediaButton:hover > i[data-media-type="text"]:not(.mediaButtonLoading) {
-    background: #11a6d8;
 }
 
 .mediaButtonLoading {
@@ -351,14 +350,7 @@
 
 /* ADD + EDIT NODE BUTTONS */
 
-.editNodeButton:hover,
-.editNodeButton:active,
-.addNodeButton:hover,
-.addNodeButton:active {
-    transform: scale(1.15) translate(0, -21px);
-}
-
-body {font-family: Arial, Helvetica, sans-serif; font-size: 16px;}
+body {font-family: Arial, Helvetica, sans-serif; font-size: 16px; z-index: 0;}
 * {box-sizing: border-box;}
 
 input[type="checkbox"][disabled] {
@@ -367,4 +359,41 @@ input[type="checkbox"][disabled] {
 
 #mediaFormat[disabled], #mediaType[disabled]{
     cursor: not-allowed;
+}
+
+.tapestry-tooltip {
+    pointer-events: none;
+    position: absolute;
+    background: black;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 22px;
+    width: 100%;
+    bottom: 8px;
+    z-index: 10;
+}
+
+.tapestry-tooltip::after {
+    position: absolute;
+    background: black;
+    content: "";
+    width: 16px;
+    height: 16px;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.tapestry-tooltip ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+
+.tapestry-tooltip li {
+    margin: 0;
+    padding: 0;
 }
