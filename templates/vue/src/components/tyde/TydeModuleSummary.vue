@@ -5,8 +5,12 @@
       <b-tabs card>
         <b-tab title="Content" no-body>
           <b-list-group flush>
-            <b-list-group-item v-for="stage in stages" :key="stage.node.id">
-              <h4 class="mx-0">{{ stage.node.title }}</h4>
+            <b-list-group-item
+              v-for="stage in stages"
+              :key="stage.node.id"
+              class="p-3"
+            >
+              <h4 class="mx-0 mb-4">{{ stage.node.title }}</h4>
               <p v-if="stage.topics.length === 0">
                 You haven't completed a topic yet.
               </p>
@@ -20,9 +24,10 @@
                 <b-button
                   v-for="topic in stage.topics"
                   :key="topic.id"
-                  class="p-0"
+                  class="topic"
                   @click="openTopic(topic.id)"
                 >
+                  <img class="mb-2" :src="topic.imageURL" />
                   <h4>{{ topic.title }}</h4>
                   <p>{{ topic.description }}</p>
                 </b-button>
@@ -77,6 +82,27 @@ export default {
     &:last-child {
       margin-right: 0;
     }
+  }
+
+  button {
+    width: 20%;
+  }
+}
+
+.topic {
+  background: rgba(0, 0, 0, 0.03);
+  border: none;
+  border-radius: 16px;
+  color: inherit;
+  padding: 16px 0;
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
   }
 }
 
