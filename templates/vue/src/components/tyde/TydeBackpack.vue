@@ -3,7 +3,7 @@
     <input
       id="tyde-backpack-icon"
       type="image"
-      :src="backpackUrl"
+      :src="spaceshipIconUrl"
       @click="toggleMenu"
     />
     <tyde-menu
@@ -17,8 +17,9 @@
 
 <script>
 import TydeMenu from "./TydeMenu"
-import BackpackIcon from "@/assets/backpack.svg"
+import SpaceshipIcon from "@/assets/spaceship.png"
 import { mapState } from "vuex"
+import Helpers from "../../utils/Helpers"
 
 const TYDE_BACKGROUND_AUDIO_SRC =
   "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file
@@ -55,9 +56,9 @@ export default {
   },
   computed: {
     ...mapState(["lightbox"]),
-    backpackUrl() {
-      return `${wpData.vue_uri}/${BackpackIcon.split("dist")[1]}`
-    },
+    spaceshipIconUrl() {
+      return `${wpData.vue_uri}/${SpaceshipIcon.split("dist")[1]}`
+    }
   },
   beforeDestroy() {
     window.removeEventListener(this.escMenuOpenListener)

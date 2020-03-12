@@ -17,13 +17,18 @@
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button
+        class="cockpit-button"
+        icon="cog"
+        label="Cockpit"
+        @click="setActivePage('home')"
+      ></tyde-button>
+      <tyde-button
         class="close-button"
         icon="times"
         @click="$emit('continue')"
       ></tyde-button>
     </div>
     <div class="content">
-      <h1>Captain's Log</h1>
       <tyde-menu-home
         v-if="activePage === 'home'"
         :logs="logs"
@@ -150,6 +155,13 @@ export default {
         z-index: -1;
       }
     }
+  }
+
+  .cockpit-button {
+    position: absolute;
+    right: 80px;
+    top: 17px;
+    z-index: 10;
   }
 
   .close-button {

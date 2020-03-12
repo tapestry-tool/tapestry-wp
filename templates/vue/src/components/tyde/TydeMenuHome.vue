@@ -1,6 +1,6 @@
 <template>
-  <section id="tyde-menu-home">
-    <nav>
+  <section id="tyde-menu-home" :style="{ 'background-image': ''+this.cockpitImage+'' }">
+    <!-- <nav>
       <ul>
         <tyde-tab
           v-for="tab in tabs"
@@ -19,7 +19,7 @@
         :log="log"
         @close="$emit('close')"
       />
-    </ul>
+    </ul> -->
   </section>
 </template>
 
@@ -28,6 +28,7 @@ import TydeLog from "./TydeLog"
 import TydeTab from "./TydeTab"
 import Helpers from "@/utils/Helpers"
 import TapestryApi from "@/services/TapestryAPI"
+import { mapGetters } from "vuex"
 
 const TapestryApiClient = new TapestryApi(wpPostId)
 
@@ -52,6 +53,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["settings"]),
     visibleLogs() {
       const filter = this.activeTab
       if (filter === "activities") {
@@ -65,6 +67,9 @@ export default {
       }
       return this.logsWithAnswers
     },
+    cockpitImage() {
+      return this.settings.spaceshipBackgroundUrl
+    }
   },
   watch: {
     /**
@@ -106,6 +111,9 @@ export default {
       }
     },
   },
+  mounted() {
+    document.getElementById("tyde-menu-home").style.backgroundImage = this.cockpitImage
+  }
 }
 </script>
 
