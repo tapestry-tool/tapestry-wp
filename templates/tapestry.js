@@ -204,7 +204,14 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [], showInBackpack: true })
+            var updatedNode = fillEmptyFields(node, { 
+                accordionProgress: [], 
+                skippable: true, 
+                behaviour: "embed", 
+                completed: false, 
+                quiz: [], 
+                showInBackpack: true,
+                tydeProgress: 0})
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }

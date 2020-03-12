@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapMutations } from "vuex"
 import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
@@ -120,7 +120,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getDirectParents"]),
     node() {
       return this.getNode(this.nodeId)
     },
@@ -133,6 +133,7 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
+    ...mapMutations(["updateTydeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -148,18 +149,19 @@ export default {
 
       if (secondsDiff > SAVE_INTERVAL) {
         await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-
         if (type === "h5p") {
           await this.updateH5pSettings(this.h5pSettings)
         }
-
         this.timeSinceLastSaved = now
       }
     },
     async complete() {
       await this.completeNode(this.nodeId)
       this.$emit("complete")
-    },
+      const stages = this.getDirectParents(this.nodeId).filter(id => this.getNode(id).tydeType === "Stage")
+      console.log("topic complete, updating stages: " + stages)
+      stages.map(sid => this.updateTydeProgress({parentId: sid, isParentModule: false}))
+    }
   },
 }
 </script>

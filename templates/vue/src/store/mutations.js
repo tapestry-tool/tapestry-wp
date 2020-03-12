@@ -1,3 +1,4 @@
+import { tydeTypes } from "../utils/constants"
 import Helpers from "../utils/Helpers"
 
 export function init(state, dataset) {
@@ -77,4 +78,35 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   const entries = question.entries || {}
   entries[answerType] = Object.values(entry)[0]
   question.entries = entries
+}
+
+export function updateTydeProgress(state, {parentId, isParentModule}){
+  const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
+  const childNodeIds = getChildIds(state, parentId)
+  const childNodes = childNodeIds.map(id => state.nodes[Helpers.findNodeIndex(id, state)])
+  console.log(parentNode)
+  if(isParentModule){ // parentNode is a module, and all children are stages
+    const childProgress = childNodes.map(stage => stage.tydeProgress)
+    const reducer = (accumulator, progress) => accumulator + progress
+    var curProgress = childProgress.reduce(reducer, 0) / childNodes.length
+  } else { // parentNode is a stage, and all children are nodes (topics)
+    var childProgress = childNodes.map(topic => topic.completed)
+    const reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
+    var curProgress = childProgress.reduce(reducer, 0) / childNodes.length
+  }
+  parentNode.tydeProgress = curProgress
+
+  if(!isParentModule){ // If node is stage, module must be updated as well
+    getParentIds(state, parentId).map(id => updateTydeProgress(state, {parentId: id, isParentModule: true}))
+  }
+}
+
+function getParentIds(state, nodeId){
+  const links = state.links
+  return links.filter(link => link.target.id == nodeId).map(link => link.source.id)
+}
+
+function getChildIds(state, nodeId){
+  const links = state.links
+  return links.filter(link => link.source.id == nodeId).map(link => link.target.id)
 }
