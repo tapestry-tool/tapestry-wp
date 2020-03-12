@@ -232,6 +232,15 @@ export default {
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          planetViewNotEarnedIconUrl: "",
+          planetViewEarnedIconUrl: "",
+          spaceshipPartNotEarnedIconUrl: "",
+          spaceShipPartEarnedIconUrl: "",
+          spaceShipPartHoverUrl: "",
+          spaceshipPartX: 0,
+          spaceshipPartY: 0,
+          spaceshipPartWidth: 0,
+          spaceshipPartHeight: 0,
         },
         unlocked: true,
         hideTitle: false,
@@ -347,6 +356,33 @@ export default {
             break
           case "showInBackpack":
             newNodeEntry.showInBackpack = fieldValue
+            break
+          case "planetViewNotEarnedIconUrl":
+            newNodeEntry.typeData.planetViewNotEarnedIconUrl = fieldValue
+            break
+          case "planetViewEarnedIconUrl":
+            newNodeEntry.typeData.planetViewEarnedIconUrl = fieldValue
+            break
+          case "spaceshipPartNotEarnedIconUrl":
+            newNodeEntry.typeData.spaceshipPartNotEarnedIconUrl = fieldValue
+            break
+          case "spaceShipPartEarnedIconUrl":
+            newNodeEntry.typeData.spaceShipPartEarnedIconUrl = fieldValue
+            break
+          case "spaceShipPartHoverUrl":
+            newNodeEntry.typeData.spaceShipPartHoverUrl = fieldValue
+            break
+          case "spaceshipPartX":
+            newNodeEntry.typeData.spaceshipPartX = fieldValue
+            break
+          case "spaceshipPartX":
+            newNodeEntry.typeData.spaceshipPartY = fieldValue
+            break
+          case "spaceshipPartWidth":
+            newNodeEntry.typeData.spaceshipPartWidth = fieldValue
+            break
+          case "spaceshipPartHeight":
+            newNodeEntry.typeData.spaceshipPartHeight = fieldValue
             break
           default:
             break
