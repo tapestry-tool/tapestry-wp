@@ -27,7 +27,11 @@
                   class="topic"
                   @click="openTopic(topic.id)"
                 >
-                  <img class="mb-2" :src="topic.imageURL" />
+                  <img
+                    v-if="topic.imageURL.length > 0"
+                    class="mb-2"
+                    :src="topic.imageURL"
+                  />
                   <h4>{{ topic.title }}</h4>
                   <p>{{ topic.description }}</p>
                 </b-button>
@@ -35,7 +39,13 @@
             </b-list-group-item>
           </b-list-group>
         </b-tab>
-        <b-tab title="Activities"></b-tab>
+        <b-tab title="Activities">
+          <tyde-activity-summary
+            v-for="activity in activities"
+            :key="activity.id"
+            :activity="activity"
+          />
+        </b-tab>
       </b-tabs>
     </b-card>
   </div>
@@ -43,9 +53,13 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TydeActivitySummary from "./TydeActivitySummary"
 
 export default {
   name: "tyde-module-summary",
+  components: {
+    TydeActivitySummary,
+  },
   props: {
     moduleId: {
       type: [String, Number],

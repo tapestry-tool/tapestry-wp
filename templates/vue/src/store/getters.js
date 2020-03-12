@@ -87,7 +87,7 @@ export function getActivities(_, { getNode, getDirectChildren }) {
       if (topic.mediaType === "accordion") {
         // look at the rows for questions
         const rows = getDirectChildren(topic.id).map(getNode)
-        return rows.filter(row => row.quiz).map(getCompletedActivities)
+        return rows.filter(row => row.quiz).flatMap(getCompletedActivities)
       }
       if (topic.quiz) {
         return getCompletedActivities(topic)
