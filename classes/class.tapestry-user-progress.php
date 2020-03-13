@@ -191,6 +191,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->progress = 0;
             }         
 
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
             if ($completed_value !== null) {
                 $progress->$nodeId->completed = $completed_value === "1";
@@ -198,7 +199,6 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
 
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
         }

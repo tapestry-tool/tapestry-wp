@@ -63,9 +63,9 @@ export async function completeNode({ commit, getters }, nodeId) {
   }
 }
 
-export function updateDependents({ commit, getters }, nodeId) {
+export function updateMayUnlockNodes({ commit, getters }, nodeId) {
   const node = getters.getNode(nodeId)
-  node.dependents.forEach(element => {
+  node.mayUnlockNodes.forEach(element => {
     commit("fulfillNodeCondition", {
       id: element.id,
       condition: element.condition,

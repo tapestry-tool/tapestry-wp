@@ -177,10 +177,10 @@ export default {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
   },
   methods: {
-    ...mapActions(["completeNode", "updateDependents"]),
+    ...mapActions(["completeNode", "updateMayUnlockNodes"]),
     complete() {
       this.completeNode(this.nodeId)
-      this.updateDependents(this.nodeId)
+      this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
       this.$router.push("/")

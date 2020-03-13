@@ -195,12 +195,14 @@ function tapestryTool(config){
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
-            /**
-             * Dependents refer to all nodes who rely on this node in some way.
-             * e.g. if Node B is locked until Node A is completed, then Node B
-             *      is a dependent of Node A.
-             */
-            var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [], dependents: [] })
+            var updatedNode = fillEmptyFields(node, { 
+                accordionProgress: [], 
+                skippable: true, 
+                behaviour: "embed", 
+                completed: false, 
+                quiz: [], 
+                mayUnlockNodes: []      // ths keeps track of all nodes that may get unlocked by this node
+            })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
                 { authenticated: ["read"] }
@@ -487,7 +489,7 @@ function tapestryTool(config){
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                 method: API_DELETE_METHOD,
                 success: function() {
-                    updateDependentListAfterDelete(nodeId);
+                    updatedMayUnlockNodesAfterDelete(nodeId);
                     location.reload();
                 },
                 error: function(e) {
@@ -2070,13 +2072,13 @@ function tapestryTool(config){
         nodes.forEach(node => {
             const { conditions } = node
             conditions.forEach(condition => {
-                const dependency = nodes[findNodeIndex(condition.value)]
-                let nodeDependents = dependency.dependents
-                nodeDependents.push({id: node.id, condition: condition})
-                dependency.dependents = nodeDependents
+                const conditionNode = nodes[findNodeIndex(condition.value)]
+                let mayUnlockNodes = conditionNode.mayUnlockNodes
+                mayUnlockNodes.push({id: node.id, condition: condition})
+                conditionNode.mayUnlockNodes = mayUnlockNodes
                 switch (condition.type) {
                     case conditionTypes.NODE_COMPLETED: {
-                        condition.fulfilled = dependency.completed
+                        condition.fulfilled = conditionNode.completed
                         break
                     }
                     default:
@@ -2089,19 +2091,20 @@ function tapestryTool(config){
     }
 
     /**
-     * when node is being deleted, iterate over conditions to find nodes which it is depends on and update their dependents list to remove deleted node
+     * when node is being deleted, iterate over conditions to find nodes that unlocked this
+     * node and remove this node from the list of nodes that those nodes unlocked
      * @param {integer} nodeId
      */
-    function updateDependentListAfterDelete(nodeId) {
+    function updatedMayUnlockNodesAfterDelete(nodeId) {
         const { nodes } = tapestry.dataset
         const node = nodes[findNodeIndex(nodeId)];
         const { conditions } = node;
         conditions.forEach(condition => {
-            const dependency = nodes[findNodeIndex(condition.value)];
-            const updatedDependentList = dependency.dependents.filter(dep => {
-                return dep.id != nodeId;
+            const conditionNode = nodes[findNodeIndex(condition.value)];
+            const mayUnlockNodes = conditionNode.mayUnlockNodes.filter(thisNode => {
+                return thisNode.id != nodeId;
             });
-            dependency.dependents = updatedDependentList;
+            conditionNode.mayUnlockNodes = mayUnlockNodes;
         })
     }
     
