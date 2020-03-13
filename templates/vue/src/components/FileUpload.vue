@@ -2,10 +2,7 @@
   <b-container fluid>
     <div v-if="isUploading" class="upload-container">
       <b-row>
-        <b-col
-          cols="auto"
-          class="upload-label mr-auto text-muted"
-        >
+        <b-col cols="auto" class="upload-label mr-auto text-muted">
           <p v-if="doneUploading">
             Upload complete. Press the "Submit" button to save your changes
           </p>
@@ -53,6 +50,7 @@
       </b-col>
       <b-col class="px-0">
         <b-form-input
+          name="text-input"
           :placeholder="placeholder"
           :value="value"
           :disabled="isUploading"
