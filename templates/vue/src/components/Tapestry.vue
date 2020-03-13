@@ -236,7 +236,7 @@ export default {
           planetViewEarnedIconUrl: "",
           spaceshipPartNotEarnedIconUrl: "",
           spaceShipPartEarnedIconUrl: "",
-          spaceShipPartHoverUrl: "",
+          spaceShipPartHoverIconUrl: "",
           spaceshipPartX: 0,
           spaceshipPartY: 0,
           spaceshipPartWidth: 0,
@@ -369,13 +369,13 @@ export default {
           case "spaceShipPartEarnedIconUrl":
             newNodeEntry.typeData.spaceShipPartEarnedIconUrl = fieldValue
             break
-          case "spaceShipPartHoverUrl":
-            newNodeEntry.typeData.spaceShipPartHoverUrl = fieldValue
+          case "spaceShipPartHoverIconUrl":
+            newNodeEntry.typeData.spaceShipPartHoverIconUrl = fieldValue
             break
           case "spaceshipPartX":
             newNodeEntry.typeData.spaceshipPartX = fieldValue
             break
-          case "spaceshipPartX":
+          case "spaceshipPartY":
             newNodeEntry.typeData.spaceshipPartY = fieldValue
             break
           case "spaceshipPartWidth":

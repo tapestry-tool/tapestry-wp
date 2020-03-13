@@ -367,7 +367,7 @@
             </b-form-group>
             <b-form-group label="Spaceship Part - hover">
               <file-upload
-                v-model="node.typeData.spaceShipPartHoverUrl"
+                v-model="node.typeData.spaceShipPartHoverIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
@@ -644,7 +644,7 @@ export default {
         { name: "planetViewEarnedIconUrl", value: this.node.typeData.planetViewEarnedIconUrl },
         { name: "spaceshipPartNotEarnedIconUrl", value: this.node.typeData.spaceshipPartNotEarnedIconUrl },
         { name: "spaceShipPartEarnedIconUrl", value: this.node.typeData.spaceShipPartEarnedIconUrl },
-        { name: "spaceShipPartHoverUrl", value: this.node.typeData.spaceShipPartHoverUrl },
+        { name: "spaceShipPartHoverIconUrl", value: this.node.typeData.spaceShipPartHoverIconUrl },
         { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
         { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },
         { name: "spaceshipPartWidth", value: this.node.typeData.spaceshipPartWidth },
