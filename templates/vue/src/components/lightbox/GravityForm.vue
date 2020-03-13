@@ -51,7 +51,6 @@ export default {
     this.loading = false
 
     this.disableAutocomplete()
-    // this.injectImageScripts()
     this.styleImageUI()
 
     if (this.entry) {
