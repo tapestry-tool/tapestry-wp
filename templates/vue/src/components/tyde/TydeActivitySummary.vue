@@ -69,7 +69,15 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.answer .answer-entry ul {
+  margin-bottom: 0;
+}
+</style>
+
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .activity {
   background: rgba(0, 0, 0, 0.03);
   border-radius: 16px;
@@ -82,6 +90,7 @@ export default {
 
 .answer {
   display: flex;
+  margin-bottom: 1rem;
 
   .icon {
     width: 96px;
@@ -92,7 +101,7 @@ export default {
     align-items: center;
     justify-content: center;
     margin-right: 16px;
-    background: var(--teal);
+    background: $tyde-orange;
     border-radius: 16px;
 
     img {
