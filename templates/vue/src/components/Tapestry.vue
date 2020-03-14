@@ -136,14 +136,19 @@ export default {
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
+      "updateTydeProgress",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
+        const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+        stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
       } else {
         this.setDataset(event.detail.dataset)
+        const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+        stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
       }
     },
     getEmptyNode() {
