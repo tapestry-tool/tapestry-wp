@@ -7,8 +7,10 @@ export const API_URL = `${SITE_URL}/wp-json/tapestry-tool/v1`
 
 export const getStore = () => cy.window().its("app.$store")
 
-export const visitTapestry = (name = "empty") =>
+export const visitTapestry = (name = "empty") => {
   cy.visit(`${SITE_URL}/tapestry/${name}`)
+  cy.get("#content")
+}
 
 export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
 
