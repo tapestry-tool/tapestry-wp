@@ -4,6 +4,7 @@
       <img :src="topic.imageURL" />
     </div>
     <p>{{ topic.title }}</p>
+    <slot></slot>
   </button>
 </template>
 

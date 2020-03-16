@@ -21,20 +21,14 @@
                   grid: stage.topics.length >= 4,
                 }"
               >
-                <b-button
+                <tyde-topic
                   v-for="topic in stage.topics"
                   :key="topic.id"
-                  class="topic"
+                  :topic="topic"
                   @click="openTopic(topic.id)"
                 >
-                  <img
-                    v-if="topic.imageURL.length > 0"
-                    class="mb-2"
-                    :src="topic.imageURL"
-                  />
-                  <h4>{{ topic.title }}</h4>
                   <p>{{ topic.description }}</p>
-                </b-button>
+                </tyde-topic>
               </div>
             </b-list-group-item>
           </b-list-group>
@@ -54,11 +48,13 @@
 <script>
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
+import TydeTopic from "./TydeTopic"
 
 export default {
   name: "tyde-module-summary",
   components: {
     TydeActivitySummary,
+    TydeTopic,
   },
   props: {
     nodeId: {
