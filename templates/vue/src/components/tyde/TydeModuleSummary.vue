@@ -61,7 +61,7 @@ export default {
     TydeActivitySummary,
   },
   props: {
-    moduleId: {
+    nodeId: {
       type: [String, Number],
       required: true,
     },
@@ -69,13 +69,13 @@ export default {
   computed: {
     ...mapGetters(["getNode", "getContent", "getActivities"]),
     module() {
-      return this.getNode(this.moduleId)
+      return this.getNode(this.nodeId)
     },
     stages() {
-      return this.getContent(this.moduleId)
+      return this.getContent(this.nodeId)
     },
     activities() {
-      return this.getActivities(this.moduleId)
+      return this.getActivities(this.nodeId)
     },
   },
   methods: {

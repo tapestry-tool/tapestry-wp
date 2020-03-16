@@ -3,16 +3,13 @@
     <div>
       <h1>{{ node.title }}</h1>
       <section>
-        <button
-          v-for="question in questions"
-          :key="question.id"
-          @click="openLightbox(question.id)"
-        >
-          <div>
-            <img :src="question.imageURL" />
-          </div>
-          <p>{{ question.title }}</p>
-        </button>
+        <tyde-topic
+          v-for="topic in topics"
+          :key="topic.id"
+          :topic="topic"
+          style="align-self: flex-start;"
+          @click="openLightbox(topic.id)"
+        />
       </section>
       <footer>
         <button v-if="done" @click="$emit('next')">
@@ -25,9 +22,13 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TydeTopic from "./TydeTopic"
 
 export default {
   name: "tyde-stage",
+  components: {
+    TydeTopic,
+  },
   props: {
     nodeId: {
       type: [String, Number],
@@ -37,7 +38,7 @@ export default {
   computed: {
     ...mapGetters(["getNode", "getDirectChildren"]),
     done() {
-      return this.questions.every(question => question.completed)
+      return this.topics.every(question => question.completed)
     },
     node() {
       return this.getNode(this.nodeId)
@@ -47,7 +48,7 @@ export default {
         backgroundImage: `url(${this.node.imageURL})`,
       }
     },
-    questions() {
+    topics() {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
     },
@@ -76,11 +77,6 @@ export default {
 </script>
 
 <style>
-:root {
-  --tyde-green: #205a27;
-  --tyde-border-green: #39b54a;
-}
-
 body.tapestry-stage-open {
   overflow: hidden;
 }
