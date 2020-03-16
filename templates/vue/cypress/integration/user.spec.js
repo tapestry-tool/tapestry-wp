@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 import {
   visitTapestry,
   getStore,
@@ -5,7 +7,6 @@ import {
   API_URL,
   findNode,
   getLightbox,
-  SITE_URL,
 } from "../support/utils"
 
 const TEST_TAPESTRY_NAME = Cypress.env("USER_TAPESTRY_NAME")
@@ -38,7 +39,7 @@ describe("User side", () => {
     it("Should display lightbox in fullscreen if item is a fullscreen item", () => {
       findNode(node => node.fullscreen).then(node => {
         cy.openLightbox(node.id)
-          .find(".content")
+          .find("#spotlight-content")
           .then(el => {
             const box = el[0].getBoundingClientRect()
             cy.window()
@@ -60,7 +61,7 @@ describe("User side", () => {
     it("Should be able to view video node", () => {
       findNode(node => node.mediaFormat === "mp4" && !node.fullscreen).then(node => {
         cy.openLightbox(node.id)
-          .find("video")
+          .find("source")
           .should("have.attr", "src")
           .should("equal", node.typeData.mediaURL)
       })
@@ -103,17 +104,15 @@ describe("User side", () => {
 
   describe("Quiz", () => {
     beforeEach(() => {
-      findNode(node => node.mediaFormat === "mp4" && node.fullscreen).then(node => {
+      findNode(node => node.mediaFormat === "mp4" && !node.fullscreen).then(node => {
         cy.openLightbox(node.id)
           .find("video")
           .then(el => {
             const video = el[0]
             video.currentTime = 15
           })
-
-        const env = Cypress.env("ENV")
         cy.get(".end-screen").should("be.visible")
-        cy.contains(env === "TYDE" ? /answer question/i : /take quiz/i).click()
+        cy.contains(/take quiz/i).click()
         cy.get(".quiz-screen").should("be.visible")
       })
     })

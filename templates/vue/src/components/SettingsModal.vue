@@ -8,12 +8,11 @@
             description="Add a background image to the page where this tapestry
               appears."
           >
-            <b-form-input
+            <file-upload
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
               autofocus
-              required
             />
           </b-form-group>
           <b-form-group
@@ -37,6 +36,17 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab title="TYDE">
+          <b-form-group
+            label="Spaceship Cockpit Background"
+            description="Add a background for the spaceship cockpit"
+          >
+            <file-upload
+              v-model="spaceshipBackgroundUrl"
+              placeholder="Enter the URL for the background"
+            />
+          </b-form-group>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -57,8 +67,12 @@
 
 <script>
 import { mapGetters } from "vuex"
+import FileUpload from "./FileUpload"
 export default {
   name: "settings-modal",
+  components: {
+    FileUpload,
+  },
   props: {
     wpCanEditTapestry: {
       type: Boolean,
@@ -71,6 +85,7 @@ export default {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
+      spaceshipBackgroundUrl: "",
     }
   },
   computed: {
@@ -95,16 +110,19 @@ export default {
         backgroundUrl = "",
         autoLayout = false,
         nodeDraggable = true,
+        spaceshipBackgroundUrl = "",
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
+      this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
         nodeDraggable: this.nodeDraggable,
+        spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
