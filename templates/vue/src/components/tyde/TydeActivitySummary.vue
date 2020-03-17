@@ -7,7 +7,8 @@
       </div>
       <div class="answer-entry">
         <h4>You answered:</h4>
-        <div v-html="answer.entry"></div>
+        <div v-if="answer.icon !== 'audio'" v-html="answer.entry"></div>
+        <audio v-else controls></audio>
       </div>
     </div>
   </div>
