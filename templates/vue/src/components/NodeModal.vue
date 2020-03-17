@@ -329,6 +329,111 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
+        <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
+          <div id="modal-spaceship-icons">
+            <h6 class="mb-3 text-muted">Planet View Icon</h6>
+            <b-form-group label="Not earned">
+              <file-upload
+                v-model="node.typeData.planetViewNotEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Earned">
+              <file-upload
+                v-model="node.typeData.planetViewEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <h6 class="mb-3 text-muted">Spaceship Cockpit Image</h6>
+            <b-form-group label="Not earned">
+              <file-upload
+                v-model="node.typeData.spaceshipPartNotEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Earned">
+              <file-upload
+                v-model="node.typeData.spaceShipPartEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Hover">
+              <file-upload
+                v-model="node.typeData.spaceShipPartHoverIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <h6 class="mb-3 text-muted">
+              Spaceship Part Coordinates and Size in Cockpit
+            </h6>
+            <b-row id="node-spaceship-parts" class="mb-4">
+              <b-col sm="6" class="pt-2">
+                Distance from upper left-hand corner:
+              </b-col>
+              <b-col>
+                <b-input-group
+                  label-cols="3"
+                  label="X: "
+                  append="px"
+                  label-for="node-spaceship-part-x"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-x"
+                    v-model="node.typeData.spaceshipPartX"
+                    placeholder="In pixels (top left)"
+                  />
+                </b-input-group>
+              </b-col>
+              <b-col>
+                <b-input-group
+                  label-cols="3"
+                  label="Y: "
+                  append="px"
+                  label-for="node-spaceship-part-y"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-y"
+                    v-model="node.typeData.spaceshipPartY"
+                    placeholder="In pixels (top left)"
+                  />
+                </b-input-group>
+              </b-col>
+            </b-row>
+            <b-row id="node-spaceship-parts">
+              <b-col sm="6" class="pt-2">
+                Dimensions of image:
+              </b-col>
+              <b-col>
+                <b-input-group
+                  label-cols="3"
+                  label="Width: "
+                  append="px"
+                  label-for="node-spaceship-part-width"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-width"
+                    v-model="node.typeData.spaceshipPartWidth"
+                    placeholder="In pixels"
+                  />
+                </b-input-group>
+              </b-col>
+              <b-col>
+                <b-input-group
+                  label-cols="3"
+                  label="Height: "
+                  append="px"
+                  label-for="node-spaceship-part-height"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-height"
+                    v-model="node.typeData.spaceshipPartHeight"
+                    placeholder="In pixels"
+                  />
+                </b-input-group>
+              </b-col>
+            </b-row>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -432,6 +537,7 @@ export default {
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
+      tydeTypes: tydeTypes,
     }
   },
   computed: {
@@ -523,6 +629,33 @@ export default {
         { name: "fullscreen", value: this.node.fullscreen },
         { name: "tydeType", value: this.node.tydeType },
         { name: "showInBackpack", value: this.node.showInBackpack },
+        {
+          name: "planetViewNotEarnedIconUrl",
+          value: this.node.typeData.planetViewNotEarnedIconUrl,
+        },
+        {
+          name: "planetViewEarnedIconUrl",
+          value: this.node.typeData.planetViewEarnedIconUrl,
+        },
+        {
+          name: "spaceshipPartNotEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartNotEarnedIconUrl,
+        },
+        {
+          name: "spaceShipPartEarnedIconUrl",
+          value: this.node.typeData.spaceShipPartEarnedIconUrl,
+        },
+        {
+          name: "spaceShipPartHoverIconUrl",
+          value: this.node.typeData.spaceShipPartHoverIconUrl,
+        },
+        { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
+        { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },
+        { name: "spaceshipPartWidth", value: this.node.typeData.spaceshipPartWidth },
+        {
+          name: "spaceshipPartHeight",
+          value: this.node.typeData.spaceshipPartHeight,
+        },
       ]
     },
     nodeImageUrl() {
@@ -790,12 +923,6 @@ table {
 #node-modal-container {
   * {
     outline: none;
-  }
-
-  .form-control {
-    padding: 15px;
-    border: none;
-    background: #f1f1f1;
   }
 
   .disable-message {
