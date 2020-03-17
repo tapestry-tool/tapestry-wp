@@ -26,9 +26,7 @@
                   :key="topic.id"
                   :topic="topic"
                   @click="openTopic(topic.id)"
-                >
-                  <p>{{ topic.description }}</p>
-                </tyde-topic>
+                />
               </div>
             </b-list-group-item>
           </b-list-group>
