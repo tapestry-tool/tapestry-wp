@@ -8,10 +8,10 @@
     <b-form-group label="Finish button text">
       <b-form-input v-model="node.typeData.finishButtonText"></b-form-input>
     </b-form-group>
-    <b-form-group label="Confirmation title text">
+    <b-form-group label="Well done!">
       <b-form-input v-model="node.typeData.confirmationTitleText"></b-form-input>
     </b-form-group>
-    <b-form-group label="Confirmation body text">
+    <b-form-group label="Ready to keep going?">
       <b-form-input v-model="node.typeData.confirmationBodyText"></b-form-input>
     </b-form-group>
     <b-form-group label="Continue button text">
