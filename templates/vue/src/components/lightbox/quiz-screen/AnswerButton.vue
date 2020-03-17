@@ -45,6 +45,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 button {
   padding: 0;
   margin: 0;
@@ -57,7 +59,7 @@ button {
 
 .button {
   padding: 0;
-  background-color: var(--tyde-orange);
+  background-color: $tyde-orange;
   color: white;
   width: 136px;
   border-radius: 6px;
@@ -80,7 +82,7 @@ button {
   }
 
   &:hover {
-    background-color: var(--tyde-orange-light);
+    background-color: $tyde-orange-light;
   }
 
   > * {
