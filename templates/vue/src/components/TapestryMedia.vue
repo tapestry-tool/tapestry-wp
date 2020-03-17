@@ -158,9 +158,13 @@ export default {
     async complete() {
       await this.completeNode(this.nodeId)
       this.$emit("complete")
-      const stages = this.getDirectParents(this.nodeId).filter(id => this.getNode(id).tydeType === "Stage")
-      stages.map(sid => this.updateTydeProgress({parentId: sid, isParentModule: false}))
-    }
+      const stages = this.getDirectParents(this.nodeId).filter(
+        id => this.getNode(id).tydeType === "Stage"
+      )
+      stages.map(sid =>
+        this.updateTydeProgress({ parentId: sid, isParentModule: false })
+      )
+    },
   },
 }
 </script>
