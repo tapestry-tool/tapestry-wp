@@ -32,7 +32,7 @@ export default {
       const entries = Object.entries(this.activity.entries)
       return entries.map(entry => ({
         icon: this.getIcon(entry),
-        entry: this.formatEntry(this.getEntry(entry)),
+        entry: this.formatEntry(this.getEntry(entry).map(i => i[1])),
       }))
     },
   },
@@ -50,20 +50,26 @@ export default {
       return ul.outerHTML
     },
     getEntry(answer) {
-      const validEntries = Object.entries(answer[1]).filter(entry => {
+      if (answer[0] === "audioId") {
+        return answer
+      }
+      return Object.entries(answer[1]).filter(entry => {
         const val = parseInt(entry[0])
         return !isNaN(val)
       })
-      return validEntries.map(i => i[1])
     },
     getIcon(answer) {
       const entry = this.getEntry(answer)
-      if (entry.length === 1) {
-        return "text"
-      } else if (entry.length > 1) {
-        return "checklist"
+      if (entry.length) {
+        if (entry[0] === "audioId") {
+          return "audio"
+        }
+        const id = entry[0][0]
+        return this.isDecimal(id) ? "checklist" : "text"
       }
-      return answer[0].substring(0, answer[0].length - 2)
+    },
+    isDecimal(str) {
+      return str % 1 != 0
     },
   },
 }
