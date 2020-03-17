@@ -12,6 +12,7 @@
 
 <script>
 import Tapestry from "./Tapestry"
+import TydeModule from "./tyde/TydeModule"
 import TydeModuleSummary from "./tyde/TydeModuleSummary"
 import TydeBackpack from "./tyde/TydeBackpack"
 
@@ -19,6 +20,7 @@ export default {
   name: "tyde",
   components: {
     Tapestry,
+    TydeModule,
     TydeModuleSummary,
     TydeBackpack,
   },

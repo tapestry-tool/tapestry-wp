@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <h3 class="title py-3">{{ module.title }}</h3>
-    <ul>
-      <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
-        Content
-      </tyde-tab>
-      <tyde-tab :is-active="activeTab === 1" @click="activeTab = 1">
-        Activities
-      </tyde-tab>
-    </ul>
+  <div class="tyde-summary">
+    <header class="p-3">
+      <h1 class="title">{{ module.title }}</h1>
+      <ul>
+        <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
+          Content
+        </tyde-tab>
+        <tyde-tab :is-active="activeTab === 1" @click="activeTab = 1">
+          Activities
+        </tyde-tab>
+      </ul>
+    </header>
     <div v-if="activeTab === 0">
       <div v-for="stage in stages" :key="stage.node.id" class="p-3">
         <h4 class="mx-0 mb-4">{{ stage.node.title }}</h4>
@@ -86,6 +88,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tyde-summary {
+  background: #000;
+  border-radius: 16px;
+  color: white;
+
+  * {
+    font-family: var(--tyde-font-mono);
+  }
+
+  header {
+    background: var(--tapestry-gray);
+    border-radius: 16px 16px 0 0;
+
+    ul {
+      display: flex;
+      justify-content: center;
+      margin: 0;
+    }
+  }
+}
+
 .center {
   display: flex;
   justify-content: center;
@@ -126,8 +149,11 @@ export default {
 }
 
 .title {
-  background: rgba(0, 0, 0, 0.03);
-  font-weight: 600;
-  margin-bottom: 0;
+  font-weight: 700;
+  margin-bottom: 12px;
+
+  &:after {
+    display: none;
+  }
 }
 </style>

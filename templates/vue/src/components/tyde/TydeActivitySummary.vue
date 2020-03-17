@@ -92,6 +92,7 @@ export default {
 
   * {
     text-align: left;
+    font-family: inherit;
   }
 }
 
@@ -108,7 +109,7 @@ export default {
     align-items: center;
     justify-content: center;
     margin-right: 16px;
-    background: $tyde-orange;
+    background: var(--tyde-border-green);
     border-radius: 16px;
 
     img {
