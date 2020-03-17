@@ -1,57 +1,57 @@
 <template>
   <div>
-    <b-card no-body>
-      <h3 class="title py-3">{{ module.title }}</h3>
-      <b-tabs card>
-        <b-tab title="Content" no-body>
-          <b-list-group flush>
-            <b-list-group-item
-              v-for="stage in stages"
-              :key="stage.node.id"
-              class="p-3"
-            >
-              <h4 class="mx-0 mb-4">{{ stage.node.title }}</h4>
-              <p v-if="stage.topics.length === 0">
-                You haven't completed a topic yet.
-              </p>
-              <div
-                v-else
-                :class="{
-                  center: stage.topics.length < 4,
-                  grid: stage.topics.length >= 4,
-                }"
-              >
-                <tyde-topic
-                  v-for="topic in stage.topics"
-                  :key="topic.id"
-                  :topic="topic"
-                  @click="openTopic(topic.id)"
-                />
-              </div>
-            </b-list-group-item>
-          </b-list-group>
-        </b-tab>
-        <b-tab title="Activities">
-          <tyde-activity-summary
-            v-for="activity in activities"
-            :key="activity.id"
-            :activity="activity"
+    <h3 class="title py-3">{{ module.title }}</h3>
+    <ul>
+      <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
+        Content
+      </tyde-tab>
+      <tyde-tab :is-active="activeTab === 1" @click="activeTab = 1">
+        Activities
+      </tyde-tab>
+    </ul>
+    <div v-if="activeTab === 0">
+      <div v-for="stage in stages" :key="stage.node.id" class="p-3">
+        <h4 class="mx-0 mb-4">{{ stage.node.title }}</h4>
+        <p v-if="stage.topics.length === 0">
+          You haven't completed a topic yet.
+        </p>
+        <div
+          v-else
+          :class="{
+            center: stage.topics.length < 4,
+            grid: stage.topics.length >= 4,
+          }"
+        >
+          <tyde-topic
+            v-for="topic in stage.topics"
+            :key="topic.id"
+            :topic="topic"
+            @click="openTopic(topic.id)"
           />
-        </b-tab>
-      </b-tabs>
-    </b-card>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <tyde-activity-summary
+        v-for="activity in activities"
+        :key="activity.id"
+        :activity="activity"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
+import TydeTab from "./TydeTab"
 import TydeTopic from "./TydeTopic"
 
 export default {
   name: "tyde-module-summary",
   components: {
     TydeActivitySummary,
+    TydeTab,
     TydeTopic,
   },
   props: {
@@ -59,6 +59,11 @@ export default {
       type: [String, Number],
       required: true,
     },
+  },
+  data() {
+    return {
+      activeTab: 0,
+    }
   },
   computed: {
     ...mapGetters(["getNode", "getContent", "getActivities"]),
