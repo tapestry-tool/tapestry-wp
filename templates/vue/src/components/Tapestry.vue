@@ -143,13 +143,11 @@ export default {
       if (!this.tapestryLoaded) {
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
-        const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
-        stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
       } else {
         this.setDataset(event.detail.dataset)
-        const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
-        stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
       }
+      const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+      stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
     },
     getEmptyNode() {
       return {

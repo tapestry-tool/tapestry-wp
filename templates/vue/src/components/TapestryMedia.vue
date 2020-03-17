@@ -159,7 +159,6 @@ export default {
       await this.completeNode(this.nodeId)
       this.$emit("complete")
       const stages = this.getDirectParents(this.nodeId).filter(id => this.getNode(id).tydeType === "Stage")
-      console.log("topic complete, updating stages: " + stages)
       stages.map(sid => this.updateTydeProgress({parentId: sid, isParentModule: false}))
     }
   },
