@@ -52,6 +52,7 @@ export async function completeNode({ commit, getters }, nodeId) {
     id: nodeId,
     newNode: { completed: true },
   })
+  thisTapestryTool.updateAccordionProgress()
 
   const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {

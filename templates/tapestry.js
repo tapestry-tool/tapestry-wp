@@ -222,6 +222,8 @@ function tapestryTool(config){
             return updatedNode
         });
 
+        this.updateAccordionProgress();
+
         dispatchEvent(new CustomEvent('tapestry-updated', { 
             detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
         }));
@@ -1889,8 +1891,27 @@ function tapestryTool(config){
         return radius;
     }
     
+    this.updateAccordionProgress = function() {
+        const accordions = tapestry.dataset.nodes.filter(nd => nd.mediaType === "accordion");
+
+        accordions.forEach(node => {
+            const progress = []
+            const rows = tapestry.dataset.links
+                .filter(link => link.source == node.id || link.source.id == node.id)
+                .map(link => link.target.id || link.target);
+            const completedRows = rows
+                .map(getNodeById)
+                .filter(row => row.completed);
+            completedRows.forEach(row => progress.push(row));
+            node.accordionProgress = progress;
+            
+            const currProgress = progress.length / rows.length;
+            node.typeData.progress[0].value = currProgress;
+            node.typeData.progress[1].value = 1 - currProgress;
+        });
+    }
+
     function setDatasetProgress(progressObj) {
-        
         if (progressObj.length < 1) {
             return false;
         }
@@ -1905,41 +1926,29 @@ function tapestryTool(config){
             var index = findNodeIndex(id);
             
             if (index !== -1) {
-                //Update the dataset with new values
-                tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-                tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-                tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
-
-                var questions = tapestry.dataset.nodes[index].quiz;
-                if (quizCompletionInfo) {
-                    Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
-                        var question = questions.find(question => question.id === questionId);
-                        if (question) {
-                            question.completed = completionInfo.completed;
-                            question.entries = {};
-                            Object.entries(completionInfo).forEach(([key, value]) => {
-                                if (key !== "completed") {
-                                    question.entries[key] = value;
-                                }
-                            })
-                        }
-                    })
-                }
-                tapestry.dataset.nodes[index].completed = completed;
-
                 var node = tapestry.dataset.nodes[index];
-                if (node.mediaType === "accordion") {
-                    var accordionProgress = []
-                    var accordionRowIds = tapestry.dataset.links.filter(link => {
-                        return link.source == node.id || link.target == node.id
-                    }).map(link => link.target == node.id ? link.source : link.target)
-                    accordionRowIds.forEach(accordionRowId => {
-                        const accordionRow = tapestry.dataset.nodes[findNodeIndex(accordionRowId)]
-                        if (accordionRow.completed) {
-                            accordionProgress.push(accordionRowId)
-                        }
-                    })
-                    node.accordionProgress = accordionProgress
+                if (node.mediaType !== "accordion") {
+                    //Update the dataset with new values
+                    tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
+                    tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
+                    tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
+
+                    var questions = tapestry.dataset.nodes[index].quiz;
+                    if (quizCompletionInfo) {
+                        Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
+                            var question = questions.find(question => question.id === questionId);
+                            if (question) {
+                                question.completed = completionInfo.completed;
+                                question.entries = {};
+                                Object.entries(completionInfo).forEach(([key, value]) => {
+                                    if (key !== "completed") {
+                                        question.entries[key] = value;
+                                    }
+                                })
+                            }
+                        })
+                    }
+                    tapestry.dataset.nodes[index].completed = completed;
                 }
             }
         }
