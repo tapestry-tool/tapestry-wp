@@ -6,7 +6,12 @@
     ]"
     :style="containerStyles"
   >
-    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
+    <text-media
+      v-if="node.mediaType === 'text'"
+      :node="node"
+      @complete="complete"
+      @load="handleLoad"
+    />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
@@ -42,17 +47,20 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
+      @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
       @complete="complete"
+      @load="handleLoad"
     ></wp-post-media>
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
       @complete="complete"
       @close="$emit('close')"
+      @load="handleLoad"
     />
     <completion-screen v-if="showCompletionScreen" />
   </div>
