@@ -23,6 +23,7 @@
           :autoplay="false"
           @complete="updateProgress(row.id)"
           @close="toggle(index)"
+          @load="handleLoad"
         />
       </template>
       <template v-slot:footer>
@@ -110,6 +111,9 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleLoad(args) {
+      console.log("loaded: ", args)
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -119,6 +123,7 @@ export default {
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
+        this.$refs.container.scrollTop = 0
       } else {
         this.activeIndex = index
       }

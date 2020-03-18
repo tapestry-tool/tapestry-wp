@@ -49,6 +49,7 @@ export default {
     this.entry = entry
 
     this.loading = false
+    this.$emit("load")
 
     this.disableAutocomplete()
 
