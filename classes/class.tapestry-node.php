@@ -185,6 +185,20 @@ class TapestryNode implements ITapestryNode
         $this->_deleteNodeFromDatabase();
     }
 
+    public function updateConditions($nodeId)
+    {
+        $listModified = false;
+        foreach($this->conditions as $conditionId => $condition) {
+            if ($condition->value == $nodeId) {
+                array_splice($this->conditions, $conditionId, 1);
+                $listModified = true;
+            }
+        }
+        if ($listModified) {
+            $this->_saveToDatabase();
+        }
+    }
+
     private function _saveToDatabase()
     {
         $node = $this->_formNode();
