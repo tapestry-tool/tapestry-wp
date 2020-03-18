@@ -185,6 +185,13 @@ class TapestryNode implements ITapestryNode
         $this->_deleteNodeFromDatabase();
     }
 
+    /**
+     * Update node conditions by removing conditions by nodeId
+     *
+     * @param   String  $nodeId  nodeId
+     * 
+     * @return NULL
+     */
     public function updateConditions($nodeId)
     {
         $listModified = false;
