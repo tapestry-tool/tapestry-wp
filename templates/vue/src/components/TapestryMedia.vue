@@ -17,6 +17,7 @@
       :autoplay="autoplay"
       :node="node"
       :allow-end-screen="allowEndScreen"
+      :dimensions="dimensions"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
