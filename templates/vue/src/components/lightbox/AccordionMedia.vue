@@ -6,6 +6,7 @@
     </header>
     <accordion-row
       v-for="(row, index) in rows"
+      ref="rowRefs"
       :key="row.id"
       :visible="index === activeIndex"
     >
@@ -165,8 +166,15 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
-    handleLoad(args) {
-      console.log("loaded: ", args)
+    handleLoad() {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          const ref = this.$refs.rowRefs[this.activeIndex].$el
+          this.$refs.container.scrollTop = ref.offsetTop - 12
+        }
+      })
     },
     scrollToTop() {
       const el = this.$refs.container
@@ -177,7 +185,6 @@ export default {
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
-        this.$refs.container.scrollTop = 0
       } else {
         this.activeIndex = index
       }
