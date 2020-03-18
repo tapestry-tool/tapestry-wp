@@ -1,16 +1,14 @@
 <template>
-  <section id="tyde-menu-home">
-    <div id="tyde-cockpit" :style="cockpitImage">
-      <div v-for="node in this.nodes" :key="node.id">
-        <div
-          v-if="isNodeModuleType(node)"
-          :id="`tyde-cockpit-`+node.id"
-          :src="node.typeData.spaceshipPartNotEarnedIconUrl"
-          :style="moduleStyles(node)"
-          @mouseover="nodeMouseOverHandler(node)"
-          @mouseleave="nodeMouseLeaveHandler(node)"
-        >
-        </div>
+  <section id="tyde-cockpit" :style="cockpitImage">
+    <div v-for="node in this.nodes" :key="node.id">
+      <div
+        v-if="isNodeModuleType(node)"
+        :id="`tyde-cockpit-`+node.id"
+        :src="moduleImage(node)"
+        :style="moduleStyles(node)"
+        @mouseover="nodeMouseOverHandler(node)"
+        @mouseleave="nodeMouseLeaveHandler(node)"
+      >
       </div>
     </div>
   </section>
@@ -25,7 +23,7 @@ import { mapGetters } from "vuex"
 const TapestryApiClient = new TapestryApi(wpPostId)
 
 export default {
-  name: "tyde-menu-home",
+  name: "tyde-cockpit",
   props: {
     logs: {
       type: Array,
@@ -60,6 +58,7 @@ export default {
         backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`
       }
     },
+
   },
   watch: {
     /**
@@ -110,24 +109,29 @@ export default {
         width: node.typeData.spaceshipPartWidth+'px'
       }
     },
+    moduleImage(node) {
+      if (node.tydeProgress == 1) {
+        return node.typeData.spaceshipPartEarnedIconUrl
+      } else {
+        return node.typeData.spaceshipPartNotEarnedIconUrl
+      }
+    },
     isNodeModuleType(node) {
       return node.tydeType === tydeTypes.MODULE
     },
     nodeMouseOverHandler(node) {
-      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${node.typeData.spaceShipPartHoverUrl})`
+      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${node.typeData.spaceShipPartHoverIconUrl})`
     },
     nodeMouseLeaveHandler(node) {
-      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${node.typeData.spaceshipPartNotEarnedIconUrl})`
+      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${this.moduleImage(node)})`
     },
   },
-  mounted() {
-    document.getElementById("tyde-menu-home").style.backgroundImage = this.cockpitImage
-  }
 }
 </script>
 
 <style lang="scss" scoped>
-#tyde-menu-home {
+#tyde-cockpit {
+  height: 85vh;
   nav ul {
     display: flex;
     font-size: 16px;
@@ -142,9 +146,6 @@ export default {
     height: calc(100vh - 210px);
     overflow-y: scroll;
   }
-
-  #tyde-cockpit {
-    height: 85vh;
-  }
 }
+
 </style>
