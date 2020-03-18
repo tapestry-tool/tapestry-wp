@@ -15,6 +15,7 @@
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
+      :dimensions="dimensions"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"

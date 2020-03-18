@@ -109,6 +109,9 @@ export default {
       return this.rows.findIndex(node => !node.completed)
     },
   },
+  mounted() {
+    this.isMounted = true
+  },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),

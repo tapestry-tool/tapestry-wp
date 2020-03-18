@@ -19,6 +19,7 @@
       controls
       :autoplay="autoplay"
       :src="node.typeData.mediaURL"
+      :style="videoStyles"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
       @pause="handlePause(node)"
@@ -51,13 +52,34 @@ export default {
       required: false,
       default: true,
     },
+    dimensions: {
+      type: Object,
+      required: true,
+      validator: val => {
+        return ["width", "height"].every(prop => val.hasOwnProperty(prop))
+      },
+    },
   },
   data() {
     return {
       showPlayScreen: !this.autoplay,
       showEndScreen: this.getInitialEndScreenState(),
       showQuizScreen: false,
+      videoDimensions: null,
     }
+  },
+  computed: {
+    videoStyles() {
+      if (!this.videoDimensions) {
+        return { width: "100%" }
+      }
+      const { height } = this.videoDimensions
+      if (height > this.dimensions.height) {
+        return { height: this.dimensions.height + "px", width: "auto" }
+      } else {
+        return { width: "100%" }
+      }
+    },
   },
   watch: {
     node(newNode, oldNode) {
@@ -132,6 +154,11 @@ export default {
       }
     },
     handleLoad() {
+      const video = this.$refs.video
+      this.videoDimensions = {
+        height: video.videoHeight,
+        width: video.videoWidth,
+      }
       this.updateDimensions()
       this.seek()
     },
@@ -187,9 +214,5 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
-
-  video {
-    width: 100%;
-  }
 }
 </style>
