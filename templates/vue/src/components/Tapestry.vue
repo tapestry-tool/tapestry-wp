@@ -136,6 +136,7 @@ export default {
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
+      "updateTydeProgress",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
@@ -145,6 +146,10 @@ export default {
       } else {
         this.setDataset(event.detail.dataset)
       }
+      const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+      stages.map(n =>
+        this.updateTydeProgress({ parentId: n.id, isParentModule: false })
+      )
     },
     getEmptyNode() {
       return {
@@ -225,10 +230,7 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 },
-          ],
+          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -236,7 +238,7 @@ export default {
           planetViewEarnedIconUrl: "",
           spaceshipPartNotEarnedIconUrl: "",
           spaceShipPartEarnedIconUrl: "",
-          spaceShipPartHoverUrl: "",
+          spaceShipPartHoverIconUrl: "",
           spaceshipPartX: 0,
           spaceshipPartY: 0,
           spaceshipPartWidth: 0,
@@ -369,13 +371,13 @@ export default {
           case "spaceShipPartEarnedIconUrl":
             newNodeEntry.typeData.spaceShipPartEarnedIconUrl = fieldValue
             break
-          case "spaceShipPartHoverUrl":
-            newNodeEntry.typeData.spaceShipPartHoverUrl = fieldValue
+          case "spaceShipPartHoverIconUrl":
+            newNodeEntry.typeData.spaceShipPartHoverIconUrl = fieldValue
             break
           case "spaceshipPartX":
             newNodeEntry.typeData.spaceshipPartX = fieldValue
             break
-          case "spaceshipPartX":
+          case "spaceshipPartY":
             newNodeEntry.typeData.spaceshipPartY = fieldValue
             break
           case "spaceshipPartWidth":

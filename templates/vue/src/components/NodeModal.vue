@@ -1,28 +1,21 @@
 <template>
   <b-modal
     id="node-modal-container"
+    :title="modalTitle"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
   >
-    <template v-slot:modal-header="{ close }">
-      <div class="modal-header-row">
-        <h5>{{ modalTitle }}</h5>
-        <b-button size="sm" variant="outline-danger" @click="close()">
-          Close Modal
-        </b-button>
-      </div>
-      <div class="modal-header-row">
-        <b-alert
-          v-if="formErrors.length"
-          id="tapestry-modal-form-errors"
-          variant="danger"
-          show
-          v-html="formErrors"
-        ></b-alert>
-      </div>
-    </template>
+    <div class="modal-header-row">
+      <b-alert
+        v-if="formErrors.length"
+        id="tapestry-modal-form-errors"
+        variant="danger"
+        show
+        v-html="formErrors"
+      ></b-alert>
+    </div>
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
@@ -85,7 +78,7 @@
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
               :label="videoLabel"
             >
-              <b-form-input
+              <file-upload
                 id="node-video-media-url"
                 v-model="node.typeData.mediaURL"
                 data-testid="node-videoUrl"
@@ -146,6 +139,7 @@
             >
               <combobox
                 v-model="selectedGravityFormContent"
+                data-testid="combobox-gravity-form"
                 item-text="title"
                 item-value="id"
                 empty-message="There are no forms available. Please add one in your WP dashboard."
@@ -201,6 +195,7 @@
             <b-form-group v-if="addThumbnail">
               <file-upload
                 v-model="node.imageURL"
+                data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
@@ -334,58 +329,52 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
-        <b-tab
-          v-if="node.tydeType === tydeTypes.MODULE"
-          title="Spaceship Part"
-        >
+        <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
           <div id="modal-spaceship-icons">
-            <h6 class="mb-3 text-muted">Planet View Icons</h6>
-            <b-form-group label="Planet View Icon - not earned">
+            <h6 class="mb-3 text-muted">Planet View Icon</h6>
+            <b-form-group label="Not earned">
               <file-upload
                 v-model="node.typeData.planetViewNotEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
-            <b-form-group label="Planet View Icon - earned">
+            <b-form-group label="Earned">
               <file-upload
                 v-model="node.typeData.planetViewEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
             <h6 class="mb-3 text-muted">Spaceship Cockpit Image</h6>
-            <b-form-group label="Spaceship Part - not earned">
+            <b-form-group label="Not earned">
               <file-upload
                 v-model="node.typeData.spaceshipPartNotEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
-            <b-form-group label="Spaceship Part - earned">
+            <b-form-group label="Earned">
               <file-upload
                 v-model="node.typeData.spaceShipPartEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
-            <b-form-group label="Spaceship Part - hover">
+            <b-form-group label="Hover">
               <file-upload
-                v-model="node.typeData.spaceShipPartHoverUrl"
+                v-model="node.typeData.spaceShipPartHoverIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
-            <label for="node-spaceship-parts">
-              Spaceship Part square coordinates
-            </label>
-            <b-row id="node-spaceship-parts">
-              <b-col
-                sm="3"
-                class="pt-2"
-              >
-                Upper lefthand corner
+            <h6 class="mb-3 text-muted">
+              Spaceship Part Coordinates and Size in Cockpit
+            </h6>
+            <b-row id="node-spaceship-parts" class="mb-4">
+              <b-col sm="6" class="pt-2">
+                Distance from upper left-hand corner:
               </b-col>
               <b-col>
-                <b-form-group
-                  label-cols="4"
-                  label-cols-lg="2"
+                <b-input-group
+                  label-cols="3"
                   label="X: "
+                  append="px"
                   label-for="node-spaceship-part-x"
                 >
                   <b-form-input
@@ -393,13 +382,13 @@
                     v-model="node.typeData.spaceshipPartX"
                     placeholder="In pixels (top left)"
                   />
-                </b-form-group>
+                </b-input-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  label-cols="4"
-                  label-cols-lg="2"
+                <b-input-group
+                  label-cols="3"
                   label="Y: "
+                  append="px"
                   label-for="node-spaceship-part-y"
                 >
                   <b-form-input
@@ -407,18 +396,18 @@
                     v-model="node.typeData.spaceshipPartY"
                     placeholder="In pixels (top left)"
                   />
-                </b-form-group>
+                </b-input-group>
               </b-col>
             </b-row>
-            <label for="node-spaceship-dimensions">
-              Dimensions
-            </label>
             <b-row id="node-spaceship-parts">
+              <b-col sm="6" class="pt-2">
+                Dimensions of image:
+              </b-col>
               <b-col>
-                <b-form-group
-                  label-cols="4"
-                  label-cols-lg="2"
+                <b-input-group
+                  label-cols="3"
                   label="Width: "
+                  append="px"
                   label-for="node-spaceship-part-width"
                 >
                   <b-form-input
@@ -426,13 +415,13 @@
                     v-model="node.typeData.spaceshipPartWidth"
                     placeholder="In pixels"
                   />
-                </b-form-group>
+                </b-input-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  label-cols="4"
-                  label-cols-lg="2"
+                <b-input-group
+                  label-cols="3"
                   label="Height: "
+                  append="px"
                   label-for="node-spaceship-part-height"
                 >
                   <b-form-input
@@ -440,7 +429,7 @@
                     v-model="node.typeData.spaceshipPartHeight"
                     placeholder="In pixels"
                   />
-                </b-form-group>
+                </b-input-group>
               </b-col>
             </b-row>
           </div>
@@ -640,15 +629,33 @@ export default {
         { name: "fullscreen", value: this.node.fullscreen },
         { name: "tydeType", value: this.node.tydeType },
         { name: "showInBackpack", value: this.node.showInBackpack },
-        { name: "planetViewNotEarnedIconUrl", value: this.node.typeData.planetViewNotEarnedIconUrl },
-        { name: "planetViewEarnedIconUrl", value: this.node.typeData.planetViewEarnedIconUrl },
-        { name: "spaceshipPartNotEarnedIconUrl", value: this.node.typeData.spaceshipPartNotEarnedIconUrl },
-        { name: "spaceShipPartEarnedIconUrl", value: this.node.typeData.spaceShipPartEarnedIconUrl },
-        { name: "spaceShipPartHoverUrl", value: this.node.typeData.spaceShipPartHoverUrl },
+        {
+          name: "planetViewNotEarnedIconUrl",
+          value: this.node.typeData.planetViewNotEarnedIconUrl,
+        },
+        {
+          name: "planetViewEarnedIconUrl",
+          value: this.node.typeData.planetViewEarnedIconUrl,
+        },
+        {
+          name: "spaceshipPartNotEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartNotEarnedIconUrl,
+        },
+        {
+          name: "spaceShipPartEarnedIconUrl",
+          value: this.node.typeData.spaceShipPartEarnedIconUrl,
+        },
+        {
+          name: "spaceShipPartHoverIconUrl",
+          value: this.node.typeData.spaceShipPartHoverIconUrl,
+        },
         { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
         { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },
         { name: "spaceshipPartWidth", value: this.node.typeData.spaceshipPartWidth },
-        { name: "spaceshipPartHeight", value: this.node.typeData.spaceshipPartHeight },
+        {
+          name: "spaceshipPartHeight",
+          value: this.node.typeData.spaceshipPartHeight,
+        },
       ]
     },
     nodeImageUrl() {
@@ -890,11 +897,25 @@ table {
   padding-bottom: 0;
   margin-left: 5px;
   flex-direction: column;
+
+  button.close {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.nav-link:focus {
+  outline: none;
 }
 </style>
 
@@ -902,12 +923,6 @@ table {
 #node-modal-container {
   * {
     outline: none;
-  }
-
-  .form-control {
-    padding: 15px;
-    border: none;
-    background: #f1f1f1;
   }
 
   .disable-message {
@@ -920,7 +935,7 @@ table {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 
     &:last-child {
       margin-bottom: 0;

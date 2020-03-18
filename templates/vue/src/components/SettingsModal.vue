@@ -8,12 +8,11 @@
             description="Add a background image to the page where this tapestry
               appears."
           >
-            <b-form-input
+            <file-upload
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
               autofocus
-              required
             />
           </b-form-group>
           <b-form-group
