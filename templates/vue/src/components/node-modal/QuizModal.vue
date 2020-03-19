@@ -26,6 +26,25 @@
               Delete
             </b-button>
           </b-row>
+          <b-form-group>
+            <b-form-checkbox v-model="question.isFollowUp">
+              Follow up to a previous activity
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="question.isFollowUp" label="Previous Activity">
+            <combobox
+              :options="activities"
+              item-text="text"
+              item-value="id"
+              empty-message="There are no activities yet."
+            >
+              <template v-slot="slotProps">
+                <p>
+                  {{ slotProps.option.text }}
+                </p>
+              </template>
+            </combobox>
+          </b-form-group>
           <b-form-group label="Question Text">
             <b-form-input
               v-model="question.text"
@@ -102,6 +121,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
 import H5PApi from "../../services/H5PApi"
@@ -138,6 +158,12 @@ export default {
       wasFocused: false,
     }
   },
+  computed: {
+    ...mapGetters(["getActivities"]),
+    activities() {
+      return this.getActivities({ exclude: [this.node.id] })
+    },
+  },
   watch: {
     canAddQuestion(isAdding) {
       if (isAdding && !this.questions.length) {
@@ -162,6 +188,8 @@ export default {
         ...this.questions,
         {
           id: Helpers.createUUID(),
+          isFollowUp: false,
+          previousEntry: null,
           text: "",
           answers: { ...defaultQuestion.answers },
           completed: false,
