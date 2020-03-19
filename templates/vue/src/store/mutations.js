@@ -79,34 +79,46 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   question.entries = entries
 }
 
-export function updateTydeProgress(state, {parentId, isParentModule}){
+export function updateTydeProgress(state, { parentId, isParentModule }) {
   const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
   const childNodeIds = getChildIds(state, parentId)
-  const childNodes = childNodeIds.map(id => state.nodes[Helpers.findNodeIndex(id, state)])
-  if(isParentModule){ // parentNode is a module, and all children are stages
+  const childNodes = childNodeIds.map(
+    id => state.nodes[Helpers.findNodeIndex(id, state)]
+  )
+  if (isParentModule) {
+    // parentNode is a module, and all children are stages
     const childProgress = childNodes.map(stage => stage.tydeProgress)
     const reducer = (accumulator, progress) => accumulator + progress
     parentNode.tydeProgress = childProgress.reduce(reducer, 0) / childNodes.length
-  } else { // parentNode is a stage, and all children are nodes (topics)
+  } else {
+    // parentNode is a stage, and all children are nodes (topics)
     var childProgress = childNodes.map(topic => topic.completed)
-    const reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
+    const reducer = (accumulator, completed) =>
+      accumulator + (completed === true ? 1 : 0)
     parentNode.tydeProgress = childProgress.reduce(reducer, 0) / childNodes.length
   }
-  if(!isParentModule){ // If node is stage, parent module must be updated as well
-    getParentIds(state, parentId).map(id => updateTydeProgress(state, {parentId: id, isParentModule: true}))
+  if (!isParentModule) {
+    // If node is stage, parent module must be updated as well
+    getParentIds(state, parentId).map(id =>
+      updateTydeProgress(state, { parentId: id, isParentModule: true })
+    )
   }
 }
 
-function getParentIds(state, nodeId){
+function getParentIds(state, nodeId) {
   const links = state.links
   return links
-          .filter(link => link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId)
-          .map(link => link.source.id == undefined ? link.source : link.source.id)
+    .filter(link =>
+      link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId
+    )
+    .map(link => (link.source.id == undefined ? link.source : link.source.id))
 }
 
-function getChildIds(state, nodeId){
+function getChildIds(state, nodeId) {
   const links = state.links
   return links
-            .filter(link => link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId)
-            .map(link => link.target.id == undefined ? link.target : link.target.id)
+    .filter(link =>
+      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
+    )
+    .map(link => (link.target.id == undefined ? link.target : link.target.id))
 }

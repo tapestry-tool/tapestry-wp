@@ -1,7 +1,21 @@
 <template>
   <div class="stage-wrapper" :style="nodeStyles">
     <div>
-      <h1>{{ node.title }}</h1>
+      <div class="stage-header">
+        <tyde-progress-bar
+          :node-id="parent.id"
+          :width="200"
+          :progress="parent.tydeProgress"
+        />
+        <div v-if="this.done" class="stage-star">
+          <img :src="this.activeStarSrc" />
+        </div>
+        <div v-else class="stage-star">
+          <img :src="this.inactiveStarSrc" />
+          <div>{{ this.numComplete }}/{{ this.questions.length }}</div>
+        </div>
+        <h1>{{ node.title + " " + parent.tydeProgress }}</h1>
+      </div>
       <section>
         <button
           v-for="question in questions"
@@ -10,6 +24,7 @@
         >
           <div>
             <img :src="question.imageURL" />
+            <i v-if="question.completed" class="fas fa-check fa-3x"></i>
           </div>
           <p>{{ question.title }}</p>
         </button>
@@ -25,9 +40,17 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TydeProgressBar from "./TydeProgressBar"
+import ActiveStar from "@/assets/star-active.png"
+import InactiveStar from "@/assets/star-inactive.png"
+import Helpers from "@/utils/Helpers"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   name: "tyde-stage",
+  components: {
+    TydeProgressBar,
+  },
   props: {
     nodeId: {
       type: [String, Number],
@@ -35,12 +58,18 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
     done() {
       return this.questions.every(question => question.completed)
     },
     node() {
       return this.getNode(this.nodeId)
+    },
+    module() {
+      const moduleIds = this.getDirectParents(this.nodeId).filter(
+        id => this.getNode(id).tydeType === tydeTypes.MODULE
+      )
+      return this.getNode(moduleIds[0])
     },
     nodeStyles() {
       return {
@@ -50,6 +79,17 @@ export default {
     questions() {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
+    },
+    activeStarSrc() {
+      return Helpers.getImagePath(ActiveStar)
+    },
+    inactiveStarSrc() {
+      return Helpers.getImagePath(InactiveStar)
+    },
+    numComplete() {
+      const reducer = (accumulator, completed) =>
+        accumulator + (completed === true ? 1 : 0)
+      return this.questions.map(n => n.completed).reduce(reducer, 0)
     },
   },
   mounted() {
@@ -92,8 +132,48 @@ body.tapestry-stage-open {
   height: 100%;
   width: 100%;
 
+  .stage-header {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    top: 32px;
+    right: 32px;
+    font-family: "VT323", monospace;
+    color: var(--tyde-border-green);
+    align-items: center;
+
+    .stage-star {
+      margin-left: 25vw;
+      margin-right: 30px;
+      padding-bottom: 10px;
+      position: relative;
+      font-family: inherit;
+      color: white;
+      font-size: 32px;
+
+      img {
+        width: 80px;
+      }
+
+      > div {
+        position: absolute;
+        left: 25%;
+        top: 23%;
+      }
+    }
+
+    h1 {
+      font-family: inherit;
+      font-size: 64px;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
   > div {
-    width: 70vw;
+    width: 100vw;
     height: 72vh;
     position: absolute;
     top: 32px;
@@ -105,16 +185,8 @@ body.tapestry-stage-open {
     padding: 64px;
     color: var(--tyde-border-green);
 
-    h1 {
-      font-family: inherit;
-      font-size: 64px;
-
-      &::before {
-        display: none;
-      }
-    }
-
     > section {
+      margin-left: 30vw;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -133,6 +205,14 @@ body.tapestry-stage-open {
         div {
           width: 198px;
           height: 184px;
+
+          i {
+            position: relative;
+            right: -75px;
+            bottom: 30px;
+            -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: white;
+          }
 
           img {
             width: 90%;
@@ -155,6 +235,7 @@ body.tapestry-stage-open {
   }
 
   footer {
+    margin-left: 30vw;
     display: flex;
     justify-content: flex-end;
 

@@ -147,7 +147,9 @@ export default {
         this.setDataset(event.detail.dataset)
       }
       const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
-      stages.map(n => this.updateTydeProgress({parentId: n.id, isParentModule: false}))
+      stages.map(n =>
+        this.updateTydeProgress({ parentId: n.id, isParentModule: false })
+      )
     },
     getEmptyNode() {
       return {
