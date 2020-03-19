@@ -80,7 +80,7 @@ export default {
       }
       const { height } = this.videoDimensions
       if (height > this.dimensions.height) {
-        return { height: this.dimensions.height + "px", width: "auto" }
+        return { height: this.dimensions.height - 24 + "px", width: "auto" }
       } else {
         return { width: "100%" }
       }
