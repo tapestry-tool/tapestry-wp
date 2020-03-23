@@ -18,6 +18,17 @@
       @submit="$emit('submit')"
     />
     <div v-else>
+      <div v-if="question.isFollowUp">
+        <h1>{{ lastQuestion.text }}</h1>
+        <div>
+          <p>Previously, you said:</p>
+          <div
+            v-for="answer in answers"
+            :key="answer.type"
+            v-html="answer.entry"
+          ></div>
+        </div>
+      </div>
       <h1 class="question-title">
         {{ question.text }}
       </h1>
@@ -54,7 +65,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
@@ -89,6 +100,25 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getEntry", "getQuestion"]),
+    lastQuestion() {
+      if (this.question.previousEntry) {
+        return this.getQuestion(this.question.previousEntry)
+      }
+      return null
+    },
+    answers() {
+      if (this.question.previousEntry) {
+        const previousQuestion = this.lastQuestion
+        const answeredTypes = Object.entries(previousQuestion.answers)
+          .filter(entry => entry[1].length > 0)
+          .map(i => i[0])
+        return answeredTypes.map(type =>
+          this.getEntry(this.node.id, this.question.id, type)
+        )
+      }
+      return []
+    },
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)
     },

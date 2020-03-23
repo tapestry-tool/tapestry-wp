@@ -156,7 +156,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
   height: 100%;
 }
 .media-wrapper-embed {

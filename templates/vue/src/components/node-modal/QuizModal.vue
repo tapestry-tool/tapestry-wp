@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
 import H5PApi from "../../services/H5PApi"
@@ -164,9 +164,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getActivities"]),
+    ...mapState(["nodes"]),
     activities() {
-      return this.getActivities({ exclude: [this.node.id] })
+      const rest = this.nodes.filter(node => node.id != this.node.id)
+      return rest.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
     },
   },
   watch: {
