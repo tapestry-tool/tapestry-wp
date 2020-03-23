@@ -117,6 +117,13 @@ $hh: 30px;
   .tyde-part-icon {
     border-radius: 50%;
     margin-left: 10px;
+
+    > img {
+        position: absolute;
+        width: 85%;
+        top: 7.5%;
+        left: 7.5%;
+    }
   }
 
   > div {
