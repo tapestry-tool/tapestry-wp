@@ -1,42 +1,29 @@
 <template>
-  <section id="tyde-menu-home">
-    <nav>
-      <ul>
-        <tyde-tab
-          v-for="tab in tabs"
-          :key="tab"
-          :is-active="tab === activeTab"
-          @click="setActiveTab(tab)"
-        >
-          See {{ tab }}
-        </tyde-tab>
-      </ul>
-    </nav>
-    <ul class="logs">
-      <tyde-log
-        v-for="log in visibleLogs"
-        :key="log.name"
-        :log="log"
-        @close="$emit('close')"
-      />
-    </ul>
+  <section id="tyde-cockpit" :style="cockpitImage">
+    <div v-for="node in this.nodes" :key="node.id">
+      <div
+        v-if="isNodeModuleType(node)"
+        :id="`tyde-cockpit-`+node.id"
+        :src="moduleImage(node)"
+        :style="moduleStyles(node)"
+        @mouseover="nodeMouseOverHandler(node)"
+        @mouseleave="nodeMouseLeaveHandler(node)"
+      >
+      </div>
+    </div>
   </section>
 </template>
 
 <script>
-import TydeLog from "./TydeLog"
-import TydeTab from "./TydeTab"
 import Helpers from "@/utils/Helpers"
 import TapestryApi from "@/services/TapestryAPI"
+import { tydeTypes } from "@/utils/constants"
+import { mapGetters } from "vuex"
 
 const TapestryApiClient = new TapestryApi(wpPostId)
 
 export default {
-  name: "tyde-menu-home",
-  components: {
-    TydeLog,
-    TydeTab,
-  },
+  name: "tyde-cockpit",
   props: {
     logs: {
       type: Array,
@@ -52,6 +39,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["settings", "nodes"]),
     visibleLogs() {
       const filter = this.activeTab
       if (filter === "activities") {
@@ -65,6 +53,12 @@ export default {
       }
       return this.logsWithAnswers
     },
+    cockpitImage() {
+      return {
+        backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`
+      }
+    },
+
   },
   watch: {
     /**
@@ -105,12 +99,39 @@ export default {
         return ""
       }
     },
+    moduleStyles(node) {
+      return {
+        backgroundImage: `url(${node.typeData.spaceshipPartNotEarnedIconUrl})`,
+        position: 'relative',
+        top: node.typeData.spaceshipPartY+'px',
+        left: node.typeData.spaceshipPartX+'px',
+        height: node.typeData.spaceshipPartHeight+'px',
+        width: node.typeData.spaceshipPartWidth+'px'
+      }
+    },
+    moduleImage(node) {
+      if (node.tydeProgress == 1) {
+        return node.typeData.spaceshipPartEarnedIconUrl
+      } else {
+        return node.typeData.spaceshipPartNotEarnedIconUrl
+      }
+    },
+    isNodeModuleType(node) {
+      return node.tydeType === tydeTypes.MODULE
+    },
+    nodeMouseOverHandler(node) {
+      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${node.typeData.spaceShipPartHoverIconUrl})`
+    },
+    nodeMouseLeaveHandler(node) {
+      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${this.moduleImage(node)})`
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-#tyde-menu-home {
+#tyde-cockpit {
+  height: 85vh;
   nav ul {
     display: flex;
     font-size: 16px;
@@ -126,4 +147,5 @@ export default {
     overflow-y: scroll;
   }
 }
+
 </style>
