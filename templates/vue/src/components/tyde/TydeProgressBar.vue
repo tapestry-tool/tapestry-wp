@@ -1,19 +1,22 @@
 <template>
   <div class="progress-wrapper">
-    <div :style="outerCSS">
-      <div :style="innerCSS"></div>
-      <img
-        v-for="n in incompleteStages"
-        :key="n"
-        :style="starStyle(n)"
-        :src="inactiveStarSrc"
-      />
-      <img
-        v-for="m in range(incompleteStages + 1, incompleteStages + completeStages)"
-        :key="m"
-        :style="starStyle(m)"
-        :src="activeStarSrc"
-      />
+    <div class="bar-wrapper" :style="wrapperCSS">
+      <div class="outer-progress" :style="outerCSS">
+        <div class="inner-progress" :style="innerCSS"></div>
+        <img
+          v-for="n in incompleteStages"
+          :key="n"
+          :style="starStyle(n)"
+          :src="inactiveStarSrc"
+        />
+        <img
+          v-for="m in range(incompleteStages + 1, incompleteStages + completeStages)"
+          :key="m"
+          :style="starStyle(m)"
+          :src="activeStarSrc"
+        />
+      </div>
+      <div class="end-buffer" :style="barBufferStyle"></div>
     </div>
     <div class="tyde-part-icon" :style="iconCSS">
       <img v-if="progress !== 1" :src="node.typeData.planetViewNotEarnedIconUrl" />
@@ -89,16 +92,31 @@ export default {
     inactiveStarSrc() {
       return Helpers.getImagePath(InactiveStar)
     },
+    barBufferStyle() {
+      const leng = this.starDistance(2)
+      return {
+        background: this.progress === 1 ? "var(--tapestry-light-blue)" : "gray",
+        width: leng + "px",
+      }
+    },
+    wrapperCSS() {
+      return {
+        width: this.width + this.starDistance(2) + "px",
+        height: this.height + "px",
+      }
+    },
   },
   methods: {
     starStyle(k) {
-      const increment = 1 / this.stages.length
-      var rightPos = (k - 1) * increment * this.width - (this.height + 6) / 2
       return {
         height: this.height + 6 + "px",
         width: this.height + 6 + "px",
-        right: rightPos + "px",
+        right: this.starDistance(k) + this.starDistance(2) + "px",
       }
+    },
+    starDistance(k) {
+      const increment = 1 / this.stages.length
+      return (k - 1) * increment * this.width - (this.height + 6) / 2
     },
     range(start, end) {
       return Helpers.range(start, end)
@@ -108,8 +126,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$hh: 30px;
-
 .progress-wrapper {
   display: flex;
   align-items: center;
@@ -117,16 +133,18 @@ $hh: 30px;
   .tyde-part-icon {
     border-radius: 50%;
     margin-left: 10px;
+    position: relative;
+    border: solid 2px lightgray;
 
     > img {
-        position: absolute;
-        width: 85%;
-        top: 7.5%;
-        left: 7.5%;
+      position: absolute;
+      width: 85%;
+      top: 7.5%;
+      left: 7.5%;
     }
   }
 
-  > div {
+  .bar-wrapper {
     background: gray;
     border: solid 2px lightgray;
     min-height: 3vh;
@@ -135,16 +153,27 @@ $hh: 30px;
     position: relative;
     overflow: hidden;
 
-    > div {
-      background: var(--tapestry-light-blue);
-      border-radius: 8px;
-      height: 101%;
+    .outer-progress {
+      .inner-progress {
+        background: var(--tapestry-light-blue);
+        border-radius: 8px;
+        height: 110%;
+      }
+
+      > img {
+        position: absolute;
+        padding-bottom: 3px;
+        top: 0px;
+        z-index: 1;
+      }
     }
 
-    > img {
+    .end-buffer {
       position: absolute;
-      padding-bottom: 3px;
+      height: 110%;
+      right: 0px;
       top: 0px;
+      z-index: 0;
     }
   }
 }
