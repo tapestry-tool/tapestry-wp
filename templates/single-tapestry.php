@@ -104,13 +104,25 @@ get_header(); ?>
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry.css" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.css" rel="stylesheet" />
+            
+        <!-- Get Gravity Forms CSS if plugin is installed -->
+        <?php if (class_exists("GFCommon")) :
+            echo '<link href="' . GFCommon::get_base_url() . '/css/formsmain.min.css" rel="stylesheet" />';
+        endif; ?>
+
+        <?php if (class_exists("GFImageChoices")) :
+            $GF_Image_Choices_Object = new GFImageChoices();
+            echo '<link href="' . plugin_dir_url(__FILE__) . 'libs/gf-image-ui.css" rel="stylesheet" />';
+            echo '<link href="' . $GF_Image_Choices_Object->get_base_url() . '/css/gf_image_choices.css" rel="stylesheet" />';
+            echo '<script src="' . $GF_Image_Choices_Object->get_base_url() . '/js/gf_image_choices.js" type="application/javascript"></script>';
+        endif; ?>
 
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/h5p-resizer.min.js" charset="UTF-8"></script>
-
+        
         <script>
             // EXAMPLE OF USAGE:
             // thisTapestryTool.setDataset({'abc':'123'});
