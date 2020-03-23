@@ -33,6 +33,8 @@
           </b-form-group>
           <b-form-group v-if="question.isFollowUp" label="Previous Activity">
             <combobox
+              v-model="question.previousEntry"
+              class="mb-0"
               :options="activities"
               item-text="text"
               item-value="id"
@@ -55,6 +57,7 @@
             <b-form-group label="Textbox Gravity Form">
               <combobox
                 v-model="question.answers.textId"
+                class="mb-0"
                 :data-testid="`question-answer-textbox-${index}`"
                 :options="formOptions"
                 item-text="title"
@@ -73,6 +76,7 @@
             <b-form-group label="H5P Audio Recorder">
               <combobox
                 v-model="question.answers.audioId"
+                class="mb-0"
                 :options="h5pOptions"
                 item-text="title"
                 item-value="id"
@@ -90,6 +94,7 @@
             <b-form-group label="Checklist Gravity Form">
               <combobox
                 v-model="question.answers.checklistId"
+                class="mb-0"
                 :options="formOptions"
                 item-text="title"
                 item-value="id"
