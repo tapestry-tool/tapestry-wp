@@ -20,13 +20,16 @@
     <div v-else>
       <div v-if="question.isFollowUp">
         <h1>{{ lastQuestion.text }}</h1>
-        <div>
+        <div v-if="answers.length">
           <p>Previously, you said:</p>
           <div
             v-for="answer in answers"
             :key="answer.type"
             v-html="answer.entry"
           ></div>
+        </div>
+        <div v-else>
+          <p>You haven't done the previous activity yet.</p>
         </div>
       </div>
       <h1 class="question-title">
@@ -109,13 +112,12 @@ export default {
     },
     answers() {
       if (this.question.previousEntry) {
-        const previousQuestion = this.lastQuestion
-        const answeredTypes = Object.entries(previousQuestion.answers)
+        const answeredTypes = Object.entries(this.lastQuestion.answers)
           .filter(entry => entry[1].length > 0)
           .map(i => i[0])
-        return answeredTypes.map(type =>
-          this.getEntry(this.node.id, this.question.id, type)
-        )
+        return answeredTypes
+          .map(type => this.getEntry(this.question.previousEntry, type))
+          .filter(Boolean)
       }
       return []
     },

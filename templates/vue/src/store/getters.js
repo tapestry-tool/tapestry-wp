@@ -19,13 +19,9 @@ export function getQuestion(state) {
   }
 }
 
-export function getEntry(_, { getNode }) {
-  return (nodeId, questionId, answerType) => {
-    const node = getNode(nodeId)
-    if (!node || !node.quiz) {
-      return null
-    }
-    const question = node.quiz.find(q => q.id === questionId)
+export function getEntry(_, { getQuestion }) {
+  return (questionId, answerType) => {
+    const question = getQuestion(questionId)
     if (!question) {
       return null
     }
