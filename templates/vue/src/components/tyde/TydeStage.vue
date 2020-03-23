@@ -2,11 +2,7 @@
   <div class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
-        <tyde-progress-bar
-          :node-id="parent.id"
-          :width="200"
-          :progress="parent.tydeProgress"
-        />
+        <tyde-progress-bar :node-id="this.moduleId" />
         <div v-if="this.done" class="stage-star">
           <img :src="this.activeStarSrc" />
         </div>
@@ -14,7 +10,7 @@
           <img :src="this.inactiveStarSrc" />
           <div>{{ this.numComplete }}/{{ this.questions.length }}</div>
         </div>
-        <h1>{{ node.title + " " + parent.tydeProgress }}</h1>
+        <h1>{{ node.title }}</h1>
       </div>
       <section>
         <button
@@ -65,11 +61,11 @@ export default {
     node() {
       return this.getNode(this.nodeId)
     },
-    module() {
+    moduleId() {
       const moduleIds = this.getDirectParents(this.nodeId).filter(
         id => this.getNode(id).tydeType === tydeTypes.MODULE
       )
-      return this.getNode(moduleIds[0])
+      return moduleIds[0]
     },
     nodeStyles() {
       return {
