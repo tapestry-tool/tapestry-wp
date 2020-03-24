@@ -21,9 +21,14 @@
           :node-id="row.node.id"
           :dimensions="dimensions"
           :autoplay="false"
+          style="color: white; margin-bottom: 24px;"
           @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
         />
+        <sub-accordion
+          v-if="row.children.length > 0"
+          :rows="row.children"
+        ></sub-accordion>
       </template>
       <template v-slot:footer>
         <button v-if="row.node.completed" class="mt-2" @click="next">
@@ -60,6 +65,7 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -67,6 +73,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    SubAccordion,
   },
   props: {
     node: {
@@ -90,7 +97,7 @@ export default {
       const children = this.getDirectChildren(this.node.id).map(this.getNode)
       return children.map(node => ({
         node,
-        children: this.getDirectChildren(node.id),
+        children: this.getDirectChildren(node.id).map(this.getNode),
       }))
     },
     dimensions() {
