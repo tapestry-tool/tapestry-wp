@@ -211,11 +211,20 @@ function tapestryTool(config){
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
+            const getDirectChildren = id => this.dataset.links
+                .filter(link => link.source == id)
+                .map(link => link.target)
+
             if (node.mediaType === "accordion") {
-                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
+                const accordionRowIds = getDirectChildren(node.id)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
+                    const subRows = getDirectChildren(accordionRowId)
+                    subRows.forEach(id => {
+                        const subRow = this.dataset.nodes[findNodeIndex(id)]
+                        subRow.presentationStyle = "accordion-row"
+                    })
                 })
             }
 
