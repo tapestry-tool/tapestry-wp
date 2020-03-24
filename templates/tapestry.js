@@ -1064,7 +1064,7 @@ function tapestryTool(config){
                 return d.imageURL;
             });
         
-        // Create a porgress bar under the node
+        // Add progress bar above module nodes
         nodes.append("foreignObject")
             .filter(function (d){
                 return getViewable(d) && d.tydeType === "Module";
