@@ -3,7 +3,7 @@
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
-      :key="row.id"
+      :key="row.node.id"
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
@@ -13,20 +13,20 @@
           @click="toggle(index)"
         >
           <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-          {{ row.title }}
+          {{ row.node.title }}
         </button>
       </template>
       <template v-slot:content>
         <tapestry-media
-          :node-id="row.id"
+          :node-id="row.node.id"
           :dimensions="dimensions"
           :autoplay="false"
-          @complete="updateProgress(row.id)"
+          @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
         />
       </template>
       <template v-slot:footer>
-        <button v-if="row.completed" class="mt-2" @click="next">
+        <button v-if="row.node.completed" class="mt-2" @click="next">
           {{ node.typeData.finishButtonText }}
         </button>
       </template>
@@ -87,7 +87,11 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.getDirectChildren(this.node.id).map(this.getNode)
+      const children = this.getDirectChildren(this.node.id).map(this.getNode)
+      return children.map(node => ({
+        node,
+        children: this.getDirectChildren(node.id),
+      }))
     },
     dimensions() {
       if (!this.isMounted) {
@@ -104,7 +108,7 @@ export default {
       return this.node.typeData.lockRows
     },
     disabledFrom() {
-      return this.rows.findIndex(node => !node.completed)
+      return this.rows.findIndex(row => !row.node.completed)
     },
   },
   methods: {
