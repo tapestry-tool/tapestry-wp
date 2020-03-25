@@ -198,8 +198,11 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
+        const { roles: allRoles } = wp;
+        const roles = Object.keys(allRoles).filter(key => key !== "administrator" && key !== "author");
+
         var reorderPermissions = permissions => {
-            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            var withoutDuplicates = new Set(["public", "authenticated", ...roles, ...Object.keys(permissions)])
             return [...withoutDuplicates];
         }
 
