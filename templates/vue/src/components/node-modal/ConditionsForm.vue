@@ -17,7 +17,7 @@
         </button>
         <b-form-group label="Node">
           <b-form-select
-            v-model="condition.value"
+            v-model="condition.nodeId"
             :options="nodeOptions"
           ></b-form-select>
         </b-form-group>
@@ -44,7 +44,7 @@ import { conditionTypes } from "@/utils/constants"
 
 const baseCondition = {
   type: conditionTypes.NODE_COMPLETED,
-  value: 0,
+  nodeId: 0,
 }
 
 export default {

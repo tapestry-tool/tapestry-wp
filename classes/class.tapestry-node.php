@@ -192,11 +192,11 @@ class TapestryNode implements ITapestryNode
      * 
      * @return NULL
      */
-    public function updateConditions($nodeId)
+    public function removeConditionsById($nodeId)
     {
         $listModified = false;
         foreach($this->conditions as $conditionId => $condition) {
-            if ($condition->value == $nodeId) {
+            if ($condition->nodeId == $nodeId) {
                 array_splice($this->conditions, $conditionId, 1);
                 $listModified = true;
             }

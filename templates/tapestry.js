@@ -1110,7 +1110,7 @@ function tapestryTool(config){
                     const listItem = document.createElement("li");
                     switch (cond.type) {
                         case conditionTypes.NODE_COMPLETED: {
-                            const node = getNodeById(cond.value);
+                            const node = getNodeById(cond.nodeId);
                             listItem.innerText = `Complete "${node.title}"`;
                             break;
                         }
@@ -2072,19 +2072,19 @@ function tapestryTool(config){
         nodes.forEach(node => {
             const { conditions } = node
             conditions.forEach(condition => {
-                const conditionNode = nodes[findNodeIndex(condition.value)]
+                const conditionNode = nodes[findNodeIndex(condition.nodeId)]
                 let mayUnlockNodes = conditionNode.mayUnlockNodes
-                mayUnlockNodes.push({id: node.id, condition: condition})
-                conditionNode.mayUnlockNodes = mayUnlockNodes
-                switch (condition.type) {
-                    case conditionTypes.NODE_COMPLETED: {
-                        condition.fulfilled = conditionNode.completed
-                        break
+                    mayUnlockNodes.push({id: node.id, condition: condition})
+                    conditionNode.mayUnlockNodes = mayUnlockNodes
+                    switch (condition.type) {
+                        case conditionTypes.NODE_COMPLETED: {
+                            condition.fulfilled = conditionNode.completed
+                            break
+                        }
+                        default:
+                            condition.fulfilled = false
+                            break
                     }
-                    default:
-                        condition.fulfilled = false
-                        break
-                }
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
         })
@@ -2100,7 +2100,7 @@ function tapestryTool(config){
         const node = nodes[findNodeIndex(nodeId)];
         const { conditions } = node;
         conditions.forEach(condition => {
-            const conditionNode = nodes[findNodeIndex(condition.value)];
+            const conditionNode = nodes[findNodeIndex(condition.nodeId)];
             const mayUnlockNodes = conditionNode.mayUnlockNodes.filter(thisNode => {
                 return thisNode.id != nodeId;
             });
