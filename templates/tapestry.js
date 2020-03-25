@@ -206,11 +206,19 @@ function tapestryTool(config){
             return [...withoutDuplicates];
         }
 
+        const getDefaultRoles = () => {
+            const obj = {}
+            Object.keys(allRoles)
+                .filter(role => role !== "administrator" && role !== "author")
+                .forEach(role => (obj[role] = ["read"]));
+            return obj;
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
             var updatedNode = fillEmptyFields(node, { accordionProgress: [], skippable: true, behaviour: "embed", completed: false, quiz: [] })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
-                { authenticated: ["read"] }
+                { authenticated: ["read"], ...getDefaultRoles() }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
