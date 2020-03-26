@@ -57,7 +57,7 @@ export default {
   computed: {
     ...mapState(["lightbox"]),
     spaceshipIconUrl() {
-      return `${wpData.vue_uri}/${SpaceshipIcon.split("dist")[1]}`
+      return Helpers.getImagePath(SpaceshipIcon)
     }
   },
   beforeDestroy() {

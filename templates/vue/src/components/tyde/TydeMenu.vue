@@ -31,7 +31,6 @@
     <div class="content">
       <tyde-cockpit
         v-if="activePage === 'home'"
-        :logs="logs"
         @close="$emit('continue')"
       />
       <tyde-menu-settings
