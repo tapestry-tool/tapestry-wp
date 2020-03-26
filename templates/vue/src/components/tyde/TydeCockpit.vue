@@ -3,6 +3,7 @@
     <div v-for="node in this.nodes" :key="node.id">
       <div
         v-if="isNodeModuleType(node)"
+        class="tyde-spaceship-part"
         :id="`tyde-cockpit-`+node.id"
         :src="moduleImage(node)"
         :style="moduleStyles(node)"
@@ -102,7 +103,6 @@ export default {
     moduleStyles(node) {
       return {
         backgroundImage: `url(${node.typeData.spaceshipPartNotEarnedIconUrl})`,
-        position: 'relative',
         top: node.typeData.spaceshipPartY+'px',
         left: node.typeData.spaceshipPartX+'px',
         height: node.typeData.spaceshipPartHeight+'px',
@@ -131,7 +131,14 @@ export default {
 
 <style lang="scss" scoped>
 #tyde-cockpit {
-  height: 85vh;
+  background-size: cover;
+  margin: -16px -32px;
+  height: calc(100% + 32px);
+  .tyde-spaceship-part {
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+  }
   nav ul {
     display: flex;
     font-size: 16px;
