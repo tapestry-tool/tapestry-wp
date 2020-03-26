@@ -4,15 +4,18 @@
       <div class="outer-progress" :style="outerCSS">
         <div class="inner-progress" :style="innerCSS"></div>
         <img
-          v-for="n in incompleteStages"
-          :key="n"
-          :style="starStyle(n)"
+          v-for="inactiveStarIndex in incompleteStages"
+          :key="inactiveStarIndex"
+          :style="starStyle(inactiveStarIndex)"
           :src="inactiveStarSrc"
         />
         <img
-          v-for="m in range(incompleteStages + 1, incompleteStages + completeStages)"
-          :key="m"
-          :style="starStyle(m)"
+          v-for="activeStarIndex in range(
+            incompleteStages + 1,
+            incompleteStages + completeStages
+          )"
+          :key="activeStarIndex"
+          :style="starStyle(activeStarIndex)"
           :src="activeStarSrc"
         />
       </div>
@@ -109,8 +112,6 @@ export default {
   methods: {
     starStyle(k) {
       return {
-        height: this.height + 6 + "px",
-        width: this.height + 6 + "px",
         right: this.starDistance(k) + this.starDistance(2) + "px",
       }
     },
@@ -165,6 +166,8 @@ export default {
         padding-bottom: 3px;
         top: 0px;
         z-index: 1;
+        width: auto;
+        height: 110%;
       }
     }
 
