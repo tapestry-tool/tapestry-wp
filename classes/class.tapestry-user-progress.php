@@ -189,7 +189,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
-        $quiz->$questionId = true;
+        $quiz[$questionId]['completed'] = true;
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }
 
@@ -261,8 +261,8 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         if (isset($completed_values) && is_array($completed_values)) {
-            foreach ($completed_values as $id => $completed) {
-                $quiz[$id]['completed'] = $completed;
+            foreach ($completed_values as $id => $info) {
+                $quiz[$id]['completed'] = $info['completed'];
             }
         }
 
