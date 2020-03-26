@@ -89,6 +89,19 @@
           <b-form-invalid-feedback :state="isAnswerValid(question)">
             Please enter an ID in at least one of the answer types.
           </b-form-invalid-feedback>
+          <b-form-group label="Confirmation Page Title">
+            <b-form-input
+              v-model="question.confirmationTitle"
+              :data-testid="`question-confirmation-title-${index}`"
+            />
+          </b-form-group>
+          <b-form-group label="Confirmation Page Message">
+            <b-form-textarea
+              v-model="question.confirmationMessage"
+              :data-testid="`question-confirmation-message-${index}`"
+              placeholder="Enter message"
+            ></b-form-textarea>
+          </b-form-group>
         </b-form-group>
       </b-card>
     </div>
