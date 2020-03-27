@@ -105,7 +105,13 @@ export default {
         case "edit-node":
           return this.selectedNode.permissionsOrder
         default:
-          return ["public", "authenticated"]
+          return [
+            "public",
+            "authenticated",
+            ...Object.keys(wpData.roles).filter(
+              role => role !== "administrator" && role !== "author"
+            ),
+          ]
       }
     },
     wpCanEditTapestry: function() {

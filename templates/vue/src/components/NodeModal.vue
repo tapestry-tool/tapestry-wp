@@ -537,7 +537,7 @@ export default {
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
       const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user")) {
+      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.isPermissionDisabled(higherRow, type)
       }
 
@@ -563,7 +563,7 @@ export default {
       this.$set(this.node.permissions, rowName, newPermissions)
     },
     updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user")) {
+      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.changeIndividualPermission(value, rowName, type)
       }
       const rowIndex = this.getPermissionRowIndex(rowName)

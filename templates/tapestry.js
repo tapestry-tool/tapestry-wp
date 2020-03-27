@@ -189,9 +189,22 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
+        const exceptions = ["administrator", "author", "editor"];
+
+        const { roles: allRoles } = wp;
+        const roles = Object.keys(allRoles).filter(key => !exceptions.includes(key));
+
         var reorderPermissions = permissions => {
-            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            var withoutDuplicates = new Set(["public", "authenticated", ...roles, ...Object.keys(permissions)])
             return [...withoutDuplicates];
+        }
+
+        const getDefaultRoles = () => {
+            const obj = {}
+            Object.keys(allRoles)
+                .filter(key => !exceptions.includes(key))
+                .forEach(role => (obj[role] = ["read"]));
+            return obj;
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
@@ -205,7 +218,7 @@ function tapestryTool(config){
             })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
-                { authenticated: ["read"] }
+                { authenticated: ["read"], ...getDefaultRoles() }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
