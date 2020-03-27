@@ -1,6 +1,6 @@
 <template>
   <div class="tyde-summary">
-    <header class="p-3">
+    <header class="p-3 mb-4">
       <h1 class="title">{{ module.title }}</h1>
       <ul>
         <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
@@ -13,7 +13,7 @@
     </header>
     <div v-if="activeTab === 0">
       <div v-for="stage in stages" :key="stage.node.id" class="p-3">
-        <h4 class="mx-0 mb-4">{{ stage.node.title }}</h4>
+        <h4 class="mx-0 mb-4 mt-2">{{ stage.node.title }}</h4>
         <p v-if="stage.topics.length === 0">
           You haven't completed a topic yet.
         </p>
@@ -95,6 +95,10 @@ export default {
 
   * {
     font-family: var(--tyde-font-mono);
+  }
+
+  h4 {
+    font-size: 2em;
   }
 
   header {

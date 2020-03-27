@@ -90,7 +90,11 @@ export default {
   border-radius: 16px;
   padding: 16px 32px;
 
-  * {
+  h4 {
+    font-size: 1.8em;
+  }
+
+  *:not(.fas) {
     text-align: left;
     font-family: inherit;
   }
