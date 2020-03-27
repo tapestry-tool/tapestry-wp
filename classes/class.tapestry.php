@@ -123,6 +123,20 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
+    /**
+     * Retrieves ids of all copilot-only nodes. Assumes the
+     * currently logged in user is a copilot.
+     */
+    public function getCopilotNodeIds()
+    {
+        $postId = $this->postId;
+        function isCopilotNode($id)
+        {
+            $node = new TapestryNode($postId, $id);
+            return in_array("copilot", $node->permissions);
+        }
+        return array_filter($this->nodes, "isCopilotNode");
+    }
 
     /**
      * Add a new node

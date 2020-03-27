@@ -1,6 +1,7 @@
 <?php
 // TODO Change exceptions to using an ERROR class
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
+require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 
 /**
  * Add/update/retrieve User progress
@@ -39,9 +40,12 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_checkUserAndPostId();
 
         $tapestry = new Tapestry($this->postId);
-        $nodeIdArr = $tapestry->getNodeIds();
+        $nodeIds = $tapestry->getNodeIds();
 
-        return $this->_getUserProgress($nodeIdArr);
+        if (!TapestryUserRoles::isRole('copilot')) {
+            $progress = $this->_getUserProgress($nodeIds, $this->_userId);
+            return json_encode($progress);
+        }
     }
 
     /**
@@ -129,11 +133,11 @@ class TapestryUserProgress implements ITapestryUserProgress
      * 
      * @return String user entries in json format
      */
-    public function getUserEntries($formId = 0)
+    public function getUserEntries($userId, $formId = 0)
     {
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
-            'value' => $this->_userId
+            'value' => $userId
         );
         $entries = GFAPI::get_entries($formId, $search_criteria);
         return $this->_formatEntries($entries);
@@ -177,13 +181,13 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }
 
-    private function _getUserProgress($nodeIdArr)
+    private function _getUserProgress($nodeIdArr, $userId)
     {
         $progress = new stdClass();
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodeIdArr as $nodeId) {
-            $progress_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
+            $progress_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
             $progress->$nodeId = new stdClass();
             if ($progress_value !== null) {
                 $progress->$nodeId->progress = (float) $progress_value;
@@ -192,28 +196,25 @@ class TapestryUserProgress implements ITapestryUserProgress
             }         
 
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
+            $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
             if ($completed_value !== null) {
                 $progress->$nodeId->completed = $completed_value === "1";
             } else {
                 $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
             }
 
-            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
+            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
             $progress->$nodeId->quiz = $quiz;
         }
-
-        $progress->entries = $this->getUserEntries();
-
         return json_encode($progress);
     }
 
-    private function _getQuizProgress($nodeId, $nodeMetadata)
+    private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
     {
         $quiz = array();
-        $completed_values = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
+        $completed_values = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
 
-        $entries = $this->getUserEntries();
+        $entries = $this->getUserEntries($userId);
 
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
             foreach ($nodeMetadata->quiz as $question) {
