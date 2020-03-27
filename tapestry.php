@@ -86,6 +86,37 @@ function create_tapestry_node_type()
 add_action('init', 'create_tapestry_node_type');
 
 /**
+ * Add the copilot role on plugin activation
+ */
+function create_copilot_role()
+{
+    add_role(
+        'copilot',
+        'Copilot',
+        array(
+            'read'  => true,
+            'edit_posts' => true
+        )
+    );
+}
+add_action('init', 'create_copilot_role');
+
+function add_copilot_teen_field($user) 
+{ ?>
+    <table class="form-table">
+    <tr>
+        <th><label for="teenId"><?php _e("Teen ID"); ?></label></th>
+        <td>
+            <input type="text" name="teenId" id="teenId" value="<?php echo esc_attr( get_the_author_meta('teenId', $user->ID)); ?>" class="regular-text" /><br />
+            <span class="description"><?php _e("Please enter your teen's user ID."); ?></span>
+        </td>
+    </tr>
+    </table>
+<?php }
+add_action('show_user_profile', 'add_copilot_teen_field');
+add_action('edit_user_profile', 'add_copilot_teen_field');
+
+/**
  * Show posts of Tapestry type on the home page
  */
 function add_tapestry_post_types_to_query($query)
