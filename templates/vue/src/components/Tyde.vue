@@ -6,7 +6,8 @@
       :node-id="moduleId"
       @done="showModule = false"
     />
-    <tyde-backpack @return-to-map="showModule = false" />
+    <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
+    <tyde-spaceship @return-to-map="showModule = false" />
   </div>
 </template>
 
@@ -14,7 +15,7 @@
 import Tapestry from "./Tapestry"
 import TydeModule from "./tyde/TydeModule"
 import TydeModuleSummary from "./tyde/TydeModuleSummary"
-import TydeBackpack from "./tyde/TydeBackpack"
+import TydeSpaceship from "./tyde/TydeSpaceship"
 
 export default {
   name: "tyde",
@@ -22,7 +23,7 @@ export default {
     Tapestry,
     TydeModule,
     TydeModuleSummary,
-    TydeBackpack,
+    TydeSpaceship,
   },
   data() {
     return {

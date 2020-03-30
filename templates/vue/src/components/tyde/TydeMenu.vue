@@ -17,16 +17,20 @@
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button
+        icon="space-shuttle"
+        class="cockpit-button"
+        label="Cockpit"
+        @click="setActivePage('home')"
+      ></tyde-button>
+      <tyde-button
         class="close-button"
         icon="times"
         @click="$emit('continue')"
       ></tyde-button>
     </div>
     <div class="content">
-      <h1>Captain's Log</h1>
-      <tyde-menu-home
+      <tyde-cockpit
         v-if="activePage === 'home'"
-        :logs="logs"
         @close="$emit('continue')"
       />
       <tyde-menu-settings
@@ -42,7 +46,7 @@
 
 <script>
 import TydeButton from "./TydeButton"
-import TydeMenuHome from "./TydeMenuHome"
+import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
@@ -51,7 +55,7 @@ export default {
   name: "tyde-menu",
   components: {
     TydeButton,
-    TydeMenuHome,
+    TydeCockpit,
     TydeMenuSettings,
     TydeMenuHelp,
   },
@@ -150,6 +154,13 @@ export default {
         z-index: -1;
       }
     }
+  }
+
+  .cockpit-button {
+    position: absolute;
+    right: 80px;
+    top: 17px;
+    z-index: 10;
   }
 
   .close-button {

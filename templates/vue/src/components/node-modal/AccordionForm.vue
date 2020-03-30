@@ -37,8 +37,8 @@ export default {
     this.node.typeData = {
       lockRows: false,
       finishButtonText: "Finish",
-      confirmationTitleText: "Section Complete!",
-      confirmationBodyText: "Would you like to continue?",
+      confirmationTitleText: "Well done!",
+      confirmationBodyText: "Ready to keep going?",
       continueButtonText: "Continue",
       cancelLinkText: "Cancel",
       ...this.node.typeData,

@@ -1,7 +1,9 @@
 <template>
   <div>
     <b-form-group>
-      <b-form-checkbox v-model="canAddQuestion">Add Question</b-form-checkbox>
+      <b-form-checkbox v-model="canAddQuestion" data-testid="add-question-checkbox">
+        Add Question
+      </b-form-checkbox>
     </b-form-group>
     <div v-if="canAddQuestion" class="quiz">
       <b-card
@@ -25,12 +27,16 @@
             </b-button>
           </b-row>
           <b-form-group label="Question Text">
-            <b-form-input v-model="question.text" />
+            <b-form-input
+              v-model="question.text"
+              :data-testid="`question-title-${index}`"
+            />
           </b-form-group>
           <b-form-group label="Question Answer Types">
             <b-form-group label="Textbox Gravity Form">
               <combobox
                 v-model="question.answers.textId"
+                :data-testid="`question-answer-textbox-${index}`"
                 :options="formOptions"
                 item-text="title"
                 item-value="id"
@@ -136,6 +142,8 @@ export default {
     canAddQuestion(isAdding) {
       if (isAdding && !this.questions.length) {
         this.addQuestion()
+      } else if (!isAdding && this.questions.length) {
+        this.questions = []
       }
     },
     questions(newQuestions) {

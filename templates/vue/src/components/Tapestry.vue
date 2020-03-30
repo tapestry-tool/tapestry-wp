@@ -136,6 +136,7 @@ export default {
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
+      "updateTydeProgress",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
@@ -145,6 +146,10 @@ export default {
       } else {
         this.setDataset(event.detail.dataset)
       }
+      const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+      stages.map(n =>
+        this.updateTydeProgress({ parentId: n.id, isParentModule: false })
+      )
     },
     getEmptyNode() {
       return {
@@ -225,13 +230,19 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 },
-          ],
+          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          planetViewNotEarnedIconUrl: "",
+          planetViewEarnedIconUrl: "",
+          spaceshipPartNotEarnedIconUrl: "",
+          spaceShipPartEarnedIconUrl: "",
+          spaceShipPartHoverIconUrl: "",
+          spaceshipPartX: 0,
+          spaceshipPartY: 0,
+          spaceshipPartWidth: 0,
+          spaceshipPartHeight: 0,
         },
         unlocked: true,
         hideTitle: false,
@@ -347,6 +358,33 @@ export default {
             break
           case "showInBackpack":
             newNodeEntry.showInBackpack = fieldValue
+            break
+          case "planetViewNotEarnedIconUrl":
+            newNodeEntry.typeData.planetViewNotEarnedIconUrl = fieldValue
+            break
+          case "planetViewEarnedIconUrl":
+            newNodeEntry.typeData.planetViewEarnedIconUrl = fieldValue
+            break
+          case "spaceshipPartNotEarnedIconUrl":
+            newNodeEntry.typeData.spaceshipPartNotEarnedIconUrl = fieldValue
+            break
+          case "spaceShipPartEarnedIconUrl":
+            newNodeEntry.typeData.spaceShipPartEarnedIconUrl = fieldValue
+            break
+          case "spaceShipPartHoverIconUrl":
+            newNodeEntry.typeData.spaceShipPartHoverIconUrl = fieldValue
+            break
+          case "spaceshipPartX":
+            newNodeEntry.typeData.spaceshipPartX = fieldValue
+            break
+          case "spaceshipPartY":
+            newNodeEntry.typeData.spaceshipPartY = fieldValue
+            break
+          case "spaceshipPartWidth":
+            newNodeEntry.typeData.spaceshipPartWidth = fieldValue
+            break
+          case "spaceshipPartHeight":
+            newNodeEntry.typeData.spaceshipPartHeight = fieldValue
             break
           default:
             break

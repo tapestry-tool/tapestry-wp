@@ -159,6 +159,8 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 button {
   margin: auto;
 }
@@ -247,7 +249,7 @@ button {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: var(--tyde-blue);
+  background: $tyde-blue;
   display: flex;
   align-items: center;
   justify-content: center;
