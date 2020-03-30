@@ -28,7 +28,8 @@ export default {
         top: this.node.typeData.spaceshipPartY+'px',
         left: this.node.typeData.spaceshipPartX+'px',
         height: this.node.typeData.spaceshipPartHeight+'px',
-        width: this.node.typeData.spaceshipPartWidth+'px'
+        width: this.node.typeData.spaceshipPartWidth+'px',
+        cursor: (this.node.tydeProgress === 1) ? 'pointer' : 'default'
       }
     },
   },
@@ -41,7 +42,9 @@ export default {
       }
     },
     partMouseOverHandler() {
-      this.img = this.node.typeData.spaceShipPartHoverIconUrl
+      if (this.node.tydeProgress === 1) {
+        this.img = this.node.typeData.spaceShipPartHoverIconUrl
+      }
     },
     partMouseLeaveHandler() {
       this.img = this.moduleImage()
