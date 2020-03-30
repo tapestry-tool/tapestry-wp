@@ -1,6 +1,11 @@
 <template>
   <div class="tyde-summary">
-    <header class="p-3 mb-4">
+    <tyde-button
+      class="close-button"
+      icon="arrow-right"
+      @click="$emit('close')"
+    ></tyde-button>
+    <header class="p-3">
       <h1 class="title">{{ module.title }}</h1>
       <ul>
         <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
@@ -11,7 +16,7 @@
         </tyde-tab>
       </ul>
     </header>
-    <div v-if="activeTab === 0">
+    <div v-if="activeTab === 0" class="content pt-4">
       <div v-for="stage in stages" :key="stage.node.id" class="p-3">
         <h4 class="mx-0 mb-4 mt-2">{{ stage.node.title }}</h4>
         <p v-if="stage.topics.length === 0">
@@ -33,7 +38,7 @@
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else class="content pt-4">
       <tyde-activity-summary
         v-for="activity in activities"
         :key="activity.id"
@@ -46,6 +51,7 @@
 <script>
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
+import TydeButton from "./TydeButton"
 import TydeTab from "./TydeTab"
 import TydeTopic from "./TydeTopic"
 
@@ -53,6 +59,7 @@ export default {
   name: "tyde-module-summary",
   components: {
     TydeActivitySummary,
+    TydeButton,
     TydeTab,
     TydeTopic,
   },
@@ -89,8 +96,7 @@ export default {
 
 <style lang="scss" scoped>
 .tyde-summary {
-  background: #000;
-  border-radius: 16px;
+  background: var(--tapestry-gray);
   color: white;
 
   * {
@@ -102,15 +108,24 @@ export default {
   }
 
   header {
-    background: var(--tapestry-gray);
-    border-radius: 16px 16px 0 0;
-
     ul {
       display: flex;
       justify-content: center;
       margin: 0;
     }
   }
+
+  .close-button {
+    position: absolute;
+    right: 0;
+    background: var(--tapestry-med-gray);
+    color: white;
+  }
+}
+
+.content {
+  background: #000;
+  border-radius: 16px;
 }
 
 .center {

@@ -1,7 +1,10 @@
 <template>
   <section id="tyde-cockpit" :style="cockpitImage">
     <div v-for="node in modules" :key="node.id">
-      <tyde-spaceship-part :node="node"></tyde-spaceship-part>
+      <tyde-spaceship-part
+        :node="node"
+        @click="$emit('show-summary', node.id)"
+      ></tyde-spaceship-part>
     </div>
   </section>
 </template>

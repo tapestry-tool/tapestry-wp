@@ -1,41 +1,16 @@
 <template>
-  <div>
-    <div
-      id="tyde-spaceship-part"
-      :style="moduleStyles"
-      @mouseover="partMouseOverHandler()"
-      @mouseleave="partMouseLeaveHandler()"
-      @click="openSummary"
-    ></div>
-    <tapestry-modal
-      v-if="showSummary"
-      :content-container-style="{
-        top: '10vh',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '65vw',
-        height: '70vh',
-        color: 'white',
-      }"
-      @close="showSummary = false"
-    >
-      <div class="summary-container">
-        <tyde-module-summary :node-id="node.id"></tyde-module-summary>
-      </div>
-    </tapestry-modal>
-  </div>
+  <div
+    id="tyde-spaceship-part"
+    :style="moduleStyles"
+    @mouseover="partMouseOverHandler()"
+    @mouseleave="partMouseLeaveHandler()"
+    @click="$emit('click')"
+  ></div>
 </template>
 
 <script>
-import TapestryModal from "@/components/TapestryModal"
-import TydeModuleSummary from "@/components/tyde/TydeModuleSummary"
-
 export default {
   name: "tyde-spaceship-part",
-  components: {
-    TapestryModal,
-    TydeModuleSummary,
-  },
   props: {
     node: {
       type: Object,
@@ -45,7 +20,6 @@ export default {
   data() {
     return {
       img: this.moduleImage(this.node),
-      showSummary: false,
     }
   },
   computed: {
@@ -90,11 +64,5 @@ export default {
   position: absolute;
   background-size: cover;
   background-position: center;
-}
-
-.summary-container {
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
 }
 </style>
