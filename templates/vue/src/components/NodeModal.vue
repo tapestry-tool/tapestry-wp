@@ -434,6 +434,28 @@
             </b-row>
           </div>
         </b-tab>
+        <b-tab
+          v-if="node.tydeType === tydeTypes.MODULE || node.mediaType === 'accordion'"
+          title="Ordering"
+        >
+          <div>
+            <slick-list
+              v-model="ordering"
+              lock-axis="y"
+              :lock-to-container-edges="true"
+            >
+              <slick-item
+                v-for="(id, index) in ordering"
+                :key="index"
+                class="slick-list-item"
+                :index="index"
+              >
+                <span class="fa fa-bars"></span>
+                {{ getNode(id).title }}
+              </slick-item>
+            </slick-list>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -467,12 +489,13 @@ import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
-import { mapGetters } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
 import { tydeTypes } from "../utils/constants"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
   name: "node-modal",
@@ -482,6 +505,8 @@ export default {
     QuizModal,
     TydeTypeInput,
     FileUpload,
+    SlickItem,
+    SlickList,
   },
   props: {
     node: {
@@ -542,6 +567,7 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapMutations(["updateOrdering"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -656,6 +682,7 @@ export default {
           name: "spaceshipPartHeight",
           value: this.node.typeData.spaceshipPartHeight,
         },
+        { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
     nodeImageUrl() {
@@ -671,6 +698,14 @@ export default {
         ordered[permission] = this.node.permissions[permission]
       })
       return ordered
+    },
+    ordering: {
+      get() {
+        return this.node.childOrdering
+      },
+      set(ord) {
+        this.node.childOrdering = ord
+      },
     },
   },
   watch: {
@@ -939,6 +974,20 @@ table {
 
     &:last-child {
       margin-bottom: 0;
+    }
+  }
+
+  .slick-list-item {
+    display: flex;
+    height: 25px;
+    border: lightgray solid 1px;
+    margin: 10px;
+    border-radius: 5px;
+    padding: 15px;
+    align-items: center;
+
+    > span {
+      margin-right: 10px;
     }
   }
 }

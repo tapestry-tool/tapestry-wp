@@ -467,7 +467,7 @@ export default {
         },
       })
 
-      if (!isEdit) {
+      if (!isEdit && this.getParent(id) !== null) {
         this.getNode(this.getParent(id)).childOrdering.push(id)
       }
 

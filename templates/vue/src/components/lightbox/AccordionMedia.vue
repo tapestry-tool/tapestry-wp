@@ -138,7 +138,7 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.getDirectChildren(this.node.id).map(this.getNode)
+      return this.node.childOrdering.map(this.getNode)
     },
     dimensions() {
       if (!this.isMounted) {
