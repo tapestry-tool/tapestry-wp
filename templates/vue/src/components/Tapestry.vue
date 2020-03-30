@@ -374,7 +374,7 @@ export default {
           case "spaceshipPartEarnedIconUrl":
             newNodeEntry.typeData.spaceshipPartEarnedIconUrl = fieldValue
             break
-          case "spaceShipPartHoverIconUrl":
+          case "spaceshipPartHoverIconUrl":
             newNodeEntry.typeData.spaceshipPartHoverIconUrl = fieldValue
             break
           case "spaceshipPartX":
