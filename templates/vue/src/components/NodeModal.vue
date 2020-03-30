@@ -372,8 +372,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="X: "
+                  prepend="X: "
                   append="px"
                   label-for="node-spaceship-part-x"
                 >
@@ -386,8 +385,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Y: "
+                  prepend="Y: "
                   append="px"
                   label-for="node-spaceship-part-y"
                 >
@@ -405,8 +403,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Width: "
+                  prepend="Width: "
                   append="px"
                   label-for="node-spaceship-part-width"
                 >
@@ -419,8 +416,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Height: "
+                  prepend="Height: "
                   append="px"
                   label-for="node-spaceship-part-height"
                 >
