@@ -29,10 +29,7 @@
       ></tyde-button>
     </div>
     <div class="content">
-      <tyde-cockpit
-        v-if="activePage === 'home'"
-        @close="$emit('continue')"
-      />
+      <tyde-cockpit v-if="activePage === 'home'" @close="$emit('continue')" />
       <tyde-menu-settings
         v-if="activePage === 'settings'"
         :settings="settings"

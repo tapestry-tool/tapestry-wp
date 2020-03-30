@@ -1,13 +1,12 @@
 <template>
   <section id="tyde-cockpit" :style="cockpitImage">
     <div v-for="node in modules" :key="node.id">
-      <tyde-spaceship-part  :node=node></tyde-spaceship-part>
+      <tyde-spaceship-part :node="node"></tyde-spaceship-part>
     </div>
   </section>
 </template>
 
 <script>
-import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
 import { mapGetters } from "vuex"
 import TydeSpaceshipPart from "@/components/tyde/TydeSpaceshipPart"
@@ -21,13 +20,12 @@ export default {
     ...mapGetters(["settings", "nodes"]),
     cockpitImage() {
       return {
-        backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`
+        backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`,
       }
     },
     modules() {
       return this.nodes.filter(this.isNodeModuleType)
     },
-
   },
   methods: {
     isNodeModuleType(node) {

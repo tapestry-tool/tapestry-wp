@@ -1,10 +1,10 @@
 <template>
-  <div id="tyde-spaceship-part"
+  <div
+    id="tyde-spaceship-part"
     :style="moduleStyles"
     @mouseover="partMouseOverHandler()"
     @mouseleave="partMouseLeaveHandler()"
-  >
-  </div>
+  ></div>
 </template>
 
 <script>
@@ -18,18 +18,18 @@ export default {
   },
   data() {
     return {
-      img: this.moduleImage(this.node)
+      img: this.moduleImage(this.node),
     }
   },
   computed: {
     moduleStyles() {
       return {
         backgroundImage: `url(${this.img})`,
-        top: this.node.typeData.spaceshipPartY+'px',
-        left: this.node.typeData.spaceshipPartX+'px',
-        height: this.node.typeData.spaceshipPartHeight+'px',
-        width: this.node.typeData.spaceshipPartWidth+'px',
-        cursor: (this.node.tydeProgress === 1) ? 'pointer' : 'default'
+        top: this.node.typeData.spaceshipPartY + "px",
+        left: this.node.typeData.spaceshipPartX + "px",
+        height: this.node.typeData.spaceshipPartHeight + "px",
+        width: this.node.typeData.spaceshipPartWidth + "px",
+        cursor: this.node.tydeProgress === 1 ? "pointer" : "default",
       }
     },
   },
