@@ -353,13 +353,13 @@
             </b-form-group>
             <b-form-group label="Earned">
               <file-upload
-                v-model="node.typeData.spaceShipPartEarnedIconUrl"
+                v-model="node.typeData.spaceshipPartEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
             <b-form-group label="Hover">
               <file-upload
-                v-model="node.typeData.spaceShipPartHoverIconUrl"
+                v-model="node.typeData.spaceshipPartHoverIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
@@ -638,12 +638,12 @@ export default {
           value: this.node.typeData.spaceshipPartNotEarnedIconUrl,
         },
         {
-          name: "spaceShipPartEarnedIconUrl",
-          value: this.node.typeData.spaceShipPartEarnedIconUrl,
+          name: "spaceshipPartEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartEarnedIconUrl,
         },
         {
-          name: "spaceShipPartHoverIconUrl",
-          value: this.node.typeData.spaceShipPartHoverIconUrl,
+          name: "spaceshipPartHoverIconUrl",
+          value: this.node.typeData.spaceshipPartHoverIconUrl,
         },
         { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
         { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },

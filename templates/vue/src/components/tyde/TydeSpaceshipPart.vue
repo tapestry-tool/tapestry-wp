@@ -43,7 +43,7 @@ export default {
     },
     partMouseOverHandler() {
       if (this.node.tydeProgress === 1) {
-        this.img = this.node.typeData.spaceShipPartHoverIconUrl
+        this.img = this.node.typeData.spaceshipPartHoverIconUrl
       }
     },
     partMouseLeaveHandler() {
