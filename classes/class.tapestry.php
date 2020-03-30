@@ -129,13 +129,14 @@ class Tapestry implements ITapestry
      */
     public function getCopilotNodeIds()
     {
-        $postId = $this->postId;
-        function isCopilotNode($id)
-        {
-            $node = new TapestryNode($postId, $id);
-            return in_array("copilot", $node->permissions);
+        $result = array();
+        foreach ($this->nodes as $nodeId) {
+            $node = $this->getNode($nodeId);
+            if ($node->isCopilotOnly()) {
+                array_push($result, $nodeId);
+            }
         }
-        return array_filter($this->nodes, "isCopilotNode");
+        return $result;
     }
 
     /**

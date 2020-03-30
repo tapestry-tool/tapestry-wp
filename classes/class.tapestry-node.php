@@ -172,6 +172,24 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
+     * Returns whether this node is copilot only or not
+     * 
+     * @return bool
+     */
+    public function isCopilotOnly()
+    {
+        if (!property_exists($this->permissions, "copilot")) {
+            return false;
+        }
+        foreach((array)$this->permissions as $role => $permissions) {
+            if ($role !== "copilot" && count($permissions) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Delete a node
      *
      * @return NULL

@@ -42,6 +42,10 @@ class TapestryUserProgress implements ITapestryUserProgress
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
 
+        $teenId = get_the_author_meta('teen_id', $this->_userId);
+        error_log(print_r($teenId, true));
+        error_log(print_r($tapestry->getCopilotNodeIds(), true));
+
         if (!TapestryUserRoles::isRole('copilot')) {
             $progress = $this->_getUserProgress($nodeIds, $this->_userId);
             return json_encode($progress);
