@@ -43,10 +43,9 @@
       <tyde-menu-settings
         v-if="activePage === 'settings'"
         :settings="settings"
-        @back="setActivePage('home')"
         @settings-change="updateSettings"
       />
-      <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
+      <tyde-menu-help v-if="activePage === 'help'" />
     </div>
   </div>
 </template>

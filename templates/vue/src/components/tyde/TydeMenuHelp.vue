@@ -1,6 +1,5 @@
 <template>
   <section id="tyde-menu-help">
-    <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
     <h1>How to Play</h1>
     <p>Click on any icon to play.</p>
     <p>
@@ -11,13 +10,8 @@
 </template>
 
 <script>
-import TydeButton from "./TydeButton"
-
 export default {
   name: "tyde-menu-help",
-  components: {
-    TydeButton,
-  },
 }
 </script>
 
