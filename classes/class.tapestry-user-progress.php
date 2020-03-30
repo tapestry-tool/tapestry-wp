@@ -68,17 +68,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set 'unlocked' status of a Tapestry Node for this User to true
-     *
-     * @return Null
-     */
-    public function unlockNode() 
-    {
-        $this->_checkUserAndPostId();
-        $this->_unlockNode();
-    }
-
-    /**
      * Set 'completed' status of a Tapestry Node for this User to true
      * 
      * @return Null
@@ -175,11 +164,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
     }
 
-    private function _unlockNode() 
-    {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $this->nodeMetaId, true);
-    }
-
     private function _complete()
     {
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
@@ -189,7 +173,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
-        $quiz->$questionId = true;
+        $quiz[$questionId]['completed'] = true;
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }
 
@@ -205,17 +189,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->progress = (float) $progress_value;
             } else {
                 $progress->$nodeId->progress = 0;
-            }
+            }         
 
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $default_unlocked_status = isset($nodeMetadata->unlocked) && $nodeMetadata->unlocked ? true : false;
-            $unlocked_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_unlocked_' . $nodeId, true);
-            if ($unlocked_value !== null) {
-                $progress->$nodeId->unlocked = $unlocked_value;
-            } else {
-                $progress->$nodeId->unlocked = $default_unlocked_status;
-            }           
-
             $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
             if ($completed_value !== null) {
                 $progress->$nodeId->completed = $completed_value === "1";
@@ -261,8 +237,8 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         if (isset($completed_values) && is_array($completed_values)) {
-            foreach ($completed_values as $id => $completed) {
-                $quiz[$id]['completed'] = $completed;
+            foreach ($completed_values as $id => $info) {
+                $quiz[$id]['completed'] = $info['completed'];
             }
         }
 

@@ -69,7 +69,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -147,7 +146,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -197,6 +195,7 @@ export default {
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        conditions: [],
         behaviour: "embed",
         status: "publish",
         nodeType: "",
@@ -217,7 +216,6 @@ export default {
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
         },
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -297,9 +295,6 @@ export default {
               newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
             break
-          case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot
-            break
           case "hideTitle":
             newNodeEntry.hideTitle = fieldValue
             break
@@ -325,6 +320,7 @@ export default {
             newNodeEntry.quiz = fieldValue
             break
           default:
+            newNodeEntry[fieldName] = fieldValue
             break
         }
       }

@@ -64,6 +64,17 @@ export async function completeNode({ commit, getters }, nodeId) {
   }
 }
 
+export function updateMayUnlockNodes({ commit, getters }, nodeId) {
+  const node = getters.getNode(nodeId)
+  node.mayUnlockNodes.forEach(element => {
+    commit("fulfillNodeCondition", {
+      id: element.id,
+      condition: element.condition,
+    })
+  })
+  thisTapestryTool.reloadTooltips()
+}
+
 export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }

@@ -13,11 +13,11 @@ class TapestryNode implements ITapestryNode
     private $nodePostId;
     private $nodeMetaId;
     private $author;
+    private $conditions;
     private $type;
     private $size;
     private $title;
     private $status;
-    private $unlocked;
     private $behaviour;
     private $typeData;
     private $imageURL;
@@ -49,13 +49,13 @@ class TapestryNode implements ITapestryNode
         $this->nodeMetaId = (int) $nodeMetaId;
 
         $this->author = wp_get_current_user()->ID;
+        $this->conditions = [];
         $this->size = '';
         $this->title = '';
         $this->status = '';
         $this->imageURL = '';
         $this->mediaType = '';
         $this->mediaFormat = '';
-        $this->unlocked = true;
         $this->mediaDuration = 0;
         $this->description = '';
         $this->behaviour = 'embed';
@@ -111,9 +111,6 @@ class TapestryNode implements ITapestryNode
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
         }
-        if (isset($node->unlocked) && is_bool($node->unlocked)) {
-            $this->unlocked = $node->unlocked;
-        }
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
         }
@@ -156,6 +153,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
         }
+        if (isset($node->conditions) && is_array($node->conditions)) {
+            $this->conditions = $node->conditions;
+        }
     }
 
     /**
@@ -183,6 +183,27 @@ class TapestryNode implements ITapestryNode
         }
 
         $this->_deleteNodeFromDatabase();
+    }
+
+    /**
+     * Update node conditions by removing conditions by nodeId
+     *
+     * @param   String  $nodeId  nodeId
+     * 
+     * @return NULL
+     */
+    public function removeConditionsById($nodeId)
+    {
+        $listModified = false;
+        foreach($this->conditions as $conditionId => $condition) {
+            if ($condition->nodeId == $nodeId) {
+                array_splice($this->conditions, $conditionId, 1);
+                $listModified = true;
+            }
+        }
+        if ($listModified) {
+            $this->_saveToDatabase();
+        }
     }
 
     private function _saveToDatabase()
@@ -262,7 +283,6 @@ class TapestryNode implements ITapestryNode
             'imageURL'      => $this->imageURL,
             'mediaType'     => $this->mediaType,
             'mediaFormat'   => $this->mediaFormat,
-            'unlocked'      => $this->unlocked,
             'mediaDuration' => $this->mediaDuration,
             'description'   => $this->description,
             'behaviour'     => $this->behaviour,
@@ -275,6 +295,7 @@ class TapestryNode implements ITapestryNode
             'skippable'     => $this->skippable,
             'quiz'          => $this->quiz,
             'fullscreen'    => $this->fullscreen,
+            'conditions'    => $this->conditions
         ];
     }
 
@@ -311,9 +332,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
-        }
-        if (isset($nodeMetadata->meta_value->unlocked)) {
-            $nodeData->unlocked = $nodeMetadata->meta_value->unlocked;
         }
         return $nodeData;
     }

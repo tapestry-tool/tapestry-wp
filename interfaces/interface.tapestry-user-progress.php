@@ -22,13 +22,6 @@ interface ITapestryUserProgress
      * @return Null
      */
     public function updateUserProgress($progressValue);
-    
-    /**
-     * Set 'unlocked' status of a Tapestry Node for this User to true
-     *
-     * @return Null
-     */
-    public function unlockNode();
 
     /**
      * Set 'skippable' status of a Tapestry Node for this User to true
