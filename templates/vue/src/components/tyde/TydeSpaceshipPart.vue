@@ -1,9 +1,9 @@
 <template>
   <div
     id="tyde-spaceship-part"
-    :style="moduleStyles"
-    @mouseover="partMouseOverHandler()"
-    @mouseleave="partMouseLeaveHandler()"
+    :style="style"
+    @mouseover="state = 'hover'"
+    @mouseleave="state = 'normal'"
     @click="$emit('click')"
   ></div>
 </template>
@@ -19,11 +19,23 @@ export default {
   },
   data() {
     return {
-      img: this.moduleImage(this.node),
+      state: "normal",
     }
   },
   computed: {
-    moduleStyles() {
+    img() {
+      if (this.node.tydeProgress !== 11) {
+        switch (this.state) {
+          case "hover":
+            return this.node.typeData.spaceshipPartHoverIconUrl
+          default:
+            return this.node.typeData.spaceshipPartEarnedIconUrl
+        }
+      } else {
+        return this.node.typeData.spaceshipPartNotEarnedIconUrl
+      }
+    },
+    style() {
       return {
         backgroundImage: `url(${this.img})`,
         top: this.node.typeData.spaceshipPartY + "px",
@@ -31,28 +43,6 @@ export default {
         height: this.node.typeData.spaceshipPartHeight + "px",
         width: this.node.typeData.spaceshipPartWidth + "px",
         cursor: this.node.tydeProgress === 1 ? "pointer" : "default",
-      }
-    },
-  },
-  methods: {
-    moduleImage() {
-      if (this.node.tydeProgress === 1) {
-        return this.node.typeData.spaceshipPartEarnedIconUrl
-      } else {
-        return this.node.typeData.spaceshipPartNotEarnedIconUrl
-      }
-    },
-    partMouseOverHandler() {
-      if (this.node.tydeProgress === 1) {
-        this.img = this.node.typeData.spaceshipPartHoverIconUrl
-      }
-    },
-    partMouseLeaveHandler() {
-      this.img = this.moduleImage()
-    },
-    openSummary() {
-      if (this.node.tydeProgress === 1) {
-        this.showSummary = true
       }
     },
   },

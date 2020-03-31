@@ -50,6 +50,7 @@ button {
     transition: transform 0.2s ease-out;
     line-height: 0.9em;
     max-width: 200px;
+    min-height: 2em;
   }
 }
 </style>

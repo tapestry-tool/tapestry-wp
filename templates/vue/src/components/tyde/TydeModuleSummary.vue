@@ -2,9 +2,10 @@
   <div class="tyde-summary">
     <tyde-button
       class="close-button"
-      icon="arrow-right"
+      icon="arrow-left"
       @click="$emit('close')"
     ></tyde-button>
+    <img :src="module.typeData.planetViewEarnedIconUrl" class="spaceship-icon" />
     <header class="p-3">
       <h1 class="title">{{ module.title }}</h1>
       <ul>
@@ -103,11 +104,28 @@ export default {
     font-family: var(--tyde-font-mono);
   }
 
-  h4 {
-    font-size: 2em;
+  .close-button {
+    position: absolute;
+    left: 16px;
+    background: var(--tapestry-med-gray);
+    color: white;
+  }
+
+  .spaceship-icon {
+    position: absolute;
+    right: 16px;
   }
 
   header {
+    .title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+
+      &:after {
+        display: none;
+      }
+    }
     ul {
       display: flex;
       justify-content: center;
@@ -115,64 +133,35 @@ export default {
     }
   }
 
-  .close-button {
-    position: absolute;
-    right: 0;
-    background: var(--tapestry-med-gray);
-    color: white;
-  }
-}
+  .content {
+    background: #000;
+    border-radius: 16px;
 
-.content {
-  background: #000;
-  border-radius: 16px;
-}
+    h4 {
+      font-size: 2em;
+    }
 
-.center {
-  display: flex;
-  justify-content: center;
+    .center {
+      display: flex;
+      justify-content: center;
 
-  > * {
-    margin-right: 16px;
-    &:last-child {
-      margin-right: 0;
+      > * {
+        margin-right: 16px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      button {
+        width: 20%;
+      }
     }
   }
 
-  button {
-    width: 20%;
-  }
-}
-
-.topic {
-  background: rgba(0, 0, 0, 0.03);
-  border: none;
-  border-radius: 16px;
-  color: inherit;
-  padding: 16px 0;
-
-  * {
-    margin: 0;
-    padding: 0;
-  }
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.1);
-  }
-}
-
-.grid {
-  display: grid;
-  grid-gap: 16px;
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.title {
-  font-weight: 700;
-  margin-bottom: 12px;
-
-  &:after {
-    display: none;
+  .grid {
+    display: grid;
+    grid-gap: 16px;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 </style>
