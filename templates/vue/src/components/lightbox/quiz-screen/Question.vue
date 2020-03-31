@@ -59,6 +59,7 @@ import AnswerButton from "./AnswerButton"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "question",
@@ -122,15 +123,17 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
-      this.loading = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType: this.formType,
-        formId: this.formId,
-        questionId: this.question.id,
-      })
-      this.loading = false
-      this.$emit("submit")
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.loading = true
+        await this.completeQuestion({
+          nodeId: this.node.id,
+          answerType: this.formType,
+          formId: this.formId,
+          questionId: this.question.id,
+        })
+        this.loading = false
+        this.$emit("submit")
+      }
     },
     hasId(label) {
       const id = this.question.answers[label]

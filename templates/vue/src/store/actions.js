@@ -1,4 +1,5 @@
 import TapestryApi from "../services/TapestryAPI"
+import Helpers from "@/utils/Helpers"
 
 const client = new TapestryApi(wpPostId)
 
@@ -39,23 +40,19 @@ export async function updateNode({ commit }, payload) {
   return payload.id
 }
 
-function canUserUpdateProgress(node) {
-  return !node.hasOwnProperty("userType") || node.userType === "copilot"
-}
-
 export async function updateNodeProgress({ commit, getters }, payload) {
   const { id, progress } = payload
   const node = getters.getNode(id)
-  if (canUserUpdateProgress(node)) {
+  if (Helpers.canUserUpdateProgress(node)) {
     await client.updateUserProgress(id, progress)
     commit("updateNodeProgress", { id, progress })
     thisTapestryTool.updateProgressBars()
   }
 }
 
-export async function completeNode({ commit, getters }, nodeId) {
+export async function completeNode({ commit, dispatch, getters }, nodeId) {
   const node = getters.getNode(nodeId)
-  if (canUserUpdateProgress(node)) {
+  if (Helpers.canUserUpdateProgress(node)) {
     await client.completeNode(nodeId)
     commit("updateNode", {
       id: nodeId,
@@ -68,6 +65,7 @@ export async function completeNode({ commit, getters }, nodeId) {
       })
       thisTapestryTool.updateProgressBars()
     }
+    dispatch("updateMayUnlockNodes", nodeId)
   }
 }
 

@@ -100,4 +100,8 @@ export default class {
       }
     }
   }
+
+  static canUserUpdateProgress(node) {
+    return !node.hasOwnProperty("userType") || node.userType === "copilot"
+  }
 }
