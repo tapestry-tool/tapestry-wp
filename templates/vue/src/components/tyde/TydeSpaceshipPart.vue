@@ -1,10 +1,11 @@
 <template>
-  <div id="tyde-spaceship-part"
-    :style="moduleStyles"
-    @mouseover="partMouseOverHandler()"
-    @mouseleave="partMouseLeaveHandler()"
-  >
-  </div>
+  <div
+    id="tyde-spaceship-part"
+    :style="style"
+    @mouseover="state = 'hover'"
+    @mouseleave="state = 'normal'"
+    @click="$emit('click')"
+  ></div>
 </template>
 
 <script>
@@ -18,36 +19,31 @@ export default {
   },
   data() {
     return {
-      img: this.moduleImage(this.node)
+      state: "normal",
     }
   },
   computed: {
-    moduleStyles() {
-      return {
-        backgroundImage: `url(${this.img})`,
-        top: this.node.typeData.spaceshipPartY+'px',
-        left: this.node.typeData.spaceshipPartX+'px',
-        height: this.node.typeData.spaceshipPartHeight+'px',
-        width: this.node.typeData.spaceshipPartWidth+'px',
-        cursor: (this.node.tydeProgress === 1) ? 'pointer' : 'default'
-      }
-    },
-  },
-  methods: {
-    moduleImage() {
+    img() {
       if (this.node.tydeProgress === 1) {
-        return this.node.typeData.spaceshipPartEarnedIconUrl
+        switch (this.state) {
+          case "hover":
+            return this.node.typeData.spaceshipPartHoverIconUrl
+          default:
+            return this.node.typeData.spaceshipPartEarnedIconUrl
+        }
       } else {
         return this.node.typeData.spaceshipPartNotEarnedIconUrl
       }
     },
-    partMouseOverHandler() {
-      if (this.node.tydeProgress === 1) {
-        this.img = this.node.typeData.spaceShipPartHoverIconUrl
+    style() {
+      return {
+        backgroundImage: `url(${this.img})`,
+        top: this.node.typeData.spaceshipPartY + "px",
+        left: this.node.typeData.spaceshipPartX + "px",
+        height: this.node.typeData.spaceshipPartHeight + "px",
+        width: this.node.typeData.spaceshipPartWidth + "px",
+        cursor: this.node.tydeProgress === 1 ? "pointer" : "default",
       }
-    },
-    partMouseLeaveHandler() {
-      this.img = this.moduleImage()
     },
   },
 }

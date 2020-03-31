@@ -68,3 +68,35 @@ export function getParent(state) {
     return link ? link.source : null
   }
 }
+
+export function getContent(_, { getNode, getDirectChildren }) {
+  return moduleId =>
+    getDirectChildren(moduleId).map(stageId => ({
+      node: getNode(stageId),
+      topics: getDirectChildren(stageId)
+        .map(getNode)
+        .filter(content => content.completed),
+    }))
+}
+
+export function getActivities(_, { getNode, getDirectChildren }) {
+  return moduleId => {
+    const topics = getDirectChildren(moduleId).flatMap(getDirectChildren)
+    return topics.flatMap(id => {
+      const topic = getNode(id)
+      if (topic.mediaType === "accordion") {
+        // look at the rows for questions
+        const rows = getDirectChildren(topic.id).map(getNode)
+        return rows.filter(row => row.quiz).flatMap(getCompletedActivities)
+      }
+      if (topic.quiz) {
+        return getCompletedActivities(topic)
+      }
+      return []
+    })
+  }
+}
+
+function getCompletedActivities(node) {
+  return node.quiz.filter(activity => activity.completed)
+}

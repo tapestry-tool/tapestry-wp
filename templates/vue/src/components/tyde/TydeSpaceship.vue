@@ -58,7 +58,7 @@ export default {
     ...mapState(["lightbox"]),
     spaceshipIconUrl() {
       return Helpers.getImagePath(SpaceshipIcon)
-    }
+    },
   },
   beforeDestroy() {
     window.removeEventListener(this.escMenuOpenListener)

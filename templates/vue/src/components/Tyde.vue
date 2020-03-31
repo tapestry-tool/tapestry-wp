@@ -39,5 +39,8 @@ export default {
   --tapestry-light-gray: #787878;
   --tapestry-med-gray: #535353;
   --tapestry-light-blue: #1eade1;
+  --tyde-green: #205a27;
+  --tyde-border-green: #39b54a;
+  --tyde-font-mono: "VT323", monospace;
 }
 </style>
