@@ -954,7 +954,7 @@ function tapestryTool(config){
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
+                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         goToNode(d.id)
                     }
                 }
@@ -990,7 +990,7 @@ function tapestryTool(config){
             })
             .on("click keydown", function (d) {
                 if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
+                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         goToNode(d.id)
                     }
                 }
@@ -1039,7 +1039,7 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    if (config.wpCanEditTapestry || d.accessible) {
+                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         tapestry.selectNode(d.id)
                     }
                 }
@@ -1305,6 +1305,7 @@ function tapestryTool(config){
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
                     ' class="' + getIconClass(d.mediaType, 'play', d.accessible) + ' mediaButtonIcon"' +
+                    ' data-usertype="' + d.userType + '"' +
                     ' data-id="' + d.id + '"' + 
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
@@ -1334,7 +1335,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry) {
+            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry || thisBtn.dataset.usertype === 'teen') {
                 goToNode(thisBtn.dataset.id);
             }
         });
