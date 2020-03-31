@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     img() {
-      if (this.node.tydeProgress !== 11) {
+      if (this.node.tydeProgress === 1) {
         switch (this.state) {
           case "hover":
             return this.node.typeData.spaceshipPartHoverIconUrl
