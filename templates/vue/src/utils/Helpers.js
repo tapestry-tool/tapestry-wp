@@ -77,4 +77,27 @@ export default class {
   static decodeHTMLChars(str) {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
+
+  // src: https://gist.github.com/beaucharman/e46b8e4d03ef30480d7f4db5a78498ca
+  static throttle(callback, delay, immediate) {
+    let timeout = null
+    let initialCall = true
+
+    return function() {
+      const callNow = immediate && initialCall
+      const next = () => {
+        callback.apply(this, arguments)
+        timeout = null
+      }
+
+      if (callNow) {
+        initialCall = false
+        next()
+      }
+
+      if (!timeout) {
+        timeout = setTimeout(next, delay)
+      }
+    }
+  }
 }

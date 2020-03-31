@@ -39,27 +39,35 @@ export async function updateNode({ commit }, payload) {
   return payload.id
 }
 
-export async function updateNodeProgress({ commit }, payload) {
+function canUserUpdateProgress(node) {
+  return !node.hasOwnProperty("userType") || node.userType === "copilot"
+}
+
+export async function updateNodeProgress({ commit, getters }, payload) {
   const { id, progress } = payload
-  await client.updateUserProgress(id, progress)
-  commit("updateNodeProgress", { id, progress })
-  thisTapestryTool.updateProgressBars()
+  const node = getters.getNode(id)
+  if (canUserUpdateProgress(node)) {
+    await client.updateUserProgress(id, progress)
+    commit("updateNodeProgress", { id, progress })
+    thisTapestryTool.updateProgressBars()
+  }
 }
 
 export async function completeNode({ commit, getters }, nodeId) {
-  await client.completeNode(nodeId)
-  commit("updateNode", {
-    id: nodeId,
-    newNode: { completed: true },
-  })
-
   const node = getters.getNode(nodeId)
-  if (node.mediaType !== "video") {
-    commit("updateNodeProgress", {
+  if (canUserUpdateProgress(node)) {
+    await client.completeNode(nodeId)
+    commit("updateNode", {
       id: nodeId,
-      progress: 1,
+      newNode: { completed: true },
     })
-    thisTapestryTool.updateProgressBars()
+    if (node.mediaType !== "video") {
+      commit("updateNodeProgress", {
+        id: nodeId,
+        progress: 1,
+      })
+      thisTapestryTool.updateProgressBars()
+    }
   }
 }
 
