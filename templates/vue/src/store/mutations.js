@@ -97,7 +97,7 @@ export function updateTydeProgress(state, { parentId, isParentModule }) {
   }
   parentNode.tydeProgress =
     childNodes.length === 0
-      ? 0
+      ? 1
       : childProgress.reduce(reducer, 0) / childNodes.length
   if (!isParentModule) {
     // If node is stage, parent module must be updated as well
