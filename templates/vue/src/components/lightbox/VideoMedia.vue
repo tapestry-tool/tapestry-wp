@@ -73,11 +73,12 @@ export default {
       if (!this.videoDimensions) {
         return { width: "100%" }
       }
-      const { height } = this.videoDimensions
-      if (height > this.dimensions.height) {
-        return { height: this.dimensions.height + "px", width: "auto" }
-      } else {
+      const { height, width } = this.videoDimensions
+      if (width / height > 1) {
+        // Video is wider than it is tall
         return { width: "100%" }
+      } else {
+        return { height: this.dimensions.height + "px", width: "auto" }
       }
     },
   },
