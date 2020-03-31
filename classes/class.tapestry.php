@@ -139,6 +139,10 @@ class Tapestry implements ITapestry
         return $result;
     }
 
+    /**
+     * Retrieves ids of all teen nodes. It does this by checking
+     * whether the node id exists in the copilot nodes array.
+     */
     public function getTeenNodeIds()
     {
         $result = array();
@@ -367,7 +371,15 @@ class Tapestry implements ITapestry
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
                 $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
-                return $tapestryNode->get();
+                $node = $tapestryNode->get();
+                if (TapestryUserRoles::isRole('copilot')) {
+                    if ($tapestryNode->isCopilotOnly()) {
+                        $node->userType = 'copilot';
+                    } else {
+                        $node->userType = 'teen';
+                    }
+                }
+                return $node;
             },
             $tapestry->nodes
         );

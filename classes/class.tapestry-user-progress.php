@@ -43,8 +43,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $nodeIds = $tapestry->getNodeIds();
 
         if (!TapestryUserRoles::isRole('copilot')) {
-            $progress = $this->_getUserProgress($nodeIds, $this->_userId);
-            return json_encode($progress);
+            return $this->_getUserProgress($nodeIds, $this->_userId);
         }
 
         $teenId = get_the_author_meta('teen_id', $this->_userId);
@@ -52,9 +51,8 @@ class TapestryUserProgress implements ITapestryUserProgress
         $teenNodes = $tapestry->getTeenNodeIds();
         $copilotProgress = $this->_getUserProgress($copilotNodes, $this->_userId);
         $teenProgress = $this->_getUserProgress($teenNodes, $teenId);
-        $progress = (array)$teenProgress + (array)$copilotProgress;
-
-        return json_encode($progress);
+        
+        return (array)$teenProgress + (array)$copilotProgress;
     }
 
     /**
