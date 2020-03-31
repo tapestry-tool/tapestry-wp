@@ -42,14 +42,19 @@ class TapestryUserProgress implements ITapestryUserProgress
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
 
-        $teenId = get_the_author_meta('teen_id', $this->_userId);
-        error_log(print_r($teenId, true));
-        error_log(print_r($tapestry->getCopilotNodeIds(), true));
-
         if (!TapestryUserRoles::isRole('copilot')) {
             $progress = $this->_getUserProgress($nodeIds, $this->_userId);
             return json_encode($progress);
         }
+
+        $teenId = get_the_author_meta('teen_id', $this->_userId);
+        $copilotNodes = $tapestry->getCopilotNodeIds();
+        $teenNodes = $tapestry->getTeenNodeIds();
+        $copilotProgress = $this->_getUserProgress($copilotNodes, $this->_userId);
+        $teenProgress = $this->_getUserProgress($teenNodes, $teenId);
+        $progress = (array)$teenProgress + (array)$copilotProgress;
+
+        return json_encode($progress);
     }
 
     /**
@@ -210,7 +215,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
             $progress->$nodeId->quiz = $quiz;
         }
-        return json_encode($progress);
+        return $progress;
     }
 
     private function _getQuizProgress($nodeId, $nodeMetadata, $userId)

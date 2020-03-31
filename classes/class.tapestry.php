@@ -139,6 +139,18 @@ class Tapestry implements ITapestry
         return $result;
     }
 
+    public function getTeenNodeIds()
+    {
+        $result = array();
+        $copilotNodes = $this->getCopilotNodeIds();
+        foreach ($this->nodes as $nodeId) {
+            if (!in_array($nodeId, $copilotNodes)) {
+                array_push($result, $nodeId);
+            }
+        }
+        return $result;
+    }
+
     /**
      * Add a new node
      * 
