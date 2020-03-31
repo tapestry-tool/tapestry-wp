@@ -9,7 +9,7 @@
       <template v-slot:trigger>
         <button
           class="button-row"
-          :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
+          :disabled="isDisabled(index)"
           @click="toggle(index)"
         >
           <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
@@ -110,6 +110,12 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    isDisabled(index) {
+      if (this.node.userType === "teen") {
+        return false
+      }
+      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
