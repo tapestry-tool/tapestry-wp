@@ -440,18 +440,20 @@
         >
           <div>
             <slick-list
-              v-model="ordering"
+              :value="node.childOrdering"
               lock-axis="y"
-              :lock-to-container-edges="true"
+              @input="updateOrderingArray"
             >
               <slick-item
                 v-for="(id, index) in ordering"
                 :key="index"
                 class="slick-list-item"
                 :index="index"
+                style="z-index: 9999 !important;"
               >
-                <span class="fa fa-bars"></span>
-                {{ getNode(id).title }}
+                <span class="fas fa-bars fa-xs"></span>
+                <span>{{ getNode(id).title }}</span>
+                <span style="color: grey;">id: {{ id }}</span>
               </slick-item>
             </slick-list>
           </div>
@@ -567,7 +569,6 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
-    ...mapMutations(["updateOrdering"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -699,14 +700,6 @@ export default {
       })
       return ordered
     },
-    ordering: {
-      get() {
-        return this.node.childOrdering
-      },
-      set(ord) {
-        this.node.childOrdering = ord
-      },
-    },
   },
   watch: {
     nodeImageUrl: function() {
@@ -745,6 +738,7 @@ export default {
     })
   },
   methods: {
+    ...mapMutations(["updateOrdering"]),
     setInitialTydeType() {
       // only set node types if adding a new node
       if (this.parent && this.modalType === "add-new-node") {
@@ -909,6 +903,12 @@ export default {
         alert("Enter valid user id")
       }
     },
+    updateOrderingArray(arr) {
+      this.updateOrdering({
+        id: this.node.id,
+        ord: arr,
+      })
+    },
   },
 }
 </script>
@@ -980,14 +980,18 @@ table {
   .slick-list-item {
     display: flex;
     height: 25px;
-    border: lightgray solid 1px;
-    margin: 10px;
+    border: lightgray solid 1.5px;
+    margin: 10px 25px;
     border-radius: 5px;
     padding: 15px;
     align-items: center;
 
     > span {
-      margin-right: 10px;
+      margin-right: 25px;
+    }
+
+    > span:last-of-type {
+      margin-left: auto;
     }
   }
 }
