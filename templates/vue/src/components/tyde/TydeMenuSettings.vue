@@ -1,6 +1,5 @@
 <template>
   <section id="tyde-menu-settings">
-    <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
     <h1>Settings</h1>
     <div class="settings">
       <div class="setting">
@@ -17,13 +16,8 @@
 </template>
 
 <script>
-import TydeButton from "./TydeButton"
-
 export default {
   name: "tyde-menu-settings",
-  components: {
-    TydeButton,
-  },
   props: {
     settings: {
       type: Object,

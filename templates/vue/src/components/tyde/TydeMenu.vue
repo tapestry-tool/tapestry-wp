@@ -22,53 +22,77 @@
         @click="setActivePage('profile')"
       ></tyde-button>
       <tyde-button
+        icon="space-shuttle"
+        class="cockpit-button"
+        label="Cockpit"
+        @click="setActivePage('home')"
+      ></tyde-button>
+      <tyde-button
         class="close-button"
         icon="times"
         @click="$emit('continue')"
       ></tyde-button>
     </div>
     <div class="content">
-      <h1>Captain's Log</h1>
-      <tyde-menu-home
-        v-if="activePage === 'home'"
-        :logs="logs"
+      <tyde-cockpit
+        v-if="activePage === 'home' && !showSummary"
         @close="$emit('continue')"
+        @show-summary="openSummary"
+      />
+      <tyde-module-summary
+        v-if="activePage === 'home' && showSummary"
+        :node-id="moduleId"
+        style="margin-bottom: 32px;"
+        @close="showSummary = false"
       />
       <tyde-menu-settings
         v-if="activePage === 'settings'"
         :settings="settings"
-        @back="setActivePage('home')"
         @settings-change="updateSettings"
       />
+<<<<<<< HEAD
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
       <tyde-menu-profile
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
+=======
+      <tyde-menu-help v-if="activePage === 'help'" />
+>>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
     </div>
   </div>
 </template>
 
 <script>
 import TydeButton from "./TydeButton"
-import TydeMenuHome from "./TydeMenuHome"
+import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
+<<<<<<< HEAD
 import TydeMenuProfile from "./TydeMenuProfile"
+=======
+import TydeModuleSummary from "./TydeModuleSummary"
+>>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
 
 export default {
   name: "tyde-menu",
   components: {
     TydeButton,
-    TydeMenuHome,
+    TydeCockpit,
     TydeMenuSettings,
     TydeMenuHelp,
+<<<<<<< HEAD
     TydeMenuProfile,
+=======
+    TydeModuleSummary,
+>>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
   },
   data() {
     return {
       activePage: "home",
+      showSummary: false,
+      moduleId: null,
       settings: {
         isAudioPlaying: false,
       },
@@ -76,7 +100,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["logs"]),
+    ...mapGetters(["logs", "getNode"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -88,6 +112,13 @@ export default {
   methods: {
     setActivePage(page) {
       this.activePage = page
+    },
+    openSummary(nodeId) {
+      const node = this.getNode(nodeId)
+      if (node.tydeProgress === 1) {
+        this.showSummary = true
+        this.moduleId = nodeId
+      }
     },
     updateSettings(partialNewSettings) {
       this.settings = { ...this.settings, ...partialNewSettings }
@@ -126,6 +157,7 @@ export default {
     background: var(--tapestry-gray);
     border: 4px solid white;
     height: calc(100vh - 86px);
+    overflow-y: scroll;
     padding: 16px 32px;
     position: relative;
     z-index: 0;
@@ -161,6 +193,13 @@ export default {
         z-index: -1;
       }
     }
+  }
+
+  .cockpit-button {
+    position: absolute;
+    right: 80px;
+    top: 17px;
+    z-index: 10;
   }
 
   .close-button {
