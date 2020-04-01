@@ -25,13 +25,13 @@
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = true"
-      @update-settings="$emit('update-settings', $event)"
+      @update-settings="updateH5pSettings"
     />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapActions, mapState } from "vuex"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
@@ -78,6 +78,7 @@ export default {
     ...mapState(["h5pSettings"]),
   },
   methods: {
+    ...mapActions(["updateH5pSettings"]),
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true

@@ -29,7 +29,6 @@
       :width="dimensions.width"
       :height="dimensions.height"
       @load="handleLoad"
-      @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
       @complete="complete"
       @close="$emit('close')"
