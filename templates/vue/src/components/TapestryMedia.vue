@@ -28,7 +28,6 @@
       :node="node"
       :width="dimensions.width"
       :height="dimensions.height"
-      :settings="h5pSettings"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
@@ -88,11 +87,6 @@ export default {
     dimensions: {
       type: Object,
       required: true,
-    },
-    h5pSettings: {
-      type: Object,
-      required: false,
-      default: () => ({}),
     },
     autoplay: {
       type: Boolean,

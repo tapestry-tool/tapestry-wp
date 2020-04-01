@@ -26,11 +26,8 @@ export default {
       },
     },
     settings: {
-      type: [Object, String],
-      required: false,
-      default: () => {
-        return {}
-      },
+      type: Object,
+      required: true,
     },
     width: {
       type: Number,
