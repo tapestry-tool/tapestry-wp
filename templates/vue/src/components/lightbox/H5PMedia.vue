@@ -25,6 +25,7 @@
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
       @show-end-screen="showEndScreen = true"
+      @update-settings="$emit('update-settings', $event)"
     />
   </div>
 </template>

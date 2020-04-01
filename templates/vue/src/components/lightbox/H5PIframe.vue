@@ -3,7 +3,7 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
+    :src="node.typeData.mediaURL"
     :width="width"
     @load="handleLoad"
   ></iframe>
@@ -34,10 +34,6 @@ export default {
     },
     width: {
       type: Number,
-      required: false,
-    },
-    mediaURL: {
-      type: String,
       required: false,
     },
     autoplay: {

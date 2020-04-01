@@ -187,14 +187,14 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
-        'ROUTE'     => 'users/h5psettings',
+        'ROUTE'     => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserU5PSettingsByPostId',
+            'callback'              => 'getUserH5PSettingsByPostId',
         ]
     ],
     'UPDATE_TAPESTRY_USER_H5P_SETTING' => (object) [
-        'ROUTE'     => 'users/h5psettings',
+        'ROUTE'     => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'updateUserH5PSettingsByPostId',
@@ -935,16 +935,15 @@ function completeQuestionById($request)
 
 /**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
- * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=42
+ * Example: /wp-json/tapestry-tool/v1/users/h5psettings/42
  * 
  * @param Object $request HTTP request
  * 
  * @return Object $response HTTP response
  */
-function getUserU5PSettingsByPostId($request)
+function getUserH5PSettingsByPostId($request)
 {
-    $postId = $request['post_id'];
-
+    $postId = $request['tapestryPostId'];
     try {
         $userProgress = new TapestryUserProgress($postId);
         return $userProgress->getH5PSettings();
@@ -955,16 +954,25 @@ function getUserU5PSettingsByPostId($request)
 
 /**
  * Update the user's h5p settings by post id
- * Example: /wp-json/tapestry-tool/v1/users/h5psettings?post_id=44&json={"volume":100,"muted":false,"caption":null,"quality":"q1","playbackRate":0.5,"time":11.934346}
+ * 
+ * Example endpoint: /wp-json/tapestry-tool/v1/users/h5psettings/44
+ * Example body:
+ * {
+ *  "volume": 100,
+ *  "muted": false,
+ *  "caption": null,
+ *  "quality": "q1",
+ *  "playbackRate": 0.5,
+ *  "time": 11.934346
+ * }
  * 
  * @param Object $request HTTP request
  * 
  */
 function updateUserH5PSettingsByPostId($request)
 {
-    $postId = $request['post_id'];
-    $h5pSettingsData = $request['json'];
-
+    $postId = $request['tapestryPostId'];
+    $h5pSettingsData = $request->get_body();
     try {
         $userProgress = new TapestryUserProgress($postId);
         $userProgress->updateH5PSettings($h5pSettingsData);
