@@ -47,6 +47,41 @@
             />
           </b-form-group>
         </b-tab>
+        <b-tab title="Profile">
+          <div v-for="(activity, index) in profileActivities" :key="index">
+            <b-row align-v="center" class="mb-2 mx-0">
+              <b-button
+                class="ml-auto"
+                size="sm"
+                variant="outline-danger"
+                @click="deleteActivity(index)"
+              >
+                Delete
+              </b-button>
+            </b-row>
+            <b-form-group label="Choose an activity">
+              <combobox
+                v-model="activity.activityRef"
+                :options="activities"
+                item-text="text"
+                item-value="id"
+                empty-message="There are no activities yet."
+              >
+                <template v-slot="slotProps">
+                  <p>
+                    {{ slotProps.option.text }}
+                  </p>
+                </template>
+              </combobox>
+            </b-form-group>
+          </div>
+          <b-row class="mx-0">
+            <b-button variant="primary" @click="addActivity">
+              <i class="fas fa-plus icon"></i>
+              Add Activity
+            </b-button>
+          </b-row>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -66,12 +101,15 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
+import Combobox from "../components/Combobox"
+
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    Combobox,
   },
   props: {
     wpCanEditTapestry: {
@@ -86,10 +124,15 @@ export default {
       autoLayout: false,
       nodeDraggable: true,
       spaceshipBackgroundUrl: "",
+      profileActivities: [],
     }
   },
   computed: {
+    ...mapState(["nodes"]),
     ...mapGetters(["settings"]),
+    activities() {
+      return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
+    },
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -105,17 +148,30 @@ export default {
     closeModal() {
       this.$bvModal.hide("settings-modal")
     },
+    addActivity() {
+      this.profileActivities = [
+        ...this.profileActivities,
+        {
+          activityRef: null,
+        },
+      ]
+    },
+    deleteActivity(index) {
+      this.profileActivities.splice(index, 1)
+    },
     getSettings() {
       const {
         backgroundUrl = "",
         autoLayout = false,
         nodeDraggable = true,
         spaceshipBackgroundUrl = "",
+        profileActivities = [],
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
+      this.profileActivities = profileActivities
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -123,6 +179,7 @@ export default {
         autoLayout: this.autoLayout,
         nodeDraggable: this.nodeDraggable,
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
+        profileActivities: this.profileActivities,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)

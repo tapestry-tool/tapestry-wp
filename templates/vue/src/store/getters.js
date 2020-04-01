@@ -1,9 +1,10 @@
+const mapIdToKey = {
+  textId: "text",
+  checklistId: "checklist",
+  audioId: "audio",
+}
+
 export function logs(state) {
-  const mapIdToKey = {
-    textId: "text",
-    checklistId: "checklist",
-    audioId: "audio",
-  }
   const contents = state.nodes
     .filter(node => node.completed && node.showInBackpack)
     .map(node => ({
@@ -24,18 +25,64 @@ export function logs(state) {
   )
   nodesWithQuestions.forEach(node => {
     node.quiz.forEach(question => {
-      Object.entries(question.entries).forEach(([answerType, entry]) => {
-        activities.push({
-          type: "activity",
-          title: question.text,
-          nodeId: node.id,
-          [mapIdToKey[answerType]]: getAnswer(answerType, entry),
+      if (question.entries) {
+        Object.entries(question.entries).forEach(([answerType, entry]) => {
+          activities.push({
+            type: "activity",
+            title: question.text,
+            nodeId: node.id,
+            [mapIdToKey[answerType]]: getAnswer(answerType, entry),
+          })
         })
-      })
+      }
     })
   })
 
   return contents.concat(activities)
+}
+
+export function profileActivities(state) {
+  let activities = []
+  let nodesWithQuestions = state.nodes.filter(
+    node =>
+      node.quiz &&
+      node.quiz.some(
+        question => question.entries && Object.keys(question.entries).length > 0
+      )
+  )
+  nodesWithQuestions.forEach(node => {
+    node.quiz
+      .filter(
+        question =>
+          question.entries &&
+          state.settings.profileActivities.find(item =>
+            node.quiz.find(question => item.activityRef === question.id)
+          )
+      )
+      .forEach(question => {
+        Object.entries(question.entries).forEach(([answerType, entry]) => {
+          activities.push({
+            id: question.id,
+            title: question.text,
+            nodeId: node.id,
+            [mapIdToKey[answerType]]: getAnswer(answerType, entry),
+          })
+        })
+      })
+  })
+  // Maintain order of the activities from state.settings.profileActivities
+  let orderedActivities = []
+  state.settings.profileActivities.forEach(function(key) {
+    let found = false
+    activities = activities.filter(function(question) {
+      if (!found && question.id === key.activityRef) {
+        orderedActivities.push(question)
+        found = true
+        return false
+      } else return true
+    })
+  })
+  return orderedActivities
 }
 
 const getAnswer = (answerType, entry) => {

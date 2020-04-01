@@ -17,6 +17,11 @@
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button
+        icon="user-circle"
+        label="Profile"
+        @click="setActivePage('profile')"
+      ></tyde-button>
+      <tyde-button
         class="close-button"
         icon="times"
         @click="$emit('continue')"
@@ -36,6 +41,10 @@
         @settings-change="updateSettings"
       />
       <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
+      <tyde-menu-profile
+        v-if="activePage === 'profile'"
+        @back="setActivePage('home')"
+      />
     </div>
   </div>
 </template>
@@ -46,6 +55,7 @@ import TydeMenuHome from "./TydeMenuHome"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
+import TydeMenuProfile from "./TydeMenuProfile"
 
 export default {
   name: "tyde-menu",
@@ -54,6 +64,7 @@ export default {
     TydeMenuHome,
     TydeMenuSettings,
     TydeMenuHelp,
+    TydeMenuProfile,
   },
   data() {
     return {
