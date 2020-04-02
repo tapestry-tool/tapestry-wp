@@ -2068,6 +2068,10 @@ function tapestryTool(config){
                     })
                     node.accordionProgress = accordionProgress
                 }
+
+                if(node.tydeType === "Module" || node.tydeType === "Stage"){
+                    node.tydeProgress = 0;
+                }
             }
         }
     

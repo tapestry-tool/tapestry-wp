@@ -72,15 +72,9 @@ export default {
 }
 </script>
 
-<style>
-:root {
-  --tyde-blue: #1074bb;
-  --tyde-orange: #f79621;
-  --tyde-orange-light: #f9b664;
-}
-</style>
-
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .end-screen {
   display: flex;
   flex-direction: column;
@@ -106,7 +100,7 @@ export default {
 
     button {
       background: none;
-      background-color: var(--tyde-blue);
+      background-color: $tyde-blue;
       padding: 4px 32px;
       margin: 0;
       display: flex;
@@ -128,7 +122,7 @@ export default {
       }
 
       .button-quiz {
-        background-color: var(--tyde-orange);
+        background-color: $tyde-orange;
       }
 
       p {

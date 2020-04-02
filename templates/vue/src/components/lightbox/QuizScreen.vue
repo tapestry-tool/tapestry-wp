@@ -97,6 +97,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .quiz-screen {
   display: flex;
   background-size: cover;
@@ -113,9 +115,7 @@ export default {
   color: black;
   z-index: 10;
 }
-</style>
 
-<style lang="scss" scoped>
 .question-footer {
   margin-top: 1em;
   display: flex;
@@ -152,7 +152,7 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: var(--tyde-blue);
+  background: $tyde-blue;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,7 +194,7 @@ export default {
   padding: 0;
   font-weight: bold;
   font-size: 40px;
-  color: var(--tyde-blue);
+  color: $tyde-blue;
   margin-right: 32px;
 }
 </style>

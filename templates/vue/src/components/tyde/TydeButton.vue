@@ -1,5 +1,9 @@
 <template>
-  <button class="tyde-button" :style="cssProps" @click="$emit('click')">
+  <button
+    :class="['tyde-button', { 'has-label': label.length > 0 }]"
+    :style="cssProps"
+    @click="$emit('click')"
+  >
     <i :class="iconClass"></i>
     <slot></slot>
   </button>
@@ -15,6 +19,8 @@ export default {
     },
     label: {
       type: String,
+      required: false,
+      default: "",
     },
   },
   computed: {
@@ -33,22 +39,28 @@ export default {
 <style lang="scss" scoped>
 .tyde-button {
   position: relative;
-  width: auto;
+  width: 60px;
   height: 60px;
   border-radius: 30px;
   display: flex;
   align-items: center;
+  justify-content: center;
   color: black;
   background: white;
   font-size: 30px;
   margin-right: 16px;
   transition: all 0.2s ease;
 
-  i {
-    margin-right: 8px;
-    margin-left: 0px;
-    margin-bottom: 2px;
-    padding: 0px;
+  &.has-label {
+    width: auto;
+    justify-content: flex-start;
+
+    i {
+      margin-right: 8px;
+      margin-left: 0px;
+      margin-bottom: 2px;
+      padding: 0px;
+    }
   }
 
   &:last-child {
