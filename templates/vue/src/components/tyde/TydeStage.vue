@@ -109,7 +109,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 body.tapestry-stage-open {
   overflow: hidden;
 }
