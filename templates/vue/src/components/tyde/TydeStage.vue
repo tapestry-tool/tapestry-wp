@@ -3,12 +3,11 @@
     <div>
       <div class="stage-header">
         <tyde-progress-bar :node-id="this.moduleId" />
-        <div v-if="this.done" class="stage-star">
-          <img :src="this.activeStarSrc" />
-        </div>
-        <div v-else class="stage-star">
-          <img :src="this.inactiveStarSrc" />
-          <div>{{ this.numComplete }}/{{ this.questions.length }}</div>
+        <div class="stage-star">
+          <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
+          <div v-if="!this.done">
+            {{ this.numComplete }}/{{ this.topics.length }}
+          </div>
         </div>
         <h1>{{ node.title }}</h1>
       </div>
@@ -17,6 +16,7 @@
           v-for="topic in topics"
           :key="topic.id"
           :topic="topic"
+          :show-complete="true"
           style="align-self: flex-start;"
           @click="openLightbox(topic.id)"
         />
@@ -54,7 +54,7 @@ export default {
   computed: {
     ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
     done() {
-      return this.topics.every(question => question.completed)
+      return this.topics.every(topic => topic.completed)
     },
     node() {
       return this.getNode(this.nodeId)
@@ -83,7 +83,7 @@ export default {
     numComplete() {
       const reducer = (accumulator, completed) =>
         accumulator + (completed === true ? 1 : 0)
-      return this.questions.map(n => n.completed).reduce(reducer, 0)
+      return this.topics.map(n => n.completed).reduce(reducer, 0)
     },
   },
   mounted() {
@@ -132,13 +132,13 @@ body.tapestry-stage-open {
     align-items: center;
 
     .stage-star {
-      margin-left: 25vw;
+      margin-left: 32vw;
       margin-right: 30px;
       padding-bottom: 10px;
       position: relative;
       font-family: inherit;
       color: white;
-      font-size: 32px;
+      font-size: 29px;
 
       img {
         width: 80px;
@@ -146,8 +146,8 @@ body.tapestry-stage-open {
 
       > div {
         position: absolute;
-        left: 25%;
-        top: 23%;
+        left: 27%;
+        top: 24%;
       }
     }
 
@@ -194,14 +194,6 @@ body.tapestry-stage-open {
         div {
           width: 198px;
           height: 184px;
-
-          i {
-            position: relative;
-            right: -75px;
-            bottom: 30px;
-            -webkit-text-stroke-width: 1px;
-            -webkit-text-stroke-color: white;
-          }
 
           img {
             width: 90%;
