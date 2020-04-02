@@ -1,4 +1,3 @@
-import Vue from "vue"
 import Helpers from "../utils/Helpers"
 
 export function init(state, dataset) {
@@ -96,13 +95,10 @@ export function updateTydeProgress(state, { parentId, isParentModule }) {
     childProgress = childNodes.map(topic => topic.completed)
     reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
   }
-  Vue.set(
-    parentNode,
-    "tydeProgress",
+  parentNode.tydeProgress =
     childNodes.length === 0
       ? 1
       : childProgress.reduce(reducer, 0) / childNodes.length
-  )
   if (!isParentModule) {
     // If node is stage, parent module must be updated as well
     getParentIds(state, parentId).map(id =>
