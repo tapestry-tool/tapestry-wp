@@ -22,11 +22,13 @@
         <h1>{{ lastQuestion.text }}</h1>
         <div v-if="answers.length">
           <p>Previously, you said:</p>
-          <div
+          <tapestry-activity
             v-for="answer in answers"
             :key="answer.type"
-            v-html="answer.entry"
-          ></div>
+            :type="answer.type"
+            :entry="answer.entry"
+            :src="answer.src"
+          ></tapestry-activity>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -73,6 +75,7 @@ import AnswerButton from "./AnswerButton"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
+import TapestryActivity from "@/components/TapestryActivity"
 
 export default {
   name: "question",
@@ -81,6 +84,7 @@ export default {
     GravityForm,
     Loading,
     "h5p-iframe": H5PIframe,
+    TapestryActivity,
   },
   props: {
     question: {
@@ -116,7 +120,13 @@ export default {
           .filter(entry => entry[1].length > 0)
           .map(i => i[0])
         return answeredTypes
-          .map(type => this.getEntry(this.question.previousEntry, type))
+          .map(type => {
+            const answer = this.getEntry(this.question.previousEntry, type)
+            if (answer && answer.type === "audio") {
+              answer.src = `${apiUrl}/tapestries/${wpPostId}/nodes/${this.node.id}/audio/${answer.entry}`
+            }
+            return answer
+          })
           .filter(Boolean)
       }
       return []

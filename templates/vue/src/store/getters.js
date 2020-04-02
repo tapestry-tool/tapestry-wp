@@ -33,7 +33,6 @@ export function getEntry(_, { getQuestion }) {
     if (answerType === "audioId") {
       return { type: "audio", entry }
     }
-
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
   }
@@ -50,14 +49,10 @@ function formatEntry(answers, answerType) {
   if (answerType === "textId") {
     return {
       type: "text",
-      entry: `<div>${answers[0].replace(/(?:\r\n|\r|\n)/g, "<br>")}</div>`,
+      entry: answers[0],
     }
   }
-  const ul = document.createElement("ul")
-  answers.forEach(answer => {
-    const li = document.createElement("li")
-    li.innerText = answer
-    ul.appendChild(li)
-  })
-  return { type: "checklist", entry: ul.outerHTML }
+  if (answerType === "checklistId") {
+    return { type: "checklist", entry: answers.filter(answer => answer.length) }
+  }
 }
