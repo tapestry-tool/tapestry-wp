@@ -15,6 +15,7 @@
       v-if="node.mediaType === 'accordion'"
       :node="node"
       @close="close"
+      @complete="complete"
     />
     <tapestry-media
       v-else
@@ -22,6 +23,7 @@
       :dimensions="dimensions"
       @load="handleLoad"
       @close="close"
+      @complete="complete"
     />
   </tapestry-modal>
 </template>
@@ -31,7 +33,7 @@ import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
-import { mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 
 export default {
   name: "lightbox",
@@ -175,6 +177,11 @@ export default {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
   },
   methods: {
+    ...mapActions(["completeNode", "updateMayUnlockNodes"]),
+    complete() {
+      this.completeNode(this.nodeId)
+      this.updateMayUnlockNodes(this.nodeId)
+    },
     close() {
       this.$router.push("/")
     },

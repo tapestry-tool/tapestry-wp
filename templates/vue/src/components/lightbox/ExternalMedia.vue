@@ -6,6 +6,7 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
+      @loadeddata="$emit('load')"
     ></iframe>
     <div v-else class="preview">
       <div
@@ -49,8 +50,11 @@ export default {
       return Helpers.normalizeUrl(this.node.typeData.mediaURL)
     },
   },
-  async mounted() {
+  mounted() {
     this.$emit("complete")
+    if (this.node.behaviour !== "embed") {
+      this.$emit("load")
+    }
   },
 }
 </script>
