@@ -230,18 +230,15 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 },
-          ],
+          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
           planetViewNotEarnedIconUrl: "",
           planetViewEarnedIconUrl: "",
           spaceshipPartNotEarnedIconUrl: "",
-          spaceShipPartEarnedIconUrl: "",
-          spaceShipPartHoverIconUrl: "",
+          spaceshipPartEarnedIconUrl: "",
+          spaceshipPartHoverIconUrl: "",
           spaceshipPartX: 0,
           spaceshipPartY: 0,
           spaceshipPartWidth: 0,
@@ -371,11 +368,11 @@ export default {
           case "spaceshipPartNotEarnedIconUrl":
             newNodeEntry.typeData.spaceshipPartNotEarnedIconUrl = fieldValue
             break
-          case "spaceShipPartEarnedIconUrl":
-            newNodeEntry.typeData.spaceShipPartEarnedIconUrl = fieldValue
+          case "spaceshipPartEarnedIconUrl":
+            newNodeEntry.typeData.spaceshipPartEarnedIconUrl = fieldValue
             break
-          case "spaceShipPartHoverIconUrl":
-            newNodeEntry.typeData.spaceShipPartHoverIconUrl = fieldValue
+          case "spaceshipPartHoverIconUrl":
+            newNodeEntry.typeData.spaceshipPartHoverIconUrl = fieldValue
             break
           case "spaceshipPartX":
             newNodeEntry.typeData.spaceshipPartX = fieldValue

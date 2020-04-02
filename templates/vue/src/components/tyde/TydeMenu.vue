@@ -30,17 +30,22 @@
     </div>
     <div class="content">
       <tyde-cockpit
-        v-if="activePage === 'home'"
-        :logs="logs"
+        v-if="activePage === 'home' && !showSummary"
         @close="$emit('continue')"
+        @show-summary="openSummary"
+      />
+      <tyde-module-summary
+        v-if="activePage === 'home' && showSummary"
+        :node-id="moduleId"
+        style="margin-bottom: 32px;"
+        @close="showSummary = false"
       />
       <tyde-menu-settings
         v-if="activePage === 'settings'"
         :settings="settings"
-        @back="setActivePage('home')"
         @settings-change="updateSettings"
       />
-      <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
+      <tyde-menu-help v-if="activePage === 'help'" />
     </div>
   </div>
 </template>
@@ -51,6 +56,7 @@ import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
+import TydeModuleSummary from "./TydeModuleSummary"
 
 export default {
   name: "tyde-menu",
@@ -59,10 +65,13 @@ export default {
     TydeCockpit,
     TydeMenuSettings,
     TydeMenuHelp,
+    TydeModuleSummary,
   },
   data() {
     return {
       activePage: "home",
+      showSummary: false,
+      moduleId: null,
       settings: {
         isAudioPlaying: false,
       },
@@ -70,7 +79,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["logs"]),
+    ...mapGetters(["logs", "getNode"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -82,6 +91,13 @@ export default {
   methods: {
     setActivePage(page) {
       this.activePage = page
+    },
+    openSummary(nodeId) {
+      const node = this.getNode(nodeId)
+      if (node.tydeProgress === 1) {
+        this.showSummary = true
+        this.moduleId = nodeId
+      }
     },
     updateSettings(partialNewSettings) {
       this.settings = { ...this.settings, ...partialNewSettings }
@@ -120,6 +136,7 @@ export default {
     background: var(--tapestry-gray);
     border: 4px solid white;
     height: calc(100vh - 86px);
+    overflow-y: scroll;
     padding: 16px 32px;
     position: relative;
     z-index: 0;

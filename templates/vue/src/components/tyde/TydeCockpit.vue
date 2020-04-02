@@ -3,13 +3,12 @@
     <div v-for="node in this.nodes" :key="node.id">
       <div
         v-if="isNodeModuleType(node)"
-        :id="`tyde-cockpit-`+node.id"
+        :id="`tyde-cockpit-` + node.id"
         :src="moduleImage(node)"
         :style="moduleStyles(node)"
         @mouseover="nodeMouseOverHandler(node)"
         @mouseleave="nodeMouseLeaveHandler(node)"
-      >
-      </div>
+      ></div>
     </div>
   </section>
 </template>
@@ -55,10 +54,9 @@ export default {
     },
     cockpitImage() {
       return {
-        backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`
+        backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`,
       }
     },
-
   },
   watch: {
     /**
@@ -102,11 +100,11 @@ export default {
     moduleStyles(node) {
       return {
         backgroundImage: `url(${node.typeData.spaceshipPartNotEarnedIconUrl})`,
-        position: 'relative',
-        top: node.typeData.spaceshipPartY+'px',
-        left: node.typeData.spaceshipPartX+'px',
-        height: node.typeData.spaceshipPartHeight+'px',
-        width: node.typeData.spaceshipPartWidth+'px'
+        position: "relative",
+        top: node.typeData.spaceshipPartY + "px",
+        left: node.typeData.spaceshipPartX + "px",
+        height: node.typeData.spaceshipPartHeight + "px",
+        width: node.typeData.spaceshipPartWidth + "px",
       }
     },
     moduleImage(node) {
@@ -120,10 +118,14 @@ export default {
       return node.tydeType === tydeTypes.MODULE
     },
     nodeMouseOverHandler(node) {
-      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${node.typeData.spaceShipPartHoverIconUrl})`
+      document.getElementById(
+        "tyde-cockpit-" + node.id
+      ).style.backgroundImage = `url(${node.typeData.spaceShipPartHoverIconUrl})`
     },
     nodeMouseLeaveHandler(node) {
-      document.getElementById("tyde-cockpit-"+node.id).style.backgroundImage = `url(${this.moduleImage(node)})`
+      document.getElementById(
+        "tyde-cockpit-" + node.id
+      ).style.backgroundImage = `url(${this.moduleImage(node)})`
     },
   },
 }
@@ -147,5 +149,4 @@ export default {
     overflow-y: scroll;
   }
 }
-
 </style>

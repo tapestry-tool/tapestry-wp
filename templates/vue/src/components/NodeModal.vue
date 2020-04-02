@@ -353,13 +353,13 @@
             </b-form-group>
             <b-form-group label="Earned">
               <file-upload
-                v-model="node.typeData.spaceShipPartEarnedIconUrl"
+                v-model="node.typeData.spaceshipPartEarnedIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
             <b-form-group label="Hover">
               <file-upload
-                v-model="node.typeData.spaceShipPartHoverIconUrl"
+                v-model="node.typeData.spaceshipPartHoverIconUrl"
                 placeholder="Enter link (starting with http)"
               />
             </b-form-group>
@@ -372,8 +372,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="X: "
+                  prepend="X: "
                   append="px"
                   label-for="node-spaceship-part-x"
                 >
@@ -386,8 +385,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Y: "
+                  prepend="Y: "
                   append="px"
                   label-for="node-spaceship-part-y"
                 >
@@ -405,8 +403,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Width: "
+                  prepend="Width: "
                   append="px"
                   label-for="node-spaceship-part-width"
                 >
@@ -419,8 +416,7 @@
               </b-col>
               <b-col>
                 <b-input-group
-                  label-cols="3"
-                  label="Height: "
+                  prepend="Height: "
                   append="px"
                   label-for="node-spaceship-part-height"
                 >
@@ -642,12 +638,12 @@ export default {
           value: this.node.typeData.spaceshipPartNotEarnedIconUrl,
         },
         {
-          name: "spaceShipPartEarnedIconUrl",
-          value: this.node.typeData.spaceShipPartEarnedIconUrl,
+          name: "spaceshipPartEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartEarnedIconUrl,
         },
         {
-          name: "spaceShipPartHoverIconUrl",
-          value: this.node.typeData.spaceShipPartHoverIconUrl,
+          name: "spaceshipPartHoverIconUrl",
+          value: this.node.typeData.spaceshipPartHoverIconUrl,
         },
         { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
         { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },

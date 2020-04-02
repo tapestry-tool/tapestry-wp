@@ -4,59 +4,63 @@
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
     </header>
-    <accordion-row
-      v-for="(row, index) in rows"
-      :key="row.id"
-      :visible="index === activeIndex"
-    >
-      <template v-slot:trigger>
-        <button
-          class="button-row"
-          :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
-          @click="toggle(index)"
-        >
-          <div class="button-row-icon">
-            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-          </div>
-          <div>
-            <p class="button-row-title">{{ row.title }}</p>
-            <p class="button-row-description">{{ row.description }}</p>
-          </div>
-          <div class="icon-container">
-            <tyde-icon
-              v-if="row.mediaType === 'gravity-form'"
-              class="icon icon-activity"
-              icon="activity"
-            ></tyde-icon>
-            <tyde-icon
-              v-if="row.completed"
-              class="icon"
-              icon="checkmark"
-            ></tyde-icon>
-            <tyde-icon
-              v-if="lockRows && disabledFrom >= 0 && index > disabledFrom"
-              class="icon"
-              icon="lock"
-            ></tyde-icon>
-          </div>
-        </button>
-      </template>
-      <template v-slot:content>
-        <tapestry-media
-          :allow-end-screen="false"
-          :autoplay="false"
-          :node-id="row.id"
-          :dimensions="dimensions"
-          @complete="updateProgress(row.id)"
-          @close="toggle(index)"
-        />
-      </template>
-      <template v-slot:footer>
-        <button v-if="row.completed" class="button-finished mt-2" @click="next">
-          {{ node.typeData.finishButtonText }}
-        </button>
-      </template>
-    </accordion-row>
+    <div class="rows">
+      <accordion-row
+        v-for="(row, index) in rows"
+        ref="rowRefs"
+        :key="row.id"
+        :visible="index === activeIndex"
+      >
+        <template v-slot:trigger>
+          <button
+            class="button-row"
+            :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
+            @click="toggle(index)"
+          >
+            <div class="button-row-icon">
+              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+            </div>
+            <div>
+              <p class="button-row-title">{{ row.title }}</p>
+              <p class="button-row-description">{{ row.description }}</p>
+            </div>
+            <div class="icon-container">
+              <tyde-icon
+                v-if="row.mediaType === 'gravity-form'"
+                class="icon icon-activity"
+                icon="activity"
+              ></tyde-icon>
+              <tyde-icon
+                v-if="row.completed"
+                class="icon"
+                icon="checkmark"
+              ></tyde-icon>
+              <tyde-icon
+                v-if="lockRows && disabledFrom >= 0 && index > disabledFrom"
+                class="icon"
+                icon="lock"
+              ></tyde-icon>
+            </div>
+          </button>
+        </template>
+        <template v-slot:content>
+          <tapestry-media
+            :allow-end-screen="false"
+            :autoplay="false"
+            :node-id="row.id"
+            :dimensions="dimensions"
+            @complete="updateProgress(row.id)"
+            @close="toggle(index)"
+            @load="handleLoad"
+          />
+        </template>
+        <template v-slot:footer>
+          <button v-if="row.completed" class="button-finished mt-2" @click="next">
+            {{ node.typeData.finishButtonText }}
+          </button>
+        </template>
+      </accordion-row>
+    </div>
     <tapestry-modal
       v-if="showCompletion"
       :allow-close="false"
@@ -164,6 +168,16 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleLoad() {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          const ref = this.$refs.rowRefs[this.activeIndex].$el
+          this.$refs.container.scrollTop = ref.offsetTop - 12
+        }
+      })
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -208,10 +222,6 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   color: white;
   text-align: left;
   padding: 24px 48px;
@@ -241,11 +251,15 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
-  padding: 0 48px 32px 48px;
+  padding: 0;
 
   ::-webkit-scrollbar-track {
     background-color: black;
   }
+}
+
+.rows {
+  padding: 32px;
 }
 
 .button-completion {
