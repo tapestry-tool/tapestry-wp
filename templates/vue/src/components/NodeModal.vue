@@ -566,18 +566,13 @@ export default {
       }
     },
     disableDeleteButton() {
-      const children = this.getDirectChildren(this.node.id)
-      return (
-        (this.hasChildren && this.node.tydeType === tydeTypes.MODULE) ||
-        (this.node.tydeType === tydeTypes.STAGE &&
-          children
-            .map(this.getNode)
-            .every(node =>
-              (node.tydeType === this.node.tydeType) === tydeTypes.MODULE
-                ? tydeTypes.STAGE
-                : tydeTypes.QUESTION_SET
-            ))
-      )
+      if (
+        this.node.tydeType === tydeTypes.MODULE ||
+        this.node.tydeType === tydeTypes.STAGE
+      ) {
+        return this.hasChildren
+      }
+      return false
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
