@@ -18,9 +18,9 @@
       @submit="$emit('submit')"
     />
     <div v-else>
-      <div v-if="question.isFollowUp">
+      <div v-if="question.isFollowUp" class="follow-up">
         <h1>{{ lastQuestion.text }}</h1>
-        <div v-if="answers.length">
+        <div v-if="answers.length" class="answer-container">
           <p>Previously, you said:</p>
           <tapestry-activity
             v-for="answer in answers"
@@ -193,6 +193,11 @@ export default {
 <style lang="scss" scoped>
 button {
   margin: auto;
+}
+
+.answer-container {
+  width: 75%;
+  margin: 0 auto;
 }
 
 .question {
