@@ -1,5 +1,5 @@
 <template>
-  <div class="stage-wrapper" :style="nodeStyles">
+  <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
         <tyde-progress-bar :node-id="this.moduleId" />
