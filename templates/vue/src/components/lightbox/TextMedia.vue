@@ -21,6 +21,7 @@ export default {
   },
   mounted() {
     this.$emit("complete")
+    this.$emit("load")
   },
 }
 </script>
