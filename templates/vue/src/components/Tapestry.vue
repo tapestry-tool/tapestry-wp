@@ -230,10 +230,7 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [
-            { group: "viewed", value: 0 },
-            { group: "unviewed", value: 1 },
-          ],
+          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
