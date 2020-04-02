@@ -94,7 +94,6 @@ export default {
   .tyde-part-icon {
     width: 70px;
     height: 70px;
-    margin-left: 10px;
     position: relative;
 
     > img {
