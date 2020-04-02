@@ -4,18 +4,15 @@
       <div class="outer-progress" :style="outerCSS">
         <div class="inner-progress" :style="innerCSS"></div>
         <img
-          v-for="inactiveStarIndex in incompleteStages"
-          :key="inactiveStarIndex"
-          :style="starStyle(inactiveStarIndex)"
+          v-for="index in numIncompleteStages"
+          :key="index"
+          :style="starStyle(index)"
           :src="inactiveStarSrc"
         />
         <img
-          v-for="activeStarIndex in range(
-            incompleteStages + 1,
-            incompleteStages + completeStages
-          )"
-          :key="activeStarIndex"
-          :style="starStyle(activeStarIndex)"
+          v-for="index in range(numIncompleteStages + 1, stages.length)"
+          :key="index"
+          :style="starStyle(index)"
           :src="activeStarSrc"
         />
       </div>
@@ -55,14 +52,8 @@ export default {
         .map(n => this.getNode(n))
         .filter(n => n.tydeType === tydeTypes.STAGE)
     },
-    incompleteStages() {
+    numIncompleteStages() {
       return this.stages.filter(n => n.tydeProgress < 1).length
-    },
-    completeStages() {
-      return this.stages.filter(n => n.tydeProgress === 1).length
-    },
-    height() {
-      return 30
     },
     outerCSS() {
       return {
