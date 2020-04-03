@@ -1835,7 +1835,6 @@ function tapestryTool(config){
                     //Update the dataset with new values
                     tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                     tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-                    tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
 
                     var questions = tapestry.dataset.nodes[index].quiz;
                     if (quizCompletionInfo) {
