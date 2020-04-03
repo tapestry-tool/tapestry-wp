@@ -1070,17 +1070,17 @@ function tapestryTool(config){
                 return getViewable(d) && d.tydeType === "Module";
             })
             .attr("width", function (d) {
-                return getRadius(d)*2;
+                return getRadius(d) * 1.4;
             })
             .attr("height", 10)
             .attr("x", function (d) {
-                return - getRadius(d);
+                return - getRadius(d) * 0.85;
             })
             .attr("y", function (d) {
                 return - getRadius(d) - 50;
             })
             .attr("progress", function (d) {
-                return d.tydeProgress*100;
+                return d.tydeProgress * 100;
             })
             .attr("class", "tyde-module-progress")
             .html(function(d){
@@ -1097,7 +1097,7 @@ function tapestryTool(config){
                 return getViewable(d) && d.tydeType === "Module";
             })
             .attr("x", function (d) {
-                return getRadius(d) + 10;
+                return getRadius(d) * 0.55;
             })
             .attr("y", function (d) {
                 return - getRadius(d) - 80;
@@ -1222,13 +1222,13 @@ function tapestryTool(config){
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .attr("x", function (d) {
-                    return - getRadius(d);
+                    return - getRadius(d) * 0.85;
                 })
                 .attr("y", function (d) {
                     return - getRadius(d) - 50;
                 })
                 .attr("width", function (d) {
-                    return getRadius(d)*2;
+                    return getRadius(d) * 1.4;
                 });
 
         nodes.selectAll(".tyde-module-planet-icon")
@@ -1238,7 +1238,7 @@ function tapestryTool(config){
                     return - getRadius(d) - 80;
                 })
                 .attr("x", function (d) {
-                    return getRadius(d) + 10;
+                    return getRadius(d) * 0.55;
                 });
         
         /* Attach images to be used within each node */
