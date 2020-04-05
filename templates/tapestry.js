@@ -1521,13 +1521,13 @@ function tapestryTool(config){
                     return arcGenerator(adjustProgressBarRadii(d));
                 });
             
-            // Update the progress attribute for modules's foreign object
+            // TYDE ONLY - Update the progress attribute for modules's foreign object
             nodes.selectAll(".tyde-module-progress")
             .attr("progress", function (d) {
                 return d.tydeProgress*100;
             });
             
-            // Update progress bar based on foreign object
+            // TYDE ONLY - Update progress bar based on foreign object
             nodes.selectAll(".progress-bar")
                 .transition()
                 .duration(300)
@@ -1541,7 +1541,7 @@ function tapestryTool(config){
                     return "width:" + foreignObject.attr("progress") + "%"
                 });
             
-            // Reassign the planet view icon incase of module completion
+            // TYDE ONLY - Reassign the planet view icon incase of module completion
             nodes.selectAll(".tyde-module-planet-icon")
                 .html(function(d){
                     let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
