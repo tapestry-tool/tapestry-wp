@@ -1070,11 +1070,13 @@ function tapestryTool(config){
                 return getViewable(d) && d.tydeType === "Module";
             })
             .attr("width", function (d) {
-                return getRadius(d) * 1.4;
+                return getRadius(d) * 1.3;
             })
-            .attr("height", 10)
+            .attr("height", function (d) {
+                return getRadius(d) / 7;
+            })
             .attr("x", function (d) {
-                return - getRadius(d) * 0.85;
+                return - getRadius(d) * 0.8;
             })
             .attr("y", function (d) {
                 return - getRadius(d) - 50;
@@ -1096,17 +1098,17 @@ function tapestryTool(config){
             .filter(function (d){
                 return getViewable(d) && d.tydeType === "Module";
             })
+            .attr("width", 100)
+            .attr("height", 100)
             .attr("x", function (d) {
-                return getRadius(d) * 0.55;
+                return getRadius(d) * 0.6;
             })
             .attr("y", function (d) {
-                return - getRadius(d) - 80;
+                return - getRadius(d) - 70;
             })
             .attr("src", function (d) {
                 return d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
             })
-            .attr("width", 100)
-            .attr("height", 100)
             .attr("class", "tyde-module-planet-icon")
             .html(function(d){
                 let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
@@ -1221,24 +1223,27 @@ function tapestryTool(config){
         nodes.selectAll(".tyde-module-progress")
                 .transition()
                 .duration(TRANSITION_DURATION)
+                .attr("width", function (d) {
+                    return getRadius(d) * 1.3;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 7;
+                })
                 .attr("x", function (d) {
-                    return - getRadius(d) * 0.85;
+                    return - getRadius(d) * 0.8;
                 })
                 .attr("y", function (d) {
                     return - getRadius(d) - 50;
-                })
-                .attr("width", function (d) {
-                    return getRadius(d) * 1.4;
                 });
 
         nodes.selectAll(".tyde-module-planet-icon")
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .attr("y", function (d) {
-                    return - getRadius(d) - 80;
+                    return - getRadius(d) - 70;
                 })
                 .attr("x", function (d) {
-                    return getRadius(d) * 0.55;
+                    return getRadius(d) * 0.5;
                 });
         
         /* Attach images to be used within each node */

@@ -4,6 +4,16 @@
 
 @import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
 
+:root {
+    --tapestry-gray: #404040;
+    --tapestry-light-gray: #787878;
+    --tapestry-med-gray: #535353;
+    --tapestry-light-blue: #1eade1;
+    --tyde-green: #205a27;
+    --tyde-border-green: #39b54a;
+    --tyde-font-mono: "VT323", monospace;
+}
+
 #header {
     position: fixed;
     top: 1em;
@@ -202,14 +212,6 @@
     text-align:center;
 }
 
-.progress-meter .background {
-    fill: #333333;
-}
-
-.progress-meter .foreground {
-    fill: #11a6d8;
-}
-
 .node {
     cursor: pointer;
 }
@@ -367,4 +369,21 @@ input[type="checkbox"][disabled] {
 
 #mediaFormat[disabled], #mediaType[disabled]{
     cursor: not-allowed;
+}
+
+/* TYDE PROGRESS */
+
+.progress {
+    display: flex;
+    background: gray;
+    border: solid 2px lightgray;
+    border-radius: 8px;
+    height: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: var(--tapestry-light-blue);
+    height: 100%;
 }
