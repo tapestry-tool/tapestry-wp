@@ -19,9 +19,8 @@
     />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
-        <h1>{{ lastQuestion.text }}</h1>
-        <div v-if="answers.length" class="answer-container">
-          <p>Previously, you said:</p>
+        <div v-if="answers.length" class="answer-container mx-auto mb-3">
+          <h3 class="mb-4">Previously, you said:</h3>
           <tapestry-activity
             v-for="answer in answers"
             :key="answer.type"
@@ -197,7 +196,6 @@ button {
 
 .answer-container {
   width: 75%;
-  margin: 0 auto;
 }
 
 .question {
