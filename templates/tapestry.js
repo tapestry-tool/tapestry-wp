@@ -1063,6 +1063,62 @@ function tapestryTool(config){
             .attr("xlink:href", function (d) {
                 return d.imageURL;
             });
+        
+        // TYDE ONLY - Add progress bar above module nodes
+        nodes.append("foreignObject")
+            .filter(function (d){
+                return getViewable(d) && d.tydeType === "Module";
+            })
+            .attr("width", function (d) {
+                return getRadius(d) * 1.3;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) / 7;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d) * 0.8;
+            })
+            .attr("y", function (d) {
+                return - getRadius(d) - 50;
+            })
+            .attr("progress", function (d) {
+                return d.tydeProgress * 100;
+            })
+            .attr("class", "tyde-module-progress")
+            .html(function(d){
+                let progressBar = "<div class='progress-bar' role='progressbar' style='width: "
+                    + d.tydeProgress*100 + "%' aria-valuenow='" + d.tydeProgress*100 +
+                    "' aria-valuemin='0' aria-valuemax='100'></div>";
+                let progress = "<div class='progress'>" + progressBar + "</div>";
+                return progress;
+            })
+
+        // TYDE ONLY - Add spaceship planet view icon
+        nodes.append("foreignObject")
+            .filter(function (d){
+                return getViewable(d) && d.tydeType === "Module";
+            })
+            .attr("width", function (d) {
+                return getRadius(d) / 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) / 2;
+            })
+            .attr("x", function (d) {
+                return getRadius(d) * 0.7;
+            })
+            .attr("y", function (d) {
+                return - getRadius(d) * 1.2 - 45;
+            })
+            .attr("src", function (d) {
+                return d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
+            })
+            .attr("class", "tyde-module-planet-icon")
+            .html(function(d){
+                let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
+                let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
+                return img;
+            });
 
         /* Add path and button */
         buildPathAndButton();
@@ -1166,6 +1222,40 @@ function tapestryTool(config){
                     if (!d.hideProgress) {
                         return PROGRESS_THICKNESS * adjustedRadiusRatio;
                     }
+                });
+
+        // TYDE ONLY - update progress bar size and position
+        nodes.selectAll(".tyde-module-progress")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("width", function (d) {
+                    return getRadius(d) * 1.3;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 7;
+                })
+                .attr("x", function (d) {
+                    return - getRadius(d) * 0.8;
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d) - 50;
+                });
+
+        // TYDE ONLY - update planet icon size and position
+        nodes.selectAll(".tyde-module-planet-icon")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("width", function (d) {
+                    return getRadius(d) / 2;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 2;
+                })
+                .attr("x", function (d) {
+                    return getRadius(d) * 0.7;
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d) * 1.2 - 45;
                 });
         
         /* Attach images to be used within each node */
@@ -1429,6 +1519,34 @@ function tapestryTool(config){
                 })
                 .attr("d", function (d) {
                     return arcGenerator(adjustProgressBarRadii(d));
+                });
+            
+            // TYDE ONLY - Update the progress attribute for modules's foreign object
+            nodes.selectAll(".tyde-module-progress")
+            .attr("progress", function (d) {
+                return d.tydeProgress*100;
+            });
+            
+            // TYDE ONLY - Update progress bar based on foreign object
+            nodes.selectAll(".progress-bar")
+                .transition()
+                .duration(300)
+                .attr("aria-valuenow", function (d) {
+                    // Here d is undefined, so we have to manually get the foreign object's attributes
+                    let foreignObject = d3.select(this.parentNode.parentNode)
+                    return foreignObject.attr("progress")
+                })
+                .attr("style", function (d) {
+                    let foreignObject = d3.select(this.parentNode.parentNode)
+                    return "width:" + foreignObject.attr("progress") + "%"
+                });
+            
+            // TYDE ONLY - Reassign the planet view icon incase of module completion
+            nodes.selectAll(".tyde-module-planet-icon")
+                .html(function(d){
+                    let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
+                    let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
+                    return img;
                 });
         }
     }
