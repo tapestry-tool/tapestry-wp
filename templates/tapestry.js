@@ -1064,7 +1064,7 @@ function tapestryTool(config){
                 return d.imageURL;
             });
         
-        // Add progress bar above module nodes
+        // TYDE ONLY - Add progress bar above module nodes
         nodes.append("foreignObject")
             .filter(function (d){
                 return getViewable(d) && d.tydeType === "Module";
@@ -1093,18 +1093,22 @@ function tapestryTool(config){
                 return progress;
             })
 
-        // Add spaceship planet view icon
+        // TYDE ONLY - Add spaceship planet view icon
         nodes.append("foreignObject")
             .filter(function (d){
                 return getViewable(d) && d.tydeType === "Module";
             })
-            .attr("width", 100)
-            .attr("height", 100)
+            .attr("width", function (d) {
+                return getRadius(d) / 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) / 2;
+            })
             .attr("x", function (d) {
-                return getRadius(d) * 0.6;
+                return getRadius(d) * 0.7;
             })
             .attr("y", function (d) {
-                return - getRadius(d) - 70;
+                return - getRadius(d) * 1.2 - 45;
             })
             .attr("src", function (d) {
                 return d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
@@ -1220,6 +1224,7 @@ function tapestryTool(config){
                     }
                 });
 
+        // TYDE ONLY - update progress bar size and position
         nodes.selectAll(".tyde-module-progress")
                 .transition()
                 .duration(TRANSITION_DURATION)
@@ -1236,14 +1241,21 @@ function tapestryTool(config){
                     return - getRadius(d) - 50;
                 });
 
+        // TYDE ONLY - update planet icon size and position
         nodes.selectAll(".tyde-module-planet-icon")
                 .transition()
                 .duration(TRANSITION_DURATION)
-                .attr("y", function (d) {
-                    return - getRadius(d) - 70;
+                .attr("width", function (d) {
+                    return getRadius(d) / 2;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 2;
                 })
                 .attr("x", function (d) {
-                    return getRadius(d) * 0.5;
+                    return getRadius(d) * 0.7;
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d) * 1.2 - 45;
                 });
         
         /* Attach images to be used within each node */

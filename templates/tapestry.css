@@ -387,3 +387,8 @@ input[type="checkbox"][disabled] {
     background: var(--tapestry-light-blue);
     height: 100%;
 }
+
+.tyde-module-planet-icon img {
+    width: auto;
+    height: 100%;
+}
