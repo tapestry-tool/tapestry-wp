@@ -4,6 +4,7 @@
     <accordion-row
       v-for="(row, index) in rows"
       :key="row.node.id"
+      ref="rowRefs"
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
@@ -24,6 +25,7 @@
           style="color: white; margin-bottom: 24px;"
           @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
+          @load="handleLoad"
         />
         <p v-if="row.children.length > 0" style="color: white;">
           {{ row.node.typeData.subAccordionText }}
@@ -121,9 +123,22 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
   },
+  mounted() {
+    this.isMounted = true
+  },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleLoad() {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          const ref = this.$refs.rowRefs[this.activeIndex].$el
+          this.$refs.container.scrollTop = ref.offsetTop - 12
+        }
+      })
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -144,10 +159,12 @@ export default {
         this.showCompletion = true
       }
     },
-    updateProgress(rowId) {
+    async updateProgress(rowId) {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
         accordionProgress.push(rowId)
+        await this.completeNode(rowId)
+
         this.updateNodeProgress({
           id: this.node.id,
           progress: accordionProgress.length / this.rows.length,
@@ -158,7 +175,7 @@ export default {
         })
 
         if (accordionProgress.length === this.rows.length) {
-          this.completeNode(this.node.id)
+          this.$emit("complete")
         }
       }
     },

@@ -69,7 +69,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -148,7 +147,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -198,6 +196,7 @@ export default {
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        conditions: [],
         behaviour: "embed",
         status: "publish",
         nodeType: "",
@@ -219,7 +218,6 @@ export default {
           mediaHeight: 600,
           subAccordionText: "More content:",
         },
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -299,9 +297,6 @@ export default {
               newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
             break
-          case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot
-            break
           case "hideTitle":
             newNodeEntry.hideTitle = fieldValue
             break
@@ -330,6 +325,7 @@ export default {
             newNodeEntry.typeData.subAccordionText = fieldValue
             break
           default:
+            newNodeEntry[fieldName] = fieldValue
             break
         }
       }
