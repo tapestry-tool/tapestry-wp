@@ -67,6 +67,7 @@ button {
   border-radius: 6px;
   display: flex;
   flex-direction: column;
+  align-items: normal;
   font-size: 24px;
   transition: all 0.1s ease-out;
 
