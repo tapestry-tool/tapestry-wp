@@ -47,6 +47,9 @@
               </template>
             </combobox>
           </b-form-group>
+          <b-form-group v-if="question.isFollowUp" label="Follow Up Text">
+            <b-form-input v-model="question.followUpText"></b-form-input>
+          </b-form-group>
           <b-form-group label="Question Text">
             <b-form-input
               v-model="question.text"
@@ -196,6 +199,7 @@ export default {
           id: Helpers.createUUID(),
           isFollowUp: false,
           previousEntry: null,
+          followUpText: "Previously, you said:",
           text: "",
           answers: { ...defaultQuestion.answers },
           completed: false,

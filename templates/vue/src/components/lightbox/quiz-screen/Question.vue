@@ -20,7 +20,7 @@
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
-          <h3 class="mb-4">Previously, you said:</h3>
+          <h3 class="mb-4">{{ question.followUpText }}</h3>
           <tapestry-activity
             v-for="answer in answers"
             :key="answer.type"
