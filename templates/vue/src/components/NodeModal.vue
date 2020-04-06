@@ -38,6 +38,9 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -340,6 +343,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
@@ -409,6 +413,16 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    hasSubAccordion() {
+      const parents = this.getDirectParents(this.node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(this.node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -453,6 +467,7 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
       ]
     },
     nodeImageUrl() {

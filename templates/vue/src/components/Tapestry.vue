@@ -144,6 +144,7 @@ export default {
         typeData: {
           mediaURL: "",
           textContent: "",
+          subAccordionText: "More content:",
         },
         mediaDuration: "",
         imageURL: "",
@@ -216,6 +217,7 @@ export default {
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          subAccordionText: "More content:",
         },
         unlocked: true,
         hideTitle: false,
@@ -323,6 +325,9 @@ export default {
             break
           case "quiz":
             newNodeEntry.quiz = fieldValue
+            break
+          case "subAccordionText":
+            newNodeEntry.typeData.subAccordionText = fieldValue
             break
           default:
             break
