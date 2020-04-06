@@ -876,6 +876,22 @@ function tapestryTool(config){
             rebuildNodeContents();
         }
     }
+
+    const selection = new Set();
+    let isMultiSelect = false;
+
+    document.addEventListener("keydown", evt => {
+        if (evt.code === "Escape") {
+            selection.clear();
+        }
+        if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+            isMultiSelect = true;
+        }
+    });
+
+    document.addEventListener("keyup", () => {
+        isMultiSelect = false;
+    })
     
     /* Draws the components that make up node */
     function buildNodeContents() {
@@ -1027,7 +1043,11 @@ function tapestryTool(config){
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
-                        tapestry.selectNode(d.id)
+                        if (!isMultiSelect) {
+                            tapestry.selectNode(d.id);
+                            selection.clear();
+                        }
+                        selection.add(d);
                     }
                 }
             });
@@ -1835,7 +1855,6 @@ function tapestryTool(config){
                     //Update the dataset with new values
                     tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                     tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
-                    tapestry.dataset.nodes[index].unlocked = unlocked ? true : false;
 
                     var questions = tapestry.dataset.nodes[index].quiz;
                     if (quizCompletionInfo) {
