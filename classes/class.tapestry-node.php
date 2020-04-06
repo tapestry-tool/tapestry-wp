@@ -33,6 +33,7 @@ class TapestryNode implements ITapestryNode
     private $skippable;
     private $quiz;
     private $fullscreen;
+    private $childOrdering;
 
     /**
      * Constructor
@@ -69,6 +70,7 @@ class TapestryNode implements ITapestryNode
         $this->skippable = true;
         $this->quiz = array();
         $this->fullscreen = false;
+        $this->childOrdering = array();
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -155,6 +157,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->conditions) && is_array($node->conditions)) {
             $this->conditions = $node->conditions;
+        }
+        if (isset($node->childOrdering) && is_array($node->childOrdering)) {
+            $this->childOrdering = $node->childOrdering;
         }
     }
 
@@ -295,7 +300,8 @@ class TapestryNode implements ITapestryNode
             'skippable'     => $this->skippable,
             'quiz'          => $this->quiz,
             'fullscreen'    => $this->fullscreen,
-            'conditions'    => $this->conditions
+            'conditions'    => $this->conditions,
+            'childOrdering' => $this->childOrdering,
         ];
     }
 
