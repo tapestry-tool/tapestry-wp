@@ -63,6 +63,21 @@ export function updateNodeCoordinates(state, payload) {
   })
 }
 
+export function fulfillNodeCondition(state, { id, condition }) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  const toFulfill = node.conditions.find(
+    cond => cond.type === condition.type && cond.value === condition.value
+  )
+  if (toFulfill) {
+    toFulfill.fulfilled = true
+    if (node.conditions.every(cond => cond.fulfilled)) {
+      node.unlocked = true
+      node.accessible = true
+      thisTapestryTool.reload()
+    }
+  }
+}
+
 // links
 export function addLink(state, link) {
   state.links.push(link)

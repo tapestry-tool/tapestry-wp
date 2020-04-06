@@ -198,10 +198,12 @@ export default {
         this.showCompletion = true
       }
     },
-    updateProgress(rowId) {
+    async updateProgress(rowId) {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
         accordionProgress.push(rowId)
+        await this.completeNode(rowId)
+
         this.updateNodeProgress({
           id: this.node.id,
           progress: accordionProgress.length / this.rows.length,
@@ -212,7 +214,7 @@ export default {
         })
 
         if (accordionProgress.length === this.rows.length) {
-          this.completeNode(this.node.id)
+          this.$emit("complete")
         }
       }
     },

@@ -164,8 +164,7 @@ export default {
         this.timeSinceLastSaved = now
       }
     },
-    async complete() {
-      await this.completeNode(this.nodeId)
+    complete() {
       this.$emit("complete")
       const stages = this.getDirectParents(this.nodeId).filter(
         id => this.getNode(id).tydeType === "Stage"
@@ -183,7 +182,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
   height: 100%;
 }
 .media-wrapper-embed {

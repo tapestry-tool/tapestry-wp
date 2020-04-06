@@ -4,3 +4,7 @@ export const tydeTypes = {
   STAGE: "Stage",
   QUESTION_SET: "Question set",
 }
+
+export const conditionTypes = {
+  NODE_COMPLETED: "node_completed",
+}

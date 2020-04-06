@@ -39,11 +39,6 @@ html {
       padding: 0;
     }
 
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
     a {
       color: #42b983;
     }

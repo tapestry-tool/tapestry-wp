@@ -259,7 +259,8 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Permissions">
+        <b-tab title="Access">
+          <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
               <b-thead>
@@ -322,6 +323,8 @@
               </b-tbody>
             </b-table-simple>
           </div>
+          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+          <conditions-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -493,6 +496,7 @@ import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
+import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
@@ -502,6 +506,7 @@ export default {
     Combobox,
     QuizModal,
     TydeTypeInput,
+    ConditionsForm,
     FileUpload,
     SlickItem,
     SlickList,
@@ -621,6 +626,7 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
+        { name: "conditions", value: this.node.conditions || [] },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
@@ -637,7 +643,6 @@ export default {
           name: "imageURL",
           value: this.node.imageURL || "",
         },
-        { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
@@ -984,6 +989,22 @@ table {
     > span:last-of-type {
       margin-left: auto;
     }
+  }
+}
+
+.slick-list-item {
+  display: flex;
+  height: 25px;
+  border: lightgray solid 1.5px;
+  margin: 10px 25px;
+  border-radius: 5px;
+  padding: 15px;
+  align-items: center;
+  > span {
+    margin-right: 25px;
+  }
+  > span:last-of-type {
+    margin-left: auto;
   }
 }
 </style>

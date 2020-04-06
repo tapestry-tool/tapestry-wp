@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-screen" :style="{ backgroundImage }">
-    <completion-screen v-if="showCompletionScreen">
+    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
@@ -111,7 +111,7 @@ export default {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   color: black;
   z-index: 10;
 }
