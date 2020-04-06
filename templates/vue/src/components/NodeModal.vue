@@ -445,7 +445,7 @@
               @input="updateOrderingArray"
             >
               <slick-item
-                v-for="(id, index) in ordering"
+                v-for="(id, index) in node.childOrdering"
                 :key="index"
                 class="slick-list-item"
                 :index="index"
