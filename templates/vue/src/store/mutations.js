@@ -1,9 +1,13 @@
 import Helpers from "../utils/Helpers"
+import { tydeTypes } from "../utils/constants"
 
 export function init(state, dataset) {
   setDataset(state, dataset)
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
+  state.nodes
+    .filter(n => n.tydeType === tydeTypes.MODULE || n.mediaType === "accordion")
+    .forEach(n => initializeOrdering(state, n.id))
 }
 
 export function setDataset(state, dataset) {
@@ -123,4 +127,18 @@ function getChildIds(state, nodeId) {
       link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
     )
     .map(link => (link.target.id == undefined ? link.target : link.target.id))
+}
+
+export function initializeOrdering(state, id) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  getChildIds(state, id)
+    .filter(cid => !node.childOrdering.includes(cid))
+    .forEach(id => node.childOrdering.push(id))
+  const children = getChildIds(state, id)
+  node.childOrdering.filter(id => children.includes(id))
+}
+
+export function updateOrdering(state, payload) {
+  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
+  state.nodes[nodeIndex].childOrdering = payload.ord
 }

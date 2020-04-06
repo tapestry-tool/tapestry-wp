@@ -35,6 +35,7 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $tydeType;
     private $showInBackpack;
+    private $childOrdering;
 
     /**
      * Constructor
@@ -73,6 +74,7 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->tydeType = '';
         $this->showInBackpack = true;
+        $this->childOrdering = array();
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -165,6 +167,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->showInBackpack) && is_bool($node->showInBackpack)) {
             $this->showInBackpack = $node->showInBackpack;
+        }
+        if (isset($node->childOrdering) && is_array($node->childOrdering)) {
+            $this->childOrdering = $node->childOrdering;
         }
     }
 
@@ -286,7 +291,8 @@ class TapestryNode implements ITapestryNode
             'quiz'          => $this->quiz,
             'fullscreen'    => $this->fullscreen,
             'tydeType'      => $this->tydeType,
-            'showInBackpack'=> $this->showInBackpack
+            'showInBackpack'=> $this->showInBackpack,
+            'childOrdering' => $this->childOrdering
         ];
     }
 

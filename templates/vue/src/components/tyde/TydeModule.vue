@@ -30,7 +30,7 @@ export default {
       return this.getNode(this.nodeId)
     },
     stages() {
-      return this.getDirectChildren(this.nodeId)
+      return this.node.childOrdering
     },
     activeStage() {
       return this.stages[this.activeStageIndex]
