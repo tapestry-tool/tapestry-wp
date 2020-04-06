@@ -25,6 +25,9 @@
           @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
         />
+        <p v-if="row.children.length > 0" style="color: white;">
+          {{ row.node.typeData.subAccordionText }}
+        </p>
         <sub-accordion
           v-if="row.children.length > 0"
           :rows="row.children"
