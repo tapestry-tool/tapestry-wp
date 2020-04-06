@@ -29,17 +29,23 @@
             </b-button>
           </b-row>
           <b-card
-            sub-title="Question Details"
+            sub-title="Show Answer to a Previous Activity First"
             bg-variant="light"
             text-variant="dark"
             class="mb-3"
           >
             <b-form-group>
-              <b-form-checkbox v-model="question.isFollowUp">
-                Follow up to a previous activity
+              <b-form-checkbox v-model="question.isFollowUp" switch>
+                {{ question.isFollowUp ? "Yes" : "No" }}
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="question.isFollowUp" label="Previous Activity">
+            <b-form-group v-if="question.isFollowUp" label="Show this text first:">
+              <b-form-input v-model="question.followUpText"></b-form-input>
+            </b-form-group>
+            <b-form-group
+              v-if="question.isFollowUp"
+              label="Then show user answer to the following activity:"
+            >
               <combobox
                 v-model="question.previousEntry"
                 class="mb-0"
@@ -55,16 +61,20 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group v-if="question.isFollowUp" label="Follow Up Text">
-              <b-form-input v-model="question.followUpText"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Question Text">
+          </b-card>
+          <b-card
+            sub-title="Question Details"
+            bg-variant="light"
+            text-variant="dark"
+            class="mb-3"
+          >
+            <b-form-group label="Question text">
               <b-form-input
                 v-model="question.text"
                 :data-testid="`question-title-${index}`"
               />
             </b-form-group>
-            <b-form-group label="Answer Options" class="mb-0">
+            <b-form-group label="Answer options" class="mb-0">
               <b-row>
                 <b-col cols="12" md="4">
                   <b-form-group label="Textbox Gravity Form" class="mb-0">
