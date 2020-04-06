@@ -79,7 +79,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -158,6 +158,7 @@ export default {
         },
         description: "",
         quiz: [],
+        childOrdering: [],
       }
     },
     addRootNode() {
@@ -227,6 +228,7 @@ export default {
           x: 3000,
           y: 3000,
         },
+        childOrdering: [],
       }
 
       if (isEdit) {
@@ -324,6 +326,9 @@ export default {
           case "subAccordionText":
             newNodeEntry.typeData.subAccordionText = fieldValue
             break
+          case "childOrdering":
+            newNodeEntry.childOrdering = fieldValue
+            break
           default:
             newNodeEntry[fieldName] = fieldValue
             break
@@ -394,6 +399,10 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
+
+      if (!isEdit && this.getParent(id) !== null) {
+        this.getNode(this.getParent(id)).childOrdering.push(id)
+      }
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)

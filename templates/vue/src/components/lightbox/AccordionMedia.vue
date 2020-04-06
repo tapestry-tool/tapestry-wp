@@ -99,11 +99,7 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      const children = this.getDirectChildren(this.node.id).map(this.getNode)
-      return children.map(node => ({
-        node,
-        children: this.getDirectChildren(node.id).map(this.getNode),
-      }))
+      return this.node.childOrdering.map(this.getNode)
     },
     dimensions() {
       if (!this.isMounted) {

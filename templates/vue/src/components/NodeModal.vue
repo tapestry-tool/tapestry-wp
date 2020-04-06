@@ -323,6 +323,27 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
+        <b-tab v-if="node.mediaType === 'accordion'" title="Ordering">
+          <div>
+            <slick-list
+              :value="node.childOrdering"
+              lock-axis="y"
+              @input="updateOrderingArray"
+            >
+              <slick-item
+                v-for="(id, index) in node.childOrdering"
+                :key="index"
+                class="slick-list-item"
+                :index="index"
+                style="z-index: 9999 !important;"
+              >
+                <span class="fas fa-bars fa-xs"></span>
+                <span>{{ getNode(id).title }}</span>
+                <span style="color: grey;">id: {{ id }}</span>
+              </slick-item>
+            </slick-list>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -352,10 +373,12 @@ import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
+import { mapGetters, mapMutations } from "vuex"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
   name: "node-modal",
@@ -365,6 +388,8 @@ export default {
     QuizModal,
     ConditionsForm,
     FileUpload,
+    SlickItem,
+    SlickList,
   },
   props: {
     node: {
@@ -473,6 +498,7 @@ export default {
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
         { name: "subAccordionText", value: this.node.typeData.subAccordionText },
+        { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
     nodeImageUrl() {
@@ -526,6 +552,7 @@ export default {
     })
   },
   methods: {
+    ...mapMutations(["updateOrdering"]),
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
         return false
@@ -678,6 +705,12 @@ export default {
         alert("Enter valid user id")
       }
     },
+    updateOrderingArray(arr) {
+      this.updateOrdering({
+        id: this.node.id,
+        ord: arr,
+      })
+    },
   },
 }
 </script>
@@ -755,6 +788,22 @@ table {
 
   &:last-child {
     margin-bottom: 0;
+  }
+}
+
+.slick-list-item {
+  display: flex;
+  height: 25px;
+  border: lightgray solid 1.5px;
+  margin: 10px 25px;
+  border-radius: 5px;
+  padding: 15px;
+  align-items: center;
+  > span {
+    margin-right: 25px;
+  }
+  > span:last-of-type {
+    margin-left: auto;
   }
 }
 </style>

@@ -18,6 +18,21 @@
       @submit="$emit('submit')"
     />
     <div v-else>
+      <div v-if="question.isFollowUp" class="follow-up">
+        <div v-if="answers.length" class="answer-container mx-auto mb-3">
+          <h3 class="mb-4">{{ question.followUpText }}</h3>
+          <tapestry-activity
+            v-for="answer in answers"
+            :key="answer.type"
+            :type="answer.type"
+            :entry="answer.entry"
+            :src="answer.src"
+          ></tapestry-activity>
+        </div>
+        <div v-else>
+          <p>You haven't done the previous activity yet.</p>
+        </div>
+      </div>
       <h1 class="question-title">
         {{ question.text }}
       </h1>
@@ -66,11 +81,12 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
+import TapestryActivity from "@/components/TapestryActivity"
 
 export default {
   name: "question",
@@ -79,6 +95,7 @@ export default {
     GravityForm,
     Loading,
     "h5p-iframe": H5PIframe,
+    TapestryActivity,
   },
   props: {
     question: {
@@ -101,6 +118,30 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getEntry", "getQuestion"]),
+    lastQuestion() {
+      if (this.question.previousEntry) {
+        return this.getQuestion(this.question.previousEntry)
+      }
+      return null
+    },
+    answers() {
+      if (this.question.previousEntry) {
+        const answeredTypes = Object.entries(this.lastQuestion.answers)
+          .filter(entry => entry[1].length > 0)
+          .map(i => i[0])
+        return answeredTypes
+          .map(type => {
+            const answer = this.getEntry(this.question.previousEntry, type)
+            if (answer && answer.type === "audio") {
+              answer.src = `${apiUrl}/tapestries/${wpPostId}/nodes/${this.node.id}/audio/${answer.entry}`
+            }
+            return answer
+          })
+          .filter(Boolean)
+      }
+      return []
+    },
     options() {
       return Object.entries(this.question.answers).filter(opt => opt[1].length > 0)
     },
@@ -166,6 +207,10 @@ export default {
 <style lang="scss" scoped>
 button {
   margin: auto;
+}
+
+.answer-container {
+  width: 75%;
 }
 
 .question {
