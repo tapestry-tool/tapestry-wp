@@ -36,7 +36,7 @@
       <h1 class="question-title">
         {{ question.text }}
       </h1>
-      <div class="question-content">
+      <div v-if="options.length > 1" class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
           <answer-button
@@ -63,6 +63,18 @@
             checklist
           </answer-button>
         </div>
+      </div>
+      <div v-else>
+        <gravity-form
+          v-if="options[0][0] !== 'audioId'"
+          :id="options[0][1]"
+          @submit="handleFormSubmit"
+        ></gravity-form>
+        <h5p-iframe
+          v-else
+          :media-u-r-l="`${adminAjaxUrl}?action=h5p_embed&id=${options[0][1]}`"
+          @submit="$emit('submit')"
+        />
       </div>
     </div>
   </div>
@@ -129,6 +141,9 @@ export default {
           .filter(Boolean)
       }
       return []
+    },
+    options() {
+      return Object.entries(this.question.answers).filter(opt => opt[1].length > 0)
     },
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)

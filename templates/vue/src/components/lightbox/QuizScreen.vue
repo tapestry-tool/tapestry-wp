@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-screen">
-    <completion-screen v-if="showCompletionScreen">
+    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
