@@ -383,6 +383,7 @@
                     id="node-spaceship-part-x"
                     v-model="node.typeData.spaceshipPartX"
                     placeholder="In pixels (top left)"
+                    type="number"
                   />
                 </b-input-group>
               </b-col>
@@ -396,6 +397,7 @@
                     id="node-spaceship-part-y"
                     v-model="node.typeData.spaceshipPartY"
                     placeholder="In pixels (top left)"
+                    type="number"
                   />
                 </b-input-group>
               </b-col>
@@ -414,6 +416,7 @@
                     id="node-spaceship-part-width"
                     v-model="node.typeData.spaceshipPartWidth"
                     placeholder="In pixels"
+                    type="number"
                   />
                 </b-input-group>
               </b-col>
@@ -427,6 +430,7 @@
                     id="node-spaceship-part-height"
                     v-model="node.typeData.spaceshipPartHeight"
                     placeholder="In pixels"
+                    type="number"
                   />
                 </b-input-group>
               </b-col>
