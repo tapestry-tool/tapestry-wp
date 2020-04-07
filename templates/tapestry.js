@@ -1816,7 +1816,7 @@ function tapestryTool(config){
             const completedRows = rows
                 .map(getNodeById)
                 .filter(row => row.completed);
-            completedRows.forEach(row => progress.push(row));
+            completedRows.forEach(row => progress.push(row.id));
             node.accordionProgress = progress;
             
             const currProgress = rows.length ? progress.length / rows.length : 1;

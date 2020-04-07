@@ -79,7 +79,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -373,6 +373,7 @@ export default {
             appearsAt: appearsAt,
           }
           await this.addLink(newLink)
+          this.selectedNode.childOrdering.push(id)
         } else {
           this.updateRootNode(newNodeEntry.id)
           this.updateSelectedNode(newNodeEntry.id)
@@ -399,10 +400,6 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
-
-      if (!isEdit && this.getParent(id) !== null) {
-        this.getNode(this.getParent(id)).childOrdering.push(id)
-      }
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
