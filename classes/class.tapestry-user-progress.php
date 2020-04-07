@@ -61,7 +61,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         // Value should be between 0 and 1
         if ($progressValue < 0 || $progressValue > 1) {
-            throw new Exception('Invalid progress value');
+            throw new TapestryError('INVALID_PROGRESS');
         }
 
         $this->_updateUserProgress($progressValue);
