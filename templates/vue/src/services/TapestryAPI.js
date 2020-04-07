@@ -192,9 +192,7 @@ export default class {
   async getUserFavourites() {
     const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
     const response = await axios.get(url)
-    console.log("Here")
-    console.log(response)
-    return response.data
+    return response
   }
 
   async updateUserFavourites(favourites) {

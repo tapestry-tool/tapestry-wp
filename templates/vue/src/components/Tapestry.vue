@@ -112,14 +112,7 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
-  async mounted() {
-    let tapestryApi = new TapestryApi(wpPostId)
-    const favourites = await tapestryApi.getUserFavourites()
-    console.log(favourites)
-
-    if (favourites) {
-      this.$store.commit("updateFavourites", favourites)
-    }
+  mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
@@ -134,8 +127,12 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    tapestryUpdated(event) {
+    async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
+        this.tapestryLoaded = true
+        const tapestryApi = new TapestryApi(wpPostId)
+        const response = await tapestryApi.getUserFavourites()
+        event.detail.dataset["favourites"] = JSON.parse(response.data)
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {

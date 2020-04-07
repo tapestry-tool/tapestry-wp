@@ -50,8 +50,6 @@ class TapestryUserFavourites implements ITapestryUserFavourites
     public function updateFavourites($favourites)
     {
         $this->_checkUserAndPostId();
-        error_log("Updating");
-        error_log(print_r($favourites, true));
         update_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, $favourites);
     }
     
