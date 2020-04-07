@@ -249,7 +249,7 @@ export default {
               this.updateInterval = setInterval(() => {
                 const currentPlayedTime = h5pVideo.getCurrentTime()
                 const amountViewed = currentPlayedTime / videoDuration
-                this.$emit("timeupdate", "h5p", amountViewed)
+                this.$emit("timeupdate", amountViewed)
 
                 if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
                   this.$emit("complete")
@@ -258,7 +258,7 @@ export default {
                 if (amountViewed >= 1) {
                   this.$emit("show-end-screen")
                 }
-              }, 300)
+              }, 1000)
               this.handlePlay(this.node)
               break
             }
