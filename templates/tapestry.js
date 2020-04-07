@@ -44,7 +44,7 @@ function tapestryTool(config){
         simulation,                                             // Force
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
-        tapestryDimensionsBeforeDrag, nodeBeforeDrag,
+        tapestryDimensionsBeforeDrag, nodesBeforeDrag,
         h5pVideoSettings = {},
         tapestryDepth = 4,                                      // Default depth of Tapestry
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
@@ -621,16 +621,7 @@ function tapestryTool(config){
  
         if (!d3.event.active) simulation.alphaTarget(0.2).restart();
 
-        nodeBeforeDrag = d;
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d.y, tapestryDimensionsBeforeDrag.height);
-        }
-
+        nodesBeforeDrag = Array.from(selection);
         recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -640,13 +631,15 @@ function tapestryTool(config){
             return;
         }
 
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height);
-        }
+        selection.forEach(nd => {
+            if (canEditNode(nd)) {
+                nd[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
+                nd[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
+            } else {
+                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
+                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
+            }
+        })
     }
 
     function dragended(d) {
@@ -657,24 +650,24 @@ function tapestryTool(config){
 
         if (!d3.event.active) simulation.alphaTarget(0);
 
-        d[xORfx] = d.x;
-        d[yORfy] = d.y;
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                        //nd[xORfx] = nodesBeforeDrag.x;
+                        //nd[yORfy] = nodesBeforeDrag.y;
+                    }
+                });
+            }
+        })
         updateSvgDimensions();
-
-        if (canEditNode(d) && !autoLayout) {
-            $.ajax({
-                url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
-                method: API_PUT_METHOD,
-                data: JSON.stringify({x: d.x, y: d.y}),
-                error: function(e) {
-                    alert("Sorry, there was an error saving the coordinates of this node!");
-                    console.error(e);
-                    d[xORfx] = nodeBeforeDrag.x;
-                    d[yORfy] = nodeBeforeDrag.y;
-                }
-            });
-        }
-
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
