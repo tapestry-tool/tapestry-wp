@@ -612,65 +612,6 @@ function tapestryTool(config){
             });
     }
 
-    // D3 DRAGGING FUNCTIONS
-    function dragstarted(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
- 
-        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
-        nodesBeforeDrag = Array.from(selection);
-        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
-    }
-
-    function dragged(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
-
-        selection.forEach(nd => {
-            if (canEditNode(nd)) {
-                nd[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-                nd[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-            } else {
-                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
-                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
-            }
-        })
-    }
-
-    function dragended(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
-
-        if (!d3.event.active) simulation.alphaTarget(0);
-
-        selection.forEach(nd => {
-            nd[xORfx] = nd.x;
-            nd[yORfy] = nd.y;
-            if (canEditNode(nd) && !autoLayout) {
-                $.ajax({
-                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
-                    method: API_PUT_METHOD,
-                    data: JSON.stringify({x: nd.x, y: nd.y}),
-                    error: function(e) {
-                        alert("Sorry, there was an error saving the coordinates of this node!");
-                        console.error(e);
-                        //nd[xORfx] = nodesBeforeDrag.x;
-                        //nd[yORfy] = nodesBeforeDrag.y;
-                    }
-                });
-            }
-        })
-        updateSvgDimensions();
-        recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
-    }
-
     function createSvgContainer() {
 
         // hide the container so we can smoothly fade it in at the end of this function
@@ -1038,12 +979,81 @@ function tapestryTool(config){
                     if (config.wpCanEditTapestry || d.accessible) {
                         if (!isMultiSelect) {
                             tapestry.selectNode(d.id);
-                            selection.clear();
+                        } else {
+                            if (!selection.size) {
+                                selection.add(getNodeById(root))
+                            }
+                            selection.add(d);
                         }
-                        selection.add(d);
                     }
                 }
             });
+    }
+
+    function dragstarted(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+ 
+        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+
+        if (!selection.size) {
+            selection.add(d)
+        }
+        nodesBeforeDrag = Array.from(selection)
+        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
+    }
+
+    function dragged(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
+        selection.forEach(nd => {
+            if (canEditNode(nd)) {
+                nd[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
+                nd[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
+            } else {
+                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
+                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
+            }
+        })
+    }
+
+    function dragended(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
+        if (!d3.event.active) simulation.alphaTarget(0);
+
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                        //nd[xORfx] = nodesBeforeDrag.x;
+                        //nd[yORfy] = nodesBeforeDrag.y;
+                    }
+                });
+            }
+        })
+
+        if (selection.size === 1) {
+            selection.clear();
+        }
+
+        updateSvgDimensions();
+        recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
     function renderTooltips() {
@@ -1072,7 +1082,6 @@ function tapestryTool(config){
         nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
 
         nodes.on("mouseover", function (thisNode) {
-
             // Place this node at the end of the svg so that it appears on top
             $(this).insertAfter($(this).parent().children().last())
 
