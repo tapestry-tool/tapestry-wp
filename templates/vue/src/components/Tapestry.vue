@@ -79,7 +79,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode"]),
+    ...mapGetters(["selectedNode", "getParent", "tapestry", "getNode"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&

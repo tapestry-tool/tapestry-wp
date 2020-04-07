@@ -1,3 +1,10 @@
+export function getParent(state) {
+  return id => {
+    const link = state.links.find(l => l.target == id || l.target.id == id)
+    return link ? link.source : null
+  }
+}
+
 export function getActivities(state) {
   return (options = {}) => {
     const { exclude = [] } = options
