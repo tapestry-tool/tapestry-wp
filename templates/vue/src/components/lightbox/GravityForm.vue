@@ -86,11 +86,9 @@ export default {
       return response.data.includes("gform_confirmation_message")
     },
     populateForm() {
-      const BASE_INPUT_ID = "1"
-      const inputs = Object.entries(this.entry).filter(entry =>
-        entry[0].startsWith(BASE_INPUT_ID)
+      const inputs = Object.entries(this.entry).filter(
+        entry => !isNaN(parseInt(entry[0]))
       )
-
       inputs.forEach(([id, value]) => {
         const inputName = `input_${id}`
         const inputElement = document.getElementsByName(inputName)[0]
@@ -129,7 +127,6 @@ export default {
 }
 
 .gf-form-container {
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
