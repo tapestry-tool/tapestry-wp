@@ -112,7 +112,14 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
-  mounted() {
+  async mounted() {
+    let tapestryApi = new TapestryApi(wpPostId)
+    const favourites = await tapestryApi.getUserFavourites()
+    console.log(favourites)
+
+    if (favourites) {
+      this.$store.commit("updateFavourites", favourites)
+    }
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)

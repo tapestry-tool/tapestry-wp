@@ -14,12 +14,26 @@
           </div>
         </button>
         <slot></slot>
+        <button
+          v-if="isFavourite"
+          class="button-favourite"
+          @click="removeFromFavourites"
+        >
+          <i class="fas fa-heart fa-sm"></i>
+          <p>Remove node from favourites</p>
+        </button>
+        <button v-else class="button-favourite" @click="addToFavourites">
+          <i class="fas fa-heart fa-sm"></i>
+          <p>Add node to favourites</p>
+        </button>
       </div>
     </transition>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex"
+
 const defaultStyles = {
   top: "150px",
   left: "50%",
@@ -36,6 +50,11 @@ const defaultStyles = {
 export default {
   name: "tapestry-modal",
   props: {
+    nodeId: {
+      type: [String, Number],
+      required: false,
+      default: 0,
+    },
     contentContainerStyle: {
       type: Object,
       required: false,
@@ -57,8 +76,30 @@ export default {
       load: false,
     }
   },
+  computed: {
+    ...mapGetters(["getFavourites"]),
+    favourites() {
+      return this.getFavourites ? this.getFavourites : []
+    },
+    isFavourite() {
+      return this.favourites.find(id => id == this.nodeId)
+    },
+  },
   mounted() {
     this.load = true
+  },
+  methods: {
+    ...mapActions(["updateUserFavourites"]),
+    addToFavourites() {
+      let updatedFavouritesList = [...this.favourites]
+      updatedFavouritesList.push(this.nodeId)
+      this.updateUserFavourites(updatedFavouritesList)
+    },
+    removeFromFavourites() {
+      let updatedFavouritesList = [...this.favourites]
+      updatedFavouritesList = updatedFavouritesList.filter(id => id != this.nodeId)
+      this.updateUserFavourites(updatedFavouritesList)
+    },
   },
 }
 </script>
@@ -123,6 +164,24 @@ export default {
     i {
       background: none;
     }
+  }
+}
+
+.button-favourite {
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  margin-top: 20px;
+  border-radius: 4px;
+  text-align: left;
+  padding: 0 10px;
+
+  i {
+    margin-right: 8px;
+  }
+
+  p {
+    margin-top: 10px;
   }
 }
 </style>

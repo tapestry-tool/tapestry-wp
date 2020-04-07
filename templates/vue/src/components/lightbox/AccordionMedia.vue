@@ -33,6 +33,7 @@
     </accordion-row>
     <tapestry-modal
       v-if="showCompletion"
+      :node-id="node.id"
       :allow-close="false"
       @close="showCompletion = false"
     >

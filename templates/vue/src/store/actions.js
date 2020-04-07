@@ -100,3 +100,9 @@ export async function addLink({ commit }, newLink) {
   await client.addLink(JSON.stringify(newLink))
   commit("addLink", newLink)
 }
+
+// favourites
+export async function updateUserFavourites({ commit }, favourites) {
+  await client.updateUserFavourites(JSON.stringify(favourites))
+  commit("updateFavourites", { favourites })
+}

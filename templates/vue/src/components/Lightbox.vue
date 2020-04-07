@@ -6,6 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
+    :node-id="this.nodeId"
     :content-container-style="lightboxContentStyles"
     :close-button-style="closeButtonStyles"
     :allow-close="canSkip"

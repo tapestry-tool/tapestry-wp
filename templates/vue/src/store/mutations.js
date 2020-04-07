@@ -89,3 +89,8 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   entries[answerType] = Object.values(entry)[0]
   question.entries = entries
 }
+
+// favourites
+export function updateFavourites(state, { favourites }) {
+  state.favourites = favourites
+}
