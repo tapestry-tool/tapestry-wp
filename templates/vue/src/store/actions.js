@@ -47,11 +47,11 @@ export async function updateNodeProgress({ commit }, payload) {
 }
 
 export async function completeNode({ commit, getters }, nodeId) {
-  await client.completeNode(nodeId)
   commit("updateNode", {
     id: nodeId,
     newNode: { completed: true },
   })
+  await client.completeNode(nodeId)
   thisTapestryTool.updateAccordionProgress()
 
   const node = getters.getNode(nodeId)
