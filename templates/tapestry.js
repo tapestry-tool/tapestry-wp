@@ -287,6 +287,8 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+
+        initializeSelection();
     }
 
     this.resetNodeCache = function() {
@@ -824,6 +826,17 @@ function tapestryTool(config){
         }
     }
 
+    function initializeSelection() {
+        new DragSelect({
+            selectables: document.querySelectorAll(".node"),
+            onDragStart: () => selection.clear(),
+            onElementSelect: node => {
+                const id = node.id.split("node-")[1]
+                selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+            }
+        });
+    }
+
     const selection = createSelection();
     let isMultiSelect = false;
 
@@ -848,12 +861,10 @@ function tapestryTool(config){
             },
             add(node) {
                 data.add(node);
-                if (data.size > 1) {
-                    data.forEach(d => {
-                        const nd = document.getElementById(`node-${d.id}`);
-                        nd.classList.add("node-selected");
-                    })
-                }
+                data.forEach(d => {
+                    const nd = document.getElementById(`node-${d.id}`);
+                    nd.classList.add("node-selected");
+                })
             },
             has(node) {
                 return data.has(node);

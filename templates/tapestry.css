@@ -218,6 +218,7 @@ body {
 .node {
     cursor: pointer;
     z-index: 0;
+    user-select: none;
 }
 
 .node .meta {
