@@ -829,7 +829,11 @@ function tapestryTool(config){
     function initializeSelection() {
         new DragSelect({
             selectables: document.querySelectorAll(".node"),
-            onDragStart: () => selection.clear(),
+            onDragStart: () => {
+                if (!isMultiSelect) {
+                    selection.clear()
+                }
+            },
             onElementSelect: node => {
                 const id = node.id.split("node-")[1]
                 selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
