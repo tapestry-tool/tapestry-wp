@@ -850,6 +850,9 @@ function tapestryTool(config){
         }
         if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
             isMultiSelect = true;
+            if (evt.code === "KeyA") {
+                tapestry.dataset.nodes.forEach(d => selection.add(d));
+            }
         }
     });
 
