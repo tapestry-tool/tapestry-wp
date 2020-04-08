@@ -1,7 +1,7 @@
 <template>
   <div class="speech-bubble">
     <slot></slot>
-    <div :style="{ backgroundImage: bubbleImage }"></div>
+    <div class="bubble-corner" :style="{ backgroundImage: bubbleImage }"></div>
   </div>
 </template>
 
@@ -20,11 +20,13 @@ export default {
 
 <style lang="scss" scoped>
 .speech-bubble {
+  background: #fff;
   position: relative;
   border: 2px solid black;
   padding: 12px 16px;
-  border-radius: 1em;
-  font-size: 28px;
+  margin-bottom: 15px;
+  border-radius: 1.2em;
+  font-size: 1em;
   font-style: italic;
   line-height: 1.2;
 
@@ -38,7 +40,7 @@ export default {
     background: black;
   }
 
-  > div {
+  .bubble-corner {
     position: absolute;
     left: 10%;
     bottom: -31px;

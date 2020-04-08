@@ -888,8 +888,9 @@ function tapestryTool(config){
         /* Draws the circle that defines how large the node is */
         nodes.append("rect")
             .attr("class", function (d) {
-                if (d.nodeType === "grandchild") return "imageContainer grandchild";
-                return "imageContainer";
+                var classes = "imageContainer"
+                if (d.nodeType === "grandchild") classes += " grandchild"
+                return classes;
             })
             .attr("rx", function (d) {
                 if (d.hideProgress && d.imageURL.length) {
@@ -935,10 +936,10 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (!d.accessible)
-                    return COLOR_LOCKED;
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
+                if (!d.accessible)
+                    return COLOR_LOCKED;
                 return COLOR_BLANK_HOVER;
             })
             .on("click keydown", function (d) {
@@ -961,7 +962,7 @@ function tapestryTool(config){
         nodes.append("circle")
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
-                return !(d.hideProgress && d.imageURL.length);
+                return !(d.accessible && d.hideProgress && d.imageURL.length);
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
@@ -1108,8 +1109,8 @@ function tapestryTool(config){
             .style("position", "relative")
             .style("pointer-events", "none")
             .style("opacity", 0)
-            .attr("width", d => Math.min(getRadius(d) * 2 + 48, 300))
-            .attr("height", d => getRadius(d) * 2)
+            .attr("width", d => Math.min(getRadius(d) * 5 + 48, 600))
+            .attr("height", d => getRadius(d) * 3)
             .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
             .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
             .append("xhtml:div")
@@ -1164,7 +1165,7 @@ function tapestryTool(config){
     }
 
     function getTooltipHtml(node) {
-        const str = "To unlock this node: <br />";
+        const str = "To access this content, you need to first: <br />";
         const wrapper = document.createElement("ul");
 
         if (node.conditions.length === 0) {
@@ -1259,10 +1260,10 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
-                    if (!d.accessible)
-                        return COLOR_LOCKED;
                     if (d.imageURL.length)
                         return "url('#node-thumb-" + d.id + "')";
+                    if (!d.accessible)
+                        return COLOR_LOCKED;
                     return COLOR_BLANK_HOVER;
                 })
                 .attr("stroke-width", function (d) {
@@ -1807,6 +1808,9 @@ function tapestryTool(config){
         }
         if (node.imageURL.length === 0) {
             base += " imageOverlay--no-image";
+        }
+        if (!node.accessible) {
+            base += " locked";
         }
         return base;
     }

@@ -127,7 +127,7 @@ body.tapestry-stage-open {
     width: 100vw;
     top: 32px;
     right: 32px;
-    font-family: "VT323", monospace;
+    font-family: "Roboto", monospace;
     color: var(--tyde-border-green);
     align-items: center;
 
@@ -167,7 +167,7 @@ body.tapestry-stage-open {
     position: absolute;
     top: 32px;
     right: 32px;
-    font-family: "VT323", monospace;
+    font-family: "Roboto", monospace;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

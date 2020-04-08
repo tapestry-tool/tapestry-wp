@@ -18,26 +18,23 @@
       @submit="$emit('submit')"
     />
     <div v-else>
-      <div v-if="question.isFollowUp" class="follow-up">
-        <div v-if="answers.length" class="answer-container mx-auto mb-3">
-          <h3 class="mb-4">{{ question.followUpText }}</h3>
-          <tapestry-activity
-            v-for="answer in answers"
-            :key="answer.type"
-            :type="answer.type"
-            :entry="answer.entry"
-            :src="answer.src"
-          ></tapestry-activity>
-        </div>
-        <div v-else>
-          <p>You haven't done the previous activity yet.</p>
-        </div>
-      </div>
       <speech-bubble class="question-title">
         <div class="question-title-step">
           {{ currentStep }}
         </div>
-        {{ question.text }}
+        <div v-if="question.isFollowUp && answers.length" class="follow-up">
+          <div class="answer-container mx-auto mb-3">
+            <h3 class="mb-4">{{ question.followUpText }}</h3>
+            <tapestry-activity
+              v-for="answer in answers"
+              :key="answer.type"
+              :type="answer.type"
+              :entry="answer.entry"
+              :src="answer.src"
+            ></tapestry-activity>
+          </div>
+        </div>
+        <h3>{{ question.text }}</h3>
       </speech-bubble>
       <div v-if="options.length > 1" class="question-content">
         <p class="question-answer-text">I want to answer with...</p>

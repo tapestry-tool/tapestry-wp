@@ -106,7 +106,7 @@ export default {
   align-items: flex-end;
   justify-content: space-between;
   padding: 24px;
-  padding-left: 40%;
+  padding-left: 20%;
   position: absolute;
   left: 0;
   top: 0;
@@ -114,6 +114,10 @@ export default {
   min-height: 100%;
   color: black;
   z-index: 10;
+  background-color: #fff;
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: 0 80%;
 }
 
 .question-footer {

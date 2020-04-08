@@ -39,7 +39,7 @@ export default {
 <style lang="scss" scoped>
 .tapestry-activity {
   align-items: center;
-  background: #262626;
+  background: #eee;
   border-radius: 8px;
   display: flex;
   margin-bottom: 8px;
@@ -50,9 +50,14 @@ export default {
   }
 
   .icon {
+    color: #ccc;
     margin-right: 16px;
     height: 24px;
     width: 24px;
+  }
+
+  img {
+    filter: brightness(0.8);
   }
 
   .checklist {

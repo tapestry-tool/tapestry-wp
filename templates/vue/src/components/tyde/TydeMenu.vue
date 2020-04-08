@@ -134,7 +134,8 @@ export default {
 
   .content {
     background: var(--tapestry-gray);
-    border: 4px solid white;
+    border: 4px var(--tapestry-gray);
+    border-radius: 20px;
     height: calc(100vh - 86px);
     overflow-y: scroll;
     padding: 16px 32px;
