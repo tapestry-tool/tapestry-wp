@@ -824,7 +824,7 @@ function tapestryTool(config){
         }
     }
 
-    const selection = new Set();
+    const selection = createSelection();
     let isMultiSelect = false;
 
     document.addEventListener("keydown", evt => {
@@ -838,7 +838,42 @@ function tapestryTool(config){
 
     document.addEventListener("keyup", () => {
         isMultiSelect = false;
-    })
+    });
+
+    function createSelection() {
+        const data = new Set();
+        const selection = {
+            size() {
+                return data.size;
+            },
+            add(node) {
+                data.add(node);
+                if (data.size > 1) {
+                    data.forEach(d => {
+                        const nd = document.getElementById(`node-${d.id}`);
+                        nd.classList.add("node-selected");
+                    })
+                }
+            },
+            has(node) {
+                return data.has(node);
+            },
+            delete(node) {
+                data.delete(node);
+                const nd = document.getElementById(`node-${node.id}`);
+                nd.classList.remove("node-selected");
+            },
+            clear() {
+                data.forEach(d => {
+                    selection.delete(d);
+                })
+            },
+            forEach(fn) {
+                data.forEach(fn);
+            }
+        }
+        return selection;
+    }
     
     /* Draws the components that make up node */
     function buildNodeContents() {
@@ -991,9 +1026,10 @@ function tapestryTool(config){
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
                         if (!isMultiSelect) {
+                            selection.clear();
                             tapestry.selectNode(d.id);
                         } else {
-                            if (!selection.size) {
+                            if (!selection.size()) {
                                 selection.add(getNodeById(root))
                             }
                             selection.add(d);
@@ -1011,8 +1047,12 @@ function tapestryTool(config){
  
         if (!d3.event.active) simulation.alphaTarget(0.2).restart();
 
-        if (!selection.size) {
+        if (!selection.size()) {
             selection.add(d)
+        }
+        if (!selection.has(d) && !isMultiSelect) {
+            selection.clear();
+            selection.add(d);
         }
         nodesBeforeDrag = Array.from(selection)
         recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
@@ -1065,7 +1105,7 @@ function tapestryTool(config){
             }
         })
 
-        if (selection.size === 1) {
+        if (selection.size() === 1) {
             selection.clear();
         }
 
