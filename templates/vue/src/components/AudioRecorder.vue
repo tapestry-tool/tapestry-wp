@@ -70,8 +70,13 @@ export default {
 
         recorder.addEventListener("stop", () => {
           const blob = new Blob(this.data, { type: "audio/ogg; codecs=opus" })
-          this.audio = URL.createObjectURL(blob)
-          this.state = this.states.DONE
+          const reader = new FileReader()
+          reader.readAsDataURL(blob)
+          reader.onload = () => {
+            const data = reader.result
+            this.audio = data
+            this.state = this.states.DONE
+          }
         })
 
         this.recorder = recorder
