@@ -76,6 +76,7 @@ export default {
         quiz: [],
         skippable: true,
       },
+      favourites: [],
     }
   },
   computed: {
@@ -112,6 +113,11 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
+  async created() {
+    const tapestryApi = new TapestryApi(wpPostId)
+    const response = await tapestryApi.getUserFavourites()
+    this.favourites = JSON.parse(response.data)
+  },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
@@ -129,10 +135,7 @@ export default {
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     async tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
-        this.tapestryLoaded = true
-        const tapestryApi = new TapestryApi(wpPostId)
-        const response = await tapestryApi.getUserFavourites()
-        event.detail.dataset["favourites"] = JSON.parse(response.data)
+        event.detail.dataset["favourites"] = this.favourites
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {
