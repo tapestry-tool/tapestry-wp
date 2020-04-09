@@ -3,6 +3,7 @@ import Vuex from "vuex"
 
 import * as actions from "./actions"
 import * as mutations from "./mutations"
+import * as getters from "./getters"
 
 import Helpers from "../utils/Helpers"
 
@@ -42,6 +43,7 @@ const store = new Vuex.Store({
       el: state.lightboxEl,
     }),
     getFavourites: state => state.favourites,
+    ...getters,
   },
   mutations,
   actions,

@@ -23,6 +23,9 @@ export default {
       required: true,
     },
   },
+  mounted() {
+    this.$emit("load")
+  },
   methods: {
     ...mapActions(["updateNodeProgress"]),
     handleSubmit() {

@@ -176,7 +176,8 @@ export default {
   text-align: left;
   padding: 0 10px;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     transform: scale(1.15);
     background: #11a6d8;
     outline: none;

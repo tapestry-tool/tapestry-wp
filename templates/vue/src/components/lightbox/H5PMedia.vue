@@ -24,6 +24,7 @@
       :settings="settings"
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
+      @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
     />
   </div>

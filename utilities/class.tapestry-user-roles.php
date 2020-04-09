@@ -5,16 +5,26 @@
 class TapestryUserRoles
 {
     /**
+     * Check if the current user is a particular role
+     * 
+     * @return Boolean
+     */
+    static function isRole($role)
+    {
+        return in_array(
+            $role,
+            wp_get_current_user()->roles
+        );
+    }
+
+    /**
      * Check if the current user is an administrator
      * 
      * @return Boolean
      */
     static function isAdministrator()
     {
-        return in_array(
-            'administrator',
-            wp_get_current_user()->roles
-        );
+        return TapestryUserRoles::isRole('administrator');
     }
 
     /**
@@ -24,10 +34,7 @@ class TapestryUserRoles
      */
     static function isEditor()
     {
-        return in_array(
-            'editor',
-            wp_get_current_user()->roles
-        );
+        return TapestryUserRoles::isRole('editor');
     }
 
     /**
@@ -37,10 +44,7 @@ class TapestryUserRoles
      */
     static function isAuthor()
     {
-        return in_array(
-            'author',
-            wp_get_current_user()->roles
-        );
+        return TapestryUserRoles::isRole('author');
     }
 
     /**
@@ -63,9 +67,6 @@ class TapestryUserRoles
      */
     static function isSubscriber()
     {
-        return in_array(
-            'subscriber',
-            wp_get_current_user()->roles
-        );
+        return TapestryUserRoles::isRole('subscriber');
     }
 }

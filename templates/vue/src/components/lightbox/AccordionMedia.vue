@@ -3,6 +3,7 @@
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
+      ref="rowRefs"
       :key="row.id"
       :visible="index === activeIndex"
     >
@@ -23,6 +24,7 @@
           :autoplay="false"
           @complete="updateProgress(row.id)"
           @close="toggle(index)"
+          @load="handleLoad"
         />
       </template>
       <template v-slot:footer>
@@ -88,7 +90,7 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.getDirectChildren(this.node.id).map(this.getNode)
+      return this.node.childOrdering.map(this.getNode)
     },
     dimensions() {
       if (!this.isMounted) {
@@ -108,9 +110,22 @@ export default {
       return this.rows.findIndex(node => !node.completed)
     },
   },
+  mounted() {
+    this.isMounted = true
+  },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleLoad() {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          const ref = this.$refs.rowRefs[this.activeIndex].$el
+          this.$refs.container.scrollTop = ref.offsetTop - 12
+        }
+      })
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
