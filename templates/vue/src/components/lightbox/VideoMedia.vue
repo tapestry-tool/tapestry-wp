@@ -19,6 +19,7 @@
       controls
       :autoplay="autoplay"
       :src="node.typeData.mediaURL"
+      :style="videoStyles"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
       @pause="handlePause(node)"
@@ -56,13 +57,35 @@ export default {
       required: false,
       default: true,
     },
+    dimensions: {
+      type: Object,
+      required: true,
+      validator: val => {
+        return ["width", "height"].every(prop => val.hasOwnProperty(prop))
+      },
+    },
   },
   data() {
     return {
       showPlayScreen: !this.autoplay,
       showEndScreen: this.getInitialEndScreenState(),
       showQuizScreen: false,
+      videoDimensions: null,
     }
+  },
+  computed: {
+    videoStyles() {
+      if (!this.videoDimensions) {
+        return { width: "100%" }
+      }
+      const { height, width } = this.videoDimensions
+      if (width / height > 1) {
+        // Video is wider than it is tall
+        return { width: "100%" }
+      } else {
+        return { height: this.dimensions.height + "px", width: "auto" }
+      }
+    },
   },
   watch: {
     node(newNode, oldNode) {
@@ -137,6 +160,11 @@ export default {
       }
     },
     handleLoad() {
+      const video = this.$refs.video
+      this.videoDimensions = {
+        height: video.videoHeight,
+        width: video.videoWidth,
+      }
       this.updateDimensions()
       this.seek()
     },
@@ -163,23 +191,13 @@ export default {
       const video = this.$refs.video
       if (video) {
         const amountViewed = video.currentTime / video.duration
-        const amountNotViewed = 1.0 - amountViewed
-
-        this.$emit("timeupdate", "video", amountViewed)
-        this.$set(this.node.typeData.progress[0], "value", amountViewed)
-        this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
-
+        this.$emit("timeupdate", amountViewed)
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-          this.$set(this.node, "completed", true)
           this.$emit("complete")
         }
-
         if (amountViewed >= 1 && this.allowEndScreen) {
           this.showEndScreen = true
         }
-
-        thisTapestryTool.updateChildren(this.node.id, video)
-        thisTapestryTool.updateProgressBars()
       }
     },
   },
@@ -192,10 +210,5 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
-  z-index: 0;
-
-  video {
-    width: 100%;
-  }
 }
 </style>

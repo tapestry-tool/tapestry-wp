@@ -86,4 +86,10 @@ export default class {
   static decodeHTMLChars(str) {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
+
+  static range(start, end) {
+    return Array(end - start + 1)
+      .fill()
+      .map((_, idx) => start + idx)
+  }
 }

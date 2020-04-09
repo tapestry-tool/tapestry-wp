@@ -2,8 +2,8 @@
   <section id="tyde-menu-profile">
     <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
     <ul class="profile-activities">
-      <tyde-profile-activity
-        v-for="activity in this.profileActivities"
+      <tyde-activity-summary
+        v-for="activity in getProfileActivities"
         :key="activity.id"
         :activity="activity"
       />
@@ -23,7 +23,7 @@ export default {
     TydeProfileActivity,
   },
   computed: {
-    ...mapGetters(["profileActivities"]),
+    ...mapGetters(["getProfileActivities"]),
   },
 }
 </script>

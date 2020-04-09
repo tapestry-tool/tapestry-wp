@@ -50,15 +50,11 @@
         :settings="settings"
         @settings-change="updateSettings"
       />
-<<<<<<< HEAD
-      <tyde-menu-help v-if="activePage === 'help'" @back="setActivePage('home')" />
+      <tyde-menu-help v-if="activePage === 'help'" />
       <tyde-menu-profile
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
-=======
-      <tyde-menu-help v-if="activePage === 'help'" />
->>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
     </div>
   </div>
 </template>
@@ -69,11 +65,8 @@ import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
-<<<<<<< HEAD
 import TydeMenuProfile from "./TydeMenuProfile"
-=======
 import TydeModuleSummary from "./TydeModuleSummary"
->>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
 
 export default {
   name: "tyde-menu",
@@ -82,11 +75,8 @@ export default {
     TydeCockpit,
     TydeMenuSettings,
     TydeMenuHelp,
-<<<<<<< HEAD
     TydeMenuProfile,
-=======
     TydeModuleSummary,
->>>>>>> 17f3f4e9213770848acf5438d98c47357014fbde
   },
   data() {
     return {
@@ -100,7 +90,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["logs", "getNode"]),
+    ...mapGetters(["getNode"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -155,7 +145,8 @@ export default {
 
   .content {
     background: var(--tapestry-gray);
-    border: 4px solid white;
+    border: 4px var(--tapestry-gray);
+    border-radius: 20px;
     height: calc(100vh - 86px);
     overflow-y: scroll;
     padding: 16px 32px;

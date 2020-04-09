@@ -72,7 +72,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         showInBackpack: true,
         permissions: {
           public: ["read"],
@@ -85,7 +84,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getParent", "selectedNode", "tapestry"]),
+    ...mapGetters(["getParent", "selectedNode", "tapestry", "getNode"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -162,7 +161,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -176,6 +174,7 @@ export default {
         description: "",
         quiz: [],
         tydeType: tydeTypes.REGULAR,
+        childOrdering: [],
       }
     },
     addRootNode() {
@@ -218,6 +217,7 @@ export default {
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        conditions: [],
         behaviour: "embed",
         status: "publish",
         nodeType: "",
@@ -230,7 +230,10 @@ export default {
         group: 1,
         typeData: {
           linkMetadata: null,
-          progress: [{ group: "viewed", value: 0 }, { group: "unviewed", value: 1 }],
+          progress: [
+            { group: "viewed", value: 0 },
+            { group: "unviewed", value: 1 },
+          ],
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
@@ -244,7 +247,6 @@ export default {
           spaceshipPartWidth: 0,
           spaceshipPartHeight: 0,
         },
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -256,6 +258,7 @@ export default {
           x: 3000,
           y: 3000,
         },
+        childOrdering: [],
       }
 
       if (isEdit) {
@@ -326,9 +329,6 @@ export default {
               newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
             break
-          case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot
-            break
           case "hideTitle":
             newNodeEntry.hideTitle = fieldValue
             break
@@ -386,7 +386,11 @@ export default {
           case "spaceshipPartHeight":
             newNodeEntry.typeData.spaceshipPartHeight = fieldValue
             break
+          case "childOrdering":
+            newNodeEntry.childOrdering = fieldValue
+            break
           default:
+            newNodeEntry[fieldName] = fieldValue
             break
         }
       }
@@ -458,6 +462,10 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
+
+      if (!isEdit && this.getParent(id) !== null) {
+        this.getNode(this.getParent(id)).childOrdering.push(id)
+      }
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)

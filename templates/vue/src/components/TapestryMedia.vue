@@ -6,12 +6,18 @@
     ]"
     :style="containerStyles"
   >
-    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
+    <text-media
+      v-if="node.mediaType === 'text'"
+      :node="node"
+      @complete="complete"
+      @load="handleLoad"
+    />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
       :allow-end-screen="allowEndScreen"
+      :dimensions="dimensions"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -42,17 +48,20 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
+      @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
       @complete="complete"
+      @load="handleLoad"
     ></wp-post-media>
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
       @complete="complete"
       @close="$emit('close')"
+      @load="handleLoad"
     />
     <completion-screen v-if="showCompletionScreen" />
   </div>
@@ -68,8 +77,6 @@ import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
-
-const SAVE_INTERVAL = 5
 
 export default {
   name: "tapestry-media",
@@ -141,22 +148,10 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    async updateProgress(type, amountViewed) {
-      const now = new Date()
-      const secondsDiff = Math.abs(
-        (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
-      )
-
-      if (secondsDiff > SAVE_INTERVAL) {
-        await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-        if (type === "h5p") {
-          await this.updateH5pSettings(this.h5pSettings)
-        }
-        this.timeSinceLastSaved = now
-      }
+    updateProgress(amountViewed) {
+      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
-    async complete() {
-      await this.completeNode(this.nodeId)
+    complete() {
       this.$emit("complete")
       const stages = this.getDirectParents(this.nodeId).filter(
         id => this.getNode(id).tydeType === "Stage"
@@ -174,7 +169,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
   height: 100%;
 }
 .media-wrapper-embed {

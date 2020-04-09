@@ -28,10 +28,6 @@ export default {
   &:last-child {
     margin-bottom: 0;
   }
-
-  &:nth-child(2) {
-    margin-top: 32px;
-  }
 }
 
 .content {

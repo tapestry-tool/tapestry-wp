@@ -51,6 +51,7 @@ export default {
 
 <style lang="scss" scoped>
 #tyde-spaceship-part {
+  cursor: pointer;
   position: absolute;
   background-size: cover;
   background-position: center;

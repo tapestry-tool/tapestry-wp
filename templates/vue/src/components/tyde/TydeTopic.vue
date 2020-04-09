@@ -2,6 +2,7 @@
   <button @click="$emit('click')">
     <div>
       <img :src="topic.imageURL" />
+      <i v-if="topic.completed && showComplete" class="fas fa-check fa-3x"></i>
     </div>
     <p>{{ topic.title }}</p>
     <slot></slot>
@@ -15,6 +16,10 @@ export default {
     topic: {
       type: Object,
       required: true,
+    },
+    showComplete: {
+      type: Boolean,
+      default: false,
     },
   },
 }
@@ -32,12 +37,24 @@ button {
   }
 
   div {
-    width: 198px;
-    height: 198px;
+    position: relative;
+    max-width: 198px;
+    margin: 0 auto 20px;
+    min-height: 170px;
 
     img {
       width: 90%;
       height: auto;
+    }
+
+    i {
+      position: absolute;
+      right: 0;
+      top: 155px;
+      background: #fff;
+      border-radius: 50%;
+      font-size: 1.5em;
+      padding: 5px;
     }
   }
 
@@ -48,7 +65,7 @@ button {
     color: inherit;
     font-size: 32px;
     transition: transform 0.2s ease-out;
-    line-height: 0.9em;
+    line-height: 1em;
     max-width: 200px;
     min-height: 2em;
   }

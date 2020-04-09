@@ -49,6 +49,7 @@ export default {
     this.entry = entry
 
     this.loading = false
+    this.$emit("load")
 
     this.disableAutocomplete()
     this.styleImageUI()
@@ -120,26 +121,28 @@ export default {
     },
     styleImageUI() {
       const imageContainer = document.querySelector(".gfield_checkbox")
-      const allImages = imageContainer.childNodes
-      const allImagesArray = Array.from(allImages)
-      allImagesArray.forEach(image => {
-        image.childNodes[1].addEventListener("click", function() {
-          this.parentElement.classList.toggle("image-choices-choice-selected")
+      if (imageContainer) {
+        const allImages = imageContainer.childNodes
+        const allImagesArray = Array.from(allImages)
+        allImagesArray.forEach(image => {
+          image.childNodes[1].addEventListener("click", function() {
+            this.parentElement.classList.toggle("image-choices-choice-selected")
+          })
+          image.childNodes[1].addEventListener("focus", function() {
+            this.parentElement.classList.add("image-choices-choice-focus")
+          })
+          image.childNodes[1].addEventListener("blur", function() {
+            this.parentElement.classList.remove("image-choices-choice-focus")
+          })
+          image.addEventListener("mouseover", function() {
+            this.classList.add("image-choices-choice-hover")
+          })
+          image.addEventListener("mouseout", function() {
+            this.classList.remove("image-choices-choice-hover")
+          })
+          image.classList.add("image-choices-choice")
         })
-        image.childNodes[1].addEventListener("focus", function() {
-          this.parentElement.classList.add("image-choices-choice-focus")
-        })
-        image.childNodes[1].addEventListener("blur", function() {
-          this.parentElement.classList.remove("image-choices-choice-focus")
-        })
-        image.addEventListener("mouseover", function() {
-          this.classList.add("image-choices-choice-hover")
-        })
-        image.addEventListener("mouseout", function() {
-          this.classList.remove("image-choices-choice-hover")
-        })
-        image.classList.add("image-choices-choice")
-      })
+      }
     },
   },
 }

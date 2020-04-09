@@ -1,12 +1,22 @@
 <template>
-  <div class="stage-wrapper" :style="nodeStyles">
+  <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
-      <h1>{{ node.title }}</h1>
+      <div class="stage-header">
+        <tyde-progress-bar :node-id="this.moduleId" />
+        <div class="stage-star">
+          <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
+          <div v-if="!this.done">
+            {{ this.numComplete }}/{{ this.topics.length }}
+          </div>
+        </div>
+        <h1>{{ node.title }}</h1>
+      </div>
       <section>
         <tyde-topic
           v-for="topic in topics"
           :key="topic.id"
           :topic="topic"
+          :show-complete="true"
           style="align-self: flex-start;"
           @click="openLightbox(topic.id)"
         />
@@ -23,11 +33,17 @@
 <script>
 import { mapGetters } from "vuex"
 import TydeTopic from "./TydeTopic"
+import TydeProgressBar from "./TydeProgressBar"
+import ActiveStar from "@/assets/star-active.png"
+import InactiveStar from "@/assets/star-inactive.png"
+import Helpers from "@/utils/Helpers"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   name: "tyde-stage",
   components: {
     TydeTopic,
+    TydeProgressBar,
   },
   props: {
     nodeId: {
@@ -36,12 +52,18 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
     done() {
-      return this.topics.every(question => question.completed)
+      return this.topics.every(topic => topic.completed)
     },
     node() {
       return this.getNode(this.nodeId)
+    },
+    moduleId() {
+      const moduleIds = this.getDirectParents(this.nodeId).filter(
+        id => this.getNode(id).tydeType === tydeTypes.MODULE
+      )
+      return moduleIds[0]
     },
     nodeStyles() {
       return {
@@ -51,6 +73,17 @@ export default {
     topics() {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
+    },
+    activeStarSrc() {
+      return Helpers.getImagePath(ActiveStar)
+    },
+    inactiveStarSrc() {
+      return Helpers.getImagePath(InactiveStar)
+    },
+    numComplete() {
+      const reducer = (accumulator, completed) =>
+        accumulator + (completed === true ? 1 : 0)
+      return this.topics.map(n => n.completed).reduce(reducer, 0)
     },
   },
   mounted() {
@@ -76,7 +109,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 body.tapestry-stage-open {
   overflow: hidden;
 }
@@ -88,18 +121,35 @@ body.tapestry-stage-open {
   height: 100%;
   width: 100%;
 
-  > div {
-    width: 70vw;
-    height: 72vh;
-    position: absolute;
+  .stage-header {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
     top: 32px;
     right: 32px;
-    font-family: "VT323", monospace;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 64px;
+    font-family: "Roboto", monospace;
     color: var(--tyde-border-green);
+    align-items: center;
+
+    .stage-star {
+      margin-left: 32vw;
+      margin-right: 30px;
+      padding-bottom: 10px;
+      position: relative;
+      font-family: inherit;
+      color: white;
+      font-size: 29px;
+
+      img {
+        width: 80px;
+      }
+
+      > div {
+        position: absolute;
+        left: 27%;
+        top: 24%;
+      }
+    }
 
     h1 {
       font-family: inherit;
@@ -109,8 +159,23 @@ body.tapestry-stage-open {
         display: none;
       }
     }
+  }
+
+  > div {
+    width: 100vw;
+    height: 72vh;
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    font-family: "Roboto", monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px;
+    color: var(--tyde-border-green);
 
     > section {
+      margin-left: 30vw;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -151,6 +216,7 @@ body.tapestry-stage-open {
   }
 
   footer {
+    margin-left: 30vw;
     display: flex;
     justify-content: flex-end;
 
