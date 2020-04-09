@@ -183,7 +183,10 @@ class TapestryUserProgress implements ITapestryUserProgress
                     }
                 ))[0];
                 if($entry[$input['id']] != ''){
-                    $entry[$input['id']] = $correspondingChoice['imageChoices_image'];
+                    $inputMap = new stdClass();
+                    $inputMap->choiceText = $label;
+                    $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
+                    $entry[$input['id']] = $inputMap;
                 }
             }
         }
