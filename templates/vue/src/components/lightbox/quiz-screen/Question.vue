@@ -12,11 +12,7 @@
       :id="formId"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <h5p-iframe
-      v-else-if="recorderOpened"
-      :media-u-r-l="h5pRecorderUrl"
-      @submit="$emit('submit')"
-    />
+    <audio-recorder v-else-if="recorderOpened" />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
@@ -70,11 +66,7 @@
           :id="options[0][1]"
           @submit="handleFormSubmit"
         ></gravity-form>
-        <h5p-iframe
-          v-else
-          :media-u-r-l="`${adminAjaxUrl}?action=h5p_embed&id=${options[0][1]}`"
-          @submit="$emit('submit')"
-        />
+        <audio-recorder />
       </div>
     </div>
   </div>
@@ -83,18 +75,18 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
+import AudioRecorder from "@/components/AudioRecorder"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
-import H5PIframe from "../H5PIframe"
 import TapestryActivity from "@/components/TapestryActivity"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
+    AudioRecorder,
     GravityForm,
     Loading,
-    "h5p-iframe": H5PIframe,
     TapestryActivity,
   },
   props: {
