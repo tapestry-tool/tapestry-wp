@@ -25,7 +25,7 @@
           style="color: white; margin-bottom: 24px;"
           @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
-          @load="handleLoad"
+          @load="handleLoad($refs.rowRefs[index].$el)"
         />
         <p v-if="row.children.length > 0" style="color: white;">
           {{ row.node.typeData.subAccordionText }}
@@ -33,6 +33,7 @@
         <sub-accordion
           v-if="row.children.length > 0"
           :rows="row.children"
+          @load="handleLoad"
         ></sub-accordion>
       </template>
       <template v-slot:footer>
@@ -131,13 +132,12 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
-    handleLoad() {
+    handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
           this.$refs.container.scrollTop = 0
         } else {
-          const ref = this.$refs.rowRefs[this.activeIndex].$el
-          this.$refs.container.scrollTop = ref.offsetTop - 12
+          this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
     },

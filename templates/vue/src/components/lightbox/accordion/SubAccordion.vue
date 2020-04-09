@@ -3,6 +3,7 @@
     <accordion-row
       v-for="(row, index) in rows"
       :key="row.id"
+      ref="rowRefs"
       class="sub-accordion-row"
       :visible="index === activeIndex"
     >
@@ -19,6 +20,7 @@
           :autoplay="false"
           style="color: white;"
           @close="toggle(index)"
+          @load="handleLoad(index)"
         />
       </template>
     </accordion-row>
@@ -67,6 +69,9 @@ export default {
     this.isMounted = true
   },
   methods: {
+    handleLoad(idx) {
+      this.$emit("load", this.$refs.rowRefs[idx].$el)
+    },
     toggle(index) {
       if (this.activeIndex === index) {
         this.activeIndex = -1
