@@ -10,6 +10,9 @@
           </div>
         </div>
         <h1>{{ node.title }}</h1>
+        <button @click="$emit('close')">
+          <i class="fas fa-times fa-2x"></i>
+        </button>
       </div>
       <section>
         <tyde-topic
@@ -22,6 +25,9 @@
         />
       </section>
       <footer>
+        <button :class="stageIndex === 0 ? 'disabled' : ''" @click="$emit('prev')">
+          Prev
+        </button>
         <button v-if="done" @click="$emit('next')">
           Next
         </button>
@@ -49,6 +55,10 @@ export default {
     nodeId: {
       type: [String, Number],
       required: true,
+    },
+    stageIndex: {
+      type: [Number],
+      default: 1,
     },
   },
   computed: {
@@ -130,6 +140,16 @@ body.tapestry-stage-open {
     font-family: "VT323", monospace;
     color: var(--tyde-border-green);
     align-items: center;
+
+    > button {
+      border: none;
+      font-family: inherit;
+      font-size: 100%;
+      background: none;
+      color: inherit;
+      margin-left: auto;
+      margin-right: 75px;
+    }
 
     .stage-star {
       margin-left: 32vw;
@@ -222,7 +242,7 @@ body.tapestry-stage-open {
 
     button {
       background: none;
-      margin: 0;
+      margin: 0 0 0 30px;
       padding: 0;
 
       font-family: inherit;
@@ -231,6 +251,14 @@ body.tapestry-stage-open {
 
       &:hover {
         text-decoration: underline;
+      }
+    }
+
+    button.disabled {
+      opacity: 80%;
+      cursor: auto;
+      &:hover {
+        text-decoration: none;
       }
     }
   }
