@@ -77,8 +77,6 @@ export default {
     next() {
       if (this.hasNext) {
         this.activeIndex++
-      } else {
-        this.showCompletion = true
       }
     },
   },

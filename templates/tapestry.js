@@ -230,6 +230,9 @@ function tapestryTool(config){
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
                     const subRows = getDirectChildren(accordionRowId)
+                    if (subRows.length) {
+                        accordionRow.isSubAccordion = true;
+                    }
                     subRows.forEach(id => {
                         const subRow = this.dataset.nodes[findNodeIndex(id)]
                         subRow.presentationStyle = "accordion-row"
@@ -1877,10 +1880,6 @@ function tapestryTool(config){
                 }
             }
         }
-    
-        dispatchEvent(new CustomEvent("tapestry-updated", {
-            detail: { dataset: tapestry.dataset }
-        }))
         return true;
     }
     

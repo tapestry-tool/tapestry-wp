@@ -99,10 +99,13 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.node.childOrdering.map(id => ({
-        node: this.getNode(id),
-        children: this.getDirectChildren(id).map(this.getNode),
-      }))
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        const children = node.isSubAccordion
+          ? node.childOrdering.map(this.getNode)
+          : this.getDirectChildren(id).map(this.getNode)
+        return { node, children }
+      })
     },
     dimensions() {
       if (!this.isMounted) {

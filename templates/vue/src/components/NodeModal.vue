@@ -323,7 +323,10 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
-        <b-tab v-if="node.mediaType === 'accordion'" title="Ordering">
+        <b-tab
+          v-if="node.mediaType === 'accordion' || hasSubAccordion"
+          title="Ordering"
+        >
           <div>
             <slick-list
               :value="node.childOrdering"
