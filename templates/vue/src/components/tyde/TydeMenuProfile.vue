@@ -1,6 +1,7 @@
 <template>
   <section id="tyde-menu-profile">
     <tyde-button class="back-button" icon="arrow-left" @click="$emit('back')" />
+    <h2>Activities</h2>
     <ul class="profile-activities">
       <tyde-activity-summary
         v-for="activity in getProfileActivities"
@@ -14,13 +15,13 @@
 <script>
 import { mapGetters } from "vuex"
 import TydeButton from "./TydeButton"
-import TydeProfileActivity from "./TydeProfileActivity"
+import TydeActivitySummary from "./TydeActivitySummary"
 
 export default {
   name: "tyde-menu-profile",
   components: {
     TydeButton,
-    TydeProfileActivity,
+    TydeActivitySummary,
   },
   computed: {
     ...mapGetters(["getProfileActivities"]),
@@ -39,6 +40,16 @@ export default {
     width: 64px;
     height: 64px;
     font-size: 32px;
+  }
+
+  h2 {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+
+    &:before {
+      display: none;
+    }
   }
 
   .profile-activities {
