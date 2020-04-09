@@ -1,6 +1,5 @@
 <template>
-  <loading v-if="state === states.LOADING" />
-  <div v-else-if="state === states.NOT_SUPPORTED">
+  <div v-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
   <div v-else>
@@ -15,7 +14,6 @@
 
 <script>
 import AudioRecoder from "audio-recorder-polyfill"
-import Loading from "./Loading"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {
@@ -24,9 +22,6 @@ if (!window.MediaRecorder) {
 
 export default {
   name: "audio-recorder",
-  components: {
-    Loading,
-  },
   props: {
     id: {
       type: Number,
@@ -46,7 +41,6 @@ export default {
     states() {
       return {
         DONE: "done",
-        LOADING: "loading",
         NOT_SUPPORTED: "not-supported",
         PAUSED: "paused",
         READY: "ready",
@@ -55,12 +49,16 @@ export default {
     },
   },
   created() {
-    this.state = this.states.LOADING
+    this.state = this.states.READY
   },
   mounted() {
     if (!navigator.mediaDevices.getUserMedia) {
       this.state = this.states.NOT_SUPPORTED
-    } else {
+    }
+  },
+  methods: {
+    startRecording() {
+      this.data = []
       navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const recorder = new MediaRecorder(stream)
 
@@ -80,15 +78,9 @@ export default {
         })
 
         this.recorder = recorder
-        this.state = this.states.READY
+        this.recorder.start()
+        this.state = this.states.RECORDING
       })
-    }
-  },
-  methods: {
-    startRecording() {
-      this.data = []
-      this.recorder.start()
-      this.state = this.states.RECORDING
     },
     stopRecording() {
       this.recorder.stop()
