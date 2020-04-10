@@ -81,19 +81,24 @@ export function updateNodePermissions(_, payload) {
 
 export async function completeQuestion(
   { commit },
-  { answerType, formId, audioId, nodeId, questionId }
+  { answerType, formId, nodeId, questionId }
 ) {
   await client.completeQuestion(nodeId, questionId)
-
-  let entry
-  if (answerType === "audioId" && audioId) {
-    entry = { audioId }
-  } else {
-    entry = await client.getUserEntry(formId)
+  if (answerType !== "audioId") {
+    const entry = await client.getUserEntry(formId)
+    commit("updateEntry", { answerType, entry, nodeId, questionId })
   }
-
   commit("completeQuestion", { nodeId, questionId })
-  commit("updateEntry", { answerType, entry, nodeId, questionId })
+}
+
+export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
+  await client.saveAudio(audio, nodeId, questionId)
+  commit("updateEntry", {
+    answerType: "audio",
+    entry: { audio },
+    nodeId,
+    questionId,
+  })
 }
 
 // links

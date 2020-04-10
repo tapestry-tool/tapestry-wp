@@ -127,26 +127,26 @@ export default class {
   /**
    * Upload audio to server
    *
-   * @param   {Number}    nodeMetaId
+   * @param   {Number}    nodeId
    * @param   {String}    audio       base64 data string
    *
    * @return  {Object}
    */
-  async uploadAudioToServer(nodeMetaId, audio) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${audio.h5pId}`
-    const response = await axios.post(url, audio.blob)
+  async saveAudio(audio, nodeId, questionId) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio`
+    const response = await axios.post(url, { audio, questionId })
     return response
   }
 
   /**
    * Get audio from server
    *
-   * @param   {Number}    nodeMetaId
+   * @param   {Number}    nodeId
    *
    * @return  {String}    audio       base64 data string
    */
-  async getH5PAudioFromServer(nodeMetaId, h5pId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/audio/${h5pId}`
+  async getAudio(nodeId, questionId) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
     const response = await axios.get(url)
     return response.data
   }

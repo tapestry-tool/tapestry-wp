@@ -12,7 +12,7 @@
       :id="formId"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <audio-recorder v-else-if="recorderOpened" />
+    <audio-recorder v-else-if="recorderOpened" @submit="handleAudioSubmit" />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
@@ -148,7 +148,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["completeQuestion"]),
+    ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
       const wasOpened = this.formOpened || this.recorderOpened
       this.formOpened = false
@@ -175,6 +175,17 @@ export default {
         nodeId: this.node.id,
         answerType: this.formType,
         formId: this.formId,
+        questionId: this.question.id,
+      })
+      this.loading = false
+      this.$emit("submit")
+    },
+    async handleAudioSubmit(audioFile) {
+      this.recorderOpened = false
+      this.loading = true
+      await this.saveAudio({
+        audio: audioFile,
+        nodeId: this.node.id,
         questionId: this.question.id,
       })
       this.loading = false

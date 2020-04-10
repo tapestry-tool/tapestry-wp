@@ -15,6 +15,9 @@
         <code>{{ durationText }}</code>
       </div>
       <audio v-if="state === states.DONE" controls :src="audio"></audio>
+      <button v-if="state === states.DONE" @click="$emit('submit', audio)">
+        Done
+      </button>
     </div>
   </div>
 </template>
