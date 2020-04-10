@@ -6,7 +6,12 @@ export function init(state, dataset) {
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
   state.nodes
-    .filter(n => n.tydeType === tydeTypes.MODULE || n.mediaType === "accordion")
+    .filter(
+      n =>
+        n.tydeType === tydeTypes.MODULE ||
+        n.mediaType === "accordion" ||
+        n.isSubAccordion
+    )
     .forEach(n => initializeOrdering(state, n.id))
 }
 

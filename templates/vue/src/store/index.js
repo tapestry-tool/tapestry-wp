@@ -36,8 +36,9 @@ const store = new Vuex.Store({
       return links.filter(link => link.source.id == id).map(link => link.target.id)
     },
     getDirectParents: state => id => {
-      const links = state.links
-      return links.filter(link => link.target.id == id).map(link => link.source.id)
+      return state.links
+        .filter(link => link.target.id == id)
+        .map(link => link.source.id)
     },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],

@@ -187,9 +187,22 @@ function tapestryTool(config){
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
     this.init = function(isReload = false) {
+        const exceptions = ["administrator", "author", "editor"];
+
+        const { roles: allRoles } = wp;
+        const roles = Object.keys(allRoles).filter(key => !exceptions.includes(key));
+
         var reorderPermissions = permissions => {
-            var withoutDuplicates = new Set(["public", "authenticated", ...Object.keys(permissions)])
+            var withoutDuplicates = new Set(["public", "authenticated", ...roles, ...Object.keys(permissions)])
             return [...withoutDuplicates];
+        }
+
+        const getDefaultRoles = () => {
+            const obj = {}
+            Object.keys(allRoles)
+                .filter(key => !exceptions.includes(key))
+                .forEach(role => (obj[role] = ["read"]));
+            return obj;
         }
 
         this.dataset.nodes = this.dataset.nodes.map(node => {
@@ -205,16 +218,28 @@ function tapestryTool(config){
             })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
-                { authenticated: ["read"] }
+                { authenticated: ["read"], ...getDefaultRoles() }
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
             updatedNode.tydeType = updatedNode.tydeType || "Regular";
 
+            const getDirectChildren = id => this.dataset.links
+                .filter(link => link.source == id)
+                .map(link => link.target)
+
             if (node.mediaType === "accordion") {
-                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
+                const accordionRowIds = getDirectChildren(node.id)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
+                    const subRows = getDirectChildren(accordionRowId)
+                    if (subRows.length) {
+                        accordionRow.isSubAccordion = true;
+                    }
+                    subRows.forEach(id => {
+                        const subRow = this.dataset.nodes[findNodeIndex(id)]
+                        subRow.presentationStyle = "accordion-row"
+                    })
                 })
             }
 
@@ -2001,10 +2026,6 @@ function tapestryTool(config){
                 }
             }
         }
-    
-        dispatchEvent(new CustomEvent("tapestry-updated", {
-            detail: { dataset: tapestry.dataset }
-        }))
         return true;
     }
     

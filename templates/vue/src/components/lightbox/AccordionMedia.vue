@@ -7,8 +7,8 @@
     <div class="rows">
       <accordion-row
         v-for="(row, index) in rows"
+        :key="row.node.id"
         ref="rowRefs"
-        :key="row.id"
         :visible="index === activeIndex"
       >
         <template v-slot:trigger>
@@ -21,17 +21,17 @@
               <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
             </div>
             <div>
-              <p class="button-row-title">{{ row.title }}</p>
-              <p class="button-row-description">{{ row.description }}</p>
+              <p class="button-row-title">{{ row.node.title }}</p>
+              <p class="button-row-description">{{ row.node.description }}</p>
             </div>
             <div class="icon-container">
               <tyde-icon
-                v-if="row.mediaType === 'gravity-form'"
+                v-if="row.node.mediaType === 'gravity-form'"
                 class="icon icon-activity"
                 icon="activity"
               ></tyde-icon>
               <tyde-icon
-                v-if="row.completed"
+                v-if="row.node.completed"
                 class="icon"
                 icon="checkmark"
               ></tyde-icon>
@@ -45,17 +45,25 @@
         </template>
         <template v-slot:content>
           <tapestry-media
-            :allow-end-screen="false"
-            :autoplay="false"
-            :node-id="row.id"
+            :node-id="row.node.id"
             :dimensions="dimensions"
-            @complete="updateProgress(row.id)"
+            :autoplay="false"
+            style="color: white; margin-bottom: 24px;"
+            @complete="updateProgress(row.node.id)"
             @close="toggle(index)"
-            @load="handleLoad"
+            @load="handleLoad($refs.rowRefs[index].$el)"
           />
+          <p v-if="row.children.length > 0" style="color: white;">
+            {{ row.node.typeData.subAccordionText }}
+          </p>
+          <sub-accordion
+            v-if="row.children.length > 0"
+            :rows="row.children"
+            @load="handleLoad"
+          ></sub-accordion>
         </template>
         <template v-slot:footer>
-          <button v-if="row.completed" class="button-finished mt-2" @click="next">
+          <button v-if="row.node.completed" class="mt-2" @click="next">
             {{ node.typeData.finishButtonText }}
           </button>
         </template>
@@ -91,6 +99,7 @@ import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
+import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -99,6 +108,7 @@ export default {
     TapestryModal,
     AccordionRow,
     TydeIcon,
+    SubAccordion,
   },
   props: {
     node: {
@@ -142,7 +152,13 @@ export default {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.node.childOrdering.map(this.getNode)
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        const children = node.isSubAccordion
+          ? node.childOrdering.map(this.getNode)
+          : this.getDirectChildren(id).map(this.getNode)
+        return { node, children }
+      })
     },
     dimensions() {
       if (!this.isMounted) {
@@ -159,7 +175,7 @@ export default {
       return this.node.typeData.lockRows
     },
     disabledFrom() {
-      return this.rows.findIndex(node => !node.completed)
+      return this.rows.findIndex(row => !row.node.completed)
     },
   },
   mounted() {
@@ -168,13 +184,12 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
-    handleLoad() {
+    handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
           this.$refs.container.scrollTop = 0
         } else {
-          const ref = this.$refs.rowRefs[this.activeIndex].$el
-          this.$refs.container.scrollTop = ref.offsetTop - 12
+          this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
     },

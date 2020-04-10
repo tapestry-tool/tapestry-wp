@@ -10,6 +10,7 @@
  */
 function addNonceToScript()
 {
+    global $wp_roles;
     $params = array(
         'nonce'  => wp_create_nonce('wp_rest'),
         'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
@@ -24,6 +25,7 @@ function addNonceToScript()
         true
     );
     wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
+    wp_localize_script('wp_tapestry_script', 'wp', array('roles' => $wp_roles->get_names()));
     wp_enqueue_script('wp_tapestry_script');
 
     wp_add_inline_script( 'wp_tapestry_script', "
@@ -54,6 +56,7 @@ function enqueue_vue_app_build()
 
     // make custom data available to the Vue app with wp_localize_script.
     global $post;
+    global $wp_roles;
     wp_localize_script(
         'tapestry_d3_vue', // vue script handle defined in wp_register_script.
         'wpData', // javascript object that will made availabe to Vue.
@@ -73,7 +76,8 @@ function enqueue_vue_app_build()
             'wpUserId' => apply_filters('determine_current_user', false),
             'adminAjaxUrl' => admin_url('admin-ajax.php'),
             'file_upload_nonce' => wp_create_nonce('media-form'),
-            'upload_url' => admin_url('async-upload.php')
+            'upload_url' => admin_url('async-upload.php'),
+            'roles' => $wp_roles->get_names()
         )
     );
 
