@@ -1362,6 +1362,53 @@ function tapestryTool(config){
                         return PROGRESS_THICKNESS;
                     }
                 });
+
+        nodes.selectAll(".selectable")
+            .attr("class", function (d) {
+                if (!getViewable(d))
+                    return "selectable grandchild";
+                else return "selectable";
+            })
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild") 
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            });
         
         /* Attach images to be used within each node */
         nodes.selectAll("defs")
