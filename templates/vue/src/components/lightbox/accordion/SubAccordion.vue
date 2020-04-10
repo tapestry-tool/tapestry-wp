@@ -1,5 +1,5 @@
 <template>
-  <div ref="container">
+  <div ref="container" class="sub-container">
     <accordion-row
       v-for="(row, index) in rows"
       :key="row.id"
@@ -18,7 +18,6 @@
           :node-id="row.id"
           :dimensions="dimensions"
           :autoplay="false"
-          style="color: white;"
           @close="toggle(index)"
           @load="handleLoad(index)"
         />
@@ -103,7 +102,17 @@ export default {
   }
 }
 
+.sub-container {
+  padding: 16px;
+}
+
 .sub-accordion-row {
   background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+  padding: 8px 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>

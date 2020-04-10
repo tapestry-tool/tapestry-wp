@@ -125,7 +125,7 @@ export default {
   },
   watch: {
     selectedNode() {
-      this.parentNode = this.getParent(this.selectedNode)
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
     },
   },
   mounted() {
@@ -198,7 +198,7 @@ export default {
     },
     editNode() {
       this.modalType = "edit-node"
-      this.parentNode = this.getParent(this.selectedNode.id)
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },

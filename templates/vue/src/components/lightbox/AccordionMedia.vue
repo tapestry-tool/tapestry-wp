@@ -48,12 +48,12 @@
             :node-id="row.node.id"
             :dimensions="dimensions"
             :autoplay="false"
-            style="color: white; margin-bottom: 24px;"
+            style="margin-bottom: 24px;"
             @complete="updateProgress(row.node.id)"
             @close="toggle(index)"
             @load="handleLoad($refs.rowRefs[index].$el)"
           />
-          <p v-if="row.children.length > 0" style="color: white;">
+          <p v-if="row.children.length > 0" class="sub-accordion-text">
             {{ row.node.typeData.subAccordionText }}
           </p>
           <sub-accordion
@@ -382,5 +382,9 @@ button[disabled] {
   width: 56px;
   height: 56px;
   z-index: 10;
+}
+
+.sub-accordion-text {
+  margin-bottom: 0;
 }
 </style>
