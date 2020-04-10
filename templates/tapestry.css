@@ -401,6 +401,20 @@ input[type="checkbox"][disabled] {
     padding: 0;
 }
 
+rect.selectable {
+    fill: orange;
+    fill-opacity: 0;
+}
+
 .node-selected circle {
-    fill: #ff571a;
+    fill: orange;
+    fill-opacity: 0.7;
+}
+
+.node-selected path.grandchild, .node-selected .grandchild {
+    fill: orange;
+}
+
+.node-selected rect.selectable {
+    fill-opacity: 0.7;
 }
