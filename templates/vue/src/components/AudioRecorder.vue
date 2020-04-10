@@ -24,6 +24,7 @@
 
 <script>
 import AudioRecoder from "audio-recorder-polyfill"
+import { mapGetters } from "vuex"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {
@@ -34,9 +35,8 @@ export default {
   name: "audio-recorder",
   props: {
     id: {
-      type: Number,
-      required: false,
-      default: 0,
+      type: String,
+      required: true,
     },
   },
   data() {
@@ -50,6 +50,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getQuestion"]),
     durationText() {
       let hours = Math.floor(this.duration / 3600)
       let minutes = Math.floor((this.duration - hours * 3600) / 60)
@@ -65,6 +66,10 @@ export default {
       }
       return `${hours}:${minutes}:${sec}`
     },
+    hasPrevious() {
+      const question = this.getQuestion(this.id)
+      return question.entries.audio && question.entries.audio.length > 0
+    },
     states() {
       return {
         DONE: "done",
@@ -76,7 +81,12 @@ export default {
     },
   },
   created() {
-    this.state = this.states.READY
+    if (this.hasPrevious) {
+      this.state = this.states.DONE
+      this.audio = this.getQuestion(this.id).entries.audio
+    } else {
+      this.state = this.states.READY
+    }
   },
   mounted() {
     if (!navigator.mediaDevices.getUserMedia) {

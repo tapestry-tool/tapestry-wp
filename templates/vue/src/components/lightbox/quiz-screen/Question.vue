@@ -12,7 +12,11 @@
       :id="formId"
       @submit="handleFormSubmit"
     ></gravity-form>
-    <audio-recorder v-else-if="recorderOpened" @submit="handleAudioSubmit" />
+    <audio-recorder
+      v-else-if="recorderOpened"
+      :id="question.id"
+      @submit="handleAudioSubmit"
+    />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
@@ -66,7 +70,7 @@
           :id="options[0][1]"
           @submit="handleFormSubmit"
         ></gravity-form>
-        <audio-recorder />
+        <audio-recorder :id="question.id" @submit="handleAudioSubmit" />
       </div>
     </div>
   </div>
@@ -183,6 +187,12 @@ export default {
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
       this.loading = true
+      await this.completeQuestion({
+        nodeId: this.node.id,
+        answerType: "audio",
+        formId: this.formId,
+        questionId: this.question.id,
+      })
       await this.saveAudio({
         audio: audioFile,
         nodeId: this.node.id,
