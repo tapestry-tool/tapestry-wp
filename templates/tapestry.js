@@ -837,6 +837,10 @@ function tapestryTool(config){
             onElementSelect: node => {
                 const id = node.id.split("node-")[1]
                 selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+            },
+            onElementUnselect: node => {
+                const id = node.id.split("node-")[1]
+                selection.delete(tapestry.dataset.nodes[findNodeIndex(id)])
             }
         });
     }
