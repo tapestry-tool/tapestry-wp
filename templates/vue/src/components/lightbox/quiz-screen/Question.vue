@@ -7,17 +7,6 @@
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
-    <gravity-form
-      v-if="formOpened"
-      :id="formId"
-      class="answer"
-      @submit="handleFormSubmit"
-    ></gravity-form>
-    <audio-recorder
-      v-else-if="recorderOpened"
-      :id="question.id"
-      @submit="handleAudioSubmit"
-    />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
@@ -27,42 +16,54 @@
             :key="answer.type"
             :type="answer.type"
             :entry="answer.entry"
-            :src="answer.src"
           ></tapestry-activity>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
         </div>
       </div>
-      <h1 class="question-title">
-        {{ question.text }}
-      </h1>
-      <div v-if="options.length > 1" class="question-content">
-        <p class="question-answer-text">I want to answer with...</p>
-        <div class="button-container">
-          <answer-button
-            v-if="hasId('textId')"
-            :completed="textFormCompleted"
-            @click="openForm(question.answers.textId, 'textId')"
-          >
-            text
-          </answer-button>
-          <answer-button
-            v-if="hasId('audioId')"
-            :completed="audioRecorderCompleted"
-            icon="microphone"
-            @click="openRecorder(question.answers.audioId)"
-          >
-            audio
-          </answer-button>
-          <answer-button
-            v-if="hasId('checklistId')"
-            :completed="checklistFormCompleted"
-            icon="tasks"
-            @click="openForm(question.answers.checklistId, 'checklistId')"
-          >
-            checklist
-          </answer-button>
+      <gravity-form
+        v-if="formOpened"
+        :id="formId"
+        class="answer"
+        @submit="handleFormSubmit"
+      ></gravity-form>
+      <audio-recorder
+        v-else-if="recorderOpened"
+        :id="question.id"
+        @submit="handleAudioSubmit"
+      />
+      <div v-else>
+        <h1 class="question-title">
+          {{ question.text }}
+        </h1>
+        <div class="question-content">
+          <p class="question-answer-text">I want to answer with...</p>
+          <div class="button-container">
+            <answer-button
+              v-if="hasId('textId')"
+              :completed="textFormCompleted"
+              @click="openForm(question.answers.textId, 'textId')"
+            >
+              text
+            </answer-button>
+            <answer-button
+              v-if="hasId('audioId')"
+              :completed="audioRecorderCompleted"
+              icon="microphone"
+              @click="openRecorder(question.answers.audioId)"
+            >
+              audio
+            </answer-button>
+            <answer-button
+              v-if="hasId('checklistId')"
+              :completed="checklistFormCompleted"
+              icon="tasks"
+              @click="openForm(question.answers.checklistId, 'checklistId')"
+            >
+              checklist
+            </answer-button>
+          </div>
         </div>
       </div>
     </div>
@@ -119,13 +120,7 @@ export default {
           .filter(entry => entry[1].length > 0)
           .map(i => i[0])
         return answeredTypes
-          .map(type => {
-            const answer = this.getEntry(this.question.previousEntry, type)
-            if (answer && answer.type === "audio") {
-              answer.src = `${apiUrl}/tapestries/${wpPostId}/nodes/${this.node.id}/audio/${answer.entry}`
-            }
-            return answer
-          })
+          .map(type => this.getEntry(this.question.previousEntry, type))
           .filter(Boolean)
       }
       return []

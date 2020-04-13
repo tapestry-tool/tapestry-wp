@@ -36,9 +36,9 @@ export function getEntry(_, { getQuestion }) {
     if (!entry) {
       return null
     }
-    /* If the answer is an audio, then entry is just the audio id. */
+    /* If the answer is an audio, then entry is the audio file in base64. */
     if (answerType === "audioId") {
-      return { type: "audio", entry }
+      return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
     }
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
