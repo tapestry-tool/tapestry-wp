@@ -1,7 +1,7 @@
 <template>
   <div
     class="question"
-    :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
+    :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
     <button class="button-nav button-nav-menu" @click="back">
       <i class="fas fa-arrow-left"></i>
@@ -10,6 +10,7 @@
     <gravity-form
       v-if="formOpened"
       :id="formId"
+      class="answer"
       @submit="handleFormSubmit"
     ></gravity-form>
     <audio-recorder
@@ -64,14 +65,6 @@
           </answer-button>
         </div>
       </div>
-      <div v-else>
-        <gravity-form
-          v-if="options[0][0] !== 'audioId'"
-          :id="options[0][1]"
-          @submit="handleFormSubmit"
-        ></gravity-form>
-        <audio-recorder v-else :id="question.id" @submit="handleAudioSubmit" />
-      </div>
     </div>
   </div>
 </template>
@@ -109,7 +102,6 @@ export default {
       formId: null,
       formType: "",
       recorderOpened: false,
-      h5pRecorderUrl: "",
       loading: false,
     }
   },
@@ -151,21 +143,27 @@ export default {
       return !!(this.question.entries && this.question.entries.audioId)
     },
   },
+  created() {
+    if (this.options.length === 1) {
+      if (this.options[0][0] === "audioId") {
+        this.openRecorder()
+      } else {
+        this.openForm(this.options[0][1], this.options[0][0])
+      }
+    }
+  },
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
       const wasOpened = this.formOpened || this.recorderOpened
-      this.formOpened = false
-      this.recorderOpened = false
-      if (!wasOpened) {
+      if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }
+      this.formOpened = false
+      this.recorderOpened = false
     },
-    openRecorder(id) {
-      if (id) {
-        this.recorderOpened = true
-        this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
-      }
+    openRecorder() {
+      this.recorderOpened = true
     },
     openForm(id, answerType) {
       this.formId = id
@@ -224,6 +222,10 @@ button {
 
 .answer-container {
   width: 75%;
+}
+
+.answer {
+  margin-top: 80px;
 }
 
 .question {

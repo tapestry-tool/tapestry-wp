@@ -2,19 +2,37 @@
   <div v-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
-  <div v-else>
+  <div v-else class="recorder">
+    <h1>{{ question.text }}</h1>
+    <div class="mic">
+      <i class="fas fa-microphone"></i>
+    </div>
+    <audio v-if="state === states.DONE" controls :src="audio"></audio>
+    <div v-if="state !== states.DONE">
+      <code style="color: white;">{{ durationText }}</code>
+    </div>
     <div class="controls">
-      <button @click="startRecording">Start</button>
-      <button @click="toggleRecording">
-        {{ state === states.PAUSED ? "Play" : "Pause" }}
+      <button class="control" @click="toggleRecording">
+        <i
+          :class="[
+            'fas',
+            {
+              'fa-undo': state === states.DONE,
+              'fa-pause': state === states.RECORDING,
+              'fa-play': state !== states.RECORDING,
+            },
+          ]"
+        ></i>
       </button>
-      <button @click="stopRecording">Stop</button>
+      <button
+        class="control"
+        :disabled="state === states.DONE"
+        @click="stopRecording"
+      >
+        <i class="fas fa-stop"></i>
+      </button>
     </div>
     <div class="content">
-      <div>
-        <code>{{ durationText }}</code>
-      </div>
-      <audio v-if="state === states.DONE" controls :src="audio"></audio>
       <button v-if="state === states.DONE" @click="$emit('submit', audio)">
         Done
       </button>
@@ -51,6 +69,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getQuestion"]),
+    question() {
+      return this.getQuestion(this.id)
+    },
     durationText() {
       let hours = Math.floor(this.duration / 3600)
       let minutes = Math.floor((this.duration - hours * 3600) / 60)
@@ -67,8 +88,9 @@ export default {
       return `${hours}:${minutes}:${sec}`
     },
     hasPrevious() {
-      const question = this.getQuestion(this.id)
-      return question.entries.audioId && question.entries.audioId.length > 0
+      return (
+        this.question.entries.audioId && this.question.entries.audioId.length > 0
+      )
     },
     states() {
       return {
@@ -144,8 +166,56 @@ export default {
         this.recorder.resume()
         this.startDurationCount()
         this.state = this.states.RECORDING
+      } else {
+        this.startRecording()
       }
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.recorder {
+  h1 {
+    margin-bottom: 32px;
+  }
+
+  audio {
+    margin-bottom: 16px;
+  }
+
+  button {
+    background-color: rgba(26, 26, 26, 0.8);
+    border-radius: 16px;
+
+    &:hover {
+      background-color: #11a6d8;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+
+  i {
+    margin: auto;
+  }
+
+  .control {
+    border-radius: 50%;
+    font-size: 24px;
+    height: 56px;
+    width: 56px;
+  }
+
+  .controls {
+    margin-bottom: 16px;
+  }
+
+  .mic {
+    font-size: 72px;
+  }
+}
+</style>
