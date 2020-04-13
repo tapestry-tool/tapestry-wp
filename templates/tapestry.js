@@ -220,11 +220,23 @@ function tapestryTool(config){
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
 
+            const getDirectChildren = id => this.dataset.links
+                .filter(link => link.source == id)
+                .map(link => link.target)
+
             if (node.mediaType === "accordion") {
-                const accordionRowIds = this.dataset.links.filter(link => link.source == node.id).map(link => link.target)
+                const accordionRowIds = getDirectChildren(node.id)
                 accordionRowIds.forEach(accordionRowId => {
                     const accordionRow = this.dataset.nodes[findNodeIndex(accordionRowId)]
                     accordionRow.presentationStyle = "accordion-row"
+                    const subRows = getDirectChildren(accordionRowId)
+                    if (subRows.length) {
+                        accordionRow.isSubAccordion = true;
+                    }
+                    subRows.forEach(id => {
+                        const subRow = this.dataset.nodes[findNodeIndex(id)]
+                        subRow.presentationStyle = "accordion-row"
+                    })
                 })
             }
 
@@ -1820,7 +1832,7 @@ function tapestryTool(config){
             const completedRows = rows
                 .map(getNodeById)
                 .filter(row => row.completed);
-            completedRows.forEach(row => progress.push(row));
+            completedRows.forEach(row => progress.push(row.id));
             node.accordionProgress = progress;
             
             const currProgress = rows.length ? progress.length / rows.length : 1;
@@ -1868,10 +1880,6 @@ function tapestryTool(config){
                 }
             }
         }
-    
-        dispatchEvent(new CustomEvent("tapestry-updated", {
-            detail: { dataset: tapestry.dataset }
-        }))
         return true;
     }
     
