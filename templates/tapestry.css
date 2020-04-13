@@ -402,17 +402,17 @@ input[type="checkbox"][disabled] {
 }
 
 rect.selectable {
-    fill: orange;
+    fill: #11a6d8;
     fill-opacity: 0;
 }
 
 .node-selected circle {
-    fill: orange;
+    fill: #11a6d8;
     fill-opacity: 0.7;
 }
 
 .node-selected path.grandchild, .node-selected .grandchild {
-    fill: orange;
+    fill: #11a6d8;
 }
 
 .node-selected rect.selectable {
