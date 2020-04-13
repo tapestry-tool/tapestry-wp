@@ -6,7 +6,12 @@ export function init(state, dataset) {
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
   state.nodes
-    .filter(n => n.tydeType === tydeTypes.MODULE || n.mediaType === "accordion")
+    .filter(
+      n =>
+        n.tydeType === tydeTypes.MODULE ||
+        n.mediaType === "accordion" ||
+        n.isSubAccordion
+    )
     .forEach(n => initializeOrdering(state, n.id))
 }
 
@@ -61,6 +66,21 @@ export function updateNodeCoordinates(state, payload) {
   Object.entries(payload.coordinates).forEach(([key, value]) => {
     node[key] = value
   })
+}
+
+export function fulfillNodeCondition(state, { id, condition }) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  const toFulfill = node.conditions.find(
+    cond => cond.type === condition.type && cond.value === condition.value
+  )
+  if (toFulfill) {
+    toFulfill.fulfilled = true
+    if (node.conditions.every(cond => cond.fulfilled)) {
+      node.unlocked = true
+      node.accessible = true
+      thisTapestryTool.reload()
+    }
+  }
 }
 
 // links

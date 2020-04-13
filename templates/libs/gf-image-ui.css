@@ -1,6 +1,7 @@
 .gfield_checkbox {
     display: flex;
-    justify-content: space-evenly;
+	flex-wrap: wrap;
+    justify-content: flex-start;
     align-items: center;
 }
 

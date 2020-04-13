@@ -193,6 +193,15 @@ class Tapestry implements ITapestry
             }
         }
 
+        // Delete condition from nodes that rely on this node
+        foreach ($this->nodes as $index => $id) {
+            if ($id != $nodeId) {
+                // Delete condition from node and update database
+                $elementNode = new TapestryNode($this->postId, $id);
+                $elementNode->removeConditionsById($nodeId);
+            }
+        }
+
         $tapestry = $this->_formTapestry();
         update_post_meta($this->postId, 'tapestry', $tapestry);
         return $this->nodes;

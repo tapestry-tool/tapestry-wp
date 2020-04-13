@@ -76,15 +76,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getContent", "getActivities"]),
+    ...mapGetters(["getNode", "getModuleContent", "getModuleActivities"]),
     module() {
       return this.getNode(this.nodeId)
     },
     stages() {
-      return this.getContent(this.nodeId)
+      return this.getModuleContent(this.nodeId)
     },
     activities() {
-      return this.getActivities(this.nodeId)
+      return this.getModuleActivities(this.nodeId)
     },
   },
   methods: {

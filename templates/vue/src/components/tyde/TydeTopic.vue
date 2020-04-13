@@ -38,8 +38,9 @@ button {
 
   div {
     position: relative;
-    width: 198px;
-    height: 198px;
+    max-width: 198px;
+    margin: 0 auto 20px;
+    min-height: 170px;
 
     img {
       width: 90%;
@@ -64,7 +65,7 @@ button {
     color: inherit;
     font-size: 32px;
     transition: transform 0.2s ease-out;
-    line-height: 0.9em;
+    line-height: 1em;
     max-width: 200px;
     min-height: 2em;
   }

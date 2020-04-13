@@ -72,7 +72,6 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         showInBackpack: true,
         permissions: {
           public: ["read"],
@@ -85,7 +84,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getParent", "selectedNode", "tapestry", "getNode"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -111,7 +110,13 @@ export default {
         case "edit-node":
           return this.selectedNode.permissionsOrder
         default:
-          return ["public", "authenticated"]
+          return [
+            "public",
+            "authenticated",
+            ...Object.keys(wpData.roles).filter(
+              role => role !== "administrator" && role !== "author"
+            ),
+          ]
       }
     },
     wpCanEditTapestry: function() {
@@ -120,7 +125,7 @@ export default {
   },
   watch: {
     selectedNode() {
-      this.parentNode = this.getParent(this.selectedNode)
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
     },
   },
   mounted() {
@@ -159,10 +164,10 @@ export default {
         typeData: {
           mediaURL: "",
           textContent: "",
+          subAccordionText: "More content:",
         },
         mediaDuration: "",
         imageURL: "",
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -193,7 +198,7 @@ export default {
     },
     editNode() {
       this.modalType = "edit-node"
-      this.parentNode = this.getParent(this.selectedNode.id)
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },
@@ -219,6 +224,7 @@ export default {
       var newNodeEntry = {
         type: "tapestry_node",
         description: "",
+        conditions: [],
         behaviour: "embed",
         status: "publish",
         nodeType: "",
@@ -247,8 +253,8 @@ export default {
           spaceshipPartY: 0,
           spaceshipPartWidth: 0,
           spaceshipPartHeight: 0,
+          subAccordionText: "More content:",
         },
-        unlocked: true,
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -331,9 +337,6 @@ export default {
               newNodeEntry.mediaDuration = parseInt(fieldValue)
             }
             break
-          case "unlocked":
-            newNodeEntry.unlocked = String(fieldValue) === "true" || isRoot
-            break
           case "hideTitle":
             newNodeEntry.hideTitle = fieldValue
             break
@@ -391,10 +394,14 @@ export default {
           case "spaceshipPartHeight":
             newNodeEntry.typeData.spaceshipPartHeight = fieldValue
             break
+          case "subAccordionText":
+            newNodeEntry.typeData.subAccordionText = fieldValue
+            break
           case "childOrdering":
             newNodeEntry.childOrdering = fieldValue
             break
           default:
+            newNodeEntry[fieldName] = fieldValue
             break
         }
       }
@@ -440,6 +447,7 @@ export default {
             appearsAt: appearsAt,
           }
           await this.addLink(newLink)
+          this.selectedNode.childOrdering.push(id)
         } else {
           this.updateRootNode(newNodeEntry.id)
           this.updateSelectedNode(newNodeEntry.id)
@@ -466,10 +474,6 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
-
-      if (!isEdit && this.getParent(id) !== null) {
-        this.getNode(this.getParent(id)).childOrdering.push(id)
-      }
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)

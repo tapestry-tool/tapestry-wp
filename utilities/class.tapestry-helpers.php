@@ -176,6 +176,16 @@ class TapestryHelpers
                 in_array($options[$action], $nodePermissions->authenticated)
             ) {
                 return true;
+            } else if (is_user_logged_in()) {
+                $roles = wp_get_current_user()->roles;
+                foreach ($roles as $role) {
+                    if (
+                        property_exists($nodePermissions, $role) && 
+                        in_array($options[$action], $nodePermissions->$role)
+                    ) {
+                        return true;
+                    }
+                }
             } else {
                 foreach ($groupIds as $groupId) {
                     if (

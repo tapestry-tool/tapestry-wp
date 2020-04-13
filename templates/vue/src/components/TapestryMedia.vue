@@ -78,8 +78,6 @@ import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
 
-const SAVE_INTERVAL = 5
-
 export default {
   name: "tapestry-media",
   components: {
@@ -150,22 +148,10 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    async updateProgress(type, amountViewed) {
-      const now = new Date()
-      const secondsDiff = Math.abs(
-        (now.getTime() - this.timeSinceLastSaved.getTime()) / 1000
-      )
-
-      if (secondsDiff > SAVE_INTERVAL) {
-        await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-        if (type === "h5p") {
-          await this.updateH5pSettings(this.h5pSettings)
-        }
-        this.timeSinceLastSaved = now
-      }
+    updateProgress(amountViewed) {
+      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
-    async complete() {
-      await this.completeNode(this.nodeId)
+    complete() {
       this.$emit("complete")
       const stages = this.getDirectParents(this.nodeId).filter(
         id => this.getNode(id).tydeType === "Stage"
@@ -183,7 +169,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
   height: 100%;
 }
 .media-wrapper-embed {
