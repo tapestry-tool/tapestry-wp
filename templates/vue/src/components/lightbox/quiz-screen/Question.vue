@@ -70,7 +70,7 @@
           :id="options[0][1]"
           @submit="handleFormSubmit"
         ></gravity-form>
-        <audio-recorder :id="question.id" @submit="handleAudioSubmit" />
+        <audio-recorder v-else :id="question.id" @submit="handleAudioSubmit" />
       </div>
     </div>
   </div>

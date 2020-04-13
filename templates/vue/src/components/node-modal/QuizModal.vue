@@ -77,6 +77,15 @@
             <b-form-group label="Answer options" class="mb-0">
               <b-row>
                 <b-col cols="12" md="4">
+                  <b-form-checkbox
+                    :checked="question.answers.audioId.length > 0"
+                    switch
+                    @input="question.answers.audioId = $event ? '1' : ''"
+                  >
+                    Audio Recorder
+                  </b-form-checkbox>
+                </b-col>
+                <b-col cols="12" md="4">
                   <b-form-group label="Textbox Gravity Form" class="mb-0">
                     <combobox
                       v-model="question.answers.textId"
@@ -85,25 +94,6 @@
                       item-text="title"
                       item-value="id"
                       empty-message="There are no forms available. Please add one in your WP dashboard."
-                      @focus="wasFocused = true"
-                    >
-                      <template v-slot="slotProps">
-                        <p>
-                          <code>{{ slotProps.option.id }}</code>
-                          {{ slotProps.option.title }}
-                        </p>
-                      </template>
-                    </combobox>
-                  </b-form-group>
-                </b-col>
-                <b-col cols="12" md="4">
-                  <b-form-group label="H5P Audio Recorder" class="mb-0">
-                    <combobox
-                      v-model="question.answers.audioId"
-                      :options="h5pOptions"
-                      item-text="title"
-                      item-value="id"
-                      empty-message="There's no H5P content yet. Please add one in your WP dashboard."
                       @focus="wasFocused = true"
                     >
                       <template v-slot="slotProps">
@@ -176,7 +166,6 @@
 import { mapState } from "vuex"
 import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
-import H5PApi from "../../services/H5PApi"
 import Helpers from "../../utils/Helpers"
 
 const defaultQuestion = {
@@ -231,9 +220,7 @@ export default {
   },
   async mounted() {
     const forms = await GravityFormsApi.getAllForms()
-    const h5ps = await H5PApi.getAllContent()
     this.formOptions = forms
-    this.h5pOptions = h5ps
   },
   methods: {
     addQuestion() {
