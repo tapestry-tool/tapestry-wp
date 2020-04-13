@@ -28,14 +28,13 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  padding: 0 15px;
+  padding: 0 1em 1em;
   text-align: left;
 
   h1 {
     font-size: 1.75rem;
     font-weight: 500;
     margin: 1em auto;
-    max-width: 700px;
 
     :before {
       display: none;
@@ -43,11 +42,9 @@ export default {
   }
 
   div {
-    color: #47425d;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
     white-space: pre-wrap;
-    max-width: 700px;
     margin: 0 auto;
   }
 }
