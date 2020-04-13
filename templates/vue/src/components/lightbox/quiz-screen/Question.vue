@@ -194,7 +194,7 @@ export default {
         questionId: this.question.id,
       })
       await this.saveAudio({
-        audio: audioFile,
+        audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
         nodeId: this.node.id,
         questionId: this.question.id,
       })

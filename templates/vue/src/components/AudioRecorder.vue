@@ -68,7 +68,7 @@ export default {
     },
     hasPrevious() {
       const question = this.getQuestion(this.id)
-      return question.entries.audio && question.entries.audio.length > 0
+      return question.entries.audioId && question.entries.audioId.length > 0
     },
     states() {
       return {
@@ -83,7 +83,9 @@ export default {
   created() {
     if (this.hasPrevious) {
       this.state = this.states.DONE
-      this.audio = this.getQuestion(this.id).entries.audio
+      this.audio =
+        "data:audio/ogg; codecs=opus;base64," +
+        this.getQuestion(this.id).entries.audioId
     } else {
       this.state = this.states.READY
     }
