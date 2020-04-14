@@ -669,8 +669,8 @@ function tapestryTool(config){
                     error: function(e) {
                         alert("Sorry, there was an error saving the coordinates of this node!");
                         console.error(e);
-                        //nd[xORfx] = nodesBeforeDrag.x;
-                        //nd[yORfy] = nodesBeforeDrag.y;
+                        nd[xORfx] = nodesBeforeDrag.find(n => n.id == nd.id).x;
+                        nd[yORfy] = nodesBeforeDrag.find(n => n.id == nd.id).y;
                     }
                 });
             }
