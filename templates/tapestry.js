@@ -50,7 +50,7 @@ function tapestryTool(config){
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
-        autoLayout = false;
+        autoLayout = false, selection = null, isMultiSelect = false;
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -300,7 +300,7 @@ function tapestryTool(config){
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
 
-        initializeSelection();
+        initializeDragSelect();
     }
 
     this.resetNodeCache = function() {
@@ -430,6 +430,58 @@ function tapestryTool(config){
     /****************************************************
      * ADD EDITOR ELEMENTS
      ****************************************************/
+    selection = createSelection();
+    isMultiSelect = false;
+
+    document.addEventListener("keydown", evt => {
+        if (evt.code === "Escape") {
+            selection.clear();
+        }
+        if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+            isMultiSelect = true;
+            if (evt.code === "KeyA") {
+                evt.preventDefault();
+                tapestry.dataset.nodes.forEach(d => selection.add(d));
+            }
+        }
+    });
+
+    document.addEventListener("keyup", () => {
+        isMultiSelect = false;
+    });
+
+    function createSelection() {
+        const data = new Set();
+        const selection = {
+            size() {
+                return data.size;
+            },
+            add(node) {
+                data.add(node);
+                data.forEach(d => {
+                    const nd = document.getElementById(`node-${d.id}`);
+                    nd.classList.add("node-selected");
+                })
+            },
+            has(node) {
+                return data.has(node);
+            },
+            delete(node) {
+                data.delete(node);
+                const nd = document.getElementById(`node-${node.id}`);
+                nd.classList.remove("node-selected");
+            },
+            clear() {
+                data.forEach(d => {
+                    selection.delete(d);
+                })
+            },
+            forEach(fn) {
+                data.forEach(fn);
+            }
+        }
+        return selection;
+    }
     
     // To create a link
     function addLink(source, target, value, appearsAt) {
@@ -558,6 +610,79 @@ function tapestryTool(config){
     /****************************************************
      * D3 RELATED FUNCTIONS
      ****************************************************/
+    function dragstarted(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+ 
+        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+
+        if (!selection.size()) {
+            selection.add(d)
+        }
+        if (!selection.has(d) && !isMultiSelect) {
+            selection.clear();
+            selection.add(d);
+        }
+        nodesBeforeDrag = Array.from(selection)
+        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
+    }
+
+    function dragged(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
+        const xBeforeDrag = d[xORfx]
+        const yBeforeDrag = d[yORfy]
+        const deltaX = d3.event.x - xBeforeDrag
+        const deltaY = d3.event.y - yBeforeDrag
+        selection.forEach(nd => {
+            if (canEditNode(nd)) {
+                nd[xORfx] = getBoundedCoord(nd[xORfx] + deltaX, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
+                nd[yORfy] = getBoundedCoord(nd[yORfy] + deltaY, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
+            } else {
+                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
+                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
+            }
+        })
+    }
+
+    function dragended(d) {
+        if(!config.wpCanEditTapestry &&
+            tapestry.dataset.settings.nodeDraggable === false) {
+            return;
+        }
+
+        if (!d3.event.active) simulation.alphaTarget(0);
+
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                        //nd[xORfx] = nodesBeforeDrag.x;
+                        //nd[yORfy] = nodesBeforeDrag.y;
+                    }
+                });
+            }
+        })
+
+        if (selection.size() === 1) {
+            selection.clear();
+        }
+
+        updateSvgDimensions();
+        recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
+    }
 
     /* Define forces that will determine the layout of the graph */
     function startSimulation() {
@@ -838,7 +963,7 @@ function tapestryTool(config){
         }
     }
 
-    function initializeSelection() {
+    function initializeDragSelect() {
         new DragSelect({
             selectables: document.querySelectorAll(".node"),
             onDragStart: () => {
@@ -855,59 +980,6 @@ function tapestryTool(config){
                 selection.delete(tapestry.dataset.nodes[findNodeIndex(id)])
             }
         });
-    }
-
-    const selection = createSelection();
-    let isMultiSelect = false;
-
-    document.addEventListener("keydown", evt => {
-        if (evt.code === "Escape") {
-            selection.clear();
-        }
-        if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
-            isMultiSelect = true;
-            if (evt.code === "KeyA") {
-                evt.preventDefault();
-                tapestry.dataset.nodes.forEach(d => selection.add(d));
-            }
-        }
-    });
-
-    document.addEventListener("keyup", () => {
-        isMultiSelect = false;
-    });
-
-    function createSelection() {
-        const data = new Set();
-        const selection = {
-            size() {
-                return data.size;
-            },
-            add(node) {
-                data.add(node);
-                data.forEach(d => {
-                    const nd = document.getElementById(`node-${d.id}`);
-                    nd.classList.add("node-selected");
-                })
-            },
-            has(node) {
-                return data.has(node);
-            },
-            delete(node) {
-                data.delete(node);
-                const nd = document.getElementById(`node-${node.id}`);
-                nd.classList.remove("node-selected");
-            },
-            clear() {
-                data.forEach(d => {
-                    selection.delete(d);
-                })
-            },
-            forEach(fn) {
-                data.forEach(fn);
-            }
-        }
-        return selection;
     }
     
     /* Draws the components that make up node */
@@ -1129,80 +1201,6 @@ function tapestryTool(config){
                     }
                 }
             });
-    }
-
-    function dragstarted(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
- 
-        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
-        if (!selection.size()) {
-            selection.add(d)
-        }
-        if (!selection.has(d) && !isMultiSelect) {
-            selection.clear();
-            selection.add(d);
-        }
-        nodesBeforeDrag = Array.from(selection)
-        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
-    }
-
-    function dragged(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
-
-        const xBeforeDrag = d[xORfx]
-        const yBeforeDrag = d[yORfy]
-        const deltaX = d3.event.x - xBeforeDrag
-        const deltaY = d3.event.y - yBeforeDrag
-        selection.forEach(nd => {
-            if (canEditNode(nd)) {
-                nd[xORfx] = getBoundedCoord(nd[xORfx] + deltaX, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-                nd[yORfy] = getBoundedCoord(nd[yORfy] + deltaY, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-            } else {
-                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
-                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
-            }
-        })
-    }
-
-    function dragended(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
-        }
-
-        if (!d3.event.active) simulation.alphaTarget(0);
-
-        selection.forEach(nd => {
-            nd[xORfx] = nd.x;
-            nd[yORfy] = nd.y;
-            if (canEditNode(nd) && !autoLayout) {
-                $.ajax({
-                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
-                    method: API_PUT_METHOD,
-                    data: JSON.stringify({x: nd.x, y: nd.y}),
-                    error: function(e) {
-                        alert("Sorry, there was an error saving the coordinates of this node!");
-                        console.error(e);
-                        //nd[xORfx] = nodesBeforeDrag.x;
-                        //nd[yORfy] = nodesBeforeDrag.y;
-                    }
-                });
-            }
-        })
-
-        if (selection.size() === 1) {
-            selection.clear();
-        }
-
-        updateSvgDimensions();
-        recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
     function renderTooltips() {
