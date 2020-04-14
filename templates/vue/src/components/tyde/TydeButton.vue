@@ -4,7 +4,7 @@
     :style="cssProps"
     @click="$emit('click')"
   >
-    <i :class="iconClass"></i>
+    <i v-if="icon.length" :class="iconClass"></i>
     <slot></slot>
   </button>
 </template>
@@ -15,7 +15,8 @@ export default {
   props: {
     icon: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     label: {
       type: String,
@@ -50,6 +51,8 @@ export default {
   font-size: 30px;
   margin-right: 16px;
   transition: all 0.2s ease;
+  padding: 0em 0.4em;
+  box-shadow: 0 0 20px -8px #000;
 
   &.has-label {
     width: auto;
@@ -81,10 +84,17 @@ export default {
     outline: none;
   }
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--tapestry-light-blue);
     color: white;
     transform: scale(1.1);
+  }
+
+  &:disabled {
+    color: #999;
+    opacity: 0.8;
+    cursor: default;
+    box-shadow: none;
   }
 }
 </style>

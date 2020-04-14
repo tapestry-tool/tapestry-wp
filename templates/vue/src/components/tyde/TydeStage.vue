@@ -10,9 +10,11 @@
           </div>
         </div>
         <h1>{{ node.title }}</h1>
-        <button @click="$emit('close')">
-          <i class="fas fa-times fa-2x"></i>
-        </button>
+        <tyde-button
+          class="close-button"
+          icon="times"
+          @click="$emit('close')"
+        ></tyde-button>
       </div>
       <section>
         <tyde-topic
@@ -25,12 +27,16 @@
         />
       </section>
       <footer>
-        <button :class="stageIndex === 0 ? 'disabled' : ''" @click="$emit('prev')">
-          Prev
-        </button>
-        <button v-if="done" @click="$emit('next')">
-          Next
-        </button>
+        <tyde-button
+          :disabled="!stageIndex"
+          label="Prev"
+          @click="$emit(stageIndex ? 'prev' : '')"
+        ></tyde-button>
+        <tyde-button
+          :disabled="!done"
+          label="Next"
+          @click="$emit(done ? 'next' : '')"
+        ></tyde-button>
       </footer>
     </div>
   </div>
@@ -38,6 +44,7 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TydeButton from "./TydeButton"
 import TydeTopic from "./TydeTopic"
 import TydeProgressBar from "./TydeProgressBar"
 import ActiveStar from "@/assets/star-active.png"
@@ -48,6 +55,7 @@ import { tydeTypes } from "@/utils/constants"
 export default {
   name: "tyde-stage",
   components: {
+    TydeButton,
     TydeTopic,
     TydeProgressBar,
   },
@@ -141,16 +149,6 @@ body.tapestry-stage-open {
     color: var(--tyde-border-green);
     align-items: center;
 
-    > button {
-      border: none;
-      font-family: inherit;
-      font-size: 100%;
-      background: none;
-      color: inherit;
-      margin-left: auto;
-      margin-right: 75px;
-    }
-
     .stage-star {
       margin-left: 32vw;
       margin-right: 30px;
@@ -178,6 +176,13 @@ body.tapestry-stage-open {
       &::before {
         display: none;
       }
+    }
+
+    .close-button {
+      position: absolute;
+      top: -25px;
+      right: -25px;
+      z-index: 20;
     }
   }
 
@@ -236,31 +241,10 @@ body.tapestry-stage-open {
   }
 
   footer {
-    margin-left: 30vw;
+    margin-right: 11vw;
     display: flex;
     justify-content: flex-end;
-
-    button {
-      background: none;
-      margin: 0 0 0 30px;
-      padding: 0;
-
-      font-family: inherit;
-      font-size: 2.5em;
-      color: inherit;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    button.disabled {
-      opacity: 80%;
-      cursor: auto;
-      &:hover {
-        text-decoration: none;
-      }
-    }
+    margin-top: 80px;
   }
 }
 </style>
