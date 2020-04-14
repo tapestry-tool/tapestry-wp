@@ -10,6 +10,11 @@
           </div>
         </div>
         <h1>{{ node.title }}</h1>
+        <tyde-button
+          class="close-button"
+          icon="times"
+          @click="$emit('close')"
+        ></tyde-button>
       </div>
       <section>
         <tyde-topic
@@ -22,9 +27,16 @@
         />
       </section>
       <footer>
-        <button v-if="done" @click="$emit('next')">
-          Next
-        </button>
+        <tyde-button
+          :disabled="!stageIndex"
+          label="Prev"
+          @click="$emit(stageIndex ? 'prev' : '')"
+        ></tyde-button>
+        <tyde-button
+          :disabled="!done"
+          label="Next"
+          @click="$emit(done ? 'next' : '')"
+        ></tyde-button>
       </footer>
     </div>
   </div>
@@ -32,6 +44,7 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TydeButton from "./TydeButton"
 import TydeTopic from "./TydeTopic"
 import TydeProgressBar from "./TydeProgressBar"
 import ActiveStar from "@/assets/star-active.png"
@@ -42,6 +55,7 @@ import { tydeTypes } from "@/utils/constants"
 export default {
   name: "tyde-stage",
   components: {
+    TydeButton,
     TydeTopic,
     TydeProgressBar,
   },
@@ -49,6 +63,10 @@ export default {
     nodeId: {
       type: [String, Number],
       required: true,
+    },
+    stageIndex: {
+      type: [Number],
+      default: 1,
     },
   },
   computed: {
@@ -159,6 +177,13 @@ body.tapestry-stage-open {
         display: none;
       }
     }
+
+    .close-button {
+      position: absolute;
+      top: -25px;
+      right: -25px;
+      z-index: 20;
+    }
   }
 
   > div {
@@ -216,23 +241,10 @@ body.tapestry-stage-open {
   }
 
   footer {
-    margin-left: 30vw;
+    margin-right: 11vw;
     display: flex;
     justify-content: flex-end;
-
-    button {
-      background: none;
-      margin: 0;
-      padding: 0;
-
-      font-family: inherit;
-      font-size: 2.5em;
-      color: inherit;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+    margin-top: 80px;
   }
 }
 </style>
