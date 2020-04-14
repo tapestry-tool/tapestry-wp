@@ -373,67 +373,75 @@
               Spaceship Part Coordinates and Size in Cockpit
             </h6>
             <b-row id="node-spaceship-parts" class="mb-4">
-              <b-col sm="6" class="pt-2">
+              <b-col sm="5" class="pt-2">
                 Distance from upper left-hand corner:
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="X: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-x"
                 >
                   <b-form-input
                     id="node-spaceship-part-x"
                     v-model="node.typeData.spaceshipPartX"
-                    placeholder="In pixels (top left)"
+                    placeholder="In Percentage (top left)"
                     type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Y: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-y"
                 >
                   <b-form-input
                     id="node-spaceship-part-y"
                     v-model="node.typeData.spaceshipPartY"
-                    placeholder="In pixels (top left)"
+                    placeholder="In Percentage (top left)"
                     type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
             </b-row>
             <b-row id="node-spaceship-parts">
-              <b-col sm="6" class="pt-2">
+              <b-col sm="5" class="pt-2">
                 Dimensions of image:
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Width: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-width"
                 >
                   <b-form-input
                     id="node-spaceship-part-width"
                     v-model="node.typeData.spaceshipPartWidth"
-                    placeholder="In pixels"
+                    placeholder="In percentage"
                     type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Height: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-height"
                 >
                   <b-form-input
                     id="node-spaceship-part-height"
                     v-model="node.typeData.spaceshipPartHeight"
-                    placeholder="In pixels"
+                    placeholder="In percentage"
                     type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
