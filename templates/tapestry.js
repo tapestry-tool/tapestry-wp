@@ -44,7 +44,7 @@ function tapestryTool(config){
         simulation,                                             // Force
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
-        tapestryDimensionsBeforeDrag, nodeBeforeDrag,
+        tapestryDimensionsBeforeDrag,
         h5pVideoSettings = {},
         tapestryDepth = 4,                                      // Default depth of Tapestry
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
@@ -302,6 +302,8 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+
+        initializeDragSelect();
     }
 
     this.resetNodeCache = function() {
@@ -554,6 +556,80 @@ function tapestryTool(config){
     
          return visited.includes(targetNode);
     }
+
+    // Select nodes to move them around
+
+    const selection = createSelection();
+    let isMultiSelect = false;
+
+    document.addEventListener("keydown", evt => {
+        if (evt.code === "Escape") {
+            selection.clear();
+        }
+        if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+            isMultiSelect = true;
+            if (evt.code === "KeyA") {
+                evt.preventDefault();
+                tapestry.dataset.nodes.forEach(d => selection.add(d));
+            }
+        }
+    });
+
+    document.addEventListener("keyup", () => {
+        isMultiSelect = false;
+    });
+
+    function initializeDragSelect() {
+        new DragSelect({
+            selectables: document.querySelectorAll(".node"),
+            onDragStart: () => {
+                if (!isMultiSelect) {
+                    selection.clear()
+                }
+            },
+            onElementSelect: node => {
+                const id = node.id.split("node-")[1]
+                selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+            },
+            onElementUnselect: node => {
+                const id = node.id.split("node-")[1]
+                selection.delete(tapestry.dataset.nodes[findNodeIndex(id)])
+            }
+        });
+    }
+
+    function createSelection() {
+        const data = new Set();
+        const selection = {
+            size() {
+                return data.size;
+            },
+            add(node) {
+                data.add(node);
+                data.forEach(d => {
+                    const nd = document.getElementById(`node-${d.id}`);
+                    nd.classList.add("node-selected");
+                })
+            },
+            has(node) {
+                return data.has(node);
+            },
+            delete(node) {
+                data.delete(node);
+                const nd = document.getElementById(`node-${node.id}`);
+                nd.classList.remove("node-selected");
+            },
+            clear() {
+                data.forEach(d => {
+                    selection.delete(d);
+                })
+            },
+            forEach(fn) {
+                data.forEach(fn);
+            }
+        }
+        return selection;
+    }
     
     /****************************************************
      * D3 RELATED FUNCTIONS
@@ -645,19 +721,16 @@ function tapestryTool(config){
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
- 
+
         if (!d3.event.active) simulation.alphaTarget(0.2).restart();
 
-        nodeBeforeDrag = d;
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d.y, tapestryDimensionsBeforeDrag.height);
+        if (!selection.size()) {
+            selection.add(d)
         }
-
+        if (!selection.has(d) && !isMultiSelect) {
+            selection.clear();
+            selection.add(d);
+        }
         recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -667,13 +740,19 @@ function tapestryTool(config){
             return;
         }
 
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height);
-        }
+        const xBeforeDrag = d[xORfx]
+        const yBeforeDrag = d[yORfy]
+        const deltaX = d3.event.x - xBeforeDrag
+        const deltaY = d3.event.y - yBeforeDrag
+        selection.forEach(nd => {
+            if (canEditNode(nd)) {
+                nd[xORfx] = getBoundedCoord(nd[xORfx] + deltaX, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
+                nd[yORfy] = getBoundedCoord(nd[yORfy] + deltaY, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
+            } else {
+                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
+                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
+            }
+        })
     }
 
     function dragended(d) {
@@ -684,25 +763,121 @@ function tapestryTool(config){
 
         if (!d3.event.active) simulation.alphaTarget(0);
 
-        d[xORfx] = d.x;
-        d[yORfy] = d.y;
-        updateSvgDimensions();
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                    }
+                });
+            }
+        })
 
-        if (canEditNode(d) && !autoLayout) {
-            $.ajax({
-                url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
-                method: API_PUT_METHOD,
-                data: JSON.stringify({x: d.x, y: d.y}),
-                error: function(e) {
-                    alert("Sorry, there was an error saving the coordinates of this node!");
-                    console.error(e);
-                    d[xORfx] = nodeBeforeDrag.x;
-                    d[yORfy] = nodeBeforeDrag.y;
-                }
-            });
+        if (selection.size() === 1) {
+            selection.clear();
         }
 
+        updateSvgDimensions();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
+    }
+
+    // LOCKED NODE TOOLTIPS
+
+    function renderTooltips() {
+        nodes
+            .filter(d => !d.accessible)
+            .append("foreignObject")
+            .attr("class", "tooltip-wrapper")
+            .style("position", "relative")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .attr("width", d => Math.min(getRadius(d) * 5 + 48, 600))
+            .attr("height", d => getRadius(d) * 3)
+            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
+            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .append("xhtml:div")
+            .attr("class", "tapestry-tooltip")
+            .html(getTooltipHtml)
+    }
+
+    function setNodeListeners(nodes) {
+
+        // Create tooltip for all locked nodes
+        renderTooltips();
+
+        // Remove (potentially) old listeners
+        nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
+
+        nodes.on("mouseover", function (thisNode) {
+
+            // Place this node at the end of the svg so that it appears on top
+            $(this).insertAfter($(this).parent().children().last())
+
+            // Mark this node as the node to link to (potentially)
+            if (linkToDragStarted) {
+                linkToNode = thisNode;
+            }
+        }).on("mouseout", function () {
+
+            // Unmark this node as the node to link to
+            if (linkToDragStarted) {
+                linkToNode = undefined;
+            }
+        });
+
+        nodes
+            .filter(d => !d.accessible)
+            .on("mouseover", function (d) {
+
+                // Place this node at the end of the svg so that it appears on top
+                $(this).insertAfter($(this).parent().children().last())
+
+                // Show unlock conditions tooltip
+                if (d.nodeType !== "grandchild") {
+                    const wrapper = this.querySelector(".tooltip-wrapper");
+                    wrapper.style.opacity = 1;
+                }
+            })
+            .on("mouseleave", function () {
+
+                // Hide unlock conditions tooltip
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                wrapper.style.opacity = 0;
+            })
+    }
+
+    function getTooltipHtml(node) {
+        const str = "To access this content, you need to first: <br />";
+        const wrapper = document.createElement("ul");
+
+        if (node.conditions.length === 0) {
+            const listItem = document.createElement("li");
+            listItem.innerText = "Complete this parent.";
+            wrapper.appendChild(listItem);
+        } else {
+            node.conditions.forEach(cond => {
+                if (!cond.fulfilled) {
+                    const listItem = document.createElement("li");
+                    switch (cond.type) {
+                        case conditionTypes.NODE_COMPLETED: {
+                            const node = getNodeById(cond.nodeId);
+                            listItem.innerText = `Complete "${node.title}"`;
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    wrapper.appendChild(listItem);
+                }
+            })
+        }
+        return str + wrapper.outerHTML;
     }
 
     function createSvgContainer() {
@@ -984,6 +1159,62 @@ function tapestryTool(config){
                 }
             });
     
+        nodes.append("rect")
+        .attr("class", function (d) {
+            if (d.nodeType === "grandchild") return "selectable grandchild";
+            return "selectable";
+        })
+        .attr("rx", function (d) {
+            if (d.hideProgress && d.imageURL.length) {
+                return 0;
+            }
+            return getRadius(d);
+        })
+        .attr("ry", function (d) {
+            if (d.hideProgress && d.imageURL.length) {
+                return 0;
+            }
+            return getRadius(d);
+        })
+        .attr("data-id", function (d) {
+            return d.id;
+        })
+        .attr("stroke-width", function (d) {
+            if (!d.hideProgress) {
+                return PROGRESS_THICKNESS;
+            }
+        })
+        .attr("stroke", function (d) {
+            if (!getViewable(d) || d.hideProgress)
+                return "transparent";
+            else if (d.nodeType === "grandchild")
+                return COLOR_GRANDCHILD;
+            else if (!d.accessible)
+                return COLOR_LINK;
+            else return COLOR_STROKE;
+        })
+        .attr("width", function (d) {
+            if (!getViewable(d)) return 0;
+            return getRadius(d) * 2;
+        })
+        .attr("height", function (d) {
+            if (!getViewable(d)) return 0;
+            return getRadius(d) * 2;
+        })
+        .attr("x", function (d) {
+            return - getRadius(d);
+        })
+        .attr("y", function (d) {
+            return - getRadius(d);
+        })
+        .on("click keydown", function (d) {
+            if (root === d.id && d.hideMedia) {
+                if (config.wpCanEditTapestry || d.accessible) {
+                    goToNode(d.id)
+                }
+            }
+        });
+
         nodes.append("circle")
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
@@ -1120,101 +1351,18 @@ function tapestryTool(config){
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
-                        tapestry.selectNode(d.id)
+                        if (!isMultiSelect) {
+                            selection.clear();
+                            tapestry.selectNode(d.id);
+                        } else {
+                            if (!selection.size()) {
+                                selection.add(getNodeById(root))
+                            }
+                            selection.add(d);
+                        }
                     }
                 }
             });
-    }
-
-    function renderTooltips() {
-        nodes
-            .filter(d => !d.accessible)
-            .append("foreignObject")
-            .attr("class", "tooltip-wrapper")
-            .style("position", "relative")
-            .style("pointer-events", "none")
-            .style("opacity", 0)
-            .attr("width", d => Math.min(getRadius(d) * 5 + 48, 600))
-            .attr("height", d => getRadius(d) * 3)
-            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
-            .append("xhtml:div")
-            .attr("class", "tapestry-tooltip")
-            .html(getTooltipHtml)
-    }
-
-    function setNodeListeners(nodes) {
-
-        // Create tooltip for all locked nodes
-        renderTooltips();
-
-        // Remove (potentially) old listeners
-        nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
-
-        nodes.on("mouseover", function (thisNode) {
-
-            // Place this node at the end of the svg so that it appears on top
-            $(this).insertAfter($(this).parent().children().last())
-
-            // Mark this node as the node to link to (potentially)
-            if (linkToDragStarted) {
-                linkToNode = thisNode;
-            }
-        }).on("mouseout", function () {
-
-            // Unmark this node as the node to link to
-            if (linkToDragStarted) {
-                linkToNode = undefined;
-            }
-        });
-
-        nodes
-            .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
-
-                // Place this node at the end of the svg so that it appears on top
-                $(this).insertAfter($(this).parent().children().last())
-
-                // Show unlock conditions tooltip
-                if (d.nodeType !== "grandchild") {
-                    const wrapper = this.querySelector(".tooltip-wrapper");
-                    wrapper.style.opacity = 1;
-                }
-            })
-            .on("mouseleave", function () {
-
-                // Hide unlock conditions tooltip
-                const wrapper = this.querySelector(".tooltip-wrapper");
-                wrapper.style.opacity = 0;
-            })
-    }
-
-    function getTooltipHtml(node) {
-        const str = "To access this content, you need to first: <br />";
-        const wrapper = document.createElement("ul");
-
-        if (node.conditions.length === 0) {
-            const listItem = document.createElement("li");
-            listItem.innerText = "Complete this parent.";
-            wrapper.appendChild(listItem);
-        } else {
-            node.conditions.forEach(cond => {
-                if (!cond.fulfilled) {
-                    const listItem = document.createElement("li");
-                    switch (cond.type) {
-                        case conditionTypes.NODE_COMPLETED: {
-                            const node = getNodeById(cond.nodeId);
-                            listItem.innerText = `Complete "${node.title}"`;
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    wrapper.appendChild(listItem);
-                }
-            })
-        }
-        return str + wrapper.outerHTML;
     }
 
     function rebuildNodeContents() {
@@ -1330,6 +1478,53 @@ function tapestryTool(config){
                 .attr("y", function (d) {
                     return - getRadius(d) * 1.2 - 45;
                 });
+
+        nodes.selectAll(".selectable")
+            .attr("class", function (d) {
+                if (!getViewable(d))
+                    return "selectable grandchild";
+                else return "selectable";
+            })
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild") 
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            });
         
         /* Attach images to be used within each node */
         nodes.selectAll("defs")
