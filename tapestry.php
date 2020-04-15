@@ -4,7 +4,7 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.18.0-beta
+ * Version: TYDE Cohort 1 Pre-release 2
  * Author: Tapestry Team, University of British Coloumbia
  */
 
