@@ -1111,6 +1111,23 @@ function tapestryTool(config){
                 return img;
             });
 
+        // TYDE ONLY - Add checkmark to completed modules
+        nodes.append("foreignObject")
+            .filter((d) => {
+                return getViewable(d) && d.tydeType === "Module"
+            })
+            .attr("x", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("y", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("style", (d) => {
+                return d.tydeProgress === 1 ? "" : "display: none;"
+            })
+            .attr("class", "tyde-module-complete-check")
+            .html("<i class='fas fa-check'></i>");
+
         /* Add path and button */
         buildPathAndButton();
 
@@ -1347,6 +1364,17 @@ function tapestryTool(config){
                 .attr("style", (d) => {
                     return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
                 });
+
+        // TYDE ONLY - update checkmark location
+        nodes.selectAll(".tyde-module-complete-check")
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("x", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("y", function (d) {
+                return getRadius(d) - 45;
+            });
         
         /* Attach images to be used within each node */
         nodes.selectAll("defs")
