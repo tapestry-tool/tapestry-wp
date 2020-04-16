@@ -2,6 +2,12 @@ import axios from "axios"
 
 const BASE_URL = `${apiUrl}/gf`
 
+async function exists() {
+  const url = `${BASE_URL}/exists`
+  const response = await axios.get(url)
+  return response.data
+}
+
 async function getAllForms() {
   const url = `${BASE_URL}/forms`
   const response = await axios.get(url)
@@ -21,6 +27,7 @@ async function getFormEntry(id) {
 }
 
 export default {
+  exists,
   getAllForms,
   getFormHtml,
   getFormEntry,

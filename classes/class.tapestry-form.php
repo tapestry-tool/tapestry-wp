@@ -17,6 +17,9 @@ class TapestryForm implements ITapestryForm
    */
   public function getAll()
   {
+    if ( !$this::exists() ) {
+      return [];
+    }
     return GFAPI::get_forms();
   }
 
@@ -28,11 +31,24 @@ class TapestryForm implements ITapestryForm
    */
   public function getEntry($formId)
   {
+    if ( !$this::exists() ) {
+      return [];
+    }
     $userId = apply_filters('determine_current_user', false);
     $search_criteria['field_filters'][] = array(
       'key'   => 'created_by',
       'value' => $userId
     );
     return GFAPI::get_entries($formId, $search_criteria);
+  }
+
+  /**
+   * Returns the form object of all created forms
+   * 
+   * @return  Array
+   */
+  public static function exists()
+  {
+    return class_exists("GFAPI");
   }
 }
