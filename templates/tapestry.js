@@ -102,6 +102,9 @@ function tapestryTool(config){
                 if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
                     tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
                 }
+                if (typeof tapestry.dataset.nodes[i].lockedImageURL != "undefined" && tapestry.dataset.nodes[i].lockedImageURL.length > 0) {
+                    tapestry.dataset.nodes[i].lockedImageURL = tapestry.dataset.nodes[i].lockedImageURL.replace(/(http(s?)):\/\//gi, '//');
+                }
             }
         }
 
@@ -917,11 +920,15 @@ function tapestryTool(config){
             .attr("rx", function (d) {
                 if (d.hideProgress && d.imageURL.length) {
                     return 0;
+                } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                    return 0;
                 }
                 return getRadius(d);
             })
             .attr("ry", function (d) {
                 if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
                     return 0;
                 }
                 return getRadius(d);
@@ -958,6 +965,8 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
+                if (!d.accessible && d.lockedImageURL && d.lockedImageURL.length)
+                    return "url('#node-locked-thumb-" + d.id + "')";
                 if (!d.accessible)
                     return COLOR_LOCKED;
                 if (d.imageURL && d.imageURL.length)
@@ -975,7 +984,8 @@ function tapestryTool(config){
         nodes.append("circle")
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
-                return !(d.hideProgress && d.imageURL.length);
+                // or no overlay if node is locked and has a locked image
+                return !(d.hideProgress && d.imageURL.length) || (!d.accessible && d.lockedImageURL.length);
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
@@ -1034,6 +1044,34 @@ function tapestryTool(config){
             .attr("preserveAspectRatio", "xMidYMid slice")
             .attr("xlink:href", function (d) {
                 return d.imageURL;
+            });
+        
+        
+        nodes.append("defs")
+            .append("pattern")
+            .attr("id", function (d) {
+                return "node-locked-thumb-" + d.id;
+            })
+            .attr("data-id", function (d) {
+                return d.id;
+            })
+            .attr("pattenUnits", "userSpaceOnUse")
+            .attr("height", 1)
+            .attr("width", 1)
+            .append("image")
+            .attr("height", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("width", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("preserveAspectRatio", "xMidYMid slice")
+            .attr("xlink:href", function (d) {
+                return d.lockedImageURL;
             });
 
         /* Add path and button */
@@ -1186,11 +1224,15 @@ function tapestryTool(config){
                 .attr("rx", function (d) {
                     if (d.hideProgress && d.imageURL.length) {
                         return 0;
+                    } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                        return 0;
                     }
                     return getRadius(d);
                 })
                 .attr("ry", function (d) {
                     if (d.hideProgress && d.imageURL.length) {
+                        return 0;
+                    } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
                         return 0;
                     }
                     return getRadius(d);
@@ -1217,6 +1259,8 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
+                    if (!d.accessible && d.lockedImageURL && d.lockedImageURL.length)
+                        return "url('#node-locked-thumb-" + d.id + "')";
                     if (!d.accessible)
                         return COLOR_LOCKED;
                     if (d.imageURL.length)
@@ -1322,6 +1366,7 @@ function tapestryTool(config){
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
                     ' data-thumb="' + d.imageURL + '"' +
+                    ' data-locked-thumb="' + d.lockedImageURL + '"' +
                     ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
@@ -1691,9 +1736,9 @@ function tapestryTool(config){
         if (node.nodeType === "grandchild") {
             base += " grandchild";
         }
-        if (node.imageURL.length === 0) {
+        if ((node.imageURL.length === 0 && node.accessible) || (node.lockedImageURL.length === 0 && !node.accessible)) {
             base += " imageOverlay--no-image";
-        }
+        } 
         return base;
     }
 
@@ -1704,7 +1749,7 @@ function tapestryTool(config){
             return COLOR_GRANDCHILD;
         if (!node.accessible)
             return COLOR_LOCKED;
-        if (node.imageURL.length === 0)
+        if ((node.imageURL.length === 0 && node.accessible) || (node.lockedImageURL.length === 0 && !node.accessible))
             return COLOR_BLANK;
         return COLOR_STROKE;
     }
@@ -2112,6 +2157,11 @@ tapestryTool.prototype.updateNodeImage = updateNodeImage;
 
 function updateNodeImage(id, src) {
     const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
+
+function updateNodeLockedImage(id, src) {
+    const image = document.querySelector(`#node-locked-thumb-${id} > image`)
     image.setAttribute("href", src)
 }
 
