@@ -1323,6 +1323,9 @@ function tapestryTool(config){
                 })
                 .attr("y", function (d) {
                     return - getRadius(d) - 50;
+                })
+                .attr("style", (d) => {
+                    return d.tydeProgress === 0 ? "display: none;" : ""
                 });
 
         // TYDE ONLY - update planet icon size and position
@@ -1630,6 +1633,9 @@ function tapestryTool(config){
                     return - ((getRadius(d) * 1.3) / 2);
                 }
                 return - getRadius(d) * 0.8
+            })
+            .attr("style", (d) => {
+                return d.tydeProgress === 0 ? "display: none;" : ""
             });
             
             // TYDE ONLY - Update progress bar based on foreign object
