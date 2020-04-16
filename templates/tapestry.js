@@ -1060,7 +1060,11 @@ function tapestryTool(config){
                 return getRadius(d) / 7;
             })
             .attr("x", function (d) {
-                return - getRadius(d) * 0.8;
+                // If there is no planet view icon, center the bar
+                if(!visiblePlanetViewIconHasUrl(d)){
+                    return - ((getRadius(d) * 1.3) / 2);
+                }
+                return - getRadius(d) * 0.8
             })
             .attr("y", function (d) {
                 return - getRadius(d) - 50;
@@ -1080,7 +1084,7 @@ function tapestryTool(config){
         // TYDE ONLY - Add spaceship planet view icon
         nodes.append("foreignObject")
             .filter(function (d){
-                return getViewable(d) && d.tydeType === "Module";
+                return getViewable(d) && d.tydeType === "Module"
             })
             .attr("width", function (d) {
                 return getRadius(d) / 2;
@@ -1098,6 +1102,9 @@ function tapestryTool(config){
                 return d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
             })
             .attr("class", "tyde-module-planet-icon")
+            .attr("style", (d) => {
+                return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
+            })
             .html(function(d){
                 let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
                 let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
@@ -1308,7 +1315,11 @@ function tapestryTool(config){
                     return getRadius(d) / 7;
                 })
                 .attr("x", function (d) {
-                    return - getRadius(d) * 0.8;
+                    // If there is no planet view icon, center the bar
+                    if(!visiblePlanetViewIconHasUrl(d)){
+                        return - ((getRadius(d) * 1.3) / 2);
+                    }
+                    return - getRadius(d) * 0.8
                 })
                 .attr("y", function (d) {
                     return - getRadius(d) - 50;
@@ -1329,6 +1340,9 @@ function tapestryTool(config){
                 })
                 .attr("y", function (d) {
                     return - getRadius(d) * 1.2 - 45;
+                })
+                .attr("style", (d) => {
+                    return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
                 });
         
         /* Attach images to be used within each node */
@@ -1605,8 +1619,17 @@ function tapestryTool(config){
             
             // TYDE ONLY - Update the progress attribute for modules's foreign object
             nodes.selectAll(".tyde-module-progress")
+            .transition()
+            .duration(TRANSITION_DURATION)
             .attr("progress", function (d) {
                 return d.tydeProgress*100;
+            })
+            .attr("x", (d) => {
+                // If there is no planet view icon, center the bar
+                if(!visiblePlanetViewIconHasUrl(d)){
+                    return - ((getRadius(d) * 1.3) / 2);
+                }
+                return - getRadius(d) * 0.8
             });
             
             // TYDE ONLY - Update progress bar based on foreign object
@@ -1625,6 +1648,9 @@ function tapestryTool(config){
             
             // TYDE ONLY - Reassign the planet view icon incase of module completion
             nodes.selectAll(".tyde-module-planet-icon")
+                .attr("style", (d) => {
+                    return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
+                })
                 .html(function(d){
                     let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
                     let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
@@ -2216,6 +2242,13 @@ function tapestryTool(config){
 
     function canEditLink(d) {
         return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
+    }
+
+    // TYDE ONLY
+    function visiblePlanetViewIconHasUrl(d) {
+        return d.tydeProgress === 1 ? 
+                d.typeData.planetViewEarnedIconUrl !== "" && d.typeData.planetViewEarnedIconUrl.length > 0 :
+                d.typeData.planetViewNotEarnedIconUrl !== "" && d.typeData.planetViewNotEarnedIconUrl.length > 0
     }
     
 } // END OF TAPESTRY TOOL CLASS
