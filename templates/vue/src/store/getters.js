@@ -68,19 +68,19 @@ export function getProfileActivities({ nodes, settings }) {
         activities.push(question)
       })
   })
-  // Maintain order of the activities from settings.profileActivities
-  let orderedActivities = []
-  settings.profileActivities.forEach(key => {
-    let found = false
-    activities = activities.filter(question => {
-      if (!found && question.id === key.activityRef) {
-        orderedActivities.push(question)
-        found = true
-        return false
-      } else return true
-    })
-  })
-  return orderedActivities
+
+  // Go through profile activities in settings and add related answers if there
+  // Profile activites may have repeat activities and have a specific sort order
+  let profileActivities = []
+  for (let profileQuestion of settings.profileActivities) {
+    for (let questionWithAnswer of activities) {
+      if (questionWithAnswer.id === profileQuestion.activityRef) {
+        profileActivities.push(questionWithAnswer)
+        break
+      }
+    }
+  }
+  return profileActivities
 }
 
 export function getQuestion(state) {

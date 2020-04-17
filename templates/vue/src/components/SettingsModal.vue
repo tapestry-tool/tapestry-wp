@@ -48,33 +48,56 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Profile">
-          <div v-for="(activity, index) in profileActivities" :key="index">
-            <b-row align-v="center" class="mb-2 mx-0">
-              <b-button
-                class="ml-auto"
-                size="sm"
-                variant="outline-danger"
-                @click="deleteActivity(index)"
-              >
-                Delete
-              </b-button>
-            </b-row>
-            <b-form-group label="Choose an activity">
-              <combobox
-                v-model="activity.activityRef"
-                :options="activities"
-                item-text="text"
-                item-value="id"
-                empty-message="There are no activities yet."
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    {{ slotProps.option.text }}
-                  </p>
-                </template>
-              </combobox>
-            </b-form-group>
-          </div>
+          <slick-list
+            :value="profileActivities"
+            lock-axis="y"
+            @input="updateProfileOrdering"
+          >
+            <slick-item
+              v-for="(activity, index) in profileActivities"
+              :key="index"
+              :index="index"
+              class="slick-list-item"
+              style="z-index: 9999 !important;"
+            >
+              <b-row align-v="center" class="m-0">
+                <b-input-group class="mb-3">
+                  <b-input-group-prepend is-text>
+                    <span class="fas fa-bars fa-xs"></span>
+                  </b-input-group-prepend>
+                  <b-form-group class="mb-0" style="flex:auto;">
+                    <combobox
+                      :key="`profile-${index}-${activity.activityRef}`"
+                      :value="activity.activityRef"
+                      :options="activities"
+                      item-text="text"
+                      item-value="id"
+                      placeholder="Choose activity"
+                      empty-message="There are no activities yet."
+                      @change="profileActivities[index].activityRef = $event"
+                      class="mb-0"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.text }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                  <b-input-group-append>
+                    <b-button
+                      size="md"
+                      variant="danger"
+                      style="height: calc(2.2em + 3px);"
+                      @click="deleteActivity(index)"
+                    >
+                      Delete
+                    </b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-row>
+            </slick-item>
+          </slick-list>
           <b-row class="mx-0">
             <b-button variant="primary" @click="addActivity">
               <i class="fas fa-plus icon"></i>
@@ -104,12 +127,15 @@
 import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import Combobox from "../components/Combobox"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
     Combobox,
+    SlickList,
+    SlickItem,
   },
   props: {
     wpCanEditTapestry: {
@@ -158,6 +184,9 @@ export default {
     },
     deleteActivity(index) {
       this.profileActivities.splice(index, 1)
+    },
+    updateProfileOrdering(arr) {
+      this.profileActivities = [...arr]
     },
     getSettings() {
       const {
