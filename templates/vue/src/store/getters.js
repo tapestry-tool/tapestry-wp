@@ -46,6 +46,43 @@ export function getActivities(state) {
   }
 }
 
+export function getProfileActivities({ nodes, settings }) {
+  let activities = []
+  let nodesWithQuestions = nodes.filter(
+    node =>
+      node.quiz &&
+      node.quiz.some(
+        question => question.entries && Object.keys(question.entries).length > 0
+      )
+  )
+  nodesWithQuestions.forEach(node => {
+    node.quiz
+      .filter(
+        question =>
+          question.entries &&
+          settings.profileActivities.find(item =>
+            node.quiz.find(question => item.activityRef === question.id)
+          )
+      )
+      .forEach(question => {
+        activities.push(question)
+      })
+  })
+
+  // Go through profile activities in settings and add related answers if there
+  // Profile activites may have repeat activities and have a specific sort order
+  let profileActivities = []
+  for (let profileQuestion of settings.profileActivities) {
+    for (let questionWithAnswer of activities) {
+      if (questionWithAnswer.id === profileQuestion.activityRef) {
+        profileActivities.push(questionWithAnswer)
+        break
+      }
+    }
+  }
+  return profileActivities
+}
+
 export function getQuestion(state) {
   return id => {
     const node = state.nodes
