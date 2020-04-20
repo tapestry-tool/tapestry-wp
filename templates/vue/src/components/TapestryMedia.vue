@@ -142,7 +142,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
     ...mapMutations(["updateTydeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true

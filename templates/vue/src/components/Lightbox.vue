@@ -178,13 +178,13 @@ export default {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
     complete() {
       this.completeNode(this.nodeId)
-      this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
-      if (width && height) {
+    handleLoad(dim) {
+      if (dim) {
+        const { width, height } = dim
         this.updateDimensions({ width, height })
       }
     },

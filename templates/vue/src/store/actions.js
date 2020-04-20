@@ -51,13 +51,6 @@ export async function updateNodeProgress({ commit, getters }, payload) {
 }
 
 export async function completeNode({ commit, dispatch, getters }, nodeId) {
-  commit("updateNode", {
-    id: nodeId,
-    newNode: { completed: true },
-  })
-  await client.completeNode(nodeId)
-  thisTapestryTool.updateAccordionProgress()
-
   const node = getters.getNode(nodeId)
   if (Helpers.canUserUpdateProgress(node)) {
     await client.completeNode(nodeId)
@@ -73,6 +66,7 @@ export async function completeNode({ commit, dispatch, getters }, nodeId) {
       thisTapestryTool.updateProgressBars()
     }
     dispatch("updateMayUnlockNodes", nodeId)
+    thisTapestryTool.updateAccordionProgress()
   }
 }
 
