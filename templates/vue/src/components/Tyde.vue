@@ -1,6 +1,7 @@
 <template>
   <div id="tyde">
     <tapestry />
+    <tyde-star-celebration />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>
@@ -10,6 +11,7 @@
 import Tapestry from "./Tapestry"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
+import TydeStarCelebration from "./tyde/TydeStarCelebration"
 
 export default {
   name: "tyde",
@@ -17,6 +19,7 @@ export default {
     Tapestry,
     TydeModule,
     TydeSpaceship,
+    TydeStarCelebration,
   },
   data() {
     return {
@@ -28,6 +31,7 @@ export default {
     window.addEventListener("start-module", evt => {
       this.showModule = !this.showModule
       this.moduleId = evt.detail
+      this.$store.commit("updateSelectedModule", this.moduleId)
     })
   },
 }
