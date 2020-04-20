@@ -52,7 +52,8 @@ function tapestryTool(config){
                                                                 // of children of each node at the given depth
         autoLayout = false,
         selection = null,                                       // a set containing the currently selected nodes
-        isMultiSelect = false;                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
+        isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
+        allowSelection = true;                                  // enables/disables node multi selection
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -305,6 +306,14 @@ function tapestryTool(config){
         initializeDragSelect();
     }
 
+    this.disableSelection = () => {
+        allowSelection = false;
+    }
+
+    this.allowSelection = () => {
+        allowSelection = true;
+    }
+
     this.resetNodeCache = function() {
         childrenOfNodeAtDepth = {}
     }
@@ -436,20 +445,24 @@ function tapestryTool(config){
     isMultiSelect = false;
 
     document.addEventListener("keydown", evt => {
-        if (evt.code === "Escape") {
-            selection.clear();
-        }
-        if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
-            isMultiSelect = true;
-            if (evt.code === "KeyA") {
-                evt.preventDefault();
-                tapestry.dataset.nodes.forEach(d => selection.add(d));
+        if (allowSelection) {
+            if (evt.code === "Escape") {
+                selection.clear();
+            }
+            if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+                isMultiSelect = true;
+                if (evt.code === "KeyA") {
+                    evt.preventDefault();
+                    tapestry.dataset.nodes.forEach(d => selection.add(d));
+                }
             }
         }
     });
 
     document.addEventListener("keyup", () => {
-        isMultiSelect = false;
+        if (allowSelection) {
+            isMultiSelect = false;
+        }
     });
 
     function createSelection() {
@@ -660,22 +673,24 @@ function tapestryTool(config){
     }
 
     function dragstarted(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
+        if (allowSelection) {
+            if(!config.wpCanEditTapestry &&
+                tapestry.dataset.settings.nodeDraggable === false) {
+                return;
+            }
+     
+            if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+    
+            if (!selection.size()) {
+                selection.add(d)
+            }
+            if (!selection.has(d) && !isMultiSelect) {
+                selection.clear();
+                selection.add(d);
+            }
+            nodesBeforeDrag = Array.from(selection)
+            recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
- 
-        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
-        if (!selection.size()) {
-            selection.add(d)
-        }
-        if (!selection.has(d) && !isMultiSelect) {
-            selection.clear();
-            selection.add(d);
-        }
-        nodesBeforeDrag = Array.from(selection)
-        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
     function dragged(d) {
@@ -975,8 +990,10 @@ function tapestryTool(config){
                 }
             },
             onElementSelect: node => {
-                const id = node.id.split("node-")[1]
-                selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+                if (allowSelection) {
+                    const id = node.id.split("node-")[1]
+                    selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+                }
             },
             onElementUnselect: node => {
                 const id = node.id.split("node-")[1]
