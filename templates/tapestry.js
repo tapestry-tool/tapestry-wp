@@ -698,15 +698,10 @@ function tapestryTool(config){
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
-
-        const xBeforeDrag = d[xORfx]
-        const yBeforeDrag = d[yORfy]
-        const deltaX = d3.event.x - xBeforeDrag
-        const deltaY = d3.event.y - yBeforeDrag
         selection.forEach(nd => {
             if (canEditNode(nd)) {
-                nd[xORfx] = getBoundedCoord(nd[xORfx] + deltaX, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-                nd[yORfy] = getBoundedCoord(nd[yORfy] + deltaY, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
+                nd[xORfx] = nd[xORfx] + d3.event.dx;
+                nd[yORfy] = nd[yORfy] + d3.event.dy;
             } else {
                 nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
                 nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
