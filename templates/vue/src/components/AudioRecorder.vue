@@ -89,7 +89,9 @@ export default {
     },
     hasPrevious() {
       return (
-        this.question.entries.audioId && this.question.entries.audioId.length > 0
+        this.question.entries &&
+        this.question.entries.audioId &&
+        this.question.entries.audioId.length > 0
       )
     },
     states() {
