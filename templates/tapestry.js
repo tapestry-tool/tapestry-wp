@@ -699,13 +699,8 @@ function tapestryTool(config){
             return;
         }
         selection.forEach(nd => {
-            if (canEditNode(nd)) {
-                nd[xORfx] = nd[xORfx] + d3.event.dx;
-                nd[yORfy] = nd[yORfy] + d3.event.dy;
-            } else {
-                nd[xORfx] = getBoundedCoord(nd.x, tapestryDimensionsBeforeDrag.width);
-                nd[yORfy] = getBoundedCoord(nd.y, tapestryDimensionsBeforeDrag.height);
-            }
+            nd[xORfx] = nd[xORfx] + d3.event.dx;
+            nd[yORfy] = nd[yORfy] + d3.event.dy;
         })
     }
 
