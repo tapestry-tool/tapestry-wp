@@ -74,8 +74,8 @@
                       item-value="id"
                       placeholder="Choose activity"
                       empty-message="There are no activities yet."
-                      @change="profileActivities[index].activityRef = $event"
                       class="mb-0"
+                      @change="profileActivities[index].activityRef = $event"
                     >
                       <template v-slot="slotProps">
                         <p>

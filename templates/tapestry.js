@@ -1127,6 +1127,7 @@ function tapestryTool(config){
     }
 
     function renderTooltips() {
+        const tooltipWidth = d => Math.min(getRadius(d) * 5 + 48, 600)
         nodes
             .filter(d => !d.accessible)
             .append("foreignObject")
@@ -1134,10 +1135,10 @@ function tapestryTool(config){
             .style("position", "relative")
             .style("pointer-events", "none")
             .style("opacity", 0)
-            .attr("width", d => Math.min(getRadius(d) * 5 + 48, 600))
+            .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
-            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .attr("x", d => -(tooltipWidth(d) / 2))
+            .attr("y", d => -(getRadius(d) * 4 + 36))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
             .html(getTooltipHtml)

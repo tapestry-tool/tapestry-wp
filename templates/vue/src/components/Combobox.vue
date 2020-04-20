@@ -2,8 +2,8 @@
   <b-form-group>
     <b-form-input
       ref="input"
-      :placeholder="placeholder"
       v-model="inputValue"
+      :placeholder="placeholder"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
