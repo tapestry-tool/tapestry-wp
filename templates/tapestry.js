@@ -50,7 +50,9 @@ function tapestryTool(config){
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
-        autoLayout = false, selection = null, isMultiSelect = false;
+        autoLayout = false,
+        selection = null,                                       // a set containing the currently selected nodes
+        isMultiSelect = false;                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -610,6 +612,53 @@ function tapestryTool(config){
     /****************************************************
      * D3 RELATED FUNCTIONS
      ****************************************************/
+
+    /* Define forces that will determine the layout of the graph */
+    function startSimulation() {
+
+        if (autoLayout) {
+            d3.selectAll('g.node').each(function(d){
+                delete d.fx;
+                delete d.fy;
+            });
+        }
+
+        var tapestryDimensions = tapestry.getTapestryDimensions();
+        var nodes = tapestry.dataset.nodes;
+
+        simulation = d3.forceSimulation(nodes)
+
+            // "charge" and forceManyBody determine the the repulsion/attraction strength
+            .force("charge", d3.forceManyBody().strength(-4000))
+
+            // establish links, the function sets IDs as endpoints, rather than indexes
+            .force("link", d3.forceLink(tapestry.dataset.links).id(function(d) {
+                return d.id;
+            }))
+
+            // slow down the nodes from spinning
+            .velocityDecay(0.99)
+
+            // "center" determines where the center of gravity is
+            .force("center", d3.forceCenter()
+                .x(tapestryDimensions.width / 2)
+                .y(tapestryDimensions.height / 2))
+
+            // determines the minimum distance that nodes are allowed to be positioned at
+            .force("collision", d3.forceCollide().radius(function (d) {
+                if (root === d.id) {
+                    return MAX_RADIUS;
+                }
+                else {
+                    return (MAX_RADIUS - 25);
+                }
+            }));
+
+        simulation
+            .nodes(tapestry.dataset.nodes)
+            .on("tick", ticked);
+    }
+
     function dragstarted(d) {
         if(!config.wpCanEditTapestry &&
             tapestry.dataset.settings.nodeDraggable === false) {
@@ -682,52 +731,6 @@ function tapestryTool(config){
 
         updateSvgDimensions();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
-    }
-
-    /* Define forces that will determine the layout of the graph */
-    function startSimulation() {
-
-        if (autoLayout) {
-            d3.selectAll('g.node').each(function(d){
-                delete d.fx;
-                delete d.fy;
-            });
-        }
-
-        var tapestryDimensions = tapestry.getTapestryDimensions();
-        var nodes = tapestry.dataset.nodes;
-
-        simulation = d3.forceSimulation(nodes)
-
-            // "charge" and forceManyBody determine the the repulsion/attraction strength
-            .force("charge", d3.forceManyBody().strength(-4000))
-
-            // establish links, the function sets IDs as endpoints, rather than indexes
-            .force("link", d3.forceLink(tapestry.dataset.links).id(function(d) {
-                return d.id;
-            }))
-
-            // slow down the nodes from spinning
-            .velocityDecay(0.99)
-
-            // "center" determines where the center of gravity is
-            .force("center", d3.forceCenter()
-                .x(tapestryDimensions.width / 2)
-                .y(tapestryDimensions.height / 2))
-
-            // determines the minimum distance that nodes are allowed to be positioned at
-            .force("collision", d3.forceCollide().radius(function (d) {
-                if (root === d.id) {
-                    return MAX_RADIUS;
-                }
-                else {
-                    return (MAX_RADIUS - 25);
-                }
-            }));
-
-        simulation
-            .nodes(tapestry.dataset.nodes)
-            .on("tick", ticked);
     }
 
     //Resize all nodes, where id is now the selected node
