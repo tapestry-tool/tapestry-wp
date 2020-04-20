@@ -131,6 +131,9 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function getUserEntries($formId = 0)
     {
+        if (!class_exists("GFAPI")) {
+          return [];
+        }
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
             'value' => $this->_userId

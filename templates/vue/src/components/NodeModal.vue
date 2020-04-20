@@ -38,6 +38,9 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -130,12 +133,17 @@
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
+              <span v-if="!this.gravityFormExists" class="text-muted">
+                Gravity Forms plugin is not installed. Please install Gravity Forms
+                to use this content type.
+              </span>
               <combobox
+                v-else
                 v-model="selectedGravityFormContent"
                 data-testid="combobox-gravity-form"
                 item-text="title"
                 item-value="id"
-                empty-message="There are no forms available. Please add one in your WP dashboard."
+                empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
                 :options="gravityFormOptions"
               >
                 <template v-slot="slotProps">
@@ -320,7 +328,10 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
-        <b-tab v-if="node.mediaType === 'accordion'" title="Ordering">
+        <b-tab
+          v-if="node.mediaType === 'accordion' || hasSubAccordion"
+          title="Ordering"
+        >
           <div>
             <slick-list
               :value="node.childOrdering"
@@ -364,12 +375,12 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
-import { mapGetters, mapMutations } from "vuex"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
@@ -423,10 +434,10 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
-        { value: "gravity-form", text: "Gravity Form" },
         { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
+      gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
       selectedGravityFormContent: "",
@@ -439,7 +450,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    hasSubAccordion() {
+      const parents = this.getDirectParents(this.node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(this.node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -484,6 +504,7 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
         { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
@@ -514,6 +535,12 @@ export default {
     },
   },
   async mounted() {
+    this.gravityFormExists = await GravityFormsApi.exists()
+    this.mediaTypes.push({
+      value: "gravity-form",
+      text: "Gravity Form",
+      disabled: !this.gravityFormExists,
+    })
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
     this.wpPosts = await WordpressApi.getPosts()

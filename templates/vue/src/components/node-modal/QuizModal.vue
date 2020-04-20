@@ -87,13 +87,20 @@
                 </b-col>
                 <b-col cols="12" md="4">
                   <b-form-group label="Textbox Gravity Form" class="mb-0">
+                    <b-form-input
+                      v-if="!gavityFormExists"
+                      :disabled="true"
+                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
+                      value="Not Available"
+                    />
                     <combobox
+                      v-else
                       v-model="question.answers.textId"
                       :data-testid="`question-answer-textbox-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"
-                      empty-message="There are no forms available. Please add one in your WP dashboard."
+                      empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
                       @focus="wasFocused = true"
                     >
                       <template v-slot="slotProps">
@@ -107,7 +114,14 @@
                 </b-col>
                 <b-col cols="12" md="4">
                   <b-form-group label="Checklist Gravity Form" class="mb-0">
+                    <b-form-input
+                      v-if="!gavityFormExists"
+                      :disabled="true"
+                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
+                      value="Not Available"
+                    />
                     <combobox
+                      v-else
                       v-model="question.answers.checklistId"
                       :options="formOptions"
                       item-text="title"
@@ -191,6 +205,7 @@ export default {
   data() {
     return {
       canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
+      gavityFormExists: false,
       formOptions: [],
       h5pOptions: [],
       questions: this.node.quiz,
@@ -219,8 +234,8 @@ export default {
     },
   },
   async mounted() {
-    const forms = await GravityFormsApi.getAllForms()
-    this.formOptions = forms
+    this.gavityFormExists = await GravityFormsApi.exists()
+    this.formOptions = await GravityFormsApi.getAllForms()
   },
   methods: {
     addQuestion() {

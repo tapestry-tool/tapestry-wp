@@ -59,6 +59,13 @@ $REST_API_ENDPOINTS = [
             'callback'  => 'getTapestry'
         ]
     ],
+    'GET_GF_EXISTS'  => (object) [
+        'ROUTE'     => '/gf/exists',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getGfExists'
+        ]
+    ],
     'GET_GF_FORMS'  => (object) [
         'ROUTE'     => '/gf/forms',
         'ARGUMENTS' => [
@@ -288,6 +295,16 @@ function getAllH5P()
     try {
         $controller = new TapestryH5P();
         return $controller->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getGfExists()
+{
+    try {
+        $tapestryForms = new TapestryForm();
+        return TapestryForm::exists();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
