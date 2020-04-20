@@ -20,13 +20,22 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  background: #262626;
-  border-radius: 4px;
-  padding: 8px 16px;
+  background: #643493;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 8px;
 
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  box-shadow: 4px 8px 8px rgba(0, 0, 0, 0.16);
 }
 </style>

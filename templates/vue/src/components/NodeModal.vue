@@ -38,6 +38,10 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <tyde-type-input :node="node" :parent="parent" />
+            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -75,7 +79,7 @@
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video URL"
+              :label="videoLabel"
             >
               <file-upload
                 id="node-video-media-url"
@@ -84,6 +88,9 @@
                 placeholder="Enter URL for MP4 Video"
                 required
               />
+              <b-form-text v-if="showVideoDescription">
+                This video should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
@@ -97,7 +104,7 @@
                 required
               />
             </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
+            <b-form-group v-show="nodeType === 'h5p'" :label="h5pLabel">
               <combobox
                 v-model="selectedH5pContent"
                 item-text="title"
@@ -112,6 +119,9 @@
                   </p>
                 </template>
               </combobox>
+              <b-form-text v-if="showVideoDescription">
+                This H5P should not include any screenshots of the stage layout.
+              </b-form-text>
             </b-form-group>
             <b-form-group
               v-show="nodeType === 'h5p'"
@@ -214,6 +224,11 @@
                 data-testid="node-appearance-hide-media"
               >
                 Hide media button
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="node.showInBackpack">
+                Show in backpack
               </b-form-checkbox>
             </b-form-group>
             <h6 class="mt-4 mb-3 text-muted">Content Appearance</h6>
@@ -320,6 +335,147 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
+        <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
+          <div id="modal-spaceship-icons">
+            <h6 class="mb-3 text-muted">Planet View Icon</h6>
+            <b-form-group label="Not earned">
+              <file-upload
+                v-model="node.typeData.planetViewNotEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Earned">
+              <file-upload
+                v-model="node.typeData.planetViewEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <h6 class="mb-3 text-muted">Spaceship Cockpit Image</h6>
+            <b-form-group label="Not earned">
+              <file-upload
+                v-model="node.typeData.spaceshipPartNotEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Earned">
+              <file-upload
+                v-model="node.typeData.spaceshipPartEarnedIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <b-form-group label="Hover">
+              <file-upload
+                v-model="node.typeData.spaceshipPartHoverIconUrl"
+                placeholder="Enter link (starting with http)"
+              />
+            </b-form-group>
+            <h6 class="mb-3 text-muted">
+              Spaceship Part Coordinates and Size in Cockpit
+            </h6>
+            <b-row id="node-spaceship-parts" class="mb-4">
+              <b-col sm="5" class="pt-2">
+                Distance from upper left-hand corner:
+              </b-col>
+              <b-col>
+                <b-input-group
+                  prepend="X: "
+                  append="%"
+                  label-for="node-spaceship-part-x"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-x"
+                    v-model="node.typeData.spaceshipPartX"
+                    placeholder="In Percentage (top left)"
+                    type="number"
+                    min="0"
+                    max="100"
+                  />
+                </b-input-group>
+              </b-col>
+              <b-col>
+                <b-input-group
+                  prepend="Y: "
+                  append="%"
+                  label-for="node-spaceship-part-y"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-y"
+                    v-model="node.typeData.spaceshipPartY"
+                    placeholder="In Percentage (top left)"
+                    type="number"
+                    min="0"
+                    max="100"
+                  />
+                </b-input-group>
+              </b-col>
+            </b-row>
+            <b-row id="node-spaceship-parts">
+              <b-col sm="5" class="pt-2">
+                Dimensions of image:
+              </b-col>
+              <b-col>
+                <b-input-group
+                  prepend="Width: "
+                  append="%"
+                  label-for="node-spaceship-part-width"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-width"
+                    v-model="node.typeData.spaceshipPartWidth"
+                    placeholder="In percentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                  />
+                </b-input-group>
+              </b-col>
+              <b-col>
+                <b-input-group
+                  prepend="Height: "
+                  append="%"
+                  label-for="node-spaceship-part-height"
+                >
+                  <b-form-input
+                    id="node-spaceship-part-height"
+                    v-model="node.typeData.spaceshipPartHeight"
+                    placeholder="In percentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                  />
+                </b-input-group>
+              </b-col>
+            </b-row>
+          </div>
+        </b-tab>
+        <b-tab
+          v-if="
+            node.tydeType === tydeTypes.MODULE ||
+              node.mediaType === 'accordion' ||
+              hasSubAccordion
+          "
+          title="Ordering"
+        >
+          <div>
+            <slick-list
+              :value="node.childOrdering"
+              lock-axis="y"
+              @input="updateOrderingArray"
+            >
+              <slick-item
+                v-for="(id, index) in node.childOrdering"
+                :key="index"
+                class="slick-list-item"
+                :index="index"
+                style="z-index: 9999 !important;"
+              >
+                <span class="fas fa-bars fa-xs"></span>
+                <span>{{ getNode(id).title }}</span>
+                <span style="color: grey;">id: {{ id }}</span>
+              </slick-item>
+            </slick-list>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -327,10 +483,15 @@
         v-show="modalType === 'edit-node'"
         size="sm"
         variant="danger"
+        :disabled="disableDeleteButton"
         @click="$emit('delete-node')"
       >
         Delete Node
       </b-button>
+      <p v-if="disableDeleteButton" class="disable-message text-muted">
+        You cannot delete this node because this {{ node.tydeType }} node still has
+        children.
+      </p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
@@ -343,15 +504,19 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
+import { tydeTypes } from "../utils/constants"
+import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
   name: "node-modal",
@@ -359,11 +524,19 @@ export default {
     AccordionForm,
     Combobox,
     QuizModal,
+    TydeTypeInput,
     ConditionsForm,
     FileUpload,
+    SlickItem,
+    SlickList,
   },
   props: {
     node: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    parent: {
       type: Object,
       required: false,
       default: () => ({}),
@@ -411,9 +584,56 @@ export default {
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
+      tydeTypes: tydeTypes,
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    videoLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage Video URL",
+        [tydeTypes.MODULE]: "Module Completion Video URL",
+      }
+      return labels[this.node.tydeType] || "Video URL"
+    },
+    h5pLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage H5P Content",
+        [tydeTypes.MODULE]: "Module Completion H5P Content",
+      }
+      return labels[this.node.tydeType] || "H5P Content"
+    },
+    showVideoDescription() {
+      return (
+        this.node.tydeType === tydeTypes.STAGE ||
+        this.node.tydeType === tydeTypes.MODULE
+      )
+    },
+    hasChildren() {
+      if (this.modalType === "edit-node") {
+        return this.getDirectChildren(this.node.id).length > 0
+      } else {
+        return false
+      }
+    },
+    disableDeleteButton() {
+      if (
+        this.node.tydeType === tydeTypes.MODULE ||
+        this.node.tydeType === tydeTypes.STAGE
+      ) {
+        return this.hasChildren
+      }
+      return false
+    },
+    hasSubAccordion() {
+      const parents = this.getDirectParents(this.node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(this.node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -458,6 +678,37 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "tydeType", value: this.node.tydeType },
+        { name: "showInBackpack", value: this.node.showInBackpack },
+        {
+          name: "planetViewNotEarnedIconUrl",
+          value: this.node.typeData.planetViewNotEarnedIconUrl,
+        },
+        {
+          name: "planetViewEarnedIconUrl",
+          value: this.node.typeData.planetViewEarnedIconUrl,
+        },
+        {
+          name: "spaceshipPartNotEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartNotEarnedIconUrl,
+        },
+        {
+          name: "spaceshipPartEarnedIconUrl",
+          value: this.node.typeData.spaceshipPartEarnedIconUrl,
+        },
+        {
+          name: "spaceshipPartHoverIconUrl",
+          value: this.node.typeData.spaceshipPartHoverIconUrl,
+        },
+        { name: "spaceshipPartX", value: this.node.typeData.spaceshipPartX },
+        { name: "spaceshipPartY", value: this.node.typeData.spaceshipPartY },
+        { name: "spaceshipPartWidth", value: this.node.typeData.spaceshipPartWidth },
+        {
+          name: "spaceshipPartHeight",
+          value: this.node.typeData.spaceshipPartHeight,
+        },
+        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
+        { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
     nodeImageUrl() {
@@ -497,6 +748,7 @@ export default {
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
+        this.setInitialTydeType()
         const selectedContent = this.h5pContentOptions.find(content =>
           this.filterContent(content)
         )
@@ -511,6 +763,19 @@ export default {
     })
   },
   methods: {
+    ...mapMutations(["updateOrdering"]),
+    setInitialTydeType() {
+      // only set node types if adding a new node
+      if (this.parent && this.modalType === "add-new-node") {
+        const parentType = this.parent.tydeType
+        this.node.tydeType =
+          parentType === tydeTypes.MODULE
+            ? tydeTypes.STAGE
+            : parentType === tydeTypes.STAGE
+            ? tydeTypes.QUESTION_SET
+            : tydeTypes.REGULAR
+      }
+    },
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
         return false
@@ -537,7 +802,7 @@ export default {
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
       const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
+      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
       }
 
@@ -663,6 +928,12 @@ export default {
         alert("Enter valid user id")
       }
     },
+    updateOrderingArray(arr) {
+      this.updateOrdering({
+        id: this.node.id,
+        ord: arr,
+      })
+    },
   },
 }
 </script>
@@ -714,10 +985,10 @@ table {
     outline: none;
   }
 
-  .form-control {
-    padding: 15px;
-    border: none;
-    background: #f1f1f1;
+  .disable-message {
+    font-size: 0.9em;
+    padding: 0;
+    margin: 0 0 0 8px;
   }
 
   .modal-header-row {
@@ -730,16 +1001,39 @@ table {
       margin-bottom: 0;
     }
   }
+
+  .slick-list-item {
+    display: flex;
+    height: 25px;
+    border: lightgray solid 1.5px;
+    margin: 10px 25px;
+    border-radius: 5px;
+    padding: 15px;
+    align-items: center;
+
+    > span {
+      margin-right: 25px;
+    }
+
+    > span:last-of-type {
+      margin-left: auto;
+    }
+  }
 }
 
-.modal-header-row {
+.slick-list-item {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
+  height: 25px;
+  border: lightgray solid 1.5px;
+  margin: 10px 25px;
+  border-radius: 5px;
+  padding: 15px;
+  align-items: center;
+  > span {
+    margin-right: 25px;
+  }
+  > span:last-of-type {
+    margin-left: auto;
   }
 }
 </style>

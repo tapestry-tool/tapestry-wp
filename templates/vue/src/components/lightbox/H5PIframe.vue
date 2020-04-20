@@ -51,6 +51,7 @@ export default {
       recordedNodeIds: [],
       loadedH5PRecorderId: 0,
       TapestryAPI: new TapestryApi(wpPostId),
+      updateInterval: null,
     }
   },
   computed: {
@@ -206,11 +207,15 @@ export default {
       setIframeDimensions()
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const loadedH5PId = h5pObj.instances[0].contentId
+      const h5pInstance = h5pObj.instances[0]
+      const loadedH5PId = h5pInstance.contentId
+
+      const h5pLibraryName = h5pInstance.libraryInfo.machineName
+
       // Check to see whether this is an H5P recorder
       // If it is, we can emit an event to load the recorded audio (if exists)
       // and terminate
-      if (h5pObj.instances[0].recorder && loadedH5PId) {
+      if (h5pInstance.recorder && loadedH5PId) {
         this.loadedH5PRecorderId = loadedH5PId
         this.h5pRecorderSaverIsLoaded()
         return
@@ -218,110 +223,97 @@ export default {
 
       const mediaProgress = this.node.typeData.progress[0].value
 
-      if (this.node.mediaType === "video") {
-        const h5pVideo = h5pObj.instances[0].video
-        const videoDuration = h5pVideo.getDuration()
-        this.$emit("load", { el: h5pVideo })
+      if (h5pLibraryName === "H5P.InteractiveVideo") {
+        const h5pVideo = h5pInstance.video
+        const h5pIframeComponent = this
 
-        const settings = this.settings
+        h5pVideo.on("loaded", function() {
+          const videoDuration = h5pVideo.getDuration()
+          h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-        let seeked = false
-        let currentPlayedTime
+          const settings = h5pIframeComponent.settings
+          if (mediaProgress >= 1) {
+            h5pIframeComponent.$emit("show-end-screen")
+          }
+          if (settings.volume !== undefined) {
+            h5pVideo.setVolume(settings.volume)
 
-        h5pVideo.seek(mediaProgress * videoDuration)
+            if (settings.muted) {
+              h5pVideo.mute()
+            } else {
+              h5pVideo.unMute()
+            }
 
-        h5pVideo.on("stateChange", event => {
-          switch (event.data) {
-            case h5pObj.Video.PLAYING: {
-              const updateVideoInterval = setInterval(() => {
-                if (
-                  currentPlayedTime !== h5pVideo.getCurrentTime() &&
-                  h5pVideo.getCurrentTime() > 0
-                ) {
-                  currentPlayedTime = h5pVideo.getCurrentTime()
+            h5pVideo.setCaptionsTrack(settings.caption)
+            h5pVideo.setQuality(settings.quality)
+            h5pVideo.setPlaybackRate(settings.playbackRate)
+          }
+          h5pVideo.seek(mediaProgress * videoDuration)
+
+          h5pVideo.on("stateChange", event => {
+            switch (event.data) {
+              case h5pObj.Video.PLAYING: {
+                h5pIframeComponent.updateInterval = setInterval(() => {
+                  const currentPlayedTime = h5pVideo.getCurrentTime()
                   const amountViewed = currentPlayedTime / videoDuration
-
-                  this.$emit("timeupdate", "h5p", amountViewed)
-                  thisTapestryTool.updateProgressBars()
+                  h5pIframeComponent.$emit("timeupdate", amountViewed)
 
                   if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-                    this.$emit("complete")
+                    h5pIframeComponent.$emit("complete")
                   }
 
                   if (amountViewed >= 1) {
-                    this.$emit("show-end-screen")
+                    h5pIframeComponent.$emit("show-end-screen")
                   }
-                } else {
-                  clearInterval(updateVideoInterval)
-                }
-              }, 300)
-
-              if (!seeked) {
-                // Change the video settings to whatever the user had set before
-                if (settings.volume !== undefined) {
-                  h5pVideo.setVolume(settings.volume)
-
-                  if (settings.muted) {
-                    h5pVideo.mute()
-                  } else {
-                    h5pVideo.unMute()
-                  }
-
-                  h5pVideo.setCaptionsTrack(settings.caption)
-                  h5pVideo.setQuality(settings.quality)
-                  h5pVideo.setPlaybackRate(settings.playbackRate)
-                }
-
-                const viewedAmount = mediaProgress * videoDuration
-                if (viewedAmount > 0) {
-                  h5pVideo.seek(viewedAmount)
-                }
-                if (viewedAmount === videoDuration) {
-                  this.$emit("show-end-screen")
-                }
-                seeked = true
+                }, 1000)
+                h5pIframeComponent.handlePlay(h5pIframeComponent.node)
+                break
               }
-              this.handlePlay(this.node)
-              break
-            }
 
-            case h5pObj.Video.PAUSED: {
-              const newSettings = {
-                volume: h5pVideo.getVolume(),
-                muted: h5pVideo.isMuted(),
-                caption: h5pVideo.getCaptionsTrack(),
-                quality: h5pVideo.getQuality(),
-                playbackRate: h5pVideo.getPlaybackRate(),
-                time: h5pVideo.getCurrentTime(),
+              case h5pObj.Video.PAUSED: {
+                if (h5pIframeComponent.updateInterval) {
+                  clearInterval(h5pIframeComponent.updateInterval)
+                }
+                const newSettings = {
+                  volume: h5pVideo.getVolume(),
+                  muted: h5pVideo.isMuted(),
+                  caption: h5pVideo.getCaptionsTrack(),
+                  quality: h5pVideo.getQuality(),
+                  playbackRate: h5pVideo.getPlaybackRate(),
+                  time: h5pVideo.getCurrentTime(),
+                }
+                h5pIframeComponent.handlePause(h5pIframeComponent.node)
+                h5pIframeComponent.$emit("update-settings", newSettings)
+                break
               }
-              seeked = true
-              this.handlePause(this.node)
-              this.$emit("update-settings", newSettings)
-              break
-            }
 
-            case h5pObj.Video.BUFFERING: {
-              const { id, mediaType } = this.node
-              thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
-              break
+              case h5pObj.Video.BUFFERING: {
+                const { id, mediaType } = h5pIframeComponent.node
+                thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
+                break
+              }
             }
+          })
+          if (h5pIframeComponent.autoplay) {
+            setTimeout(() => {
+              h5pVideo.play()
+              thisTapestryTool.recordAnalyticsEvent(
+                "app",
+                "auto-play",
+                "h5p-video",
+                h5pIframeComponent.node.id
+              )
+            }, 1000)
           }
         })
-        if (this.autoplay) {
-          setTimeout(() => {
-            h5pVideo.play()
-            thisTapestryTool.recordAnalyticsEvent(
-              "app",
-              "auto-play",
-              "h5p-video",
-              this.node.id
-            )
-          }, 1000)
-        }
       }
     },
   },
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+#h5p {
+  width: 100% !important;
+}
+</style>

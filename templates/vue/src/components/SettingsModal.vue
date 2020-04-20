@@ -36,6 +36,75 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab title="TYDE">
+          <b-form-group
+            label="Spaceship Cockpit Background"
+            description="Add a background for the spaceship cockpit"
+          >
+            <file-upload
+              v-model="spaceshipBackgroundUrl"
+              placeholder="Enter the URL for the background"
+            />
+          </b-form-group>
+        </b-tab>
+        <b-tab title="Profile">
+          <slick-list
+            :value="profileActivities"
+            lock-axis="y"
+            @input="updateProfileOrdering"
+          >
+            <slick-item
+              v-for="(activity, index) in profileActivities"
+              :key="index"
+              :index="index"
+              class="slick-list-item"
+              style="z-index: 9999 !important;"
+            >
+              <b-row align-v="center" class="m-0">
+                <b-input-group class="mb-3">
+                  <b-input-group-prepend is-text>
+                    <span class="fas fa-bars fa-xs"></span>
+                  </b-input-group-prepend>
+                  <b-form-group class="mb-0" style="flex:auto;">
+                    <combobox
+                      :key="`profile-${index}-${activity.activityRef}`"
+                      :value="activity.activityRef"
+                      :options="activities"
+                      item-text="text"
+                      item-value="id"
+                      placeholder="Choose activity"
+                      empty-message="There are no activities yet."
+                      @change="profileActivities[index].activityRef = $event"
+                      class="mb-0"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.text }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                  <b-input-group-append>
+                    <b-button
+                      size="md"
+                      variant="danger"
+                      style="height: calc(2.2em + 3px);"
+                      @click="deleteActivity(index)"
+                    >
+                      Delete
+                    </b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-row>
+            </slick-item>
+          </slick-list>
+          <b-row class="mx-0">
+            <b-button variant="primary" @click="addActivity">
+              <i class="fas fa-plus icon"></i>
+              Add Activity
+            </b-button>
+          </b-row>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -55,12 +124,18 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
+import Combobox from "../components/Combobox"
+import { SlickList, SlickItem } from "vue-slicksort"
+
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    Combobox,
+    SlickList,
+    SlickItem,
   },
   props: {
     wpCanEditTapestry: {
@@ -74,10 +149,16 @@ export default {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
+      spaceshipBackgroundUrl: "",
+      profileActivities: [],
     }
   },
   computed: {
+    ...mapState(["nodes"]),
     ...mapGetters(["settings"]),
+    activities() {
+      return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
+    },
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -93,21 +174,41 @@ export default {
     closeModal() {
       this.$bvModal.hide("settings-modal")
     },
+    addActivity() {
+      this.profileActivities = [
+        ...this.profileActivities,
+        {
+          activityRef: null,
+        },
+      ]
+    },
+    deleteActivity(index) {
+      this.profileActivities.splice(index, 1)
+    },
+    updateProfileOrdering(arr) {
+      this.profileActivities = [...arr]
+    },
     getSettings() {
       const {
         backgroundUrl = "",
         autoLayout = false,
         nodeDraggable = true,
+        spaceshipBackgroundUrl = "",
+        profileActivities = [],
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
+      this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
+      this.profileActivities = profileActivities
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
         nodeDraggable: this.nodeDraggable,
+        spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
+        profileActivities: this.profileActivities,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)

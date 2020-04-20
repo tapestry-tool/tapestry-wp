@@ -19,6 +19,7 @@
       controls
       :autoplay="autoplay"
       :src="node.typeData.mediaURL"
+      :style="videoStyles"
       @loadeddata="handleLoad"
       @play="handlePlay(node)"
       @pause="handlePause(node)"
@@ -46,10 +47,22 @@ export default {
       type: Object,
       required: true,
     },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     autoplay: {
       type: Boolean,
       required: false,
       default: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
+      validator: val => {
+        return ["width", "height"].every(prop => val.hasOwnProperty(prop))
+      },
     },
   },
   data() {
@@ -57,7 +70,22 @@ export default {
       showPlayScreen: !this.autoplay,
       showEndScreen: this.getInitialEndScreenState(),
       showQuizScreen: false,
+      videoDimensions: null,
     }
+  },
+  computed: {
+    videoStyles() {
+      if (!this.videoDimensions) {
+        return { width: "100%" }
+      }
+      const { height, width } = this.videoDimensions
+      if (width / height > 1) {
+        // Video is wider than it is tall
+        return { width: "100%" }
+      } else {
+        return { height: this.dimensions.height + "px", width: "auto" }
+      }
+    },
   },
   watch: {
     node(newNode, oldNode) {
@@ -103,7 +131,7 @@ export default {
     getInitialEndScreenState() {
       const progress = this.node.typeData.progress[0].value
       if (progress >= 1) {
-        return true
+        return this.allowEndScreen
       }
       if (this.$refs.video) {
         const viewedAmount = progress * this.$refs.video.duration
@@ -132,6 +160,11 @@ export default {
       }
     },
     handleLoad() {
+      const video = this.$refs.video
+      this.videoDimensions = {
+        height: video.videoHeight,
+        width: video.videoWidth,
+      }
       this.updateDimensions()
       this.seek()
     },
@@ -158,13 +191,11 @@ export default {
       const video = this.$refs.video
       if (video) {
         const amountViewed = video.currentTime / video.duration
-        this.$emit("timeupdate", "video", amountViewed)
-
+        this.$emit("timeupdate", amountViewed)
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
           this.$emit("complete")
         }
-
-        if (amountViewed >= 1) {
+        if (amountViewed >= 1 && this.allowEndScreen) {
           this.showEndScreen = true
         }
       }
@@ -179,9 +210,5 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
-
-  video {
-    width: 100%;
-  }
 }
 </style>

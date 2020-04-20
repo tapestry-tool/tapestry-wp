@@ -44,7 +44,7 @@ export default {
     closeButtonStyle: {
       type: Object,
       reuired: false,
-      default: () => {},
+      default: () => ({}),
     },
     allowClose: {
       type: Boolean,

@@ -1,9 +1,6 @@
 <template>
   <button class="button" :disabled="disabled" @click="$emit('click')">
-    <i
-      class="fas fa-check-circle"
-      :class="this.completed ? 'visible' : 'invisible'"
-    ></i>
+    <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
@@ -48,11 +45,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 button {
   padding: 0;
   margin: 0;
-  margin-right: 24px;
-  background: black;
+  margin-right: 16px;
   &:last-child,
   &:only-child {
     margin-right: 0;
@@ -61,14 +59,20 @@ button {
 
 .button {
   padding: 0;
-  background-color: #262626;
+  background-color: $tyde-orange;
   color: white;
   width: 136px;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
+  align-items: normal;
   font-size: 24px;
   transition: all 0.1s ease-out;
+  margin-right: 16px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   i {
     color: white;
@@ -79,7 +83,11 @@ button {
   }
 
   &:hover {
-    background-color: #11a6d8;
+    background-color: $tyde-orange-light;
+  }
+
+  > * {
+    margin-bottom: 16px;
   }
 
   > * {

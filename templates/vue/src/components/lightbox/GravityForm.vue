@@ -49,8 +49,10 @@ export default {
     this.entry = entry
 
     this.loading = false
+    this.$emit("load")
 
     this.disableAutocomplete()
+    this.styleImageUI()
 
     if (this.entry) {
       this.populateForm()
@@ -85,11 +87,9 @@ export default {
       return response.data.includes("gform_confirmation_message")
     },
     populateForm() {
-      const BASE_INPUT_ID = "1"
-      const inputs = Object.entries(this.entry).filter(entry =>
-        entry[0].startsWith(BASE_INPUT_ID)
+      const inputs = Object.entries(this.entry).filter(
+        entry => !isNaN(parseInt(entry[0]))
       )
-
       inputs.forEach(([id, value]) => {
         const inputName = `input_${id}`
         const inputElement = document.getElementsByName(inputName)[0]
@@ -117,6 +117,31 @@ export default {
         input.autocomplete = "off"
       })
     },
+    styleImageUI() {
+      const imageContainer = document.querySelector(".gfield_checkbox")
+      if (imageContainer) {
+        const allImages = imageContainer.childNodes
+        const allImagesArray = Array.from(allImages)
+        allImagesArray.forEach(image => {
+          image.childNodes[1].addEventListener("click", function() {
+            this.parentElement.classList.toggle("image-choices-choice-selected")
+          })
+          image.childNodes[1].addEventListener("focus", function() {
+            this.parentElement.classList.add("image-choices-choice-focus")
+          })
+          image.childNodes[1].addEventListener("blur", function() {
+            this.parentElement.classList.remove("image-choices-choice-focus")
+          })
+          image.addEventListener("mouseover", function() {
+            this.classList.add("image-choices-choice-hover")
+          })
+          image.addEventListener("mouseout", function() {
+            this.classList.remove("image-choices-choice-hover")
+          })
+          image.classList.add("image-choices-choice")
+        })
+      }
+    },
   },
 }
 </script>
@@ -128,7 +153,6 @@ export default {
 }
 
 .gf-form-container {
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

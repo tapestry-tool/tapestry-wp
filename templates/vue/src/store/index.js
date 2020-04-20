@@ -2,6 +2,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 
 import * as actions from "./actions"
+import * as getters from "./getters"
 import * as mutations from "./mutations"
 
 import Helpers from "../utils/Helpers"
@@ -13,6 +14,7 @@ const store = new Vuex.Store({
     groups: [],
     links: [],
     nodes: [],
+    lightbox: null,
     progress: {},
     rootId: null,
     settings: {},
@@ -21,6 +23,7 @@ const store = new Vuex.Store({
     tapestryIsLoaded: false,
   },
   getters: {
+    ...getters,
     selectedNode: state => {
       const { selectedNodeId } = state
       const node = state.nodes[Helpers.findNodeIndex(selectedNodeId, state)]
@@ -32,14 +35,14 @@ const store = new Vuex.Store({
       const links = state.links
       return links.filter(link => link.source.id == id).map(link => link.target.id)
     },
+    getDirectParents: state => id => {
+      return state.links
+        .filter(link => link.target.id == id)
+        .map(link => link.source.id)
+    },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
-    lightbox: state => ({
-      id: state.lightboxId,
-      isOpen: state.isLightboxOpen,
-      el: state.lightboxEl,
-    }),
   },
   mutations,
   actions,

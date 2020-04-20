@@ -24,7 +24,8 @@
       :settings="settings"
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
-      @show-end-screen="showEndScreen = true"
+      @timeupdate="$emit('timeupdate', $event)"
+      @show-end-screen="showEndScreen = allowEndScreen"
     />
   </div>
 </template>
@@ -61,6 +62,11 @@ export default {
     height: {
       type: Number,
       required: true,
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     autoplay: {
       type: Boolean,
@@ -106,7 +112,7 @@ export default {
 .container {
   position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   max-width: 100vw;
   padding: 0;
 }

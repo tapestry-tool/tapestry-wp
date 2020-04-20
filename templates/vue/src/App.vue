@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <tapestry />
+    <tyde />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Tapestry from "./components/Tapestry"
+import Tyde from "./components/Tyde"
 
 export default {
   name: "app",
   components: {
-    Tapestry,
+    Tyde,
   },
   data() {
     return {}

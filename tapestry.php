@@ -246,3 +246,59 @@ function gf_button_ajax_get_form()
     die();
 }
 // End of Gravity Forms Pluggin
+
+// TYDE CUSTOMIZATIONS
+
+register_activation_hook( __FILE__, 'tapestry_activation' );
+function tapestry_activation() {
+    create_copilot_role();
+}
+
+/**
+ * Add the copilot role on plugin activation
+ */
+function create_copilot_role()
+{
+    add_role(
+        'copilot',
+        'Copilot',
+        array(
+            'read'  => true,
+            'edit_posts' => true
+        )
+    );
+}
+
+/**
+ * Show the teen input label if the user is a copilot
+ */
+function add_copilot_teen_field($user) 
+{ 
+    if (in_array("copilot", $user->roles)): ?>
+        <table class="form-table">
+        <tr>
+            <th><label for="teen_id"><?php _e("Teen ID"); ?></label></th>
+            <td>
+                <input type="text" name="teen_id" id="teen_id" value="<?php echo esc_attr( get_the_author_meta('teen_id', $user->ID)); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your teen's user ID."); ?></span>
+            </td>
+        </tr>
+        </table>
+    <?php endif;
+}
+add_action('show_user_profile', 'add_copilot_teen_field');
+add_action('edit_user_profile', 'add_copilot_teen_field');
+
+function save_copilot_teen_field($user_id)
+{
+    if (!current_user_can('edit_user', $user_id)) {
+        return false;
+    }
+    $user = get_user_by('id', $user_id);
+    if (!in_array('copilot', $user->roles)) {
+        return false;
+    }
+    update_user_meta($user_id, 'teen_id', $_POST['teen_id']);
+}
+add_action('personal_options_update', 'save_copilot_teen_field');
+add_action('edit_user_profile_update', 'save_copilot_teen_field');

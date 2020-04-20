@@ -4,12 +4,20 @@
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
     ]"
+    :style="containerStyles"
   >
-    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
+    <text-media
+      v-if="node.mediaType === 'text'"
+      :node="node"
+      @complete="complete"
+      @load="handleLoad"
+    />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
+      :allow-end-screen="allowEndScreen"
+      :dimensions="dimensions"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -29,6 +37,7 @@
       :width="dimensions.width"
       :height="dimensions.height"
       :settings="h5pSettings"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
@@ -39,24 +48,27 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       @submit="handleFormSubmit"
+      @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
+      @load="handleLoad"
     ></wp-post-media>
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @close="$emit('close')"
+      @load="handleLoad"
     />
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapMutations } from "vuex"
 import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
@@ -90,6 +102,16 @@ export default {
       type: Object,
       required: true,
     },
+    containerStyles: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     h5pSettings: {
       type: Object,
       required: false,
@@ -108,7 +130,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getDirectParents"]),
     node() {
       return this.getNode(this.nodeId)
     },
@@ -120,7 +142,8 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
+    ...mapMutations(["updateTydeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -136,6 +159,12 @@ export default {
     }, SAVE_INTERVAL),
     complete() {
       this.$emit("complete")
+      const stages = this.getDirectParents(this.nodeId).filter(
+        id => this.getNode(id).tydeType === "Stage"
+      )
+      stages.map(sid =>
+        this.updateTydeProgress({ parentId: sid, isParentModule: false })
+      )
     },
   },
 }
@@ -146,7 +175,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
   height: 100%;
 }
 .media-wrapper-embed {

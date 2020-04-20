@@ -1,5 +1,25 @@
 @import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
 
+:root {
+    --tapestry-gray: #404040;
+    --tapestry-light-gray: #787878;
+    --tapestry-med-gray: #535353;
+    --tapestry-light-blue: #1eade1;
+    --tyde-green: #205a27;
+    --tyde-border-green: #39b54a;
+    --tyde-font-mono: "Roboto", monospace;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font-size: 16px; 
+    z-index: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
     font-size: 16px; 
@@ -207,14 +227,6 @@ body {
     text-align:center;
 }
 
-.progress-meter .background {
-    fill: #333333;
-}
-
-.progress-meter .foreground {
-    fill: #11a6d8;
-}
-
 .node {
     cursor: pointer;
     z-index: 0;
@@ -250,6 +262,9 @@ body {
 .imageOverlay--no-image {
     opacity: 1;
 }
+.imageOverlay.locked {
+    opacity: 0.8;
+}
 
 .node path:first-of-type {
     fill: #11a6d8;
@@ -264,7 +279,7 @@ body {
     transform: scale(1.2);
 }
 
-.node:hover .imageOverlay {
+.node:hover .imageOverlay:not(.locked) {
     opacity: 0;
 }
 
@@ -363,6 +378,29 @@ input[type="checkbox"][disabled] {
     cursor: not-allowed;
 }
 
+=======
+/* TYDE PROGRESS */
+
+.progress {
+    display: flex;
+    background: gray;
+    border: solid 2px lightgray;
+    border-radius: 8px;
+    height: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: var(--tapestry-light-blue);
+    height: 100%;
+}
+
+.tyde-module-planet-icon img {
+    width: auto;
+    height: 100%;
+}
+
 .tapestry-tooltip {
     pointer-events: none;
     position: absolute;
@@ -371,7 +409,7 @@ input[type="checkbox"][disabled] {
     padding: 12px 16px;
     border-radius: 8px;
     text-align: left;
-    font-size: 22px;
+    font-size: 32px;
     width: 100%;
     bottom: 8px;
     z-index: 10;

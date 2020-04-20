@@ -1,56 +1,91 @@
 <template>
   <div ref="container" class="media-container">
-    <h1 class="title">{{ node.title }}</h1>
-    <accordion-row
-      v-for="(row, index) in rows"
-      :key="row.id"
-      :visible="index === activeIndex"
-    >
-      <template v-slot:trigger>
-        <button
-          class="button-row"
-          :disabled="isDisabled(index)"
-          @click="toggle(index)"
-        >
-          <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-          {{ row.title }}
-        </button>
-      </template>
-      <template v-slot:content>
-        <tapestry-media
-          :node-id="row.id"
-          :dimensions="dimensions"
-          :autoplay="false"
-          @complete="updateProgress(row.id)"
-          @close="toggle(index)"
-        />
-      </template>
-      <template v-slot:footer>
-        <button v-if="row.completed" class="mt-2" @click="next">
-          {{ node.typeData.finishButtonText }}
-        </button>
-      </template>
-    </accordion-row>
+    <header class="header" :style="headerBackground">
+      <h1 class="title">{{ node.title }}</h1>
+      <img :src="node.imageURL" />
+    </header>
+    <div class="rows">
+      <accordion-row
+        v-for="(row, index) in rows"
+        :key="row.node.id"
+        ref="rowRefs"
+        :visible="index === activeIndex"
+      >
+        <template v-slot:trigger>
+          <button
+            class="button-row"
+            :disabled="isDisabled(index)"
+            @click="toggle(index)"
+          >
+            <div class="button-row-icon">
+              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+            </div>
+            <div>
+              <p class="button-row-title">{{ row.node.title }}</p>
+              <p class="button-row-description">{{ row.node.description }}</p>
+            </div>
+            <div class="icon-container">
+              <tyde-icon
+                v-if="row.node.mediaType === 'gravity-form'"
+                class="icon icon-activity"
+                icon="activity"
+              ></tyde-icon>
+              <tyde-icon
+                v-if="row.node.completed"
+                class="icon"
+                icon="checkmark"
+              ></tyde-icon>
+              <tyde-icon
+                v-if="lockRows && disabledFrom >= 0 && index > disabledFrom"
+                class="icon"
+                icon="lock"
+              ></tyde-icon>
+            </div>
+          </button>
+        </template>
+        <template v-slot:content>
+          <tapestry-media
+            :node-id="row.node.id"
+            :dimensions="dimensions"
+            :autoplay="false"
+            style="margin-bottom: 24px;"
+            @complete="updateProgress(row.node.id)"
+            @close="toggle(index)"
+            @load="handleLoad($refs.rowRefs[index].$el)"
+          />
+          <p v-if="row.children.length > 0" class="sub-accordion-text">
+            {{ row.node.typeData.subAccordionText }}
+          </p>
+          <sub-accordion
+            v-if="row.children.length > 0"
+            :rows="row.children"
+            @load="handleLoad"
+          ></sub-accordion>
+        </template>
+        <template v-slot:footer>
+          <button v-if="row.node.completed" class="mt-2" @click="next">
+            {{ node.typeData.finishButtonText }}
+          </button>
+        </template>
+      </accordion-row>
+    </div>
     <tapestry-modal
       v-if="showCompletion"
       :allow-close="false"
+      :content-container-style="confirmationStyles"
       @close="showCompletion = false"
     >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
+          {{ node.typeData.continueButtonText }}
         </button>
         <button class="button-completion" @click="showCompletion = false">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
+          {{ node.typeData.cancelLinkText }}
         </button>
       </div>
     </tapestry-modal>
     <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up fa-2x"></i>
+      <i class="fas fa-chevron-up"></i>
     </button>
   </div>
 </template>
@@ -60,6 +95,11 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import TydeIcon from "../tyde/TydeIcon"
+import Helpers from "../../utils/Helpers"
+import AccordionHeader from "../../assets/accordion-header.png"
+import AccordionConfirmation from "../../assets/accordion-confirmation.png"
+import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -67,6 +107,8 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    TydeIcon,
+    SubAccordion,
   },
   props: {
     node: {
@@ -83,17 +125,46 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    confirmationStyles() {
+      return {
+        backgroundColor: "white",
+        backgroundImage: `url(${Helpers.getImagePath(AccordionConfirmation)})`,
+        backgroundOrigin: "content-box",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "contain",
+        padding: "32px 64px",
+        top: "150px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "800px",
+        height: "500px",
+        color: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        justifyContent: "center",
+      }
+    },
+    headerBackground() {
+      return { backgroundImage: `url(${Helpers.getImagePath(AccordionHeader)})` }
+    },
     hasNext() {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.getDirectChildren(this.node.id).map(this.getNode)
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        const children = node.isSubAccordion
+          ? node.childOrdering.map(this.getNode)
+          : this.getDirectChildren(id).map(this.getNode)
+        return { node, children }
+      })
     },
     dimensions() {
       if (!this.isMounted) {
         return {
-          height: 0,
           width: 0,
+          height: 0,
         }
       }
       const box = this.$refs.container
@@ -104,8 +175,11 @@ export default {
       return this.node.typeData.lockRows
     },
     disabledFrom() {
-      return this.rows.findIndex(node => !node.completed)
+      return this.rows.findIndex(row => !row.node.completed)
     },
+  },
+  mounted() {
+    this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -115,6 +189,15 @@ export default {
         return false
       }
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    },
+    handleLoad(el) {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          this.$refs.container.scrollTop = el.offsetTop - 12
+        }
+      })
     },
     scrollToTop() {
       const el = this.$refs.container
@@ -161,14 +244,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
+.header {
+  color: white;
+  text-align: left;
+  padding: 24px 48px;
+  background-size: cover;
+  border-radius: 8px 8px 0px 0px;
+  display: flex;
+  justify-content: space-between;
+
+  img {
+    height: 96px;
+    margin: -24px 0;
+  }
 }
 
 .title {
-  color: #fff;
-  margin-bottom: 1em;
+  font-weight: 700;
+  margin: 0;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .media-container {
@@ -176,41 +274,45 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
+  padding: 0;
 
   ::-webkit-scrollbar-track {
     background-color: black;
   }
 }
 
+.rows {
+  padding: 32px;
+}
+
 .button-completion {
-  background: none;
-  padding: 0;
+  display: block;
+  width: 100%;
+  background: #3fa9f5;
+  padding: 16px 24px;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: inherit;
-  margin-right: 2em;
+  color: white;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.5em;
+  margin-bottom: 24px;
 
   &:last-child {
-    margin-right: 0;
+    margin-bottom: 0;
   }
 
   &:hover {
-    color: #11a6d8;
+    opacity: 0.9;
   }
 
   p {
-    margin: 1em auto 0;
     padding: 0;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 
 .button-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 250px;
 }
 
 .button-row {
@@ -218,13 +320,59 @@ button[disabled] {
   align-items: center;
   background: none;
   margin: 0;
+  padding: 0;
   width: 100%;
-  border-radius: 4px;
   text-align: left;
 
-  i {
-    margin-right: 8px;
+  &-icon {
+    background: #b29ac9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-right: 24px;
   }
+
+  p {
+    display: block;
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+    font-size: 1.2em;
+  }
+
+  &-title {
+    font-weight: bold;
+  }
+
+  &-description {
+    font-weight: 400;
+  }
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+
+  &-activity {
+    width: 52px;
+  }
+}
+
+.icon-container {
+  margin-left: auto;
+}
+
+.button-finished {
+  background: #bbd8ee;
+  border-radius: 16px;
+  margin: 0;
+  padding: 8px 36px;
+  color: #026c93;
+  font-weight: bold;
+  font-size: 1.2em;
 }
 
 .button-scroll-top {
@@ -232,11 +380,17 @@ button[disabled] {
   position: absolute;
   right: 24px;
   bottom: 24px;
-  background: #262626;
+  background: white;
+  border: 2px solid #3fa9f5;
+  color: #3fa9f5;
   border-radius: 50%;
   padding: 0;
   width: 56px;
   height: 56px;
   z-index: 10;
+}
+
+.sub-accordion-text {
+  margin-bottom: 0;
 }
 </style>

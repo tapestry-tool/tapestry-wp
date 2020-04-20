@@ -14,8 +14,8 @@ export async function updateH5pSettings({ commit }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit }, newNode) {
-  const response = await client.addNode(JSON.stringify(newNode))
+export async function addNode({ commit }, { newNode, parentId }) {
+  const response = await client.addNode(JSON.stringify(newNode), parentId)
 
   const nodeToAdd = { ...newNode }
   nodeToAdd.id = response.data.id
@@ -51,6 +51,13 @@ export async function updateNodeProgress({ commit, getters }, payload) {
 }
 
 export async function completeNode({ commit, dispatch, getters }, nodeId) {
+  commit("updateNode", {
+    id: nodeId,
+    newNode: { completed: true },
+  })
+  await client.completeNode(nodeId)
+  thisTapestryTool.updateAccordionProgress()
+
   const node = getters.getNode(nodeId)
   if (Helpers.canUserUpdateProgress(node)) {
     await client.completeNode(nodeId)

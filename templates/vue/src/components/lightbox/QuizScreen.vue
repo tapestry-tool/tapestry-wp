@@ -1,6 +1,6 @@
 <template>
-  <div class="quiz-screen">
-    <completion-screen v-if="showCompletionScreen">
+  <div class="quiz-screen" :style="{ backgroundImage }">
+    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
@@ -13,6 +13,7 @@
     <question
       v-else
       :question="activeQuestion"
+      :current-step="currentQuestionText"
       :node="node"
       @submit="handleSubmit"
       @back="$emit('back')"
@@ -31,6 +32,8 @@
 
 <script>
 import Question from "./quiz-screen/Question"
+import Helpers from "@/utils/Helpers"
+import BackgroundImg from "@/assets/question-screen-bg.png"
 import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
 
@@ -63,6 +66,9 @@ export default {
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
     },
+    backgroundImage() {
+      return `url(${Helpers.getImagePath(BackgroundImg)})`
+    },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
     },
@@ -91,21 +97,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/tyde-colors.scss";
+
 .quiz-screen {
   display: flex;
   background-size: cover;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
+  padding: 24px;
+  padding-left: 20%;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
-  background: #111;
-  color: #eee;
+  min-height: 100%;
+  color: black;
   z-index: 10;
-  padding: 24px;
+  background-color: #fff;
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: 0 80%;
 }
 
 .question-footer {
@@ -144,7 +156,7 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: #262626;
+  background: $tyde-blue;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,10 +165,10 @@ export default {
   margin: 0;
   margin-right: 12px;
   opacity: 1;
-  transition: all 0.1s ease-out;
+  transition: opacity 0.1s ease-out;
 
   &:hover {
-    background: #11a6d8;
+    opacity: 0.8;
   }
 
   &:disabled {
@@ -170,12 +182,23 @@ export default {
   }
 }
 
+.button-nav-menu {
+  width: 80px;
+  height: 80px;
+  font-size: 64px;
+
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 20;
+}
+
 .question-step {
   margin: 0;
   padding: 0;
   font-weight: bold;
   font-size: 40px;
-  color: var(--tyde-blue);
+  color: $tyde-blue;
   margin-right: 32px;
 }
 </style>

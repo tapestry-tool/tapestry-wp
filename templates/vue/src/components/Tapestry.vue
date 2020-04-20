@@ -27,6 +27,7 @@
     </div>
     <node-modal
       :node="populatedNode"
+      :parent="parentNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
       :permissions-order="permissionsOrder"
@@ -43,6 +44,7 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
+import { tydeTypes } from "@/utils/constants"
 import { getLinkMetadata } from "../services/LinkPreviewApi"
 import Helpers from "../utils/Helpers"
 
@@ -59,6 +61,7 @@ export default {
       TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
+      parentNode: null,
       populatedNode: {
         title: "",
         description: "",
@@ -69,17 +72,19 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
         },
         quiz: [],
         skippable: true,
+        tydeType: tydeTypes.REGULAR,
       },
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -118,6 +123,11 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
+  watch: {
+    selectedNode() {
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
+    },
+  },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
@@ -131,6 +141,7 @@ export default {
       "updateSelectedNode",
       "updateRootNode",
       "updateNodeCoordinates",
+      "updateTydeProgress",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
@@ -140,6 +151,10 @@ export default {
       } else {
         this.setDataset(event.detail.dataset)
       }
+      const stages = this.tapestry.nodes.filter(n => n.tydeType === tydeTypes.STAGE)
+      stages.map(n =>
+        this.updateTydeProgress({ parentId: n.id, isParentModule: false })
+      )
     },
     getEmptyNode() {
       return {
@@ -149,6 +164,7 @@ export default {
         typeData: {
           mediaURL: "",
           textContent: "",
+          subAccordionText: "More content:",
         },
         mediaDuration: "",
         imageURL: "",
@@ -157,26 +173,32 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        showInBackpack: true,
         permissions: {
           public: ["read"],
           authenticated: ["read"],
         },
         description: "",
         quiz: [],
+        tydeType: tydeTypes.REGULAR,
+        childOrdering: [],
       }
     },
     addRootNode() {
       this.modalType = "add-root-node"
+      this.parentNode = null
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
     addNewNode() {
       this.modalType = "add-new-node"
+      this.parentNode = this.selectedNode
       this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal-container")
     },
     editNode() {
       this.modalType = "edit-node"
+      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },
@@ -186,6 +208,7 @@ export default {
     },
     closeModal() {
       this.modalType = ""
+      this.parent = null
       this.$bvModal.hide("node-modal-container")
     },
     changeSelectedNode(event) {
@@ -221,16 +244,29 @@ export default {
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          planetViewNotEarnedIconUrl: "",
+          planetViewEarnedIconUrl: "",
+          spaceshipPartNotEarnedIconUrl: "",
+          spaceshipPartEarnedIconUrl: "",
+          spaceshipPartHoverIconUrl: "",
+          spaceshipPartX: 0,
+          spaceshipPartY: 0,
+          spaceshipPartWidth: 0,
+          spaceshipPartHeight: 0,
+          subAccordionText: "More content:",
         },
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
         skippable: true,
         fullscreen: false,
+        tydeType: tydeTypes.REGULAR,
+        showInBackpack: true,
         coordinates: {
           x: 3000,
           y: 3000,
         },
+        childOrdering: [],
       }
 
       if (isEdit) {
@@ -325,6 +361,45 @@ export default {
           case "quiz":
             newNodeEntry.quiz = fieldValue
             break
+          case "tydeType":
+            newNodeEntry.tydeType = fieldValue
+            break
+          case "showInBackpack":
+            newNodeEntry.showInBackpack = fieldValue
+            break
+          case "planetViewNotEarnedIconUrl":
+            newNodeEntry.typeData.planetViewNotEarnedIconUrl = fieldValue
+            break
+          case "planetViewEarnedIconUrl":
+            newNodeEntry.typeData.planetViewEarnedIconUrl = fieldValue
+            break
+          case "spaceshipPartNotEarnedIconUrl":
+            newNodeEntry.typeData.spaceshipPartNotEarnedIconUrl = fieldValue
+            break
+          case "spaceshipPartEarnedIconUrl":
+            newNodeEntry.typeData.spaceshipPartEarnedIconUrl = fieldValue
+            break
+          case "spaceshipPartHoverIconUrl":
+            newNodeEntry.typeData.spaceshipPartHoverIconUrl = fieldValue
+            break
+          case "spaceshipPartX":
+            newNodeEntry.typeData.spaceshipPartX = fieldValue
+            break
+          case "spaceshipPartY":
+            newNodeEntry.typeData.spaceshipPartY = fieldValue
+            break
+          case "spaceshipPartWidth":
+            newNodeEntry.typeData.spaceshipPartWidth = fieldValue
+            break
+          case "spaceshipPartHeight":
+            newNodeEntry.typeData.spaceshipPartHeight = fieldValue
+            break
+          case "subAccordionText":
+            newNodeEntry.typeData.subAccordionText = fieldValue
+            break
+          case "childOrdering":
+            newNodeEntry.childOrdering = fieldValue
+            break
           default:
             newNodeEntry[fieldName] = fieldValue
             break
@@ -357,7 +432,10 @@ export default {
       let id
       if (!isEdit) {
         // New node
-        id = await this.addNode(newNodeEntry)
+        id = await this.addNode({
+          newNode: newNodeEntry,
+          parentId: this.parentNode && this.parentNode.id,
+        })
         newNodeEntry.id = id
         if (!isRoot) {
           // Add link from parent node to this node
@@ -369,6 +447,7 @@ export default {
             appearsAt: appearsAt,
           }
           await this.addLink(newLink)
+          this.selectedNode.childOrdering.push(id)
         } else {
           this.updateRootNode(newNodeEntry.id)
           this.updateSelectedNode(newNodeEntry.id)

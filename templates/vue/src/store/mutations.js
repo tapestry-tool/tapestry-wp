@@ -1,9 +1,18 @@
 import Helpers from "../utils/Helpers"
+import { tydeTypes } from "../utils/constants"
 
 export function init(state, dataset) {
   setDataset(state, dataset)
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
+  state.nodes
+    .filter(
+      n =>
+        n.tydeType === tydeTypes.MODULE ||
+        n.mediaType === "accordion" ||
+        n.isSubAccordion
+    )
+    .forEach(n => initializeOrdering(state, n.id))
 }
 
 export function setDataset(state, dataset) {
@@ -26,6 +35,10 @@ export function updateSelectedNode(state, newNodeId) {
 
 export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
+}
+
+export function setLightbox(state, el) {
+  state.lightbox = el
 }
 
 // nodes
@@ -88,4 +101,64 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   const entries = question.entries || {}
   entries[answerType] = Object.values(entry)[0]
   question.entries = entries
+}
+
+export function updateTydeProgress(state, { parentId, isParentModule }) {
+  const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
+  const childNodeIds = getChildIds(state, parentId)
+  const childNodes = childNodeIds.map(
+    id => state.nodes[Helpers.findNodeIndex(id, state)]
+  )
+  var childProgress, reducer
+  if (isParentModule) {
+    // parentNode is a module, and all children are stages
+    childProgress = childNodes.map(stage => stage.tydeProgress)
+    reducer = (accumulator, progress) => accumulator + progress
+  } else {
+    // parentNode is a stage, and all children are nodes (topics)
+    childProgress = childNodes.map(topic => topic.completed)
+    reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
+  }
+  parentNode.tydeProgress =
+    childNodes.length === 0
+      ? 1
+      : childProgress.reduce(reducer, 0) / childNodes.length
+  if (!isParentModule) {
+    // If node is stage, parent module must be updated as well
+    getParentIds(state, parentId).map(id =>
+      updateTydeProgress(state, { parentId: id, isParentModule: true })
+    )
+  }
+}
+
+function getParentIds(state, nodeId) {
+  const links = state.links
+  return links
+    .filter(link =>
+      link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId
+    )
+    .map(link => (link.source.id == undefined ? link.source : link.source.id))
+}
+
+function getChildIds(state, nodeId) {
+  const links = state.links
+  return links
+    .filter(link =>
+      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
+    )
+    .map(link => (link.target.id == undefined ? link.target : link.target.id))
+}
+
+export function initializeOrdering(state, id) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  getChildIds(state, id)
+    .filter(cid => !node.childOrdering.includes(cid))
+    .forEach(id => node.childOrdering.push(id))
+  const children = getChildIds(state, id)
+  node.childOrdering.filter(id => children.includes(id))
+}
+
+export function updateOrdering(state, payload) {
+  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
+  state.nodes[nodeIndex].childOrdering = payload.ord
 }

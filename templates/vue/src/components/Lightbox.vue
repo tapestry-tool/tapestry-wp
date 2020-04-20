@@ -95,7 +95,7 @@ export default {
       }
 
       if (this.node.mediaType === "accordion") {
-        return Object.assign(styles, { padding: "24px" })
+        return Object.assign(styles, { background: "white" })
       }
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
@@ -169,17 +169,16 @@ export default {
     this.isLoaded = true
     this.applyDimensions()
     thisTapestryTool.selectNode(Number(this.nodeId))
-    thisTapestryTool.changeToViewMode(this.lightboxDimensions)
     document.querySelector("body").classList.add("tapestry-lightbox-open")
   },
   beforeDestroy() {
-    thisTapestryTool.exitViewMode()
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
   },
   methods: {
-    ...mapActions(["completeNode"]),
+    ...mapActions(["completeNode", "updateMayUnlockNodes"]),
     complete() {
       this.completeNode(this.nodeId)
+      this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
       this.$router.push("/")
@@ -209,7 +208,6 @@ export default {
 
 <style lang="scss">
 body.tapestry-lightbox-open {
-  overflow: hidden;
   overflow: hidden;
 }
 </style>

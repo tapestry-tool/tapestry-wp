@@ -73,6 +73,15 @@ export default class {
     return `${wpData.vue_uri}/${image.split("dist")[1]}`
   }
 
+  static base64ToBlob(b64Data, contentType) {
+    const url = `data:${contentType};base64,${b64Data}`
+    return new Promise(resolve => {
+      return fetch(url).then(response => {
+        resolve(response.blob())
+      })
+    })
+  }
+
   // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
   static decodeHTMLChars(str) {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
@@ -103,5 +112,11 @@ export default class {
 
   static canUserUpdateProgress(node) {
     return !node.hasOwnProperty("userType") || node.userType === "copilot"
+  }
+
+  static range(start, end) {
+    return Array(end - start + 1)
+      .fill()
+      .map((_, idx) => start + idx)
   }
 }
