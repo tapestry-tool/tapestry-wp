@@ -468,6 +468,7 @@ function tapestryTool(config){
     function createSelection() {
         const data = new Set();
         const selection = {
+            data,
             size() {
                 return data.size;
             },
@@ -688,7 +689,11 @@ function tapestryTool(config){
                 selection.clear();
                 selection.add(d);
             }
-            nodesBeforeDrag = Array.from(selection)
+            
+            nodesBeforeDrag = Array
+                .from(selection.data)
+                .map(node => ({ id: node.id, x: node.x, y: node.y }));
+
             recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
     }
@@ -731,7 +736,13 @@ function tapestryTool(config){
         })
 
         if (selection.size() === 1) {
-            selection.clear();
+            selection.forEach(nd => {
+                const prev = nodesBeforeDrag.find(n => n.id == nd.id)
+                const { x, y } = prev
+                if (x != nd.x || y != nd.y) {
+                    selection.clear()
+                }
+            })
         }
 
         updateSvgDimensions();
@@ -994,6 +1005,13 @@ function tapestryTool(config){
     
     /* Draws the components that make up node */
     function buildNodeContents() {
+        const handleClick = d => {
+            if (root === d.id && d.hideMedia) {
+                if (config.wpCanEditTapestry || d.accessible) {
+                    goToNode(d.id)
+                }
+            }
+        }
 
         tapestryDepthSlider.max = findMaxDepth(root);
         hideShowControls();
@@ -1054,13 +1072,7 @@ function tapestryTool(config){
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
         
         
         nodes.append("rect")
@@ -1111,13 +1123,7 @@ function tapestryTool(config){
             .attr("y", function (d) {
                 return - getRadius(d);
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
     
         nodes.append("circle")
             .filter(function (d) {
@@ -1147,13 +1153,7 @@ function tapestryTool(config){
             .attr("fill", function (d) {
                 return getNodeColor(d);
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
     
         /* Attach images to be used within each node */
         nodes.append("defs")
@@ -1203,9 +1203,6 @@ function tapestryTool(config){
                             selection.clear();
                             tapestry.selectNode(d.id);
                         } else {
-                            if (!selection.size()) {
-                                selection.add(getNodeById(root))
-                            }
                             selection.add(d);
                         }
                     }
