@@ -230,10 +230,12 @@ export default {
     },
   },
   async mounted() {
-    const forms = await GravityFormsApi.getAllForms()
-    const h5ps = await H5PApi.getAllContent()
+    var forms = await GravityFormsApi.getAllForms()
+    var h5ps = await H5PApi.getAllContent()
     this.formOptions = forms
+    this.formOptions.push({id: "", title: "None"})
     this.h5pOptions = h5ps
+    this.h5pOptions.push({id: "", title: "None"})
   },
   methods: {
     addQuestion() {
