@@ -536,7 +536,7 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
-        thisTapestryTool.disableSelection()
+        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
@@ -555,7 +555,7 @@ export default {
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId == "node-modal-container") {
-        thisTapestryTool.allowSelection()
+        thisTapestryTool.enableMovements()
       }
     })
   },

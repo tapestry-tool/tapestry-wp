@@ -53,7 +53,7 @@ function tapestryTool(config){
         autoLayout = false,
         selection = null,                                       // a set containing the currently selected nodes
         isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
-        allowSelection = true;                                  // enables/disables node multi selection
+        movementsEnabled = true;                                // enables/disables node movements by author or d3 itself
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -306,12 +306,12 @@ function tapestryTool(config){
         initializeDragSelect();
     }
 
-    this.disableSelection = () => {
-        allowSelection = false;
+    this.disableMovements = () => {
+        movementsEnabled = false;
     }
 
-    this.allowSelection = () => {
-        allowSelection = true;
+    this.enableMovements = () => {
+        movementsEnabled = true;
     }
 
     this.resetNodeCache = function() {
@@ -445,7 +445,7 @@ function tapestryTool(config){
     isMultiSelect = false;
 
     document.addEventListener("keydown", evt => {
-        if (allowSelection) {
+        if (movementsEnabled) {
             if (evt.code === "Escape") {
                 selection.clear();
             }
@@ -460,7 +460,7 @@ function tapestryTool(config){
     });
 
     document.addEventListener("keyup", () => {
-        if (allowSelection) {
+        if (movementsEnabled) {
             isMultiSelect = false;
         }
     });
@@ -681,6 +681,12 @@ function tapestryTool(config){
     }
 
     function ticked() {
+
+        // To improve performance while tapestry is not being actively used, we won't run these functions
+        if (!movementsEnabled) {
+            return;
+        }
+
         var tapestryDimensions = tapestry.getTapestryDimensions();
         links
             .attr("x1", function (d) {
@@ -708,7 +714,7 @@ function tapestryTool(config){
     }
 
     function dragstarted(d) {
-        if (allowSelection) {
+        if (movementsEnabled) {
             if(!config.wpCanEditTapestry &&
                 tapestry.dataset.settings.nodeDraggable === false) {
                 return;
@@ -991,7 +997,7 @@ function tapestryTool(config){
                 }
             },
             onElementSelect: node => {
-                if (allowSelection) {
+                if (movementsEnabled) {
                     const id = node.id.split("node-")[1]
                     selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
                 }
