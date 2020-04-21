@@ -3,29 +3,21 @@
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
       <div v-if="load" class="content" :style="contentContainerStyle">
-        <button
-          v-if="allowClose"
-          class="close-btn"
-          :style="closeButtonStyle"
-          @click="$emit('close')"
-        >
+        <modal-button :button-style="closeButtonStyles" @clicked="$emit('close')">
           <div>
             <i class="fa fa-times"></i>
           </div>
-        </button>
-        <slot></slot>
-        <button
-          v-if="isFavourite"
-          class="button-favourite"
-          @click="removeFromFavourites"
+        </modal-button>
+        <modal-button
+          :button-style="favouriteButtonStyles"
+          @clicked="updateFavourites"
         >
-          <i class="fas fa-heart fa-sm"></i>
-          <p>Remove node from favourites</p>
-        </button>
-        <button v-else class="button-favourite" @click="addToFavourites">
-          <i class="fas fa-heart fa-sm"></i>
-          <p>Add node to favourites</p>
-        </button>
+          <div>
+            <i v-if="isFavourite" class="fas fa-heart fa-sm" style="color:red;"></i>
+            <i v-else class="fas fa-heart fa-sm"></i>
+          </div>
+        </modal-button>
+        <slot></slot>
       </div>
     </transition>
   </div>
@@ -33,6 +25,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex"
+import ModalButton from "./ModalButton"
 
 const defaultStyles = {
   top: "150px",
@@ -49,6 +42,9 @@ const defaultStyles = {
 
 export default {
   name: "tapestry-modal",
+  components: {
+    ModalButton,
+  },
   props: {
     nodeId: {
       type: [String, Number],
@@ -59,11 +55,6 @@ export default {
       type: Object,
       required: false,
       default: () => defaultStyles,
-    },
-    closeButtonStyle: {
-      type: Object,
-      reuired: false,
-      default: () => {},
     },
     allowClose: {
       type: Boolean,
@@ -78,11 +69,33 @@ export default {
   },
   computed: {
     ...mapGetters(["getFavourites"]),
+    ...mapGetters(["getNode"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     favourites() {
       return this.getFavourites ? this.getFavourites : []
     },
     isFavourite() {
       return this.favourites.find(id => id == this.nodeId)
+    },
+    closeButtonStyles() {
+      return this.node.fullscreen
+        ? {
+            position: "fixed",
+            top: "16px",
+            right: "16px",
+          }
+        : { right: "-42px" }
+    },
+    favouriteButtonStyles() {
+      return this.node.fullscreen
+        ? {
+            position: "fixed",
+            top: "16px",
+            right: "62px",
+          }
+        : { right: "4px" }
     },
   },
   mounted() {
@@ -90,14 +103,13 @@ export default {
   },
   methods: {
     ...mapActions(["updateUserFavourites"]),
-    addToFavourites() {
+    updateFavourites() {
       let updatedFavouritesList = [...this.favourites]
-      updatedFavouritesList.push(this.nodeId)
-      this.updateUserFavourites(updatedFavouritesList)
-    },
-    removeFromFavourites() {
-      let updatedFavouritesList = [...this.favourites]
-      updatedFavouritesList = updatedFavouritesList.filter(id => id != this.nodeId)
+      if (this.isFavourite) {
+        updatedFavouritesList = updatedFavouritesList.filter(id => id != this.nodeId)
+      } else {
+        updatedFavouritesList.push(this.nodeId)
+      }
       this.updateUserFavourites(updatedFavouritesList)
     },
   },
@@ -173,7 +185,7 @@ export default {
   margin: 0;
   margin-top: 20px;
   border-radius: 4px;
-  text-align: left;
+  text-align: center;
   padding: 0 10px;
 
   &:hover,
@@ -188,7 +200,7 @@ export default {
   }
 
   p {
-    margin-top: 10px;
+    margin-top: 16px;
   }
 }
 </style>

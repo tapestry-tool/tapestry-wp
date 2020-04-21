@@ -8,7 +8,6 @@
     }"
     :node-id="this.nodeId"
     :content-container-style="lightboxContentStyles"
-    :close-button-style="closeButtonStyles"
     :allow-close="canSkip"
     @close="close"
   >
@@ -69,15 +68,6 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
-    },
-    closeButtonStyles() {
-      return this.node.fullscreen
-        ? {
-            position: "fixed",
-            top: "16px",
-            right: "16px",
-          }
-        : {}
     },
     lightboxContentStyles() {
       const styles = {
