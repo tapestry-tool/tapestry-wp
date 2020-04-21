@@ -133,12 +133,17 @@
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
+              <span v-if="!this.gravityFormExists" class="text-muted">
+                Gravity Forms plugin is not installed. Please install Gravity Forms
+                to use this content type.
+              </span>
               <combobox
+                v-else
                 v-model="selectedGravityFormContent"
                 data-testid="combobox-gravity-form"
                 item-text="title"
                 item-value="id"
-                empty-message="There are no forms available. Please add one in your WP dashboard."
+                empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
                 :options="gravityFormOptions"
               >
                 <template v-slot="slotProps">
@@ -429,10 +434,10 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
-        { value: "gravity-form", text: "Gravity Form" },
         { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
+      gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
       selectedGravityFormContent: "",
@@ -530,6 +535,12 @@ export default {
     },
   },
   async mounted() {
+    this.gravityFormExists = await GravityFormsApi.exists()
+    this.mediaTypes.push({
+      value: "gravity-form",
+      text: "Gravity Form",
+      disabled: !this.gravityFormExists,
+    })
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
     this.wpPosts = await WordpressApi.getPosts()
