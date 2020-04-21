@@ -2,6 +2,7 @@
   <b-form-group>
     <b-form-input
       ref="input"
+      :placeholder="placeholder"
       v-model="inputValue"
       @blur="handleBlur"
       @focus="handleFocus"
@@ -47,7 +48,13 @@ export default {
     },
     value: {
       type: [Object, String],
-      required: true,
+      required: false,
+      default: null,
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: "",
     },
     emptyMessage: {
       type: String,
@@ -111,7 +118,7 @@ export default {
       }
     },
     handleClick(option) {
-      this.$emit("input", this.getValue(option))
+      this.$emit("change", this.getValue(option))
       this.inputValue = option[this.itemText]
       this.selected = true
       this.$refs.input.blur()
