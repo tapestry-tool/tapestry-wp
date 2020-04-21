@@ -80,7 +80,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "getParent", "tapestry", "getNode"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -156,6 +156,7 @@ export default {
         typeData: {
           mediaURL: "",
           textContent: "",
+          subAccordionText: "More content:",
         },
         mediaDuration: "",
         imageURL: "",
@@ -229,6 +230,7 @@ export default {
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          subAccordionText: "More content:",
         },
         hideTitle: false,
         hideProgress: false,
@@ -334,6 +336,9 @@ export default {
           case "quiz":
             newNodeEntry.quiz = fieldValue
             break
+          case "subAccordionText":
+            newNodeEntry.typeData.subAccordionText = fieldValue
+            break
           case "childOrdering":
             newNodeEntry.childOrdering = fieldValue
             break
@@ -381,6 +386,7 @@ export default {
             appearsAt: appearsAt,
           }
           await this.addLink(newLink)
+          this.selectedNode.childOrdering.push(id)
         } else {
           this.updateRootNode(newNodeEntry.id)
           this.updateSelectedNode(newNodeEntry.id)
@@ -407,10 +413,6 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
-
-      if (!isEdit && this.getParent(id) !== null) {
-        this.getNode(this.getParent(id)).childOrdering.push(id)
-      }
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
