@@ -1595,8 +1595,29 @@ function tapestryTool(config){
                 })
                 .on('end',function(){
                     if (typeof linkToNode != "undefined" && linkFromNode.id != linkToNode.id) {
-                        if (confirm('Link from ' + linkFromNode.title + ' to ' + linkToNode.title + "?")) {
-                            addLink(linkFromNode.id, linkToNode.id, 1, '');
+                        let source = linkFromNode;
+                        let target = linkToNode;
+
+                        const shouldAddLink = confirm(`Link from ${source.title} to ${target.title}?`);
+
+                        // If one of the nodes is an accordion
+                        if (source.mediaType === "accordion" || target.mediaType === "accordion") {
+                            // Since an accordion cannot be a child of another accordion, we only prompt if we're not linking 2 accordions
+                            if (source.mediaType !== "accordion" || target.mediaType !== "accordion") {
+                                const addRow = confirm(`Add ${target.title} as a row of ${source.title}?`);
+                                if (addRow) {
+                                    if (target.mediaType === "accordion") {
+                                        // Swap the link ends so that it begins at the accordion
+                                        source = linkToNode;
+                                        target = linkFromNode;
+                                    }
+                                    source.childOrdering.push(target.id);
+                                }
+                            }
+                        }
+
+                        if (shouldAddLink) {
+                            addLink(source.id, target.id, 1, '');
                         }
                     }
                     // Reset everything
