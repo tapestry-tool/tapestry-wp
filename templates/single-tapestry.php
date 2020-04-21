@@ -10,6 +10,7 @@
  */
 function addNonceToScript()
 {
+    global $TAPESTRY_VERSION_NUMBER;
     global $wp_roles;
     $params = array(
         'nonce'  => wp_create_nonce('wp_rest'),
@@ -43,6 +44,7 @@ add_action('wp_enqueue_scripts', 'addNonceToScript');
 
 function enqueue_vue_app_build()
 {
+    global $TAPESTRY_VERSION_NUMBER;
     global $TAPESTRY_USE_DEV_MODE;
 
     // register the Vue build script.
