@@ -2,7 +2,7 @@
 
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
-    font-size: 16px; 
+    font-size: 16px;
     z-index: 0;
 }
 * {
@@ -218,6 +218,7 @@ body {
 .node {
     cursor: pointer;
     z-index: 0;
+    user-select: none;
 }
 
 .node .meta {
@@ -398,4 +399,22 @@ input[type="checkbox"][disabled] {
 .tapestry-tooltip li {
     margin: 0;
     padding: 0;
+}
+
+rect.selectable {
+    fill: #11a6d8;
+    fill-opacity: 0;
+}
+
+.node-selected circle {
+    fill: #11a6d8;
+    fill-opacity: 0.7;
+}
+
+.node-selected path.grandchild, .node-selected .grandchild {
+    fill: #11a6d8;
+}
+
+.node-selected rect.selectable {
+    fill-opacity: 0.7;
 }

@@ -44,13 +44,16 @@ function tapestryTool(config){
         simulation,                                             // Force
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
-        tapestryDimensionsBeforeDrag, nodeBeforeDrag,
+        tapestryDimensionsBeforeDrag, nodesBeforeDrag,
         h5pVideoSettings = {},
         tapestryDepth = 4,                                      // Default depth of Tapestry
         tapestryDepthSlider, hideShowControls = function(){},   // Controls
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
-        autoLayout = false;
+        autoLayout = false,
+        selection = null,                                       // a set containing the currently selected nodes
+        isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
+        movementsEnabled = true;                                // enables/disables node movements by author or d3 itself
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -299,6 +302,16 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+
+        initializeDragSelect();
+    }
+
+    this.disableMovements = () => {
+        movementsEnabled = false;
+    }
+
+    this.enableMovements = () => {
+        movementsEnabled = true;
     }
 
     this.resetNodeCache = function() {
@@ -428,6 +441,63 @@ function tapestryTool(config){
     /****************************************************
      * ADD EDITOR ELEMENTS
      ****************************************************/
+    selection = createSelection();
+    isMultiSelect = false;
+
+    document.addEventListener("keydown", evt => {
+        if (movementsEnabled) {
+            if (evt.code === "Escape") {
+                selection.clear();
+            }
+            if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+                isMultiSelect = true;
+                if (evt.code === "KeyA") {
+                    evt.preventDefault();
+                    tapestry.dataset.nodes.forEach(d => selection.add(d));
+                }
+            }
+        }
+    });
+
+    document.addEventListener("keyup", () => {
+        if (movementsEnabled) {
+            isMultiSelect = false;
+        }
+    });
+
+    function createSelection() {
+        const data = new Set();
+        const selection = {
+            data,
+            size() {
+                return data.size;
+            },
+            add(node) {
+                data.add(node);
+                data.forEach(d => {
+                    const nd = document.getElementById(`node-${d.id}`);
+                    nd.classList.add("node-selected");
+                })
+            },
+            has(node) {
+                return data.has(node);
+            },
+            delete(node) {
+                data.delete(node);
+                const nd = document.getElementById(`node-${node.id}`);
+                nd.classList.remove("node-selected");
+            },
+            clear() {
+                data.forEach(d => {
+                    selection.delete(d);
+                })
+            },
+            forEach(fn) {
+                data.forEach(fn);
+            }
+        }
+        return selection;
+    }
     
     // To create a link
     function addLink(source, target, value, appearsAt) {
@@ -611,6 +681,12 @@ function tapestryTool(config){
     }
 
     function ticked() {
+
+        // To improve performance while tapestry is not being actively used, we won't run these functions
+        if (!movementsEnabled) {
+            return;
+        }
+
         var tapestryDimensions = tapestry.getTapestryDimensions();
         links
             .attr("x1", function (d) {
@@ -637,26 +713,29 @@ function tapestryTool(config){
             });
     }
 
-    // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
+        if (movementsEnabled) {
+            if(!config.wpCanEditTapestry &&
+                tapestry.dataset.settings.nodeDraggable === false) {
+                return;
+            }
+     
+            if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+    
+            if (!selection.size()) {
+                selection.add(d)
+            }
+            if (!selection.has(d) && !isMultiSelect) {
+                selection.clear();
+                selection.add(d);
+            }
+            
+            nodesBeforeDrag = Array
+                .from(selection.data)
+                .map(node => ({ id: node.id, x: node.x, y: node.y }));
+
+            recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
- 
-        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
-        nodeBeforeDrag = d;
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d.y, tapestryDimensionsBeforeDrag.height);
-        }
-
-        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
     function dragged(d) {
@@ -664,14 +743,10 @@ function tapestryTool(config){
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height);
-        }
+        selection.forEach(nd => {
+            nd[xORfx] = nd[xORfx] + d3.event.dx;
+            nd[yORfy] = nd[yORfy] + d3.event.dy;
+        })
     }
 
     function dragended(d) {
@@ -682,24 +757,35 @@ function tapestryTool(config){
 
         if (!d3.event.active) simulation.alphaTarget(0);
 
-        d[xORfx] = d.x;
-        d[yORfy] = d.y;
-        updateSvgDimensions();
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                        nd[xORfx] = nodesBeforeDrag.find(n => n.id == nd.id).x;
+                        nd[yORfy] = nodesBeforeDrag.find(n => n.id == nd.id).y;
+                    }
+                });
+            }
+        })
 
-        if (canEditNode(d) && !autoLayout) {
-            $.ajax({
-                url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
-                method: API_PUT_METHOD,
-                data: JSON.stringify({x: d.x, y: d.y}),
-                error: function(e) {
-                    alert("Sorry, there was an error saving the coordinates of this node!");
-                    console.error(e);
-                    d[xORfx] = nodeBeforeDrag.x;
-                    d[yORfy] = nodeBeforeDrag.y;
+        if (selection.size() === 1) {
+            selection.forEach(nd => {
+                const prev = nodesBeforeDrag.find(n => n.id == nd.id)
+                const { x, y } = prev
+                if (x != nd.x || y != nd.y) {
+                    selection.clear()
                 }
-            });
+            })
         }
 
+        updateSvgDimensions();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -901,9 +987,37 @@ function tapestryTool(config){
             rebuildNodeContents();
         }
     }
+
+    function initializeDragSelect() {
+        new DragSelect({
+            selectables: document.querySelectorAll(".node"),
+            onDragStart: () => {
+                if (!isMultiSelect) {
+                    selection.clear()
+                }
+            },
+            onElementSelect: node => {
+                if (movementsEnabled) {
+                    const id = node.id.split("node-")[1]
+                    selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+                }
+            },
+            onElementUnselect: node => {
+                const id = node.id.split("node-")[1]
+                selection.delete(tapestry.dataset.nodes[findNodeIndex(id)])
+            }
+        });
+    }
     
     /* Draws the components that make up node */
     function buildNodeContents() {
+        const handleClick = d => {
+            if (root === d.id && d.hideMedia) {
+                if (config.wpCanEditTapestry || d.accessible) {
+                    goToNode(d.id)
+                }
+            }
+        }
 
         tapestryDepthSlider.max = findMaxDepth(root);
         hideShowControls();
@@ -964,13 +1078,58 @@ function tapestryTool(config){
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
+            .on("click keydown", handleClick);
+        
+        
+        nodes.append("rect")
+            .attr("class", function (d) {
+                if (d.nodeType === "grandchild") return "selectable grandchild";
+                return "selectable";
+            })
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
                 }
-            });
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("data-id", function (d) {
+                return d.id;
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild")
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .on("click keydown", handleClick);
     
         nodes.append("circle")
             .filter(function (d) {
@@ -1000,13 +1159,7 @@ function tapestryTool(config){
             .attr("fill", function (d) {
                 return getNodeColor(d);
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
     
         /* Attach images to be used within each node */
         nodes.append("defs")
@@ -1052,7 +1205,12 @@ function tapestryTool(config){
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
-                        tapestry.selectNode(d.id)
+                        if (!isMultiSelect) {
+                            selection.clear();
+                            tapestry.selectNode(d.id);
+                        } else {
+                            selection.add(d);
+                        }
                     }
                 }
             });
@@ -1084,7 +1242,6 @@ function tapestryTool(config){
         nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
 
         nodes.on("mouseover", function (thisNode) {
-
             // Place this node at the end of the svg so that it appears on top
             $(this).insertAfter($(this).parent().children().last())
 
@@ -1228,6 +1385,53 @@ function tapestryTool(config){
                         return PROGRESS_THICKNESS;
                     }
                 });
+
+        nodes.selectAll(".selectable")
+            .attr("class", function (d) {
+                if (!getViewable(d))
+                    return "selectable grandchild";
+                else return "selectable";
+            })
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild") 
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            });
         
         /* Attach images to be used within each node */
         nodes.selectAll("defs")
