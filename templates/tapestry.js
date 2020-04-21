@@ -673,6 +673,40 @@ function tapestryTool(config){
             .on("tick", ticked);
     }
 
+    //Resize all nodes, where id is now the selected node
+    function resizeNodes(id) {
+        setNodeTypes(id);
+        setLinkTypes(id);
+        filterTapestry();
+    }
+
+    function ticked() {
+        var tapestryDimensions = tapestry.getTapestryDimensions();
+        links
+            .attr("x1", function (d) {
+                return getBoundedCoord(d.source.x, tapestryDimensions.width);
+            })
+            .attr("y1", function (d) {
+                return getBoundedCoord(d.source.y, tapestryDimensions.height);
+            })
+            .attr("x2", function (d) {
+                return getBoundedCoord(d.target.x, tapestryDimensions.width);
+            })
+            .attr("y2", function (d) {
+                return getBoundedCoord(d.target.y, tapestryDimensions.height);
+            });
+        nodes
+            .attr("cx", function (d) {
+                return getBoundedCoord(d.x, tapestryDimensions.width);
+            })
+            .attr("cy", function (d) {
+                return getBoundedCoord(d.y, tapestryDimensions.height);
+            })
+            .attr("transform", function (d) {
+                return "translate(" + getBoundedCoord(d.x, tapestryDimensions.width) + "," + getBoundedCoord(d.y, tapestryDimensions.height) + ")";
+            });
+    }
+
     function dragstarted(d) {
         if (allowSelection) {
             if(!config.wpCanEditTapestry &&
@@ -747,40 +781,6 @@ function tapestryTool(config){
 
         updateSvgDimensions();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
-    }
-
-    //Resize all nodes, where id is now the selected node
-    function resizeNodes(id) {
-        setNodeTypes(id);
-        setLinkTypes(id);
-        filterTapestry();
-    }
-
-    function ticked() {
-        var tapestryDimensions = tapestry.getTapestryDimensions();
-        links
-            .attr("x1", function (d) {
-                return getBoundedCoord(d.source.x, tapestryDimensions.width);
-            })
-            .attr("y1", function (d) {
-                return getBoundedCoord(d.source.y, tapestryDimensions.height);
-            })
-            .attr("x2", function (d) {
-                return getBoundedCoord(d.target.x, tapestryDimensions.width);
-            })
-            .attr("y2", function (d) {
-                return getBoundedCoord(d.target.y, tapestryDimensions.height);
-            });
-        nodes
-            .attr("cx", function (d) {
-                return getBoundedCoord(d.x, tapestryDimensions.width);
-            })
-            .attr("cy", function (d) {
-                return getBoundedCoord(d.y, tapestryDimensions.height);
-            })
-            .attr("transform", function (d) {
-                return "translate(" + getBoundedCoord(d.x, tapestryDimensions.width) + "," + getBoundedCoord(d.y, tapestryDimensions.height) + ")";
-            });
     }
 
     function createSvgContainer() {
