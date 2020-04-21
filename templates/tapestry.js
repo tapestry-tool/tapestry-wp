@@ -46,21 +46,25 @@ function tapestryTool(config){
         saveProgress = true,                                    // Saving Progress
         tapestryDimensionsBeforeDrag, nodesBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 4,                                      // Default depth of Tapestry
-        tapestryDepthSlider, hideShowControls = function(){},   // Controls
+        tapestryDepth = 0,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
         autoLayout = false,
         selection = null,                                       // a set containing the currently selected nodes
         isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
-        movementsEnabled = true;                                // enables/disables node movements by author or d3 itself
+        movementsEnabled = true,                                // enables/disables node movements by author or d3 itself
+        renderThumbnailsForEditors = false,                     // when authoring large tapestries, set this to false to improve performance
+        hardCodedDimensions = false;                            // if a tapestry has been finalized, adding this will improve performance
+                                                                // (console log getTapestryDimensions() with max depth to get this value)
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
         innerRadius = NORMAL_RADIUS - (PROGRESS_THICKNESS / 2),
         outerRadius = NORMAL_RADIUS + (PROGRESS_THICKNESS / 2),
         xORfx = autoLayout ? 'x' : 'fx',
-        yORfy = autoLayout ? 'y' : 'fy';
+        yORfy = autoLayout ? 'y' : 'fy',
+        renderThumbnails = config.wpCanEditTapestry ? renderThumbnailsForEditors : true;
 
     /****************************************************
      * EDIT-RELATED VARIABLES
@@ -98,12 +102,21 @@ function tapestryTool(config){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
-                // change http(s):// to // in media URLs and image URLs
+
+                // change http(s):// to // in media URLs
                 if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
-                if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
-                    tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+
+                if (renderThumbnails) {
+                    // change http(s):// to // in media URLs
+                    if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
+                        tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+                    }
+                }
+                else {
+                    // turn off thumbnails
+                    tapestry.dataset.nodes[i].imageURL = "";
                 }
             }
         }
@@ -326,8 +339,11 @@ function tapestryTool(config){
 
         dispatchEvent(new CustomEvent('change-selected-node', { detail: id }));
 
-        // slider's maximum depth is set to the longest path from the new selected node
-        tapestryDepthSlider.max = findMaxDepth(id);
+        if (tapestryDepth) {
+            // slider's maximum depth is set to the longest path from the new selected node
+            tapestryDepthSlider.max = findMaxDepth(id) + 1;
+        }
+
         updateSvgDimensions();
         renderTooltips()
     }
@@ -361,45 +377,7 @@ function tapestryTool(config){
         //--------------------------------------------------
         
         var tapestryControlsDiv = document.createElement("div");
-        tapestryControlsDiv.id = "tapestry-controls-wrapper"
-        
-        //--------------------------------------------------
-        // Add in Depth Slider
-        //--------------------------------------------------
-        
-        // Create wrapper div 
-        var depthSliderWrapper = document.createElement("div");
-        depthSliderWrapper.id = "tapestry-depth-slider-wrapper";
-        depthSliderWrapper.style.display = "none";
-        
-        // Create label element
-        var tapestryDepthSliderLabel = document.createElement("label");
-        tapestryDepthSliderLabel.innerHTML = "Depth: ";
-        depthSliderWrapper.appendChild(tapestryDepthSliderLabel);
-        
-        // Create input element
-        tapestryDepthSlider = document.createElement("input");
-        setAttributes(tapestryDepthSlider ,{
-            type:"range",
-            min:"2",
-            max:"4",
-            value:"4",
-            id:"tapestry-depth-slider"
-        });
-        depthSliderWrapper.appendChild(tapestryDepthSlider);
-        
-        // Every time the slider's value is changed, do the following
-        tapestryDepthSlider.onchange = function() {
-            tapestryDepth = this.value;
-        
-            setNodeTypes(root);
-            setLinkTypes(root);
-        
-            filterTapestry();
-            updateSvgDimensions();
-        };
-        
-        tapestryControlsDiv.appendChild(depthSliderWrapper);
+        tapestryControlsDiv.id = "tapestry-controls-wrapper";
 
         //--------------------------------------------------
         // Add in settings modal button
@@ -421,8 +399,46 @@ function tapestryTool(config){
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
+        
+        //--------------------------------------------------
+        // Add in Depth Slider
+        //--------------------------------------------------
 
-        function hideShowControls() {
+        if (tapestryDepth) {
+
+            // Create wrapper div 
+            var depthSliderWrapper = document.createElement("div");
+            depthSliderWrapper.id = "tapestry-depth-slider-wrapper";
+            depthSliderWrapper.style.display = "none";
+            
+            // Create label element
+            var tapestryDepthSliderLabel = document.createElement("label");
+            tapestryDepthSliderLabel.innerHTML = "Depth: ";
+            depthSliderWrapper.appendChild(tapestryDepthSliderLabel);
+            
+            // Create input element
+            tapestryDepthSlider = document.createElement("input");
+            setAttributes(tapestryDepthSlider ,{
+                type:"range",
+                min:"1",
+                max:"4",
+                value:"4",
+                id:"tapestry-depth-slider"
+            });
+            depthSliderWrapper.appendChild(tapestryDepthSlider);
+            
+            // Every time the slider's value is changed, do the following
+            tapestryDepthSlider.onchange = function() {
+                tapestryDepth = this.value;
+            
+                setNodeTypes(root);
+                setLinkTypes(root);
+            
+                filterTapestry();
+                updateSvgDimensions();
+            };
+            
+            tapestryControlsDiv.appendChild(depthSliderWrapper);
 
             var showDepthSlider = findMaxDepth(root) >= 2;
             // Hide depth slider if depth is less than 3 
@@ -433,7 +449,6 @@ function tapestryTool(config){
 
             tapestryControlsDiv.style.display = (showDepthSlider || showSettings) ? "flex" : "none";
         }
-        hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 
         return tapestryControlsDiv;
     }
@@ -1019,8 +1034,9 @@ function tapestryTool(config){
             }
         }
 
-        tapestryDepthSlider.max = findMaxDepth(root);
-        hideShowControls();
+        if (tapestryDepth) {
+            tapestryDepthSlider.max = findMaxDepth(root) + 1;
+        }
 
         /* Draws the circle that defines how large the node is */
         nodes.append("rect")
@@ -1474,7 +1490,7 @@ function tapestryTool(config){
     /* Create the node meta */
         nodes
             .filter(function (d){
-                return getViewable(d) && !d.hideTitle;
+                return getViewable(d) && (!d.hideTitle || !renderThumbnails);
             })
             .append('foreignObject')
             .attr("class","metaWrapper")
@@ -1773,8 +1789,8 @@ function tapestryTool(config){
 
         var maxPointX = 0;
         var maxPointY = 0;
-        var minPointX = 3000;
-        var minPointY = 3000;
+        var minPointX = 30000;
+        var minPointY = 30000;
                     
         if (autoLayout) {
             var maxDepth = findMaxDepth(root);
@@ -1815,6 +1831,10 @@ function tapestryTool(config){
 
     /* Gets the boundary of the tapestry */
     this.getTapestryDimensions = function () {
+
+        if (hardCodedDimensions) {
+            return hardCodedDimensions;
+        }
 
         var tapestryWidth = $('#'+TAPESTRY_CONTAINER_ID).outerWidth();
         var tapestryHeight = getBrowserHeight() - $('#'+TAPESTRY_CONTAINER_ID).offset().top;
@@ -1921,6 +1941,11 @@ function tapestryTool(config){
     /* Add 'depth' parameter to each node recursively. 
         The depth is determined by the number of levels from the root each node is. */
     function addDepthToNodes(id, depth, visited) {
+
+        if (!tapestryDepth) {
+            return;
+        }
+
         visited.push(id);
 
         const node = tapestry.dataset.nodes[findNodeIndex(id)];
@@ -2091,8 +2116,11 @@ function tapestryTool(config){
     function setNodeTypes(rootId) {
     
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 2),
-            grandchildren = getChildren(root, tapestryDepth - 1);
+
+        if (tapestryDepth) {
+            var children = getChildren(root, tapestryDepth - 2),
+                grandchildren = getChildren(root, tapestryDepth - 1);
+        }
     
         for (var i in tapestry.dataset.nodes) {
             var node = tapestry.dataset.nodes[i];
@@ -2102,7 +2130,7 @@ function tapestryTool(config){
             //      should default to being the more senior role
             if (id === root) {
                 node.nodeType = "root";
-            } else if (children.indexOf(id) > -1) {
+            } else if (!tapestryDepth || children.indexOf(id) > -1) {
                 node.nodeType = "child";
             } else if (grandchildren.indexOf(id) > -1) {
                 node.nodeType = "grandchild";
@@ -2114,9 +2142,13 @@ function tapestryTool(config){
     
     /* For setting the "type" field of links in dataset */
     function setLinkTypes(rootId) {
+
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 2),
-            grandchildren = getChildren(root, tapestryDepth - 1);
+
+        if (tapestryDepth) {
+            var children = getChildren(root, tapestryDepth - 2),
+                grandchildren = getChildren(root, tapestryDepth - 1);
+        }
     
         for (var i in tapestry.dataset.links) {
             var link = tapestry.dataset.links[i];
@@ -2127,7 +2159,7 @@ function tapestryTool(config){
             if (tapestry.dataset.links[i].appearsAt && tapestry.dataset.links[i].appearsAt <= (tapestry.dataset.nodes[parentIndex].typeData.progress[0].value * tapestry.dataset.nodes[parentIndex].mediaDuration)) {
                 if (targetId === root) {
                     link.type = "root";
-                } else if (children.indexOf(targetId) > -1) {
+                } else if (!tapestryDepth || children.indexOf(targetId) > -1) {
                     link.type = "child";
                 } else if (grandchildren.indexOf(targetId) > -1) {
                     link.type = "grandchild";
