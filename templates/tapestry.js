@@ -538,6 +538,12 @@ function tapestryTool(config){
                         method: API_DELETE_METHOD,
                         data: JSON.stringify(linkToRemove),
                         success: function(result) {
+                            const sourceNode = getNodeById(source);
+                            if (sourceNode.mediaType === "accordion") {
+                                if (sourceNode.childOrdering.includes(target)) {
+                                    sourceNode.childOrdering = sourceNode.childOrdering.filter(id => id !== target);
+                                }
+                            }
                            tapestry.dataset.links.splice(linkToRemove, 1);
                             if (isDeleteNode) {
                                 tapestry.dataset.nodes.splice(spliceIndex, 1);
