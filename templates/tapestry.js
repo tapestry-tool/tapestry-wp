@@ -46,7 +46,7 @@ function tapestryTool(config){
         saveProgress = true,                                    // Saving Progress
         tapestryDimensionsBeforeDrag, nodesBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 0,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
         tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -54,7 +54,7 @@ function tapestryTool(config){
         selection = null,                                       // a set containing the currently selected nodes
         isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
         movementsEnabled = true,                                // enables/disables node movements by author or d3 itself
-        renderImagesForEditors = false,                     // when authoring large tapestries, set this to false to improve performance
+        renderImagesForEditors = true,                      // when authoring large tapestries, set this to false to improve performance
         hardCodedDimensions = false;                            // if a tapestry has been finalized, adding this will improve performance
                                                                 // (console log getTapestryDimensions() with max depth to get this value)
 
