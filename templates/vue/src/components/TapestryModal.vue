@@ -68,8 +68,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getFavourites", "getNode"]),
     node() {
       return this.getNode(this.nodeId)
     },
