@@ -539,7 +539,7 @@ function tapestryTool(config){
                         data: JSON.stringify(linkToRemove),
                         success: function(result) {
                             const sourceNode = getNodeById(source);
-                            if (sourceNode.mediaType === "accordion") {
+                            if (sourceNode.mediaType === "accordion" || sourceNode.presentationStyle === "accordion-row") {
                                 if (sourceNode.childOrdering.includes(target)) {
                                     sourceNode.childOrdering = sourceNode.childOrdering.filter(id => id !== target);
                                 }
@@ -1605,14 +1605,16 @@ function tapestryTool(config){
                         let target = linkToNode;
 
                         const shouldAddLink = confirm(`Link from ${source.title} to ${target.title}?`);
+                        const isAccordionOrSubAccordion = source.mediaType === "accordion" || target.mediaType === "accordion" || source.presentationStyle === "accordion-row" || target.mediaType === "accordion-row"
 
-                        // If one of the nodes is an accordion
-                        if (source.mediaType === "accordion" || target.mediaType === "accordion") {
+                        if (isAccordionOrSubAccordion) {
+                            const isBothAccordion = (source.mediaType === "accordion" && target.mediaType === "accordion")
+                            const isBothSubAccordion = (source.presentationStyle === "accordion-row" && target.presentationStyle === "accordion-row")
                             // Since an accordion cannot be a child of another accordion, we only prompt if we're not linking 2 accordions
-                            if (source.mediaType !== "accordion" || target.mediaType !== "accordion") {
+                            if (!isBothAccordion && !isBothSubAccordion) {
                                 const addRow = confirm(`Add ${target.title} as a row of ${source.title}?`);
                                 if (addRow) {
-                                    if (target.mediaType === "accordion") {
+                                    if (target.mediaType === "accordion" || target.presentationStyle === "accordion-row") {
                                         // Swap the link ends so that it begins at the accordion
                                         source = linkToNode;
                                         target = linkFromNode;
