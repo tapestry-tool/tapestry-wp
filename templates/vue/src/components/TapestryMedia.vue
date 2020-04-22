@@ -31,8 +31,7 @@
       v-if="node.mediaType === 'url-embed'"
       :dimensions="dimensions"
       :node="node"
-      :dimensions="dimensions"
-      @mounted="handleLoad"
+      @load="handleLoad"
       @complete="complete"
     />
     <h5p-media
@@ -40,8 +39,6 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :node="node"
-      :width="dimensions.width"
-      :height="dimensions.height"
       :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @timeupdate="updateProgress"

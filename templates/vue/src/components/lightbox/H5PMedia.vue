@@ -22,7 +22,7 @@
       :node="node"
       :settings="h5pSettings"
       @complete="$emit('complete')"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
       @update-settings="updateH5pSettings"
@@ -100,6 +100,10 @@ export default {
     play() {
       this.showPlayScreen = false
       this.$refs.h5pIframe.play()
+    },
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load")
     },
   },
 }

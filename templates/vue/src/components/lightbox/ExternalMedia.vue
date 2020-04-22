@@ -6,7 +6,7 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
-      @loadeddata="$emit('load')"
+      @load="$emit('load')"
     ></iframe>
     <div v-else class="preview" :style="previewStyles">
       <div
@@ -42,10 +42,6 @@ export default {
       default: () => ({}),
     },
     node: {
-      type: Object,
-      required: true,
-    },
-    dimensions: {
       type: Object,
       required: true,
     },
