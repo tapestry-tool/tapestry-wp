@@ -1374,6 +1374,9 @@ function tapestryTool(config){
             })
             .attr("y", function (d) {
                 return getRadius(d) - 45;
+            })
+            .attr("style", (d) => {
+                return d.tydeProgress === 1 ? "" : "display: none;"
             });
         
         /* Attach images to be used within each node */
@@ -2281,8 +2284,8 @@ function tapestryTool(config){
     // TYDE ONLY
     function visiblePlanetViewIconHasUrl(d) {
         return d.tydeProgress === 1 ? 
-                d.typeData.planetViewEarnedIconUrl !== "" && d.typeData.planetViewEarnedIconUrl.length > 0 :
-                d.typeData.planetViewNotEarnedIconUrl !== "" && d.typeData.planetViewNotEarnedIconUrl.length > 0
+                d.typeData.planetViewEarnedIconUrl !== "" && d.typeData.planetViewEarnedIconUrl && d.typeData.planetViewEarnedIconUrl.length > 0 :
+                d.typeData.planetViewNotEarnedIconUrl !== "" && d.typeData.planetViewNotEarnedIconUrl && d.typeData.planetViewNotEarnedIconUrl.length > 0
     }
     
 } // END OF TAPESTRY TOOL CLASS
