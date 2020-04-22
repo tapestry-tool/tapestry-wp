@@ -2,8 +2,8 @@
   <b-form-group>
     <b-form-input
       ref="input"
-      :placeholder="placeholder"
       v-model="inputValue"
+      :placeholder="placeholder"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
@@ -111,14 +111,15 @@ export default {
   methods: {
     handleBlur() {
       this.isOpen = false
-      // if user leaves focus and hasn't selected anything,
-      // revert to whatever the previous selection was.
-      if (this.inputValue !== this.text && !this.selected) {
+      // if user leaves focus and input is empty, clear the value
+      if (this.inputValue.length === 0) {
+        this.$emit("input", null)
+      } else if (this.inputValue !== this.text && !this.selected) {
         this.inputValue = this.text
       }
     },
     handleClick(option) {
-      this.$emit("change", this.getValue(option))
+      this.$emit("input", this.getValue(option))
       this.inputValue = option[this.itemText]
       this.selected = true
       this.$refs.input.blur()
