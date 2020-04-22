@@ -4,7 +4,6 @@
     ref="h5p"
     frameborder="0"
     :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
-    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -174,36 +173,6 @@ export default {
     },
     handleLoad() {
       this.$emit("is-loaded")
-
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
-          }
-        })
-      }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]

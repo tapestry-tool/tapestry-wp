@@ -6,7 +6,7 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
-      @loadeddata="$emit('load')"
+      @load="$emit('load')"
     ></iframe>
     <div v-else class="preview">
       <div
@@ -37,10 +37,6 @@ export default {
   name: "external-media",
   props: {
     node: {
-      type: Object,
-      required: true,
-    },
-    dimensions: {
       type: Object,
       required: true,
     },

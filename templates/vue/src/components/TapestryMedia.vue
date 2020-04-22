@@ -24,16 +24,13 @@
     <external-media
       v-if="node.mediaType === 'url-embed'"
       :node="node"
-      :dimensions="dimensions"
-      @mounted="handleLoad"
+      @load="handleLoad"
       @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
       :node="node"
-      :width="dimensions.width"
-      :height="dimensions.height"
       :settings="h5pSettings"
       @load="handleLoad"
       @update-settings="updateH5pSettings"
