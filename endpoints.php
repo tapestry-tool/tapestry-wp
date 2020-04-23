@@ -13,7 +13,6 @@ require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
 require_once __DIR__ . '/classes/class.tapestry-audio.php';
 require_once __DIR__ . '/classes/class.tapestry-form.php';
 require_once __DIR__ . '/classes/class.tapestry-h5p.php';
-require_once __DIR__ . '/classes/class.tapestry-user-favourites.php';
 require_once __DIR__ . '/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
