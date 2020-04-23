@@ -25,6 +25,7 @@
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"
+      :dimensions="dimensions"
       :node="node"
       :dimensions="dimensions"
       @mounted="handleLoad"
