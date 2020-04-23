@@ -3,7 +3,8 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="(node.typeData && node.typeData.mediaURL) || mediaURL"
+    :src="node.typeData && node.typeData.mediaURL"
+    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -31,14 +32,6 @@ export default {
         return {}
       },
     },
-    width: {
-      type: Number,
-      required: false,
-    },
-    mediaURL: {
-      type: String,
-      required: false,
-    },
     autoplay: {
       type: Boolean,
       required: false,
@@ -47,6 +40,7 @@ export default {
   },
   data() {
     return {
+      width: 50,
       recordedNodeIds: [],
       loadedH5PRecorderId: 0,
       TapestryAPI: new TapestryApi(wpPostId),
@@ -173,6 +167,26 @@ export default {
     },
     handleLoad() {
       this.$emit("is-loaded")
+
+      if (this.node.fullscreen) {
+        const frame = this.$refs.h5p
+        frame.removeAttribute("width")
+        frame.removeAttribute("height")
+        const setIframeDimensions = () => {
+          const { width, height } = frame.getBoundingClientRect()
+          const parentHeight = frame.parentNode.getBoundingClientRect().height
+          if (height > parentHeight) {
+            const ratio = height / width
+            if (ratio < 1) {
+              const newWidth = width * (parentHeight / height)
+              frame.style.width = newWidth + "px"
+              frame.style.height = parentHeight + "px"
+            }
+          }
+        }
+        $(window).resize(setIframeDimensions)
+        setIframeDimensions()
+      }
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]

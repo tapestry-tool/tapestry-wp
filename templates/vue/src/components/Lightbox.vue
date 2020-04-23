@@ -118,6 +118,13 @@ export default {
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
 
+      if (this.node.fullscreen) {
+        return {
+          width: browserWidth,
+          height: browserHeight,
+        }
+      }
+
       let resizeRatio = 1
       let videoWidth = width
       let videoHeight = height
