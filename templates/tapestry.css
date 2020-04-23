@@ -394,8 +394,8 @@ input[type="checkbox"][disabled] {
 
 .tyde-module-complete-check {
     color: lightgreen;
-    height: 4em;
-    width: 4em;
+    height: 5em;
+    width: 5em;
 }
 
 .tyde-module-complete-check i {

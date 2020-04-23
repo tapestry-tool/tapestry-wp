@@ -1259,7 +1259,7 @@ function tapestryTool(config){
         // TYDE ONLY - Add progress bar above module nodes
         nodes.append("foreignObject")
             .filter(function (d){
-                return getViewable(d) && d.tydeType === "Module";
+                return getViewable(d) && d.tydeType === "Module" && d.tydeProgress > 0 && d.tydeProgress < 1;
             })
             .attr("width", function (d) {
                 return getRadius(d) * 1.3;
@@ -1557,7 +1557,7 @@ function tapestryTool(config){
                     return - getRadius(d) - 50;
                 })
                 .attr("style", (d) => {
-                    return d.tydeProgress === 0 ? "display: none;" : ""
+                    return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
                 });
 
         // TYDE ONLY - update planet icon size and position
@@ -1928,7 +1928,7 @@ function tapestryTool(config){
                 return - getRadius(d) * 0.8
             })
             .attr("style", (d) => {
-                return d.tydeProgress === 0 ? "display: none;" : ""
+                return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
             });
             
             // TYDE ONLY - Update progress bar based on foreign object
