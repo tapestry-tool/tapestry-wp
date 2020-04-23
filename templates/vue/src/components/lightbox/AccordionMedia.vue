@@ -19,7 +19,7 @@
           </button>
           <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
             <i
-              v-if="isFavouriteAccordion(row.node.id)"
+              v-if="isFavourite(row.node.id)"
               class="fas fa-heart fa-sm"
               style="color:red;"
             ></i>
@@ -198,14 +198,14 @@ export default {
         }
       }
     },
-    isFavouriteAccordion(nodeId) {
+    isFavourite(nodeId) {
       nodeId = nodeId.toString()
       return this.favourites.find(id => id == nodeId)
     },
     updateFavourites(nodeId) {
       let updatedFavouritesList = [...this.favourites]
       nodeId = nodeId.toString()
-      if (this.isFavouriteAccordion(nodeId)) {
+      if (this.isFavourite(nodeId)) {
         updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
       } else {
         updatedFavouritesList.push(nodeId)

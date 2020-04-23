@@ -15,7 +15,7 @@
           </button>
           <a @click="updateFavourites(row.id)">
             <i
-              v-if="isFavouriteAccordion(row.id)"
+              v-if="isFavourite(row.id)"
               class="fas fa-heart fa-sm"
               style="color:red;"
             ></i>
@@ -100,14 +100,14 @@ export default {
         this.activeIndex++
       }
     },
-    isFavouriteAccordion(nodeId) {
+    isFavourite(nodeId) {
       nodeId = nodeId.toString()
       return this.favourites.find(id => id == nodeId)
     },
     updateFavourites(nodeId) {
       let updatedFavouritesList = [...this.favourites]
       nodeId = nodeId.toString()
-      if (this.isFavouriteAccordion(nodeId)) {
+      if (this.isFavourite(nodeId)) {
         updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
       } else {
         updatedFavouritesList.push(nodeId)
