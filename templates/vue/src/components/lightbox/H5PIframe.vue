@@ -9,9 +9,7 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -142,35 +140,25 @@ export default {
     handleLoad() {
       this.$emit("is-loaded")
 
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
+      if (this.node.fullscreen) {
+        const frame = this.$refs.h5p
+        frame.removeAttribute("width")
+        frame.removeAttribute("height")
+        const setIframeDimensions = () => {
+          const { width, height } = frame.getBoundingClientRect()
+          const parentHeight = frame.parentNode.getBoundingClientRect().height
+          if (height > parentHeight) {
+            const ratio = height / width
+            if (ratio < 1) {
+              const newWidth = width * (parentHeight / height)
+              frame.style.width = newWidth + "px"
+              frame.style.height = parentHeight + "px"
+            }
           }
-        })
+        }
+        $(window).resize(setIframeDimensions)
+        setIframeDimensions()
       }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
 
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
