@@ -1134,8 +1134,8 @@ function getUserFavourites($request)
 {
     $postId = $request['post_id'];
     try {
-        $userFavourites = new TapestryUserFavourites($postId);
-        return $userFavourites->get();
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getFavourites();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1153,8 +1153,8 @@ function updateUserFavourites($request)
     $postId = $request['post_id'];
     $favourites = json_decode($request->get_body())->favourites;
     try {
-        $userFavourites = new TapestryUserFavourites($postId);
-        return $userFavourites->updateFavourites($favourites);
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->updateFavourites($favourites);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
