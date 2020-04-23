@@ -4,7 +4,7 @@
     <transition name="modal">
       <div v-if="load" class="content" :style="contentContainerStyle">
         <div class="buttons-container">
-          <modal-button icon="times" @clicked="$emit('close')" />
+          <modal-button v-if="allowClose" icon="times" @clicked="$emit('close')" />
           <modal-button
             icon="heart"
             icon-size="sm"
