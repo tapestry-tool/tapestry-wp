@@ -205,7 +205,7 @@
                 v-model="addLockedThumbnail"
                 data-testid="node-appearance-add-locked-thumbnail"
               >
-                Add a thumbnail for when node is locked
+                Show a different thumbnail when locked
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addLockedThumbnail">
@@ -550,8 +550,9 @@ export default {
     nodeImageUrl() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
-    nodeLockedImageURL(){
-      this.addLockedThumbnail = this.node.lockedImageURL && this.node.lockedImageURL.length > 0
+    nodeLockedImageURL() {
+      this.addLockedThumbnail =
+        this.node.lockedImageURL && this.node.lockedImageURL.length > 0
     },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()

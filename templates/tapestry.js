@@ -918,17 +918,13 @@ function tapestryTool(config){
                 return "imageContainer";
             })
             .attr("rx", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
-                    return 0;
-                } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
             })
             .attr("ry", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
-                    return 0;
-                } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
@@ -965,10 +961,12 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (!d.accessible && d.lockedImageURL && d.lockedImageURL.length)
-                    return "url('#node-locked-thumb-" + d.id + "')";
-                if (!d.accessible)
-                    return COLOR_LOCKED;
+                if (!d.accessible) {
+                    if (d.lockedImageURL && d.lockedImageURL.length)
+                        return "url('#node-locked-thumb-" + d.id + "')";
+                    else
+                        return COLOR_LOCKED;
+                }
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
@@ -985,7 +983,7 @@ function tapestryTool(config){
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
                 // or no overlay if node is locked and has a locked image
-                return !(d.hideProgress && d.imageURL.length) || (!d.accessible && d.lockedImageURL.length);
+                return !(d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length));
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
@@ -1222,17 +1220,13 @@ function tapestryTool(config){
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .attr("rx", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
-                        return 0;
-                    } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                         return 0;
                     }
                     return getRadius(d);
                 })
                 .attr("ry", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
-                        return 0;
-                    } else if(d.hideProgress && !d.accessible && d.lockedImageURL.length){
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                         return 0;
                     }
                     return getRadius(d);
@@ -1259,10 +1253,12 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
-                    if (!d.accessible && d.lockedImageURL && d.lockedImageURL.length)
-                        return "url('#node-locked-thumb-" + d.id + "')";
-                    if (!d.accessible)
-                        return COLOR_LOCKED;
+                    if (!d.accessible) {
+                        if (d.lockedImageURL && d.lockedImageURL.length)
+                            return "url('#node-locked-thumb-" + d.id + "')";
+                        else
+                            return COLOR_LOCKED;
+                    }
                     if (d.imageURL.length)
                         return "url('#node-thumb-" + d.id + "')";
                     return COLOR_BLANK_HOVER;
@@ -1311,7 +1307,7 @@ function tapestryTool(config){
         /* Update the progress pies */
         updateViewedProgress();
     
-    /* Create the node meta */
+        /* Create the node meta */
         nodes
             .filter(function (d){
                 return getViewable(d) && !d.hideTitle;
@@ -1365,8 +1361,6 @@ function tapestryTool(config){
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' +
-                    ' data-locked-thumb="' + d.lockedImageURL + '"' +
                     ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
@@ -1736,21 +1730,21 @@ function tapestryTool(config){
         if (node.nodeType === "grandchild") {
             base += " grandchild";
         }
-        if ((node.imageURL.length === 0 && node.accessible) || (node.lockedImageURL.length === 0 && !node.accessible)) {
+        if ((node.accessible ? node.imageURL.length : node.lockedImageURL.length) === 0) {
             base += " imageOverlay--no-image";
         } 
         return base;
     }
 
     function getNodeColor(node) {
-        if (!getViewable(node))
+        if (!getViewable(node) || (!node.accessible && node.lockedImageURL.length))
             return "transparent";
         if (node.nodeType === "grandchild")
             return COLOR_GRANDCHILD;
+        if (node.accessible && node.imageURL.length === 0)
+            return COLOR_BLANK;
         if (!node.accessible)
             return COLOR_LOCKED;
-        if ((node.imageURL.length === 0 && node.accessible) || (node.lockedImageURL.length === 0 && !node.accessible))
-            return COLOR_BLANK;
         return COLOR_STROKE;
     }
 
