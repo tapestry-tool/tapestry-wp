@@ -23,6 +23,7 @@
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"
+      :dimensions="dimensions"
       :node="node"
       @load="handleLoad"
       @complete="complete"
