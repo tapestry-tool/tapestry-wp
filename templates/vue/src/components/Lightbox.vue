@@ -185,9 +185,9 @@ export default {
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
-      if (width && height) {
-        this.updateDimensions({ width, height })
+    handleLoad(args) {
+      if (args && args.width && args.height) {
+        this.updateDimensions({ width: args.width, height: args.height })
       }
     },
     updateDimensions(dimensions) {
