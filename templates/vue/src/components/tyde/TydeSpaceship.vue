@@ -73,7 +73,6 @@ export default {
       }
     },
     returnToMap() {
-      this.$router.push("/")
       this.toggleMenu()
       this.$emit("return-to-map")
     },

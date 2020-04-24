@@ -39,6 +39,9 @@
               ></b-form-textarea>
             </b-form-group>
             <tyde-type-input :node="node" :parent="parent" />
+            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -259,7 +262,8 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Permissions">
+        <b-tab title="Access">
+          <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
               <b-thead>
@@ -322,6 +326,8 @@
               </b-tbody>
             </b-table-simple>
           </div>
+          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+          <conditions-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -367,63 +373,75 @@
               Spaceship Part Coordinates and Size in Cockpit
             </h6>
             <b-row id="node-spaceship-parts" class="mb-4">
-              <b-col sm="6" class="pt-2">
+              <b-col sm="5" class="pt-2">
                 Distance from upper left-hand corner:
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="X: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-x"
                 >
                   <b-form-input
                     id="node-spaceship-part-x"
                     v-model="node.typeData.spaceshipPartX"
-                    placeholder="In pixels (top left)"
+                    placeholder="In Percentage (top left)"
+                    type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Y: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-y"
                 >
                   <b-form-input
                     id="node-spaceship-part-y"
                     v-model="node.typeData.spaceshipPartY"
-                    placeholder="In pixels (top left)"
+                    placeholder="In Percentage (top left)"
+                    type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
             </b-row>
             <b-row id="node-spaceship-parts">
-              <b-col sm="6" class="pt-2">
+              <b-col sm="5" class="pt-2">
                 Dimensions of image:
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Width: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-width"
                 >
                   <b-form-input
                     id="node-spaceship-part-width"
                     v-model="node.typeData.spaceshipPartWidth"
-                    placeholder="In pixels"
+                    placeholder="In percentage"
+                    type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
               <b-col>
                 <b-input-group
                   prepend="Height: "
-                  append="px"
+                  append="%"
                   label-for="node-spaceship-part-height"
                 >
                   <b-form-input
                     id="node-spaceship-part-height"
                     v-model="node.typeData.spaceshipPartHeight"
-                    placeholder="In pixels"
+                    placeholder="In percentage"
+                    type="number"
+                    min="0"
+                    max="100"
                   />
                 </b-input-group>
               </b-col>
@@ -431,7 +449,11 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="node.tydeType === tydeTypes.MODULE || node.mediaType === 'accordion'"
+          v-if="
+            node.tydeType === tydeTypes.MODULE ||
+              node.mediaType === 'accordion' ||
+              hasSubAccordion
+          "
           title="Ordering"
         >
           <div>
@@ -482,17 +504,18 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
-import { mapGetters, mapMutations } from "vuex"
 import { tydeTypes } from "../utils/constants"
 import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
+import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
@@ -502,6 +525,7 @@ export default {
     Combobox,
     QuizModal,
     TydeTypeInput,
+    ConditionsForm,
     FileUpload,
     SlickItem,
     SlickList,
@@ -564,7 +588,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -601,6 +625,15 @@ export default {
       }
       return false
     },
+    hasSubAccordion() {
+      const parents = this.getDirectParents(this.node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(this.node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -621,6 +654,7 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
+        { name: "conditions", value: this.node.conditions || [] },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
@@ -637,7 +671,6 @@ export default {
           name: "imageURL",
           value: this.node.imageURL || "",
         },
-        { name: "unlocked", value: this.node.unlocked },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
@@ -674,6 +707,7 @@ export default {
           name: "spaceshipPartHeight",
           value: this.node.typeData.spaceshipPartHeight,
         },
+        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
         { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
@@ -710,6 +744,7 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
+        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
@@ -725,6 +760,11 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+      }
+    })
+    this.$root.$on("bv::modal::hide", (_, modalId) => {
+      if (modalId == "node-modal-container") {
+        thisTapestryTool.enableMovements()
       }
     })
   },
@@ -768,7 +808,7 @@ export default {
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
       const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user")) {
+      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
       }
 
@@ -794,7 +834,7 @@ export default {
       this.$set(this.node.permissions, rowName, newPermissions)
     },
     updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user")) {
+      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.changeIndividualPermission(value, rowName, type)
       }
       const rowIndex = this.getPermissionRowIndex(rowName)
@@ -877,7 +917,9 @@ export default {
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
-        return Object.values(question.answers).some(value => value.length > 0)
+        return Object.values(question.answers).some(
+          value => value && value.length > 0
+        )
       })
     },
     addUserPermissionRow() {
@@ -984,6 +1026,22 @@ table {
     > span:last-of-type {
       margin-left: auto;
     }
+  }
+}
+
+.slick-list-item {
+  display: flex;
+  height: 25px;
+  border: lightgray solid 1.5px;
+  margin: 10px 25px;
+  border-radius: 5px;
+  padding: 15px;
+  align-items: center;
+  > span {
+    margin-right: 25px;
+  }
+  > span:last-of-type {
+    margin-left: auto;
   }
 }
 </style>

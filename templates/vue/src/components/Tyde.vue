@@ -44,6 +44,6 @@ export default {
   --tapestry-light-blue: #1eade1;
   --tyde-green: #205a27;
   --tyde-border-green: #39b54a;
-  --tyde-font-mono: "VT323", monospace;
+  --tyde-font-mono: "Roboto", monospace;
 }
 </style>

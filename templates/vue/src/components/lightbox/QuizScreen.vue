@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-screen" :style="{ backgroundImage }">
-    <completion-screen v-if="showCompletionScreen">
+    <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
       <button v-if="hasNext" class="button-completion" @click="next">
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
@@ -106,14 +106,18 @@ export default {
   align-items: flex-end;
   justify-content: space-between;
   padding: 24px;
-  padding-left: 40%;
+  padding-left: 20%;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   color: black;
   z-index: 10;
+  background-color: #fff;
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: 0 80%;
 }
 
 .question-footer {

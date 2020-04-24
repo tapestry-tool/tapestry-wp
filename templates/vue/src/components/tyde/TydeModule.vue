@@ -1,6 +1,12 @@
 <template>
   <div :id="`module-${nodeId}`" class="module-wrapper">
-    <tyde-stage :node-id="activeStage" @next="next"></tyde-stage>
+    <tyde-stage
+      :node-id="activeStage"
+      :stage-index="activeStageIndex"
+      @next="next"
+      @close="$emit('done')"
+      @prev="prev"
+    ></tyde-stage>
   </div>
 </template>
 
@@ -64,6 +70,11 @@ export default {
       } else {
         this.openLightbox(this.nodeId)
         this.$emit("done")
+      }
+    },
+    prev() {
+      if (this.activeStageIndex > 0) {
+        this.activeStageIndex--
       }
     },
   },

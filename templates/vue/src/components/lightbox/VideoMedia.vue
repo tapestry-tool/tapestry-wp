@@ -191,23 +191,13 @@ export default {
       const video = this.$refs.video
       if (video) {
         const amountViewed = video.currentTime / video.duration
-        const amountNotViewed = 1.0 - amountViewed
-
-        this.$emit("timeupdate", "video", amountViewed)
-        this.$set(this.node.typeData.progress[0], "value", amountViewed)
-        this.$set(this.node.typeData.progress[1], "value", amountNotViewed)
-
+        this.$emit("timeupdate", amountViewed)
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-          this.$set(this.node, "completed", true)
           this.$emit("complete")
         }
-
         if (amountViewed >= 1 && this.allowEndScreen) {
           this.showEndScreen = true
         }
-
-        thisTapestryTool.updateChildren(this.node.id, video)
-        thisTapestryTool.updateProgressBars()
       }
     },
   },

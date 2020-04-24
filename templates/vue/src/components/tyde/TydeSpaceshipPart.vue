@@ -38,10 +38,10 @@ export default {
     style() {
       return {
         backgroundImage: `url(${this.img})`,
-        top: this.node.typeData.spaceshipPartY + "px",
-        left: this.node.typeData.spaceshipPartX + "px",
-        height: this.node.typeData.spaceshipPartHeight + "px",
-        width: this.node.typeData.spaceshipPartWidth + "px",
+        top: this.node.typeData.spaceshipPartY + "%",
+        left: this.node.typeData.spaceshipPartX + "%",
+        height: this.node.typeData.spaceshipPartHeight + "%",
+        width: this.node.typeData.spaceshipPartWidth + "%",
         cursor: this.node.tydeProgress === 1 ? "pointer" : "default",
       }
     },
@@ -51,6 +51,7 @@ export default {
 
 <style lang="scss" scoped>
 #tyde-spaceship-part {
+  cursor: pointer;
   position: absolute;
   background-size: cover;
   background-position: center;

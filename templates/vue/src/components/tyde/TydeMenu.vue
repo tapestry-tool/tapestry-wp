@@ -17,6 +17,11 @@
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button
+        icon="user-circle"
+        label="Profile"
+        @click="setActivePage('profile')"
+      ></tyde-button>
+      <tyde-button
         icon="space-shuttle"
         class="cockpit-button"
         label="Cockpit"
@@ -46,6 +51,10 @@
         @settings-change="updateSettings"
       />
       <tyde-menu-help v-if="activePage === 'help'" />
+      <tyde-menu-profile
+        v-if="activePage === 'profile'"
+        @back="setActivePage('home')"
+      />
     </div>
   </div>
 </template>
@@ -56,6 +65,7 @@ import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
+import TydeMenuProfile from "./TydeMenuProfile"
 import TydeModuleSummary from "./TydeModuleSummary"
 
 export default {
@@ -65,6 +75,7 @@ export default {
     TydeCockpit,
     TydeMenuSettings,
     TydeMenuHelp,
+    TydeMenuProfile,
     TydeModuleSummary,
   },
   data() {
@@ -79,7 +90,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
-    ...mapGetters(["logs", "getNode"]),
+    ...mapGetters(["getNode"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -134,7 +145,8 @@ export default {
 
   .content {
     background: var(--tapestry-gray);
-    border: 4px solid white;
+    border: 4px var(--tapestry-gray);
+    border-radius: 20px;
     height: calc(100vh - 86px);
     overflow-y: scroll;
     padding: 16px 32px;

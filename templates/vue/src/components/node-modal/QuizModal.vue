@@ -9,7 +9,8 @@
       <b-card
         v-for="(question, index) in questions"
         :key="question.id"
-        bg-variant="light"
+        bg-variant="secondary"
+        text-variant="light"
         class="mb-3"
       >
         <b-form-group class="mb-0">
@@ -20,75 +21,145 @@
             <b-button
               class="ml-auto del-button"
               size="sm"
-              variant="outline-danger"
+              variant="danger"
+              text-variant="white"
               @click="deleteQuestion(question.id)"
             >
               Delete
             </b-button>
           </b-row>
-          <b-form-group label="Question Text">
-            <b-form-input
-              v-model="question.text"
-              :data-testid="`question-title-${index}`"
-            />
-          </b-form-group>
-          <b-form-group label="Question Answer Types">
-            <b-form-group label="Textbox Gravity Form">
+          <b-card
+            sub-title="Show Answer to a Previous Activity First"
+            bg-variant="light"
+            text-variant="dark"
+            class="mb-3"
+          >
+            <b-form-group>
+              <b-form-checkbox v-model="question.isFollowUp" switch>
+                {{ question.isFollowUp ? "Yes" : "No" }}
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="question.isFollowUp" label="Show this text first:">
+              <b-form-input v-model="question.followUpText"></b-form-input>
+            </b-form-group>
+            <b-form-group
+              v-if="question.isFollowUp"
+              label="Then show user answer to the following activity:"
+            >
               <combobox
-                v-model="question.answers.textId"
-                :data-testid="`question-answer-textbox-${index}`"
-                :options="formOptions"
-                item-text="title"
+                v-model="question.previousEntry"
+                class="mb-0"
+                :options="getPreviousOptions(question)"
+                item-text="text"
                 item-value="id"
-                empty-message="There are no forms available. Please add one in your WP dashboard."
-                @focus="wasFocused = true"
+                empty-message="There are no activities yet."
               >
                 <template v-slot="slotProps">
                   <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
+                    {{ slotProps.option.text }}
                   </p>
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group label="H5P Audio Recorder">
-              <combobox
-                v-model="question.answers.audioId"
-                :options="h5pOptions"
-                item-text="title"
-                item-value="id"
-                empty-message="There's no H5P content yet. Please add one in your WP dashboard."
-                @focus="wasFocused = true"
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
-                  </p>
-                </template>
-              </combobox>
+          </b-card>
+          <b-card
+            sub-title="Question Details"
+            bg-variant="light"
+            text-variant="dark"
+            class="mb-3"
+          >
+            <b-form-group label="Question text">
+              <b-form-input
+                v-model="question.text"
+                :data-testid="`question-title-${index}`"
+              />
             </b-form-group>
-            <b-form-group label="Checklist Gravity Form">
-              <combobox
-                v-model="question.answers.checklistId"
-                :options="formOptions"
-                item-text="title"
-                item-value="id"
-                empty-message="There are no forms available. Please add one in your WP dashboard."
-                @focus="wasFocused = true"
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
-                  </p>
-                </template>
-              </combobox>
+            <b-form-group label="Answer options" class="mb-0">
+              <b-row>
+                <b-col cols="12" md="4">
+                  <b-form-group label="Textbox Gravity Form" class="mb-0">
+                    <combobox
+                      v-model="question.answers.textId"
+                      :data-testid="`question-answer-textbox-${index}`"
+                      :options="formOptions"
+                      item-text="title"
+                      item-value="id"
+                      empty-message="There are no forms available. Please add one in your WP dashboard."
+                      @focus="wasFocused = true"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          <code>{{ slotProps.option.id }}</code>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12" md="4">
+                  <b-form-group label="H5P Audio Recorder" class="mb-0">
+                    <combobox
+                      v-model="question.answers.audioId"
+                      :options="h5pOptions"
+                      item-text="title"
+                      item-value="id"
+                      empty-message="There's no H5P content yet. Please add one in your WP dashboard."
+                      @focus="wasFocused = true"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          <code>{{ slotProps.option.id }}</code>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12" md="4">
+                  <b-form-group label="Checklist Gravity Form" class="mb-0">
+                    <combobox
+                      v-model="question.answers.checklistId"
+                      :options="formOptions"
+                      item-text="title"
+                      item-value="id"
+                      empty-message="There are no forms available. Please add one in your WP dashboard."
+                      @focus="wasFocused = true"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          <code>{{ slotProps.option.id }}</code>
+                          {{ slotProps.option.title }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                </b-col>
+              </b-row>
             </b-form-group>
-          </b-form-group>
-          <b-form-invalid-feedback :state="isAnswerValid(question)">
-            Please enter an ID in at least one of the answer types.
-          </b-form-invalid-feedback>
+            <b-form-invalid-feedback :state="isAnswerValid(question)">
+              Please enter an ID in at least one of the answer types.
+            </b-form-invalid-feedback>
+          </b-card>
+          <b-card
+            sub-title="Confirmation Page Customization"
+            bg-variant="light"
+            text-variant="dark"
+          >
+            <b-form-group label="Title">
+              <b-form-input
+                v-model="question.confirmationTitle"
+                :data-testid="`question-confirmation-title-${index}`"
+                placeholder="Thanks!"
+              />
+            </b-form-group>
+            <b-form-group label="Body">
+              <b-form-textarea
+                v-model="question.confirmationMessage"
+                :data-testid="`question-confirmation-message-${index}`"
+                placeholder="Your response has been recorded."
+              ></b-form-textarea>
+            </b-form-group>
+          </b-card>
         </b-form-group>
       </b-card>
     </div>
@@ -102,6 +173,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
 import H5PApi from "../../services/H5PApi"
@@ -138,6 +210,20 @@ export default {
       wasFocused: false,
     }
   },
+  computed: {
+    ...mapState(["nodes"]),
+    activities() {
+      const questions = this.nodes
+        .filter(node => Boolean(node.quiz))
+        .flatMap(node => node.quiz)
+      this.questions.forEach(q => {
+        if (!questions.find(qn => qn.id === q.id)) {
+          questions.push(q)
+        }
+      })
+      return questions
+    },
+  },
   watch: {
     canAddQuestion(isAdding) {
       if (isAdding && !this.questions.length) {
@@ -157,11 +243,17 @@ export default {
     this.h5pOptions = h5ps
   },
   methods: {
+    getPreviousOptions(currentQuestion) {
+      return this.activities.filter(qn => qn !== currentQuestion)
+    },
     addQuestion() {
       this.questions = [
         ...this.questions,
         {
           id: Helpers.createUUID(),
+          isFollowUp: false,
+          previousEntry: null,
+          followUpText: "Previously, you said:",
           text: "",
           answers: { ...defaultQuestion.answers },
           completed: false,
@@ -178,7 +270,7 @@ export default {
       if (!this.wasFocused) {
         return null
       }
-      return Object.values(question.answers).some(value => value.length > 0)
+      return Object.values(question.answers).some(value => value && value.length > 0)
     },
   },
 }
