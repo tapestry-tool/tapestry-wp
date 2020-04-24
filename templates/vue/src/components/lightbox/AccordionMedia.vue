@@ -115,11 +115,8 @@ export default {
     TapestryModal,
     AccordionRow,
     TydeIcon,
-<<<<<<< HEAD
     TydeProgressBar,
-=======
     SubAccordion,
->>>>>>> 510a69f77a3f668fa66ba9c1133e233f60832a5c
   },
   props: {
     node: {
