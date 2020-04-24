@@ -917,7 +917,9 @@ export default {
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
-        return Object.values(question.answers).some(value => value.length > 0)
+        return Object.values(question.answers).some(
+          value => value && value.length > 0
+        )
       })
     },
     addUserPermissionRow() {
