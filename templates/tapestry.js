@@ -109,17 +109,18 @@ function tapestryTool(config){
                 }
 
                 if (renderThumbnails) {
-                    // change http(s):// to // in media URLs
+                    // change http(s):// to // in media URLs and locked image URLs
                     if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
                         tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+                    }
+                    if (typeof tapestry.dataset.nodes[i].lockedImageURL != "undefined" && tapestry.dataset.nodes[i].lockedImageURL.length > 0) {
+                        tapestry.dataset.nodes[i].lockedImageURL = tapestry.dataset.nodes[i].lockedImageURL.replace(/(http(s?)):\/\//gi, '//');
                     }
                 }
                 else {
                     // turn off thumbnails
                     tapestry.dataset.nodes[i].imageURL = "";
-                }
-                if (typeof tapestry.dataset.nodes[i].lockedImageURL != "undefined" && tapestry.dataset.nodes[i].lockedImageURL.length > 0) {
-                    tapestry.dataset.nodes[i].lockedImageURL = tapestry.dataset.nodes[i].lockedImageURL.replace(/(http(s?)):\/\//gi, '//');
+                    tapestry.dataset.nodes[i].lockedImageURL = "";
                 }
             }
         }
