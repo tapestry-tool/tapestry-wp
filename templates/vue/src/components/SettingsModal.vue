@@ -75,7 +75,7 @@
                       placeholder="Choose activity"
                       empty-message="There are no activities yet."
                       class="mb-0"
-                      @change="profileActivities[index].activityRef = $event"
+                      @input="profileActivities[index].activityRef = $event"
                     >
                       <template v-slot="slotProps">
                         <p>
