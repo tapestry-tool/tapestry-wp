@@ -7,8 +7,14 @@
       </div>
       <div class="answer-entry">
         <h4>You answered:</h4>
-        <div v-if="answer.icon !== 'audio'" v-html="answer.entry"></div>
-        <audio v-else controls></audio>
+        <div v-if="answer.icon !== 'audio' && answer.icon !== 'checklist'" v-html="answer.entryHTML"></div>
+        <ul v-if="answer.icon === 'checklist'" class="checklist">
+          <li v-for="(choice, index) in answer.entry" :key="index">
+            <img :src="choice.imageUrl" />
+            {{ choice.choiceText }}
+          </li>
+        </ul>
+        <audio v-if="answer.icon === 'audio'" controls></audio>
       </div>
     </div>
   </div>
@@ -33,9 +39,14 @@ export default {
       const entries = Object.entries(this.activity.entries)
       return entries.map(entry => ({
         icon: this.getIcon(entry),
-        entry: this.formatEntry(this.getEntry(entry).map(i => i[1])),
+        entry: this.getEntry(entry).map(i => i[1]),
+        entryHTML: this.formatEntry(this.getEntry(entry).map(i => i[1])),
       }))
     },
+  },
+  mounted() {
+    const entries = Object.entries(this.activity.entries)
+    console.log(entries.map(e => this.getEntry(e).map(i => i[1]).filter(e => e !== "")))
   },
   methods: {
     formatEntry(entry) {
@@ -53,7 +64,7 @@ export default {
     getEntry(answer) {
       if (answer[0] === "audioId") {
         return answer
-      }
+      } 
       return Object.entries(answer[1]).filter(entry => {
         const val = parseInt(entry[0])
         return !isNaN(val)
@@ -119,6 +130,11 @@ export default {
     img {
       width: 70%;
     }
+  }
+
+  .answer-entry > ul > li > img{
+    height: 75px;
+    width: auto;
   }
 }
 </style>
