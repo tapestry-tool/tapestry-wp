@@ -46,7 +46,7 @@ export default {
       required: true,
     },
     value: {
-      type: [Object, String, null],
+      type: [Object, String],
       required: false,
       default: null,
     },
