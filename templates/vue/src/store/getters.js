@@ -129,6 +129,6 @@ function formatEntry(answers, answerType) {
     }
   }
   if (answerType === "checklistId") {
-    return { type: "checklist", entry: answers.filter(answer => answer.length) }
+    return { type: "checklist", entry: answers.filter(answer => answer !== "") }
   }
 }

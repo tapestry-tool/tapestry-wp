@@ -3,7 +3,10 @@
     <div class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ entry }}</div>
     <ul v-if="type === 'checklist'" class="checklist">
-      <li v-for="choice in entry" :key="choice">{{ choice }}</li>
+      <li v-for="(choice, index) in entry" :key="index">
+        <img :src="choice.imageUrl" />
+        {{ choice.choiceText }}
+      </li>
     </ul>
     <audio v-if="type === 'audio'" controls :src="src"></audio>
   </div>
@@ -38,12 +41,14 @@ export default {
 
 <style lang="scss" scoped>
 .tapestry-activity {
+  position: relative;
   align-items: center;
   background: #eee;
   border-radius: 8px;
   display: flex;
   margin-bottom: 8px;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 38px;
+  justify-content: center;
 
   &:last-child {
     margin-bottom: 0;
@@ -51,9 +56,10 @@ export default {
 
   .icon {
     color: #ccc;
-    margin-right: 16px;
     height: 24px;
     width: 24px;
+    position: absolute;
+    left: 8px;
   }
 
   img {
@@ -65,9 +71,16 @@ export default {
     display: flex;
 
     li {
+      display: flex;
+      flex-direction: column;
       margin-right: 8px;
       &:last-child {
         margin-right: 0;
+      }
+
+      > img {
+        width: 100px;
+        height: auto;
       }
     }
   }
