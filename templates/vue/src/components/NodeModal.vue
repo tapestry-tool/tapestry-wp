@@ -574,6 +574,7 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
+        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
@@ -588,6 +589,11 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+      }
+    })
+    this.$root.$on("bv::modal::hide", (_, modalId) => {
+      if (modalId == "node-modal-container") {
+        thisTapestryTool.enableMovements()
       }
     })
   },
@@ -728,7 +734,9 @@ export default {
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
-        return Object.values(question.answers).some(value => value.length > 0)
+        return Object.values(question.answers).some(
+          value => value && value.length > 0
+        )
       })
     },
     addUserPermissionRow() {
