@@ -750,7 +750,7 @@ function tapestryTool(config){
         if (movementsEnabled) {
                 
             if(!config.wpCanEditTapestry &&
-                tapestry.dataset.settings.nodeDraggable !== true) {
+                tapestry.dataset.settings.nodeDraggable === false) {
                 return;
             }
 
@@ -765,7 +765,7 @@ function tapestryTool(config){
             }
             
             nodesBeforeDrag = Array
-                .from(selection.data || [])
+                .from(selection.data)
                 .map(node => ({ id: node.id, x: node.x, y: node.y }));
 
             recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
