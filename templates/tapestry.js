@@ -1915,21 +1915,21 @@ function tapestryTool(config){
             
             // TYDE ONLY - Update the progress attribute for modules's foreign object
             nodes.selectAll(".tyde-module-progress")
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .attr("progress", function (d) {
-                return d.tydeProgress*100;
-            })
-            .attr("x", (d) => {
-                // If there is no planet view icon, center the bar
-                if(!visiblePlanetViewIconHasUrl(d)){
-                    return - ((getRadius(d) * 1.3) / 2);
-                }
-                return - getRadius(d) * 0.8
-            })
-            .attr("style", (d) => {
-                return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
-            });
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("progress", function (d) {
+                    return d.tydeProgress*100;
+                })
+                .attr("x", (d) => {
+                    // If there is no planet view icon, center the bar
+                    if(!visiblePlanetViewIconHasUrl(d)){
+                        return - ((getRadius(d) * 1.3) / 2);
+                    }
+                    return - getRadius(d) * 0.8
+                })
+                .attr("style", (d) => {
+                    return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
+                });
             
             // TYDE ONLY - Update progress bar based on foreign object
             nodes.selectAll(".progress-bar")
@@ -1954,6 +1954,14 @@ function tapestryTool(config){
                     let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
                     let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
                     return img;
+                });
+
+             // TYDE ONLY - Assign checkmark as visible in case of module completion 
+            nodes.selectAll(".tyde-module-complete-check")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("style", (d) => {
+                    return d.tydeProgress === 1 ? "" : "display: none;"
                 });
         }
     }
