@@ -235,6 +235,20 @@ $REST_API_ENDPOINTS = [
             'callback'  => 'getGfEntry'
         ]
     ],
+    'GET_TAPESTRY_USER_FAVOURITES' => (object) [
+        'ROUTE'     => 'users/favourites',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getUserFavourites',
+        ]
+    ],
+    'UPDATE_TAPESTRY_USER_FAVOURITES' => (object) [
+        'ROUTE'     => 'users/favourites',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'updateUserFavourites',
+        ]
+    ],
     'LOGIN' => (object) [
         'ROUTE' => '/login',
         'ARGUMENTS' => [
@@ -1095,3 +1109,40 @@ function getNodesWithRecordedAudios($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+/**
+ * Get user favourite nodes on a tapestry page by post id. 
+ * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getUserFavourites($request)
+{
+    $postId = $request['post_id'];
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getFavourites();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update favourite nodes for the current user by passing in post id and favourites array
+ * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&favourites=[409, 411]
+ * 
+ * @param Object $request HTTP request
+ * 
+ */
+function updateUserFavourites($request)
+{
+    $postId = $request['post_id'];
+    $favourites = json_decode($request->get_body())->favourites;
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->updateFavourites($favourites);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+} 

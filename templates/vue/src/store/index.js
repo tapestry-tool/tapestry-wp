@@ -21,6 +21,7 @@ const store = new Vuex.Store({
     h5pSettings: {},
     selectedNodeId: null,
     tapestryIsLoaded: false,
+    favourites: [],
   },
   getters: {
     ...getters,
@@ -43,6 +44,7 @@ const store = new Vuex.Store({
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
+    getFavourites: state => state.favourites,
   },
   mutations,
   actions,
