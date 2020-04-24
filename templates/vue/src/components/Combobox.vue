@@ -47,7 +47,8 @@ export default {
     },
     value: {
       type: [Object, String],
-      required: true,
+      required: false,
+      default: null,
     },
     emptyMessage: {
       type: String,
@@ -104,9 +105,10 @@ export default {
   methods: {
     handleBlur() {
       this.isOpen = false
-      // if user leaves focus and hasn't selected anything,
-      // revert to whatever the previous selection was.
-      if (this.inputValue !== this.text && !this.selected) {
+      // if user leaves focus and input is empty, clear the value
+      if (this.inputValue.length === 0) {
+        this.$emit("input", null)
+      } else if (this.inputValue !== this.text && !this.selected) {
         this.inputValue = this.text
       }
     },
