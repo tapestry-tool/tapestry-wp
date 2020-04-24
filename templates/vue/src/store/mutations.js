@@ -142,3 +142,7 @@ export function updateOrdering(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
   state.nodes[nodeIndex].childOrdering = payload.ord
 }
+
+export function updateSelectedModule(state, moduleId) {
+  state.selectedModuleId = moduleId
+}

@@ -67,6 +67,12 @@
       :content-container-style="confirmationStyles"
       @close="showCompletion = false"
     >
+      <tyde-progress-bar
+        v-if="moduleOpened"
+        class="modal-progress"
+        :nodeId="this.selectedModuleId"
+        :showIcon="false"
+      />
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">
           {{ node.typeData.continueButtonText }}
@@ -83,10 +89,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from "vuex"
+import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import TydeProgressBar from '../tyde/TydeProgressBar'
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
@@ -99,6 +106,7 @@ export default {
     TapestryModal,
     AccordionRow,
     TydeIcon,
+    TydeProgressBar,
   },
   props: {
     node: {
@@ -115,6 +123,7 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapState(["selectedModuleId"]),
     confirmationStyles() {
       return {
         backgroundColor: "white",
@@ -161,6 +170,9 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(node => !node.completed)
     },
+    moduleOpened() {
+      return this.selectedModuleId !== null
+    }
   },
   mounted() {
     this.isMounted = true
@@ -286,6 +298,12 @@ button[disabled] {
     padding: 0;
     font-weight: 700;
   }
+}
+
+
+.modal-progress {
+  align-self: center;
+  padding-bottom: 52%;
 }
 
 .button-container {

@@ -1,7 +1,6 @@
 <template>
   <div id="tyde">
     <tapestry />
-    <tyde-star-celebration />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>

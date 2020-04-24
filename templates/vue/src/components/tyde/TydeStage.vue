@@ -2,7 +2,7 @@
   <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
-        <tyde-progress-bar :node-id="this.moduleId" />
+        <tyde-progress-bar :nodeId="this.selectedModuleId" />
         <div class="stage-star">
           <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
           <div v-if="!this.done">
@@ -12,6 +12,10 @@
         <h1>{{ node.title }}</h1>
       </div>
       <section>
+        <tyde-star-celebration
+          v-if="showStar"
+          @close="showStar = false"
+        />
         <tyde-topic
           v-for="topic in topics"
           :key="topic.id"
@@ -31,9 +35,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import TydeTopic from "./TydeTopic"
 import TydeProgressBar from "./TydeProgressBar"
+import TydeStarCelebration from "./TydeStarCelebration"
 import ActiveStar from "@/assets/star-active.png"
 import InactiveStar from "@/assets/star-inactive.png"
 import Helpers from "@/utils/Helpers"
@@ -44,6 +49,13 @@ export default {
   components: {
     TydeTopic,
     TydeProgressBar,
+    TydeStarCelebration,
+  },
+  data() {
+    return {
+      notCompleted: true,
+      showStar: false,
+    }
   },
   props: {
     nodeId: {
@@ -51,8 +63,17 @@ export default {
       required: true,
     },
   },
+  watch: {
+    isLightboxOpen() {
+      if (this.notCompleted && this.getNode(this.nodeId).tydeProgress == 1) {
+        this.showStar = true
+        this.notCompleted = false
+      }
+    },
+  },
   computed: {
     ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
+    ...mapState(["selectedModuleId"]),
     done() {
       return this.topics.every(topic => topic.completed)
     },
@@ -85,9 +106,13 @@ export default {
         accumulator + (completed === true ? 1 : 0)
       return this.topics.map(n => n.completed).reduce(reducer, 0)
     },
+    isLightboxOpen() {
+      return this.$route.path.includes("nodes")
+    },
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-stage-open")
+    this.notCompleted = this.getNode(this.nodeId).tydeProgress !== 1
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-stage-open")

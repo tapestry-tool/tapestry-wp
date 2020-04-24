@@ -17,7 +17,7 @@
         />
       </div>
     </div>
-    <div class="tyde-part-icon">
+    <div v-if="showIcon" class="tyde-part-icon">
       <img v-if="progress !== 1" :src="node.typeData.planetViewNotEarnedIconUrl" />
       <img v-else :src="node.typeData.planetViewEarnedIconUrl" />
     </div>
@@ -38,6 +38,11 @@ export default {
       type: [Number, String],
       required: true,
     },
+    showIcon: {
+      type: Boolean,
+      required: false,
+      default: true,
+    }
   },
   computed: {
     ...mapGetters(["getNode", "getDirectChildren"]),

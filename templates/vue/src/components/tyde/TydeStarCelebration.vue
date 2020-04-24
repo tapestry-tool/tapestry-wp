@@ -3,6 +3,7 @@
     <tapestry-modal
       :allow-close="true"
       :content-container-style="celebrationStyles"
+      @close="$emit('close')"
     ></tapestry-modal>
   </div>
 </template>
@@ -35,8 +36,8 @@ export default {
     },
   },
   mounted() {
-    let audio = new Audio(Helpers.getImagePath("@/assets/tyde-unlock-sound.wav"))
-    audio.play()
+    // let audio = new Audio(Helpers.getImagePath(require("@/assets/tyde-unlock-sound.wav")))
+    // audio.play()
   },
 }
 </script>
