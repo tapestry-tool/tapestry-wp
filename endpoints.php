@@ -123,6 +123,13 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateTapestryNodeImageURL'
         ]
     ],
+    'PUT_TAPESTRY_NODE_LOCKED_IMAGE_URL' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/lockedImageURL',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_PUT_METHOD,
+            'callback'              => 'updateTapestryNodeLockedImageURL'
+        ]
+    ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
@@ -776,6 +783,44 @@ function updateTapestryNodeImageURL($request)
         $node = $tapestry->getNode($nodeMetaId);
 
         $node->set((object) ['imageURL' => $imageURL]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+/**
+ * Update Tapestry Node Locked Image Url
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeLockedImageURL($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $imageURL = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the image url exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+        $node->set((object) ['lockedImageURL' => $imageURL]);
         return $node->save();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

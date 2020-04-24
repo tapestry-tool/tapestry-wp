@@ -72,6 +72,7 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         showInBackpack: true,
         permissions: {
           public: ["read"],
@@ -168,6 +169,7 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -230,6 +232,7 @@ export default {
         nodeType: "",
         title: "",
         imageURL: "",
+        lockedImageURL: "",
         mediaType: "video",
         mediaFormat: "",
         mediaDuration: 0,
@@ -297,6 +300,9 @@ export default {
             newNodeEntry[fieldName] = fieldValue
             break
           case "imageURL":
+            newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "lockedImageURL":
             newNodeEntry[fieldName] = fieldValue || ""
             break
           case "behaviour":
@@ -425,6 +431,13 @@ export default {
 
           if (shouldChange) {
             newNodeEntry.imageURL = data.image
+          }
+
+          if (newNodeEntry.lockedImageURL) {
+            shouldChange = confirm("Change locked thumbnail to new image?")
+          }
+          if (shouldChange) {
+            newNodeEntry.lockedImageURL = data.image
           }
         }
       }
