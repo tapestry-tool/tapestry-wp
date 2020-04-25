@@ -79,7 +79,6 @@
         v-if="moduleOpened"
         class="modal-progress"
         :nodeId="this.selectedModuleId"
-        :showIcon="false"
       />
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">

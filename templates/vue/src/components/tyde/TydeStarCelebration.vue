@@ -12,6 +12,7 @@
 import Unlock from "@/assets/tyde-unlock.gif"
 import Helpers from "@/utils/Helpers"
 import TapestryModal from "../TapestryModal"
+import UnlockSound from "@/assets/tyde-unlock-sound.wav"
 
 export default {
   name: "tyde-star-celebration",
@@ -36,8 +37,8 @@ export default {
     },
   },
   mounted() {
-    // let audio = new Audio(Helpers.getImagePath(require("@/assets/tyde-unlock-sound.wav")))
-    // audio.play()
+    let audio = new Audio(Helpers.getImagePath(UnlockSound))
+    audio.play()
   },
 }
 </script>
