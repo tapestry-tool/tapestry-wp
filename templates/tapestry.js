@@ -557,6 +557,12 @@ function tapestryTool(config){
                         method: API_DELETE_METHOD,
                         data: JSON.stringify(linkToRemove),
                         success: function(result) {
+                            const sourceNode = getNodeById(source);
+                            if (sourceNode.mediaType === "accordion" || sourceNode.presentationStyle === "accordion-row") {
+                                if (sourceNode.childOrdering.includes(target)) {
+                                    sourceNode.childOrdering = sourceNode.childOrdering.filter(id => id !== target);
+                                }
+                            }
                            tapestry.dataset.links.splice(linkToRemove, 1);
                             if (isDeleteNode) {
                                 tapestry.dataset.nodes.splice(spliceIndex, 1);
@@ -1651,9 +1657,43 @@ function tapestryTool(config){
                 })
                 .on('end',function(){
                     if (typeof linkToNode != "undefined" && linkFromNode.id != linkToNode.id) {
-                        if (confirm('Link from ' + linkFromNode.title + ' to ' + linkToNode.title + "?")) {
-                            addLink(linkFromNode.id, linkToNode.id, 1, '');
+                        const shouldAddLink = confirm(`Link from ${linkFromNode.title} to ${linkToNode.title}?`);
+
+                        if (!shouldAddLink) {
+                            return;
                         }
+
+                        const isAccordion = node => {
+                            if (node.mediaType === "accordion") {
+                                return true;
+                            }
+                            const parent = getParent(node);
+                            return parent ? parent.mediaType === "accordion" : false;
+                        };
+
+                        const getLinkState = (source, target) => {
+                            if (isAccordion(source) && isAccordion(target)) {
+                                return { state: "NORMAL", data: { source, target } };
+                            }
+                            if (isAccordion(source) || isAccordion(target)) {
+                                return {
+                                    state: "ADD-ROW",
+                                    data: {
+                                        source: isAccordion(source) ? source : target,
+                                        target: isAccordion(source) ? target : source
+                                    }
+                                }
+                            }
+                            return { state: "NORMAL", data: { source, target } };
+                        };
+                        const { state, data: { source, target } } = getLinkState(linkFromNode, linkToNode);
+                        if (state === "ADD-ROW") {
+                            const shouldAddRow = confirm(`Add ${target.title} as a row of ${source.title}?`);
+                            if (shouldAddRow) {
+                                source.childOrdering.push(target.id);
+                            }
+                        }
+                        addLink(source.id, target.id, 1, '')
                     }
                     // Reset everything
                     linkToDragStarted = false;
@@ -1797,6 +1837,14 @@ function tapestryTool(config){
      * HELPER FUNCTIONS
      ****************************************************/
     
+    function getParent(node) {
+        const links = tapestry.dataset.links;
+        const link = links.find(l => l.target == node.id || l.target.id == node.id);
+        return typeof link.source === "object" 
+            ? link.source 
+            : getNodeById(link.source);
+    }
+
     // Set multiple attributes for an HTML element at once
     function setAttributes(elem, obj) {
         for (var prop in obj) {
