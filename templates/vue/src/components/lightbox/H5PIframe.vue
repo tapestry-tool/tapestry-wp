@@ -141,6 +141,7 @@ export default {
       this.$emit("is-loaded")
 
       if (this.node.fullscreen) {
+        console.log("here")
         const frame = this.$refs.h5p
         frame.removeAttribute("width")
         frame.removeAttribute("height")
