@@ -69,6 +69,7 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -76,6 +77,7 @@ export default {
         quiz: [],
         skippable: true,
       },
+      favourites: [],
     }
   },
   computed: {
@@ -118,6 +120,11 @@ export default {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
+  async created() {
+    const tapestryApi = new TapestryApi(wpPostId)
+    const response = await tapestryApi.getUserFavourites()
+    this.favourites = JSON.parse(response.data)
+  },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
@@ -135,6 +142,7 @@ export default {
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
+        event.detail.dataset["favourites"] = this.favourites
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {
@@ -153,6 +161,7 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -209,6 +218,7 @@ export default {
         nodeType: "",
         title: "",
         imageURL: "",
+        lockedImageURL: "",
         mediaType: "video",
         mediaFormat: "",
         mediaDuration: 0,
@@ -265,6 +275,9 @@ export default {
             newNodeEntry[fieldName] = fieldValue
             break
           case "imageURL":
+            newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "lockedImageURL":
             newNodeEntry[fieldName] = fieldValue || ""
             break
           case "behaviour":
@@ -360,6 +373,14 @@ export default {
 
           if (shouldChange) {
             newNodeEntry.imageURL = data.image
+          }
+
+          if (newNodeEntry.lockedImageURL) {
+            shouldChange = confirm("Change locked thumbnail to new image?")
+          }
+
+          if (shouldChange) {
+            newNodeEntry.lockedImageURL = data.image
           }
         }
       }
