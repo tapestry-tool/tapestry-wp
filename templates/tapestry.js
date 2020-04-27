@@ -1957,7 +1957,10 @@ function tapestryTool(config){
         }
         if ((node.accessible ? node.imageURL.length : node.lockedImageURL.length) === 0) {
             base += " imageOverlay--no-image";
-        } 
+        }
+        if (!node.accessible) {
+            base += " locked";
+        }
         return base;
     }
 
