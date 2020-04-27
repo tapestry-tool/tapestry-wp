@@ -12,18 +12,22 @@
         :visible="index === activeIndex"
       >
         <template v-slot:trigger>
-          <button
-            class="button-row"
-            :disabled="disableRow(index)"
-            @click="toggle(index)"
-          >
-            <div class="button-row-icon">
-              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-            </div>
-            <div>
-              <p class="button-row-title">{{ row.node.title }}</p>
-              <p class="button-row-description">{{ row.node.description }}</p>
-            </div>
+          <div class="row-header">
+            <button
+              class="button-row"
+              :disabled="disableRow(index)"
+              @click="toggle(index)"
+            >
+              <div class="button-row-icon">
+                <i
+                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
+                ></i>
+              </div>
+              <div>
+                <p class="button-row-title">{{ row.node.title }}</p>
+                <p class="button-row-description">{{ row.node.description }}</p>
+              </div>
+            </button>
             <div class="icon-container">
               <tyde-icon
                 v-if="row.node.mediaType === 'gravity-form'"
@@ -40,16 +44,16 @@
                 class="icon"
                 icon="lock"
               ></tyde-icon>
-              <a v-else @click="updateFavourites(row.node.id)">
+              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
                 <i
                   v-if="isFavourite(row.node.id)"
-                  class="fas fa-heart fa-sm"
+                  class="fas fa-heart fa-lg"
                   style="color:red;"
                 ></i>
-                <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+                <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
               </a>
             </div>
-          </button>
+          </div>
         </template>
         <template v-slot:content>
           <tapestry-media
@@ -338,6 +342,10 @@ button[disabled] {
   width: 250px;
 }
 
+.row-header {
+  display: flex;
+}
+
 .button-row {
   display: flex;
   align-items: center;
@@ -389,7 +397,10 @@ button[disabled] {
 }
 
 .icon-container {
-  margin-left: auto;
+  display: flex;
+  margin-right: 10px;
+  align-items: center;
+  flex: auto;
 }
 
 .button-finished {
