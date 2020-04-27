@@ -200,7 +200,7 @@
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
-            <b-form-group>
+            <b-form-group v-if="addThumbnail">
               <b-form-checkbox
                 v-model="addLockedThumbnail"
                 data-testid="node-appearance-add-locked-thumbnail"
