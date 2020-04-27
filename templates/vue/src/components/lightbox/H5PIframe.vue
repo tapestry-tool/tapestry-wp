@@ -4,7 +4,6 @@
     ref="h5p"
     frameborder="0"
     :src="node.typeData && node.typeData.mediaURL"
-    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -40,7 +39,6 @@ export default {
   },
   data() {
     return {
-      width: 50,
       recordedNodeIds: [],
       loadedH5PRecorderId: 0,
       TapestryAPI: new TapestryApi(wpPostId),
@@ -169,6 +167,7 @@ export default {
       this.$emit("is-loaded")
 
       if (this.node.fullscreen) {
+        console.log("here")
         const frame = this.$refs.h5p
         frame.removeAttribute("width")
         frame.removeAttribute("height")
