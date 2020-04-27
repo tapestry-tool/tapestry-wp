@@ -44,20 +44,27 @@ function tapestryTool(config){
         simulation,                                             // Force
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
-        tapestryDimensionsBeforeDrag, nodeBeforeDrag,
+        nodesBeforeDrag,
         h5pVideoSettings = {},
-        tapestryDepth = 4,                                      // Default depth of Tapestry
-        tapestryDepthSlider, hideShowControls = function(){},   // Controls
+        tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
-        autoLayout = false;
+        autoLayout = false,
+        selection = null,                                       // a set containing the currently selected nodes
+        isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
+        movementsEnabled = true,                                // enables/disables node movements by author or d3 itself
+        renderImagesForEditors = true,                      // when authoring large tapestries, set this to false to improve performance
+        hardCodedDimensions = false;                            // if a tapestry has been finalized, adding this will improve performance
+                                                                // (console log getTapestryDimensions() with max depth to get this value)
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
         innerRadius = NORMAL_RADIUS - (PROGRESS_THICKNESS / 2),
         outerRadius = NORMAL_RADIUS + (PROGRESS_THICKNESS / 2),
         xORfx = autoLayout ? 'x' : 'fx',
-        yORfy = autoLayout ? 'y' : 'fy';
+        yORfy = autoLayout ? 'y' : 'fy',
+        renderImages = config.wpCanEditTapestry ? renderImagesForEditors : true;
 
     /****************************************************
      * EDIT-RELATED VARIABLES
@@ -95,13 +102,26 @@ function tapestryTool(config){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
-                // change http(s):// to // in media URLs and image URLs
+
+                // change http(s):// to // in media URLs
                 if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
-                if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
-                    tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+
+                if (renderImages) {
+                    // change http(s):// to // in image URLs
+                    if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
+                        tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+                    }
+                    if (typeof tapestry.dataset.nodes[i].lockedImageURL != "undefined" && tapestry.dataset.nodes[i].lockedImageURL.length > 0) {
+                        tapestry.dataset.nodes[i].lockedImageURL = tapestry.dataset.nodes[i].lockedImageURL.replace(/(http(s?)):\/\//gi, '//');
+                    }
                 }
+                else {
+                    // turn off thumbnails
+                    tapestry.dataset.nodes[i].imageURL = "";
+                    tapestry.dataset.nodes[i].lockedImageURL = "";
+                }   
             }
         }
 
@@ -302,6 +322,18 @@ function tapestryTool(config){
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
             recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
         }
+
+        if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
+            initializeDragSelect();
+        }
+    }
+
+    this.disableMovements = () => {
+        movementsEnabled = false;
+    }
+
+    this.enableMovements = () => {
+        movementsEnabled = true;
     }
 
     this.resetNodeCache = function() {
@@ -316,8 +348,11 @@ function tapestryTool(config){
 
         dispatchEvent(new CustomEvent('change-selected-node', { detail: id }));
 
-        // slider's maximum depth is set to the longest path from the new selected node
-        tapestryDepthSlider.max = findMaxDepth(id);
+        if (tapestryDepth) {
+            // slider's maximum depth is set to the longest path from the new selected node
+            tapestryDepthSlider.max = findMaxDepth(id);
+        }
+
         updateSvgDimensions();
         renderTooltips()
     }
@@ -338,10 +373,12 @@ function tapestryTool(config){
     }
     
     function setBackgroundImage() {
-        const { backgroundUrl } = tapestry.dataset.settings;
-        const htmlBody = document.getElementsByTagName("BODY")[0];
-        htmlBody.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
-        htmlBody.style.backgroundSize = "cover";
+        if (renderImages) {
+            const { backgroundUrl } = tapestry.dataset.settings;
+            const htmlBody = document.getElementsByTagName("BODY")[0];
+            htmlBody.style.background = backgroundUrl ? `url(${backgroundUrl})` : "";
+            htmlBody.style.backgroundSize = "cover";
+        }
     }
 
     this.getControls = function() {
@@ -351,45 +388,7 @@ function tapestryTool(config){
         //--------------------------------------------------
         
         var tapestryControlsDiv = document.createElement("div");
-        tapestryControlsDiv.id = "tapestry-controls-wrapper"
-        
-        //--------------------------------------------------
-        // Add in Depth Slider
-        //--------------------------------------------------
-        
-        // Create wrapper div 
-        var depthSliderWrapper = document.createElement("div");
-        depthSliderWrapper.id = "tapestry-depth-slider-wrapper";
-        depthSliderWrapper.style.display = "none";
-        
-        // Create label element
-        var tapestryDepthSliderLabel = document.createElement("label");
-        tapestryDepthSliderLabel.innerHTML = "Depth: ";
-        depthSliderWrapper.appendChild(tapestryDepthSliderLabel);
-        
-        // Create input element
-        tapestryDepthSlider = document.createElement("input");
-        setAttributes(tapestryDepthSlider ,{
-            type:"range",
-            min:"2",
-            max:"4",
-            value:"4",
-            id:"tapestry-depth-slider"
-        });
-        depthSliderWrapper.appendChild(tapestryDepthSlider);
-        
-        // Every time the slider's value is changed, do the following
-        tapestryDepthSlider.onchange = function() {
-            tapestryDepth = this.value;
-        
-            setNodeTypes(root);
-            setLinkTypes(root);
-        
-            filterTapestry();
-            updateSvgDimensions();
-        };
-        
-        tapestryControlsDiv.appendChild(depthSliderWrapper);
+        tapestryControlsDiv.id = "tapestry-controls-wrapper";
 
         //--------------------------------------------------
         // Add in settings modal button
@@ -412,7 +411,46 @@ function tapestryTool(config){
             showSettings = true;
         }
 
-        function hideShowControls() {
+        
+        //--------------------------------------------------
+        // Add in Depth Slider
+        //--------------------------------------------------
+        
+        if (tapestryDepth) {
+
+            // Create wrapper div 
+            var depthSliderWrapper = document.createElement("div");
+            depthSliderWrapper.id = "tapestry-depth-slider-wrapper";
+            depthSliderWrapper.style.display = "none";
+
+            // Create label element
+            var tapestryDepthSliderLabel = document.createElement("label");
+            tapestryDepthSliderLabel.innerHTML = "Depth: ";
+            depthSliderWrapper.appendChild(tapestryDepthSliderLabel);
+
+            // Create input element
+            tapestryDepthSlider = document.createElement("input");
+            setAttributes(tapestryDepthSlider ,{
+                type:"range",
+                min:"1",
+                max:"4",
+                value:"4",
+                id:"tapestry-depth-slider"
+            });
+            depthSliderWrapper.appendChild(tapestryDepthSlider);
+
+            // Every time the slider's value is changed, do the following
+            tapestryDepthSlider.onchange = function() {
+                tapestryDepth = this.value;
+
+                setNodeTypes(root);
+                setLinkTypes(root);
+
+                filterTapestry();
+                updateSvgDimensions();
+            };
+
+            tapestryControlsDiv.appendChild(depthSliderWrapper);
 
             var showDepthSlider = findMaxDepth(root) >= 2;
             // Hide depth slider if depth is less than 3 
@@ -423,7 +461,6 @@ function tapestryTool(config){
 
             tapestryControlsDiv.style.display = (showDepthSlider || showSettings) ? "flex" : "none";
         }
-        hideShowControls(); // run it now (we will also run it later when tapestry is modified)
 
         return tapestryControlsDiv;
     }
@@ -431,6 +468,67 @@ function tapestryTool(config){
     /****************************************************
      * ADD EDITOR ELEMENTS
      ****************************************************/
+
+    if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
+        
+        selection = createSelection();
+        isMultiSelect = false;
+    
+        document.addEventListener("keydown", evt => {
+            if (movementsEnabled) {
+                if (evt.code === "Escape") {
+                    selection.clear();
+                }
+                if (evt.ctrlKey || evt.shiftKey || evt.metaKey) {
+                    isMultiSelect = true;
+                    if (evt.code === "KeyA") {
+                        evt.preventDefault();
+                        tapestry.dataset.nodes.forEach(d => selection.add(d));
+                    }
+                }
+            }
+        });
+    
+        document.addEventListener("keyup", () => {
+            if (movementsEnabled) {
+                isMultiSelect = false;
+            }
+        });
+    
+        function createSelection() {
+            const data = new Set();
+            const selection = {
+                data,
+                size() {
+                    return data.size;
+                },
+                add(node) {
+                    data.add(node);
+                    data.forEach(d => {
+                        const nd = document.getElementById(`node-${d.id}`);
+                        nd.classList.add("node-selected");
+                    })
+                },
+                has(node) {
+                    return data.has(node);
+                },
+                delete(node) {
+                    data.delete(node);
+                    const nd = document.getElementById(`node-${node.id}`);
+                    nd.classList.remove("node-selected");
+                },
+                clear() {
+                    data.forEach(d => {
+                        selection.delete(d);
+                    })
+                },
+                forEach(fn) {
+                    data.forEach(fn);
+                }
+            }
+            return selection;
+        }
+    }
     
     // To create a link
     function addLink(source, target, value, appearsAt) {
@@ -471,7 +569,13 @@ function tapestryTool(config){
                         method: API_DELETE_METHOD,
                         data: JSON.stringify(linkToRemove),
                         success: function(result) {
-                           tapestry.dataset.links.splice(linkToRemove, 1);
+                            const sourceNode = getNodeById(source);
+                            if (sourceNode.mediaType === "accordion" || sourceNode.presentationStyle === "accordion-row") {
+                                if (sourceNode.childOrdering.includes(target)) {
+                                    sourceNode.childOrdering = sourceNode.childOrdering.filter(id => id !== target);
+                                }
+                            }
+                            tapestry.dataset.links.splice(linkToRemove, 1);
                             if (isDeleteNode) {
                                 tapestry.dataset.nodes.splice(spliceIndex, 1);
                                 root = tapestry.dataset.rootId; // need to change selected node b/c deleting currently selected node
@@ -613,6 +717,12 @@ function tapestryTool(config){
     }
 
     function ticked() {
+
+        // To improve performance while tapestry is not being actively used, we won't run these functions
+        if (!movementsEnabled) {
+            return;
+        }
+
         var tapestryDimensions = tapestry.getTapestryDimensions();
         links
             .attr("x1", function (d) {
@@ -641,24 +751,29 @@ function tapestryTool(config){
 
     // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
-        if(!config.wpCanEditTapestry &&
-            tapestry.dataset.settings.nodeDraggable === false) {
-            return;
+        if (movementsEnabled) {
+                
+            if(!config.wpCanEditTapestry &&
+                tapestry.dataset.settings.nodeDraggable === false) {
+                return;
+            }
+
+            if (!d3.event.active) simulation.alphaTarget(0.2).restart();
+
+            if (!selection.size()) {
+                selection.add(d)
+            }
+            if (!selection.has(d) && !isMultiSelect) {
+                selection.clear();
+                selection.add(d);
+            }
+            
+            nodesBeforeDrag = Array
+                .from(selection.data)
+                .map(node => ({ id: node.id, x: node.x, y: node.y }));
+
+            recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
- 
-        if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
-        nodeBeforeDrag = d;
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d.y, tapestryDimensionsBeforeDrag.height);
-        }
-
-        recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
     function dragged(d) {
@@ -666,14 +781,10 @@ function tapestryTool(config){
             tapestry.dataset.settings.nodeDraggable === false) {
             return;
         }
-
-        if (canEditNode(d)) {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width+(MAX_RADIUS*2));
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height+(MAX_RADIUS*2));
-        } else {
-            d[xORfx] = getBoundedCoord(d3.event.x, tapestryDimensionsBeforeDrag.width);
-            d[yORfy] = getBoundedCoord(d3.event.y, tapestryDimensionsBeforeDrag.height);
-        }
+        selection.forEach(nd => {
+            nd[xORfx] = nd[xORfx] + d3.event.dx;
+            nd[yORfy] = nd[yORfy] + d3.event.dy;
+            })
     }
 
     function dragended(d) {
@@ -684,24 +795,35 @@ function tapestryTool(config){
 
         if (!d3.event.active) simulation.alphaTarget(0);
 
-        d[xORfx] = d.x;
-        d[yORfy] = d.y;
-        updateSvgDimensions();
+        selection.forEach(nd => {
+            nd[xORfx] = nd.x;
+            nd[yORfy] = nd.y;
+            if (canEditNode(nd) && !autoLayout) {
+                $.ajax({
+                    url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nd.id + "/coordinates",
+                    method: API_PUT_METHOD,
+                    data: JSON.stringify({x: nd.x, y: nd.y}),
+                    error: function(e) {
+                        alert("Sorry, there was an error saving the coordinates of this node!");
+                        console.error(e);
+                        nd[xORfx] = nodesBeforeDrag.find(n => n.id == nd.id).x;
+                        nd[yORfy] = nodesBeforeDrag.find(n => n.id == nd.id).y;
+                    }
+                });
+            }
+        })
 
-        if (canEditNode(d) && !autoLayout) {
-            $.ajax({
-                url: config.apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + d.id + "/coordinates",
-                method: API_PUT_METHOD,
-                data: JSON.stringify({x: d.x, y: d.y}),
-                error: function(e) {
-                    alert("Sorry, there was an error saving the coordinates of this node!");
-                    console.error(e);
-                    d[xORfx] = nodeBeforeDrag.x;
-                    d[yORfy] = nodeBeforeDrag.y;
+        if (selection.size() === 1) {
+            selection.forEach(nd => {
+                const prev = nodesBeforeDrag.find(n => n.id == nd.id)
+                const { x, y } = prev
+                if (x != nd.x || y != nd.y) {
+                    selection.clear()
                 }
-            });
+            })
         }
 
+        updateSvgDimensions();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -715,7 +837,6 @@ function tapestryTool(config){
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
-        tapestryDimensionsBeforeDrag = tapestryDimensions;
         var tapestrySvg = d3.select("#"+TAPESTRY_CONTAINER_ID)
                 .append("svg:svg")
                 .attr("id", TAPESTRY_CONTAINER_ID+"-svg")
@@ -731,7 +852,6 @@ function tapestryTool(config){
 
     function updateSvgDimensions() {
         var tapestryDimensions = tapestry.getTapestryDimensions();
-        tapestryDimensionsBeforeDrag = tapestryDimensions;
 
         const MIN_WIDTH = getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR;
         const MIN_HEIGHT = getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR;
@@ -903,12 +1023,51 @@ function tapestryTool(config){
             rebuildNodeContents();
         }
     }
+
+    function initializeDragSelect() {
+        new DragSelect({
+            selectables: document.querySelectorAll(".node"),
+            onDragStart: () => {
+                if (!isMultiSelect) {
+                    selection.clear()
+                }
+            },
+            onElementSelect: node => {
+                if (movementsEnabled) {
+                    const id = node.id.split("node-")[1]
+                    selection.add(tapestry.dataset.nodes[findNodeIndex(id)])
+                }
+            },
+            onElementUnselect: node => {
+                const id = node.id.split("node-")[1]
+                selection.delete(tapestry.dataset.nodes[findNodeIndex(id)])
+            }
+        });
+    }
     
     /* Draws the components that make up node */
     function buildNodeContents() {
 
-        tapestryDepthSlider.max = findMaxDepth(root);
-        hideShowControls();
+        const handleClick = d => {
+            if (root === d.id && d.hideMedia) {
+                if (config.wpCanEditTapestry || d.accessible) {
+                    if (d.tydeType === "Module") {
+                        dispatchEvent(
+                            new CustomEvent(
+                                'start-module',
+                                { detail: d.id }
+                            )
+                        )
+                    } else {
+                        goToNode(d.id)
+                    }
+                }
+            }
+        }
+
+        if (tapestryDepth) {
+            tapestryDepthSlider.max = findMaxDepth(root);
+        }
 
         /* Draws the circle that defines how large the node is */
         nodes.append("rect")
@@ -918,13 +1077,13 @@ function tapestryTool(config){
                 return classes;
             })
             .attr("rx", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
             })
             .attr("ry", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
@@ -961,33 +1120,73 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (!d.accessible)
-                    return COLOR_LOCKED;
+                if (!d.accessible) {
+                    if (d.lockedImageURL && d.lockedImageURL.length)
+                        return "url('#node-locked-thumb-" + d.id + "')";
+                    else
+                        return COLOR_LOCKED;
+                }
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.userType == 'teen' || d.accessible) {
-                        if (d.tydeType === "Module") {
-                            dispatchEvent(
-                                new CustomEvent(
-                                    'start-module',
-                                    { detail: d.id }
-                                )
-                            )
-                        } else {
-                            goToNode(d.id)
-                        }
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
     
+        nodes.append("rect")
+        .attr("class", function (d) {
+            if (d.nodeType === "grandchild") return "selectable grandchild";
+            return "selectable";
+        })
+        .attr("rx", function (d) {
+            if (d.hideProgress && d.imageURL.length) {
+                return 0;
+            }
+            return getRadius(d);
+        })
+        .attr("ry", function (d) {
+            if (d.hideProgress && d.imageURL.length) {
+                return 0;
+            }
+            return getRadius(d);
+        })
+        .attr("data-id", function (d) {
+            return d.id;
+        })
+        .attr("stroke-width", function (d) {
+            if (!d.hideProgress) {
+                return PROGRESS_THICKNESS;
+            }
+        })
+        .attr("stroke", function (d) {
+            if (!getViewable(d) || d.hideProgress)
+                return "transparent";
+            else if (d.nodeType === "grandchild")
+                return COLOR_GRANDCHILD;
+            else if (!d.accessible)
+                return COLOR_LINK;
+            else return COLOR_STROKE;
+        })
+        .attr("width", function (d) {
+            if (!getViewable(d)) return 0;
+            return getRadius(d) * 2;
+        })
+        .attr("height", function (d) {
+            if (!getViewable(d)) return 0;
+            return getRadius(d) * 2;
+        })
+        .attr("x", function (d) {
+            return - getRadius(d);
+        })
+        .attr("y", function (d) {
+            return - getRadius(d);
+        })
+        .on("click keydown", handleClick);
+
         nodes.append("circle")
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
-                return !(d.accessible && d.hideProgress && d.imageURL.length);
+                // or no overlay if node is locked and has a locked image
+                return !(d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length));
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
@@ -1012,13 +1211,7 @@ function tapestryTool(config){
             .attr("fill", function (d) {
                 return getNodeColor(d);
             })
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            });
+            .on("click keydown", handleClick);
     
         /* Attach images to be used within each node */
         nodes.append("defs")
@@ -1048,10 +1241,37 @@ function tapestryTool(config){
                 return d.imageURL;
             });
         
+        nodes.append("defs")
+            .append("pattern")
+            .attr("id", function (d) {
+                return "node-locked-thumb-" + d.id;
+            })
+            .attr("data-id", function (d) {
+                return d.id;
+            })
+            .attr("pattenUnits", "userSpaceOnUse")
+            .attr("height", 1)
+            .attr("width", 1)
+            .append("image")
+            .attr("height", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("width", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("preserveAspectRatio", "xMidYMid slice")
+            .attr("xlink:href", function (d) {
+                return d.lockedImageURL;
+            });
+
         // TYDE ONLY - Add progress bar above module nodes
         nodes.append("foreignObject")
             .filter(function (d){
-                return getViewable(d) && d.tydeType === "Module";
+                return getViewable(d) && d.tydeType === "Module" && d.tydeProgress > 0 && d.tydeProgress < 1;
             })
             .attr("width", function (d) {
                 return getRadius(d) * 1.3;
@@ -1060,7 +1280,11 @@ function tapestryTool(config){
                 return getRadius(d) / 7;
             })
             .attr("x", function (d) {
-                return - getRadius(d) * 0.8;
+                // If there is no planet view icon, center the bar
+                if(!visiblePlanetViewIconHasUrl(d)){
+                    return - ((getRadius(d) * 1.3) / 2);
+                }
+                return - getRadius(d) * 0.8
             })
             .attr("y", function (d) {
                 return - getRadius(d) - 50;
@@ -1080,7 +1304,7 @@ function tapestryTool(config){
         // TYDE ONLY - Add spaceship planet view icon
         nodes.append("foreignObject")
             .filter(function (d){
-                return getViewable(d) && d.tydeType === "Module";
+                return getViewable(d) && d.tydeType === "Module"
             })
             .attr("width", function (d) {
                 return getRadius(d) / 2;
@@ -1098,11 +1322,31 @@ function tapestryTool(config){
                 return d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
             })
             .attr("class", "tyde-module-planet-icon")
+            .attr("style", (d) => {
+                return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
+            })
             .html(function(d){
                 let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
                 let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
                 return img;
             });
+
+        // TYDE ONLY - Add checkmark to completed modules
+        nodes.append("foreignObject")
+            .filter((d) => {
+                return getViewable(d) && d.tydeType === "Module"
+            })
+            .attr("x", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("y", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("style", (d) => {
+                return d.tydeProgress === 1 ? "" : "display: none;"
+            })
+            .attr("class", "tyde-module-complete-check")
+            .html("<i class='fas fa-check'></i>");
 
         /* Add path and button */
         buildPathAndButton();
@@ -1110,7 +1354,8 @@ function tapestryTool(config){
         setNodeListeners(nodes);
     
         /* Add dragging and node selection functionality to the node */
-        nodes
+        if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
+            nodes
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
@@ -1120,11 +1365,30 @@ function tapestryTool(config){
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
-                        tapestry.selectNode(d.id)
+                        if (!isMultiSelect) {
+                            selection.clear();
+                            tapestry.selectNode(d.id);
+                        } else {
+                            selection.add(d);
+                        }
                     }
                 }
             });
+        }
+        else {
+            nodes
+            .on("click keydown", function (d) {
+                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                if (root != d.id) { // prevent multiple clicks
+                    if (config.wpCanEditTapestry || d.accessible) {
+                        tapestry.selectNode(d.id);
+                    }
+                }
+            });
+        }
     }
+
+    // LOCKED NODE TOOLTIPS
 
     function renderTooltips() {
         const tooltipWidth = d => Math.min(getRadius(d) * 5 + 48, 600)
@@ -1253,6 +1517,122 @@ function tapestryTool(config){
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .attr("rx", function (d) {
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
+                        return 0;
+                    }
+                    return getRadius(d);
+                })
+                .attr("ry", function (d) {
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
+                        return 0;
+                    }
+                    return getRadius(d);
+                })
+                .attr("stroke", function (d) {
+                    if (!getViewable(d) || d.hideProgress)
+                        return "transparent";
+                    else if (d.nodeType === "grandchild") 
+                        return COLOR_GRANDCHILD;
+                    else if (!d.accessible)
+                        return COLOR_LINK;
+                    else return COLOR_STROKE;
+                })
+                .attr("width", function (d) {
+                    return getRadius(d) * 2;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) * 2;
+                })
+                .attr("x", function (d) {
+                    return - getRadius(d);
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d);
+                })
+                .attr("fill", function (d) {
+                    if (!d.accessible) {
+                        if (d.lockedImageURL && d.lockedImageURL.length)
+                            return "url('#node-locked-thumb-" + d.id + "')";
+                        else
+                            return COLOR_LOCKED;
+                    }
+                    if (d.imageURL.length)
+                        return "url('#node-thumb-" + d.id + "')";
+                    return COLOR_BLANK_HOVER;
+                })
+                .attr("stroke-width", function (d) {
+                    if (!d.hideProgress) {
+                        return PROGRESS_THICKNESS;
+                    }
+                });
+
+        // TYDE ONLY - update progress bar size and position
+        nodes.selectAll(".tyde-module-progress")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("width", function (d) {
+                    return getRadius(d) * 1.3;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 7;
+                })
+                .attr("x", function (d) {
+                    // If there is no planet view icon, center the bar
+                    if(!visiblePlanetViewIconHasUrl(d)){
+                        return - ((getRadius(d) * 1.3) / 2);
+                    }
+                    return - getRadius(d) * 0.8
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d) - 50;
+                })
+                .attr("style", (d) => {
+                    return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
+                });
+
+        // TYDE ONLY - update planet icon size and position
+        nodes.selectAll(".tyde-module-planet-icon")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("width", function (d) {
+                    return getRadius(d) / 2;
+                })
+                .attr("height", function (d) {
+                    return getRadius(d) / 2;
+                })
+                .attr("x", function (d) {
+                    return getRadius(d) * 0.7;
+                })
+                .attr("y", function (d) {
+                    return - getRadius(d) * 1.2 - 45;
+                })
+                .attr("style", (d) => {
+                    return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
+                });
+
+        // TYDE ONLY - update checkmark location
+        nodes.selectAll(".tyde-module-complete-check")
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("x", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("y", function (d) {
+                return getRadius(d) - 45;
+            })
+            .attr("style", (d) => {
+                return d.tydeProgress === 1 ? "" : "display: none;"
+            });
+
+        nodes.selectAll(".selectable")
+                .attr("class", function (d) {
+                    if (!getViewable(d))
+                        return "selectable grandchild";
+                    else return "selectable";
+                })
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("rx", function (d) {
                     if (d.hideProgress && d.imageURL.length) {
                         return 0;
                     }
@@ -1285,51 +1665,10 @@ function tapestryTool(config){
                 .attr("y", function (d) {
                     return - getRadius(d);
                 })
-                .attr("fill", function (d) {
-                    if (!d.accessible)
-                        return COLOR_LOCKED;
-                    if (d.imageURL.length)
-                        return "url('#node-thumb-" + d.id + "')";
-                    return COLOR_BLANK_HOVER;
-                })
                 .attr("stroke-width", function (d) {
                     if (!d.hideProgress) {
                         return PROGRESS_THICKNESS;
                     }
-                });
-
-        // TYDE ONLY - update progress bar size and position
-        nodes.selectAll(".tyde-module-progress")
-                .transition()
-                .duration(TRANSITION_DURATION)
-                .attr("width", function (d) {
-                    return getRadius(d) * 1.3;
-                })
-                .attr("height", function (d) {
-                    return getRadius(d) / 7;
-                })
-                .attr("x", function (d) {
-                    return - getRadius(d) * 0.8;
-                })
-                .attr("y", function (d) {
-                    return - getRadius(d) - 50;
-                });
-
-        // TYDE ONLY - update planet icon size and position
-        nodes.selectAll(".tyde-module-planet-icon")
-                .transition()
-                .duration(TRANSITION_DURATION)
-                .attr("width", function (d) {
-                    return getRadius(d) / 2;
-                })
-                .attr("height", function (d) {
-                    return getRadius(d) / 2;
-                })
-                .attr("x", function (d) {
-                    return getRadius(d) * 0.7;
-                })
-                .attr("y", function (d) {
-                    return - getRadius(d) * 1.2 - 45;
                 });
         
         /* Attach images to be used within each node */
@@ -1370,10 +1709,10 @@ function tapestryTool(config){
         /* Update the progress pies */
         updateViewedProgress();
     
-    /* Create the node meta */
+        /* Create the node meta */
         nodes
             .filter(function (d){
-                return getViewable(d) && !d.hideTitle;
+                return getViewable(d) && (!d.hideTitle || !renderImages);
             })
             .append('foreignObject')
             .attr("class","metaWrapper")
@@ -1424,8 +1763,7 @@ function tapestryTool(config){
                     ' data-id="' + d.id + '"' + 
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
-                    ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' +
+                    ' data-media-type="' + d.mediaType + '"' +
                     ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
@@ -1503,9 +1841,43 @@ function tapestryTool(config){
                 })
                 .on('end',function(){
                     if (typeof linkToNode != "undefined" && linkFromNode.id != linkToNode.id) {
-                        if (confirm('Link from ' + linkFromNode.title + ' to ' + linkToNode.title + "?")) {
-                            addLink(linkFromNode.id, linkToNode.id, 1, '');
+
+                        const shouldAddLink = confirm(`Link from ${linkFromNode.title} to ${linkToNode.title}?`);
+                        if (!shouldAddLink) {
+                            return;
                         }
+
+                        const isAccordion = node => {
+                            if (node.mediaType === "accordion") {
+                                return true;
+                            }
+                            const parent = getParent(node);
+                            return parent ? parent.mediaType === "accordion" : false;
+                        };
+
+                        const getLinkState = (source, target) => {
+                            if (isAccordion(source) && isAccordion(target)) {
+                                return { state: "NORMAL", data: { source, target } };
+                            }
+                            if (isAccordion(source) || isAccordion(target)) {
+                                return {
+                                    state: "ADD-ROW",
+                                    data: {
+                                        source: isAccordion(source) ? source : target,
+                                        target: isAccordion(source) ? target : source
+                                    }
+                                }
+                            }
+                            return { state: "NORMAL", data: { source, target } };
+                        };
+                        const { state, data: { source, target } } = getLinkState(linkFromNode, linkToNode);
+                        if (state === "ADD-ROW") {
+                            const shouldAddRow = confirm(`Add ${target.title} as a row of ${source.title}?`);
+                            if (shouldAddRow) {
+                                source.childOrdering.push(target.id);
+                            }
+                        }
+                        addLink(source.id, target.id, 1, '')
                     }
                     // Reset everything
                     linkToDragStarted = false;
@@ -1607,9 +1979,21 @@ function tapestryTool(config){
             
             // TYDE ONLY - Update the progress attribute for modules's foreign object
             nodes.selectAll(".tyde-module-progress")
-            .attr("progress", function (d) {
-                return d.tydeProgress*100;
-            });
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("progress", function (d) {
+                    return d.tydeProgress*100;
+                })
+                .attr("x", (d) => {
+                    // If there is no planet view icon, center the bar
+                    if(!visiblePlanetViewIconHasUrl(d)){
+                        return - ((getRadius(d) * 1.3) / 2);
+                    }
+                    return - getRadius(d) * 0.8
+                })
+                .attr("style", (d) => {
+                    return d.tydeProgress === 0 || d.tydeProgress === 1 ? "display: none;" : ""
+                });
             
             // TYDE ONLY - Update progress bar based on foreign object
             nodes.selectAll(".progress-bar")
@@ -1627,10 +2011,21 @@ function tapestryTool(config){
             
             // TYDE ONLY - Reassign the planet view icon incase of module completion
             nodes.selectAll(".tyde-module-planet-icon")
+                .attr("style", (d) => {
+                    return visiblePlanetViewIconHasUrl(d) ? "" : "display: none;"
+                })
                 .html(function(d){
                     let imgSrc = d.tydeProgress === 1 ? d.typeData.planetViewEarnedIconUrl : d.typeData.planetViewNotEarnedIconUrl;
                     let img = "<img src='" + imgSrc + "' alt='Planet View Icon'>";
                     return img;
+                });
+
+             // TYDE ONLY - Assign checkmark as visible in case of module completion 
+            nodes.selectAll(".tyde-module-complete-check")
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .attr("style", (d) => {
+                    return d.tydeProgress === 1 ? "" : "display: none;"
                 });
         }
     }
@@ -1677,6 +2072,14 @@ function tapestryTool(config){
      * HELPER FUNCTIONS
      ****************************************************/
     
+    function getParent(node) {
+        const links = tapestry.dataset.links;
+        const link = links.find(l => l.target == node.id || l.target.id == node.id);
+        return typeof link.source === "object" 
+            ? link.source 
+            : getNodeById(link.source);
+    }
+    
     // Set multiple attributes for an HTML element at once
     function setAttributes(elem, obj) {
         for (var prop in obj) {
@@ -1709,8 +2112,8 @@ function tapestryTool(config){
 
         var maxPointX = 0;
         var maxPointY = 0;
-        var minPointX = 3000;
-        var minPointY = 3000;
+        var minPointX = 30000;
+        var minPointY = 30000;
                     
         if (autoLayout) {
             var maxDepth = findMaxDepth(root);
@@ -1751,6 +2154,10 @@ function tapestryTool(config){
 
     /* Gets the boundary of the tapestry */
     this.getTapestryDimensions = function () {
+
+        if (hardCodedDimensions) {
+            return hardCodedDimensions;
+        }
 
         var tapestryWidth = $('#'+TAPESTRY_CONTAINER_ID).outerWidth();
         var tapestryHeight = getBrowserHeight() - $('#'+TAPESTRY_CONTAINER_ID).offset().top;
@@ -1833,7 +2240,7 @@ function tapestryTool(config){
         if (node.nodeType === "grandchild") {
             base += " grandchild";
         }
-        if (node.imageURL.length === 0) {
+        if ((node.accessible ? node.imageURL.length : node.lockedImageURL.length) === 0) {
             base += " imageOverlay--no-image";
         }
         if (!node.accessible) {
@@ -1843,14 +2250,14 @@ function tapestryTool(config){
     }
 
     function getNodeColor(node) {
-        if (!getViewable(node))
+        if (!getViewable(node) || (!node.accessible && node.lockedImageURL.length))
             return "transparent";
         if (node.nodeType === "grandchild")
             return COLOR_GRANDCHILD;
+        if (node.accessible && node.imageURL.length === 0)
+            return COLOR_BLANK;
         if (!node.accessible)
             return COLOR_LOCKED;
-        if (node.imageURL.length === 0)
-            return COLOR_BLANK;
         return COLOR_STROKE;
     }
 
@@ -1862,6 +2269,11 @@ function tapestryTool(config){
     /* Add 'depth' parameter to each node recursively. 
         The depth is determined by the number of levels from the root each node is. */
     function addDepthToNodes(id, depth, visited) {
+
+        if (!tapestryDepth) {
+            return;
+        }
+
         visited.push(id);
 
         const node = tapestry.dataset.nodes[findNodeIndex(id)];
@@ -2035,8 +2447,11 @@ function tapestryTool(config){
     function setNodeTypes(rootId) {
     
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 2),
-            grandchildren = getChildren(root, tapestryDepth - 1);
+
+        if (tapestryDepth) {
+            var children = getChildren(root, tapestryDepth - 2),
+                grandchildren = getChildren(root, tapestryDepth - 1);
+        }
     
         for (var i in tapestry.dataset.nodes) {
             var node = tapestry.dataset.nodes[i];
@@ -2046,7 +2461,7 @@ function tapestryTool(config){
             //      should default to being the more senior role
             if (id === root) {
                 node.nodeType = "root";
-            } else if (children.indexOf(id) > -1) {
+            } else if (!tapestryDepth || children.indexOf(id) > -1) {
                 node.nodeType = "child";
             } else if (grandchildren.indexOf(id) > -1) {
                 node.nodeType = "grandchild";
@@ -2059,8 +2474,11 @@ function tapestryTool(config){
     /* For setting the "type" field of links in dataset */
     function setLinkTypes(rootId) {
         root = rootId;
-        var children = getChildren(root, tapestryDepth - 2),
-            grandchildren = getChildren(root, tapestryDepth - 1);
+
+        if (tapestryDepth) {
+            var children = getChildren(root, tapestryDepth - 2),
+                grandchildren = getChildren(root, tapestryDepth - 1);
+        }
     
         for (var i in tapestry.dataset.links) {
             var link = tapestry.dataset.links[i];
@@ -2071,7 +2489,7 @@ function tapestryTool(config){
             if (tapestry.dataset.links[i].appearsAt && tapestry.dataset.links[i].appearsAt <= (tapestry.dataset.nodes[parentIndex].typeData.progress[0].value * tapestry.dataset.nodes[parentIndex].mediaDuration)) {
                 if (targetId === root) {
                     link.type = "root";
-                } else if (children.indexOf(targetId) > -1) {
+                } else if (!tapestryDepth || children.indexOf(targetId) > -1) {
                     link.type = "child";
                 } else if (grandchildren.indexOf(targetId) > -1) {
                     link.type = "grandchild";
@@ -2219,6 +2637,13 @@ function tapestryTool(config){
     function canEditLink(d) {
         return config.wpCanEditTapestry || (checkPermission(d.source, "edit") && checkPermission(d.target, "edit"));
     }
+
+    // TYDE ONLY
+    function visiblePlanetViewIconHasUrl(d) {
+        return d.tydeProgress === 1 ? 
+                d.typeData.planetViewEarnedIconUrl !== "" && d.typeData.planetViewEarnedIconUrl && d.typeData.planetViewEarnedIconUrl.length > 0 :
+                d.typeData.planetViewNotEarnedIconUrl !== "" && d.typeData.planetViewNotEarnedIconUrl && d.typeData.planetViewNotEarnedIconUrl.length > 0
+    }
     
 } // END OF TAPESTRY TOOL CLASS
 
@@ -2265,6 +2690,11 @@ tapestryTool.prototype.updateNodeImage = updateNodeImage;
 
 function updateNodeImage(id, src) {
     const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
+
+function updateNodeLockedImage(id, src) {
+    const image = document.querySelector(`#node-locked-thumb-${id} > image`)
     image.setAttribute("href", src)
 }
 

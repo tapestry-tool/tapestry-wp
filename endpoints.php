@@ -123,6 +123,13 @@ $REST_API_ENDPOINTS = [
             'callback'              => 'updateTapestryNodeImageURL'
         ]
     ],
+    'PUT_TAPESTRY_NODE_LOCKED_IMAGE_URL' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/lockedImageURL',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_PUT_METHOD,
+            'callback'              => 'updateTapestryNodeLockedImageURL'
+        ]
+    ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
@@ -233,6 +240,20 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'   => $REST_API_GET_METHOD,
             'callback'  => 'getGfEntry'
+        ]
+    ],
+    'GET_TAPESTRY_USER_FAVOURITES' => (object) [
+        'ROUTE'     => 'users/favourites',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_GET_METHOD,
+            'callback'              => 'getUserFavourites',
+        ]
+    ],
+    'UPDATE_TAPESTRY_USER_FAVOURITES' => (object) [
+        'ROUTE'     => 'users/favourites',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'updateUserFavourites',
         ]
     ],
     'LOGIN' => (object) [
@@ -782,6 +803,44 @@ function updateTapestryNodeImageURL($request)
     }
 }
 
+
+/**
+ * Update Tapestry Node Locked Image Url
+ * 
+ * @param   Object  $request    HTTP request
+ * 
+ * @return  Object  $response   HTTP response
+ */
+function updateTapestryNodeLockedImageURL($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $imageURL = json_decode($request->get_body());
+    // TODO: JSON validations should happen here
+    // make sure the image url exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::currentUserIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+        $node->set((object) ['lockedImageURL' => $imageURL]);
+        return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 /** 
  * Update Tapestry Node Type Data
  * 
@@ -1095,3 +1154,40 @@ function getNodesWithRecordedAudios($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+/**
+ * Get user favourite nodes on a tapestry page by post id. 
+ * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function getUserFavourites($request)
+{
+    $postId = $request['post_id'];
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->getFavourites();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Update favourite nodes for the current user by passing in post id and favourites array
+ * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&favourites=[409, 411]
+ * 
+ * @param Object $request HTTP request
+ * 
+ */
+function updateUserFavourites($request)
+{
+    $postId = $request['post_id'];
+    $favourites = json_decode($request->get_body())->favourites;
+    try {
+        $userProgress = new TapestryUserProgress($postId);
+        return $userProgress->updateFavourites($favourites);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+} 
