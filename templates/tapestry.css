@@ -392,6 +392,19 @@ input[type="checkbox"][disabled] {
     height: 100%;
 }
 
+.tyde-module-complete-check {
+    color: lightgreen;
+    height: 5em;
+    width: 5em;
+}
+
+.tyde-module-complete-check i {
+    background: white;
+    border-radius: 50%;
+    font-size: 3em;
+    padding: 0.25em;
+}
+
 .tapestry-tooltip {
     pointer-events: none;
     position: absolute;
