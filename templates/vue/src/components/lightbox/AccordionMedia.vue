@@ -12,18 +12,22 @@
         :visible="index === activeIndex"
       >
         <template v-slot:trigger>
-          <button
-            class="button-row"
-            :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
-            @click="toggle(index)"
-          >
-            <div class="button-row-icon">
-              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-            </div>
-            <div>
-              <p class="button-row-title">{{ row.node.title }}</p>
-              <p class="button-row-description">{{ row.node.description }}</p>
-            </div>
+          <div class="button-row">
+            <button
+              class="button-row-trigger"
+              :disabled="disableRow(index)"
+              @click="toggle(index)"
+            >
+              <div class="button-row-icon">
+                <i
+                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
+                ></i>
+              </div>
+              <div>
+                <p class="button-row-title">{{ row.node.title }}</p>
+                <p class="button-row-description">{{ row.node.description }}</p>
+              </div>
+            </button>
             <div class="icon-container">
               <tyde-icon
                 v-if="row.node.mediaType === 'gravity-form'"
@@ -36,12 +40,20 @@
                 icon="checkmark"
               ></tyde-icon>
               <tyde-icon
-                v-if="lockRows && disabledFrom >= 0 && index > disabledFrom"
+                v-if="disableRow(index)"
                 class="icon"
                 icon="lock"
               ></tyde-icon>
+              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+                <i
+                  v-if="isFavourite(row.node.id)"
+                  class="fas fa-heart fa-lg"
+                  style="color:red;"
+                ></i>
+                <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
+              </a>
             </div>
-          </button>
+          </div>
         </template>
         <template v-slot:content>
           <tapestry-media
@@ -71,6 +83,7 @@
     </div>
     <tapestry-modal
       v-if="showCompletion"
+      :node-id="node.id"
       :allow-close="false"
       :content-container-style="confirmationStyles"
       @close="showCompletion = false"
@@ -124,7 +137,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
     confirmationStyles() {
       return {
         backgroundColor: "white",
@@ -177,13 +190,16 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    favourites() {
+      return this.getFavourites ? this.getFavourites : []
+    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -213,6 +229,9 @@ export default {
         this.showCompletion = true
       }
     },
+    disableRow(index) {
+      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    },
     async updateProgress(rowId) {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
@@ -232,6 +251,20 @@ export default {
           this.$emit("complete")
         }
       }
+    },
+    isFavourite(nodeId) {
+      nodeId = nodeId.toString()
+      return this.favourites.find(id => id == nodeId)
+    },
+    updateFavourites(nodeId) {
+      let updatedFavouritesList = [...this.favourites]
+      nodeId = nodeId.toString()
+      if (this.isFavourite(nodeId)) {
+        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
+      } else {
+        updatedFavouritesList.push(nodeId)
+      }
+      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }
@@ -311,12 +344,20 @@ button[disabled] {
 
 .button-row {
   display: flex;
-  align-items: center;
-  background: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  text-align: left;
+  
+  &-trigger{
+    display: flex;
+    align-items: center;
+    background: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+  }
+
+  a {
+    cursor: pointer;
+  }
 
   &-icon {
     background: #b29ac9;
@@ -356,7 +397,10 @@ button[disabled] {
 }
 
 .icon-container {
-  margin-left: auto;
+  display: flex;
+  margin-right: 10px;
+  align-items: center;
+  flex: auto;
 }
 
 .button-finished {

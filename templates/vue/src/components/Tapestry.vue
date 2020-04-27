@@ -81,6 +81,7 @@ export default {
         skippable: true,
         tydeType: tydeTypes.REGULAR,
       },
+      favourites: [],
     }
   },
   computed: {
@@ -128,6 +129,11 @@ export default {
       this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
     },
   },
+  async created() {
+    const tapestryApi = new TapestryApi(wpPostId)
+    const response = await tapestryApi.getUserFavourites()
+    this.favourites = JSON.parse(response.data)
+  },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
@@ -146,6 +152,7 @@ export default {
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
+        event.detail.dataset["favourites"] = this.favourites
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {
