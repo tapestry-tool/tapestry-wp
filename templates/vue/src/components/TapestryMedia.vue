@@ -153,12 +153,6 @@ export default {
     },
     complete() {
       this.$emit("complete")
-      const stages = this.getDirectParents(this.nodeId).filter(
-        id => this.getNode(id).tydeType === "Stage"
-      )
-      stages.map(sid =>
-        this.updateTydeProgress({ parentId: sid, isParentModule: false })
-      )
     },
   },
 }
