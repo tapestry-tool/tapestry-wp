@@ -109,14 +109,18 @@ function tapestryTool(config){
                 }
 
                 if (renderThumbnails) {
-                    // change http(s):// to // in media URLs
+                    // change http(s):// to // in media URLs and locked image URLs
                     if (typeof tapestry.dataset.nodes[i].imageURL != "undefined" && tapestry.dataset.nodes[i].imageURL.length > 0) {
                         tapestry.dataset.nodes[i].imageURL = tapestry.dataset.nodes[i].imageURL.replace(/(http(s?)):\/\//gi, '//');
+                    }
+                    if (typeof tapestry.dataset.nodes[i].lockedImageURL != "undefined" && tapestry.dataset.nodes[i].lockedImageURL.length > 0) {
+                        tapestry.dataset.nodes[i].lockedImageURL = tapestry.dataset.nodes[i].lockedImageURL.replace(/(http(s?)):\/\//gi, '//');
                     }
                 }
                 else {
                     // turn off thumbnails
                     tapestry.dataset.nodes[i].imageURL = "";
+                    tapestry.dataset.nodes[i].lockedImageURL = "";
                 }
             }
         }
@@ -1045,13 +1049,13 @@ function tapestryTool(config){
                 return "imageContainer";
             })
             .attr("rx", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
             })
             .attr("ry", function (d) {
-                if (d.hideProgress && d.imageURL.length) {
+                if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                     return 0;
                 }
                 return getRadius(d);
@@ -1088,8 +1092,12 @@ function tapestryTool(config){
                 return - getRadius(d);
             })
             .attr("fill", function (d) {
-                if (!d.accessible)
-                    return COLOR_LOCKED;
+                if (!d.accessible) {
+                    if (d.lockedImageURL && d.lockedImageURL.length)
+                        return "url('#node-locked-thumb-" + d.id + "')";
+                    else
+                        return COLOR_LOCKED;
+                }
                 if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
@@ -1150,7 +1158,8 @@ function tapestryTool(config){
         nodes.append("circle")
             .filter(function (d) {
                 // no overlay if hiding progress and there is an image
-                return !(d.hideProgress && d.imageURL.length);
+                // or no overlay if node is locked and has a locked image
+                return !(d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length));
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
@@ -1203,6 +1212,34 @@ function tapestryTool(config){
             .attr("preserveAspectRatio", "xMidYMid slice")
             .attr("xlink:href", function (d) {
                 return d.imageURL;
+            });
+        
+        
+        nodes.append("defs")
+            .append("pattern")
+            .attr("id", function (d) {
+                return "node-locked-thumb-" + d.id;
+            })
+            .attr("data-id", function (d) {
+                return d.id;
+            })
+            .attr("pattenUnits", "userSpaceOnUse")
+            .attr("height", 1)
+            .attr("width", 1)
+            .append("image")
+            .attr("height", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("width", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("preserveAspectRatio", "xMidYMid slice")
+            .attr("xlink:href", function (d) {
+                return d.lockedImageURL;
             });
 
         /* Add path and button */
@@ -1357,13 +1394,13 @@ function tapestryTool(config){
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .attr("rx", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                         return 0;
                     }
                     return getRadius(d);
                 })
                 .attr("ry", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
+                    if (d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length)) {
                         return 0;
                     }
                     return getRadius(d);
@@ -1390,8 +1427,12 @@ function tapestryTool(config){
                     return - getRadius(d);
                 })
                 .attr("fill", function (d) {
-                    if (!d.accessible)
-                        return COLOR_LOCKED;
+                    if (!d.accessible) {
+                        if (d.lockedImageURL && d.lockedImageURL.length)
+                            return "url('#node-locked-thumb-" + d.id + "')";
+                        else
+                            return COLOR_LOCKED;
+                    }
                     if (d.imageURL.length)
                         return "url('#node-thumb-" + d.id + "')";
                     return COLOR_BLANK_HOVER;
@@ -1487,7 +1528,7 @@ function tapestryTool(config){
         /* Update the progress pies */
         updateViewedProgress();
     
-    /* Create the node meta */
+        /* Create the node meta */
         nodes
             .filter(function (d){
                 return getViewable(d) && (!d.hideTitle || !renderThumbnails);
@@ -1541,7 +1582,6 @@ function tapestryTool(config){
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
                     ' data-media-type="' + d.mediaType + '"' + 
-                    ' data-thumb="' + d.imageURL + '"' +
                     ' data-fullscreen="' + d.fullscreen + '"' +
                     ' data-url="' + (d.typeData.mediaURL ? d.typeData.mediaURL : '') + '"' +
                     ' data-media-width="' + d.typeData.mediaWidth + '"' + 
@@ -1915,21 +1955,24 @@ function tapestryTool(config){
         if (node.nodeType === "grandchild") {
             base += " grandchild";
         }
-        if (node.imageURL.length === 0) {
+        if ((node.accessible ? node.imageURL.length : node.lockedImageURL.length) === 0) {
             base += " imageOverlay--no-image";
+        }
+        if (!node.accessible) {
+            base += " locked";
         }
         return base;
     }
 
     function getNodeColor(node) {
-        if (!getViewable(node))
+        if (!getViewable(node) || (!node.accessible && node.lockedImageURL.length))
             return "transparent";
         if (node.nodeType === "grandchild")
             return COLOR_GRANDCHILD;
+        if (node.accessible && node.imageURL.length === 0)
+            return COLOR_BLANK;
         if (!node.accessible)
             return COLOR_LOCKED;
-        if (node.imageURL.length === 0)
-            return COLOR_BLANK;
         return COLOR_STROKE;
     }
 
@@ -2348,6 +2391,11 @@ tapestryTool.prototype.updateNodeImage = updateNodeImage;
 
 function updateNodeImage(id, src) {
     const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
+
+function updateNodeLockedImage(id, src) {
+    const image = document.querySelector(`#node-locked-thumb-${id} > image`)
     image.setAttribute("href", src)
 }
 
