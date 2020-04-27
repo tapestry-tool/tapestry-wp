@@ -37,7 +37,7 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
 }
 
 function getCompletedActivities(node) {
-  return node.quiz.filter(activity => node.userType === "teen" || activity.completed)
+  return node.quiz.filter(activity => activity.completed)
 }
 
 export function getActivities(state) {
