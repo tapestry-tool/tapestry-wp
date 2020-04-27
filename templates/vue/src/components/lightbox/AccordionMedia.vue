@@ -12,9 +12,9 @@
         :visible="index === activeIndex"
       >
         <template v-slot:trigger>
-          <div class="row-header">
+          <div class="button-row">
             <button
-              class="button-row"
+              class="button-row-trigger"
               :disabled="disableRow(index)"
               @click="toggle(index)"
             >
@@ -342,18 +342,18 @@ button[disabled] {
   width: 250px;
 }
 
-.row-header {
-  display: flex;
-}
-
 .button-row {
   display: flex;
-  align-items: center;
-  background: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  text-align: left;
+  
+  &-trigger{
+    display: flex;
+    align-items: center;
+    background: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+  }
 
   a {
     cursor: pointer;
