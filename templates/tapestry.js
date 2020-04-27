@@ -120,7 +120,8 @@ function tapestryTool(config){
                 else {
                     // turn off thumbnails
                     tapestry.dataset.nodes[i].imageURL = "";
-                }
+                    tapestry.dataset.nodes[i].lockedImageURL = "";
+                }   
             }
         }
 
@@ -1207,8 +1208,9 @@ function tapestryTool(config){
 
         nodes.append("circle")
             .filter(function (d) {
-                 // or no overlay if node is locked and has a locked image
-                 return !(d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length));
+                // no overlay if hiding progress and there is an image
+                // or no overlay if node is locked and has a locked image
+                return !(d.hideProgress && (d.accessible ? d.imageURL.length : d.lockedImageURL.length));
             })
             .attr("class", function (d) {
                 return getNodeClasses(d);
