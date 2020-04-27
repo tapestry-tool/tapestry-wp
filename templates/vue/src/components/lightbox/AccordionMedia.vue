@@ -347,8 +347,8 @@ button[disabled] {
 
 .button-row {
   display: flex;
-  
-  &-trigger{
+
+  &-trigger {
     display: flex;
     align-items: center;
     background: none;
