@@ -202,7 +202,7 @@
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
-            <b-form-group>
+            <b-form-group v-if="addThumbnail">
               <b-form-checkbox
                 v-model="addLockedThumbnail"
                 data-testid="node-appearance-add-locked-thumbnail"
@@ -210,7 +210,7 @@
                 Show a different thumbnail when locked
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="addLockedThumbnail">
+            <b-form-group v-if="addThumbnail && addLockedThumbnail">
               <file-upload
                 v-model="node.lockedImageURL"
                 data-testid="node-lockedImageURL"
