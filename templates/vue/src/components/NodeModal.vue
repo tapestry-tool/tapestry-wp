@@ -208,7 +208,7 @@
                 Show a different thumbnail when locked
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="addLockedThumbnail">
+            <b-form-group v-if="addThumbnail && addLockedThumbnail">
               <file-upload
                 v-model="node.lockedImageURL"
                 data-testid="node-lockedImageURL"
