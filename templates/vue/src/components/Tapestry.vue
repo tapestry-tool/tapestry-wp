@@ -436,6 +436,7 @@ export default {
           if (newNodeEntry.lockedImageURL) {
             shouldChange = confirm("Change locked thumbnail to new image?")
           }
+
           if (shouldChange) {
             newNodeEntry.lockedImageURL = data.image
           }

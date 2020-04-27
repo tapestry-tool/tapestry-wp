@@ -754,7 +754,8 @@ export default {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
     },
     nodeLockedImageURL() {
-      this.addLockedThumbnail = this.node.lockedImageURL && this.node.lockedImageURL.length > 0
+      this.addLockedThumbnail =
+        this.node.lockedImageURL && this.node.lockedImageURL.length > 0
     },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()

@@ -1150,7 +1150,7 @@ function tapestryTool(config){
                     else
                         return COLOR_LOCKED;
                 }
-                if (d.imageURL.length)
+                if (d.imageURL && d.imageURL.length)
                     return "url('#node-thumb-" + d.id + "')";
                 return COLOR_BLANK_HOVER;
             })
@@ -1671,7 +1671,7 @@ function tapestryTool(config){
         /* Update the progress pies */
         updateViewedProgress();
     
-    /* Create the node meta */
+        /* Create the node meta */
         nodes
             .filter(function (d){
                 return getViewable(d) && (!d.hideTitle || !renderImages);
@@ -2579,6 +2579,11 @@ tapestryTool.prototype.updateNodeImage = updateNodeImage;
 
 function updateNodeImage(id, src) {
     const image = document.querySelector(`#node-thumb-${id} > image`)
+    image.setAttribute("href", src)
+}
+
+function updateNodeLockedImage(id, src) {
+    const image = document.querySelector(`#node-locked-thumb-${id} > image`)
     image.setAttribute("href", src)
 }
 
