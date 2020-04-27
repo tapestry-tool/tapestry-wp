@@ -2583,17 +2583,17 @@ function tapestryTool(config){
         if (config.wpCanEditTapestry) {
             return true;
         }
-    
-        // CHECK 3: If node is the root node or is currently selected
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
 
-        // CHECK 4: If node is an accordion row and user is not the author
+        // CHECK 3: If node is an accordion row and user is not the author
         if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
 
-        // CHECK 5: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
+        // CHECK 4: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
         if ((node.tydeType === "Stage" || node.tydeType === "Question set") && !config.wpCanEditTapestry) {
             return false;
         }
+
+        // CHECK 5: If node is the root node or is currently selected
+        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
     
         // If it passes all the checks, return true!
         return true;

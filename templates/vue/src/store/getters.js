@@ -6,13 +6,16 @@ export function getParent(state) {
 }
 
 export function getModuleContent(_, { getNode, getDirectChildren }) {
-  return moduleId =>
-    getDirectChildren(moduleId).map(stageId => ({
+  return moduleId => {
+    const module = getNode(moduleId)
+    const isCopilot = module.userType === "teen"
+    return getDirectChildren(moduleId).map(stageId => ({
       node: getNode(stageId),
       topics: getDirectChildren(stageId)
         .map(getNode)
-        .filter(content => content.completed),
+        .filter(content => isCopilot || content.completed),
     }))
+  }
 }
 
 export function getModuleActivities(_, { getNode, getDirectChildren }) {
@@ -34,7 +37,7 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
 }
 
 function getCompletedActivities(node) {
-  return node.quiz.filter(activity => activity.completed)
+  return node.quiz.filter(activity => node.userType === "teen" || activity.completed)
 }
 
 export function getActivities(state) {
