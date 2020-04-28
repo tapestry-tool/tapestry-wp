@@ -94,7 +94,7 @@ export async function completeQuestion(
 export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
   await client.saveAudio(audio, nodeId, questionId)
   commit("updateEntry", {
-    answerType: "audio",
+    answerType: "audioId",
     entry: { audio },
     nodeId,
     questionId,
