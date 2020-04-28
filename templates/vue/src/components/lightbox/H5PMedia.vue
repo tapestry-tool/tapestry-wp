@@ -18,9 +18,8 @@
     <h5p-iframe
       ref="h5pIframe"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
-      :width="width"
-      :height="height"
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
@@ -53,12 +52,8 @@ export default {
       type: Object,
       required: true,
     },
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
+    dimensions: {
+      type: Object,
       required: true,
     },
     allowEndScreen: {

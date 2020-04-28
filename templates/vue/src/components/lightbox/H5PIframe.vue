@@ -3,7 +3,10 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="node.typeData.mediaURL"
+    :height="frameHeight"
+    :src="node.typeData && node.typeData.mediaURL"
+    :width="frameWidth"
+    scrolling="no"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -18,10 +21,11 @@ export default {
   props: {
     node: {
       type: Object,
-      required: false,
-      default: () => {
-        return {}
-      },
+      required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
     },
     settings: {
       type: [Object],
@@ -34,15 +38,35 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      instance: null,
+      frameHeight: 0,
+      frameWidth: 0,
+    }
+  },
   watch: {
     node(_, oldNode) {
       this.handlePause(oldNode)
     },
   },
+  created() {
+    this.frameWidth = "100%"
+  },
   beforeDestroy() {
     this.handlePause(this.node)
   },
   methods: {
+    setFrameHeight() {
+      const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
+      if (videoHeight > this.dimensions.height) {
+        const scaleFactor = this.dimensions.height / videoHeight
+        this.frameHeight = this.dimensions.height
+        this.frameWidth = 100 * scaleFactor + "%"
+      } else {
+        this.frameHeight = videoHeight
+      }
+    },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -140,30 +164,11 @@ export default {
     handleLoad() {
       this.$emit("is-loaded")
 
-      if (this.node.fullscreen) {
-        console.log("here")
-        const frame = this.$refs.h5p
-        frame.removeAttribute("width")
-        frame.removeAttribute("height")
-        const setIframeDimensions = () => {
-          const { width, height } = frame.getBoundingClientRect()
-          const parentHeight = frame.parentNode.getBoundingClientRect().height
-          if (height > parentHeight) {
-            const ratio = height / width
-            if (ratio < 1) {
-              const newWidth = width * (parentHeight / height)
-              frame.style.width = newWidth + "px"
-              frame.style.height = parentHeight + "px"
-            }
-          }
-        }
-        $(window).resize(setIframeDimensions)
-        setIframeDimensions()
-      }
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
+      this.instance = h5pInstance
+      this.setFrameHeight()
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
 
@@ -257,9 +262,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-#h5p {
-  width: 100% !important;
-}
-</style>
