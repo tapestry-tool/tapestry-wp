@@ -284,7 +284,7 @@ export default {
       if (!this.wasFocused) {
         return null
       }
-      return Object.values(question.answers).some(value => value.length > 0)
+      return Object.values(question.answers).some(value => value && value.length > 0)
     },
   },
 }

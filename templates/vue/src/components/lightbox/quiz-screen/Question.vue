@@ -143,7 +143,9 @@ export default {
       return []
     },
     options() {
-      return Object.entries(this.question.answers).filter(opt => opt[1].length > 0)
+      return Object.entries(this.question.answers).filter(
+        opt => opt[1] && opt[1].length > 0
+      )
     },
     textFormCompleted() {
       return !!(this.question.entries && this.question.entries.textId)

@@ -8,14 +8,24 @@
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
-        <button
-          class="button-row"
-          :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
-          @click="toggle(index)"
-        >
-          <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-          {{ row.node.title }}
-        </button>
+        <div class="button-row">
+          <button
+            class="button-row-trigger"
+            :disabled="disableRow(index)"
+            @click="toggle(index)"
+          >
+            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+            {{ row.node.title }}
+          </button>
+          <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+            <i
+              v-if="isFavourite(row.node.id)"
+              class="fas fa-heart fa-sm"
+              style="color:red;"
+            ></i>
+            <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+          </a>
+        </div>
       </template>
       <template v-slot:content>
         <tapestry-media
@@ -45,6 +55,7 @@
     </accordion-row>
     <tapestry-modal
       v-if="showCompletion"
+      :node-id="node.id"
       :allow-close="false"
       @close="showCompletion = false"
     >
@@ -96,7 +107,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
     hasNext() {
       return this.activeIndex < this.rows.length - 1
     },
@@ -126,13 +137,16 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    favourites() {
+      return this.getFavourites ? this.getFavourites : []
+    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -162,6 +176,9 @@ export default {
         this.showCompletion = true
       }
     },
+    disableRow(index) {
+      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    },
     async updateProgress(rowId) {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
@@ -181,6 +198,20 @@ export default {
           this.$emit("complete")
         }
       }
+    },
+    isFavourite(nodeId) {
+      nodeId = nodeId.toString()
+      return this.favourites.find(id => id == nodeId)
+    },
+    updateFavourites(nodeId) {
+      let updatedFavouritesList = [...this.favourites]
+      nodeId = nodeId.toString()
+      if (this.isFavourite(nodeId)) {
+        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
+      } else {
+        updatedFavouritesList.push(nodeId)
+      }
+      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }
@@ -242,15 +273,23 @@ button[disabled] {
 .button-row {
   display: flex;
   align-items: center;
-  background: none;
   margin: 0;
   width: 100%;
   border-radius: 4px;
-  text-align: left;
 
   i {
     margin-right: 8px;
   }
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.button-row-trigger {
+  background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .button-scroll-top {

@@ -20,6 +20,7 @@ const store = new Vuex.Store({
     h5pSettings: {},
     selectedNodeId: null,
     tapestryIsLoaded: false,
+    favourites: [],
   },
   getters: {
     selectedNode: state => {
@@ -46,6 +47,7 @@ const store = new Vuex.Store({
       isOpen: state.isLightboxOpen,
       el: state.lightboxEl,
     }),
+    getFavourites: state => state.favourites,
     ...getters,
   },
   mutations,
