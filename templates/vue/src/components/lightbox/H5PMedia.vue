@@ -18,6 +18,7 @@
     <h5p-iframe
       ref="h5pIframe"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
       :settings="settings"
       @complete="$emit('complete')"
@@ -46,6 +47,10 @@ export default {
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    dimensions: {
       type: Object,
       required: true,
     },

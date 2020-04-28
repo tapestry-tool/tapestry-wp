@@ -3,6 +3,10 @@
     :class="[
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
+      {
+        'media-wrapper-no-scroll':
+          node.mediaFormat === 'video' || node.mediaFormat === 'h5p',
+      },
     ]"
   >
     <text-media
@@ -31,6 +35,7 @@
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
       :settings="h5pSettings"
       @load="handleLoad"
@@ -149,8 +154,13 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
-}
-.media-wrapper-embed {
-  background: white;
+
+  &-embed {
+    background: white;
+  }
+
+  &-no-scroll {
+    overflow: hidden;
+  }
 }
 </style>
