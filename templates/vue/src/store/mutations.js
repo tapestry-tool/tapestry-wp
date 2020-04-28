@@ -140,6 +140,11 @@ function getParentIds(state, nodeId) {
     .map(link => (link.source.id == undefined ? link.source : link.source.id))
 }
 
+// favourites
+export function updateFavourites(state, { favourites }) {
+  state.favourites = favourites
+}
+
 function getChildIds(state, nodeId) {
   const links = state.links
   return links

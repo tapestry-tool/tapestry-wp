@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import Unlock from "@/assets/tyde-unlock.gif"
 import Helpers from "@/utils/Helpers"
 import TapestryModal from "../TapestryModal"
+import UnlockImage from "@/assets/tyde-unlock.gif"
 import UnlockSound from "@/assets/tyde-unlock-sound.wav"
 
 export default {
@@ -23,7 +23,7 @@ export default {
     celebrationStyles() {
       return {
         backgroundColor: "white",
-        backgroundImage: `url(${Helpers.getImagePath(Unlock)})`,
+        backgroundImage: `url(${Helpers.getImagePath(UnlockImage)})`,
         backgroundOrigin: "content-box",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",

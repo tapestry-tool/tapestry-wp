@@ -256,6 +256,36 @@ class TapestryUserProgress implements ITapestryUserProgress
         return json_encode($settings);
     }
 
+    /**
+     * Get User's video progress for a tapestry post
+     *
+     * @return Array $favourites array of nodeIds
+     */
+    public function getFavourites()
+    {
+        $this->_isValidTapestryPost();
+        $this->_checkUserAndPostId();
+
+        $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
+        if ($favourites) {
+            return $favourites;
+        }
+        return [];
+    }
+
+    /**
+     * Update User's favourite nodes for a tapestry post
+     *
+     * @param Array $favourites update the favourite nodes
+     *
+     * @return Null
+     */
+    public function updateFavourites($favourites)
+    {
+        $this->_checkUserAndPostId();
+        update_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, $favourites);
+    }
+
     /* Helpers */
 
     private function _checkUserAndPostId()
