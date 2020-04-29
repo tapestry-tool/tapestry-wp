@@ -247,6 +247,7 @@ export default {
 
           if (settings.muted) {
             h5pVideo.mute()
+            this.toggleMuteIcon(h5pObj.$body[0])
           } else {
             h5pVideo.unMute()
           }
@@ -317,6 +318,10 @@ export default {
         }
         //})
       }
+    },
+    toggleMuteIcon(body) {
+      const btn = body.querySelector(".h5p-mute")
+      btn.classList.toggle("h5p-muted")
     },
   },
 }
