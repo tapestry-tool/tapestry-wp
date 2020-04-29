@@ -1,8 +1,16 @@
 <template>
   <div class="completion-screen">
     <header>
-      <h1>Thanks!</h1>
-      <p>Your response has been recorded.</p>
+      <h1>
+        {{ question.confirmationTitle ? question.confirmationTitle : "Thanks!" }}
+      </h1>
+      <p>
+        {{
+          question.confirmationMessage
+            ? question.confirmationMessage
+            : "Your response has been recorded."
+        }}
+      </p>
     </header>
     <div>
       <slot></slot>
@@ -13,6 +21,12 @@
 <script>
 export default {
   name: "completion-screen",
+  props: {
+    question: {
+      type: Object,
+      required: false,
+    },
+  },
 }
 </script>
 

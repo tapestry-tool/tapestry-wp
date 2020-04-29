@@ -52,6 +52,7 @@ export async function completeNode({ commit, getters }, nodeId) {
     id: nodeId,
     newNode: { completed: true },
   })
+  thisTapestryTool.updateAccordionProgress()
 
   const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {
@@ -99,4 +100,10 @@ export async function completeQuestion(
 export async function addLink({ commit }, newLink) {
   await client.addLink(JSON.stringify(newLink))
   commit("addLink", newLink)
+}
+
+// favourites
+export async function updateUserFavourites({ commit }, favourites) {
+  commit("updateFavourites", { favourites })
+  await client.updateUserFavourites(JSON.stringify(favourites))
 }

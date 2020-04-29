@@ -3,36 +3,58 @@
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
-      :key="row.id"
+      :key="row.node.id"
+      ref="rowRefs"
       :visible="index === activeIndex"
     >
       <template v-slot:trigger>
-        <button
-          class="button-row"
-          :disabled="lockRows && disabledFrom >= 0 && index > disabledFrom"
-          @click="toggle(index)"
-        >
-          <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-          {{ row.title }}
-        </button>
+        <div class="button-row">
+          <button
+            class="button-row-trigger"
+            :disabled="disableRow(index)"
+            @click="toggle(index)"
+          >
+            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+            {{ row.node.title }}
+          </button>
+          <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+            <i
+              v-if="isFavourite(row.node.id)"
+              class="fas fa-heart fa-sm"
+              style="color:red;"
+            ></i>
+            <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+          </a>
+        </div>
       </template>
       <template v-slot:content>
         <tapestry-media
-          :node-id="row.id"
+          :node-id="row.node.id"
           :dimensions="dimensions"
           :autoplay="false"
-          @complete="updateProgress(row.id)"
+          style="color: white; margin-bottom: 24px;"
+          @complete="updateProgress(row.node.id)"
           @close="toggle(index)"
+          @load="handleLoad($refs.rowRefs[index].$el)"
         />
+        <p v-if="row.children.length > 0" style="color: white;">
+          {{ row.node.typeData.subAccordionText }}
+        </p>
+        <sub-accordion
+          v-if="row.children.length > 0"
+          :rows="row.children"
+          @load="handleLoad"
+        ></sub-accordion>
       </template>
       <template v-slot:footer>
-        <button v-if="row.completed" class="mt-2" @click="next">
+        <button v-if="row.node.completed" class="mt-2" @click="next">
           {{ node.typeData.finishButtonText }}
         </button>
       </template>
     </accordion-row>
     <tapestry-modal
       v-if="showCompletion"
+      :node-id="node.id"
       :allow-close="false"
       @close="showCompletion = false"
     >
@@ -60,6 +82,7 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -67,6 +90,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    SubAccordion,
   },
   props: {
     node: {
@@ -82,12 +106,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
     hasNext() {
       return this.activeIndex < this.rows.length - 1
     },
     rows() {
-      return this.getDirectChildren(this.node.id).map(this.getNode)
+      return this.node.childOrdering.map(id => {
+        const node = this.getNode(id)
+        const children = node.isSubAccordion
+          ? node.childOrdering.map(this.getNode)
+          : this.getDirectChildren(id).map(this.getNode)
+        return { node, children }
+      })
     },
     dimensions() {
       if (!this.isMounted) {
@@ -104,12 +134,27 @@ export default {
       return this.node.typeData.lockRows
     },
     disabledFrom() {
-      return this.rows.findIndex(node => !node.completed)
+      return this.rows.findIndex(row => !row.node.completed)
     },
+    favourites() {
+      return this.getFavourites ? this.getFavourites : []
+    },
+  },
+  mounted() {
+    this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    handleLoad(el) {
+      this.$nextTick(() => {
+        if (this.activeIndex < 0) {
+          this.$refs.container.scrollTop = 0
+        } else {
+          this.$refs.container.scrollTop = el.offsetTop - 12
+        }
+      })
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -130,6 +175,9 @@ export default {
         this.showCompletion = true
       }
     },
+    disableRow(index) {
+      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    },
     async updateProgress(rowId) {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
@@ -149,6 +197,20 @@ export default {
           this.$emit("complete")
         }
       }
+    },
+    isFavourite(nodeId) {
+      nodeId = nodeId.toString()
+      return this.favourites.find(id => id == nodeId)
+    },
+    updateFavourites(nodeId) {
+      let updatedFavouritesList = [...this.favourites]
+      nodeId = nodeId.toString()
+      if (this.isFavourite(nodeId)) {
+        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
+      } else {
+        updatedFavouritesList.push(nodeId)
+      }
+      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }
@@ -210,15 +272,23 @@ button[disabled] {
 .button-row {
   display: flex;
   align-items: center;
-  background: none;
   margin: 0;
   width: 100%;
   border-radius: 4px;
-  text-align: left;
 
   i {
     margin-right: 8px;
   }
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.button-row-trigger {
+  background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .button-scroll-top {

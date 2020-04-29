@@ -38,6 +38,9 @@
                 placeholder="Enter description"
               ></b-form-textarea>
             </b-form-group>
+            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
+            </b-form-group>
             <b-form-group label="Content Type">
               <b-form-select
                 id="node-media-type"
@@ -130,12 +133,17 @@
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
+              <span v-if="!this.gravityFormExists" class="text-muted">
+                Gravity Forms plugin is not installed. Please install Gravity Forms
+                to use this content type.
+              </span>
               <combobox
+                v-else
                 v-model="selectedGravityFormContent"
                 data-testid="combobox-gravity-form"
                 item-text="title"
                 item-value="id"
-                empty-message="There are no forms available. Please add one in your WP dashboard."
+                empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
                 :options="gravityFormOptions"
               >
                 <template v-slot="slotProps">
@@ -189,6 +197,21 @@
               <file-upload
                 v-model="node.imageURL"
                 data-testid="node-imageUrl"
+                placeholder="Enter the URL for the thumbnail"
+              />
+            </b-form-group>
+            <b-form-group v-if="addThumbnail">
+              <b-form-checkbox
+                v-model="addLockedThumbnail"
+                data-testid="node-appearance-add-locked-thumbnail"
+              >
+                Show a different thumbnail when locked
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="addThumbnail && addLockedThumbnail">
+              <file-upload
+                v-model="node.lockedImageURL"
+                data-testid="node-lockedImageURL"
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
@@ -320,6 +343,30 @@
         >
           <quiz-modal :node="node" />
         </b-tab>
+        <b-tab
+          v-if="node.mediaType === 'accordion' || hasSubAccordion"
+          title="Ordering"
+        >
+          <div>
+            <slick-list
+              :value="node.childOrdering"
+              lock-axis="y"
+              @input="updateOrderingArray"
+            >
+              <slick-item
+                v-for="(id, index) in node.childOrdering"
+                :key="index"
+                class="slick-list-item"
+                :index="index"
+                style="z-index: 9999 !important;"
+              >
+                <span class="fas fa-bars fa-xs"></span>
+                <span>{{ getNode(id).title }}</span>
+                <span style="color: grey;">id: {{ id }}</span>
+              </slick-item>
+            </slick-list>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -343,6 +390,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
 import QuizModal from "./node-modal/QuizModal"
@@ -352,6 +400,7 @@ import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 export default {
   name: "node-modal",
@@ -361,6 +410,8 @@ export default {
     QuizModal,
     ConditionsForm,
     FileUpload,
+    SlickItem,
+    SlickList,
   },
   props: {
     node: {
@@ -398,10 +449,10 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
-        { value: "gravity-form", text: "Gravity Form" },
         { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
+      gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
       selectedGravityFormContent: "",
@@ -411,9 +462,20 @@ export default {
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
+      addLockedThumbnail: false,
     }
   },
   computed: {
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    hasSubAccordion() {
+      const parents = this.getDirectParents(this.node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(this.node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
@@ -451,6 +513,10 @@ export default {
           name: "imageURL",
           value: this.node.imageURL || "",
         },
+        {
+          name: "lockedImageURL",
+          value: this.node.lockedImageURL || "",
+        },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
@@ -458,10 +524,15 @@ export default {
         { name: "skippable", value: this.node.skippable },
         { name: "quiz", value: this.node.quiz || [] },
         { name: "fullscreen", value: this.node.fullscreen },
+        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
+        { name: "childOrdering", value: this.node.childOrdering },
       ]
     },
     nodeImageUrl() {
       return this.node.imageURL
+    },
+    nodeLockedImageURL() {
+      return this.node.lockedImageURL
     },
     newPermissions() {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
@@ -476,8 +547,12 @@ export default {
     },
   },
   watch: {
-    nodeImageUrl: function() {
+    nodeImageUrl() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
+    },
+    nodeLockedImageURL() {
+      this.addLockedThumbnail =
+        this.node.lockedImageURL && this.node.lockedImageURL.length > 0
     },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
@@ -487,12 +562,19 @@ export default {
     },
   },
   async mounted() {
+    this.gravityFormExists = await GravityFormsApi.exists()
+    this.mediaTypes.push({
+      value: "gravity-form",
+      text: "Gravity Form",
+      disabled: !this.gravityFormExists,
+    })
     this.gravityFormOptions = await GravityFormsApi.getAllForms()
     this.h5pContentOptions = await H5PApi.getAllContent()
     this.wpPosts = await WordpressApi.getPosts()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
+        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
@@ -509,8 +591,14 @@ export default {
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
       }
     })
+    this.$root.$on("bv::modal::hide", (_, modalId) => {
+      if (modalId == "node-modal-container") {
+        thisTapestryTool.enableMovements()
+      }
+    })
   },
   methods: {
+    ...mapMutations(["updateOrdering"]),
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
         return false
@@ -537,7 +625,7 @@ export default {
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
       const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user")) {
+      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
       }
 
@@ -563,7 +651,7 @@ export default {
       this.$set(this.node.permissions, rowName, newPermissions)
     },
     updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user")) {
+      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.changeIndividualPermission(value, rowName, type)
       }
       const rowIndex = this.getPermissionRowIndex(rowName)
@@ -646,7 +734,9 @@ export default {
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
-        return Object.values(question.answers).some(value => value.length > 0)
+        return Object.values(question.answers).some(
+          value => value && value.length > 0
+        )
       })
     },
     addUserPermissionRow() {
@@ -662,6 +752,12 @@ export default {
       } else {
         alert("Enter valid user id")
       }
+    },
+    updateOrderingArray(arr) {
+      this.updateOrdering({
+        id: this.node.id,
+        ord: arr,
+      })
     },
   },
 }
@@ -740,6 +836,22 @@ table {
 
   &:last-child {
     margin-bottom: 0;
+  }
+}
+
+.slick-list-item {
+  display: flex;
+  height: 25px;
+  border: lightgray solid 1.5px;
+  margin: 10px 25px;
+  border-radius: 5px;
+  padding: 15px;
+  align-items: center;
+  > span {
+    margin-right: 25px;
+  }
+  > span:last-of-type {
+    margin-left: auto;
   }
 }
 </style>

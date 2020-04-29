@@ -124,6 +124,9 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function getUserEntries($formId = 0)
     {
+        if (!class_exists("GFAPI")) {
+          return [];
+        }
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
             'value' => $this->_userId
@@ -247,6 +250,36 @@ class TapestryUserProgress implements ITapestryUserProgress
     {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
         return json_decode($settings);
+    }
+
+    /**
+     * Get User's video progress for a tapestry post
+     *
+     * @return Array $favourites array of nodeIds
+     */
+    public function getFavourites()
+    {
+        $this->_isValidTapestryPost();
+        $this->_checkUserAndPostId();
+
+        $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
+        if ($favourites) {
+            return $favourites;
+        }
+        return [];
+    }
+
+    /**
+     * Update User's favourite nodes for a tapestry post
+     *
+     * @param Array $favourites update the favourite nodes
+     *
+     * @return Null
+     */
+    public function updateFavourites($favourites)
+    {
+        $this->_checkUserAndPostId();
+        update_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, $favourites);
     }
 
     /* Helpers */

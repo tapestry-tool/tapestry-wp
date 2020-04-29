@@ -24,6 +24,7 @@
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
+      @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
       @update-settings="updateH5pSettings"
     />

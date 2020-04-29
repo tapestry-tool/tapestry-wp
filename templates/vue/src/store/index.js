@@ -3,6 +3,7 @@ import Vuex from "vuex"
 
 import * as actions from "./actions"
 import * as mutations from "./mutations"
+import * as getters from "./getters"
 
 import Helpers from "../utils/Helpers"
 
@@ -19,6 +20,7 @@ const store = new Vuex.Store({
     h5pSettings: {},
     selectedNodeId: null,
     tapestryIsLoaded: false,
+    favourites: [],
   },
   getters: {
     selectedNode: state => {
@@ -32,6 +34,11 @@ const store = new Vuex.Store({
       const links = state.links
       return links.filter(link => link.source.id == id).map(link => link.target.id)
     },
+    getDirectParents: state => id => {
+      return state.links
+        .filter(link => link.target.id == id)
+        .map(link => link.source.id)
+    },
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
@@ -40,6 +47,8 @@ const store = new Vuex.Store({
       isOpen: state.isLightboxOpen,
       el: state.lightboxEl,
     }),
+    getFavourites: state => state.favourites,
+    ...getters,
   },
   mutations,
   actions,

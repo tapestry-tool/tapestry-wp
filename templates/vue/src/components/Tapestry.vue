@@ -69,6 +69,7 @@ export default {
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         permissions: {
           public: ["read"],
           authenticated: ["read"],
@@ -76,10 +77,11 @@ export default {
         quiz: [],
         skippable: true,
       },
+      favourites: [],
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -105,12 +107,23 @@ export default {
         case "edit-node":
           return this.selectedNode.permissionsOrder
         default:
-          return ["public", "authenticated"]
+          return [
+            "public",
+            "authenticated",
+            ...Object.keys(wpData.roles).filter(
+              role => role !== "administrator" && role !== "author"
+            ),
+          ]
       }
     },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
+  },
+  async created() {
+    const tapestryApi = new TapestryApi(wpPostId)
+    const response = await tapestryApi.getUserFavourites()
+    this.favourites = JSON.parse(response.data)
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
@@ -129,6 +142,7 @@ export default {
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
+        event.detail.dataset["favourites"] = this.favourites
         this.init(event.detail.dataset)
         this.tapestryLoaded = true
       } else {
@@ -143,9 +157,11 @@ export default {
         typeData: {
           mediaURL: "",
           textContent: "",
+          subAccordionText: "More content:",
         },
         mediaDuration: "",
         imageURL: "",
+        lockedImageURL: "",
         hideTitle: false,
         hideProgress: false,
         hideMedia: false,
@@ -157,6 +173,7 @@ export default {
         },
         description: "",
         quiz: [],
+        childOrdering: [],
       }
     },
     addRootNode() {
@@ -201,6 +218,7 @@ export default {
         nodeType: "",
         title: "",
         imageURL: "",
+        lockedImageURL: "",
         mediaType: "video",
         mediaFormat: "",
         mediaDuration: 0,
@@ -215,6 +233,7 @@ export default {
           mediaURL: "",
           mediaWidth: 960, //TODO: This needs to be flexible with H5P
           mediaHeight: 600,
+          subAccordionText: "More content:",
         },
         hideTitle: false,
         hideProgress: false,
@@ -225,6 +244,7 @@ export default {
           x: 3000,
           y: 3000,
         },
+        childOrdering: [],
       }
 
       if (isEdit) {
@@ -255,6 +275,9 @@ export default {
             newNodeEntry[fieldName] = fieldValue
             break
           case "imageURL":
+            newNodeEntry[fieldName] = fieldValue || ""
+            break
+          case "lockedImageURL":
             newNodeEntry[fieldName] = fieldValue || ""
             break
           case "behaviour":
@@ -319,6 +342,12 @@ export default {
           case "quiz":
             newNodeEntry.quiz = fieldValue
             break
+          case "subAccordionText":
+            newNodeEntry.typeData.subAccordionText = fieldValue
+            break
+          case "childOrdering":
+            newNodeEntry.childOrdering = fieldValue
+            break
           default:
             newNodeEntry[fieldName] = fieldValue
             break
@@ -345,6 +374,14 @@ export default {
           if (shouldChange) {
             newNodeEntry.imageURL = data.image
           }
+
+          if (newNodeEntry.lockedImageURL) {
+            shouldChange = confirm("Change locked thumbnail to new image?")
+          }
+
+          if (shouldChange) {
+            newNodeEntry.lockedImageURL = data.image
+          }
         }
       }
 
@@ -363,6 +400,7 @@ export default {
             appearsAt: appearsAt,
           }
           await this.addLink(newLink)
+          this.selectedNode.childOrdering.push(id)
         } else {
           this.updateRootNode(newNodeEntry.id)
           this.updateSelectedNode(newNodeEntry.id)
