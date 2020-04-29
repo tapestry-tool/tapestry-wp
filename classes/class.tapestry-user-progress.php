@@ -278,7 +278,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         if ($favourites) {
             return $favourites;
         }
-        return [];
+        return json_encode([]);
     }
 
     /**

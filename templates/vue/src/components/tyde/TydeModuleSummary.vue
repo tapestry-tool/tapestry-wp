@@ -21,7 +21,7 @@
       <div v-for="stage in stages" :key="stage.node.id" class="p-3">
         <h4 class="mx-0 mb-4 mt-2">{{ stage.node.title }}</h4>
         <p v-if="stage.topics.length === 0">
-          You haven't completed a topic yet.
+          There are no topics to show.
         </p>
         <div
           v-else
@@ -140,8 +140,15 @@ export default {
     background: #000;
     border-radius: 16px;
 
-    h4 {
-      font-size: 2em;
+    > div {
+      > h4 {
+        font-size: 1.5em;
+        padding-left: 20px;
+      }
+
+      > p {
+        padding-left: 20px !important;
+      }
     }
 
     .center {
@@ -169,7 +176,7 @@ export default {
   .grid {
     display: grid;
     grid-gap: 16px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
 </style>
