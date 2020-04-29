@@ -249,7 +249,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getUserH5PSettings()
     {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
-        return json_decode($settings);
+        return $settings ? json_decode($settings) : (object) [];
     }
 
     /**
