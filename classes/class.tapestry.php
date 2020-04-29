@@ -362,7 +362,7 @@ class Tapestry implements ITapestry
             && (!TapestryUserRoles::isAdministrator())
             && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -385,7 +385,7 @@ class Tapestry implements ITapestry
         return $newLinks;
     }
 
-    private function _filterNodeMetaIdsByPermissions($nodeMetaIds)
+    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId)
     {
         $newNodeMetaIds = [];
         $options = TapestryNodePermissions::getNodePermissions();
@@ -393,11 +393,29 @@ class Tapestry implements ITapestry
         $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
 
         foreach ($nodeMetaIds as $nodeMetaId) {
-            if (TapestryHelpers::currentUserIsAllowed('READ', $nodeMetaId, $this->postId)) {
+            if ($this->_checkPathIsAllowed($nodeMetaId, $rootId)) {
                 array_push($newNodeMetaIds, $nodeMetaId);
             }
         }
 
         return $newNodeMetaIds;
+    }
+
+    private function _checkPathIsAllowed($nodeMetaId, $rootId)
+    {
+        if (TapestryHelpers::currentUserIsAllowed('READ', $nodeMetaId, $this->postId))
+        {
+            if ($nodeMetaId == $rootId) {
+                return true;
+            }
+
+            foreach ($this->links as $link) {
+                if ($link->target == $nodeMetaId) {
+                    return $this->_checkPathIsAllowed($link->source, $rootId);
+                }
+            }   
+        }
+
+        return false;
     }
 }
