@@ -39,12 +39,15 @@
         </div>
       </div>
     </div>
-    <div v-else class="content pt-4">
+    <div v-else-if="activities.length > 0" class="content pt-4">
       <tyde-activity-summary
         v-for="activity in activities"
         :key="activity.id"
         :activity="activity"
       />
+    </div>
+    <div v-else class="content empty-message">
+      There are no completed activities yet.
     </div>
   </div>
 </template>
@@ -155,6 +158,11 @@ export default {
       button {
         width: 20%;
       }
+    }
+
+    &.empty-message {
+      padding: 1.5rem;
+      text-align: center;
     }
   }
 
