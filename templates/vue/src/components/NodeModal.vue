@@ -200,6 +200,21 @@
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
+            <b-form-group v-if="addThumbnail">
+              <b-form-checkbox
+                v-model="addLockedThumbnail"
+                data-testid="node-appearance-add-locked-thumbnail"
+              >
+                Show a different thumbnail when locked
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="addThumbnail && addLockedThumbnail">
+              <file-upload
+                v-model="node.lockedImageURL"
+                data-testid="node-lockedImageURL"
+                placeholder="Enter the URL for the thumbnail"
+              />
+            </b-form-group>
             <b-form-group>
               <b-form-checkbox
                 v-model="node.hideTitle"
@@ -447,6 +462,7 @@ export default {
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
+      addLockedThumbnail: false,
     }
   },
   computed: {
@@ -497,6 +513,10 @@ export default {
           name: "imageURL",
           value: this.node.imageURL || "",
         },
+        {
+          name: "lockedImageURL",
+          value: this.node.lockedImageURL || "",
+        },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
         { name: "hideProgress", value: this.node.hideProgress },
@@ -511,6 +531,9 @@ export default {
     nodeImageUrl() {
       return this.node.imageURL
     },
+    nodeLockedImageURL() {
+      return this.node.lockedImageURL
+    },
     newPermissions() {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
       return [...this.node.permissions[last]]
@@ -524,8 +547,12 @@ export default {
     },
   },
   watch: {
-    nodeImageUrl: function() {
+    nodeImageUrl() {
       this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
+    },
+    nodeLockedImageURL() {
+      this.addLockedThumbnail =
+        this.node.lockedImageURL && this.node.lockedImageURL.length > 0
     },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
@@ -547,6 +574,7 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
+        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
@@ -561,6 +589,11 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+      }
+    })
+    this.$root.$on("bv::modal::hide", (_, modalId) => {
+      if (modalId == "node-modal-container") {
+        thisTapestryTool.enableMovements()
       }
     })
   },
@@ -701,7 +734,9 @@ export default {
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
-        return Object.values(question.answers).some(value => value.length > 0)
+        return Object.values(question.answers).some(
+          value => value && value.length > 0
+        )
       })
     },
     addUserPermissionRow() {

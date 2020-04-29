@@ -49,7 +49,7 @@
               <combobox
                 v-model="question.previousEntry"
                 class="mb-0"
-                :options="activities"
+                :options="getPreviousOptions(question)"
                 item-text="text"
                 item-value="id"
                 empty-message="There are no activities yet."
@@ -217,8 +217,15 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     activities() {
-      const rest = this.nodes.filter(node => node.id != this.node.id)
-      return rest.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
+      const questions = this.nodes
+        .filter(node => Boolean(node.quiz))
+        .flatMap(node => node.quiz)
+      this.questions.forEach(q => {
+        if (!questions.find(qn => qn.id === q.id)) {
+          questions.push(q)
+        }
+      })
+      return questions
     },
   },
   watch: {
@@ -238,6 +245,9 @@ export default {
     this.formOptions = await GravityFormsApi.getAllForms()
   },
   methods: {
+    getPreviousOptions(currentQuestion) {
+      return this.activities.filter(qn => qn !== currentQuestion)
+    },
     addQuestion() {
       this.questions = [
         ...this.questions,
@@ -262,7 +272,7 @@ export default {
       if (!this.wasFocused) {
         return null
       }
-      return Object.values(question.answers).some(value => value.length > 0)
+      return Object.values(question.answers).some(value => value && value.length > 0)
     },
   },
 }

@@ -93,6 +93,11 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   question.entries = entries
 }
 
+// favourites
+export function updateFavourites(state, { favourites }) {
+  state.favourites = favourites
+}
+
 function getChildIds(state, nodeId) {
   const links = state.links
   return links
