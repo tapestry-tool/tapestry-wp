@@ -2,6 +2,7 @@
   <div class="star-celebration">
     <tapestry-modal
       :allow-close="true"
+      :show-fav="false"
       :content-container-style="celebrationStyles"
       @close="$emit('close')"
     ></tapestry-modal>
