@@ -21,6 +21,7 @@ const store = new Vuex.Store({
     h5pSettings: {},
     selectedNodeId: null,
     tapestryIsLoaded: false,
+    selectedModuleId: null,
     favourites: [],
   },
   getters: {

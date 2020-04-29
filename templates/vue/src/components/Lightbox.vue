@@ -33,7 +33,8 @@ import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import { tydeTypes } from "../utils/constants"
 
 export default {
   name: "lightbox",
@@ -62,7 +63,7 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "tapestryIsLoaded"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getDirectParents"]),
     node() {
       return this.getNode(this.nodeId)
     },
@@ -169,9 +170,16 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
+    ...mapMutations(["updateTydeProgress"]),
     complete() {
       this.completeNode(this.nodeId)
       this.updateMayUnlockNodes(this.nodeId)
+      const stages = this.getDirectParents(this.nodeId).filter(
+        id => this.getNode(id).tydeType === tydeTypes.STAGE
+      )
+      stages.map(sid =>
+        this.updateTydeProgress({ parentId: sid, isParentModule: false })
+      )
     },
     close() {
       this.$router.push("/")
