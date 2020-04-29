@@ -6,6 +6,7 @@
         <div class="buttons-container">
           <modal-button v-if="allowClose" icon="times" @clicked="$emit('close')" />
           <modal-button
+            v-if="showFav"
             icon="heart"
             icon-size="sm"
             :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
@@ -55,6 +56,11 @@ export default {
       default: () => defaultStyles,
     },
     allowClose: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showFav: {
       type: Boolean,
       required: false,
       default: true,
