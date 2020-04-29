@@ -11,6 +11,7 @@
 <script>
 import { mapActions } from "vuex"
 import QuizScreen from "./QuizScreen"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "quiz-media",
@@ -29,12 +30,14 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     handleSubmit() {
-      const numberCompleted = this.node.quiz.filter(question => question.completed)
-        .length
-      const progress = numberCompleted / this.node.quiz.length
-      this.updateNodeProgress({ id: this.node.id, progress })
-      if (progress === 1) {
-        this.$emit("complete")
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        const numberCompleted = this.node.quiz.filter(question => question.completed)
+          .length
+        const progress = numberCompleted / this.node.quiz.length
+        this.updateNodeProgress({ id: this.node.id, progress })
+        if (progress === 1) {
+          this.$emit("complete")
+        }
       }
     },
   },

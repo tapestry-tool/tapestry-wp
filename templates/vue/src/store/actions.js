@@ -1,5 +1,4 @@
 import TapestryApi from "../services/TapestryAPI"
-import Helpers from "@/utils/Helpers"
 
 const client = new TapestryApi(wpPostId)
 
@@ -40,34 +39,29 @@ export async function updateNode({ commit }, payload) {
   return payload.id
 }
 
-export async function updateNodeProgress({ commit, getters }, payload) {
+export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
-  const node = getters.getNode(id)
-  if (Helpers.canUserUpdateProgress(node)) {
-    await client.updateUserProgress(id, progress)
-    commit("updateNodeProgress", { id, progress })
-    thisTapestryTool.updateProgressBars()
-  }
+  await client.updateUserProgress(id, progress)
+  commit("updateNodeProgress", { id, progress })
+  thisTapestryTool.updateProgressBars()
 }
 
 export async function completeNode({ commit, dispatch, getters }, nodeId) {
   const node = getters.getNode(nodeId)
-  if (Helpers.canUserUpdateProgress(node)) {
-    await client.completeNode(nodeId)
-    commit("updateNode", {
+  await client.completeNode(nodeId)
+  commit("updateNode", {
+    id: nodeId,
+    newNode: { completed: true },
+  })
+  if (node.mediaType !== "video") {
+    commit("updateNodeProgress", {
       id: nodeId,
-      newNode: { completed: true },
+      progress: 1,
     })
-    if (node.mediaType !== "video") {
-      commit("updateNodeProgress", {
-        id: nodeId,
-        progress: 1,
-      })
-      thisTapestryTool.updateProgressBars()
-    }
-    dispatch("updateMayUnlockNodes", nodeId)
-    thisTapestryTool.updateAccordionProgress()
+    thisTapestryTool.updateProgressBars()
   }
+  dispatch("updateMayUnlockNodes", nodeId)
+  thisTapestryTool.updateAccordionProgress()
 }
 
 export function updateMayUnlockNodes({ commit, getters }, nodeId) {

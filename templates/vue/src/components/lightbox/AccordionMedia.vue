@@ -92,7 +92,7 @@
       <tyde-progress-bar
         v-if="moduleOpened"
         class="modal-progress"
-        :nodeId="this.selectedModuleId"
+        :node-id="this.selectedModuleId"
       />
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">
@@ -114,7 +114,7 @@ import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
-import TydeProgressBar from '../tyde/TydeProgressBar'
+import TydeProgressBar from "../tyde/TydeProgressBar"
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
@@ -248,22 +248,24 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     async updateProgress(rowId) {
-      const { accordionProgress } = this.node
-      if (!accordionProgress.includes(rowId)) {
-        accordionProgress.push(rowId)
-        await this.completeNode(rowId)
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        const { accordionProgress } = this.node
+        if (!accordionProgress.includes(rowId)) {
+          accordionProgress.push(rowId)
+          await this.completeNode(rowId)
 
-        this.updateNodeProgress({
-          id: this.node.id,
-          progress: accordionProgress.length / this.rows.length,
-        })
-        this.updateNode({
-          id: this.node.id,
-          newNode: { accordionProgress },
-        })
+          this.updateNodeProgress({
+            id: this.node.id,
+            progress: accordionProgress.length / this.rows.length,
+          })
+          this.updateNode({
+            id: this.node.id,
+            newNode: { accordionProgress },
+          })
 
-        if (accordionProgress.length === this.rows.length) {
-          this.$emit("complete")
+          if (accordionProgress.length === this.rows.length) {
+            this.$emit("complete")
+          }
         }
       }
     },
@@ -352,7 +354,6 @@ button[disabled] {
     font-weight: 700;
   }
 }
-
 
 .modal-progress {
   top: 10px;

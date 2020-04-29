@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
@@ -135,15 +135,16 @@ export default {
       return this.getNode(this.nodeId)
     },
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
-      id: this.nodeId,
-      progress: this.node && this.node.typeData.progress[0].value,
-    })
+  beforeDestroy() {
+    if (Helpers.canUserUpdateProgress(this.node)) {
+      this.updateNodeProgress({
+        id: this.nodeId,
+        progress: this.node && this.node.typeData.progress[0].value,
+      })
+    }
   },
   methods: {
     ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
-    ...mapMutations(["updateTydeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -151,10 +152,9 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    updateProgress: Helpers.throttle(async function(type, amountViewed) {
-      await this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-      if (type === "h5p") {
-        await this.updateH5pSettings(this.h5pSettings)
+    updateProgress: Helpers.throttle(function(amountViewed) {
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     }, SAVE_INTERVAL),
     complete() {

@@ -6,7 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="this.nodeId"
+    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="close"
@@ -172,13 +172,15 @@ export default {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
     ...mapMutations(["updateTydeProgress"]),
     complete() {
-      this.completeNode(this.nodeId)
-      const stages = this.getDirectParents(this.nodeId).filter(
-        id => this.getNode(id).tydeType === tydeTypes.STAGE
-      )
-      stages.map(sid =>
-        this.updateTydeProgress({ parentId: sid, isParentModule: false })
-      )
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.completeNode(this.nodeId)
+        const stages = this.getDirectParents(this.nodeId).filter(
+          id => this.getNode(id).tydeType === tydeTypes.STAGE
+        )
+        stages.map(sid =>
+          this.updateTydeProgress({ parentId: sid, isParentModule: false })
+        )
+      }
     },
     close() {
       this.$router.push("/")

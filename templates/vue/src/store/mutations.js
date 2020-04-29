@@ -105,32 +105,29 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
 
 export function updateTydeProgress(state, { parentId, isParentModule }) {
   const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
-  if (parentNode.userType !== "teen") {
-    const childNodeIds = getChildIds(state, parentId)
-    const childNodes = childNodeIds.map(
-      id => state.nodes[Helpers.findNodeIndex(id, state)]
+  const childNodeIds = getChildIds(state, parentId)
+  const childNodes = childNodeIds.map(
+    id => state.nodes[Helpers.findNodeIndex(id, state)]
+  )
+  var childProgress, reducer
+  if (isParentModule) {
+    // parentNode is a module, and all children are stages
+    childProgress = childNodes.map(stage => stage.tydeProgress)
+    reducer = (accumulator, progress) => accumulator + progress
+  } else {
+    // parentNode is a stage, and all children are nodes (topics)
+    childProgress = childNodes.map(topic => topic.completed)
+    reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
+  }
+  parentNode.tydeProgress =
+    childNodes.length === 0
+      ? 1
+      : childProgress.reduce(reducer, 0) / childNodes.length
+  if (!isParentModule) {
+    // If node is stage, parent module must be updated as well
+    getParentIds(state, parentId).map(id =>
+      updateTydeProgress(state, { parentId: id, isParentModule: true })
     )
-    var childProgress, reducer
-    if (isParentModule) {
-      // parentNode is a module, and all children are stages
-      childProgress = childNodes.map(stage => stage.tydeProgress)
-      reducer = (accumulator, progress) => accumulator + progress
-    } else {
-      // parentNode is a stage, and all children are nodes (topics)
-      childProgress = childNodes.map(topic => topic.completed)
-      reducer = (accumulator, completed) =>
-        accumulator + (completed === true ? 1 : 0)
-    }
-    parentNode.tydeProgress =
-      childNodes.length === 0
-        ? 1
-        : childProgress.reduce(reducer, 0) / childNodes.length
-    if (!isParentModule) {
-      // If node is stage, parent module must be updated as well
-      getParentIds(state, parentId).map(id =>
-        updateTydeProgress(state, { parentId: id, isParentModule: true })
-      )
-    }
   }
 }
 
