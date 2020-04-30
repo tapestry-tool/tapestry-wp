@@ -4,39 +4,42 @@
   </div>
   <div v-else class="recorder">
     <h1>{{ question.text }}</h1>
-    <div class="mic">
-      <i class="fas fa-microphone"></i>
-    </div>
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
-    <div v-if="state !== states.DONE">
-      <code style="color: white;">{{ durationText }}</code>
+    <button v-else class="main-button my-2" @click="toggleRecording">
+      <i
+        :class="'fas fa-' + (state === states.RECORDING ? 'pause' : 'microphone')"
+      ></i>
+    </button>
+    <div class="w-100">
+      <code v-if="state !== states.DONE" style="color: white;">
+        {{ durationText }}
+      </code>
     </div>
-    <div class="controls">
-      <button class="control" @click="toggleRecording">
-        <i
-          :class="[
-            'fas',
-            {
-              'fa-undo': state === states.DONE,
-              'fa-pause': state === states.RECORDING,
-              'fa-play': state !== states.RECORDING,
-            },
-          ]"
-        ></i>
-      </button>
-      <button
-        class="control"
-        :disabled="state === states.DONE"
-        @click="stopRecording"
-      >
-        <i class="fas fa-stop"></i>
-      </button>
-    </div>
-    <div class="content">
-      <button v-if="state === states.DONE" @click="$emit('submit', audio)">
-        Done
-      </button>
-    </div>
+    <button
+      :disabled="duration === 0 && state !== states.DONE"
+      class="my-3"
+      @click="resetRecording"
+    >
+      <i class="fas fa-undo"></i>
+      Re-record
+    </button>
+    <button
+      v-if="state !== states.DONE"
+      :disabled="duration === 0"
+      class="my-3"
+      @click="stopRecording"
+    >
+      <i class="fas fa-check"></i>
+      Done
+    </button>
+    <button
+      v-if="state === states.DONE"
+      class="my-3"
+      @click="$emit('submit', audio)"
+    >
+      <i class="fas fa-check"></i>
+      Submit
+    </button>
   </div>
 </template>
 
@@ -112,6 +115,7 @@ export default {
         this.getQuestion(this.id).entries.audioId
     } else {
       this.state = this.states.READY
+      this.initialize()
     }
   },
   mounted() {
@@ -120,12 +124,7 @@ export default {
     }
   },
   methods: {
-    startDurationCount() {
-      this.durationInterval = setInterval(() => {
-        this.duration++
-      }, 1000)
-    },
-    startRecording() {
+    initialize() {
       this.data = []
       this.duration = 0
       navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -147,29 +146,50 @@ export default {
         })
 
         this.recorder = recorder
-        this.recorder.start()
-        this.startDurationCount()
-        this.state = this.states.RECORDING
       })
+    },
+    startDurationCount() {
+      this.durationInterval = setInterval(() => {
+        this.duration++
+      }, 1000)
     },
     stopDurationCount() {
       clearInterval(this.durationInterval)
+    },
+    startRecording() {
+      this.recorder.start()
+      this.startDurationCount()
+      this.state = this.states.RECORDING
+    },
+    pauseRecording() {
+      this.recorder.pause()
+      this.stopDurationCount()
+      this.state = this.states.PAUSED
+    },
+    resumeRecording() {
+      this.recorder.resume()
+      this.startDurationCount()
+      this.state = this.states.RECORDING
     },
     stopRecording() {
       this.recorder.stop()
       this.stopDurationCount()
     },
+    resetRecording() {
+      this.initialize()
+      this.state = null
+    },
     toggleRecording() {
-      if (this.state === this.states.RECORDING) {
-        this.recorder.pause()
-        this.stopDurationCount()
-        this.state = this.states.PAUSED
-      } else if (this.state === this.states.PAUSED) {
-        this.recorder.resume()
-        this.startDurationCount()
-        this.state = this.states.RECORDING
-      } else {
-        this.startRecording()
+      switch (this.state) {
+        case this.states.RECORDING:
+          this.pauseRecording()
+          break
+        case this.states.PAUSED:
+          this.resumeRecording()
+          break
+        default:
+          this.startRecording()
+          break
       }
     },
   },
@@ -188,9 +208,20 @@ export default {
 
   button {
     background-color: rgba(26, 26, 26, 0.8);
-    border-radius: 16px;
+    border-radius: 30px;
+    font-size: 24px;
+    height: 56px;
+    width: auto;
+    min-width: 56px;
 
-    &:hover {
+    &.main-button {
+      width: 122px;
+      height: 122px;
+      font-size: 72px;
+      border-radius: 72px;
+    }
+
+    &:not(:disabled):hover {
       background-color: #11a6d8;
     }
 
@@ -203,21 +234,6 @@ export default {
 
   i {
     margin: auto;
-  }
-
-  .control {
-    border-radius: 50%;
-    font-size: 24px;
-    height: 56px;
-    width: 56px;
-  }
-
-  .controls {
-    margin-bottom: 16px;
-  }
-
-  .mic {
-    font-size: 72px;
   }
 }
 </style>
