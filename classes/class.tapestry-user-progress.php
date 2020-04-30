@@ -183,7 +183,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _completeQuestion($questionId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata);
+        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);
         $quiz[$questionId]['completed'] = true;
         update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
     }

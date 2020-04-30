@@ -44,6 +44,7 @@
         v-for="activity in activities"
         :key="activity.id"
         :activity="activity"
+        :module="module"
       />
     </div>
     <div v-else class="content empty-message">

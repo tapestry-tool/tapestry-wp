@@ -6,7 +6,9 @@
         <tyde-icon :icon="answer.icon" style="color: inherit;"></tyde-icon>
       </div>
       <div class="answer-entry">
-        <h4>You answered:</h4>
+        <h4>
+          {{ activity.userType === "copilot" ? "You" : "Your teen" }} answered:
+        </h4>
         <div v-if="answer.icon !== 'audio'" v-html="answer.entry"></div>
         <audio v-else controls></audio>
       </div>

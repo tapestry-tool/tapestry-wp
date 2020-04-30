@@ -37,7 +37,9 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
 }
 
 function getCompletedActivities(node) {
-  return node.quiz.filter(activity => activity.completed)
+  return node.quiz
+    .filter(activity => activity.completed)
+    .map(activity => ({ ...activity, userType: node.userType }))
 }
 
 export function getActivities(state) {
