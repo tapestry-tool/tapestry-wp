@@ -141,6 +141,15 @@ export default {
           image.classList.add("image-choices-choice")
         })
       }
+
+      const optionList = document.querySelector(".gfield_checkbox")
+      if(optionList){
+        const allListElements = optionList.childNodes
+        const allLIArray = Array.from(allListElements)
+        allLIArray.forEach(li => {
+          li.style.height = "125px"
+        })
+      }
     },
   },
 }
