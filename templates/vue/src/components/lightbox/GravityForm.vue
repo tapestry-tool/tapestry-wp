@@ -26,6 +26,10 @@ export default {
       type: String,
       required: true,
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -45,7 +49,7 @@ export default {
     const html = await GravityFormsApi.getFormHtml(this.id)
     this.html = html
 
-    const entry = await GravityFormsApi.getFormEntry(this.id)
+    const entry = await GravityFormsApi.getFormEntry(this.id, wpData.wpTeenId || 0)
     this.entry = entry
 
     this.loading = false

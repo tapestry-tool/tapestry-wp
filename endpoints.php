@@ -327,9 +327,10 @@ function getGfForms()
 function getGfEntry($request)
 {
     $formId = $request['form_id'];
+    $userId = $request['user_id'];
     try {
         $controller = new TapestryForm();
-        return $controller->getEntry($formId);
+        return $controller->getEntry($formId, $userId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

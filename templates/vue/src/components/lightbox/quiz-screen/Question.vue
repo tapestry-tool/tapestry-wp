@@ -10,6 +10,7 @@
     <gravity-form
       v-if="formOpened"
       :id="formId"
+      :node="node"
       @submit="handleFormSubmit"
     ></gravity-form>
     <h5p-iframe
@@ -68,6 +69,7 @@
         <gravity-form
           v-if="options[0][0] !== 'audioId'"
           :id="options[0][1]"
+          :node="node"
           @submit="handleFormSubmit"
         ></gravity-form>
         <h5p-iframe

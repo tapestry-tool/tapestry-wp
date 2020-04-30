@@ -47,6 +47,7 @@
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
+      :node="node"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
