@@ -2591,9 +2591,6 @@ function tapestryTool(config){
         if ((node.tydeType === "Stage" || node.tydeType === "Question set") && !config.wpCanEditTapestry) {
             return false;
         }
-
-        // CHECK 5: If node is the root node or is currently selected
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
     
         // If it passes all the checks, return true!
         return true;
