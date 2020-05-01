@@ -164,6 +164,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
         }
+        if (isset($node->conditions) && is_array($node->conditions)) {
+            $this->conditions = $node->conditions;
+        }
         if (isset($node->tydeType) && is_string($node->tydeType)) {
             $this->tydeType = $node->tydeType;
         }
@@ -189,6 +192,24 @@ class TapestryNode implements ITapestryNode
             throw new TapestryError('INVALID_NODE_META_ID');
         }
         return $this->_formNode();
+    }
+
+    /**
+     * Returns whether this node is copilot only or not
+     * 
+     * @return bool
+     */
+    public function isCopilotOnly()
+    {
+        if (!property_exists($this->permissions, "copilot")) {
+            return false;
+        }
+        foreach((array)$this->permissions as $role => $permissions) {
+            if ($role !== "copilot" && count($permissions) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

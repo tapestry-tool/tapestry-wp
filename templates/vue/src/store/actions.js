@@ -46,15 +46,13 @@ export async function updateNodeProgress({ commit }, payload) {
   thisTapestryTool.updateProgressBars()
 }
 
-export async function completeNode({ commit, getters }, nodeId) {
+export async function completeNode({ commit, dispatch, getters }, nodeId) {
+  const node = getters.getNode(nodeId)
+  await client.completeNode(nodeId)
   commit("updateNode", {
     id: nodeId,
     newNode: { completed: true },
   })
-  await client.completeNode(nodeId)
-  thisTapestryTool.updateAccordionProgress()
-
-  const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {
     commit("updateNodeProgress", {
       id: nodeId,
@@ -62,6 +60,8 @@ export async function completeNode({ commit, getters }, nodeId) {
     })
     thisTapestryTool.updateProgressBars()
   }
+  dispatch("updateMayUnlockNodes", nodeId)
+  thisTapestryTool.updateAccordionProgress()
 }
 
 export function updateMayUnlockNodes({ commit, getters }, nodeId) {

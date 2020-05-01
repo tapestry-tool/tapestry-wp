@@ -124,6 +124,37 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
+    /**
+     * Retrieves ids of all copilot-only nodes. Assumes the
+     * currently logged in user is a copilot.
+     */
+    public function getCopilotNodeIds()
+    {
+        $result = array();
+        foreach ($this->nodes as $nodeId) {
+            $node = $this->getNode($nodeId);
+            if ($node->isCopilotOnly()) {
+                array_push($result, $nodeId);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Retrieves ids of all teen nodes. It does this by checking
+     * whether the node id exists in the copilot nodes array.
+     */
+    public function getTeenNodeIds()
+    {
+        $result = array();
+        $copilotNodes = $this->getCopilotNodeIds();
+        foreach ($this->nodes as $nodeId) {
+            if (!in_array($nodeId, $copilotNodes)) {
+                array_push($result, $nodeId);
+            }
+        }
+        return $result;
+    }
 
     /**
      * Add a new node
@@ -405,7 +436,15 @@ class Tapestry implements ITapestry
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
                 $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
-                return $tapestryNode->get();
+                $node = $tapestryNode->get();
+                if (TapestryUserRoles::isRole('copilot')) {
+                    if ($tapestryNode->isCopilotOnly()) {
+                        $node->userType = 'copilot';
+                    } else {
+                        $node->userType = 'teen';
+                    }
+                }
+                return $node;
             },
             $tapestry->nodes
         );

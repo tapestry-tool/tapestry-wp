@@ -14,8 +14,8 @@ async function getFormHtml(id) {
   return response.data
 }
 
-async function getFormEntry(id) {
-  const url = `${BASE_URL}/entries?form_id=${id}`
+async function getFormEntry(id, userId) {
+  const url = `${BASE_URL}/entries?form_id=${id}&user_id=${userId}`
   const response = await axios.get(url)
   return response.data && response.data[0]
 }

@@ -10,7 +10,6 @@
 import Tapestry from "./Tapestry"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
-import TydeStarCelebration from "./tyde/TydeStarCelebration"
 
 export default {
   name: "tyde",
@@ -18,7 +17,6 @@ export default {
     Tapestry,
     TydeModule,
     TydeSpaceship,
-    TydeStarCelebration,
   },
   data() {
     return {

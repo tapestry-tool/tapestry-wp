@@ -26,9 +26,11 @@ class TapestryForm implements ITapestryForm
    * 
    * @return Object the corresponding entry
    */
-  public function getEntry($formId)
+  public function getEntry($formId, $userId = 0)
   {
-    $userId = apply_filters('determine_current_user', false);
+    if (!$userId) {
+      $userId = apply_filters('determine_current_user', false);
+    }
     $search_criteria['field_filters'][] = array(
       'key'   => 'created_by',
       'value' => $userId

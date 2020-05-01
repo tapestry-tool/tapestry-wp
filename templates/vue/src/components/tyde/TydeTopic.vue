@@ -28,9 +28,11 @@ export default {
 <style lang="scss" scoped>
 button {
   margin: 0;
+  padding: 0;
   background: none;
   color: var(--tyde-border-green);
   font-family: var(--tyde-font-mono);
+  flex-direction: column;
 
   &:hover p {
     transform: translateY(-8px);
@@ -63,9 +65,9 @@ button {
     margin-top: 0.5em;
     font-family: inherit;
     color: inherit;
-    font-size: 32px;
+    font-size: 1.6em;
     transition: transform 0.2s ease-out;
-    line-height: 1em;
+    line-height: 1.3em;
     max-width: 200px;
     min-height: 2em;
   }

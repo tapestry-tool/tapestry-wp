@@ -158,7 +158,7 @@ function tapestryTool(config){
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        setDatasetProgress(JSON.parse(retrievedUserProgress));
+                        setDatasetProgress(retrievedUserProgress);
                     }
 
                     jQuery.get(TAPESTRY_H5P_SETTINGS_URL, { "post_id": config.wpPostId }, function(retrievedH5PSettings) {
@@ -1364,7 +1364,7 @@ function tapestryTool(config){
             .on("click keydown", function (d) {
                 recordAnalyticsEvent('user', 'click', 'node', d.id);
                 if (root != d.id) { // prevent multiple clicks
-                    if (config.wpCanEditTapestry || d.accessible) {
+                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         if (!isMultiSelect) {
                             selection.clear();
                             tapestry.selectNode(d.id);
@@ -1391,6 +1391,7 @@ function tapestryTool(config){
     // LOCKED NODE TOOLTIPS
 
     function renderTooltips() {
+        const tooltipWidth = d => Math.min(getRadius(d) * 5 + 48, 600)
         nodes
             .filter(d => !d.accessible)
             .append("foreignObject")
@@ -1398,10 +1399,10 @@ function tapestryTool(config){
             .style("position", "relative")
             .style("pointer-events", "none")
             .style("opacity", 0)
-            .attr("width", d => Math.min(getRadius(d) * 5 + 48, 600))
+            .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
-            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .attr("x", d => -(tooltipWidth(d) / 2))
+            .attr("y", d => -(getRadius(d) * 4 + 36))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
             .html(getTooltipHtml)
@@ -1758,6 +1759,7 @@ function tapestryTool(config){
             .html(function (d) {
                 return '<i id="mediaButtonIcon' + d.id + '"' + 
                     ' class="' + getIconClass(d.mediaType, 'play', d.accessible) + ' mediaButtonIcon"' +
+                    ' data-usertype="' + d.userType + '"' +
                     ' data-id="' + d.id + '"' + 
                     ' data-unlocked="' + d.accessible + '"' + 
                     ' data-format="' + d.mediaFormat + '"' + 
@@ -1786,7 +1788,7 @@ function tapestryTool(config){
     
         $('.mediaButton > i').click(function(){
             var thisBtn = $(this)[0];
-            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry) {
+            if (thisBtn.dataset.unlocked === "true" || config.wpCanEditTapestry || thisBtn.dataset.usertype === 'teen') {
                 goToNode(thisBtn.dataset.id);
             }
         });
@@ -2581,14 +2583,11 @@ function tapestryTool(config){
         if (config.wpCanEditTapestry) {
             return true;
         }
-    
-        // CHECK 3: If node is the root node or is currently selected
-        if (node.nodeType === "root" || (node.id == tapestry.dataset.rootId && node.nodeType !== "")) return true;
 
-        // CHECK 4: If node is an accordion row and user is not the author
+        // CHECK 3: If node is an accordion row and user is not the author
         if (node.presentationStyle === "accordion-row" && !config.wpCanEditTapestry) return false;
 
-        // CHECK 5: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
+        // CHECK 4: Hide stage and question set nodes unless user is an editor - this check is for TYDE only
         if ((node.tydeType === "Stage" || node.tydeType === "Question set") && !config.wpCanEditTapestry) {
             return false;
         }

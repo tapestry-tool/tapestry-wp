@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     img() {
-      if (this.node.tydeProgress === 1) {
+      if (this.node.tydeProgress === 1 || this.isCopilot) {
         switch (this.state) {
           case "hover":
             return this.node.typeData.spaceshipPartHoverIconUrl
@@ -35,6 +35,9 @@ export default {
         return this.node.typeData.spaceshipPartNotEarnedIconUrl
       }
     },
+    isCopilot() {
+      return this.node.userType === "teen"
+    },
     style() {
       return {
         backgroundImage: `url(${this.img})`,
@@ -42,7 +45,8 @@ export default {
         left: this.node.typeData.spaceshipPartX + "%",
         height: this.node.typeData.spaceshipPartHeight + "%",
         width: this.node.typeData.spaceshipPartWidth + "%",
-        cursor: this.node.tydeProgress === 1 ? "pointer" : "default",
+        cursor:
+          this.node.tydeProgress === 1 || this.isCopilot ? "pointer" : "default",
       }
     },
   },

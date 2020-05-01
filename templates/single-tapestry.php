@@ -43,6 +43,11 @@ function addNonceToScript()
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
+function get_teen_id()
+{
+    return get_the_author_meta('teen_id', apply_filters('determine_current_user', false));
+}
+
 function enqueue_vue_app_build()
 {
     global $TAPESTRY_VERSION_NUMBER;
@@ -79,6 +84,7 @@ function enqueue_vue_app_build()
             'nonce' => wp_create_nonce('wp_rest'),
             'gf_nonce' => wp_create_nonce('gf_api'),
             'wpUserId' => apply_filters('determine_current_user', false),
+            'wpTeenId' => get_teen_id(),
             'adminAjaxUrl' => admin_url('admin-ajax.php'),
             'file_upload_nonce' => wp_create_nonce('media-form'),
             'upload_url' => admin_url('async-upload.php'),

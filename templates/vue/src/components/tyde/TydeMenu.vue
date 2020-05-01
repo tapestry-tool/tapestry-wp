@@ -105,7 +105,7 @@ export default {
     },
     openSummary(nodeId) {
       const node = this.getNode(nodeId)
-      if (node.tydeProgress === 1) {
+      if (node.tydeProgress === 1 || node.userType === "teen") {
         this.showSummary = true
         this.moduleId = nodeId
       }
