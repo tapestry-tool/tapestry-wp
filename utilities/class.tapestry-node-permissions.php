@@ -11,12 +11,31 @@ class TapestryNodePermissions
      * 
      * @return  Array   DefaultNodePermissions
      */
-    static function getDefaultNodePermissions()
+    static function getDefaultNodePermissions($tapestryPostId)
     {
-        return (object) [
-            'public'        => ['read'],
-            'authenticated'    => ['read']
-        ];
+        if($tapestryPostId == 0){
+            return (object) [
+                'public'        => ['read'],
+                'authenticated'    => ['read']
+            ];
+        }
+
+        $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
+        try {
+            $defaultPermissions = $tapestry->settings->defaultPermissions;
+            if($defaultPermissions == null){
+                return (object) [
+                    'public'        => ['read'],
+                    'authenticated'    => ['read']
+                ];
+            }
+            return $defaultPermissions;
+        } catch (\Throwable $th) {
+            return (object) [
+                'public'        => ['read'],
+                'authenticated'    => ['read']
+            ];
+        }
     }
 
     /**
