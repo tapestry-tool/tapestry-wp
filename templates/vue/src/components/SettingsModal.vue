@@ -169,6 +169,14 @@
               </b-tbody>
             </b-table-simple>
           </div>
+          <b-form-group
+            label="Show Access Tab"
+            description="When enabled, users will be able to view the Access tab inside the node window. Disable this option to hide the Access tab from users except you."
+          >
+            <b-form-checkbox v-model="showAccess" switch>
+              {{ showAccess ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -229,6 +237,7 @@ export default {
         ),
       ],
       userId: "",
+      showAccess: true,
     }
   },
   computed: {
@@ -284,6 +293,7 @@ export default {
           public: ["read"],
           authenticated: ["read"],
         },
+        showAccess = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -291,6 +301,7 @@ export default {
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
       this.profileActivities = profileActivities
       this.defaultPermissions = defaultPermissions
+      this.showAccess = showAccess
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -300,6 +311,7 @@ export default {
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
         profileActivities: this.profileActivities,
         defaultPermissions: this.defaultPermissions,
+        showAccess: this.showAccess,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)

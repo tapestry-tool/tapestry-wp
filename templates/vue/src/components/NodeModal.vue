@@ -282,7 +282,7 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Access">
+        <b-tab v-if="viewAccess" title="Access">
           <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
@@ -610,7 +610,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode", "settings"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -676,7 +676,10 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
-        { name: "conditions", value: this.lockNode ? this.node.conditions || [] : [] },
+        {
+          name: "conditions",
+          value: this.lockNode ? this.node.conditions || [] : [],
+        },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
@@ -747,6 +750,13 @@ export default {
         ordered[permission] = this.node.permissions[permission]
       })
       return ordered
+    },
+    viewAccess() {
+      return this.settings.showAccess === undefined
+        ? true
+        : this.settings.showAccess
+        ? true
+        : wpData.wpCanEditTapestry !== ""
     },
   },
   watch: {
