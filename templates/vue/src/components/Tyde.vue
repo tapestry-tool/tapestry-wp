@@ -28,6 +28,7 @@ export default {
     window.addEventListener("start-module", evt => {
       this.showModule = !this.showModule
       this.moduleId = evt.detail
+      this.$store.commit("updateSelectedModule", this.moduleId)
     })
   },
 }

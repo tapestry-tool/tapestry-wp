@@ -26,6 +26,10 @@ export default {
       type: String,
       required: true,
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -45,7 +49,7 @@ export default {
     const html = await GravityFormsApi.getFormHtml(this.id)
     this.html = html
 
-    const entry = await GravityFormsApi.getFormEntry(this.id)
+    const entry = await GravityFormsApi.getFormEntry(this.id, wpData.wpTeenId || 0)
     this.entry = entry
 
     this.loading = false
@@ -56,6 +60,11 @@ export default {
 
     if (this.entry) {
       this.populateForm()
+    }
+
+    if (wpData.wpTeenId) {
+      this.disableSubmit()
+      this.addNotAllowedText()
     }
   },
   methods: {
@@ -117,6 +126,19 @@ export default {
         input.autocomplete = "off"
       })
     },
+    disableSubmit() {
+      const form = this.$refs.formContainer.querySelector("form")
+      const submitButton = form.querySelector("[type=submit]")
+      submitButton.disabled = true
+      submitButton.classList.add("gf-submit-disabled")
+    },
+    addNotAllowedText() {
+      const form = this.$refs.formContainer.querySelector("form")
+      const footer = form.querySelector(".gform_footer")
+      footer.appendChild(
+        document.createTextNode(`You're not allowed to modify teen-only activities.`)
+      )
+    },
     styleImageUI() {
       const imageContainer = document.querySelector(".gfield_checkbox")
       if (imageContainer) {
@@ -156,5 +178,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+</style>
+
+<style lang="scss">
+.gform_footer {
+  display: flex;
+  flex-direction: column;
+}
+
+.gf-submit-disabled {
+  opacity: 0.7;
+  cursor: not-allowed !important;
+  margin-bottom: 1rem !important;
 }
 </style>

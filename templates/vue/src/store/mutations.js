@@ -140,6 +140,11 @@ function getParentIds(state, nodeId) {
     .map(link => (link.source.id == undefined ? link.source : link.source.id))
 }
 
+// favourites
+export function updateFavourites(state, { favourites }) {
+  state.favourites = favourites
+}
+
 function getChildIds(state, nodeId) {
   const links = state.links
   return links
@@ -161,4 +166,8 @@ export function initializeOrdering(state, id) {
 export function updateOrdering(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
   state.nodes[nodeIndex].childOrdering = payload.ord
+}
+
+export function updateSelectedModule(state, moduleId) {
+  state.selectedModuleId = moduleId
 }

@@ -6,8 +6,8 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
+    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
-    :close-button-style="closeButtonStyles"
     :allow-close="canSkip"
     @close="close"
   >
@@ -33,7 +33,8 @@ import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "../utils/Helpers"
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import { tydeTypes } from "../utils/constants"
 
 export default {
   name: "lightbox",
@@ -62,21 +63,12 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "tapestryIsLoaded"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getDirectParents"]),
     node() {
       return this.getNode(this.nodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
-    },
-    closeButtonStyles() {
-      return this.node.fullscreen
-        ? {
-            position: "fixed",
-            top: "16px",
-            right: "16px",
-          }
-        : {}
     },
     lightboxContentStyles() {
       const styles = {
@@ -178,15 +170,24 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
+    ...mapMutations(["updateTydeProgress"]),
     complete() {
-      this.completeNode(this.nodeId)
-      this.updateMayUnlockNodes(this.nodeId)
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.completeNode(this.nodeId)
+        const stages = this.getDirectParents(this.nodeId).filter(
+          id => this.getNode(id).tydeType === tydeTypes.STAGE
+        )
+        stages.map(sid =>
+          this.updateTydeProgress({ parentId: sid, isParentModule: false })
+        )
+      }
     },
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
-      if (width && height) {
+    handleLoad(dim) {
+      if (dim) {
+        const { width, height } = dim
         this.updateDimensions({ width, height })
       }
     },

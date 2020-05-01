@@ -10,6 +10,7 @@
     <gravity-form
       v-if="formOpened"
       :id="formId"
+      :node="node"
       @submit="handleFormSubmit"
     ></gravity-form>
     <h5p-iframe
@@ -68,6 +69,7 @@
         <gravity-form
           v-if="options[0][0] !== 'audioId'"
           :id="options[0][1]"
+          :node="node"
           @submit="handleFormSubmit"
         ></gravity-form>
         <h5p-iframe
@@ -87,6 +89,7 @@ import SpeechBubble from "../../SpeechBubble"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import H5PIframe from "../H5PIframe"
+import Helpers from "@/utils/Helpers"
 import TapestryActivity from "@/components/TapestryActivity"
 
 export default {
@@ -187,15 +190,17 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
-      this.loading = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType: this.formType,
-        formId: this.formId,
-        questionId: this.question.id,
-      })
-      this.loading = false
-      this.$emit("submit")
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.loading = true
+        await this.completeQuestion({
+          nodeId: this.node.id,
+          answerType: this.formType,
+          formId: this.formId,
+          questionId: this.question.id,
+        })
+        this.loading = false
+        this.$emit("submit")
+      }
     },
     hasId(label) {
       const id = this.question.answers[label]

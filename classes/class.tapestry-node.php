@@ -21,6 +21,7 @@ class TapestryNode implements ITapestryNode
     private $behaviour;
     private $typeData;
     private $imageURL;
+    private $lockedImageURL;
     private $mediaType;
     private $mediaFormat;
     private $mediaDuration;
@@ -57,6 +58,7 @@ class TapestryNode implements ITapestryNode
         $this->title = '';
         $this->status = '';
         $this->imageURL = '';
+        $this->lockedImageURL = '';
         $this->mediaType = '';
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
@@ -123,6 +125,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
         }
+        if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
+            $this->lockedImageURL = $node->lockedImageURL;
+        }
         if (isset($node->mediaType) && is_string($node->mediaType)) {
             $this->mediaType = $node->mediaType;
         }
@@ -159,6 +164,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
         }
+        if (isset($node->conditions) && is_array($node->conditions)) {
+            $this->conditions = $node->conditions;
+        }
         if (isset($node->tydeType) && is_string($node->tydeType)) {
             $this->tydeType = $node->tydeType;
         }
@@ -184,6 +192,24 @@ class TapestryNode implements ITapestryNode
             throw new TapestryError('INVALID_NODE_META_ID');
         }
         return $this->_formNode();
+    }
+
+    /**
+     * Returns whether this node is copilot only or not
+     * 
+     * @return bool
+     */
+    public function isCopilotOnly()
+    {
+        if (!property_exists($this->permissions, "copilot")) {
+            return false;
+        }
+        foreach((array)$this->permissions as $role => $permissions) {
+            if ($role !== "copilot" && count($permissions) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -296,6 +322,7 @@ class TapestryNode implements ITapestryNode
             'title'         => $this->title,
             'status'        => $this->status,
             'imageURL'      => $this->imageURL,
+            'lockedImageURL'=> $this->lockedImageURL,
             'mediaType'     => $this->mediaType,
             'mediaFormat'   => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
@@ -350,6 +377,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
+        }
+        if (isset($nodeMetadata->meta_value->lockedImageURL)) {
+            $nodeData->lockedImageURL = $nodeMetadata->meta_value->lockedImageURL;
         }
         return $nodeData;
     }

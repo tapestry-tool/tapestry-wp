@@ -47,6 +47,7 @@
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
+      :node="node"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
@@ -68,7 +69,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./lightbox/TextMedia"
 import VideoMedia from "./lightbox/VideoMedia"
 import ExternalMedia from "./lightbox/ExternalMedia"
@@ -77,6 +78,9 @@ import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
+import Helpers from "@/utils/Helpers"
+
+const SAVE_INTERVAL = 5
 
 export default {
   name: "tapestry-media",
@@ -132,15 +136,16 @@ export default {
       return this.getNode(this.nodeId)
     },
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
-      id: this.nodeId,
-      progress: this.node && this.node.typeData.progress[0].value,
-    })
+  beforeDestroy() {
+    if (Helpers.canUserUpdateProgress(this.node)) {
+      this.updateNodeProgress({
+        id: this.nodeId,
+        progress: this.node && this.node.typeData.progress[0].value,
+      })
+    }
   },
   methods: {
-    ...mapActions(["completeNode", "updateNodeProgress", "updateH5pSettings"]),
-    ...mapMutations(["updateTydeProgress"]),
+    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -148,17 +153,13 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    updateProgress(amountViewed) {
-      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
-    },
+    updateProgress: Helpers.throttle(function(amountViewed) {
+      if (Helpers.canUserUpdateProgress(this.node)) {
+        this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
+      }
+    }, SAVE_INTERVAL),
     complete() {
       this.$emit("complete")
-      const stages = this.getDirectParents(this.nodeId).filter(
-        id => this.getNode(id).tydeType === "Stage"
-      )
-      stages.map(sid =>
-        this.updateTydeProgress({ parentId: sid, isParentModule: false })
-      )
     },
   },
 }

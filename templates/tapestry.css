@@ -20,6 +20,15 @@ body {
     box-sizing: border-box;
 }
 
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font-size: 16px; 
+    z-index: 0;
+}
+* {
+    box-sizing: border-box;
+}
+
 #header {
     position: fixed;
     top: 1em;
@@ -390,6 +399,19 @@ input[type="checkbox"][disabled] {
 .tyde-module-planet-icon img {
     width: auto;
     height: 100%;
+}
+
+.tyde-module-complete-check {
+    color: lightgreen;
+    height: 5em;
+    width: 5em;
+}
+
+.tyde-module-complete-check i {
+    background: white;
+    border-radius: 50%;
+    font-size: 3em;
+    padding: 0.25em;
 }
 
 .tapestry-tooltip {

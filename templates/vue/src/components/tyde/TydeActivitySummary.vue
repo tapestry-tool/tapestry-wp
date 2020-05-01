@@ -6,8 +6,13 @@
         <tyde-icon :icon="answer.icon" style="color: inherit;"></tyde-icon>
       </div>
       <div class="answer-entry">
-        <h4>You answered:</h4>
-        <div v-if="answer.icon !== 'audio' && answer.icon !== 'checklist'" v-html="answer.entryHTML"></div>
+        <h4>
+          {{ activity.userType === "copilot" ? "You" : "Your teen" }} answered:
+        </h4>
+        <div
+          v-if="answer.icon !== 'audio' && answer.icon !== 'checklist'"
+          v-html="answer.entryHTML"
+        ></div>
         <ul v-if="answer.icon === 'checklist'" class="checklist">
           <li v-for="(choice, index) in answer.entry" :key="index">
             <img :src="choice.imageUrl" />
@@ -46,7 +51,6 @@ export default {
   },
   mounted() {
     const entries = Object.entries(this.activity.entries)
-    console.log(entries.map(e => this.getEntry(e).map(i => i[1]).filter(e => e !== "")))
   },
   methods: {
     formatEntry(entry) {
@@ -64,7 +68,7 @@ export default {
     getEntry(answer) {
       if (answer[0] === "audioId") {
         return answer
-      } 
+      }
       return Object.entries(answer[1]).filter(entry => {
         const val = parseInt(entry[0])
         return !isNaN(val)
@@ -132,9 +136,19 @@ export default {
     }
   }
 
-  .answer-entry > ul > li > img{
-    height: 75px;
-    width: auto;
+  .answer-entry > ul {
+    list-style-type: none;
+    padding-left: 0;
+
+    > li {
+      margin-top: 0.5em;
+
+      > img {
+        height: 75px;
+        width: auto;
+        margin-right: 0.5em;
+      }
+    }
   }
 }
 </style>

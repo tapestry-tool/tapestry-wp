@@ -190,4 +190,19 @@ export default class {
     })
     return response
   }
+
+  async getUserFavourites() {
+    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
+    const response = await axios.get(url)
+    return JSON.parse(response.data)
+  }
+
+  async updateUserFavourites(favourites) {
+    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
+    const response = await axios.post(url, {
+      post_id: this.postId,
+      favourites: favourites,
+    })
+    return response
+  }
 }
