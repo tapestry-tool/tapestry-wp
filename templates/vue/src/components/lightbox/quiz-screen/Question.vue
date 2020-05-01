@@ -138,7 +138,7 @@ export default {
     answers() {
       if (this.question.previousEntry) {
         const answeredTypes = Object.entries(this.lastQuestion.answers)
-          .filter(entry => entry[1].length > 0)
+          .filter(entry => entry[1] && entry[1].length > 0)
           .map(i => i[0])
         return answeredTypes
           .map(type => {

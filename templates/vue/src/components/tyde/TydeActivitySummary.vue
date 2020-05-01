@@ -9,8 +9,17 @@
         <h4>
           {{ activity.userType === "copilot" ? "You" : "Your teen" }} answered:
         </h4>
-        <div v-if="answer.icon !== 'audio'" v-html="answer.entry"></div>
-        <audio v-else controls></audio>
+        <div
+          v-if="answer.icon !== 'audio' && answer.icon !== 'checklist'"
+          v-html="answer.entryHTML"
+        ></div>
+        <ul v-if="answer.icon === 'checklist'" class="checklist">
+          <li v-for="(choice, index) in answer.entry" :key="index">
+            <img :src="choice.imageUrl" />
+            {{ choice.choiceText }}
+          </li>
+        </ul>
+        <audio v-if="answer.icon === 'audio'" controls></audio>
       </div>
     </div>
   </div>
@@ -35,9 +44,13 @@ export default {
       const entries = Object.entries(this.activity.entries)
       return entries.map(entry => ({
         icon: this.getIcon(entry),
-        entry: this.formatEntry(this.getEntry(entry).map(i => i[1])),
+        entry: this.getEntry(entry).map(i => i[1]),
+        entryHTML: this.formatEntry(this.getEntry(entry).map(i => i[1])),
       }))
     },
+  },
+  mounted() {
+    const entries = Object.entries(this.activity.entries)
   },
   methods: {
     formatEntry(entry) {
@@ -120,6 +133,21 @@ export default {
 
     img {
       width: 70%;
+    }
+  }
+
+  .answer-entry > ul {
+    list-style-type: none;
+    padding-left: 0;
+
+    > li {
+      margin-top: 0.5em;
+
+      > img {
+        height: 75px;
+        width: auto;
+        margin-right: 0.5em;
+      }
     }
   }
 }
