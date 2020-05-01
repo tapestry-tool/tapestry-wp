@@ -289,7 +289,7 @@
                   :value="value"
                 >
                   <b-th>{{ rowName }}</b-th>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="read"
@@ -298,7 +298,7 @@
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="add"
@@ -307,7 +307,7 @@
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="edit"
