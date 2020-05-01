@@ -67,7 +67,7 @@ class TapestryNode implements ITapestryNode
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
-        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions($tapestryPostId);
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
