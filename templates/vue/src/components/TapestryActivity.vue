@@ -68,19 +68,21 @@ export default {
 
   .checklist {
     list-style: none;
-    display: flex;
 
     li {
-      display: flex;
-      flex-direction: column;
-      margin-right: 8px;
+      float: left;
+      text-align: left;
+      margin-bottom: 0.5em;
+
       &:last-child {
-        margin-right: 0;
+        margin-bottom: 0;
       }
 
       > img {
-        width: 100px;
+        width: 20%;
         height: auto;
+        float: left;
+        margin-right: 10px;
       }
     }
   }
