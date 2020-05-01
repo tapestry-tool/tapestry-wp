@@ -105,6 +105,71 @@
             </b-button>
           </b-row>
         </b-tab>
+        <b-tab title="Access">
+          <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
+          <div id="modal-permissions">
+            <b-table-simple class="text-center" striped responsive>
+              <b-thead>
+                <b-tr>
+                  <b-th></b-th>
+                  <b-th>Read</b-th>
+                  <b-th>Add</b-th>
+                  <b-th>Edit</b-th>
+                </b-tr>
+              </b-thead>
+              <b-tbody>
+                <b-tr
+                  v-for="(value, rowName) in permissions"
+                  :key="rowName"
+                  :value="value"
+                >
+                  <b-th>{{ rowName }}</b-th>
+                  <b-td class="text-center">
+                    <b-form-checkbox
+                      v-model="defaultPermissions[rowName]"
+                      value="read"
+                      :disabled="isPermissionDisabled(rowName, 'read')"
+                      :data-testid="`node-permissions-${rowName}-read`"
+                      @change="updatePermissions($event, rowName, 'read')"
+                    ></b-form-checkbox>
+                  </b-td>
+                  <b-td class="text-center">
+                    <b-form-checkbox
+                      v-model="defaultPermissions[rowName]"
+                      value="add"
+                      :disabled="isPermissionDisabled(rowName, 'add')"
+                      :data-testid="`node-permissions-${rowName}-add`"
+                      @change="updatePermissions($event, rowName, 'add')"
+                    ></b-form-checkbox>
+                  </b-td>
+                  <b-td class="text-center">
+                    <b-form-checkbox
+                      v-model="defaultPermissions[rowName]"
+                      value="edit"
+                      :disabled="isPermissionDisabled(rowName, 'edit')"
+                      :data-testid="`node-permissions-${rowName}-edit`"
+                      @change="updatePermissions($event, rowName, 'edit')"
+                    ></b-form-checkbox>
+                  </b-td>
+                </b-tr>
+                <b-tr>
+                  <b-td colspan="4">
+                    <b-input-group>
+                      <b-form-input
+                        v-model="userId"
+                        placeholder="Enter user ID"
+                      ></b-form-input>
+                      <b-button variant="secondary" @click="addUserPermissionRow()">
+                        <span class="fas fa-plus mr-1"></span>
+                        User
+                      </b-button>
+                    </b-input-group>
+                  </b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+          </div>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -128,6 +193,7 @@ import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import Combobox from "../components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
+import Helpers from "../utils/Helpers"
 
 export default {
   name: "settings-modal",
@@ -151,6 +217,18 @@ export default {
       nodeDraggable: true,
       spaceshipBackgroundUrl: "",
       profileActivities: [],
+      defaultPermissions: {
+        public: ["read"],
+        authenticated: ["read"],
+      },
+      permissionsOrder: [
+        "public",
+        "authenticated",
+        ...Object.keys(wpData.roles).filter(
+          role => role !== "administrator" && role !== "author"
+        ),
+      ],
+      userId: "",
     }
   },
   computed: {
@@ -158,6 +236,13 @@ export default {
     ...mapGetters(["settings"]),
     activities() {
       return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
+    },
+    permissions() {
+      const ordered = {}
+      this.permissionsOrder.forEach(permission => {
+        ordered[permission] = this.defaultPermissions[permission]
+      })
+      return ordered
     },
   },
   mounted() {
@@ -195,12 +280,17 @@ export default {
         nodeDraggable = true,
         spaceshipBackgroundUrl = "",
         profileActivities = [],
+        defaultPermissions = {
+          public: ["read"],
+          authenticated: ["read"],
+        },
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
       this.profileActivities = profileActivities
+      this.defaultPermissions = defaultPermissions
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -209,12 +299,71 @@ export default {
         nodeDraggable: this.nodeDraggable,
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
         profileActivities: this.profileActivities,
+        defaultPermissions: this.defaultPermissions,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
+    },
+    updatePermissions(value, rowName, type) {
+      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
+        return this.changeIndividualPermission(value, rowName, type)
+      }
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
+      lowerPriorityPermissions.forEach(newRow => {
+        this.changeIndividualPermission(value, newRow, type)
+      })
+    },
+    getPermissionRowIndex(rowName) {
+      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
+    },
+    isPermissionDisabled(rowName, type) {
+      if (rowName == "public") {
+        return false
+      }
+      // keep going up until we find a non-user higher row
+      const rowIndex = this.getPermissionRowIndex(rowName)
+      const higherRow = this.permissionsOrder[rowIndex - 1]
+      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
+        return this.isPermissionDisabled(higherRow, type)
+      }
+      const permissions = this.defaultPermissions[higherRow]
+      if (permissions) {
+        return permissions.includes(type)
+      }
+      return false
+    },
+    changeIndividualPermission(value, rowName, type) {
+      let currentPermissions = this.defaultPermissions[rowName]
+      if (!currentPermissions) {
+        currentPermissions = []
+      }
+      let newPermissions = [...currentPermissions]
+      if (value) {
+        if (!currentPermissions.includes(value)) {
+          newPermissions.push(value)
+        }
+      } else {
+        newPermissions = currentPermissions.filter(permission => permission !== type)
+      }
+      this.defaultPermissions[rowName] = newPermissions
+    },
+    addUserPermissionRow() {
+      const userId = this.userId
+      if (
+        userId &&
+        Helpers.onlyContainsDigits(userId) &&
+        $("#user-" + userId + "-editcell").val() != ""
+      ) {
+        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
+        this.permissionsOrder.push(`user-${userId}`)
+        this.userId = null
+      } else {
+        alert("Enter valid user id")
+      }
     },
   },
 }

@@ -86,7 +86,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
+    ...mapGetters([
+      "selectedNode",
+      "tapestry",
+      "getNode",
+      "getDirectParents",
+      "settings",
+    ]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -182,10 +188,12 @@ export default {
         skippable: true,
         fullscreen: false,
         showInBackpack: true,
-        permissions: {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        permissions: this.settings.defaultPermissions
+          ? this.settings.defaultPermissions
+          : {
+              public: ["read"],
+              authenticated: ["read"],
+            },
         description: "",
         quiz: [],
         tydeType: tydeTypes.REGULAR,
@@ -431,12 +439,20 @@ export default {
           newNodeEntry.typeData.linkMetadata = data
 
           if (data) {
-            if (newNodeEntry.imageURL && 
-                confirm("Would you like to use the link preview image as the thumbnail image?")) {
+            if (
+              newNodeEntry.imageURL &&
+              confirm(
+                "Would you like to use the link preview image as the thumbnail image?"
+              )
+            ) {
               newNodeEntry.imageURL = data.image
             }
-            if (newNodeEntry.lockedImageURL && 
-                confirm("Would you like to use the link preview image as the locked thumbnail image?")) {
+            if (
+              newNodeEntry.lockedImageURL &&
+              confirm(
+                "Would you like to use the link preview image as the locked thumbnail image?"
+              )
+            ) {
               newNodeEntry.lockedImageURL = data.image
             }
           }
