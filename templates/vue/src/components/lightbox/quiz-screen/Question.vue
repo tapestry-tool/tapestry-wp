@@ -18,6 +18,7 @@
       <audio-recorder
         v-else-if="recorderOpened"
         :id="question.id"
+        :node="node"
         @submit="handleAudioSubmit"
       />
       <div v-else>

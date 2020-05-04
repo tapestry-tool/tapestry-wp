@@ -1,5 +1,16 @@
 <template>
-  <div v-if="state === states.NOT_SUPPORTED">
+  <div v-if="state === states.READ_ONLY" class="recorder">
+    <h1>{{ question.text }}</h1>
+    <p class="teen-status">
+      {{
+        audio
+          ? `Your teen said:`
+          : `Your teen hasn't recorded anything for this question yet.`
+      }}
+    </p>
+    <audio v-if="audio" controls :src="audio"></audio>
+  </div>
+  <div v-else-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
   <div v-else class="recorder">
@@ -59,6 +70,10 @@ export default {
       type: String,
       required: true,
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -72,6 +87,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getQuestion"]),
+    showAudio() {
+      return this.state === this.states.DONE || this.state
+    },
     question() {
       return this.getQuestion(this.id)
     },
@@ -104,15 +122,17 @@ export default {
         PAUSED: "paused",
         READY: "ready",
         RECORDING: "recording",
+        READ_ONLY: "read-only",
       }
     },
   },
   created() {
     if (this.hasPrevious) {
-      this.state = this.states.DONE
       this.audio =
         "data:audio/ogg; codecs=opus;base64," +
         this.getQuestion(this.id).entries.audioId
+      this.state =
+        this.node.userType === "teen" ? this.states.READ_ONLY : this.states.DONE
     } else {
       this.state = this.states.READY
       this.initialize()
@@ -203,6 +223,7 @@ export default {
   }
 
   audio {
+    border-radius: 8px;
     margin-bottom: 16px;
   }
 
@@ -234,6 +255,10 @@ export default {
 
   i {
     margin: auto;
+  }
+
+  .teen-status {
+    display: block;
   }
 }
 </style>
