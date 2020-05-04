@@ -271,7 +271,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id);
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id, $userId);
                             if ($tapestryAudio->audioExists()) {
                                 $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
