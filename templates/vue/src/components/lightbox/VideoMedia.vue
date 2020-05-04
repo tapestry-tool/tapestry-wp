@@ -77,7 +77,7 @@ export default {
       if (width / height <= 1) {
         return { height: "100%", width: "auto" }
       }
-      if (this.node.fullscreen) {
+      if (this.node.fullscreen && this.node.fitWindow) {
         if (width > window.innerWidth) {
           const resizeRatio = window.innerWidth / width
           const newHeight = height * resizeRatio
