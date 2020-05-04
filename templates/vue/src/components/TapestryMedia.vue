@@ -12,7 +12,7 @@
       @load="handleLoad"
     />
     <video-media
-      v-if="node.mediaFormat === 'mp4' && youtubeVideoId === ''"
+      v-if="node.mediaFormat === 'mp4' && !node.typeData.youtubeID"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
@@ -22,11 +22,10 @@
       @close="$emit('close')"
     />
     <youtube-media
-      v-if="youtubeVideoId !== ''"
+      v-if="node.typeData.youtubeID && node.typeData.youtubeID !== ''"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
-      :youtubeId="youtubeVideoId"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -131,11 +130,6 @@ export default {
     node() {
       return this.getNode(this.nodeId)
     },
-    youtubeVideoId(){
-      const linkRegex = /(?:youtube\.com\/\S*(?:(?:e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/
-      const matchArray = this.node.typeData.mediaURL.match(linkRegex) 
-      return matchArray === null ? '' : matchArray[1]
-    }
   },
   async beforeDestroy() {
     await this.updateNodeProgress({

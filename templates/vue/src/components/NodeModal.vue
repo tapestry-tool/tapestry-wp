@@ -383,6 +383,8 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
+import YoutubeApi from "../services/YoutubeApi"
+import Vue from 'vue'
 
 export default {
   name: "node-modal",
@@ -657,9 +659,12 @@ export default {
         this.$set(this.node, "mediaFormat", "")
       }
     },
-    submitNode() {
+    async submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
+        if(this.node.typeData.youtubeID && this.node.typeData.youtubeID !== ''){
+          await this.setYoutubeDuration()
+        }
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
@@ -695,6 +700,12 @@ export default {
       } else if (this.node.mediaType === "video") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
+        }
+        const youtubeId = Helpers.getYoutubeID(this.node.typeData.mediaURL)
+        if(youtubeId === ''){ // Not a youtube video
+          this.node.mediaDuration = this.$refs.video.duration
+        } else {
+          this.node.typeData.youtubeID = youtubeId
         }
         this.node.mediaDuration = this.$refs.video.duration
       } else if (this.node.mediaType === "h5p") {
@@ -744,6 +755,11 @@ export default {
         ord: arr,
       })
     },
+    async setYoutubeDuration(){
+      await YoutubeApi.getDuration(this.node.typeData.youtubeID).then(r => {
+        this.$set(this.node, "mediaDuration", r)
+      })
+    }
   },
 }
 </script>

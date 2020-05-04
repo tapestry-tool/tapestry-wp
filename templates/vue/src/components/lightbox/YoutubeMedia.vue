@@ -14,7 +14,7 @@
       @close="close"
     />
     <youtube 
-      :video-id="youtubeId"
+      :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width"
       :player-height="dimensions.height"
       :player-vars="{start: 0, autoplay: autoplay}"
@@ -50,10 +50,6 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
-    youtubeId: {
-      type: String,
-      required: true,
-    }
   },
   data() {
     return {
@@ -79,6 +75,7 @@ export default {
   methods: {
     ready(event){ 
       this.player = event.target
+      console.log(this.player)
     },
     openQuiz() {
       this.showEndScreen = false
