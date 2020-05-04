@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container">
+  <div :class="['video-container', { fullscreen: node.fullscreen }]">
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"
@@ -219,5 +219,11 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+
+  &.fullscreen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>
