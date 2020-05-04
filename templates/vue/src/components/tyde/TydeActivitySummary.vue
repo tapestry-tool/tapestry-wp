@@ -49,9 +49,6 @@ export default {
       }))
     },
   },
-  mounted() {
-    const entries = Object.entries(this.activity.entries)
-  },
   methods: {
     formatEntry(entry) {
       if (entry.length === 1) {

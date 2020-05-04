@@ -8,7 +8,7 @@
         {{ choice.choiceText }}
       </li>
     </ul>
-    <audio v-if="type === 'audio'" controls :src="src"></audio>
+    <audio v-if="type === 'audio'" controls :src="entry"></audio>
   </div>
 </template>
 
@@ -29,11 +29,6 @@ export default {
     entry: {
       type: [String, Array],
       required: true,
-    },
-    src: {
-      type: String,
-      required: false,
-      default: null,
     },
   },
 }

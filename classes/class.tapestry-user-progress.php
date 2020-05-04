@@ -142,6 +142,9 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function getUserEntries($userId, $formId = 0)
     {
+        if (!class_exists("GFAPI")) {
+          return [];
+        }
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
             'value' => $userId
@@ -172,6 +175,38 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         return $formEntryMap;
+    }
+    
+    private function _getImageChoices($formId, &$entry)
+    {   
+        $field_types = array('checkbox', 'radio');
+        $form = GFAPI::get_form( $formId );
+        $fields = GFAPI::get_fields_by_type( $form, $field_types );
+        $image_choices_fields = array();
+        foreach($fields as &$field) {
+            if ( is_object( $field ) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
+                $image_choices_fields[$field->id] = $field;
+            }
+        }
+        foreach($image_choices_fields as $id => $field ) {
+            foreach ($field->inputs as $input) {
+                $label = $input['label'];
+                $correspondingChoice = array_values(array_filter(
+                    $field['choices'],
+                    function ($e) use ($label) {
+                        return $e['value'] == $label;
+                    }
+                ))[0];
+                if($entry[$input['id']] != ''){
+                    $inputMap = new stdClass();
+                    $inputMap->choiceText = $label;
+                    $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
+                    $entry[$input['id']] = $inputMap;
+                }
+            }
+        }
+        
+        return $entry;
     }
 
     private function _getImageChoices($formId, &$entry)
@@ -268,9 +303,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id);
                             if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $gfOrH5pId;
+                                $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
                         } else if (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
@@ -314,7 +349,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         if ($favourites) {
             return $favourites;
         }
-        return json_encode([]);
+        return [];
     }
 
     /**

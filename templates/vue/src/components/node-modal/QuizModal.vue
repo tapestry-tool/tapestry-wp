@@ -77,33 +77,30 @@
             <b-form-group label="Answer options" class="mb-0">
               <b-row>
                 <b-col cols="12" md="4">
+                  <b-form-checkbox
+                    :checked="question.answers.audioId.length > 0"
+                    switch
+                    @input="question.answers.audioId = $event ? '1' : ''"
+                  >
+                    Audio Recorder
+                  </b-form-checkbox>
+                </b-col>
+                <b-col cols="12" md="4">
                   <b-form-group label="Textbox Gravity Form" class="mb-0">
+                    <b-form-input
+                      v-if="!gavityFormExists"
+                      :disabled="true"
+                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
+                      value="Not Available"
+                    />
                     <combobox
+                      v-else
                       v-model="question.answers.textId"
                       :data-testid="`question-answer-textbox-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"
-                      empty-message="There are no forms available. Please add one in your WP dashboard."
-                      @focus="wasFocused = true"
-                    >
-                      <template v-slot="slotProps">
-                        <p>
-                          <code>{{ slotProps.option.id }}</code>
-                          {{ slotProps.option.title }}
-                        </p>
-                      </template>
-                    </combobox>
-                  </b-form-group>
-                </b-col>
-                <b-col cols="12" md="4">
-                  <b-form-group label="H5P Audio Recorder" class="mb-0">
-                    <combobox
-                      v-model="question.answers.audioId"
-                      :options="h5pOptions"
-                      item-text="title"
-                      item-value="id"
-                      empty-message="There's no H5P content yet. Please add one in your WP dashboard."
+                      empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
                       @focus="wasFocused = true"
                     >
                       <template v-slot="slotProps">
@@ -117,7 +114,14 @@
                 </b-col>
                 <b-col cols="12" md="4">
                   <b-form-group label="Checklist Gravity Form" class="mb-0">
+                    <b-form-input
+                      v-if="!gavityFormExists"
+                      :disabled="true"
+                      title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
+                      value="Not Available"
+                    />
                     <combobox
+                      v-else
                       v-model="question.answers.checklistId"
                       :options="formOptions"
                       item-text="title"
@@ -176,7 +180,6 @@
 import { mapState } from "vuex"
 import Combobox from "../Combobox"
 import GravityFormsApi from "../../services/GravityFormsApi"
-import H5PApi from "../../services/H5PApi"
 import Helpers from "../../utils/Helpers"
 
 const defaultQuestion = {
@@ -202,6 +205,7 @@ export default {
   data() {
     return {
       canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
+      gavityFormExists: false,
       formOptions: [],
       h5pOptions: [],
       questions: this.node.quiz,
@@ -237,10 +241,8 @@ export default {
     },
   },
   async mounted() {
-    const forms = await GravityFormsApi.getAllForms()
-    const h5ps = await H5PApi.getAllContent()
-    this.formOptions = forms
-    this.h5pOptions = h5ps
+    this.gavityFormExists = await GravityFormsApi.exists()
+    this.formOptions = await GravityFormsApi.getAllForms()
   },
   methods: {
     getPreviousOptions(currentQuestion) {
