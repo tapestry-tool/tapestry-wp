@@ -79,11 +79,19 @@ export default {
         return { width: "100%" }
       }
       const { height, width } = this.videoDimensions
-      if (
-        width / height <= 1 ||
-        (this.node.fullscreen && height >= window.innerHeight)
-      ) {
+      if (width / height <= 1) {
         return { height: "100%", width: "auto" }
+      }
+      if (this.node.fullscreen) {
+        if (width > window.innerWidth) {
+          const resizeRatio = window.innerWidth / width
+          const newHeight = height * resizeRatio
+          if (newHeight >= window.innerHeight) {
+            return { height: "100%", width: "auto" }
+          }
+        } else if (height > window.innerHeight) {
+          return { height: "100%", width: "auto" }
+        }
       }
       return { width: "100%" }
     },
