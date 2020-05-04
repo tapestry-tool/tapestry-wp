@@ -396,6 +396,7 @@ button[disabled] {
 
   &-activity {
     width: 52px;
+    margin-right: 10px;
   }
 }
 
