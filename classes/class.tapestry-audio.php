@@ -47,7 +47,6 @@ class TapestryAudio implements ITapestryAudio
         $decodedAudio = base64_decode($audio);
 
         if (file_put_contents($tapestry_user_upload_dir . '/' . $filename, $decodedAudio)) {
-            $this->_setNodeWithRecordedAudio();
             return $filename;
         } else {
             throw new TapestryError('FAILED_TO_SAVE_AUDIO');
@@ -79,32 +78,6 @@ class TapestryAudio implements ITapestryAudio
         $filename = $this->_getFileName();
         $upload_dir = wp_upload_dir();
         return file_exists($upload_dir['basedir'] . '/tapestry/' . $this->userId . '/' . $filename);
-    }
-
-    /**
-     * Get all node IDs that have its audios recorded
-     * 
-     * @return  Array   nodeIds
-     */
-    public function getNodesWithRecordedAudios()
-    {
-        $tapestry = new Tapestry($this->tapestryPostId);
-        $nodeIds = $tapestry->getNodeIds();
-        $nodesWithRecordedAudios = [];
-
-        foreach ($nodeIds as $nodeId) {
-            $audioRecorded = get_user_meta($this->userId, 'tapestry_' . $this->tapestryPostId . '_node_with_recorded_audio_' . $nodeId, true);
-            if (!empty($audioRecorded)) {
-                array_push($nodesWithRecordedAudios, $nodeId);
-            }
-        }
-
-        return $nodesWithRecordedAudios;
-    }
-
-    private function _setNodeWithRecordedAudio()
-    {
-        update_user_meta($this->userId, 'tapestry_' . $this->tapestryPostId . '_node_with_recorded_audio_' . $this->nodeMetaId, true);
     }
 
     private function _getFileName()

@@ -151,17 +151,6 @@ export default class {
     return response.data
   }
 
-  /**
-   * Get H5P audio nodes that are recorded
-   *
-   * @return  {Array}    nodeIds       an array of node IDs
-   */
-  async getRecordedNodeIds() {
-    const url = `${apiUrl}/tapestries/${this.postId}/recorded-audio-nodes`
-    const response = await axios.get(url)
-    return response.data
-  }
-
   async completeNode(nodeId) {
     const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
     const response = await axios.post(url)

@@ -4,7 +4,6 @@
     ref="h5p"
     frameborder="0"
     :src="node.typeData.mediaURL"
-    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
