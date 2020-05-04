@@ -82,21 +82,9 @@
             >
               <file-upload
                 id="node-video-media-url"
-                v-model="node.typeData.mediaURL"
+                v-model="videoSrc"
                 data-testid="node-videoUrl"
                 placeholder="Enter URL for MP4 Video"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video Duration"
-            >
-              <b-form-input
-                id="node-video-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-videoDuration"
-                placeholder="Enter duration (in seconds)"
                 required
               />
             </b-form-group>
@@ -116,19 +104,13 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group
-              v-show="nodeType === 'h5p'"
-              label="H5P Video Duration"
-              description="This only applies to video H5P content"
-            >
-              <b-form-input
-                id="node-h5p-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-h5pDuration"
-                placeholder="Enter duration (in seconds)"
-                required
-              />
-            </b-form-group>
+            <video
+              v-if="videoUrlEntered"
+              ref="video"
+              controls
+              :src="videoSrc"
+              style="display:none;"
+            ></video>
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
@@ -463,6 +445,8 @@ export default {
       maxDescriptionLength: 250,
       addThumbnail: false,
       addLockedThumbnail: false,
+      videoUrlEntered: false,
+      videoSrc: null,
     }
   },
   computed: {
@@ -556,9 +540,14 @@ export default {
     },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
+      this.videoUrlEntered = true
     },
     selectedGravityFormContent(id) {
       this.node.typeData.mediaURL = id
+    },
+    videoSrc(newUrl) {
+      this.node.typeData.mediaURL = newUrl
+      this.videoUrlEntered = true
     },
   },
   async mounted() {
@@ -707,16 +696,12 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
+        this.node.mediaDuration = this.$refs.video.duration
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
-        }
+        this.node.mediaDuration = this.$refs.video.duration
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
