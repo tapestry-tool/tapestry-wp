@@ -247,10 +247,6 @@ function tapestryTool(config){
                 .filter(link => link.source == id)
                 .map(link => link.target)
 
-            const getDirectChildren = id => this.dataset.links
-                .filter(link => link.source == id)
-                .map(link => link.target)
-
             if (node.mediaType === "accordion") {
                 const accordionRowIds = getDirectChildren(node.id)
                 accordionRowIds.forEach(accordionRowId => {
@@ -1047,14 +1043,6 @@ function tapestryTool(config){
     
     /* Draws the components that make up node */
     function buildNodeContents() {
-        const handleClick = d => {
-            if (root === d.id && d.hideMedia) {
-                if (config.wpCanEditTapestry || d.accessible) {
-                    goToNode(d.id)
-                }
-            }
-        }
-
         const handleClick = d => {
             if (root === d.id && d.hideMedia) {
                 if (config.wpCanEditTapestry || d.accessible) {

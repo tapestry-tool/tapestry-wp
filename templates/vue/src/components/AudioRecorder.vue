@@ -11,7 +11,7 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.DONE" style="color: white;">
+      <code v-if="state !== states.DONE">
         {{ durationText }}
       </code>
     </div>
