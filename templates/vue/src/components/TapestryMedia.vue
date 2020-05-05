@@ -36,10 +36,8 @@
       :node="node"
       :width="dimensions.width"
       :height="dimensions.height"
-      :settings="h5pSettings"
       :allow-end-screen="allowEndScreen"
       @load="handleLoad"
-      @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
       @complete="complete"
       @close="$emit('close')"
@@ -112,11 +110,6 @@ export default {
       type: Boolean,
       required: false,
       default: true,
-    },
-    h5pSettings: {
-      type: Object,
-      required: false,
-      default: () => ({}),
     },
     autoplay: {
       type: Boolean,
