@@ -203,14 +203,14 @@ export default {
           h5pVideo.unMute()
         }
       }
-      if (settings.caption !== undefined) {
-        h5pVideo.setCaptionsTrack(settings.caption)
+      if (settings.playbackRate !== undefined) {
+        h5pVideo.setPlaybackRate(settings.playbackRate)
       }
       if (settings.quality !== undefined) {
         h5pVideo.setQuality(settings.quality)
       }
-      if (settings.playbackRate !== undefined) {
-        h5pVideo.setPlaybackRate(settings.playbackRate)
+      if (settings.caption !== undefined) {
+        h5pVideo.setCaptionsTrack(settings.caption)
       }
     },
     handlePlay(node) {
