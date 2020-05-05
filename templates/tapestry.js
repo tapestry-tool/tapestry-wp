@@ -350,7 +350,7 @@ function tapestryTool(config){
 
         if (tapestryDepth) {
             // slider's maximum depth is set to the longest path from the new selected node
-            tapestryDepthSlider.max = findMaxDepth(id);
+            tapestryDepthSlider.max = findMaxDepth(id) + 1;
         }
 
         updateSvgDimensions();
@@ -470,10 +470,10 @@ function tapestryTool(config){
      ****************************************************/
 
     if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
-        
+
         selection = createSelection();
         isMultiSelect = false;
-    
+
         document.addEventListener("keydown", evt => {
             if (movementsEnabled) {
                 if (evt.code === "Escape") {
@@ -488,13 +488,11 @@ function tapestryTool(config){
                 }
             }
         });
-    
         document.addEventListener("keyup", () => {
             if (movementsEnabled) {
                 isMultiSelect = false;
             }
         });
-    
         function createSelection() {
             const data = new Set();
             const selection = {
@@ -749,17 +747,15 @@ function tapestryTool(config){
             });
     }
 
-    // D3 DRAGGING FUNCTIONS
     function dragstarted(d) {
         if (movementsEnabled) {
-                
             if(!config.wpCanEditTapestry &&
                 tapestry.dataset.settings.nodeDraggable === false) {
                 return;
             }
-
+     
             if (!d3.event.active) simulation.alphaTarget(0.2).restart();
-
+    
             if (!selection.size()) {
                 selection.add(d)
             }
@@ -784,7 +780,7 @@ function tapestryTool(config){
         selection.forEach(nd => {
             nd[xORfx] = nd[xORfx] + d3.event.dx;
             nd[yORfy] = nd[yORfy] + d3.event.dy;
-            })
+        })
     }
 
     function dragended(d) {
@@ -1047,7 +1043,6 @@ function tapestryTool(config){
     
     /* Draws the components that make up node */
     function buildNodeContents() {
-
         const handleClick = d => {
             if (root === d.id && d.hideMedia) {
                 if (config.wpCanEditTapestry || d.accessible) {
@@ -1064,9 +1059,9 @@ function tapestryTool(config){
                 }
             }
         }
-
+        
         if (tapestryDepth) {
-            tapestryDepthSlider.max = findMaxDepth(root);
+            tapestryDepthSlider.max = findMaxDepth(root) + 1;
         }
 
         /* Draws the circle that defines how large the node is */
@@ -1131,56 +1126,56 @@ function tapestryTool(config){
                 return COLOR_BLANK_HOVER;
             })
             .on("click keydown", handleClick);
-    
+        
         nodes.append("rect")
-        .attr("class", function (d) {
-            if (d.nodeType === "grandchild") return "selectable grandchild";
-            return "selectable";
-        })
-        .attr("rx", function (d) {
-            if (d.hideProgress && d.imageURL.length) {
-                return 0;
-            }
-            return getRadius(d);
-        })
-        .attr("ry", function (d) {
-            if (d.hideProgress && d.imageURL.length) {
-                return 0;
-            }
-            return getRadius(d);
-        })
-        .attr("data-id", function (d) {
-            return d.id;
-        })
-        .attr("stroke-width", function (d) {
-            if (!d.hideProgress) {
-                return PROGRESS_THICKNESS;
-            }
-        })
-        .attr("stroke", function (d) {
-            if (!getViewable(d) || d.hideProgress)
-                return "transparent";
-            else if (d.nodeType === "grandchild")
-                return COLOR_GRANDCHILD;
-            else if (!d.accessible)
-                return COLOR_LINK;
-            else return COLOR_STROKE;
-        })
-        .attr("width", function (d) {
-            if (!getViewable(d)) return 0;
-            return getRadius(d) * 2;
-        })
-        .attr("height", function (d) {
-            if (!getViewable(d)) return 0;
-            return getRadius(d) * 2;
-        })
-        .attr("x", function (d) {
-            return - getRadius(d);
-        })
-        .attr("y", function (d) {
-            return - getRadius(d);
-        })
-        .on("click keydown", handleClick);
+            .attr("class", function (d) {
+                if (d.nodeType === "grandchild") return "selectable grandchild";
+                return "selectable";
+            })
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("data-id", function (d) {
+                return d.id;
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild")
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                if (!getViewable(d)) return 0;
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .on("click keydown", handleClick);
 
         nodes.append("circle")
             .filter(function (d) {
@@ -1625,51 +1620,51 @@ function tapestryTool(config){
             });
 
         nodes.selectAll(".selectable")
-                .attr("class", function (d) {
-                    if (!getViewable(d))
-                        return "selectable grandchild";
-                    else return "selectable";
-                })
-                .transition()
-                .duration(TRANSITION_DURATION)
-                .attr("rx", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
-                        return 0;
-                    }
-                    return getRadius(d);
-                })
-                .attr("ry", function (d) {
-                    if (d.hideProgress && d.imageURL.length) {
-                        return 0;
-                    }
-                    return getRadius(d);
-                })
-                .attr("stroke", function (d) {
-                    if (!getViewable(d) || d.hideProgress)
-                        return "transparent";
-                    else if (d.nodeType === "grandchild") 
-                        return COLOR_GRANDCHILD;
-                    else if (!d.accessible)
-                        return COLOR_LINK;
-                    else return COLOR_STROKE;
-                })
-                .attr("width", function (d) {
-                    return getRadius(d) * 2;
-                })
-                .attr("height", function (d) {
-                    return getRadius(d) * 2;
-                })
-                .attr("x", function (d) {
-                    return - getRadius(d);
-                })
-                .attr("y", function (d) {
-                    return - getRadius(d);
-                })
-                .attr("stroke-width", function (d) {
-                    if (!d.hideProgress) {
-                        return PROGRESS_THICKNESS;
-                    }
-                });
+            .attr("class", function (d) {
+                if (!getViewable(d))
+                    return "selectable grandchild";
+                else return "selectable";
+            })
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr("rx", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("ry", function (d) {
+                if (d.hideProgress && d.imageURL.length) {
+                    return 0;
+                }
+                return getRadius(d);
+            })
+            .attr("stroke", function (d) {
+                if (!getViewable(d) || d.hideProgress)
+                    return "transparent";
+                else if (d.nodeType === "grandchild") 
+                    return COLOR_GRANDCHILD;
+                else if (!d.accessible)
+                    return COLOR_LINK;
+                else return COLOR_STROKE;
+            })
+            .attr("width", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("height", function (d) {
+                return getRadius(d) * 2;
+            })
+            .attr("x", function (d) {
+                return - getRadius(d);
+            })
+            .attr("y", function (d) {
+                return - getRadius(d);
+            })
+            .attr("stroke-width", function (d) {
+                if (!d.hideProgress) {
+                    return PROGRESS_THICKNESS;
+                }
+            });
         
         /* Attach images to be used within each node */
         nodes.selectAll("defs")
@@ -2473,6 +2468,7 @@ function tapestryTool(config){
     
     /* For setting the "type" field of links in dataset */
     function setLinkTypes(rootId) {
+
         root = rootId;
 
         if (tapestryDepth) {

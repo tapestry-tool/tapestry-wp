@@ -415,6 +415,16 @@ button[disabled] {
   &-activity {
     width: 52px;
   }
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.button-row-trigger {
+  background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .icon-container {

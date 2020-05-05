@@ -142,6 +142,9 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function getUserEntries($userId, $formId = 0)
     {
+        if (!class_exists("GFAPI")) {
+          return [];
+        }
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
             'value' => $userId
@@ -173,7 +176,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         return $formEntryMap;
     }
-
+    
     private function _getImageChoices($formId, &$entry)
     {   
         $field_types = array('checkbox', 'radio');
@@ -202,7 +205,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 }
             }
         }
-
+        
         return $entry;
     }
 
@@ -268,9 +271,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id, $userId);
                             if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $gfOrH5pId;
+                                $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
                         } else if (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
@@ -312,9 +315,9 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
         if ($favourites) {
-            return $favourites;
+            return json_decode($favourites);
         }
-        return json_encode([]);
+        return [];
     }
 
     /**
