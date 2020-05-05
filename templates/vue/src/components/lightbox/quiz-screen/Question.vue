@@ -3,7 +3,7 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button class="button-nav button-nav-menu" @click="back">
+    <button class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -22,6 +22,9 @@
           <p>You haven't done the previous activity yet.</p>
         </div>
       </div>
+      <h1 class="question-title">
+        {{ question.text }}
+      </h1>
       <gravity-form
         v-if="formOpened"
         :id="formId"
@@ -33,38 +36,34 @@
         :id="question.id"
         @submit="handleAudioSubmit"
       />
-      <div v-else>
-        <h1 class="question-title">
-          {{ question.text }}
-        </h1>
-        <div class="question-content">
-          <p class="question-answer-text">I want to answer with...</p>
-          <div class="button-container">
-            <answer-button
-              v-if="hasId('textId')"
-              :completed="textFormCompleted"
-              @click="openForm(question.answers.textId, 'textId')"
-            >
-              text
-            </answer-button>
-            <answer-button
-              v-if="hasId('audioId')"
-              :completed="audioRecorderCompleted"
-              icon="microphone"
-              @click="openRecorder(question.answers.audioId)"
-            >
-              audio
-            </answer-button>
-            <answer-button
-              v-if="hasId('checklistId')"
-              :completed="checklistFormCompleted"
-              icon="tasks"
-              @click="openForm(question.answers.checklistId, 'checklistId')"
-            >
-              checklist
-            </answer-button>
-          </div>
+      <div v-else class="question-content">
+        <p class="question-answer-text">I want to answer with...</p>
+        <div class="button-container">
+          <answer-button
+            v-if="hasId('textId')"
+            :completed="textFormCompleted"
+            @click="openForm(question.answers.textId, 'textId')"
+          >
+            text
+          </answer-button>
+          <answer-button
+            v-if="hasId('audioId')"
+            :completed="audioRecorderCompleted"
+            icon="microphone"
+            @click="openRecorder(question.answers.audioId)"
+          >
+            audio
+          </answer-button>
+          <answer-button
+            v-if="hasId('checklistId')"
+            :completed="checklistFormCompleted"
+            icon="tasks"
+            @click="openForm(question.answers.checklistId, 'checklistId')"
+          >
+            checklist
+          </answer-button>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -117,7 +116,7 @@ export default {
     answers() {
       if (this.question.previousEntry) {
         const answeredTypes = Object.entries(this.lastQuestion.answers)
-          .filter(entry => entry[1].length > 0)
+          .filter(entry => entry[1] && entry[1].length > 0)
           .map(i => i[0])
         return answeredTypes
           .map(type => this.getEntry(this.question.previousEntry, type))
@@ -238,87 +237,85 @@ button {
       max-width: 100px;
     }
   }
-}
 
-.question-title {
-  position: relative;
-  font-size: 28px;
-  font-weight: 600 !important;
-  padding-top: 16px;
-  margin-bottom: 36px;
-}
+  .button-nav {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background: #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    color: white;
+    margin: 0;
+    margin-right: 12px;
+    opacity: 1;
+    transition: all 0.1s ease-out;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 20;
 
-.question-title:before {
-  display: none;
-}
+    &:hover {
+      background: #11a6d8;
+    }
 
-.question-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+    &:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
 
-.question-answer-text {
-  width: 100%;
-  padding: 0;
-  font-size: 28px;
-  font-style: italic;
-}
-
-.button-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.loading {
-  background: #111;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 30;
-}
-
-.button-nav {
-  border-radius: 50%;
-  height: 56px;
-  width: 56px;
-  background: #262626;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  color: white;
-  margin: 0;
-  margin-right: 12px;
-  opacity: 1;
-  transition: all 0.1s ease-out;
-
-  &:hover {
-    background: #11a6d8;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
-  &:disabled {
-    opacity: 0.6;
-    pointer-events: none;
-    cursor: not-allowed;
+  .loading {
+    background: #111;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
   }
 
-  &:last-child {
-    margin-right: 0;
+  &-title {
+    position: relative;
+    font-size: 28px;
+    font-weight: 600 !important;
+    padding-top: 16px;
+    margin-bottom: 36px;
+
+    &:before {
+      display: none;
+    }
+
+    + .recorder {
+      margin-top: 4em;
+    }
+  }
+
+  &-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .question-answer-text {
+      width: 100%;
+      padding: 0;
+      font-size: 28px;
+      font-style: italic;
+    }
+
+    .button-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
   }
 }
 
-.button-nav-menu {
-  width: 80px;
-  height: 80px;
-  font-size: 56px;
-
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
-}
 </style>

@@ -306,7 +306,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
         if ($favourites) {
-            return $favourites;
+            return json_decode($favourites);
         }
         return [];
     }
