@@ -2,11 +2,12 @@
   <div id="app">
     <tapestry />
     <router-view></router-view>
-    <tapestry-filter />
+    <tapestry-filter v-if="tapestryIsLoaded" />
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex"
 import Tapestry from "./components/Tapestry"
 import TapestryFilter from "./components/TapestryFilter"
 
@@ -15,6 +16,9 @@ export default {
   components: {
     Tapestry,
     TapestryFilter,
+  },
+  computed: {
+    ...mapState(["tapestryIsLoaded"]),
   },
 }
 </script>
