@@ -1,14 +1,16 @@
 <template>
   <div class="filter">
-    <button>
+    <button @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
-    <combobox
-      v-if="isActive"
-      :options="comboboxFilterOptions"
-      :value="activeFilterOption"
-      @input="updateFilterOption"
-    ></combobox>
+    <div v-if="isActive">
+      <p>Filter by:</p>
+      <combobox
+        :options="comboboxFilterOptions"
+        :value="activeFilterOption"
+        @input="updateFilterOption"
+      ></combobox>
+    </div>
   </div>
 </template>
 
@@ -28,6 +30,9 @@ export default {
     isActive() {
       return this.$route.path.includes("filter")
     },
+    isFilterSelected() {
+      return this.activeFilterOption !== null
+    },
     activeFilterOption() {
       const query = this.$route.query
       return query.by || null
@@ -37,6 +42,9 @@ export default {
     },
   },
   methods: {
+    toggleFilter() {
+      this.isActive ? this.$router.go(-1) : this.$router.push("/filter")
+    },
     updateFilterOption(opt) {
       this.$router.replace({ query: opt ? { by: opt } : {} })
     },

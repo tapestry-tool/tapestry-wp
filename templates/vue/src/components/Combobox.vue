@@ -118,12 +118,14 @@ export default {
   methods: {
     handleBlur() {
       this.isOpen = false
-      // if user leaves focus and input is empty, clear the value
-      if (this.inputValue.length === 0) {
-        this.$emit("input", null)
-      } else if (this.inputValue !== this.text && !this.selected) {
-        this.inputValue = this.text
-      }
+      this.$nextTick(() => {
+        // if user leaves focus and input is empty, clear the value
+        if (this.inputValue.length === 0) {
+          this.$emit("input", null)
+        } else if (this.inputValue !== this.text && !this.selected) {
+          this.inputValue = this.text
+        }
+      })
     },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
