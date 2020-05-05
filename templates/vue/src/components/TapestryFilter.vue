@@ -1,14 +1,22 @@
 <template>
-  <h1>I'm a filter</h1>
+  <button class="filter"><i class="fas fa-search"></i></button>
 </template>
 
 <script>
 export default {
   name: "tapestry-filter",
-  watch: {
-    $route(to, from) {
-      console.log(to, from)
+  computed: {
+    isActive() {
+      return this.$route.path.includes("filter")
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.filter {
+  position: absolute;
+  top: -60px;
+  left: 10vw;
+}
+</style>
