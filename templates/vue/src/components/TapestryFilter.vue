@@ -10,11 +10,25 @@
         :value="activeFilterOption"
         @input="updateFilterOption"
       ></combobox>
+      <combobox
+        v-if="isFilterSelected"
+        :options="comboboxValueOptions"
+        item-text="name"
+        item-value="id"
+      >
+        <template v-slot="slotProps">
+          <p>
+            <code>{{ slotProps.option.id }}</code>
+            {{ slotProps.option.name }}
+          </p>
+        </template>
+      </combobox>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex"
 import Combobox from "./Combobox"
 
 const filterOptions = {
@@ -27,6 +41,7 @@ export default {
     Combobox,
   },
   computed: {
+    ...mapState(["nodes"]),
     isActive() {
       return this.$route.path.includes("filter")
     },
@@ -39,6 +54,18 @@ export default {
     },
     comboboxFilterOptions() {
       return Object.values(filterOptions)
+    },
+    comboboxValueOptions() {
+      switch (this.activeFilterOption) {
+        case filterOptions.AUTHOR: {
+          const authors = new Map(
+            this.nodes.map(node => [node.author.id, node.author])
+          )
+          return Array.from(authors.values())
+        }
+        default:
+          return []
+      }
     },
   },
   methods: {
