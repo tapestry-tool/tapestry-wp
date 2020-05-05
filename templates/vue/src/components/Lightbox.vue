@@ -185,9 +185,9 @@ export default {
     close() {
       this.$router.push("/")
     },
-    handleLoad(dim) {
-      if (dim) {
-        const { width, height } = dim
+    handleLoad(dimensions) {
+      if (dimensions) {
+        const { width, height } = dimensions
         this.updateDimensions({ width, height })
       }
     },
