@@ -1,6 +1,5 @@
 <template>
   <div v-if="state === states.READ_ONLY" class="recorder">
-    <h1>{{ question.text }}</h1>
     <p class="teen-status">
       {{
         audio
@@ -14,7 +13,6 @@
     Oops, your browser doesn't support audio recording.
   </div>
   <div v-else class="recorder">
-    <h1>{{ question.text }}</h1>
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
     <button v-else class="main-button my-2" @click="toggleRecording">
       <i

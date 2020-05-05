@@ -3,12 +3,29 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button class="button-nav button-nav-menu" @click="back">
+    <button class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
-
     <div v-else>
+      <speech-bubble class="question-title">
+        <div class="question-title-step">
+          {{ currentStep }}
+        </div>
+        <div v-if="question.isFollowUp && answers.length" class="follow-up">
+          <div class="answer-container mx-auto mb-3">
+            <h3 class="mb-4">{{ question.followUpText }}</h3>
+            <tapestry-activity
+              v-for="answer in answers"
+              :key="answer.type"
+              :type="answer.type"
+              :entry="answer.entry"
+              :src="answer.src"
+            ></tapestry-activity>
+          </div>
+        </div>
+        <h3>{{ question.text }}</h3>
+      </speech-bubble>
       <gravity-form
         v-if="formOpened"
         :id="formId"
@@ -22,25 +39,7 @@
         @submit="handleAudioSubmit"
       />
       <div v-else>
-        <speech-bubble class="question-title">
-          <div class="question-title-step">
-            {{ currentStep }}
-          </div>
-          <div v-if="question.isFollowUp && answers.length" class="follow-up">
-            <div class="answer-container mx-auto mb-3">
-              <h3 class="mb-4">{{ question.followUpText }}</h3>
-              <tapestry-activity
-                v-for="answer in answers"
-                :key="answer.type"
-                :type="answer.type"
-                :entry="answer.entry"
-                :src="answer.src"
-              ></tapestry-activity>
-            </div>
-          </div>
-          <h3>{{ question.text }}</h3>
-        </speech-bubble>
-        <div v-if="options.length > 1" class="question-content">
+        <div class="question-content">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
             <answer-button
@@ -260,100 +259,99 @@ button {
   }
 }
 
-.question-title {
-  position: relative;
-  font-size: 24px;
-  font-weight: 600 !important;
-  padding-top: 16px;
-  margin-bottom: 36px;
-}
+.question {
+  .button-nav {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background: $tyde-blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    color: white;
+    margin: 0;
+    margin-right: 12px;
+    opacity: 1;
+    transition: all 0.1s ease-out;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 20;
 
-.question-title-step {
-  position: absolute;
-  border: 2px solid black;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  top: -16px;
-  left: -24px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
+    &:hover {
+      opacity: 0.8;
+    }
 
-.question-title:before {
-  display: none;
-}
+    &:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
 
-.question-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.question-answer-text {
-  width: 100%;
-  padding: 0;
-  font-size: 28px;
-  font-style: italic;
-}
-
-.button-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.loading {
-  background: #111;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 30;
-}
-
-.button-nav {
-  border-radius: 50%;
-  height: 56px;
-  width: 56px;
-  background: $tyde-blue;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  color: white;
-  margin: 0;
-  margin-right: 12px;
-  opacity: 1;
-  transition: all 0.1s ease-out;
-
-  &:hover {
-    opacity: 0.8;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
-  &:disabled {
-    opacity: 0.6;
-    pointer-events: none;
-    cursor: not-allowed;
+  .loading {
+    background: #111;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
   }
 
-  &:last-child {
-    margin-right: 0;
+  &-title {
+    position: relative;
+    font-size: 24px;
+    font-weight: 600 !important;
+    padding-top: 16px;
+    margin-bottom: 36px;
+
+    &-step {
+      position: absolute;
+      border: 2px solid black;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      top: -16px;
+      left: -24px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    &:before {
+      display: none;
+    }
+
+    + .recorder {
+      margin-top: 4em;
+    }
   }
-}
 
-.button-nav-menu {
-  width: 80px;
-  height: 80px;
-  font-size: 56px;
+  &-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
+    .button-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  &-answer-text {
+    width: 100%;
+    padding: 0;
+    font-size: 28px;
+    font-style: italic;
+  }
 }
 </style>

@@ -182,17 +182,6 @@ export default {
   }
 }
 
-.button-nav-menu {
-  width: 80px;
-  height: 80px;
-  font-size: 64px;
-
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
-}
-
 .question-step {
   margin: 0;
   padding: 0;
