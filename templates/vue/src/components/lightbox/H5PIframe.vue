@@ -173,7 +173,8 @@ export default {
       })
     },
     handleLoad() {
-      this.$emit("is-loaded")
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      this.$emit("is-loaded", h5pObj)
 
       $("iframe").each(function() {
         $(this)
@@ -205,7 +206,6 @@ export default {
       $(window).resize(setIframeDimensions)
       setIframeDimensions()
 
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
 

@@ -105,12 +105,18 @@
               </combobox>
             </b-form-group>
             <video
-              v-if="videoUrlEntered"
+              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p'"
               ref="video"
               controls
               :src="videoSrc"
               style="display:none;"
             ></video>
+            <h5p-iframe
+              v-if="videoUrlEntered && nodeType === 'h5p'"
+              :node="node"
+              style="display: none;"
+              @is-loaded="handleH5Pload"
+            />
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
@@ -384,7 +390,7 @@ import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
 import YoutubeApi from "../services/YoutubeApi"
-import Vue from 'vue'
+import H5PIframe from "./lightbox/H5PIframe"
 
 export default {
   name: "node-modal",
@@ -396,6 +402,7 @@ export default {
     FileUpload,
     SlickItem,
     SlickList,
+    "h5p-iframe": H5PIframe,
   },
   props: {
     node: {
@@ -662,7 +669,7 @@ export default {
     async submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if(this.node.mediaType === 'video' || this.node.mediaType === 'h5p'){
+        if(this.node.mediaType === 'video' && this.nodeType !== 'h5p'){
           const youtubeId = Helpers.getYoutubeID(this.node.typeData.mediaURL)
           if(youtubeId === ''){
             this.setVideoDuration()  // Not a youtube video
@@ -711,7 +718,6 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
-        this.node.mediaDuration = this.$refs.video.duration
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
@@ -760,7 +766,14 @@ export default {
       })
     },
     setVideoDuration(){
-      this.node.mediaDuration = this.$refs.video.duration
+      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
+    },
+    handleH5Pload(event){ // Set media duration if video is loaded
+      if(this.node.mediaType === 'video'){
+        const h5pFrame = event
+        const h5pVideo = h5pFrame.instances[0].video
+        this.node.mediaDuration = h5pVideo.getDuration()
+      }
     }
   },
 }
