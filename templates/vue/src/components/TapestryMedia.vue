@@ -163,6 +163,8 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
+  padding: 0;
+  position: relative;
 }
 .media-wrapper-embed {
   background: white;

@@ -15,10 +15,12 @@
     />
     <youtube 
       :video-id="node.typeData.youtubeID"
-      :player-width="dimensions.width"
-      :player-height="dimensions.height"
-      :player-vars="{start: 0, autoplay: autoplay}"
+      :player-width="dimensions.width - 15"
+      :player-height="dimensions.height - 40"
+      :player-vars="{autoplay: autoplay, modestbranding: 1, rel: 0, iv_load_policy: 3}"
       @ready="ready"
+      @paused="handlePause(player.getCurrentTime())"
+      @ended="handleEnd"
     />
   </div>
 </template>
@@ -26,6 +28,8 @@
 <script>
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
+
+const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
   name: "video-media",
@@ -56,26 +60,21 @@ export default {
       showEndScreen: this.getInitialEndScreenState(),
       showQuizScreen: false,
       videoDimensions: null,
-      currentTime: 0,
       player: null,
     }
   },
-  watch: {
-    node(newNode, oldNode) {
-      this.handlePause(oldNode)
-      this.handleLoad()
-    },
-  },
   beforeDestroy() {
     if (this.player) {
+      const time = this.player.getCurrentTime()
       this.player.stopVideo()
-      this.updateVideoProgress()
+      this.updateVideoProgress(time)
     }
   },
   methods: {
-    ready(event){ 
+    ready(event){  
       this.player = event.target
-      console.log(this.player)
+      const startTime = this.node.typeData.progress[0].value * this.node.mediaDuration
+      this.player.seekTo(startTime, true)
     },
     openQuiz() {
       this.showEndScreen = false
@@ -84,6 +83,13 @@ export default {
     back() {
       this.showEndScreen = true
       this.showQuizScreen = false
+    },
+    rewatch() {
+      this.showEndScreen = false
+      if (this.player) {
+        this.player.seekTo(0, true)
+        this.player.playVideo()
+      }
     },
     close() {
       if (this.player) {
@@ -98,17 +104,20 @@ export default {
         return true
       }
       if (this.player) {
-        const viewedAmount = progress * this.node.mediaDuration
-        return this.$refs.video.duration <= viewedAmount
+        const viewedAmount = progress * this.player.getDuration()
+        return this.player.getDuration() <= viewedAmount
       }
       return false
     },
-    updateVideoProgress() {
+    updateVideoProgress(time) {
       if (this.player) {
-        const amountViewed = video.currentTime / video.duration
+        const currentTime = time || this.player.getCurrentTime()
+        console.log(currentTime)
+        const amountViewed = currentTime / this.player.getDuration()
         this.$emit("timeupdate", amountViewed)
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+          console.log("complete")
           this.$emit("complete")
         }
         if (amountViewed >= 1) {
@@ -116,15 +125,33 @@ export default {
         }
       }
     },
+    handlePause(time){
+      this.updateVideoProgress(time)
+    },
+    handleEnd(){
+      this.updateVideoProgress(this.node.mediaDuration) // Pass update with video duration because video may be a few milliseconds short
+      this.showEndScreen = true
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .video-container {
-  position: relative;
+  position: absolute;
+  left: 15px;
+  top: 15px;
   width: 100%;
   height: 100%;
   max-width: 100vw;
+
+  > div {
+    padding-right: 30px;
+
+    > iframe {
+    margin: 0;
+    padding: 0;
+    }
+  }
 }
 </style>
