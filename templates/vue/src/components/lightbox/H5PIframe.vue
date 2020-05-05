@@ -154,15 +154,63 @@ export default {
       })
     },
     updateSettings(h5pVideo) {
-      const newSettings = {
-        volume: h5pVideo.getVolume(),
-        muted: h5pVideo.isMuted(),
-        caption: h5pVideo.getCaptionsTrack(),
-        quality: h5pVideo.getQuality(),
-        playbackRate: h5pVideo.getPlaybackRate(),
+      let newSettings = {}
+
+      try {
+        newSettings.volume = h5pVideo.getVolume()
+      } catch (Error) {
+        console.error("H5P volume not saved", Error)
       }
+
+      try {
+        newSettings.muted = h5pVideo.isMuted()
+      } catch (Error) {
+        console.error("H5P mute status not saved", Error)
+      }
+
+      try {
+        newSettings.playbackRate = h5pVideo.getPlaybackRate()
+      } catch (Error) {
+        console.error("H5P playback rate not saved", Error)
+      }
+
+      try {
+        newSettings.quality = h5pVideo.getQuality()
+      } catch (Error) {
+        console.error("H5P quality settings not saved", Error)
+      }
+
+      try {
+        newSettings.caption = h5pVideo.getCaptionsTrack()
+      } catch (Error) {
+        console.error("H5P caption selection not saved", Error)
+      }
+
       if (Helpers.isDifferent(newSettings, this.settings)) {
         this.$emit("update-settings", newSettings)
+      }
+    },
+    applySettings(h5pVideo) {
+      const settings = this.settings
+      if (settings.volume !== undefined) {
+        h5pVideo.setVolume(settings.volume)
+      }
+      if (settings.muted !== undefined) {
+        if (settings.muted) {
+          h5pVideo.mute()
+          this.toggleMuteIcon()
+        } else {
+          h5pVideo.unMute()
+        }
+      }
+      if (settings.caption !== undefined) {
+        h5pVideo.setCaptionsTrack(settings.caption)
+      }
+      if (settings.quality !== undefined) {
+        h5pVideo.setQuality(settings.quality)
+      }
+      if (settings.playbackRate !== undefined) {
+        h5pVideo.setPlaybackRate(settings.playbackRate)
       }
     },
     handlePlay(node) {
@@ -233,34 +281,20 @@ export default {
         const h5pVideo = h5pInstance.video
         const h5pIframeComponent = this
 
-        h5pVideo.on("loaded", function() {
-          const videoDuration = h5pVideo.getDuration()
+        const handleH5pAfterLoad = function() {
           h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-          const settings = h5pIframeComponent.settings
           let currentPlayedTime
 
+          const videoDuration = h5pVideo.getDuration()
           h5pVideo.seek(mediaProgress * videoDuration)
-
-          if (settings.volume !== undefined) {
-            h5pVideo.setVolume(settings.volume)
-
-            if (settings.muted) {
-              h5pVideo.mute()
-              this.toggleMuteIcon(h5pObj.$body[0])
-            } else {
-              h5pVideo.unMute()
-            }
-
-            h5pVideo.setCaptionsTrack(settings.caption)
-            h5pVideo.setQuality(settings.quality)
-            h5pVideo.setPlaybackRate(settings.playbackRate)
-          }
 
           const viewedAmount = mediaProgress * videoDuration
           if (viewedAmount === videoDuration) {
             h5pIframeComponent.$emit("show-end-screen")
           }
+
+          h5pIframeComponent.applySettings(h5pVideo)
 
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
@@ -276,7 +310,7 @@ export default {
                     h5pIframeComponent.$emit("timeupdate", amountViewed)
                     thisTapestryTool.updateProgressBars()
 
-                    this.updateSettings(h5pVideo)
+                    h5pIframeComponent.updateSettings(h5pVideo)
 
                     if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
                       h5pIframeComponent.$emit("complete")
@@ -316,10 +350,17 @@ export default {
               )
             }, 1000)
           }
-        })
+        }
+
+        if (h5pVideo.getDuration() !== undefined) {
+          handleH5pAfterLoad()
+        } else {
+          h5pVideo.on("loaded", handleH5pAfterLoad)
+        }
       }
     },
-    toggleMuteIcon(body) {
+    toggleMuteIcon() {
+      const body = this.$refs.h5p.contentWindow.H5P.$body[0]
       const btn = body.querySelector(".h5p-mute")
       btn.classList.toggle("h5p-muted")
     },
