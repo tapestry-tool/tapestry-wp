@@ -30,7 +30,7 @@
             </button>
             <div class="icon-container">
               <tyde-icon
-                v-if="row.node.mediaType === 'gravity-form'"
+                v-if="showActivityIcon(row.node.mediaType)"
                 class="icon icon-activity"
                 icon="activity"
               ></tyde-icon>
@@ -283,6 +283,9 @@ export default {
       }
       this.updateUserFavourites(updatedFavouritesList)
     },
+    showActivityIcon(mediaType) {
+      return mediaType === "gravity-form" || mediaType === "activity"
+    },
   },
 }
 </script>
@@ -414,6 +417,7 @@ button[disabled] {
 
   &-activity {
     width: 52px;
+    margin-right: 10px;
   }
 
   a {
