@@ -85,12 +85,19 @@ export default {
         return this.options
       }
 
-      const options = this.options.filter(option => {
-        return (
-          option[this.itemValue] === this.inputValue ||
-          option[this.itemText].toLowerCase().includes(this.inputValue.toLowerCase())
-        )
-      })
+      const options =
+        this.itemValue && this.itemText
+          ? this.options.filter(option => {
+              return (
+                option[this.itemValue] === this.inputValue ||
+                option[this.itemText]
+                  .toLowerCase()
+                  .includes(this.inputValue.toLowerCase())
+              )
+            })
+          : this.options.filter(text =>
+              text.toLowerCase().includes(this.inputValue.toLowerCase())
+            )
       return options.length
         ? options.length > MAX_OPTIONS_LENGTH
           ? options.slice(0, MAX_OPTIONS_LENGTH)
@@ -120,7 +127,7 @@ export default {
     },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
-      this.inputValue = option[this.itemText]
+      this.inputValue = this.itemText ? option[this.itemText] : option
       this.selected = true
       this.$refs.input.blur()
     },

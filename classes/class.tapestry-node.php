@@ -282,7 +282,7 @@ class TapestryNode implements ITapestryNode
     {
         wp_update_post(array(
             'ID'            => $this->nodePostId,
-            'post_author'   => $this->author->id
+            'post_author'   => $this->author['id']
         ));
     }
 
