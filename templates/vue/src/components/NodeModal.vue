@@ -662,8 +662,14 @@ export default {
     async submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if(this.node.typeData.youtubeID && this.node.typeData.youtubeID !== ''){
-          await this.setYoutubeDuration()
+        if(this.node.mediaType === 'video' || this.node.mediaType === 'h5p'){
+          const youtubeId = Helpers.getYoutubeID(this.node.typeData.mediaURL)
+          if(youtubeId === ''){
+            this.setVideoDuration()  // Not a youtube video
+          } else {
+            this.node.typeData.youtubeID = youtubeId // Is a youtube video
+            await this.setYoutubeDuration()
+          }
         }
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
@@ -701,13 +707,6 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        const youtubeId = Helpers.getYoutubeID(this.node.typeData.mediaURL)
-        if(youtubeId === ''){ // Not a youtube video
-          this.node.mediaDuration = this.$refs.video.duration
-        } else {
-          this.node.typeData.youtubeID = youtubeId
-        }
-        this.node.mediaDuration = this.$refs.video.duration
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
@@ -759,6 +758,9 @@ export default {
       await YoutubeApi.getDuration(this.node.typeData.youtubeID).then(r => {
         this.$set(this.node, "mediaDuration", r)
       })
+    },
+    setVideoDuration(){
+      this.node.mediaDuration = this.$refs.video.duration
     }
   },
 }
