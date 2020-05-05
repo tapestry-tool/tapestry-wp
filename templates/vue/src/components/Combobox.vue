@@ -101,9 +101,7 @@ export default {
   },
   watch: {
     text(newText) {
-      if (this.inputValue.length === 0) {
-        this.inputValue = newText
-      }
+      this.inputValue = newText
     },
   },
   created() {
