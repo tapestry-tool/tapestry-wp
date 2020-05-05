@@ -12,9 +12,11 @@
       ></combobox>
       <combobox
         v-if="isFilterSelected"
-        :options="comboboxValueOptions"
         item-text="name"
         item-value="id"
+        :options="comboboxValueOptions"
+        :value="activeFilterValue"
+        @input="updateFilterValue"
       >
         <template v-slot="slotProps">
           <p>
@@ -55,6 +57,9 @@ export default {
     comboboxFilterOptions() {
       return Object.values(filterOptions)
     },
+    activeFilterValue() {
+      return this.$route.query.q || null
+    },
     comboboxValueOptions() {
       switch (this.activeFilterOption) {
         case filterOptions.AUTHOR: {
@@ -74,6 +79,10 @@ export default {
     },
     updateFilterOption(opt) {
       this.$router.replace({ query: opt ? { by: opt } : {} })
+    },
+    updateFilterValue(val) {
+      const newQuery = val ? { ...this.$route.query, q: val } : this.$route.query
+      this.$router.replace({ query: newQuery })
     },
   },
 }
