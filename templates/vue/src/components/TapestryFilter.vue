@@ -1,5 +1,7 @@
 <template>
-  <button class="filter"><i class="fas fa-search"></i></button>
+  <button class="filter">
+    <i class="fas fa-search"></i>
+  </button>
 </template>
 
 <script>
