@@ -2,19 +2,19 @@
   <div id="app">
     <tapestry />
     <router-view></router-view>
+    <tapestry-filter />
   </div>
 </template>
 
 <script>
 import Tapestry from "./components/Tapestry"
+import TapestryFilter from "./components/TapestryFilter"
 
 export default {
   name: "app",
   components: {
     Tapestry,
-  },
-  data() {
-    return {}
+    TapestryFilter,
   },
 }
 </script>
