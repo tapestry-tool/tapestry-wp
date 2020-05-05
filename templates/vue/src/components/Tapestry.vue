@@ -431,12 +431,20 @@ export default {
           newNodeEntry.typeData.linkMetadata = data
 
           if (data) {
-            if (newNodeEntry.imageURL && 
-                confirm("Would you like to use the link preview image as the thumbnail image?")) {
+            if (
+              newNodeEntry.imageURL &&
+              confirm(
+                "Would you like to use the link preview image as the thumbnail image?"
+              )
+            ) {
               newNodeEntry.imageURL = data.image
             }
-            if (newNodeEntry.lockedImageURL && 
-                confirm("Would you like to use the link preview image as the locked thumbnail image?")) {
+            if (
+              newNodeEntry.lockedImageURL &&
+              confirm(
+                "Would you like to use the link preview image as the locked thumbnail image?"
+              )
+            ) {
               newNodeEntry.lockedImageURL = data.image
             }
           }

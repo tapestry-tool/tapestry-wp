@@ -2,19 +2,19 @@
   <div id="app">
     <tyde />
     <router-view></router-view>
+    <tapestry-filter />
   </div>
 </template>
 
 <script>
 import Tyde from "./components/Tyde"
+import TapestryFilter from "./components/TapestryFilter"
 
 export default {
   name: "app",
   components: {
     Tyde,
-  },
-  data() {
-    return {}
+    TapestryFilter,
   },
 }
 </script>

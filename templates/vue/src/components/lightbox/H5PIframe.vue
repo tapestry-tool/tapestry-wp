@@ -9,9 +9,7 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
