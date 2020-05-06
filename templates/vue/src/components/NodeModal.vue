@@ -270,7 +270,7 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Access">
+        <b-tab title="Access" v-if="viewAccess">
           <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
@@ -289,7 +289,7 @@
                   :value="value"
                 >
                   <b-th>{{ rowName }}</b-th>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="read"
@@ -298,7 +298,7 @@
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="add"
@@ -307,7 +307,7 @@
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td>
+                  <b-td class="text-center">
                     <b-form-checkbox
                       v-model="node.permissions[rowName]"
                       value="edit"
@@ -466,7 +466,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode", "settings"]),
     hasSubAccordion() {
       const parents = this.getDirectParents(this.node.id)
       if (parents && parents[0]) {
@@ -545,6 +545,11 @@ export default {
       })
       return ordered
     },
+    viewAccess(){
+      return this.settings.showAccess === undefined ? 
+        true : this.settings.showAccess ?
+        true : wpData.wpCanEditTapestry !== ""
+    }
   },
   watch: {
     nodeImageUrl() {

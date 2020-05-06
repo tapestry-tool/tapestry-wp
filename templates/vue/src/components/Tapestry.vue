@@ -81,7 +81,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents", "settings"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -167,7 +167,7 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
-        permissions: {
+        permissions: this.settings.defaultPermissions ? this.settings.defaultPermissions : {
           public: ["read"],
           authenticated: ["read"],
         },
