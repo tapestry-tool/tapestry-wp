@@ -1975,7 +1975,8 @@ function tapestryTool(config){
     }
 
     function goToNode(nodeId) {
-        location.href += `nodes/${nodeId}`
+        const base = location.origin + location.pathname + `#\/`;
+        location.href = base + `nodes/${nodeId}`
         recordAnalyticsEvent('user', 'open', 'lightbox', nodeId);
     }
 
