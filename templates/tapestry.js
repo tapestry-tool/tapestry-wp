@@ -669,7 +669,7 @@ function tapestryTool(config){
         // unnecessary rerenders when opening lightboxes.
         if (isFilterActive(to) || isFilterActive(from)) {
             const route = window.location.href.split(`#\/`)[1]
-            let newVisibleNodes = tapestry.dataset.nodes.filter(n => visibleNodes.has(n.id))
+            let newVisibleNodes = tapestry.dataset.nodes
             if (route.startsWith("filter")) {
                 const query = new URLSearchParams(route.split("filter")[1])
                 const attr = query.get("by")
@@ -692,8 +692,10 @@ function tapestryTool(config){
     }
 
     function isFilterActive(url = window.location.href) {
-        const route = url.split(`#\/`)[1]
-        return route.startsWith("filter")
+        if (url.includes("#")) {
+            url = url.split(`#\/`)[1]
+        }
+        return url.includes("filter")
     }
     
     /****************************************************
@@ -1007,7 +1009,9 @@ function tapestryTool(config){
             .style("display", "block")
             .transition()
             .duration(TRANSITION_DURATION)
-            .style("opacity", "1");
+            .style("opacity", d => 
+                visibleNodes.has(d.source.id) && visibleNodes.has(d.target.id) ? "1" : "0.2"
+            );
     
         // Hide Links
     
@@ -1019,10 +1023,6 @@ function tapestryTool(config){
             .transition()
             .duration(TRANSITION_DURATION/2)
             .style("opacity", "0");
-        
-        setTimeout(function(){
-            linksToHide.style("display", "none");
-        }, TRANSITION_DURATION/2);
     
         // Show Nodes
     
@@ -1031,10 +1031,9 @@ function tapestryTool(config){
         });
     
         nodesToShow
-            .style("display", "block")
             .transition()
             .duration(TRANSITION_DURATION/2)
-            .style("opacity", "1");
+            .style("opacity", d => visibleNodes.has(d.id) ? "1" : "0.4");
         
         // Hide Nodes
     
@@ -1046,10 +1045,6 @@ function tapestryTool(config){
             .transition()
             .duration(TRANSITION_DURATION)
             .style("opacity", "0");
-    
-        setTimeout(function(){
-            nodesToHide.style("display", "none");
-        }, TRANSITION_DURATION);
         
         if (freshBuild) {
             buildNodeContents();
@@ -1537,7 +1532,7 @@ function tapestryTool(config){
     function rebuildNodeContents() {
         /* Remove text before transition animation */
         $(".meta").remove();
-    
+
         /* Commence transition animation */
         nodes.selectAll(".imageOverlay")
                 .transition()
@@ -2638,12 +2633,6 @@ function tapestryTool(config){
     
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
-        if (!visibleNodes.has(node.id)) return false;
-
-        if (isFilterActive() && visibleNodes.has(node.id)) {
-            return true;
-        }
-
         // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
 
