@@ -270,7 +270,7 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Access" v-if="viewAccess">
+        <b-tab v-if="viewAccess" title="Access">
           <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
@@ -545,11 +545,13 @@ export default {
       })
       return ordered
     },
-    viewAccess(){
-      return this.settings.showAccess === undefined ? 
-        true : this.settings.showAccess ?
-        true : wpData.wpCanEditTapestry !== ""
-    }
+    viewAccess() {
+      return this.settings.showAccess === undefined
+        ? true
+        : this.settings.showAccess
+        ? true
+        : wpData.wpCanEditTapestry !== ""
+    },
   },
   watch: {
     nodeImageUrl() {

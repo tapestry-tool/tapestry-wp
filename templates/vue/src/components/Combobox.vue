@@ -1,8 +1,10 @@
 <template>
-  <b-form-group>
+  <div>
     <b-form-input
       ref="input"
       v-model="inputValue"
+      :size="size"
+      :style="inputStyle"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
@@ -22,7 +24,7 @@
         <p>{{ emptyMessage }}</p>
       </div>
     </div>
-  </b-form-group>
+  </div>
 </template>
 
 <script>
@@ -54,6 +56,16 @@ export default {
       type: String,
       required: false,
       default: "Please add at least one option.",
+    },
+    size: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    inputStyle: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
   data() {

@@ -130,6 +130,8 @@
 <script>
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
+import Helpers from "@/utils/Helpers"
+
 export default {
   name: "settings-modal",
   components: {
