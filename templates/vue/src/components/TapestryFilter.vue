@@ -19,7 +19,6 @@
         </template>
       </combobox>
       <combobox
-        v-if="isFilterSelected"
         class="filter-combobox"
         item-text="name"
         item-value="id"
