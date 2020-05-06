@@ -90,7 +90,7 @@ body {
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
 		position: absolute;
-		margin-top: -60px;
+		margin-top: -50px;
 		right: 0;
 	}
 }
