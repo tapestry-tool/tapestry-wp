@@ -9,7 +9,13 @@
         :options="comboboxFilterOptions"
         :value="activeFilterOption"
         @input="updateFilterOption"
-      ></combobox>
+      >
+        <template v-slot="slotProps">
+          <p class="filter-value">
+            {{ slotProps.option }}
+          </p>
+        </template>
+      </combobox>
       <combobox
         v-if="isFilterSelected"
         item-text="name"
@@ -19,7 +25,7 @@
         @input="updateFilterValue"
       >
         <template v-slot="slotProps">
-          <p>
+          <p class="filter-value">
             <code>{{ slotProps.option.id }}</code>
             {{ slotProps.option.name }}
           </p>
@@ -66,7 +72,7 @@ export default {
           const authors = new Map(
             this.nodes.map(node => [node.author.id, node.author])
           )
-          return Array.from(authors.values())
+          return [...authors.values()]
         }
         default:
           return []
@@ -80,10 +86,15 @@ export default {
         : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
     },
     updateFilterOption(opt) {
-      this.$router.replace({ query: opt ? { by: opt } : {} })
+      this.$router.replace({
+        query: { by: opt !== null ? opt : this.comboboxFilterOptions[0] },
+      })
     },
     updateFilterValue(val) {
-      const newQuery = val ? { ...this.$route.query, q: val } : this.$route.query
+      const newQuery =
+        val !== null
+          ? { ...this.$route.query, q: val }
+          : { by: this.$route.query.by }
       this.$router.replace({ query: newQuery })
     },
   },
