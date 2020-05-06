@@ -418,3 +418,7 @@ rect.selectable {
 .node-selected rect.selectable {
     fill-opacity: 0.7;
 }
+
+.node.unfiltered {
+    opacity: 0.7;
+}
