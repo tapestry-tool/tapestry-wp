@@ -21,21 +21,16 @@ class TapestryNodePermissions
         }
 
         $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
-        try {
-            $defaultPermissions = $tapestry->settings->defaultPermissions;
-            if($defaultPermissions == null){
-                return (object) [
-                    'public'        => ['read'],
-                    'authenticated'    => ['read']
-                ];
-            }
-            return $defaultPermissions;
-        } catch (\Throwable $th) {
+        $defaultPermissions = (isset($tapestry->settings->defaultPermissions) ? $tapestry->settings->defaultPermissions : false);
+
+        if(!$defaultPermissions){
             return (object) [
                 'public'        => ['read'],
                 'authenticated'    => ['read']
             ];
         }
+
+        return $defaultPermissions;
     }
 
     /**
