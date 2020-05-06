@@ -3,11 +3,13 @@
     <button @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
-    <div v-if="isActive">
-      <p>Filter by:</p>
+    <div :class="['input-container', { 'input-container-show': isActive }]">
       <combobox
+        class="filter-combobox"
         :options="comboboxFilterOptions"
         :value="activeFilterOption"
+        :input-style="inputStyles"
+        size="sm"
         @input="updateFilterOption"
       >
         <template v-slot="slotProps">
@@ -18,10 +20,13 @@
       </combobox>
       <combobox
         v-if="isFilterSelected"
+        class="filter-combobox"
         item-text="name"
         item-value="id"
         :options="comboboxValueOptions"
         :value="activeFilterValue"
+        :input-style="inputStyles"
+        size="sm"
         @input="updateFilterValue"
       >
         <template v-slot="slotProps">
@@ -50,6 +55,12 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    inputStyles() {
+      return {
+        borderRadius: "4px",
+        width: "60%",
+      }
+    },
     isActive() {
       return this.$route.path.includes("filter")
     },
@@ -111,8 +122,48 @@ export default {
 
 <style lang="scss" scoped>
 .filter {
+  display: flex;
   position: absolute;
-  top: -60px;
+  top: -50px;
   left: 10vw;
+  height: 32px;
+
+  button {
+    color: #999;
+    padding: 0;
+    margin-right: 12px;
+    background: #fbfbfb;
+    box-shadow: 0 0 7px 0 #ddd;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 0.8em;
+    transform: translateY(-4px);
+
+    &:hover {
+      color: #11a6d8;
+    }
+  }
+
+  .filter-combobox {
+    margin-right: 8px;
+    &:last-child {
+      transform: translateX(-40%);
+    }
+  }
+}
+
+.input-container {
+  display: flex;
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: all 0.4s ease-in;
+  pointer-events: none;
+
+  &-show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
 }
 </style>
