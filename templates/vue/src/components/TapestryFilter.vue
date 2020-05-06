@@ -80,8 +80,8 @@ export default {
     },
   },
   watch: {
-    $route() {
-      thisTapestryTool.updateVisibleNodes()
+    $route(to, from) {
+      thisTapestryTool.updateVisibleNodes(to, from)
     },
   },
   methods: {

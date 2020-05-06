@@ -664,38 +664,36 @@ function tapestryTool(config){
         AUTHOR: "author"
     }
 
-    this.updateVisibleNodes = () => {
-        const route = window.location.href.split(`#\/`)[1]
-        if (route.startsWith("filter")) {
-            const query = new URLSearchParams(route.split("filter")[1])
-            const attr = query.get("by")
-            const val = query.get("q")
-            if (attr && val) {
-                let newVisibleNodes = tapestry.dataset.nodes.filter(n => visibleNodes.has(n.id))
-                switch (attr) {
-                    case filterOptions.AUTHOR:
-                        newVisibleNodes = 
-                            tapestry.dataset.nodes.filter(n => n.author.id == val)
-                                .concat(tapestry.dataset.nodes.filter(n => n.author.id == wpUserId))
-                        break
-                    default:
-                        break
-                }
-                
-                // Only rerender the tapestry if the visible nodes changes
-                if (didVisibleNodesChange(newVisibleNodes)) {
-                    visibleNodes = new Set(newVisibleNodes.map(n => n.id))
-                    filterTapestry()
+    this.updateVisibleNodes = (to, from) => {
+        // Only update if we're moving from or to a filter route. This prevents
+        // unnecessary rerenders when opening lightboxes.
+        if (isFilterActive(to) || isFilterActive(from)) {
+            const route = window.location.href.split(`#\/`)[1]
+            let newVisibleNodes = tapestry.dataset.nodes.filter(n => visibleNodes.has(n.id))
+            if (route.startsWith("filter")) {
+                const query = new URLSearchParams(route.split("filter")[1])
+                const attr = query.get("by")
+                const val = query.get("q")
+                if (attr && val) {
+                    switch (attr) {
+                        case filterOptions.AUTHOR:
+                            newVisibleNodes = 
+                                tapestry.dataset.nodes.filter(n => n.author.id == val)
+                                    .concat(tapestry.dataset.nodes.filter(n => n.author.id == wpUserId))
+                            break
+                        default:
+                            break
+                    }
                 }
             }
-        }
+            visibleNodes = new Set(newVisibleNodes.map(n => n.id))
+            resizeNodes(root)
+        }   
     }
 
-    function didVisibleNodesChange(newNodes) {
-        if (newNodes.length !== visibleNodes.size) {
-            return true
-        }
-        return newNodes.some(n => !visibleNodes.has(n.id))
+    function isFilterActive(url = window.location.href) {
+        const route = url.split(`#\/`)[1]
+        return route.startsWith("filter")
     }
     
     /****************************************************
@@ -2513,18 +2511,25 @@ function tapestryTool(config){
         for (var i in tapestry.dataset.nodes) {
             var node = tapestry.dataset.nodes[i];
             var id = node.id;
-    
-            //NOTE: If there are any nodes are that fit two roles (ie: selected and the grandchild),
-            //      should default to being the more senior role
+
             if (id === root) {
                 node.nodeType = "root";
-            } else if (!tapestryDepth || children.indexOf(id) > -1) {
-                node.nodeType = "child";
-            } else if (grandchildren.indexOf(id) > -1) {
-                node.nodeType = "grandchild";
             } else {
-                node.nodeType = "";
+                //NOTE: If there are any nodes are that fit two roles (ie: selected and the grandchild),
+                //      should default to being the more senior role
+                // If a node is in the visible nodes list and a filter is active, 
+                // always set it as a child
+                if (isFilterActive() && visibleNodes.has(id)) {
+                    node.nodeType = "child";
+                } else if (!tapestryDepth || children.indexOf(id) > -1) {
+                    node.nodeType = "child";
+                } else if (grandchildren.indexOf(id) > -1) {
+                    node.nodeType = "grandchild";
+                } else {
+                    node.nodeType = "";
+                }
             }
+            
         }
     }
     
@@ -2634,6 +2639,11 @@ function tapestryTool(config){
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
         if (!visibleNodes.has(node.id)) return false;
+
+        if (isFilterActive() && visibleNodes.has(node.id)) {
+            return true;
+        }
+
         // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
 
