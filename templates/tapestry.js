@@ -55,8 +55,9 @@ function tapestryTool(config){
         isMultiSelect = false,                                  // a flag determining whether the cmd, shift, or ctrl keys are pressed
         movementsEnabled = true,                                // enables/disables node movements by author or d3 itself
         renderImagesForEditors = true,                      // when authoring large tapestries, set this to false to improve performance
-        hardCodedDimensions = false;                            // if a tapestry has been finalized, adding this will improve performance
+        hardCodedDimensions = false,                            // if a tapestry has been finalized, adding this will improve performance
                                                                 // (console log getTapestryDimensions() with max depth to get this value)
+        visibleNodes = new Set();                               // set of ids containing all the visible nodes 
 
     var // calculated
         MAX_RADIUS = NORMAL_RADIUS + ROOT_RADIUS_DIFF + 30,     // 30 is to count for the icon
@@ -262,6 +263,8 @@ function tapestryTool(config){
 
             return updatedNode
         });
+
+        visibleNodes = new Set(this.dataset.nodes.map(n => n.id))
 
         this.updateAccordionProgress();
 
@@ -652,6 +655,44 @@ function tapestryTool(config){
         }
     
          return visited.includes(targetNode);
+    }
+
+    const filterOptions = {
+        AUTHOR: "author"
+    }
+
+    this.updateVisibleNodes = () => {
+        const route = window.location.href.split(`#\/`)[1]
+        if (route.startsWith("filter")) {
+            const query = new URLSearchParams(route.split("filter")[1])
+            const attr = query.get("by")
+            const val = query.get("q")
+            if (attr && val) {
+                let newVisibleNodes = tapestry.dataset.nodes.filter(n => visibleNodes.has(n.id))
+                switch (attr) {
+                    case filterOptions.AUTHOR:
+                        newVisibleNodes = 
+                            tapestry.dataset.nodes.filter(n => n.author.id == val)
+                                .concat(tapestry.dataset.nodes.filter(n => n.author.id == wpUserId))
+                        break
+                    default:
+                        break
+                }
+                
+                // Only rerender the tapestry if the visible nodes changes
+                if (didVisibleNodesChange(newVisibleNodes)) {
+                    visibleNodes = new Set(newVisibleNodes.map(n => n.id))
+                    filterTapestry()
+                }
+            }
+        }
+    }
+
+    function didVisibleNodesChange(newNodes) {
+        if (newNodes.length !== visibleNodes.size) {
+            return true
+        }
+        return newNodes.some(n => !visibleNodes.has(n.id))
     }
     
     /****************************************************
@@ -2354,7 +2395,7 @@ function tapestryTool(config){
     
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
-
+        if (!visibleNodes.has(node.id)) return false;
         // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
         if (node.nodeType === "") return false;
 

@@ -79,6 +79,11 @@ export default {
       }
     },
   },
+  watch: {
+    $route() {
+      thisTapestryTool.updateVisibleNodes()
+    },
+  },
   methods: {
     toggleFilter() {
       this.isActive
