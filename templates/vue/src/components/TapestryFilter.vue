@@ -75,7 +75,9 @@ export default {
   },
   methods: {
     toggleFilter() {
-      this.isActive ? this.$router.go(-1) : this.$router.push("/filter")
+      this.isActive
+        ? this.$router.go(-1)
+        : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
     },
     updateFilterOption(opt) {
       this.$router.replace({ query: opt ? { by: opt } : {} })
