@@ -21,16 +21,18 @@
       :node="node"
       :width="width"
       :height="height"
-      :settings="settings"
+      :settings="h5pSettings"
       @complete="$emit('complete')"
       @is-loaded="isLoading = false"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
+      @update-settings="updateH5pSettings"
     />
   </div>
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
@@ -48,10 +50,6 @@ export default {
   },
   props: {
     node: {
-      type: Object,
-      required: true,
-    },
-    settings: {
       type: Object,
       required: true,
     },
@@ -82,7 +80,11 @@ export default {
       showPlayScreen: !this.autoplay,
     }
   },
+  computed: {
+    ...mapState(["h5pSettings"]),
+  },
   methods: {
+    ...mapActions(["updateH5pSettings"]),
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true
