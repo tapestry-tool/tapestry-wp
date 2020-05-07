@@ -127,16 +127,18 @@ export default {
     },
     handlePlay(node) {
       const { id, mediaType } = node
+      const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
+        time: progressVal * node.mediaDuration,
       })
     },
     handlePause(node) {
       const { id, mediaType } = node
+      const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
+        time: progressVal * node.mediaDuration,
       })
     },
     handleLoad() {
@@ -187,7 +189,7 @@ export default {
         return
       }
 
-      const mediaProgress = this.node.typeData.progress[0].value
+      const mediaProgress = this.node.typeData.progress ? this.node.typeData.progress[0].value : 0
 
       if (h5pLibraryName === "H5P.InteractiveVideo") {
         const h5pVideo = h5pInstance.video
