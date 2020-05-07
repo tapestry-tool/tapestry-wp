@@ -54,8 +54,8 @@
                   :key="rowName"
                   :value="value"
                 >
-                  <b-th>{{ rowName }}</b-th>
-                  <b-td class="text-center">
+                  <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="read"
@@ -64,7 +64,7 @@
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td class="text-center">
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="add"
@@ -73,7 +73,7 @@
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td class="text-center">
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="edit"
@@ -102,10 +102,12 @@
           </div>
           <b-form-group
             label="Show Access Tab"
-            description="When enabled, users will be able to view the Access tab inside the node window. Disable this option to hide the Access tab from users except you."
+            description="When shown, users will see the Access tab when adding or editing a node
+              and can change the permissions for each node that they add. Hiding the Access tab 
+              will hide it from all users except you, editors of this tapestry, and admins."
           >
             <b-form-checkbox v-model="showAccess" switch>
-              {{ showAccess ? "Enabled" : "Disabled" }}
+              {{ showAccess ? "Show" : "Hide" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
