@@ -147,4 +147,8 @@ export default class {
     }
     return false
   }
+
+  static getPermissionRowIndex(rowName, permissionOrder) {
+    return permissionOrder.findIndex(thisRow => thisRow === rowName)
+  }
 }

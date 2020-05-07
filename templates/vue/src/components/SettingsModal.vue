@@ -219,6 +219,15 @@ export default {
       required: false,
       default: false,
     },
+    permissionsOrder: {
+      type: Array,
+      required: true,
+    },
+    initialDefault: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -227,19 +236,9 @@ export default {
       nodeDraggable: true,
       spaceshipBackgroundUrl: "",
       profileActivities: [],
-      defaultPermissions: {
-        public: ["read"],
-        authenticated: ["read"],
-      },
-      permissionsOrder: [
-        "public",
-        "authenticated",
-        ...Object.keys(wpData.roles).filter(
-          role => role !== "administrator" && role !== "author"
-        ),
-      ],
       userId: "",
       showAccess: true,
+      defaultPermissions: this.initialDefault,
     }
   },
   computed: {
@@ -291,10 +290,7 @@ export default {
         nodeDraggable = true,
         spaceshipBackgroundUrl = "",
         profileActivities = [],
-        defaultPermissions = {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        defaultPermissions = this.defaultPermissions,
         showAccess = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -325,21 +321,18 @@ export default {
       if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.changeIndividualPermission(value, rowName, type)
       }
-      const rowIndex = this.getPermissionRowIndex(rowName)
+      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
       const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
       lowerPriorityPermissions.forEach(newRow => {
         this.changeIndividualPermission(value, newRow, type)
       })
-    },
-    getPermissionRowIndex(rowName) {
-      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
     },
     isPermissionDisabled(rowName, type) {
       if (rowName == "public") {
         return false
       }
       // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
+      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
       const higherRow = this.permissionsOrder[rowIndex - 1]
       if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
