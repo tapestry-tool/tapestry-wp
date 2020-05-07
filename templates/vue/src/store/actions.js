@@ -8,7 +8,7 @@ export async function updateSettings({ commit }, newSettings) {
 }
 
 export async function updateH5pSettings({ commit }, newSettings) {
-  await client.updateH5pSettings(JSON.stringify(newSettings))
+  await client.updateH5pSettings(newSettings)
   commit("updateH5pSettings", newSettings)
 }
 
