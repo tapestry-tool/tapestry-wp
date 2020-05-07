@@ -4,11 +4,13 @@
     <div v-if="type === 'text'" class="text">{{ entry }}</div>
     <ul v-if="type === 'checklist'" class="checklist">
       <li v-for="(choice, index) in entry" :key="index">
-        <img :src="choice.imageUrl" />
+        <div class="img-wrapper">
+          <img :src="choice.imageUrl" />
+        </div>
         {{ choice.choiceText }}
       </li>
     </ul>
-    <audio v-if="type === 'audio'" controls :src="src"></audio>
+    <audio v-if="type === 'audio'" controls :src="entry"></audio>
   </div>
 </template>
 
@@ -29,11 +31,6 @@ export default {
     entry: {
       type: [String, Array],
       required: true,
-    },
-    src: {
-      type: String,
-      required: false,
-      default: null,
     },
   },
 }
@@ -68,20 +65,27 @@ export default {
 
   .checklist {
     list-style: none;
+    display: flex;
+    flex-wrap: wrap;
 
     li {
-      float: left;
+      display: flex;
+      flex: 0 0 33%;
       text-align: left;
       margin-bottom: 0.5em;
+
+      &:nth-last-child(-n + 2):first-child,
+      &:nth-last-child(-n + 2):first-child ~ li {
+        flex-grow: 1;
+      }
 
       &:last-child {
         margin-bottom: 0;
       }
 
-      > img {
+      > .img-wrapper {
         width: 20%;
-        height: auto;
-        float: left;
+        min-width: 40px;
         margin-right: 10px;
       }
     }
