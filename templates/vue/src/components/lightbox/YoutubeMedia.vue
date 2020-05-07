@@ -28,6 +28,8 @@
 <script>
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
+import { mapState, mapActions } from 'vuex'
+import Helpers from '../../utils/Helpers'
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -68,13 +70,19 @@ export default {
       const time = this.player.getCurrentTime()
       this.player.stopVideo()
       this.updateVideoProgress(time)
+      this.updateSettings()
     }
   },
+  computed: {
+    ...mapState(["h5pSettings"]),
+  },
   methods: {
+    ...mapActions(["updateH5pSettings"]),
     ready(event){  
       this.player = event.target
       const startTime = this.node.typeData.progress[0].value * this.node.mediaDuration
       this.player.seekTo(startTime, true)
+      this.applySettings()
     },
     openQuiz() {
       this.showEndScreen = false
@@ -95,6 +103,7 @@ export default {
       if (this.player) {
         this.player.stopVideo()
         this.updateVideoProgress()
+        this.updateSettings()
       }
       this.$emit("close")
     },
@@ -112,12 +121,10 @@ export default {
     updateVideoProgress(time) {
       if (this.player) {
         const currentTime = time || this.player.getCurrentTime()
-        console.log(currentTime)
         const amountViewed = currentTime / this.player.getDuration()
         this.$emit("timeupdate", amountViewed)
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-          console.log("complete")
           this.$emit("complete")
         }
         if (amountViewed >= 1) {
@@ -127,10 +134,27 @@ export default {
     },
     handlePause(time){
       this.updateVideoProgress(time)
+      this.updateSettings()
     },
     handleEnd(){
       this.updateVideoProgress(this.node.mediaDuration) // Pass update with video duration because video may be a few milliseconds short
+      this.updateSettings()
       this.showEndScreen = true
+    },
+    applySettings(){
+      if(!this.h5pSettings || Object.keys(this.h5pSettings).length === 0) return;
+      this.h5pSettings.muted ? this.player.mute() : this.player.unMute()
+      this.h5pSettings.volume ? this.player.setVolume(this.h5pSettings.volume) : false
+      this.h5pSettings.playbackRate ? this.player.setPlaybackRate(this.h5pSettings.playbackRate) : false
+    },
+    updateSettings(){
+      var newSettings = { ...this.h5pSettings }
+      newSettings.muted = this.player.isMuted()
+      newSettings.volume = this.player.getVolume()
+      newSettings.playbackRate = this.player.getPlaybackRate()
+      if(Helpers.isDifferent(this.h5pSettings, newSettings)){
+        this.updateH5pSettings(newSettings)
+      }
     }
   },
 }
