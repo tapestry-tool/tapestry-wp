@@ -84,7 +84,7 @@
                 id="node-video-media-url"
                 v-model="videoSrc"
                 data-testid="node-videoUrl"
-                placeholder="Enter URL for MP4 Video"
+                placeholder="Enter URL for MP4 or Youtube Video"
                 required
               />
             </b-form-group>
