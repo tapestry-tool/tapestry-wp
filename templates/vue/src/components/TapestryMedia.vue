@@ -44,9 +44,7 @@
       :node="node"
       :width="dimensions.width"
       :height="dimensions.height"
-      :settings="h5pSettings"
       @load="handleLoad"
-      @update-settings="updateH5pSettings"
       @timeupdate="updateProgress"
       @complete="complete"
       @close="$emit('close')"
@@ -60,13 +58,13 @@
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
-      @complete="completeNode(nodeId)"
+      @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
     />
@@ -107,11 +105,6 @@ export default {
     dimensions: {
       type: Object,
       required: true,
-    },
-    h5pSettings: {
-      type: Object,
-      required: false,
-      default: () => ({}),
     },
     autoplay: {
       type: Boolean,

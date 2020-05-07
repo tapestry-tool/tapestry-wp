@@ -158,12 +158,12 @@ function tapestryTool(config){
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        setDatasetProgress(JSON.parse(retrievedUserProgress));
+                        setDatasetProgress(retrievedUserProgress);
                     }
 
-                    jQuery.get(TAPESTRY_H5P_SETTINGS_URL, { "post_id": config.wpPostId }, function(retrievedH5PSettings) {
+                    jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
                         if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
-                            h5pVideoSettings = JSON.parse(retrievedH5PSettings);
+                            h5pVideoSettings = retrievedH5PSettings;
                         }
                     }).fail(function(e) {
                         console.error("Error with retrieving h5p video settings");

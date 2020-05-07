@@ -14,6 +14,7 @@
     "test": "cypress run"
   },
   "dependencies": {
+    "audio-recorder-polyfill": "^0.3.4",
     "axios": "^0.19.0",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",

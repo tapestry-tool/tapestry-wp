@@ -83,4 +83,32 @@ export default class {
     const matchArray = url.match(linkRegex) 
     return matchArray === null ? '' : matchArray[1] // Returns '' if link is not youtube URL
   }
+  
+  /**
+   * Shallowly checks if two objects are different from one another
+   * @param {Object} src
+   * @param {Object} other
+   */
+  static isDifferent(src, other) {
+    const srcKeys = Object.keys(src)
+    const otherKeys = Object.keys(other)
+
+    // Check 1: If one object has more keys than the other
+    if (srcKeys.length !== otherKeys.length) {
+      return true
+    }
+
+    // Check 2: If they have the same keys
+    if (!srcKeys.every(key => otherKeys.includes(key))) {
+      return true
+    }
+
+    // Check 3: If the key values are equal
+    for (const key of Object.keys(src)) {
+      if (src[key] !== other[key]) {
+        return true
+      }
+    }
+    return false
+  }
 }
