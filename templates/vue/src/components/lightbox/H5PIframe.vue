@@ -4,7 +4,6 @@
     ref="h5p"
     frameborder="0"
     :src="node.typeData.mediaURL"
-    :width="width"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -31,26 +30,10 @@ export default {
       required: false,
       default: () => ({}),
     },
-    width: {
-      type: Number,
-      required: false,
-    },
     autoplay: {
       type: Boolean,
       required: false,
       default: true,
-    },
-  },
-  data() {
-    return {
-      recordedNodeIds: [],
-      loadedH5PRecorderId: 0,
-      TapestryAPI: new TapestryApi(wpPostId),
-    }
-  },
-  computed: {
-    userLoggedIn: function() {
-      return wpApiSettings && wpApiSettings.userLoggedIn === "true"
     },
   },
   watch: {
@@ -58,22 +41,10 @@ export default {
       this.handlePause(oldNode)
     },
   },
-  async mounted() {
-    this.recordedNodeIds = await this.TapestryAPI.getRecordedNodeIds()
-
-    // Listen to event dispatched by H5P Audio Recorder lib
-    window.addEventListener("tapestry-h5p-audio-recorder", this.saveH5PAudioToServer)
-  },
   beforeDestroy() {
     this.handlePause(this.node)
-    // Detach listener to event dispatched by H5P Audio Recorder lib
-    window.removeEventListener(
-      "tapestry-h5p-audio-recorder",
-      this.saveH5PAudioToServer
-    )
   },
   methods: {
-    ...mapActions(["completeQuestion"]),
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -93,65 +64,6 @@ export default {
       if (h5pVideo) {
         h5pVideo.pause()
       }
-    },
-    async h5pRecorderSaverIsLoaded() {
-      if (
-        this.loadedH5PRecorderId &&
-        this.node.id &&
-        this.recordedNodeIds.includes(this.node.id)
-      ) {
-        await this.loadH5PAudio(this.node.id, this.loadedH5PRecorderId)
-      }
-    },
-    async loadH5PAudio(nodeMetaId, loadedH5PRecorderId) {
-      try {
-        const h5pAudioRecorder = document.getElementById("h5p")
-        const audio = await this.TapestryAPI.getH5PAudioFromServer(
-          nodeMetaId,
-          loadedH5PRecorderId
-        )
-        if (audio && h5pAudioRecorder) {
-          dispatchEvent(
-            new CustomEvent("tapestry-get-h5p-audio", {
-              detail: { audio },
-            })
-          )
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    async saveH5PAudioToServer(event) {
-      const encodedH5PAudio = event.detail.base64data.replace(
-        /^data:audio\/[a-z]+;base64,/,
-        ""
-      )
-      if (encodedH5PAudio && this.userLoggedIn && this.loadedH5PRecorderId) {
-        try {
-          const audio = {
-            blob: encodedH5PAudio,
-            h5pId: this.loadedH5PRecorderId,
-          }
-          await this.TapestryAPI.uploadAudioToServer(this.node.id, audio)
-          this.setQuestionCompleted()
-          this.$emit("submit")
-          this.recordedNodeIds.push(this.node.id)
-        } catch (e) {
-          console.error(e)
-        }
-      }
-    },
-    setQuestionCompleted() {
-      this.node.quiz.forEach(async q => {
-        if (q.answers && q.answers.audioId == this.loadedH5PRecorderId) {
-          await this.completeQuestion({
-            nodeId: this.node.id,
-            questionId: q.id,
-            answerType: "audioId",
-            audioId: this.loadedH5PRecorderId,
-          })
-        }
-      })
     },
     updateSettings(h5pVideo) {
       let newSettings = {}

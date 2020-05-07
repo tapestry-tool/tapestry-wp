@@ -236,7 +236,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $progress->entries = $this->getUserEntries();
 
-        return json_encode($progress);
+        return $progress;
     }
 
     private function _getQuizProgress($nodeId, $nodeMetadata)
@@ -255,9 +255,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id);
                             if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $gfOrH5pId;
+                                $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
                         } else if (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
@@ -299,7 +299,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
         if ($favourites) {
-            return $favourites;
+            return json_decode($favourites);
         }
         return [];
     }

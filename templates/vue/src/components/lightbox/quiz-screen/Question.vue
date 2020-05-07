@@ -1,22 +1,12 @@
 <template>
   <div
     class="question"
-    :class="{ 'question-h5p': recorderOpened, 'question-gf': formOpened }"
+    :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button class="button-nav button-nav-menu" @click="back">
+    <button class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
-    <gravity-form
-      v-if="formOpened"
-      :id="formId"
-      @submit="handleFormSubmit"
-    ></gravity-form>
-    <h5p-iframe
-      v-else-if="recorderOpened"
-      :media-u-r-l="h5pRecorderUrl"
-      @submit="$emit('submit')"
-    />
     <div v-else>
       <div v-if="question.isFollowUp" class="follow-up">
         <div v-if="answers.length" class="answer-container mx-auto mb-3">
@@ -26,7 +16,6 @@
             :key="answer.type"
             :type="answer.type"
             :entry="answer.entry"
-            :src="answer.src"
           ></tapestry-activity>
         </div>
         <div v-else>
@@ -36,7 +25,18 @@
       <h1 class="question-title">
         {{ question.text }}
       </h1>
-      <div v-if="options.length > 1" class="question-content">
+      <gravity-form
+        v-if="formOpened"
+        :id="formId"
+        class="answer"
+        @submit="handleFormSubmit"
+      ></gravity-form>
+      <audio-recorder
+        v-else-if="recorderOpened"
+        :id="question.id"
+        @submit="handleAudioSubmit"
+      />
+      <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
           <answer-button
@@ -64,17 +64,6 @@
           </answer-button>
         </div>
       </div>
-      <div v-else>
-        <gravity-form
-          v-if="options[0][0] !== 'audioId'"
-          :id="options[0][1]"
-          @submit="handleFormSubmit"
-        ></gravity-form>
-        <h5p-iframe
-          v-else
-          :media-u-r-l="`${adminAjaxUrl}?action=h5p_embed&id=${options[0][1]}`"
-          @submit="$emit('submit')"
-        />
       </div>
     </div>
   </div>
@@ -83,18 +72,18 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
+import AudioRecorder from "@/components/AudioRecorder"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
-import H5PIframe from "../H5PIframe"
 import TapestryActivity from "@/components/TapestryActivity"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
+    AudioRecorder,
     GravityForm,
     Loading,
-    "h5p-iframe": H5PIframe,
     TapestryActivity,
   },
   props: {
@@ -113,7 +102,6 @@ export default {
       formId: null,
       formType: "",
       recorderOpened: false,
-      h5pRecorderUrl: "",
       loading: false,
     }
   },
@@ -128,16 +116,10 @@ export default {
     answers() {
       if (this.question.previousEntry) {
         const answeredTypes = Object.entries(this.lastQuestion.answers)
-          .filter(entry => entry[1].length > 0)
+          .filter(entry => entry[1] && entry[1].length > 0)
           .map(i => i[0])
         return answeredTypes
-          .map(type => {
-            const answer = this.getEntry(this.question.previousEntry, type)
-            if (answer && answer.type === "audio") {
-              answer.src = `${apiUrl}/tapestries/${wpPostId}/nodes/${this.node.id}/audio/${answer.entry}`
-            }
-            return answer
-          })
+          .map(type => this.getEntry(this.question.previousEntry, type))
           .filter(Boolean)
       }
       return []
@@ -157,21 +139,27 @@ export default {
       return !!(this.question.entries && this.question.entries.audioId)
     },
   },
+  created() {
+    if (this.options.length === 1) {
+      if (this.options[0][0] === "audioId") {
+        this.openRecorder()
+      } else {
+        this.openForm(this.options[0][1], this.options[0][0])
+      }
+    }
+  },
   methods: {
-    ...mapActions(["completeQuestion"]),
+    ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
       const wasOpened = this.formOpened || this.recorderOpened
-      this.formOpened = false
-      this.recorderOpened = false
-      if (!wasOpened) {
+      if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }
+      this.formOpened = false
+      this.recorderOpened = false
     },
-    openRecorder(id) {
-      if (id) {
-        this.recorderOpened = true
-        this.h5pRecorderUrl = `${adminAjaxUrl}?action=h5p_embed&id=${id}`
-      }
+    openRecorder() {
+      this.recorderOpened = true
     },
     openForm(id, answerType) {
       this.formId = id
@@ -185,6 +173,23 @@ export default {
         nodeId: this.node.id,
         answerType: this.formType,
         formId: this.formId,
+        questionId: this.question.id,
+      })
+      this.loading = false
+      this.$emit("submit")
+    },
+    async handleAudioSubmit(audioFile) {
+      this.recorderOpened = false
+      this.loading = true
+      await this.completeQuestion({
+        nodeId: this.node.id,
+        answerType: "audio",
+        formId: this.formId,
+        questionId: this.question.id,
+      })
+      await this.saveAudio({
+        audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
+        nodeId: this.node.id,
         questionId: this.question.id,
       })
       this.loading = false
@@ -215,6 +220,10 @@ button {
   width: 75%;
 }
 
+.answer {
+  margin-top: 80px;
+}
+
 .question {
   display: flex;
   flex-direction: column;
@@ -228,87 +237,85 @@ button {
       max-width: 100px;
     }
   }
-}
 
-.question-title {
-  position: relative;
-  font-size: 28px;
-  font-weight: 600 !important;
-  padding-top: 16px;
-  margin-bottom: 36px;
-}
+  .button-nav {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background: #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    color: white;
+    margin: 0;
+    margin-right: 12px;
+    opacity: 1;
+    transition: all 0.1s ease-out;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 20;
 
-.question-title:before {
-  display: none;
-}
+    &:hover {
+      background: #11a6d8;
+    }
 
-.question-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+    &:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
 
-.question-answer-text {
-  width: 100%;
-  padding: 0;
-  font-size: 28px;
-  font-style: italic;
-}
-
-.button-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.loading {
-  background: #111;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 30;
-}
-
-.button-nav {
-  border-radius: 50%;
-  height: 56px;
-  width: 56px;
-  background: #262626;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  color: white;
-  margin: 0;
-  margin-right: 12px;
-  opacity: 1;
-  transition: all 0.1s ease-out;
-
-  &:hover {
-    background: #11a6d8;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
-  &:disabled {
-    opacity: 0.6;
-    pointer-events: none;
-    cursor: not-allowed;
+  .loading {
+    background: #111;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
   }
 
-  &:last-child {
-    margin-right: 0;
+  &-title {
+    position: relative;
+    font-size: 28px;
+    font-weight: 600 !important;
+    padding-top: 16px;
+    margin-bottom: 36px;
+
+    &:before {
+      display: none;
+    }
+
+    + .recorder {
+      margin-top: 4em;
+    }
+  }
+
+  &-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .question-answer-text {
+      width: 100%;
+      padding: 0;
+      font-size: 28px;
+      font-style: italic;
+    }
+
+    .button-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
   }
 }
 
-.button-nav-menu {
-  width: 80px;
-  height: 80px;
-  font-size: 56px;
-
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
-}
 </style>

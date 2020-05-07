@@ -158,7 +158,7 @@ function tapestryTool(config){
                 jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        setDatasetProgress(JSON.parse(retrievedUserProgress));
+                        setDatasetProgress(retrievedUserProgress);
                     }
 
                     jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
