@@ -77,4 +77,8 @@ export default class {
   static decodeHTMLChars(str) {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
+
+  static getPermissionRowIndex(rowName, permissionOrder) {
+    return permissionOrder.findIndex(thisRow => thisRow === rowName)
+  }
 }
