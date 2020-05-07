@@ -20,11 +20,4 @@ interface ITapestryAudio
      * @return  $audio    audio
      */
     public function get();
-
-    /**
-     * Get all node IDs that have its audios recorded
-     * 
-     * @return  Array   nodeIds
-     */
-    public function getNodesWithRecordedAudios();
 }
