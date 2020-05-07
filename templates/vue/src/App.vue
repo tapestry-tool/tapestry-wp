@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <tapestry />
+    <tapestry-svg />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import Tapestry from "./components/Tapestry"
+import TapestrySvg from "./components/TapestrySvg"
 
 export default {
   name: "app",
   components: {
     Tapestry,
-  },
-  data() {
-    return {}
+    TapestrySvg,
   },
 }
 </script>

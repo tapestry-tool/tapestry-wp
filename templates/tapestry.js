@@ -856,9 +856,19 @@ function tapestryTool(config){
                     Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
                     Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
                 );
+
+        d3.select(`#vue-svg`)
+            .attr("viewBox", 
+                    tapestryDimensions.startX + " " + 
+                    tapestryDimensions.startY + " " + 
+                    Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
+                    Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
+                );
                 
         startSimulation();
     }
+
+    this.updateSvgDimensions = updateSvgDimensions
 
     function removeAllLinks() {
         if (links !== undefined) {
