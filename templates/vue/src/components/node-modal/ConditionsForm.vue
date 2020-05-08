@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-group class="mb-3">
-      <b-form-checkbox v-model="lock">
+      <b-form-checkbox v-model="lock" @change="$emit('changed', !lock)">
         Prevent access until specified conditions are met
       </b-form-checkbox>
     </b-form-group>
