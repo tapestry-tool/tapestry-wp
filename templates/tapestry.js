@@ -1858,6 +1858,9 @@ function tapestryTool(config){
     function getParent(node) {
         const links = tapestry.dataset.links;
         const link = links.find(l => l.target == node.id || l.target.id == node.id);
+        if (!link) {
+            return null
+        }
         return typeof link.source === "object" 
             ? link.source 
             : getNodeById(link.source);
