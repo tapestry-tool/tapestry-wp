@@ -21,11 +21,23 @@
             :options="conditionOptions"
           ></b-form-select>
         </b-form-group>
-        <b-form-group label="Node">
+        <b-form-group
+          v-if="condition.type === conditionTypes.NODE_COMPLETED"
+          label="Node"
+        >
           <b-form-select
             v-model="condition.nodeId"
             :options="nodeOptions"
           ></b-form-select>
+        </b-form-group>
+        <b-form-group
+          v-if="
+            condition.type === conditionTypes.DATE_PASSED ||
+              condition.type === conditionTypes.DATE_NOT_PASSED
+          "
+          label="Date"
+        >
+          <b-form-datepicker v-model="condition.date"></b-form-datepicker>
         </b-form-group>
       </b-card>
       <b-row class="mx-0 mb-3">
@@ -45,6 +57,7 @@ import { conditionTypes } from "@/utils/constants"
 const baseCondition = {
   type: conditionTypes.NODE_COMPLETED,
   nodeId: 0,
+  date: null,
 }
 
 export default {
@@ -77,7 +90,18 @@ export default {
           value: conditionTypes.NODE_COMPLETED,
           text: "When another node is completed",
         },
+        {
+          value: conditionTypes.DATE_PASSED,
+          text: "After a set date/time",
+        },
+        {
+          value: conditionTypes.DATE_NOT_PASSED,
+          text: "Until a set date/time",
+        },
       ]
+    },
+    conditionTypes() {
+      return conditionTypes
     },
   },
   watch: {
