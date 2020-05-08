@@ -2616,23 +2616,21 @@ function tapestryTool(config){
                 switch (condition.type) {
                     case conditionTypes.NODE_COMPLETED: {
                         const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                        if (conditionNode) {
-                            let mayUnlockNodes = conditionNode.mayUnlockNodes
-                            mayUnlockNodes.push({ id: node.id, condition: condition })
-                            conditionNode.mayUnlockNodes = mayUnlockNodes
-                            condition.fulfilled = conditionNode.completed
-                        }
+                        let mayUnlockNodes = conditionNode.mayUnlockNodes
+                        mayUnlockNodes.push({ id: node.id, condition: condition })
+                        conditionNode.mayUnlockNodes = mayUnlockNodes
+                        condition.fulfilled = conditionNode.completed
                         break
                     }
                     case conditionTypes.DATE_NOT_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
-                        condition.fulfilled = currentDate <= conditionDate
+                        const conditionDate = new Date(condition.date)
+                        condition.fulfilled = currentDate < conditionDate
                         break
                     }   
                     case conditionTypes.DATE_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
+                        const conditionDate = new Date(condition.date)
                         condition.fulfilled = currentDate >= conditionDate
                         break
                     }
