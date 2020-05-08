@@ -54,8 +54,8 @@
                   :key="rowName"
                   :value="value"
                 >
-                  <b-th>{{ rowName }}</b-th>
-                  <b-td class="text-center">
+                  <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="read"
@@ -64,7 +64,7 @@
                       @change="updatePermissions($event, rowName, 'read')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td class="text-center">
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="add"
@@ -73,7 +73,7 @@
                       @change="updatePermissions($event, rowName, 'add')"
                     ></b-form-checkbox>
                   </b-td>
-                  <b-td class="text-center">
+                  <b-td>
                     <b-form-checkbox
                       v-model="defaultPermissions[rowName]"
                       value="edit"
@@ -102,10 +102,12 @@
           </div>
           <b-form-group
             label="Show Access Tab"
-            description="When enabled, users will be able to view the Access tab inside the node window. Disable this option to hide the Access tab from users except you."
+            description="When shown, users will see the Access tab when adding or editing a node
+              and can change the permissions for each node that they add. Hiding the Access tab 
+              will hide it from all users except you, editors of this tapestry, and admins."
           >
             <b-form-checkbox v-model="showAccess" switch>
-              {{ showAccess ? "Enabled" : "Disabled" }}
+              {{ showAccess ? "Show" : "Hide" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
@@ -143,25 +145,24 @@ export default {
       required: false,
       default: false,
     },
+    permissionsOrder: {
+      type: Array,
+      required: true
+    },
+    initialDefault: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    }
   },
   data() {
     return {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
-      defaultPermissions: {
-        public: ["read"],
-        authenticated: ["read"],
-      },
-      permissionsOrder: [
-        "public",
-        "authenticated",
-        ...Object.keys(wpData.roles).filter(
-          role => role !== "administrator" && role !== "author"
-        ),
-      ],
       userId: "",
       showAccess: true,
+      defaultPermissions: this.initialDefault,
     }
   },
   computed: {
@@ -193,10 +194,7 @@ export default {
         backgroundUrl = "",
         autoLayout = false,
         nodeDraggable = true,
-        defaultPermissions = {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        defaultPermissions = this.defaultPermissions,
         showAccess = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -223,21 +221,18 @@ export default {
       if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
         return this.changeIndividualPermission(value, rowName, type)
       }
-      const rowIndex = this.getPermissionRowIndex(rowName)
+      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
       const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
       lowerPriorityPermissions.forEach(newRow => {
         this.changeIndividualPermission(value, newRow, type)
       })
-    },
-    getPermissionRowIndex(rowName) {
-      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
     },
     isPermissionDisabled(rowName, type) {
       if (rowName == "public") {
         return false
       }
       // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
+      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
       const higherRow = this.permissionsOrder[rowIndex - 1]
       if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)

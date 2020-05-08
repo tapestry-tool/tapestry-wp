@@ -20,7 +20,11 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
+    <settings-modal 
+      :wp-can-edit-tapestry="wpCanEditTapestry" 
+      :permissions-order="permissionsOrder"
+      :initial-default="populatedNode.permissions"
+    />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
       The requested tapestry is empty.
@@ -128,8 +132,7 @@ export default {
   },
   async created() {
     const tapestryApi = new TapestryApi(wpPostId)
-    const response = await tapestryApi.getUserFavourites()
-    this.favourites = JSON.parse(response.data)
+    this.favourites = await tapestryApi.getUserFavourites()
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
