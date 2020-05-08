@@ -102,13 +102,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function updateH5PSettings($h5pSettingsData)
     {
         $this->_checkUserAndPostId();
-
-        if ($this->_isJson($h5pSettingsData)) {
-            $h5pSettingsData = json_decode($h5pSettingsData);
-        } else {
-            throw new Exception('Invalid json');
-        }
-
         $this->_updateUserH5PSettings($h5pSettingsData);
     }
 
@@ -158,8 +151,43 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $formEntryMap->$formId = $entry;
             }
         }
-
+        
+        foreach ((array)$formEntryMap as $formId => $entry) {
+            $formEntryMap->$formId = $this->_getImageChoices($formId, $entry);
+        }
         return $formEntryMap;
+    }
+    
+    private function _getImageChoices($formId, &$entry)
+    {   
+        $field_types = array('checkbox', 'radio');
+        $form = GFAPI::get_form( $formId );
+        $fields = GFAPI::get_fields_by_type( $form, $field_types );
+        $image_choices_fields = array();
+        foreach($fields as &$field) {
+            if ( is_object( $field ) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
+                $image_choices_fields[$field->id] = $field;
+            }
+        }
+        foreach($image_choices_fields as $id => $field ) {
+            foreach ($field->inputs as $input) {
+                $label = $input['label'];
+                $correspondingChoice = array_values(array_filter(
+                    $field['choices'],
+                    function ($e) use ($label) {
+                        return $e['value'] == $label;
+                    }
+                ))[0];
+                if($entry[$input['id']] != ''){
+                    $inputMap = new stdClass();
+                    $inputMap->choiceText = $label;
+                    $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
+                    $entry[$input['id']] = $inputMap;
+                }
+            }
+        }
+        
+        return $entry;
     }
 
     private function _updateUserProgress($progressValue)
@@ -208,7 +236,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $progress->entries = $this->getUserEntries();
 
-        return json_encode($progress);
+        return $progress;
     }
 
     private function _getQuizProgress($nodeId, $nodeMetadata)
@@ -227,9 +255,9 @@ class TapestryUserProgress implements ITapestryUserProgress
                 foreach ($question->answers as $type => $gfOrH5pId) {
                     if ($gfOrH5pId !== "") {
                         if ($type == 'audioId') {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $gfOrH5pId);
+                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id);
                             if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $gfOrH5pId;
+                                $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
                         } else if (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
@@ -256,7 +284,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getUserH5PSettings()
     {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
-        return json_encode($settings);
+        return $settings ? json_decode($settings) : (object) [];
     }
 
     /**
@@ -271,7 +299,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
         if ($favourites) {
-            return $favourites;
+            return json_decode($favourites);
         }
         return [];
     }
