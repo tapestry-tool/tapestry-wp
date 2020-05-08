@@ -466,7 +466,7 @@ class Tapestry implements ITapestry
             && (!TapestryUserRoles::isAdministrator())
             && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
         ) {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes);
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -489,19 +489,44 @@ class Tapestry implements ITapestry
         return $newLinks;
     }
 
-    private function _filterNodeMetaIdsByPermissions($nodeMetaIds)
+    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId)
     {
-        $newNodeMetaIds = [];
         $options = TapestryNodePermissions::getNodePermissions();
         $userId = wp_get_current_user()->ID;
         $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
 
+        $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeMetaId) {
-            if (TapestryHelpers::currentUserIsAllowed('READ', $nodeMetaId, $this->postId)) {
-                array_push($newNodeMetaIds, $nodeMetaId);
+            if ($this->_pathIsAllowed($nodeMetaId, $rootId)) {
+                array_push($nodesPermitted, $nodeMetaId);
             }
         }
 
-        return $newNodeMetaIds;
+        return $nodesPermitted;
+    }
+
+    private function _pathIsAllowed($from, $to, $checked = [])
+    {
+        if (in_array($from, $checked)) {
+            return false;
+        }
+
+        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId))
+        {
+            if ($from == $to) {
+                return true;
+            }
+
+            $checked[] = $from;
+
+            foreach ($this->links as $link) {
+                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) || 
+                    ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked))) {
+                    return true;
+                }
+            }   
+        }
+
+        return false;
     }
 }
