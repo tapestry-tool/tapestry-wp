@@ -15,16 +15,16 @@
         <button class="condition-close-button" @click="removeCondition(idx)">
           <i class="fas fa-times"></i>
         </button>
+        <b-form-group label="Unlock this node">
+          <b-form-select
+            v-model="condition.type"
+            :options="conditionOptions"
+          ></b-form-select>
+        </b-form-group>
         <b-form-group label="Node">
           <b-form-select
             v-model="condition.nodeId"
             :options="nodeOptions"
-          ></b-form-select>
-        </b-form-group>
-        <b-form-group label="Condition">
-          <b-form-select
-            v-model="condition.type"
-            :options="conditionOptions"
           ></b-form-select>
         </b-form-group>
       </b-card>
@@ -75,7 +75,7 @@ export default {
       return [
         {
           value: conditionTypes.NODE_COMPLETED,
-          text: "Completed",
+          text: "When another node is completed",
         },
       ]
     },
