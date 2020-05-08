@@ -84,6 +84,8 @@ function tapestryTool(config){
 
     const conditionTypes = {
         NODE_COMPLETED: "node_completed",
+        DATE_NOT_PASSED: "date_not_passed",
+        DATE_PASSED: "date_passed",
     }
 
     /****************************************************
@@ -2582,19 +2584,31 @@ function tapestryTool(config){
         nodes.forEach(node => {
             const { conditions } = node
             conditions.forEach(condition => {
-                const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                let mayUnlockNodes = conditionNode.mayUnlockNodes
-                    mayUnlockNodes.push({id: node.id, condition: condition})
-                    conditionNode.mayUnlockNodes = mayUnlockNodes
-                    switch (condition.type) {
-                        case conditionTypes.NODE_COMPLETED: {
-                            condition.fulfilled = conditionNode.completed
-                            break
-                        }
-                        default:
-                            condition.fulfilled = false
-                            break
+                switch (condition.type) {
+                    case conditionTypes.NODE_COMPLETED: {
+                        const conditionNode = nodes[findNodeIndex(condition.nodeId)]
+                        let mayUnlockNodes = conditionNode.mayUnlockNodes
+                        mayUnlockNodes.push({ id: node.id, condition: condition })
+                        conditionNode.mayUnlockNodes = mayUnlockNodes
+                        condition.fulfilled = conditionNode.completed
+                        break
                     }
+                    case conditionTypes.DATE_NOT_PASSED: {
+                        const currentDate = new Date()
+                        const conditionDate = new Date(condition.date)
+                        condition.fulfilled = currentDate < conditionDate
+                        break
+                    }   
+                    case conditionTypes.DATE_PASSED: {
+                        const currentDate = new Date()
+                        const conditionDate = new Date(condition.date)
+                        condition.fulfilled = currentDate >= conditionDate
+                        break
+                    }
+                    default:
+                        condition.fulfilled = false
+                        break
+                }
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
         })
