@@ -1539,6 +1539,14 @@ function tapestryTool(config){
                             listItem.innerText = `Complete "${node.title}"`;
                             break;
                         }
+                        case conditionTypes.DATE_PASSED: {
+                            listItem.innerText = `This node will be unlocked after ${cond.date}`;
+                            break;
+                        }
+                        case conditionTypes.DATE_NOT_PASSED: {
+                            listItem.innerText = `This node is automatically locked after ${cond.date}`;
+                            break;
+                        }
                         default:
                             break;
                     }
@@ -2595,13 +2603,13 @@ function tapestryTool(config){
                     }
                     case conditionTypes.DATE_NOT_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = new Date(condition.date)
-                        condition.fulfilled = currentDate < conditionDate
+                        const conditionDate = parseDate(condition.date)
+                        condition.fulfilled = currentDate <= conditionDate
                         break
                     }   
                     case conditionTypes.DATE_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = new Date(condition.date)
+                        const conditionDate = parseDate(condition.date)
                         condition.fulfilled = currentDate >= conditionDate
                         break
                     }
@@ -2612,6 +2620,12 @@ function tapestryTool(config){
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
         })
+    }
+
+    function parseDate(str) {
+        const date = new Date(str);
+        date.setDate(date.getDate() + 1);
+        return date;
     }
 
     /**
