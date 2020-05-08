@@ -37,7 +37,10 @@
           "
           label="Date"
         >
-          <b-form-datepicker v-model="condition.date"></b-form-datepicker>
+          <b-form-datepicker
+            v-model="condition.date"
+            class="datepicker"
+          ></b-form-datepicker>
         </b-form-group>
       </b-card>
       <b-row class="mx-0 mb-3">
@@ -137,6 +140,14 @@ export default {
     top: 8px;
     right: 12px;
     color: rgba(0, 0, 0, 0.5);
+  }
+}
+</style>
+
+<style lang="scss">
+.datepicker {
+  button:hover {
+    background: none !important;
   }
 }
 </style>
