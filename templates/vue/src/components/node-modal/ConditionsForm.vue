@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-group class="mb-3">
-      <b-form-checkbox v-model="lock" @change="disableConditions">
+      <b-form-checkbox v-model="lock" @change="$emit('changed', !lock)">
         Prevent access until specified conditions are met
       </b-form-checkbox>
     </b-form-group>
@@ -96,11 +96,6 @@ export default {
     },
     removeCondition(idx) {
       this.conditions.splice(idx, 1)
-    },
-    disableConditions() {
-      if (this.lock) {
-        this.conditions = []
-      }
     },
   },
 }
