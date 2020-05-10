@@ -182,9 +182,37 @@ export default {
 </style>
 
 <style lang="scss">
+.gf-container {
+  max-width: 700px;
+  padding-left: 20%;
+  float: right;
+}
+
 .gform_footer {
   display: flex;
   flex-direction: column;
+}
+
+.gform_wrapper .image-choices-use-images .ginput_container {
+
+  .gfield_checkbox {
+    display: flex;
+    align-items: flex-start;
+
+    > li {
+      flex: 0 0 18%;
+      display: flex;
+
+      &:nth-last-child(-n + 4):first-child,
+      &:nth-last-child(-n + 4):first-child ~ li {
+        flex-grow: 1;
+      }
+
+      .image-choices-field .image-choices-choice-image-wrap {
+        padding-bottom: 0 !important;
+      }
+    }
+  }
 }
 
 .gf-submit-disabled {
