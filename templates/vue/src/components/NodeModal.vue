@@ -317,7 +317,7 @@
             </b-table-simple>
           </div>
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
-          <conditions-form :node="node" />
+          <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -434,6 +434,7 @@ export default {
         { value: "activity", text: "Activity" },
         { value: "accordion", text: "Accordion" },
       ],
+      lockNode: false,
       gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
@@ -480,7 +481,7 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
-        { name: "conditions", value: this.node.conditions || [] },
+        { name: "conditions", value: this.lockNode ? this.node.conditions || [] : [] },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
@@ -495,11 +496,11 @@ export default {
         { name: "mediaDuration", value: this.node.mediaDuration },
         {
           name: "imageURL",
-          value: this.node.imageURL || "",
+          value: this.addThumbnail ? this.node.imageURL || "" : "",
         },
         {
           name: "lockedImageURL",
-          value: this.node.lockedImageURL || "",
+          value: this.addLockedThumbnail ? this.node.lockedImageURL || "" : "",
         },
         { name: "permissions", value: this.node.permissions },
         { name: "hideTitle", value: this.node.hideTitle },
@@ -511,12 +512,6 @@ export default {
         { name: "subAccordionText", value: this.node.typeData.subAccordionText },
         { name: "childOrdering", value: this.node.childOrdering },
       ]
-    },
-    nodeImageUrl() {
-      return this.node.imageURL
-    },
-    nodeLockedImageURL() {
-      return this.node.lockedImageURL
     },
     newPermissions() {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
@@ -531,13 +526,6 @@ export default {
     },
   },
   watch: {
-    nodeImageUrl() {
-      this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
-    },
-    nodeLockedImageURL() {
-      this.addLockedThumbnail =
-        this.node.lockedImageURL && this.node.lockedImageURL.length > 0
-    },
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
       this.videoUrlEntered = true
@@ -579,6 +567,9 @@ export default {
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
         this.videoSrc = this.node.typeData.mediaURL
+        this.lockNode = this.node.conditions && this.node.conditions.length > 0
+        this.addThumbnail = this.node.imageURL.length > 0
+        this.addLockedThumbnail = this.node.lockedImageURL.length > 0
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
