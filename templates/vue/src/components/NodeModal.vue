@@ -578,6 +578,7 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+        this.videoSrc = this.node.typeData.mediaURL
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
