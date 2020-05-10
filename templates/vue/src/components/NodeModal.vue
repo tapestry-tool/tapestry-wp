@@ -263,16 +263,17 @@
             </b-form-group>
             <b-form-group
               v-if="node.fullscreen && (nodeType === 'video' || nodeType === 'h5p')"
+              class="indented-options"
             >
               <b-form-radio v-model="node.fitWindow" name="fit-window" :value="true">
-                Resize to show full video
+                Fit whole video in window
               </b-form-radio>
               <b-form-radio
                 v-model="node.fitWindow"
                 name="fit-window"
                 :value="false"
               >
-                Fill window
+                Crop video to fill window (not recommended)
               </b-form-radio>
             </b-form-group>
           </div>
@@ -1110,5 +1111,10 @@ table {
   > span:last-of-type {
     margin-left: auto;
   }
+}
+
+.indented-options {
+  border-left: solid 2px #ccc;
+  padding-left: 1em;
 }
 </style>
