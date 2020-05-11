@@ -1,6 +1,7 @@
 <?php
 // TODO Change exceptions to using an ERROR class
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry-node.php";
 
 /**
  * Add/update/retrieve User progress
@@ -135,6 +136,17 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_formatEntries($entries);
     }
 
+    public function isCompleted($nodeId, $userId)
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+        $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
+        if ($completed_value !== null) {
+            return $completed_value === "1";
+        } else {
+            return isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
+        }
+    }
+
     private function _formatEntries($entries)
     {
         $formEntryMap = new stdClass();
@@ -223,15 +235,20 @@ class TapestryUserProgress implements ITapestryUserProgress
             }         
 
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $completed_value = get_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
-            if ($completed_value !== null) {
-                $progress->$nodeId->completed = $completed_value === "1";
-            } else {
-                $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
+            $completed_value = $this->isCompleted($nodeId, $this->_userId);
+            $progress->$nodeId->completed = $completed_value;
+
+            $node = new TapestryNode($this->postId, $nodeId);
+            $isLocked = $node->isLocked($this->_userId);
+            $progress->$nodeId->unlocked = !$isLocked;
+
+            if (!$isLocked) {
+                $progress->$nodeId->content = $node->getContent();
             }
 
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
+
         }
 
         $progress->entries = $this->getUserEntries();

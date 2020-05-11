@@ -336,7 +336,6 @@ class Tapestry implements ITapestry
     private function _getTapestry()
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry());
-        $userId = wp_get_current_user()->ID;
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
