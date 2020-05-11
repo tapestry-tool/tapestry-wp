@@ -9,7 +9,7 @@
  */
 
 // Used to force-refresh assets 
-$TAPESTRY_VERSION_NUMBER = '2.23.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.25.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = TRUE;
