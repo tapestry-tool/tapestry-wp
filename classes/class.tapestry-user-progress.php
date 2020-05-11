@@ -2,6 +2,7 @@
 // TODO Change exceptions to using an ERROR class
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry-node.php";
 
 /**
  * Add/update/retrieve User progress
@@ -146,6 +147,17 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_formatEntries($entries);
     }
 
+    public function isCompleted($nodeId, $userId)
+    {
+        $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+        $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
+        if ($completed_value !== null) {
+            return $completed_value === "1";
+        } else {
+            return isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
+        }
+    }
+
     private function _formatEntries($entries)
     {
         $formEntryMap = new stdClass();
@@ -244,6 +256,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
             $progress->$nodeId->quiz = $quiz;
+
         }
         return $progress;
     }

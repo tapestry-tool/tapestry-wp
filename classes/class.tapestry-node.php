@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry-user-progress.php";
 require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
@@ -256,12 +257,16 @@ class TapestryNode implements ITapestryNode
     public function isLocked($userId = 0)
     {
         $numFulfilled = 0;
+        $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
 
         foreach ($this->conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
                     if (!$userId) {
                         return true;
+                    }
+                    if ($userProgress->isCompleted($condition->nodeId, $userId)) {
+                        $numFulfilled++;
                     }
                     break;
                 case ConditionTypes::DATE_NOT_PASSED:
@@ -273,6 +278,7 @@ class TapestryNode implements ITapestryNode
                     if (new DateTime() >= new DateTime($condition->date)) {
                         $numFulfilled++;
                     }
+                    break;
                 default:
                     break;
             }
@@ -298,6 +304,14 @@ class TapestryNode implements ITapestryNode
             ]
         ];
         return $node;
+    }
+
+    public function getContent()
+    {
+        return [
+            'quiz'      => (array) $this->quiz,
+            'typeData'  => $this->typeData
+        ];
     }
 
     private function _saveToDatabase()
