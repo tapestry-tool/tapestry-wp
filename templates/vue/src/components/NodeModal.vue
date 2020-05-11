@@ -105,7 +105,7 @@
               </combobox>
             </b-form-group>
             <video
-              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p'"
+              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p' && videoUrlYoutubeID === ''"
               ref="video"
               controls
               :src="videoSrc"
@@ -116,6 +116,13 @@
               :node="node"
               style="display: none;"
               @is-loaded="handleH5Pload"
+            />
+            <youtube 
+              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p' && videoUrlYoutubeID !== ''"
+              :video-id="videoUrlYoutubeID"
+              :player-vars="{autoplay: 0, modestbranding: 1, rel: 0, iv_load_policy: 3}"
+              @ready="handleYouTubeload"
+              style="display: none;"
             />
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
@@ -370,8 +377,9 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">
-        Submit
+      <b-button id="submit-button" size="sm" variant="primary" @click="submitNode()" :class="accessSubmit ? '' : 'disabled'">
+        <b-spinner v-if="!accessSubmit"></b-spinner>
+        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -389,7 +397,6 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
-import YoutubeApi from "../services/YoutubeApi"
 import H5PIframe from "./lightbox/H5PIframe"
 
 export default {
@@ -456,6 +463,7 @@ export default {
       addLockedThumbnail: false,
       videoUrlEntered: false,
       videoSrc: null,
+      youtubeLoaded: false,
     }
   },
   computed: {
@@ -538,6 +546,12 @@ export default {
       })
       return ordered
     },
+    videoUrlYoutubeID(){
+      return this.videoUrlEntered ? Helpers.getYoutubeID(this.node.typeData.mediaURL) : ""
+    },
+    accessSubmit(){ // Locks access to submit button while youtube video loads to grab duration
+      return this.videoUrlYoutubeID === "" ? true : this.youtubeLoaded
+    }
   },
   watch: {
     nodeImageUrl() {
@@ -666,23 +680,18 @@ export default {
         this.$set(this.node, "mediaFormat", "")
       }
     },
-    async submitNode() {
+    submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if(this.node.mediaType === 'video' && this.nodeType !== 'h5p'){
-          const youtubeId = Helpers.getYoutubeID(this.node.typeData.mediaURL)
-          if(youtubeId === ''){
-            this.setVideoDuration()  // Not a youtube video
-          } else {
-            this.node.typeData.youtubeID = youtubeId // Is a youtube video
-            await this.setYoutubeDuration()
-          }
+        if(this.node.mediaType === 'video' && this.nodeType !== 'h5p' && this.videoUrlYoutubeID === ''){
+          this.setVideoDuration()
         }
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
           this.$emit("add-edit-node", this.nodeData, false)
         } else if (this.modalType === "edit-node") {
+          console.log("added")
           this.$emit("add-edit-node", this.nodeData, true)
         } else {
           console.error(`Undefined modalType: ${this.modalType}`)
@@ -760,11 +769,6 @@ export default {
         ord: arr,
       })
     },
-    async setYoutubeDuration(){
-      await YoutubeApi.getDuration(this.node.typeData.youtubeID).then(r => {
-        this.$set(this.node, "mediaDuration", r)
-      })
-    },
     setVideoDuration(){
       this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
     },
@@ -773,6 +777,13 @@ export default {
         const h5pFrame = event
         const h5pVideo = h5pFrame.instances[0].video
         this.node.mediaDuration = h5pVideo.getDuration()
+      }
+    },
+    handleYouTubeload(event) { //Set media duration if video loads
+      if(this.node.mediaType === 'video'){
+        console.log(event.target.getDuration())
+        this.node.mediaDuration = event.target.getDuration()
+        this.youtubeLoaded = true
       }
     }
   },
@@ -868,6 +879,17 @@ table {
   }
   > span:last-of-type {
     margin-left: auto;
+  }
+}
+
+#submit-button {
+  position: relative;
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
   }
 }
 </style>
