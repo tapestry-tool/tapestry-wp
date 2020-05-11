@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
+require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
@@ -214,6 +215,53 @@ class TapestryNode implements ITapestryNode
         if ($listModified) {
             $this->_saveToDatabase();
         }
+    }
+
+    public function isLocked($userId = 0)
+    {
+        $numFulfilled = 0;
+
+        foreach ($this->conditions as $condition) {
+            switch ($condition->type) {
+                case ConditionTypes::NODE_COMPLETED:
+                    if (!$userId) {
+                        return true;
+                    }
+                    break;
+                case ConditionTypes::DATE_NOT_PASSED:
+                    if (new DateTime() <= new DateTime($condition->date)) {
+                        $numFulfilled++;
+                    }
+                    break;
+                case ConditionTypes::DATE_PASSED:
+                    if (new DateTime() >= new DateTime($condition->date)) {
+                        $numFulfilled++;
+                    }
+                default:
+                    break;
+            }
+        }
+
+        return $numFulfilled !== count($this->conditions);
+    }
+
+    public function getMeta()
+    {
+        $node = $this->get();
+        $node->quiz = [];
+        $node->typeData = (object) [
+            'progress' => [
+                0   => [
+                    'group' => 'viewed',
+                    'value' => 0
+                ],
+                1   => [
+                    'group' => 'unviewed',
+                    'value' => 1
+                ]
+            ]
+        ];
+        return $node;
     }
 
     private function _saveToDatabase()

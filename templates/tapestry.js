@@ -106,7 +106,7 @@ function tapestryTool(config){
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
 
                 // change http(s):// to // in media URLs
-                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
+                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
 

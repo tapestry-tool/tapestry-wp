@@ -336,10 +336,19 @@ class Tapestry implements ITapestry
     private function _getTapestry()
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry());
+        $userId = wp_get_current_user()->ID;
 
         $tapestry->nodes = array_map(
             function ($nodeMetaId) {
                 $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
+                if ((!TapestryUserRoles::isEditor())
+                    && (!TapestryUserRoles::isAdministrator())
+                    && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+                ) {
+                    if ($tapestryNode->isLocked()) {
+                        return $tapestryNode->getMeta();
+                    }
+                }
                 return $tapestryNode->get();
             },
             $tapestry->nodes
