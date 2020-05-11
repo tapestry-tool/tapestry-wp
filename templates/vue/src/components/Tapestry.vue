@@ -430,21 +430,15 @@ export default {
           const { data } = await getLinkMetadata(url)
           newNodeEntry.typeData.linkMetadata = data
 
-          let shouldChange = true
-          if (newNodeEntry.imageURL) {
-            shouldChange = confirm("Change thumbnail to new image?")
-          }
-
-          if (shouldChange) {
-            newNodeEntry.imageURL = data.image
-          }
-
-          if (newNodeEntry.lockedImageURL) {
-            shouldChange = confirm("Change locked thumbnail to new image?")
-          }
-
-          if (shouldChange) {
-            newNodeEntry.lockedImageURL = data.image
+          if (data) {
+            if (newNodeEntry.imageURL && 
+                confirm("Would you like to use the link preview image as the thumbnail image?")) {
+              newNodeEntry.imageURL = data.image
+            }
+            if (newNodeEntry.lockedImageURL && 
+                confirm("Would you like to use the link preview image as the locked thumbnail image?")) {
+              newNodeEntry.lockedImageURL = data.image
+            }
           }
         }
       }

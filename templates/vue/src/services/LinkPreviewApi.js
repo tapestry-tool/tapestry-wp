@@ -8,6 +8,11 @@ export async function getLinkMetadata(url) {
   const endpoint = `${API_URL}/?key=${LINK_PREVIEW_API_KEY}&q=${Helpers.normalizeUrl(
     url
   )}`
-  const { data } = await axios.get(endpoint)
-  return { data }
+  try {
+    const { data } = await axios.get(endpoint)
+    return { data }
+  } catch (Error) {
+    console.error("Link preview could not be retrieved", Error)
+    return []
+  }
 }
