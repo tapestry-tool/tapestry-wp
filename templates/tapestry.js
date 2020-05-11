@@ -104,7 +104,7 @@ function tapestryTool(config){
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
 
                 // change http(s):// to // in media URLs
-                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
+                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
 
@@ -609,7 +609,7 @@ function tapestryTool(config){
                 }
             });
         } else if (getChildren(nodeId, 0) && getChildren(nodeId, 0).length > 1) {
-            alert("Can only delete nodes with one neighbouring node.");
+            alert("Cannot delete this node. \n\nOnly nodes with a single connection can be deleted.");
         } else {
             $.ajax({
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
@@ -1945,8 +1945,8 @@ function tapestryTool(config){
             return hardCodedDimensions;
         }
 
-        var tapestryWidth = $('#'+TAPESTRY_CONTAINER_ID).outerWidth();
-        var tapestryHeight = getBrowserHeight() - $('#'+TAPESTRY_CONTAINER_ID).offset().top;
+        var tapestryWidth = document.getElementById(TAPESTRY_CONTAINER_ID).offsetWidth;
+        var tapestryHeight = getBrowserHeight() - document.getElementById(TAPESTRY_CONTAINER_ID).offsetTop;
         var tapestryStartX = 0;
         var tapestryStartY = 0;
 
@@ -1970,7 +1970,7 @@ function tapestryTool(config){
         // but kept the same way on mobile phones where the browser is vertically longer
         // Note: Disabled for authors because it doesn't allow the author to lay out the tapestry the way
         // they want to while drafting a tapestry if we keep transposing it
-        if (!config.wpCanEditTapestry) {
+        if (!config.wpCanEditTapestry && tapestry.dataset.settings.nodeDraggable === false) {
             var tapestryAspectRatio = nodeDimensions.x / nodeDimensions.y;
             var windowAspectRatio = getAspectRatio();
             if (tapestryAspectRatio > 1 && windowAspectRatio < 1 || tapestryAspectRatio < 1 && windowAspectRatio > 1) {
