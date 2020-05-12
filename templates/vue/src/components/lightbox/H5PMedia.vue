@@ -86,6 +86,7 @@ export default {
     },
     rewatch() {
       this.showEndScreen = false
+      this.showPlayScreen = false
       this.$refs.h5pIframe.rewatch()
     },
     close() {
