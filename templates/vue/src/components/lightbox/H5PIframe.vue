@@ -3,7 +3,10 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="node.typeData.mediaURL"
+    :height="frameHeight"
+    :src="node.typeData && node.typeData.mediaURL"
+    :width="frameWidth"
+    scrolling="no"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -20,10 +23,11 @@ export default {
   props: {
     node: {
       type: Object,
-      required: false,
-      default: () => {
-        return {}
-      },
+      required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
     },
     settings: {
       type: Object,
@@ -41,10 +45,23 @@ export default {
       this.handlePause(oldNode)
     },
   },
+  created() {
+    this.frameWidth = "100%"
+  },
   beforeDestroy() {
     this.handlePause(this.node)
   },
   methods: {
+    setFrameHeight() {
+      const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
+      if (videoHeight > this.dimensions.height) {
+        const scaleFactor = this.dimensions.height / videoHeight
+        this.frameHeight = this.dimensions.height
+        this.frameWidth = 100 * scaleFactor + "%"
+      } else {
+        this.frameHeight = videoHeight
+      }
+    },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -142,39 +159,11 @@ export default {
     handleLoad() {
       this.$emit("is-loaded")
 
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
-          }
-        })
-      }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
+      this.instance = h5pInstance
+      this.setFrameHeight()
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
 
@@ -279,5 +268,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped></style>

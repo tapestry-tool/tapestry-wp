@@ -80,8 +80,8 @@ export default {
       if (this.node.fullscreen) {
         styles.top = "auto"
         styles.left = "auto"
-        styles.width = "auto"
-        styles.height = "100%"
+        styles.width = "100vw"
+        styles.height = "100vh"
         styles.position = "relative"
       }
 
@@ -108,6 +108,13 @@ export default {
       const { mediaWidth: width, mediaHeight: height } = this.node.typeData
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
+
+      if (this.node.fullscreen) {
+        return {
+          width: browserWidth,
+          height: browserHeight,
+        }
+      }
 
       let resizeRatio = 1
       let videoWidth = width
@@ -217,36 +224,6 @@ body.tapestry-lightbox-open {
 #lightbox {
   &.full-screen {
     background: #000;
-
-    &[format="h5p"] #spotlight-content {
-      width: 100vw !important;
-      height: 100vh !important;
-
-      iframe {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-    &[format="mp4"] #spotlight-content video {
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-    }
-
-    #spotlight-content {
-      top: 0 !important;
-      left: 0 !important;
-      width: auto !important;
-      height: auto !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      border-radius: 0;
-    }
 
     .close-btn {
       position: fixed;
