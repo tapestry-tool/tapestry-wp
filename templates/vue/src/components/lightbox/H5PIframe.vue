@@ -54,7 +54,7 @@ export default {
   methods: {
     setFrameHeight() {
       const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
-      if (videoHeight > this.dimensions.height) {
+      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
         const scaleFactor = this.dimensions.height / videoHeight
         this.frameHeight = this.dimensions.height
         this.frameWidth = 100 * scaleFactor + "%"
