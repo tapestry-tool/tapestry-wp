@@ -219,10 +219,6 @@ button {
   width: 75%;
 }
 
-.answer {
-  margin-top: 80px;
-}
-
 .question {
   display: flex;
   flex-direction: column;
