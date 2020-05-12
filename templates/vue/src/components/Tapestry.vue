@@ -122,7 +122,7 @@ export default {
   },
   async created() {
     const tapestryApi = new TapestryApi(wpPostId)
-    return await tapestryApi.getUserFavourites()
+    this.favourites = await tapestryApi.getUserFavourites()
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
