@@ -20,8 +20,8 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal 
-      :wp-can-edit-tapestry="wpCanEditTapestry" 
+    <settings-modal
+      :wp-can-edit-tapestry="wpCanEditTapestry"
       :permissions-order="permissionsOrder"
       :initial-default="populatedNode.permissions"
     />

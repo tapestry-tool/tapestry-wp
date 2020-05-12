@@ -147,13 +147,13 @@ export default {
     },
     permissionsOrder: {
       type: Array,
-      required: true
+      required: true,
     },
     initialDefault: {
       type: Object,
       required: false,
       default: () => ({}),
-    }
+    },
   },
   data() {
     return {
