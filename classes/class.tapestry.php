@@ -375,7 +375,7 @@ class Tapestry implements ITapestry
     public function setUnlocked($nodeIds, $userId = 0)
     {
         $nodes = array_map(
-            function ($nodeMetaId) {
+            function ($nodeMetaId) use ($userId) {
                 $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
                 if ((!TapestryUserRoles::isEditor())
                     && (!TapestryUserRoles::isAdministrator())
@@ -404,8 +404,54 @@ class Tapestry implements ITapestry
                 return $node;
             },
             $nodes
-        );
+        );        
+        $this->_recursivelySetAccessible($newNodes[0], array(), $newNodes);
         return $newNodes;
+    }
+
+    private function _recursivelySetAccessible($node, $visited, $nodeList)
+    {
+        if (!in_array($node, $visited)) {
+            array_push($visited, $node);
+        }
+        $node->accessible = $node->unlocked;
+        if ($node->accessible) {
+            $neighbourIds = $this->_getNeighbours($node);
+
+            $neighbours = array_map(
+                function($nodeId) use ($nodeList) {
+                    foreach ($nodeList as $otherNode) {
+                        if ($otherNode->id === $nodeId) {
+                            return $otherNode;
+                        }
+                    }
+                },
+                $neighbourIds
+            );
+
+            foreach ($neighbours as $neighbour) {
+                if (!in_array($neighbour, $visited)) {
+                    array_push($visited, $neighbour);
+                    $this->_recursivelySetAccessible($neighbour, $visited, $nodeList);
+                }
+            }
+        }
+    }
+
+    private function _getNeighbours($node)
+    {
+        $neighbourIds = array();
+
+        foreach ($this->links as $link) {
+            if ($link->source === $node->id || $link->target === $node->id) {
+                array_push(
+                    $neighbourIds, 
+                    $link->source === $node->id ? $link->target : $link->source
+                );
+            }
+        }
+
+        return $neighbourIds;
     }
 
     private function _loadFromDatabase()
@@ -469,9 +515,7 @@ class Tapestry implements ITapestry
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry());
 
-        
-        $tapestry->nodes = $this->_setUnlocked($tapestry->nodes);
-
+        $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
         $tapestry->nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
@@ -486,8 +530,6 @@ class Tapestry implements ITapestry
             },
             $tapestry->nodes
         );
-
-        $tapestry->nodes = $this->setAccessible($tapestry->nodes);
 
         $tapestry->groups = array_map(
             function ($groupMetaId) {

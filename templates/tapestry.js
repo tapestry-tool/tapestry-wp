@@ -298,7 +298,6 @@ function tapestryTool(config){
         setNodeTypes(root);
         setLinkTypes(root);
         addDepthToNodes(root, 0, []);
-        setAccessibleStatus();
 
         if (!isReload) {
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
@@ -2160,7 +2159,6 @@ function tapestryTool(config){
      ****************************************************/
 
     this.reload = () => {
-        setAccessibleStatus();
         setNodeListeners(nodes);
         filterTapestry();
     }
@@ -2523,6 +2521,7 @@ function tapestryTool(config){
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
                 node.unlocked = progressObj[id].unlocked;
+                node.accessible = progressObj[id].accessible;
                 const content = progressObj[id].content
                 if (content) {
                     node.quiz = content.quiz
