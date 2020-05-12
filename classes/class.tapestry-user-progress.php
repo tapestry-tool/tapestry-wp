@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 require_once dirname(__FILE__) . "/../classes/class.tapestry-node.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry.php";
 
 /**
  * Add/update/retrieve User progress
@@ -235,9 +236,14 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getUserProgress($nodeIdArr, $userId)
     {
         $progress = new stdClass();
+        $tapestry = new Tapestry($this->postId);
+
+        $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
-        foreach ($nodeIdArr as $nodeId) {
+        foreach ($nodes as $node) {
+            $nodeId = $node->id;
+
             $progress_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
             $progress->$nodeId = new stdClass();
             if ($progress_value !== null) {
@@ -246,17 +252,22 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->progress = 0;
             }         
 
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
-            if ($completed_value !== null) {
-                $progress->$nodeId->completed = $completed_value === "1";
-            } else {
-                $progress->$nodeId->completed = isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
+            $progress->$nodeId->accessible = $node->accessible;
+            $progress->$nodeId->unlocked = $node->unlocked;
+
+            if ($node->accessible) {
+                $progress->$nodeId->content = [
+                    'quiz'      => $node->quiz,
+                    'typeData'  => $node->typeData
+                ];
             }
+            
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            $completed_value = $this->isCompleted($nodeId, $userId);
+            $progress->$nodeId->completed = $completed_value;
 
-            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
+            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata);
             $progress->$nodeId->quiz = $quiz;
-
         }
         return $progress;
     }

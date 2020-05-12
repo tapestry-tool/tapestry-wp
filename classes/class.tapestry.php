@@ -361,7 +361,7 @@ class Tapestry implements ITapestry
     {
         $parent = null;
 
-        foreach($this->links as $link) {
+        foreach ($this->links as $link) {
             if ($link->target == $nodeId) {
                 $node = new TapestryNode($this->postId, $link->source);
                 $parent = $node->get();
@@ -370,6 +370,42 @@ class Tapestry implements ITapestry
         }
 
         return $parent;
+    }
+    
+    public function setUnlocked($nodeIds, $userId = 0)
+    {
+        $nodes = array_map(
+            function ($nodeMetaId) {
+                $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
+                if ((!TapestryUserRoles::isEditor())
+                    && (!TapestryUserRoles::isAdministrator())
+                    && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
+                ) {
+                    if ($tapestryNode->isLocked($userId)) {
+                        $nodeData = $tapestryNode->getMeta();
+                        $nodeData->unlocked = false;
+                        return $nodeData;
+                    }
+                }
+                $nodeData = $tapestryNode->get();
+                $nodeData->unlocked = true;
+                return $nodeData;
+            },
+            $nodeIds
+        );
+        return $this->_setAccessibleStatus($nodes);
+    }
+
+    private function _setAccessibleStatus($nodes)
+    {
+        $newNodes = array_map(
+            function ($node) {
+                $node->accessible = false;
+                return $node;
+            },
+            $nodes
+        );
+        return $newNodes;
     }
 
     private function _loadFromDatabase()
@@ -433,10 +469,12 @@ class Tapestry implements ITapestry
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry());
 
+        
+        $tapestry->nodes = $this->_setUnlocked($tapestry->nodes);
+
         $tapestry->nodes = array_map(
-            function ($nodeMetaId) {
-                $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
-                $node = $tapestryNode->get();
+            function ($node) {
+                $tapestryNode = new TapestryNode($this->postId, $node->id);
                 if (TapestryUserRoles::isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';
@@ -444,19 +482,12 @@ class Tapestry implements ITapestry
                         $node->userType = 'teen';
                     }
                 }
-                
-                if ((!TapestryUserRoles::isEditor())
-                    && (!TapestryUserRoles::isAdministrator())
-                    && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
-                ) {
-                    if ($tapestryNode->isLocked()) {
-                        return $tapestryNode->getMeta();
-                    }
-                }
-                return $tapestryNode->get();
+                return $node;
             },
             $tapestry->nodes
         );
+
+        $tapestry->nodes = $this->setAccessible($tapestry->nodes);
 
         $tapestry->groups = array_map(
             function ($groupMetaId) {

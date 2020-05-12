@@ -297,7 +297,6 @@ function tapestryTool(config){
 
         setNodeTypes(root);
         setLinkTypes(root);
-        setUnlocked();
         addDepthToNodes(root, 0, []);
         setAccessibleStatus();
 
@@ -2523,12 +2522,20 @@ function tapestryTool(config){
             
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
+                node.unlocked = progressObj[id].unlocked;
+                const content = progressObj[id].content
+                if (content) {
+                    node.quiz = content.quiz
+                    node.typeData = content.typeData
+                }
+
                 if (node.mediaType !== "accordion") {
                     //Update the dataset with new values
-                    tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-                    tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
 
-                    var questions = tapestry.dataset.nodes[index].quiz;
+                    node.typeData.progress[0].value = amountViewed;
+                    node.typeData.progress[1].value = amountUnviewed;
+
+                    var questions = node.quiz;
                     if (quizCompletionInfo) {
                         Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
                             var question = questions.find(question => question.id === questionId);
@@ -2543,7 +2550,7 @@ function tapestryTool(config){
                             }
                         })
                     }
-                    tapestry.dataset.nodes[index].completed = completed;
+                    node.completed = completed;
                 }
             }
         }
@@ -2613,50 +2620,6 @@ function tapestryTool(config){
                 link.type = "";
             }
         }
-    }
-    
-    /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
-    function setUnlocked() {
-        const { nodes } = tapestry.dataset
-        nodes.forEach(node => {
-            const { conditions } = node
-            conditions.forEach(condition => {
-                switch (condition.type) {
-                    case conditionTypes.NODE_COMPLETED: {
-                        const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                        let mayUnlockNodes = conditionNode.mayUnlockNodes
-                        mayUnlockNodes.push({ id: node.id, condition: condition })
-                        conditionNode.mayUnlockNodes = mayUnlockNodes
-                        condition.fulfilled = conditionNode.completed
-                        break
-                    }
-                    case conditionTypes.DATE_NOT_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition.date)
-                        condition.fulfilled = currentDate <= conditionDate
-                        break
-                    }   
-                    case conditionTypes.DATE_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition.date)
-                        condition.fulfilled = currentDate >= conditionDate
-                        break
-                    }
-                    default:
-                        condition.fulfilled = false
-                        break
-                }
-            })
-            node.unlocked = conditions.every(cond => cond.fulfilled)
-        })
-    }
-
-    function parseDate(condition) {
-        const { date, time, timezone } = condition
-        if (time) {
-            return moment.tz(`${date} ${time}`, timezone).toDate()
-        }
-        return moment.tz(date, timezone).toDate()
     }
 
     /**
