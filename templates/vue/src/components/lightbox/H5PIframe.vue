@@ -43,6 +43,7 @@ export default {
       instance: null,
       frameHeight: 0,
       frameWidth: 0,
+      played: false,
     }
   },
   watch: {
@@ -71,6 +72,7 @@ export default {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
       if (h5pVideo) {
+        this.played = true
         h5pVideo.play()
       }
     },
@@ -203,6 +205,10 @@ export default {
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
               case h5pObj.Video.PLAYING: {
+                if (!h5pIframeComponent.played) {
+                  h5pVideo.pause()
+                  return
+                }
                 h5pIframeComponent.updateInterval = setInterval(() => {
                   const currentPlayedTime = h5pVideo.getCurrentTime()
                   const amountViewed = currentPlayedTime / videoDuration
@@ -236,6 +242,7 @@ export default {
           })
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
+              h5pIframeComponent.played = true
               h5pVideo.play()
               thisTapestryTool.recordAnalyticsEvent(
                 "app",
