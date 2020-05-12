@@ -52,6 +52,10 @@ export default {
       type: Object,
       required: true,
     },
+    dimensions: {
+      type: Object,
+      required: true,
+    },
     autoplay: {
       type: Boolean,
       required: false,
@@ -77,6 +81,7 @@ export default {
     },
     rewatch() {
       this.showEndScreen = false
+      this.showPlayScreen = false
       this.$refs.h5pIframe.rewatch()
     },
     close() {

@@ -12,9 +12,7 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -39,6 +37,13 @@ export default {
       required: false,
       default: true,
     },
+  },
+  data() {
+    return {
+      frameHeight: 0,
+      frameWidth: 0,
+      instance: null,
+    }
   },
   watch: {
     node(_, oldNode) {
