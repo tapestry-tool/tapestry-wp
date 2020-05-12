@@ -306,6 +306,7 @@ function tapestryTool(config){
         links = createLinks();
         nodes = createNodes();
 
+        this.updateVisibleNodes();
         filterTapestry(true);
         
         //---------------------------------------------------
@@ -679,7 +680,6 @@ function tapestryTool(config){
                         case filterOptions.AUTHOR:
                             newVisibleNodes = 
                                 tapestry.dataset.nodes.filter(n => n.author.id == val)
-                                    .concat(tapestry.dataset.nodes.filter(n => n.author.id == wpUserId))
                             break
                         default:
                             break
