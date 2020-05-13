@@ -42,6 +42,7 @@
         </p>
         <sub-accordion
           v-if="row.children.length > 0"
+          :dimensions="dimensions"
           :rows="row.children"
           @load="handleLoad"
         ></sub-accordion>

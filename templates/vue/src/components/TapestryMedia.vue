@@ -3,6 +3,10 @@
     :class="[
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
+      {
+        'media-wrapper-no-scroll':
+          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
+      },
     ]"
   >
     <text-media
@@ -33,17 +37,16 @@
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"
-      :node="node"
       :dimensions="dimensions"
-      @mounted="handleLoad"
+      :node="node"
+      @load="handleLoad"
       @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
-      :width="dimensions.width"
-      :height="dimensions.height"
       @load="handleLoad"
       @timeupdate="updateProgress"
       @complete="complete"
@@ -159,7 +162,15 @@ export default {
   padding: 0;
   position: relative;
 }
+
 .media-wrapper-embed {
   background: white;
+  &-embed {
+    background: white;
+  }
+
+  &-no-scroll {
+    overflow: hidden;
+  }
 }
 </style>
