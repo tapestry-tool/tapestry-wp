@@ -283,6 +283,7 @@
           </div>
         </b-tab>
         <b-tab v-if="viewAccess" title="Access">
+<<<<<<< HEAD
           <h6 class="mb-3 text-muted">General Permissions</h6>
           <div id="modal-permissions">
             <b-table-simple class="text-center" striped responsive>
@@ -346,6 +347,13 @@
               </b-tbody>
             </b-table-simple>
           </div>
+=======
+          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
+          <permissions-table
+            :order="permissionsOrder"
+            :initial-default="node.permissions"
+          />
+>>>>>>> b0e70c5... Refactored Permissions Table into Component
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
@@ -537,6 +545,7 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
+import PermissionsTable from "./node-modal/PermissionsTable"
 
 export default {
   name: "node-modal",
@@ -549,6 +558,7 @@ export default {
     FileUpload,
     SlickItem,
     SlickList,
+    PermissionsTable,
   },
   props: {
     node: {
@@ -744,13 +754,6 @@ export default {
       const last = this.permissionsOrder[this.permissionsOrder.length - 1]
       return [...this.node.permissions[last]]
     },
-    permissions() {
-      const ordered = {}
-      this.permissionsOrder.forEach(permission => {
-        ordered[permission] = this.node.permissions[permission]
-      })
-      return ordered
-    },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
@@ -758,6 +761,16 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+<<<<<<< HEAD
+    viewAccess() {
+      return this.settings.showAccess === undefined
+        ? true
+        : this.settings.showAccess
+        ? true
+        : wpData.wpCanEditTapestry !== ""
+    },
+=======
+>>>>>>> b0e70c5... Refactored Permissions Table into Component
   },
   watch: {
     selectedH5pContent() {
@@ -768,6 +781,7 @@ export default {
     },
   },
   async mounted() {
+    console.log(this.node.permissions)
     this.gravityFormExists = await GravityFormsApi.exists()
     this.mediaTypes.push({
       value: "gravity-form",
@@ -835,49 +849,6 @@ export default {
 
       const adminAjaxUrl = wpData.adminAjaxUrl
       return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
-    },
-    isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
-        return false
-      }
-
-      // keep going up until we find a non-user higher row
-      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
-      const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
-      }
-
-      const permissions = this.node.permissions[higherRow]
-      if (permissions) {
-        return permissions.includes(type)
-      }
-      return false
-    },
-    changeIndividualPermission(value, rowName, type) {
-      let currentPermissions = this.node.permissions[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
-      let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
-        }
-      } else {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
-      }
-      this.$set(this.node.permissions, rowName, newPermissions)
-    },
-    updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
-        return this.changeIndividualPermission(value, rowName, type)
-      }
-      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
-      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
-      lowerPriorityPermissions.forEach(newRow => {
-        this.changeIndividualPermission(value, newRow, type)
-      })
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
@@ -957,20 +928,6 @@ export default {
           value => value && value.length > 0
         )
       })
-    },
-    addUserPermissionRow() {
-      const userId = this.userId
-      if (
-        userId &&
-        Helpers.onlyContainsDigits(userId) &&
-        $("#user-" + userId + "-editcell").val() != ""
-      ) {
-        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
-        this.permissionsOrder.push(`user-${userId}`)
-        this.userId = null
-      } else {
-        alert("Enter valid user id")
-      }
     },
     updateOrderingArray(arr) {
       this.updateOrdering({

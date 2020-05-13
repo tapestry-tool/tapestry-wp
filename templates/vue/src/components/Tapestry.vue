@@ -23,7 +23,7 @@
     <settings-modal
       :wp-can-edit-tapestry="wpCanEditTapestry"
       :permissions-order="permissionsOrder"
-      :initial-default="populatedNode.permissions"
+      :initial-default="settings.defaultPermissions"
     />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
@@ -194,10 +194,7 @@ export default {
         showInBackpack: true,
         permissions: this.settings.defaultPermissions
           ? this.settings.defaultPermissions
-          : {
-              public: ["read"],
-              authenticated: ["read"],
-            },
+          : this.populatedNode.permissions,
         description: "",
         quiz: [],
         tydeType: tydeTypes.REGULAR,
