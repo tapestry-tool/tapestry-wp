@@ -20,10 +20,10 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal 
-      :wp-can-edit-tapestry="wpCanEditTapestry" 
+    <settings-modal
+      :wp-can-edit-tapestry="wpCanEditTapestry"
       :permissions-order="permissionsOrder"
-      :initial-default="populatedNode.permissions"
+      :initial-default="settings.defaultPermissions"
     />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
@@ -85,7 +85,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents", "settings"]),
+    ...mapGetters([
+      "selectedNode",
+      "tapestry",
+      "getNode",
+      "getDirectParents",
+      "settings",
+    ]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -170,10 +176,9 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
-        permissions: this.settings.defaultPermissions ? this.settings.defaultPermissions : {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        permissions: this.settings.defaultPermissions
+          ? this.settings.defaultPermissions
+          : this.populatedNode.permissions,
         description: "",
         quiz: [],
         childOrdering: [],
