@@ -1296,20 +1296,29 @@ function tapestryTool(config){
     }
 
     function renderTooltips() {
+        nodes.selectAll(".tooltip-wrapper").remove();
         nodes
             .filter(d => !d.accessible)
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("pointer-events", "none")
             .style("opacity", 0)
-            .attr("width", d => Math.min(getRadius(d) * 2 + 48, 300))
+            .attr("width", d => Math.min(getRadius(d) * 2 + 48, 400))
             .attr("height", d => getRadius(d) * 2)
-            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
+            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 400) / 2))
             .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
             .html(getTooltipHtml)
+            .on("click", () => {
+                d3.event.stopPropagation()
+            })
+
+        nodes.filter(d => !d.accessible)
+            .select(".button-node-tooltip")
+            .on("click", function() {
+                goToNode(this.dataset.node)
+            })
     }
 
     function setNodeListeners(nodes) {
@@ -1347,23 +1356,24 @@ function tapestryTool(config){
                 if (d.nodeType !== "grandchild") {
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     wrapper.style.opacity = 1;
+                    wrapper.style.pointerEvents = "all";
                 }
             })
             .on("mouseleave", function () {
-
                 // Hide unlock conditions tooltip
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 wrapper.style.opacity = 0;
+                wrapper.style.pointerEvents = "none";
             })
     }
 
     function getTooltipHtml(node) {
-        const str = "To unlock this node: <br />";
+        const str = "This node will be unlocked: <br />";
         const wrapper = document.createElement("ul");
 
         if (node.conditions.length === 0) {
             const listItem = document.createElement("li");
-            listItem.innerText = "Complete this parent.";
+            listItem.innerText = "When this parent is unlocked.";
             wrapper.appendChild(listItem);
         } else {
             node.conditions.forEach(cond => {
@@ -1372,15 +1382,16 @@ function tapestryTool(config){
                     switch (cond.type) {
                         case conditionTypes.NODE_COMPLETED: {
                             const node = getNodeById(cond.nodeId);
-                            listItem.innerText = `Complete "${node.title}"`;
+                            const btn = createNodeButton(node)
+                            listItem.innerHTML = `When ${btn} is completed.`;
                             break;
                         }
                         case conditionTypes.DATE_PASSED: {
-                            listItem.innerText = `This node will be unlocked after ${cond.date}`;
+                            listItem.innerText = `After ${formatDate(cond)}.`;
                             break;
                         }
                         case conditionTypes.DATE_NOT_PASSED: {
-                            listItem.innerText = `This node is automatically locked after ${cond.date}`;
+                            listItem.innerText = `Until ${formatDate(cond)}.`;
                             break;
                         }
                         default:
@@ -1391,6 +1402,18 @@ function tapestryTool(config){
             })
         }
         return str + wrapper.outerHTML;
+    }
+
+    function createNodeButton(node) {
+        return `<button class="button-node-tooltip" data-node=${node.id}>${node.title}</button>`
+    }
+
+    function formatDate({ date, time, timezone }) {
+        const formatStr = `MMM D YYYY [at] h:mm a [(${timezone})]`
+        if (!time) {
+            return moment.tz(date, timezone).format(formatStr)
+        }
+        return moment.tz(`${date} ${time}`, timezone).format(formatStr)
     }
 
     function rebuildNodeContents() {
