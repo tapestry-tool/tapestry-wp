@@ -2311,13 +2311,13 @@ function tapestryTool(config){
                     }
                     case conditionTypes.DATE_NOT_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = parseDate(condition.date)
+                        const conditionDate = parseDate(condition)
                         condition.fulfilled = currentDate <= conditionDate
                         break
                     }   
                     case conditionTypes.DATE_PASSED: {
                         const currentDate = new Date()
-                        const conditionDate = parseDate(condition.date)
+                        const conditionDate = parseDate(condition)
                         condition.fulfilled = currentDate >= conditionDate
                         break
                     }
@@ -2330,10 +2330,12 @@ function tapestryTool(config){
         })
     }
 
-    function parseDate(str) {
-        const date = new Date(str);
-        date.setDate(date.getDate() + 1);
-        return date;
+    function parseDate(condition) {
+        const { date, time, timezone } = condition
+        if (time) {
+            return moment.tz(`${date} ${time}`, timezone).toDate()
+        }
+        return moment.tz(date, timezone).toDate()
     }
 
     /**
