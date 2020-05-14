@@ -1993,8 +1993,7 @@ function tapestryTool(config){
     }
 
     function goToNode(nodeId) {
-        const base = location.origin + location.pathname + `#\/`;
-        location.href = base + `nodes/${nodeId}`
+        dispatchEvent(new CustomEvent("tapestry-open-node", { detail: { id: nodeId } }));
         recordAnalyticsEvent('user', 'open', 'lightbox', nodeId);
     }
 

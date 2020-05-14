@@ -104,7 +104,7 @@ export default {
         : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
     },
     updateFilterOption(opt) {
-      this.$router.replace({
+      this.$router.push({
         query: { by: opt !== null ? opt : this.comboboxFilterOptions[0] },
       })
     },
@@ -113,7 +113,7 @@ export default {
         val !== null
           ? { ...this.$route.query, q: val }
           : { by: this.$route.query.by }
-      this.$router.replace({ query: newQuery })
+      this.$router.push({ query: newQuery })
     },
   },
 }
