@@ -446,7 +446,8 @@ function tapestryTool(config){
             // Every time the slider's value is changed, do the following
             tapestryDepthSlider.onchange = function() {
                 tapestryDepth = this.value;
-
+                updateDepthMessage();
+            
                 setNodeTypes(root);
                 setLinkTypes(root);
 
@@ -455,6 +456,13 @@ function tapestryTool(config){
             };
 
             tapestryControlsDiv.appendChild(depthSliderWrapper);
+
+            const messageWrapper = document.createElement("p");
+            messageWrapper.id = "depth-warning-message";
+            messageWrapper.textContent = `Some filter results might be hidden because you're not at max depth.`;
+            messageWrapper.style.opacity = shouldShowMessage() ? "1" : "0";
+
+            tapestryControlsDiv.appendChild(messageWrapper);
 
             var showDepthSlider = findMaxDepth(root) >= 2;
             // Hide depth slider if depth is less than 3 
@@ -467,6 +475,15 @@ function tapestryTool(config){
         }
 
         return tapestryControlsDiv;
+    }
+
+    function updateDepthMessage() {
+        const messageWrapper = document.getElementById("depth-warning-message");
+        messageWrapper.style.opacity = shouldShowMessage() ? "1" : "0";
+    }
+
+    function shouldShowMessage() {
+        return tapestryDepthSlider.value !== tapestryDepthSlider.max && isFilterActive()
     }
     
     /****************************************************
@@ -2515,9 +2532,7 @@ function tapestryTool(config){
                 //      should default to being the more senior role
                 // If a node is in the visible nodes list and a filter is active, 
                 // always set it as a child
-                if (isFilterActive() && visibleNodes.has(id)) {
-                    node.nodeType = "child";
-                } else if (!tapestryDepth || children.indexOf(id) > -1) {
+                if (!tapestryDepth || children.indexOf(id) > -1) {
                     node.nodeType = "child";
                 } else if (grandchildren.indexOf(id) > -1) {
                     node.nodeType = "grandchild";
