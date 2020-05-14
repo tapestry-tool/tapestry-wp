@@ -406,8 +406,13 @@ input[type="checkbox"][disabled] {
 }
 
 .tapestry-tooltip {
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+}
+
+.tapestry-tooltip-content {
     pointer-events: none;
-    position: absolute;
     background: black;
     color: white;
     padding: 12px 16px;
@@ -416,18 +421,13 @@ input[type="checkbox"][disabled] {
     font-size: 32px;
     width: 100%;
     bottom: 8px;
-    z-index: 10;
 }
 
-.tapestry-tooltip::after {
-    position: absolute;
+.tapestry-tooltip-content-pointer {
     background: black;
     content: "";
     width: 16px;
     height: 16px;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%) rotate(45deg);
 }
 
 .tapestry-tooltip ul {
