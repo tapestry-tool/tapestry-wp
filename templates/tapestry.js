@@ -1397,7 +1397,7 @@ function tapestryTool(config){
             .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
             .attr("x", d => -(tooltipWidth(d) / 2))
-            .attr("y", d => -(getRadius(d) * 4 + 36))
+            .attr("y", d => -(getRadius(d) * 4 + 50))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
             .append("xhtml:div")
