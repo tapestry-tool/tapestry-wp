@@ -497,7 +497,6 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.node.permissions)
     this.gravityFormExists = await GravityFormsApi.exists()
     this.mediaTypes.push({
       value: "gravity-form",
