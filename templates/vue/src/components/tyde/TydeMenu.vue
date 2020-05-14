@@ -22,6 +22,11 @@
         @click="setActivePage('profile')"
       ></tyde-button>
       <tyde-button
+        icon="user-circle"
+        label="Favourites"
+        @click="setActivePage('favourites')"
+      ></tyde-button>
+      <tyde-button
         icon="space-shuttle"
         class="cockpit-button"
         label="Cockpit"
@@ -55,6 +60,7 @@
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
+      <tyde-favourites v-if="activePage === 'favourites'"></tyde-favourites>
     </div>
   </div>
 </template>
@@ -67,6 +73,7 @@ import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 import TydeMenuProfile from "./TydeMenuProfile"
 import TydeModuleSummary from "./TydeModuleSummary"
+import TydeFavourites from "./TydeFavourites"
 
 export default {
   name: "tyde-menu",
@@ -77,6 +84,7 @@ export default {
     TydeMenuHelp,
     TydeMenuProfile,
     TydeModuleSummary,
+    TydeFavourites,
   },
   data() {
     return {
