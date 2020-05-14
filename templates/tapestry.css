@@ -78,6 +78,7 @@ body {
 
 #tapestry-controls-wrapper {
     margin: 40px 10% 20px;
+    margin-top: 0;
     padding: 10px 16px;
     float: right;
     width: auto;
@@ -90,7 +91,6 @@ body {
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
 		position: absolute;
-		margin-top: -50px;
 		right: 0;
 	}
 }
