@@ -123,7 +123,7 @@ export default {
 .filter {
   display: flex;
   position: absolute;
-  top: -50px;
+  top: 0;
   left: 10vw;
   height: 32px;
 

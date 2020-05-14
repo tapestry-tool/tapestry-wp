@@ -448,7 +448,8 @@ function tapestryTool(config){
                 filterTapestry();
                 updateSvgDimensions();
             };
-            
+
+            tapestryDepthSlider.value = tapestryDepth;
             tapestryControlsDiv.appendChild(depthSliderWrapper);
 
             const messageWrapper = document.createElement("p");
