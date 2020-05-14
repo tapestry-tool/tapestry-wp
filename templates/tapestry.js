@@ -1304,10 +1304,24 @@ function tapestryTool(config){
             .attr("width", d => Math.min(getRadius(d) * 2 + 48, 300))
             .attr("height", d => getRadius(d) * 2)
             .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 300) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 8))
+            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 20))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
+            .append("xhtml:div")
+            .attr("class", "tapestry-tooltip-content")
             .html(getTooltipHtml)
+
+        nodes
+            .filter(d => !d.accessible)
+            .append("polygon")
+            .attr("class", "tooltip-pointer")
+            .attr("points", function(d) {
+                const yOffset = getRadius(d) * 3 + 27.5 + 20 - getRadius(d) * 2
+                const points = [[-16, -16 - yOffset], [16, -16 - yOffset], [0, 16 - yOffset]]
+                return points.map(point => point.join(",")).join(" ")
+            })
+            .attr("fill", "black")
+            .style("opacity", 0)
     }
 
     function setNodeListeners(nodes) {
@@ -1344,6 +1358,8 @@ function tapestryTool(config){
                 // Show unlock conditions tooltip
                 if (d.nodeType !== "grandchild") {
                     const wrapper = this.querySelector(".tooltip-wrapper");
+                    const pointer = this.querySelector("polygon.tooltip-pointer");
+                    pointer.style.opacity = 1;
                     wrapper.style.opacity = 1;
                 }
             })
@@ -1351,6 +1367,8 @@ function tapestryTool(config){
 
                 // Hide unlock conditions tooltip
                 const wrapper = this.querySelector(".tooltip-wrapper");
+                const pointer = this.querySelector("polygon.tooltip-pointer");
+                pointer.style.opacity = 0;
                 wrapper.style.opacity = 0;
             })
     }
