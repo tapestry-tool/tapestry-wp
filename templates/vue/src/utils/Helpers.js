@@ -78,10 +78,6 @@ export default class {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
 
-  static getPermissionRowIndex(rowName, permissionOrder) {
-    return permissionOrder.findIndex(thisRow => thisRow === rowName)
-  }
-
   /**
    * Shallowly checks if two objects are different from one another
    * @param {Object} src

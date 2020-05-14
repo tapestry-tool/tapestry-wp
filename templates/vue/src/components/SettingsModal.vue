@@ -38,68 +38,11 @@
         </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
-          <div id="modal-permissions">
-            <b-table-simple class="text-center" striped responsive>
-              <b-thead>
-                <b-tr>
-                  <b-th></b-th>
-                  <b-th>Read</b-th>
-                  <b-th>Add</b-th>
-                  <b-th>Edit</b-th>
-                </b-tr>
-              </b-thead>
-              <b-tbody>
-                <b-tr
-                  v-for="(value, rowName) in permissions"
-                  :key="rowName"
-                  :value="value"
-                >
-                  <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="defaultPermissions[rowName]"
-                      value="read"
-                      :disabled="isPermissionDisabled(rowName, 'read')"
-                      :data-testid="`node-permissions-${rowName}-read`"
-                      @change="updatePermissions($event, rowName, 'read')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="defaultPermissions[rowName]"
-                      value="add"
-                      :disabled="isPermissionDisabled(rowName, 'add')"
-                      :data-testid="`node-permissions-${rowName}-add`"
-                      @change="updatePermissions($event, rowName, 'add')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="defaultPermissions[rowName]"
-                      value="edit"
-                      :disabled="isPermissionDisabled(rowName, 'edit')"
-                      :data-testid="`node-permissions-${rowName}-edit`"
-                      @change="updatePermissions($event, rowName, 'edit')"
-                    ></b-form-checkbox>
-                  </b-td>
-                </b-tr>
-                <b-tr>
-                  <b-td colspan="4">
-                    <b-input-group>
-                      <b-form-input
-                        v-model="userId"
-                        placeholder="Enter user ID"
-                      ></b-form-input>
-                      <b-button variant="secondary" @click="addUserPermissionRow()">
-                        <span class="fas fa-plus mr-1"></span>
-                        User
-                      </b-button>
-                    </b-input-group>
-                  </b-td>
-                </b-tr>
-              </b-tbody>
-            </b-table-simple>
-          </div>
+          <permissions-table
+            :order="permissionsOrder"
+            :initial-default="initialDefault"
+            @updated="handleUpdatedPermission"
+          />
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
@@ -132,12 +75,13 @@
 <script>
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
-import Helpers from "@/utils/Helpers"
+import PermissionsTable from "./node-modal/PermissionsTable"
 
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    PermissionsTable,
   },
   props: {
     wpCanEditTapestry: {
@@ -167,13 +111,6 @@ export default {
   },
   computed: {
     ...mapGetters(["settings"]),
-    permissions() {
-      const ordered = {}
-      this.permissionsOrder.forEach(permission => {
-        ordered[permission] = this.defaultPermissions[permission]
-      })
-      return ordered
-    },
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -211,66 +148,15 @@ export default {
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
       })
+      console.log(settings)
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
     },
-    updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
-        return this.changeIndividualPermission(value, rowName, type)
-      }
-      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
-      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
-      lowerPriorityPermissions.forEach(newRow => {
-        this.changeIndividualPermission(value, newRow, type)
-      })
-    },
-    isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
-        return false
-      }
-      // keep going up until we find a non-user higher row
-      const rowIndex = Helpers.getPermissionRowIndex(rowName, this.permissionsOrder)
-      const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
-      }
-      const permissions = this.defaultPermissions[higherRow]
-      if (permissions) {
-        return permissions.includes(type)
-      }
-      return false
-    },
-    changeIndividualPermission(value, rowName, type) {
-      let currentPermissions = this.defaultPermissions[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
-      let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
-        }
-      } else {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
-      }
-      this.defaultPermissions[rowName] = newPermissions
-    },
-    addUserPermissionRow() {
-      const userId = this.userId
-      if (
-        userId &&
-        Helpers.onlyContainsDigits(userId) &&
-        $("#user-" + userId + "-editcell").val() != ""
-      ) {
-        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
-        this.permissionsOrder.push(`user-${userId}`)
-        this.userId = null
-      } else {
-        alert("Enter valid user id")
-      }
+    handleUpdatedPermission(newPerm) {
+      this.defaultPermissions = newPerm
     },
   },
 }
