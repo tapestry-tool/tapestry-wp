@@ -423,13 +423,6 @@ input[type="checkbox"][disabled] {
     bottom: 8px;
 }
 
-.tapestry-tooltip-content-pointer {
-    background: black;
-    content: "";
-    width: 16px;
-    height: 16px;
-}
-
 .tapestry-tooltip ul {
     list-style-type: disc;
     list-style-position: inside;
