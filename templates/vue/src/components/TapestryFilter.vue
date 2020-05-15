@@ -100,7 +100,7 @@ export default {
   methods: {
     toggleFilter() {
       this.isActive
-        ? this.$router.go(-1)
+        ? this.$router.push(`/`)
         : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
     },
     updateFilterOption(opt) {
