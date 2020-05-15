@@ -5,7 +5,7 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
-          node.mediaFormat === 'video' || node.mediaFormat === 'h5p',
+          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
       },
     ]"
     :style="containerStyles"
