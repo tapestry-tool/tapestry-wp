@@ -117,6 +117,7 @@ export default {
     rewatch() {
       this.showEndScreen = false
       if (this.$refs.video) {
+        this.showPlayScreen = false
         this.$refs.video.currentTime = 0
         this.$refs.video.play()
       }
@@ -144,6 +145,7 @@ export default {
       return false
     },
     handlePlay(node) {
+      this.showPlayScreen = false
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
