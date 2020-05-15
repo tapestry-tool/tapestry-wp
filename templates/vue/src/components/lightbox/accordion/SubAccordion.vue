@@ -2,34 +2,38 @@
   <div ref="container">
     <tapestry-accordion :rows="rows" :default-index="-1">
       <template v-slot="{ activeIndex, toggle }">
-        <div
-          v-for="(row, index) in rows"
-          ref="rowRefs"
-          :key="row.id"
-          class="sub-accordion-row"
-        >
-          <div class="button-row">
-            <button class="button-row-trigger" @click="toggle(index)">
-              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-              {{ row.title }}
-            </button>
-            <a @click="updateFavourites(row.id)">
-              <i
-                v-if="isFavourite(row.id)"
-                class="fas fa-heart fa-sm"
-                style="color:red;"
-              ></i>
-              <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
-            </a>
+        <div>
+          <div
+            v-for="(row, index) in rows"
+            ref="rowRefs"
+            :key="row.id"
+            class="sub-accordion-row"
+          >
+            <div class="button-row">
+              <button class="button-row-trigger" @click="toggle(index)">
+                <i
+                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
+                ></i>
+                {{ row.title }}
+              </button>
+              <a @click="updateFavourites(row.id)">
+                <i
+                  v-if="isFavourite(row.id)"
+                  class="fas fa-heart fa-sm"
+                  style="color:red;"
+                ></i>
+                <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+              </a>
+            </div>
+            <tapestry-media
+              v-if="index === activeIndex"
+              :node-id="row.id"
+              :dimensions="dimensions"
+              :autoplay="false"
+              @close="toggle(index)"
+              @load="handleLoad(index)"
+            />
           </div>
-          <tapestry-media
-            v-if="index === activeIndex"
-            :node-id="row.id"
-            :dimensions="dimensions"
-            :autoplay="false"
-            @close="toggle(index)"
-            @load="handleLoad(index)"
-          />
         </div>
       </template>
     </tapestry-accordion>
@@ -111,7 +115,7 @@ export default {
 }
 
 .sub-accordion-row {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(30, 30, 30);
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;

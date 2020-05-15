@@ -1,58 +1,66 @@
 <template>
   <div ref="container" class="media-container">
     <h1 class="title">{{ node.title }}</h1>
-    <accordion-row
-      v-for="(row, index) in rows"
-      :key="row.node.id"
-      ref="rowRefs"
-      :visible="index === activeIndex"
-    >
-      <template v-slot:trigger>
-        <div class="button-row">
-          <button
-            class="button-row-trigger"
-            :disabled="disableRow(index)"
-            @click="toggle(index)"
+    <tapestry-accordion :rows="rows">
+      <template v-slot="{ activeIndex, hasNext, next, toggle }">
+        <div>
+          <div
+            v-for="(row, index) in rows"
+            :key="row.node.id"
+            ref="rowRefs"
+            class="accordion-row"
           >
-            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-            {{ row.node.title }}
-          </button>
-          <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
-            <i
-              v-if="isFavourite(row.node.id)"
-              class="fas fa-heart fa-sm"
-              style="color:red;"
-            ></i>
-            <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
-          </a>
+            <div class="button-row">
+              <button
+                class="button-row-trigger"
+                :disabled="disableRow(index)"
+                @click="toggle(index)"
+              >
+                <i
+                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
+                ></i>
+                {{ row.node.title }}
+              </button>
+              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+                <i
+                  v-if="isFavourite(row.node.id)"
+                  class="fas fa-heart fa-sm"
+                  style="color:red;"
+                ></i>
+                <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+              </a>
+            </div>
+            <div v-if="index === activeIndex">
+              <tapestry-media
+                :node-id="row.node.id"
+                :dimensions="dimensions"
+                :autoplay="false"
+                style="color: white; margin-bottom: 24px;"
+                @complete="updateProgress(row.node.id)"
+                @close="toggle(index)"
+                @load="handleLoad($refs.rowRefs[index])"
+              />
+              <p v-if="row.children.length > 0" style="color: white;">
+                {{ row.node.typeData.subAccordionText }}
+              </p>
+              <sub-accordion
+                v-if="row.children.length > 0"
+                :dimensions="dimensions"
+                :rows="row.children"
+                @load="handleLoad"
+              ></sub-accordion>
+            </div>
+            <button
+              v-if="row.node.completed && index === activeIndex"
+              class="mt-2"
+              @click="hasNext ? next() : (showCompletion = true)"
+            >
+              {{ node.typeData.finishButtonText }}
+            </button>
+          </div>
         </div>
       </template>
-      <template v-slot:content>
-        <tapestry-media
-          :node-id="row.node.id"
-          :dimensions="dimensions"
-          :autoplay="false"
-          style="color: white; margin-bottom: 24px;"
-          @complete="updateProgress(row.node.id)"
-          @close="toggle(index)"
-          @load="handleLoad($refs.rowRefs[index].$el)"
-        />
-        <p v-if="row.children.length > 0" style="color: white;">
-          {{ row.node.typeData.subAccordionText }}
-        </p>
-        <sub-accordion
-          v-if="row.children.length > 0"
-          :dimensions="dimensions"
-          :rows="row.children"
-          @load="handleLoad"
-        ></sub-accordion>
-      </template>
-      <template v-slot:footer>
-        <button v-if="row.node.completed" class="mt-2" @click="next">
-          {{ node.typeData.finishButtonText }}
-        </button>
-      </template>
-    </accordion-row>
+    </tapestry-accordion>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -80,17 +88,17 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from "vuex"
+import TapestryAccordion from "../TapestryAccordion"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
-import AccordionRow from "../AccordionRow"
 import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
   components: {
+    TapestryAccordion,
     TapestryMedia,
     TapestryModal,
-    AccordionRow,
     SubAccordion,
   },
   props: {
@@ -101,16 +109,12 @@ export default {
   },
   data() {
     return {
-      activeIndex: 0,
       showCompletion: false,
       isMounted: false,
     }
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
-    hasNext() {
-      return this.activeIndex < this.rows.length - 1
-    },
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -160,20 +164,6 @@ export default {
       const el = this.$refs.container
       if (el) {
         el.scrollTop = 0
-      }
-    },
-    toggle(index) {
-      if (this.activeIndex === index) {
-        this.activeIndex = -1
-      } else {
-        this.activeIndex = index
-      }
-    },
-    next() {
-      if (this.hasNext) {
-        this.activeIndex++
-      } else {
-        this.showCompletion = true
       }
     },
     disableRow(index) {
@@ -303,5 +293,16 @@ button[disabled] {
   width: 56px;
   height: 56px;
   z-index: 10;
+}
+
+.accordion-row {
+  background: #262626;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>
