@@ -36,6 +36,22 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
   }
 }
 
+export function inModule(_, { getNode, getDirectChildren }) {
+  return (moduleId, nodeId) => {
+    const topics = getDirectChildren(moduleId).flatMap(getDirectChildren)
+    return topics.some(id => {
+      if (id === nodeId) {
+        return true
+      }
+      const topic = getNode(id)
+      if (topic.mediaType === "accordion") {
+        return getDirectChildren(id).some(rowId => rowId === id)
+      }
+      return false
+    })
+  }
+}
+
 function getCompletedActivities(node) {
   return node.quiz
     .filter(activity => activity.completed)

@@ -60,7 +60,11 @@
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
-      <tyde-favourites v-if="activePage === 'favourites'"></tyde-favourites>
+      <tyde-favourites
+        v-if="activePage === 'favourites'"
+        :favourites="favourites"
+        class="mt-3"
+      ></tyde-favourites>
     </div>
   </div>
 </template>
@@ -97,7 +101,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "favourites"]),
     ...mapGetters(["getNode"]),
   },
   watch: {

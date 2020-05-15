@@ -9,11 +9,13 @@
     <header class="p-3">
       <h1 class="title">{{ module.title }}</h1>
       <ul>
-        <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
-          Content
-        </tyde-tab>
-        <tyde-tab :is-active="activeTab === 1" @click="activeTab = 1">
-          Activities
+        <tyde-tab
+          v-for="(tab, index) in tabs"
+          :key="tab"
+          :is-active="activeTab === index"
+          @click="activeTab = index"
+        >
+          {{ tab }}
         </tyde-tab>
       </ul>
     </header>
@@ -39,16 +41,21 @@
         </div>
       </div>
     </div>
-    <div v-else-if="activities.length > 0" class="content pt-4">
-      <tyde-activity-summary
-        v-for="activity in activities"
-        :key="activity.id"
-        :activity="activity"
-        :module="module"
-      />
+    <div v-else-if="activeTab === 1">
+      <div v-if="activities.length > 0" class="content pt-4">
+        <tyde-activity-summary
+          v-for="activity in activities"
+          :key="activity.id"
+          :activity="activity"
+          :module="module"
+        />
+      </div>
+      <div v-else class="content empty-message">
+        There are no completed activities yet.
+      </div>
     </div>
-    <div v-else class="content empty-message">
-      There are no completed activities yet.
+    <div v-else-if="activeTab === 2" class="content p-4">
+      <tyde-favourites :favourites="favourites"></tyde-favourites>
     </div>
   </div>
 </template>
@@ -57,6 +64,7 @@
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
 import TydeButton from "./TydeButton"
+import TydeFavourites from "./TydeFavourites"
 import TydeTab from "./TydeTab"
 import TydeTopic from "./TydeTopic"
 
@@ -65,6 +73,7 @@ export default {
   components: {
     TydeActivitySummary,
     TydeButton,
+    TydeFavourites,
     TydeTab,
     TydeTopic,
   },
@@ -80,7 +89,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getModuleContent", "getModuleActivities"]),
+    ...mapGetters([
+      "getNode",
+      "getModuleContent",
+      "getModuleActivities",
+      "inModule",
+    ]),
+    tabs() {
+      return ["Content", "Activities", "Favourites"]
+    },
     module() {
       return this.getNode(this.nodeId)
     },
@@ -89,6 +106,10 @@ export default {
     },
     activities() {
       return this.getModuleActivities(this.nodeId)
+    },
+    favourites() {
+      const allFavourites = this.$store.state.favourites.map(id => parseInt(id))
+      return allFavourites.filter(id => this.inModule(this.nodeId, id))
     },
   },
   methods: {
