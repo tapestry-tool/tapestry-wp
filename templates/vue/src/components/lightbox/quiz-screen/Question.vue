@@ -64,7 +64,6 @@
           </answer-button>
         </div>
       </div>
-      </div>
     </div>
   </div>
 </template>
@@ -313,5 +312,4 @@ button {
     }
   }
 }
-
 </style>

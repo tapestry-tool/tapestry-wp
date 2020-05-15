@@ -141,7 +141,7 @@ export default {
 
 .gform_wrapper {
   width: 100%;
-  
+
   .image-choices-use-images .ginput_container {
     margin: 2em 0;
 
@@ -159,7 +159,7 @@ export default {
         &:nth-last-child(-n + 4):first-child ~ li {
           flex-grow: 1;
         }
-        
+
         input {
           margin-right: -14px;
           margin-top: 2px;
