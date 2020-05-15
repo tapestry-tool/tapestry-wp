@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container">
+  <div :class="['video-container', { fullscreen: node.fullscreen }]">
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"
@@ -79,12 +79,21 @@ export default {
         return { width: "100%" }
       }
       const { height, width } = this.videoDimensions
-      if (width / height > 1) {
-        // Video is wider than it is tall
-        return { width: "100%" }
-      } else {
-        return { height: this.dimensions.height + "px", width: "auto" }
+      if (width / height <= 1) {
+        return { height: "100%", width: "auto" }
       }
+      if (this.node.fullscreen && this.node.fitWindow) {
+        if (width > window.innerWidth) {
+          const resizeRatio = window.innerWidth / width
+          const newHeight = height * resizeRatio
+          if (newHeight >= window.innerHeight) {
+            return { height: "100%", width: "auto" }
+          }
+        } else if (height > window.innerHeight) {
+          return { height: "100%", width: "auto" }
+        }
+      }
+      return { width: "100%" }
     },
   },
   watch: {
@@ -210,5 +219,11 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+
+  &.fullscreen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>
