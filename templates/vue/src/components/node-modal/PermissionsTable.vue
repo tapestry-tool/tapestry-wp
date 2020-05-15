@@ -144,9 +144,14 @@ export default {
         Helpers.onlyContainsDigits(userId) &&
         $("#user-" + userId + "-editcell").val() != ""
       ) {
-        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
         this.order.push(`user-${userId}`)
+        const higherRow = this.order[
+          this.getPermissionRowIndex(`user-${userId}`) - 1
+        ]
+        const higherRowPermissions = this.defaultPermissions[higherRow]
+        this.defaultPermissions[`user-${userId}`] = [...higherRowPermissions]
         this.userId = null
+        this.$emit("updated", this.defaultPermissions)
       } else {
         alert("Enter valid user id")
       }

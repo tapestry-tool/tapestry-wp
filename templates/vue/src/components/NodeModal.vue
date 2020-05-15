@@ -275,6 +275,7 @@
           <permissions-table
             :order="permissionsOrder"
             :initial-default="node.permissions"
+            @updated="updateNodePermissions"
           />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
@@ -538,6 +539,9 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering"]),
+    updateNodePermissions(permissions) {
+      this.node.permissions = permissions
+    },
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
         return false
