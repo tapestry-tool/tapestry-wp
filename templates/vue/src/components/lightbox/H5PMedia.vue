@@ -25,6 +25,7 @@
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
+      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateH5pSettings"
     />
   </div>
@@ -86,7 +87,6 @@ export default {
     },
     rewatch() {
       this.showEndScreen = false
-      this.showPlayScreen = false
       this.$refs.h5pIframe.rewatch()
     },
     close() {
@@ -99,7 +99,6 @@ export default {
       this.showEndScreen = true
     },
     play() {
-      this.showPlayScreen = false
       this.$refs.h5pIframe.play()
     },
     handleLoad() {
