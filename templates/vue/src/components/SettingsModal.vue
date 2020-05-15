@@ -57,6 +57,7 @@
 <script>
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
+
 export default {
   name: "settings-modal",
   components: {
