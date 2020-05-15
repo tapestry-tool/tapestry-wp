@@ -194,7 +194,6 @@ export default {
 }
 
 .gform_wrapper .image-choices-use-images .ginput_container {
-
   .gfield_checkbox {
     display: flex;
     align-items: flex-start;
