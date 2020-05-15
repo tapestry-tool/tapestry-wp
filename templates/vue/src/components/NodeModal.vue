@@ -283,77 +283,12 @@
           </div>
         </b-tab>
         <b-tab v-if="viewAccess" title="Access">
-<<<<<<< HEAD
-          <h6 class="mb-3 text-muted">General Permissions</h6>
-          <div id="modal-permissions">
-            <b-table-simple class="text-center" striped responsive>
-              <b-thead>
-                <b-tr>
-                  <b-th></b-th>
-                  <b-th>Read</b-th>
-                  <b-th>Add</b-th>
-                  <b-th>Edit</b-th>
-                </b-tr>
-              </b-thead>
-              <b-tbody>
-                <b-tr
-                  v-for="(value, rowName) in permissions"
-                  :key="rowName"
-                  :value="value"
-                >
-                  <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="read"
-                      :disabled="isPermissionDisabled(rowName, 'read')"
-                      :data-testid="`node-permissions-${rowName}-read`"
-                      @change="updatePermissions($event, rowName, 'read')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="add"
-                      :disabled="isPermissionDisabled(rowName, 'add')"
-                      :data-testid="`node-permissions-${rowName}-add`"
-                      @change="updatePermissions($event, rowName, 'add')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="edit"
-                      :disabled="isPermissionDisabled(rowName, 'edit')"
-                      :data-testid="`node-permissions-${rowName}-edit`"
-                      @change="updatePermissions($event, rowName, 'edit')"
-                    ></b-form-checkbox>
-                  </b-td>
-                </b-tr>
-                <b-tr>
-                  <b-td colspan="4">
-                    <b-input-group>
-                      <b-form-input
-                        v-model="userId"
-                        placeholder="Enter user ID"
-                      ></b-form-input>
-                      <b-button variant="secondary" @click="addUserPermissionRow()">
-                        <span class="fas fa-plus mr-1"></span>
-                        User
-                      </b-button>
-                    </b-input-group>
-                  </b-td>
-                </b-tr>
-              </b-tbody>
-            </b-table-simple>
-          </div>
-=======
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
           <permissions-table
             :order="permissionsOrder"
             :initial-default="node.permissions"
+            @updated="updateNodePermissions"
           />
->>>>>>> b0e70c5... Refactored Permissions Table into Component
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
@@ -761,16 +696,6 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-<<<<<<< HEAD
-    viewAccess() {
-      return this.settings.showAccess === undefined
-        ? true
-        : this.settings.showAccess
-        ? true
-        : wpData.wpCanEditTapestry !== ""
-    },
-=======
->>>>>>> b0e70c5... Refactored Permissions Table into Component
   },
   watch: {
     selectedH5pContent() {
@@ -834,6 +759,9 @@ export default {
             ? tydeTypes.QUESTION_SET
             : tydeTypes.REGULAR
       }
+    },
+    updateNodePermissions(permissions) {
+      this.node.permissions = permissions
     },
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
