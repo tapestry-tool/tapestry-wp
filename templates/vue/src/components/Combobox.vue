@@ -1,8 +1,10 @@
 <template>
-  <b-form-group>
+  <div>
     <b-form-input
       ref="input"
       v-model="inputValue"
+      :size="size"
+      :style="inputStyle"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
@@ -22,7 +24,7 @@
         <p>{{ emptyMessage }}</p>
       </div>
     </div>
-  </b-form-group>
+  </div>
 </template>
 
 <script>
@@ -55,6 +57,16 @@ export default {
       required: false,
       default: "Please add at least one option.",
     },
+    size: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    inputStyle: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -79,12 +91,19 @@ export default {
         return this.options
       }
 
-      const options = this.options.filter(option => {
-        return (
-          option[this.itemValue] === this.inputValue ||
-          option[this.itemText].toLowerCase().includes(this.inputValue.toLowerCase())
-        )
-      })
+      const options =
+        this.itemValue && this.itemText
+          ? this.options.filter(option => {
+              return (
+                option[this.itemValue] === this.inputValue ||
+                option[this.itemText]
+                  .toLowerCase()
+                  .includes(this.inputValue.toLowerCase())
+              )
+            })
+          : this.options.filter(text =>
+              text.toLowerCase().includes(this.inputValue.toLowerCase())
+            )
       return options.length
         ? options.length > MAX_OPTIONS_LENGTH
           ? options.slice(0, MAX_OPTIONS_LENGTH)
@@ -94,9 +113,7 @@ export default {
   },
   watch: {
     text(newText) {
-      if (this.inputValue.length === 0) {
-        this.inputValue = newText
-      }
+      this.inputValue = newText
     },
   },
   created() {
@@ -105,16 +122,18 @@ export default {
   methods: {
     handleBlur() {
       this.isOpen = false
-      // if user leaves focus and input is empty, clear the value
-      if (this.inputValue.length === 0) {
-        this.$emit("input", null)
-      } else if (this.inputValue !== this.text && !this.selected) {
-        this.inputValue = this.text
-      }
+      this.$nextTick(() => {
+        // if user leaves focus and input is empty, clear the value
+        if (this.inputValue.length === 0) {
+          this.$emit("input", null)
+        } else if (this.inputValue !== this.text && !this.selected) {
+          this.inputValue = this.text
+        }
+      })
     },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
-      this.inputValue = option[this.itemText]
+      this.inputValue = this.itemText ? option[this.itemText] : option
       this.selected = true
       this.$refs.input.blur()
     },
