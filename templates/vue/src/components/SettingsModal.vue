@@ -76,6 +76,7 @@
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
 import PermissionsTable from "./node-modal/PermissionsTable"
+
 export default {
   name: "settings-modal",
   components: {

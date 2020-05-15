@@ -6,9 +6,9 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
-      @loadeddata="$emit('load')"
+      @load="$emit('load')"
     ></iframe>
-    <div v-else class="preview">
+    <div v-else class="preview" :style="previewStyles">
       <div
         class="preview-image"
         :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
@@ -36,11 +36,12 @@ import Helpers from "../../utils/Helpers"
 export default {
   name: "external-media",
   props: {
-    node: {
-      type: Object,
-      required: true,
-    },
     dimensions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    node: {
       type: Object,
       required: true,
     },
@@ -48,6 +49,15 @@ export default {
   computed: {
     normalizedUrl() {
       return Helpers.normalizeUrl(this.node.typeData.mediaURL)
+    },
+    previewStyles() {
+      const { height } = this.dimensions
+      if (height) {
+        return {
+          maxHeight: `${height - 32}px`,
+        }
+      }
+      return {}
     },
   },
   mounted() {
@@ -73,14 +83,11 @@ export default {
     cursor: pointer;
     position: relative;
     flex: 1;
-    height: auto;
+    width: auto;
+    min-height: 100%;
     background-size: cover;
     background-position: center;
     transition: all 0.2s ease;
-
-    @media (min-width: 1000px) {
-      flex: 2;
-    }
 
     &:hover {
       transform: scale(1.05);
@@ -100,9 +107,6 @@ export default {
     text-align: left;
     font-family: "Source Sans Pro", sans-serif;
     padding: 2em;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 
     h1 {
       margin: 0;
@@ -127,6 +131,6 @@ export default {
 
 #external {
   width: 100%;
-  height: 100%;
+  min-height: 400px;
 }
 </style>
