@@ -1,50 +1,50 @@
 <template>
   <div ref="container">
-    <accordion-row
-      v-for="(row, index) in rows"
-      :key="row.id"
-      ref="rowRefs"
-      class="sub-accordion-row"
-      :visible="index === activeIndex"
-    >
-      <template v-slot:trigger>
-        <div class="button-row">
-          <button class="button-row-trigger" @click="toggle(index)">
-            <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
-            {{ row.title }}
-          </button>
-          <a @click="updateFavourites(row.id)">
-            <i
-              v-if="isFavourite(row.id)"
-              class="fas fa-heart fa-sm"
-              style="color:red;"
-            ></i>
-            <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
-          </a>
+    <tapestry-accordion :rows="rows" :default-index="-1">
+      <template v-slot="{ activeIndex, toggle }">
+        <div
+          v-for="(row, index) in rows"
+          ref="rowRefs"
+          :key="row.id"
+          class="sub-accordion-row"
+        >
+          <div class="button-row">
+            <button class="button-row-trigger" @click="toggle(index)">
+              <i :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"></i>
+              {{ row.title }}
+            </button>
+            <a @click="updateFavourites(row.id)">
+              <i
+                v-if="isFavourite(row.id)"
+                class="fas fa-heart fa-sm"
+                style="color:red;"
+              ></i>
+              <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+            </a>
+          </div>
+          <tapestry-media
+            v-if="index === activeIndex"
+            :node-id="row.id"
+            :dimensions="dimensions"
+            :autoplay="false"
+            @close="toggle(index)"
+            @load="handleLoad(index)"
+          />
         </div>
       </template>
-      <template v-slot:content>
-        <tapestry-media
-          :node-id="row.id"
-          :dimensions="dimensions"
-          :autoplay="false"
-          @close="toggle(index)"
-          @load="handleLoad(index)"
-        />
-      </template>
-    </accordion-row>
+    </tapestry-accordion>
   </div>
 </template>
 
 <script>
-import AccordionRow from "@/components/AccordionRow"
+import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
 import { mapGetters, mapActions } from "vuex"
 
 export default {
   name: "sub-accordion",
   components: {
-    AccordionRow,
+    TapestryAccordion,
     TapestryMedia,
   },
   props: {
@@ -58,40 +58,16 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      activeIndex: -1,
-      isMounted: false,
-    }
-  },
   computed: {
     ...mapGetters(["getFavourites"]),
-    hasNext() {
-      return this.activeIndex < this.rows.length - 1
-    },
     favourites() {
       return this.getFavourites ? this.getFavourites : []
     },
   },
-  mounted() {
-    this.isMounted = true
-  },
   methods: {
     ...mapActions(["updateUserFavourites"]),
     handleLoad(idx) {
-      this.$emit("load", this.$refs.rowRefs[idx].$el)
-    },
-    toggle(index) {
-      if (this.activeIndex === index) {
-        this.activeIndex = -1
-      } else {
-        this.activeIndex = index
-      }
-    },
-    next() {
-      if (this.hasNext) {
-        this.activeIndex++
-      }
+      this.$emit("load", this.$refs.rowRefs[idx])
     },
     isFavourite(nodeId) {
       nodeId = nodeId.toString()
@@ -136,5 +112,12 @@ export default {
 
 .sub-accordion-row {
   background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 </style>
