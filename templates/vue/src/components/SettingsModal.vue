@@ -119,6 +119,9 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab title="Advanced">
+          <b-button @click="exportTapestry">Export Tapestry</b-button>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -255,6 +258,30 @@ export default {
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
+    },
+    exportTapestry() {
+      const state = this.$store.state
+      const exportedTapestry = {
+        nodes: state.nodes,
+        links: state.links.map(link => ({
+          ...link,
+          source: link.source.id,
+          target: link.target.id,
+        })),
+        groups: state.groups,
+      }
+      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
+        type: "application/json",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = `${this.settings.title}.json`
+      document.body.appendChild(a)
+      a.click()
+      URL.revokeObjectURL(fileUrl)
+      document.body.removeChild(a)
     },
   },
 }
