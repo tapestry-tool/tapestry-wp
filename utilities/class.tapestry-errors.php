@@ -89,6 +89,14 @@ class TapestryError extends Error
         'INVALID_PROGRESS' => [
             'MESSAGE'   => 'Progress must be a value between 0 and 1',
             'STATUS'    => ['status' => 400]
+        ],
+        'POST_EXISTS' => [
+            'MESSAGE'   => 'A post with that title already exists',
+            'STATUS'    => ['status' => 422]
+        ],
+        'FAILED_TO_CREATE_POST' => [
+            'MESSAGE'   => 'Unable to create new Tapestry',
+            'STATUS'    => ['status' => 500]
         ]
     ];
 

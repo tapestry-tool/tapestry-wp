@@ -6,12 +6,13 @@ import {
   getByTestId,
   submitModal,
   getNode,
+  SITE_URL,
 } from "./utils"
 import roles from "./roles"
 
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
-  cy.request("POST", `${API_URL}/login`, { username, password })
+  return cy.request("POST", `${API_URL}/login`, { username, password })
 })
 
 Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
@@ -21,11 +22,11 @@ Cypress.Commands.add("openLightbox", id => {
   return cy.get("#lightbox")
 })
 
-Cypress.Commands.add("addTapestry", title => {
+Cypress.Commands.add("addTapestry", (title, body = {}) => {
   cy.login("admin")
   cy.request({
     url: `${API_URL}/tapestries`,
-    body: { title },
+    body: { title, ...body },
     method: "POST",
   })
 })
@@ -37,6 +38,11 @@ Cypress.Commands.add("deleteTapestry", title => {
     body: { title },
     method: "DELETE",
   })
+})
+
+Cypress.Commands.add("visitTapestry", title => {
+  cy.visit(`${SITE_URL}/tapestry/${title}`)
+  return cy.get("#content")
 })
 
 Cypress.Commands.add("getNodeByIndex", idx => getStore().its(`state.nodes.${idx}`))
