@@ -406,8 +406,8 @@ function addTapestry($request)
             }
             
             foreach ($tapestryData->links as $link) {
-                $oldSource = $link->source->id;
-                $oldTarget = $link->target->id;
+                $oldSource = $link->source;
+                $oldTarget = $link->target;
     
                 $link->source = $idMap->$oldSource;
                 $link->target = $idMap->$oldTarget;
