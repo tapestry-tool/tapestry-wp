@@ -373,24 +373,51 @@ function getTapestry($request)
 function addTapestry($request)
 {
     $tapestryData = json_decode($request->get_body());
-    if (!get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
+    try {
+        if (get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
+            throw new TapestryError('POST_EXISTS');
+        }
+        $user = wp_get_current_user();
+    
         $postId = wp_insert_post(array(
             'comment_status'    => 'closed',
+            'post_author'       => $user->ID ? $user->ID : 1,
             'ping_status'       => 'closed',
             'post_status'       => 'publish',
             'post_title'        => $tapestryData->title,
             'post_type'         => 'tapestry'
         ), true);
         if (is_wp_error($postId)) {
-            return $post;
+            throw new TapestryError('FAILED_TO_CREATE_POST');
         }
         $tapestry = new Tapestry($postId);
-        try {
-            $tapestry->set($tapestryData);
-            return $tapestry->save();
-        } catch (TapestryError $e) {
-            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        $data = new stdClass();
+        $data->groups = $tapestryData->groups;
+        $tapestry->set($data);
+    
+        if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
+            $idMap = new stdClass();
+    
+            foreach ($tapestryData->nodes as $node) {
+                $oldNodeId = $node->id;
+                $newNode = $tapestry->addNode($node);
+                $newNodeId = $newNode->id;
+                $idMap->$oldNodeId = $newNodeId;
+            }
+            
+            foreach ($tapestryData->links as $link) {
+                $oldSource = $link->source->id;
+                $oldTarget = $link->target->id;
+    
+                $link->source = $idMap->$oldSource;
+                $link->target = $idMap->$oldTarget;
+    
+                $tapestry->addLink($link);
+            }
         }
+        return $tapestry->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
 
