@@ -188,11 +188,15 @@ export default {
   float: right;
 }
 
-.gform_wrapper {
-  width: 100%;
+.gform_footer {
+  display: flex;
+  flex-direction: column;
+}
 
-  .image-choices-use-images .ginput_container {
-    margin: 2em 0;
+.gform_wrapper .image-choices-use-images .ginput_container {
+  .gfield_checkbox {
+    display: flex;
+    align-items: flex-start;
 
     > li {
       flex: 0 0 18%;
