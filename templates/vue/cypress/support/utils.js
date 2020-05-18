@@ -17,11 +17,13 @@ export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
 export const openAddNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
   getAddNodeButton(id).click()
+  return cy.get(`#node-modal-container`)
 }
 
 export const openEditNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
   getEditNodeButton(id).click()
+  return cy.get(`#node-modal-container`)
 }
 
 export const getModal = () => cy.get("#node-modal-container")
