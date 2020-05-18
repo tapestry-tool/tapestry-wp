@@ -110,7 +110,7 @@ export default {
       border-radius: 4px;
       opacity: 1;
       transition: opacity 0.1s ease-out;
-      font-size: 32px;
+      font-size: 2em;
       margin-bottom: 32px;
 
       &:last-child {

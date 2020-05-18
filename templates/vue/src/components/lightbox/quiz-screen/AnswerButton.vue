@@ -66,7 +66,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: normal;
-  font-size: 24px;
+  font-size: 1.5em;
   transition: all 0.1s ease-out;
   margin-right: 16px;
 
@@ -99,7 +99,7 @@ button {
   height: 56px;
 
   &-fa {
-    font-size: 56px;
+    font-size: 3.5em;
   }
 }
 </style>

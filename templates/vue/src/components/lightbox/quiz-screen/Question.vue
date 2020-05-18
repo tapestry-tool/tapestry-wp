@@ -268,7 +268,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 56px;
+    font-size: 3.5em;
     color: white;
     margin: 0;
     margin-right: 12px;
@@ -304,7 +304,7 @@ button {
 
   &-title {
     position: relative;
-    font-size: 24px;
+    font-size: 1.5em;
     font-weight: 600 !important;
     padding-top: 16px;
     margin-bottom: 36px;
@@ -321,7 +321,7 @@ button {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 1.5em;
     }
 
     &:before {
@@ -350,7 +350,7 @@ button {
   &-answer-text {
     width: 100%;
     padding: 0;
-    font-size: 28px;
+    font-size: 1.75em;
     font-style: italic;
   }
 }
