@@ -20,11 +20,7 @@
       ></b-spinner>
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
-    <settings-modal
-      :wp-can-edit-tapestry="wpCanEditTapestry"
-      :permissions-order="permissionsOrder"
-      :initial-default="settings.defaultPermissions"
-    />
+    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
     <div v-if="showEmpty" style="margin-top: 40vh;">
       The requested tapestry is empty.
@@ -33,7 +29,6 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -111,20 +106,6 @@ export default {
     },
     yORfy: function() {
       return this.tapestry.settings.autoLayout ? "y" : "fy"
-    },
-    permissionsOrder: function() {
-      switch (this.modalType) {
-        case "edit-node":
-          return this.selectedNode.permissionsOrder
-        default:
-          return [
-            "public",
-            "authenticated",
-            ...Object.keys(wpData.roles).filter(
-              role => role !== "administrator" && role !== "author"
-            ),
-          ]
-      }
     },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"

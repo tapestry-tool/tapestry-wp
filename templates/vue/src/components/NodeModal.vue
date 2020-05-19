@@ -289,7 +289,6 @@
         <b-tab v-if="viewAccess" title="Access">
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
           <permissions-table
-            :order="permissionsOrder"
             :initial-default="node.permissions"
             @updated="updateNodePermissions"
           />
@@ -394,11 +393,6 @@ export default {
       required: false,
       default: "Node",
     },
-    permissionsOrder: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -493,10 +487,6 @@ export default {
         { name: "childOrdering", value: this.node.childOrdering },
         { name: "fitWindow", value: this.node.fitWindow },
       ]
-    },
-    newPermissions() {
-      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
-      return [...this.node.permissions[last]]
     },
     viewAccess() {
       return this.settings.showAccess === undefined
