@@ -3,7 +3,12 @@
     :class="[
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
-      { 'media-wrapper-no-scroll' : node.typeData.youtubeID },
+      {
+        'media-wrapper-no-scroll':
+          node.mediaFormat === 'mp4' ||
+          node.mediaFormat === 'h5p' ||
+          node.typeData.youtubeID,
+      },
     ]"
   >
     <text-media
@@ -157,7 +162,6 @@ export default {
   overflow: scroll;
   height: 100%;
   padding: 0;
-  position: relative;
 
   &-no-scroll {
     overflow: hidden;

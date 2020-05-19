@@ -116,14 +116,13 @@
               :src="videoSrc"
               style="display:none;"
             ></video>
-            <h5p-iframe
-              v-if="videoUrlEntered && nodeType === 'h5p'"
-              :node="node"
-              :dimensions="{ height: 1, width: 1 }"
-              :settings="{ muted: true }"
+            <iframe
+              v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
+              ref="h5pNone"
+              :src="node.typeData && node.typeData.mediaURL"
               style="display: none;"
-              @is-loaded="handleH5Pload"
-            />
+              @load="handleH5Pload"
+            ></iframe>
             <youtube
               v-if="
                 videoUrlEntered &&
@@ -140,7 +139,7 @@
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
-              <span v-if="!this.gravityFormExists" class="text-muted">
+              <span v-if="!gravityFormExists" class="text-muted">
                 Gravity Forms plugin is not installed. Please install Gravity Forms
                 to use this content type.
               </span>
@@ -405,7 +404,13 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" @click="submitNode()" :class="accessSubmit ? '' : 'disabled'">
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :class="accessSubmit ? '' : 'disabled'"
+        @click="submitNode()"
+      >
         <b-spinner v-if="!accessSubmit"></b-spinner>
         <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
@@ -425,7 +430,6 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
-import H5PIframe from "./lightbox/H5PIframe"
 
 export default {
   name: "node-modal",
@@ -437,7 +441,6 @@ export default {
     FileUpload,
     SlickItem,
     SlickList,
-    "h5p-iframe": H5PIframe,
   },
   props: {
     node: {
@@ -573,17 +576,19 @@ export default {
       })
       return ordered
     },
-    videoUrlYoutubeID(){
-      return this.videoUrlEntered ? Helpers.getYoutubeID(this.node.typeData.mediaURL) : ""
+    videoUrlYoutubeID() {
+      return this.videoUrlEntered
+        ? Helpers.getYoutubeID(this.node.typeData.mediaURL)
+        : ""
     },
-    accessSubmit(){ // Locks access to submit button while youtube video loads to grab duration
+    accessSubmit() {
+      // Locks access to submit button while youtube video loads to grab duration
       return this.videoUrlYoutubeID === "" ? true : this.youtubeLoaded
-    }
+    },
   },
   watch: {
     selectedH5pContent() {
       this.node.typeData.mediaURL = this.getMediaUrl()
-      this.videoUrlEntered = true
     },
     selectedGravityFormContent(id) {
       this.node.typeData.mediaURL = id
@@ -799,22 +804,20 @@ export default {
         ord: arr,
       })
     },
-    setVideoDuration(){
+    setVideoDuration() {
       this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
     },
-    handleH5Pload(event){ // Set media duration if video is loaded
-      if(this.node.mediaType === 'video'){
-        const h5pFrame = event
-        const h5pVideo = h5pFrame.instances[0].video
-        this.node.mediaDuration = h5pVideo.getDuration()
-      }
+    handleH5Pload() {
+      // Set media duration if video is loaded
+      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
+      const h5pVideo = h5pFrame.instances[0].video
+      this.node.mediaDuration = h5pVideo.getDuration()
     },
-    handleYouTubeload(event) { // Set media duration and ID if youtube video loads
-      if(this.node.mediaType === 'video'){
-        this.node.mediaDuration = event.target.getDuration()
-        this.node.typeData.youtubeID = this.videoUrlYoutubeID
-        this.youtubeLoaded = true
-      }
+    handleYouTubeload(event) {
+      // Set media duration and ID if youtube video loads
+      this.node.mediaDuration = event.target.getDuration()
+      this.node.typeData.youtubeID = this.videoUrlYoutubeID
+      this.youtubeLoaded = true
     }
   },
 }
