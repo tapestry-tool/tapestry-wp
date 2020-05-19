@@ -380,7 +380,7 @@ export default {
               newNodeEntry.imageURL = data.image
             }
             if (
-              newNodeEntry.lockedImageUR &&
+              newNodeEntry.lockedImageURL &&
               confirm(
                 "Would you like to use the link preview image as the locked thumbnail image?"
               )

@@ -38,6 +38,13 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      frameHeight: 0,
+      frameWidth: 0,
+      instance: null,
+    }
+  },
   watch: {
     node(_, oldNode) {
       this.handlePause(oldNode)
@@ -141,6 +148,7 @@ export default {
       }
     },
     handlePlay(node) {
+      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
@@ -148,6 +156,7 @@ export default {
       })
     },
     handlePause(node) {
+      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
