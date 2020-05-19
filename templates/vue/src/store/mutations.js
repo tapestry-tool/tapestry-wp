@@ -10,7 +10,8 @@ export function init(state, dataset) {
       n =>
         n.tydeType === tydeTypes.MODULE ||
         n.mediaType === "accordion" ||
-        n.isSubAccordion
+        n.isSubAccordion ||
+        n.tydeType === tydeTypes.STAGE
     )
     .forEach(n => initializeOrdering(state, n.id))
 }

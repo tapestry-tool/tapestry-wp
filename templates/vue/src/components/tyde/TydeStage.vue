@@ -2,12 +2,10 @@
   <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
-        <tyde-progress-bar :node-id="this.selectedModuleId" />
+        <tyde-progress-bar :node-id="selectedModuleId" />
         <div class="stage-star">
-          <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
-          <div v-if="!this.done">
-            {{ this.numComplete }}/{{ this.topics.length }}
-          </div>
+          <img :src="done ? activeStarSrc : inactiveStarSrc" />
+          <div v-if="!done">{{ numComplete }}/{{ topics.length }}</div>
         </div>
         <h1>{{ node.title }}</h1>
         <tyde-button
@@ -19,9 +17,9 @@
       <section>
         <tyde-star-celebration v-if="showStar" @close="showStar = false" />
         <tyde-topic
-          v-for="topic in topics"
-          :key="topic.id"
-          :topic="topic"
+          v-for="topicID in node.childOrdering"
+          :key="topicID"
+          :topic="getNode(topicID)"
           :show-complete="true"
           style="align-self: flex-start;"
           @click="openLightbox(topic.id)"
@@ -128,6 +126,7 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-stage-open")
     this.notCompleted = this.getNode(this.nodeId).tydeProgress !== 1
+    console.log(this.node.childOrdering)
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-stage-open")
