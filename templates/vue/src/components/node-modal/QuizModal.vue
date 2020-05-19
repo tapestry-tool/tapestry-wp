@@ -79,6 +79,7 @@
                 <b-col cols="12" md="4">
                   <b-form-checkbox
                     :checked="question.answers.audioId.length > 0"
+                    :data-testid="`question-answer-audio-${index}`"
                     switch
                     @input="question.answers.audioId = $event ? '1' : ''"
                   >
@@ -96,7 +97,7 @@
                     <combobox
                       v-else
                       v-model="question.answers.textId"
-                      :data-testid="`question-answer-textbox-${index}`"
+                      :data-testid="`question-answer-text-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"
@@ -123,6 +124,7 @@
                     <combobox
                       v-else
                       v-model="question.answers.checklistId"
+                      :data-testid="`question-answer-checklist-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"

@@ -11,6 +11,7 @@ import {
   openEditNodeModal,
   TEST_TAPESTRY_NAME,
   findNode,
+  applyModalChanges,
 } from "./utils"
 import roles from "./roles"
 
@@ -63,11 +64,7 @@ Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) =
   } else {
     openRootNodeModal()
   }
-  const { mediaType, ...rest } = newNode
-  getByTestId("node-mediaType").select(mediaType)
-  Object.entries(rest).forEach(([testId, value]) => {
-    getByTestId(`node-${testId}`).type(value)
-  })
+  applyModalChanges(newNode)
   submitModal()
 
   return cy
@@ -88,15 +85,7 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   )
 
   openEditNodeModal(node.id)
-  const { mediaType, ...rest } = newNode
-  if (mediaType) {
-    getByTestId("node-mediaType").select(mediaType)
-  }
-  Object.entries(rest).forEach(([testId, value]) => {
-    getByTestId(`node-${testId}`)
-      .clear()
-      .type(value)
-  })
+  applyModalChanges(newNode)
   submitModal()
 
   cy.wait("@editPermissions")

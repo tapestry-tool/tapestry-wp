@@ -52,3 +52,40 @@ export const findNode = pred =>
 export const normalizeUrl = url => {
   return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
 }
+
+export const applyModalChanges = newNode => {
+  const { mediaType, quiz, ...rest } = newNode
+  if (mediaType) {
+    getByTestId("node-mediaType").select(mediaType)
+  }
+  Object.entries(rest).forEach(([testId, value]) => {
+    getByTestId(`node-${testId}`)
+      .clear()
+      .type(value)
+  })
+
+  if (quiz) {
+    cy.contains(/quiz/i).click()
+    getByTestId("add-question-checkbox").click({ force: true })
+    quiz.forEach((question, index) => {
+      if (index > 0) {
+        cy.contains(/add question/i).click()
+      }
+      const { title, answerTypes } = question
+      getByTestId(`question-title-${index}`)
+        .clear()
+        .type(title)
+      Object.entries(answerTypes).forEach(([type, id]) => {
+        if (type === "audio") {
+          getByTestId(`question-answer-${type}-${index}`).check()
+        } else {
+          getByTestId(`question-answer-${type}-${index}`)
+            .click()
+            .within(() => {
+              cy.contains(id).click()
+            })
+        }
+      })
+    })
+  }
+}

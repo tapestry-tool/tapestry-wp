@@ -15,8 +15,8 @@ describe("Authoring", () => {
   }
 
   beforeEach(() => {
-    cy.fixture("authoring/node-management/root.json").as("oneNode")
-    cy.fixture("authoring/node-management/two-nodes.json").as("twoNodes")
+    cy.fixture("root.json").as("oneNode")
+    cy.fixture("two-nodes.json").as("twoNodes")
   })
 
   afterEach(cleanup)
@@ -108,7 +108,7 @@ describe("Authoring", () => {
       })
     })
 
-    describe.only("Media types", () => {
+    describe("Media types", () => {
       it("Should be able to add a text node and verify that the text matches what was entered", () => {
         setup("@oneNode")
 
@@ -140,7 +140,7 @@ describe("Authoring", () => {
           })
       })
 
-      it.skip("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {
+      it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {
         setup("@oneNode")
 
         const newNode = {
@@ -152,7 +152,7 @@ describe("Authoring", () => {
             {
               title: "What's your name?",
               answerTypes: {
-                textbox: 1,
+                text: 1,
               },
             },
           ],
@@ -162,27 +162,15 @@ describe("Authoring", () => {
           .editNode(newNode) // TODO: Add support for quiz updates
           .openLightbox()
           .within(() => {
+            cy.get("video").should(video => {
+              expect(video.get(0).paused).to.be.false
+            })
             cy.get("video").then(el => {
               el.get(0).currentTime = 15
               cy.contains(/take quiz/i).click()
-              cy.contains(/text/i)
-                .parent()
-                .click()
-              cy.contains(/what's your name/i).should("exist")
+              cy.contains(newNode.quiz[0].title).should("exist")
             })
           })
-
-        /* cy.contains(/quiz/i).click()
-        getByTestId("add-question-checkbox").click({ force: true })
-        getByTestId(`question-title-0`)
-          .clear()
-          .type("What's your name?")
-        getByTestId(`question-answer-textbox-0`)
-          .click()
-          .within(() => {
-            cy.contains(/test form/i).click()
-          })
-        submitModal() */
       })
     })
   })
