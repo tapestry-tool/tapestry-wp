@@ -201,35 +201,14 @@ export default {
     > li {
       flex: 0 0 18%;
       display: flex;
-      align-items: flex-start;
-      padding-left: 0;
-      width: 100%;
 
-      > li {
-        flex: 0 0 18%;
-        display: flex;
+      &:nth-last-child(-n + 4):first-child,
+      &:nth-last-child(-n + 4):first-child ~ li {
+        flex-grow: 1;
+      }
 
-        &:nth-last-child(-n + 4):first-child,
-        &:nth-last-child(-n + 4):first-child ~ li {
-          flex-grow: 1;
-        }
-
-        input {
-          margin-right: -14px;
-          margin-top: 2px;
-          z-index: 10;
-          transform: scale(1.5);
-        }
-
-        .image-choices-choice-image-wrap {
-          padding-bottom: 0 !important;
-          background: none !important;
-
-          img {
-            max-width: 100px;
-            margin-right: 1em;
-          }
-        }
+      .image-choices-field .image-choices-choice-image-wrap {
+        padding-bottom: 0 !important;
       }
     }
   }
