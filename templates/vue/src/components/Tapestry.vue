@@ -129,6 +129,7 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("tapestry-open-node", this.openNode)
   },
   methods: {
     ...mapMutations([
@@ -139,6 +140,9 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    openNode({ detail: { id } }) {
+      this.$router.push(`/nodes/${id}`)
+    },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         event.detail.dataset["favourites"] = this.favourites
@@ -376,7 +380,7 @@ export default {
               newNodeEntry.imageURL = data.image
             }
             if (
-              newNodeEntry.lockedImageUR &&
+              newNodeEntry.lockedImageURL &&
               confirm(
                 "Would you like to use the link preview image as the locked thumbnail image?"
               )

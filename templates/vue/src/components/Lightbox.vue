@@ -181,7 +181,7 @@ export default {
       this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
-      this.$router.push("/")
+      this.$router.go(-1)
     },
     handleLoad(dimensions) {
       if (dimensions) {
