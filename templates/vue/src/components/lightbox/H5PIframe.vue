@@ -224,6 +224,7 @@ export default {
 
                   if (amountViewed >= 1) {
                     h5pIframeComponent.$emit("show-end-screen")
+                    clearInterval(h5pIframeComponent.updateInterval)
                   }
                 }, 1000)
                 h5pIframeComponent.handlePlay(h5pIframeComponent.node)

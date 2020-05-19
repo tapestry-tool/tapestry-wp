@@ -26,7 +26,6 @@
               <tapestry-media
                 v-if="node.mediaType !== 'accordion'"
                 :node-id="node.id"
-                :allow-end-screen="false"
                 :autoplay="false"
                 :dimensions="dimensions"
                 read-only
@@ -53,6 +52,7 @@ import { mapGetters } from "vuex"
 import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
 import AccordionMedia from "@/components/lightbox/AccordionMedia"
+import Helpers from "../../utils/Helpers"
 
 export default {
   name: "tyde-favourites",
@@ -81,10 +81,10 @@ export default {
       if (!this.isMounted) {
         return {}
       }
-      const { width, height } = this.$refs.container.getBoundingClientRect()
+      const { width } = this.$refs.container.getBoundingClientRect()
       return {
         width,
-        height,
+        height: Helpers.getBrowserHeight(),
       }
     },
   },

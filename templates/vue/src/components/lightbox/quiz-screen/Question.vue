@@ -177,6 +177,9 @@ export default {
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
     getAnswers(question) {
+      if (!question.entries) {
+        return []
+      }
       const answeredTypes = Object.entries(question.answers)
         .filter(entry => entry[1] && entry[1].length > 0)
         .map(i => i[0])
