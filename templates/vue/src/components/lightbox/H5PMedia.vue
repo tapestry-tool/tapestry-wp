@@ -11,6 +11,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -70,6 +71,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

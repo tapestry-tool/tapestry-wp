@@ -60,6 +60,7 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 :autoplay="false"
+                :read-only="readOnly"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(index)"
@@ -71,6 +72,7 @@
               <sub-accordion
                 v-if="row.children.length > 0"
                 :rows="row.children"
+                :read-only="readOnly"
                 @load="handleLoad"
               ></sub-accordion>
             </div>
@@ -139,6 +141,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

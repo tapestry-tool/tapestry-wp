@@ -22,13 +22,25 @@
                 </div>
               </button>
             </div>
-            <tapestry-media
-              v-if="index === activeIndex"
-              :node-id="node.id"
-              :allow-end-screen="false"
-              :autoplay="false"
-              :dimensions="dimensions"
-            />
+            <div v-if="index === activeIndex" class="content">
+              <tapestry-media
+                v-if="node.mediaType !== 'accordion'"
+                :node-id="node.id"
+                :allow-end-screen="false"
+                :autoplay="false"
+                :dimensions="dimensions"
+                read-only
+              />
+              <accordion-media
+                v-else
+                read-only
+                :node="node"
+                :style="{
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                }"
+              ></accordion-media>
+            </div>
           </div>
         </div>
       </template>
@@ -40,10 +52,12 @@
 import { mapGetters } from "vuex"
 import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
+import AccordionMedia from "@/components/lightbox/AccordionMedia"
 
 export default {
   name: "tyde-favourites",
   components: {
+    AccordionMedia,
     TapestryAccordion,
     TapestryMedia,
   },
@@ -135,5 +149,9 @@ h4 {
   &-description {
     font-weight: 400;
   }
+}
+
+.content {
+  margin-top: 24px;
 }
 </style>

@@ -15,6 +15,7 @@
       :question="activeQuestion"
       :current-step="currentQuestionText"
       :node="node"
+      :read-only="readOnly"
       @submit="handleSubmit"
       @back="$emit('back')"
     ></question>
@@ -47,6 +48,11 @@ export default {
     id: {
       type: [Number, String],
       required: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

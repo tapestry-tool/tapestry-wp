@@ -1,6 +1,7 @@
 <template>
   <quiz-screen
     :id="node.id"
+    :read-only="readOnly"
     style="position: relative;"
     @submit="handleSubmit"
     @back="$emit('close')"
@@ -22,6 +23,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   mounted() {

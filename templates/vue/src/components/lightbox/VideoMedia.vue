@@ -11,6 +11,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -63,6 +64,11 @@ export default {
       validator: val => {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

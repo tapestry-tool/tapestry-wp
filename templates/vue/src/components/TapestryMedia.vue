@@ -18,6 +18,7 @@
       :node="node"
       :allow-end-screen="allowEndScreen"
       :dimensions="dimensions"
+      :read-only="readOnly"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -37,6 +38,7 @@
       :width="dimensions.width"
       :height="dimensions.height"
       :allow-end-screen="allowEndScreen"
+      :read-only="readOnly"
       @load="handleLoad"
       @timeupdate="updateProgress"
       @complete="complete"
@@ -46,6 +48,7 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       :node="node"
+      :read-only="readOnly"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
@@ -58,6 +61,7 @@
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
+      :read-only="readOnly"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -115,6 +119,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

@@ -30,6 +30,7 @@
               :node-id="row.id"
               :dimensions="dimensions"
               :autoplay="false"
+              :read-only="readOnly"
               @close="toggle(index)"
               @load="handleLoad(index)"
             />
@@ -55,6 +56,11 @@ export default {
     rows: {
       type: Array,
       required: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
