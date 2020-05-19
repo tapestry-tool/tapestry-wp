@@ -1790,6 +1790,7 @@ function tapestryTool(config){
         nodes.selectAll(".addNodeButton").remove();
         nodes.selectAll(".metaWrapper").remove();
         nodes.selectAll(".tooltip-wrapper").remove();
+        nodes.selectAll(".tooltip-pointer").remove();
         nodes.selectAll("path").remove();
 
         setTimeout(function(){
