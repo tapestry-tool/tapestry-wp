@@ -150,54 +150,21 @@ export default {
     handlePlay(node) {
       this.$emit("show-play-screen", false)
       const { id, mediaType } = node
-      const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
-        time: progressVal * node.mediaDuration,
+        time: node.typeData.progress[0].value * node.mediaDuration,
       })
     },
     handlePause(node) {
       this.$emit("show-play-screen", true)
       const { id, mediaType } = node
-      const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-        time: progressVal * node.mediaDuration,
+        time: node.typeData.progress[0].value * node.mediaDuration,
       })
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
-      this.$emit("is-loaded", h5pObj)
-
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
-          }
-        })
-      }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
       this.instance = h5pInstance
@@ -214,7 +181,7 @@ export default {
         return
       }
 
-      const mediaProgress = this.node.typeData.progress ? this.node.typeData.progress[0].value : 0
+      const mediaProgress = this.node.typeData.progress[0].value
 
       if (h5pLibraryName === "H5P.InteractiveVideo") {
         const h5pVideo = h5pInstance.video
@@ -297,6 +264,7 @@ export default {
           h5pVideo.on("loaded", handleH5pAfterLoad)
         }
       }
+      this.$emit("is-loaded")
     },
     toggleMuteIcon() {
       const body = this.$refs.h5p.contentWindow.H5P.$body[0]
