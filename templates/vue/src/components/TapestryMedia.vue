@@ -159,12 +159,14 @@ export default {
       this.$emit("load", args)
     },
     updateProgress: Helpers.throttle(function(amountViewed) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     }, SAVE_INTERVAL),
     complete() {
-      this.$emit("complete")
+      if (!this.readOnly) {
+        this.$emit("complete")
+      }
     },
   },
 }

@@ -36,7 +36,7 @@ export default {
   methods: {
     ...mapActions(["updateNodeProgress"]),
     handleSubmit() {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         const numberCompleted = this.node.quiz.filter(question => question.completed)
           .length
         const progress = numberCompleted / this.node.quiz.length

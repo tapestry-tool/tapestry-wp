@@ -45,7 +45,11 @@
                   class="icon"
                   icon="lock"
                 ></tyde-icon>
-                <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+                <a
+                  v-if="!disableRow(index)"
+                  :disabled="readOnly"
+                  @click="updateFavourites(row.node.id)"
+                >
                   <i
                     v-if="isFavourite(row.node.id)"
                     class="fas fa-heart fa-lg"
@@ -259,7 +263,7 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     async updateProgress(rowId) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         const { accordionProgress } = this.node
         if (!accordionProgress.includes(rowId)) {
           accordionProgress.push(rowId)
@@ -285,14 +289,16 @@ export default {
       return this.favourites.find(id => id == nodeId)
     },
     updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
+      if (!this.readOnly) {
+        let updatedFavouritesList = [...this.favourites]
+        nodeId = nodeId.toString()
+        if (this.isFavourite(nodeId)) {
+          updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
+        } else {
+          updatedFavouritesList.push(nodeId)
+        }
+        this.updateUserFavourites(updatedFavouritesList)
       }
-      this.updateUserFavourites(updatedFavouritesList)
     },
     showActivityIcon(mediaType) {
       return mediaType === "gravity-form" || mediaType === "activity"
