@@ -127,6 +127,7 @@ get_header(); ?>
             // thisTapestryTool.redraw(false);
 
             var wpPostId = "<?php echo get_the_ID(); ?>";
+            var wpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
 
