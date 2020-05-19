@@ -17,7 +17,7 @@
       :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width - 15"
       :player-height="dimensions.height - 40"
-      :player-vars="{autoplay: autoplay, modestbranding: 1, rel: 0, iv_load_policy: 3}"
+      :player-vars="{autoplay: autoplay, modestbranding: 1, rel: 0, iv_load_policy: 3, enablejsapi: 1}"
       @ready="ready"
       @paused="handlePause(player.getCurrentTime())"
       @ended="handleEnd"

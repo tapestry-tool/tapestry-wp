@@ -3,10 +3,7 @@
     :class="[
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
-      {
-        'media-wrapper-no-scroll':
-          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
-      },
+      { 'media-wrapper-no-scroll' : node.typeData.youtubeID },
     ]"
   >
     <text-media
@@ -161,6 +158,10 @@ export default {
   height: 100%;
   padding: 0;
   position: relative;
+
+  &-no-scroll {
+    overflow: hidden;
+  }
 }
 
 .media-wrapper-embed {

@@ -791,10 +791,10 @@ export default {
         this.node.mediaDuration = h5pVideo.getDuration()
       }
     },
-    handleYouTubeload(event) { //Set media duration if video loads
+    handleYouTubeload(event) { // Set media duration and ID if youtube video loads
       if(this.node.mediaType === 'video'){
-        console.log(event.target.getDuration())
         this.node.mediaDuration = event.target.getDuration()
+        this.node.typeData.youtubeID = this.videoUrlYoutubeID
         this.youtubeLoaded = true
       }
     }
@@ -903,6 +903,7 @@ table {
     width: 1.5em;
     left: 33%;
   }
+}
   
 .indented-options {
   border-left: solid 2px #ccc;
