@@ -105,7 +105,12 @@
               </combobox>
             </b-form-group>
             <video
-              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p' && videoUrlYoutubeID === ''"
+              v-if="
+                videoUrlEntered &&
+                  node.mediaType === 'video' &&
+                  nodeType !== 'h5p' &&
+                  videoUrlYoutubeID === ''
+              "
               ref="video"
               controls
               :src="videoSrc"
@@ -114,15 +119,22 @@
             <h5p-iframe
               v-if="videoUrlEntered && nodeType === 'h5p'"
               :node="node"
+              :dimensions="{ height: 1, width: 1 }"
+              :settings="{ muted: true }"
               style="display: none;"
               @is-loaded="handleH5Pload"
             />
-            <youtube 
-              v-if="videoUrlEntered && node.mediaType === 'video' && nodeType !== 'h5p' && videoUrlYoutubeID !== ''"
+            <youtube
+              v-if="
+                videoUrlEntered &&
+                  node.mediaType === 'video' &&
+                  nodeType !== 'h5p' &&
+                  videoUrlYoutubeID !== ''
+              "
               :video-id="videoUrlYoutubeID"
-              :player-vars="{autoplay: 0, modestbranding: 1, rel: 0, iv_load_policy: 3}"
-              @ready="handleYouTubeload"
+              :player-vars="{ autoplay: 0 }"
               style="display: none;"
+              @ready="handleYouTubeload"
             />
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
@@ -695,7 +707,11 @@ export default {
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if(this.node.mediaType === 'video' && this.nodeType !== 'h5p' && this.videoUrlYoutubeID === ''){
+        if (
+          this.node.mediaType === "video" &&
+          this.nodeType !== "h5p" &&
+          this.videoUrlYoutubeID === ""
+        ) {
           this.setVideoDuration()
         }
         if (this.modalType === "add-root-node") {
@@ -703,7 +719,6 @@ export default {
         } else if (this.modalType === "add-new-node") {
           this.$emit("add-edit-node", this.nodeData, false)
         } else if (this.modalType === "edit-node") {
-          console.log("added")
           this.$emit("add-edit-node", this.nodeData, true)
         } else {
           console.error(`Undefined modalType: ${this.modalType}`)
