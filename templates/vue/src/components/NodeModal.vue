@@ -288,10 +288,7 @@
         </b-tab>
         <b-tab v-if="viewAccess" title="Access">
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
-          <permissions-table
-            :initial-default="node.permissions"
-            @updated="updateNodePermissions"
-          />
+          <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
@@ -505,7 +502,6 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.node.permissions)
     this.gravityFormExists = await GravityFormsApi.exists()
     this.mediaTypes.push({
       value: "gravity-form",
@@ -546,9 +542,6 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering"]),
-    updateNodePermissions(permissions) {
-      this.node.permissions = permissions
-    },
     setDefaultFullscreenOption() {
       this.node.fitWindow = true
     },
