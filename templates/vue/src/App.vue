@@ -2,7 +2,7 @@
   <div id="app">
     <tyde />
     <router-view></router-view>
-    <tapestry-filter v-if="tapestryIsLoaded" />
+    <tapestry-filter v-if="tapestryIsLoaded && enableFilter" />
   </div>
 </template>
 
@@ -16,6 +16,11 @@ export default {
   components: {
     Tyde,
     TapestryFilter,
+  },
+  data() {
+    return {
+      enableFilter: false,
+    }
   },
   computed: {
     ...mapState(["tapestryIsLoaded"]),
