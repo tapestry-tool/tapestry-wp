@@ -5,6 +5,8 @@ export const SITE_URL = Cypress.env("BASE_URL")
 
 export const API_URL = `${SITE_URL}/wp-json/tapestry-tool/v1`
 
+export const TEST_TAPESTRY_NAME = `cypress`
+
 export const getStore = () => cy.window().its("app.$store")
 
 export const visitTapestry = (name = "empty") => {

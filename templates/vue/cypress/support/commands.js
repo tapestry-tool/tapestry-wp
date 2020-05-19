@@ -9,6 +9,8 @@ import {
   SITE_URL,
   openRootNodeModal,
   openEditNodeModal,
+  TEST_TAPESTRY_NAME,
+  findNode,
 } from "./utils"
 import roles from "./roles"
 
@@ -19,29 +21,30 @@ Cypress.Commands.add("login", role => {
 
 Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 
-Cypress.Commands.add("openLightbox", id => {
-  getMediaButton(id).click()
+Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
+  const nodeId = id || node.id
+  getMediaButton(nodeId).click()
   return cy.get("#lightbox")
 })
 
-Cypress.Commands.add("addTapestry", (title, body = {}) => {
+Cypress.Commands.add("addTapestry", (body = {}) => {
   cy.request({
     url: `${API_URL}/tapestries`,
-    body: { title, ...body },
+    body: { title: TEST_TAPESTRY_NAME, ...body },
     method: "POST",
   })
 })
 
-Cypress.Commands.add("deleteTapestry", title => {
+Cypress.Commands.add("deleteTapestry", () => {
   cy.request({
     url: `${API_URL}/tapestries`,
-    body: { title },
+    body: { title: TEST_TAPESTRY_NAME },
     method: "DELETE",
   })
 })
 
-Cypress.Commands.add("visitTapestry", title => {
-  cy.visit(`${SITE_URL}/tapestry/${title}`)
+Cypress.Commands.add("visitTapestry", () => {
+  cy.visit(`${SITE_URL}/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.contains(/loading/i).should("not.exist")
 })
 
@@ -70,7 +73,7 @@ Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) =
   return cy
     .wait("@postNode")
     .its("response.body.id")
-    .then(id => getNode(id))
+    .then(id => findNode(node => node.id === id))
 })
 
 Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
@@ -79,20 +82,26 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   }
 
   cy.server()
-  cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**`).as("editNode")
+  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`).as(
+    "editPermissions"
+  )
 
   openEditNodeModal(node.id)
   const { mediaType, ...rest } = newNode
-  getByTestId("node-mediaType").select(mediaType)
+  if (mediaType) {
+    getByTestId("node-mediaType").select(mediaType)
+  }
   Object.entries(rest).forEach(([testId, value]) => {
-    getByTestId(`node-${testId}`).type(value)
+    getByTestId(`node-${testId}`)
+      .clear()
+      .type(value)
   })
   submitModal()
 
-  return cy
-    .wait("@postNode")
-    .its("response.body.id")
-    .then(id => getNode(id))
+  cy.wait("@editPermissions")
+  cy.wait("@editNode")
+  return findNode(nd => nd.id === node.id)
 })
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
