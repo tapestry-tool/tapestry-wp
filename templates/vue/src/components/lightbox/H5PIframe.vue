@@ -12,9 +12,7 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -39,6 +37,13 @@ export default {
       required: false,
       default: true,
     },
+  },
+  data() {
+    return {
+      frameHeight: 0,
+      frameWidth: 0,
+      instance: null,
+    }
   },
   watch: {
     node(_, oldNode) {
@@ -143,6 +148,7 @@ export default {
       }
     },
     handlePlay(node) {
+      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
@@ -151,6 +157,7 @@ export default {
       })
     },
     handlePause(node) {
+      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       const progressVal = node.typeData.progress ? node.typeData.progress[0].value : 0
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
