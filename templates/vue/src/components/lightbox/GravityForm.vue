@@ -1,8 +1,16 @@
 <template>
-  <div class="gf-container">
+  <div :class="['gf-container', { 'read-only': readOnly }]">
     <loading v-show="loading" label="Loading form..." />
+    <div v-if="!loading && readOnly">
+      <tapestry-activity
+        v-if="answer"
+        :type="answer.type"
+        :entry="answer.entry"
+      ></tapestry-activity>
+      <p v-else>You haven't completed this activity yet.</p>
+    </div>
     <div
-      v-show="!loading"
+      v-show="!loading && !readOnly"
       ref="formContainer"
       class="gf-form-container"
       @submit="handleSubmit"
@@ -14,12 +22,14 @@
 <script>
 import axios from "axios"
 import Loading from "@/components/Loading"
+import TapestryActivity from "@/components/TapestryActivity"
 import GravityFormsApi from "@/services/GravityFormsApi"
 
 export default {
   name: "gravity-form",
   components: {
     Loading,
+    TapestryActivity,
   },
   props: {
     id: {
@@ -30,6 +40,11 @@ export default {
       type: Object,
       required: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -37,6 +52,22 @@ export default {
       html: "",
       loading: true,
     }
+  },
+  computed: {
+    answer() {
+      if (this.entry) {
+        const answers = Object.entries(this.entry)
+          .filter(obj => !isNaN(parseInt(obj[0], 10)))
+          .map(i => i[1])
+        return answers.length === 1
+          ? {
+              type: "text",
+              entry: answers[0],
+            }
+          : { type: "checklist", entry: answers.filter(answer => answer !== "") }
+      }
+      return null
+    },
   },
   watch: {
     id(newId) {
@@ -186,6 +217,13 @@ export default {
   max-width: 700px;
   padding-left: 20%;
   float: right;
+}
+
+.read-only {
+  padding: 3em;
+  float: none;
+  margin: auto;
+  color: black;
 }
 
 .gform_footer {

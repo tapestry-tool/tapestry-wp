@@ -102,7 +102,7 @@
       <tyde-progress-bar
         v-if="moduleOpened"
         class="modal-progress"
-        :node-id="this.selectedModuleId"
+        :node-id="selectedModuleId"
       />
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">
