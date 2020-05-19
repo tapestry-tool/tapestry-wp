@@ -53,6 +53,11 @@ export default {
     TapestryMedia,
   },
   props: {
+    dimensions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
     rows: {
       type: Array,
       required: true,
@@ -70,17 +75,6 @@ export default {
   },
   computed: {
     ...mapGetters(["getFavourites"]),
-    dimensions() {
-      if (!this.isMounted) {
-        return {
-          height: 0,
-          width: 0,
-        }
-      }
-      const box = this.$refs.container
-      const rect = box.getBoundingClientRect()
-      return { width: rect.width, height: rect.height }
-    },
     favourites() {
       return this.getFavourites ? this.getFavourites : []
     },
