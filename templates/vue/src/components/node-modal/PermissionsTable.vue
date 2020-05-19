@@ -10,11 +10,11 @@
         </b-tr>
       </b-thead>
       <b-tbody>
-        <b-tr v-for="(value, rowName) in permissions" :key="rowName" :value="value">
+        <b-tr v-for="[rowName, permissionsList] in permissions" :key="rowName">
           <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
           <b-td class="text-center">
             <b-form-checkbox
-              v-model="defaultPermissions[rowName]"
+              :checked="permissionsList"
               value="read"
               :disabled="isPermissionDisabled(rowName, 'read')"
               :data-testid="`node-permissions-${rowName}-read`"
@@ -23,7 +23,7 @@
           </b-td>
           <b-td class="text-center">
             <b-form-checkbox
-              v-model="defaultPermissions[rowName]"
+              :checked="permissionsList"
               value="add"
               :disabled="isPermissionDisabled(rowName, 'add')"
               :data-testid="`node-permissions-${rowName}-add`"
@@ -32,7 +32,7 @@
           </b-td>
           <b-td class="text-center">
             <b-form-checkbox
-              v-model="defaultPermissions[rowName]"
+              :checked="permissionsList"
               value="edit"
               :disabled="isPermissionDisabled(rowName, 'edit')"
               :data-testid="`node-permissions-${rowName}-edit`"
@@ -61,50 +61,60 @@
 
 <script>
 import Helpers from "../../utils/Helpers"
+
+const PERMISSIONS_ORDER = [
+  "public",
+  "authenticated",
+  ...Object.keys(wpData.roles).filter(
+    role => role !== "administrator" && role !== "author"
+  ),
+]
+
 export default {
   name: "permissions-table",
   props: {
-    order: {
-      type: Array,
-      required: true,
-    },
-    initialDefault: {
+    value: {
       type: Object,
-      required: false,
-      default: () => ({}),
+      required: true,
     },
   },
   data() {
     return {
       userId: "",
-      defaultPermissions: this.initialDefault,
     }
   },
   computed: {
     permissions() {
-      const ordered = {}
-      this.order.forEach(permission => {
-        ordered[permission] = this.defaultPermissions[permission]
+      const orderedPermissions = []
+      PERMISSIONS_ORDER.forEach(permission => {
+        if (this.value.hasOwnProperty(permission)) {
+          orderedPermissions.push([permission, this.value[permission]])
+        } else {
+          orderedPermissions.push([permission, []])
+        }
       })
-      return ordered
+      Object.entries(this.value)
+        .filter(entry => {
+          return !orderedPermissions.some(
+            permissionMap => permissionMap[0] === entry[0]
+          )
+        })
+        .forEach(entry => orderedPermissions.push(entry))
+      return orderedPermissions
     },
-  },
-  mounted() {
-    console.log(this.initialDefault)
   },
   methods: {
     updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
-        const value = this.changeIndividualPermission(value, rowName, type)
-        this.$emit("updated", this.defaultPermissions)
-        return value
+      const newPermissions = { ...this.value }
+      this.changeIndividualPermission(value, rowName, type, newPermissions)
+      if (this.shouldCascade(rowName, type)) {
+        const rowIndex = this.getPermissionRowIndex(rowName)
+        const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
+        lowerPriorityPermissions.forEach(newRow => {
+          this.changeIndividualPermission(value, newRow[0], type, newPermissions)
+        })
       }
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const lowerPriorityPermissions = this.order.slice(rowIndex + 1)
-      lowerPriorityPermissions.forEach(newRow => {
-        this.changeIndividualPermission(value, newRow, type)
-      })
-      this.$emit("updated", this.defaultPermissions)
+      this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
       if (rowName == "public") {
@@ -112,18 +122,18 @@ export default {
       }
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
-      const higherRow = this.order[rowIndex - 1]
+      const higherRow = this.permissions[rowIndex - 1][0]
       if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
       }
-      const permissions = this.defaultPermissions[higherRow]
+      const permissions = this.value[higherRow]
       if (permissions) {
         return permissions.includes(type)
       }
       return false
     },
-    changeIndividualPermission(value, rowName, type) {
-      let currentPermissions = this.defaultPermissions[rowName]
+    changeIndividualPermission(value, rowName, type, permissionsObj) {
+      let currentPermissions = permissionsObj[rowName]
       if (!currentPermissions) {
         currentPermissions = []
       }
@@ -135,29 +145,38 @@ export default {
       } else {
         newPermissions = currentPermissions.filter(permission => permission !== type)
       }
-      this.defaultPermissions[rowName] = newPermissions
+      permissionsObj[rowName] = newPermissions
     },
     addUserPermissionRow() {
       const userId = this.userId
-      if (
-        userId &&
-        Helpers.onlyContainsDigits(userId) &&
-        $("#user-" + userId + "-editcell").val() != ""
-      ) {
-        this.order.push(`user-${userId}`)
-        const higherRow = this.order[
-          this.getPermissionRowIndex(`user-${userId}`) - 1
-        ]
-        const higherRowPermissions = this.defaultPermissions[higherRow]
-        this.defaultPermissions[`user-${userId}`] = [...higherRowPermissions]
+      if (userId && Helpers.onlyContainsDigits(userId) && this.userId != "") {
+        const higherRow = this.permissions[this.permissions.length - 1][0]
+        const higherRowPermissions = this.value[higherRow]
+        const newPermissions = { ...this.value }
+        const newUserPermissions = []
+        const types = ["read", "add", "edit"]
+        types
+          .filter(type => this.shouldCascade(higherRow, type))
+          .forEach(type => {
+            if (higherRowPermissions.includes(type)) {
+              newUserPermissions.push(type)
+            }
+          })
+        newPermissions[`user-${userId}`] = newUserPermissions
         this.userId = null
-        this.$emit("updated", this.defaultPermissions)
+        this.$emit("input", newPermissions)
       } else {
         alert("Enter valid user id")
       }
     },
     getPermissionRowIndex(rowName) {
-      return this.order.findIndex(thisRow => thisRow === rowName)
+      return this.permissions.findIndex(thisRow => thisRow[0] === rowName)
+    },
+    shouldCascade(rowName, type) {
+      if (rowName === "public" || rowName === "authenticated") {
+        return true
+      }
+      return this.isPermissionDisabled(rowName, type)
     },
   },
 }

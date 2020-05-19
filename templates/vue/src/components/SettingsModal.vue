@@ -107,11 +107,7 @@
         </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
-          <permissions-table
-            :order="permissionsOrder"
-            :initial-default="initialDefault"
-            @updated="handleUpdatedPermission"
-          />
+          <permissions-table v-model="defaultPermissions" />
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
@@ -148,6 +144,16 @@ import Combobox from "../components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
+const defaultPermissions = Object.fromEntries(
+  [
+    "public",
+    "authenticated",
+    ...Object.keys(wpData.roles).filter(
+      role => role !== "administrator" && role !== "author"
+    ),
+  ].map(rowName => [rowName, ["read"]])
+)
+
 export default {
   name: "settings-modal",
   components: {
@@ -163,15 +169,6 @@ export default {
       required: false,
       default: false,
     },
-    permissionsOrder: {
-      type: Array,
-      required: true,
-    },
-    initialDefault: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
   },
   data() {
     return {
@@ -182,7 +179,7 @@ export default {
       profileActivities: [],
       userId: "",
       showAccess: true,
-      defaultPermissions: this.initialDefault,
+      defaultPermissions,
     }
   },
   computed: {
@@ -191,6 +188,11 @@ export default {
     activities() {
       return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
     },
+  },
+  created() {
+    if (this.settings.defaultPermissions) {
+      this.defaultPermissions = this.settings.defaultPermissions
+    }
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -248,15 +250,11 @@ export default {
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
       })
-      console.log(settings)
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
-    },
-    handleUpdatedPermission(newPerm) {
-      this.defaultPermissions = newPerm
     },
   },
 }
