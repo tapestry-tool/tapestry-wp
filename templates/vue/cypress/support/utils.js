@@ -54,7 +54,7 @@ export const normalizeUrl = url => {
 }
 
 export const applyModalChanges = newNode => {
-  const { appearance, mediaType, quiz, typeData, ...rest } = newNode
+  const { appearance, mediaType, quiz, typeData, permissions, ...rest } = newNode
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
   }
@@ -141,6 +141,21 @@ export const applyModalChanges = newNode => {
             .within(() => {
               cy.contains(id).click()
             })
+        }
+      })
+    })
+  }
+
+  if (permissions) {
+    cy.contains(/access/i).click()
+    Object.entries(permissions).forEach(([role, allowedPermissions]) => {
+      const permissionTypes = ["read", "add", "edit"]
+      permissionTypes.forEach(type => {
+        const testId = `node-permissions-${role}-${type}`
+        if (allowedPermissions.includes(type)) {
+          getByTestId(testId).check({ force: true })
+        } else {
+          getByTestId(testId).uncheck({ force: true })
         }
       })
     })
