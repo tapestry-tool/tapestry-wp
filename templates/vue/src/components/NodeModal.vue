@@ -513,6 +513,9 @@ export default {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
       }
+      if (this.node.typeData.youtubeID !== "") {
+        return "youtube"
+      }
       return this.node.mediaType
     },
     modalTitle() {

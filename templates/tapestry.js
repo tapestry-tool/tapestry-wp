@@ -2600,6 +2600,13 @@ function getIconClass(mediaType, action, accessible=true) {
             classStr = "fas fa-bars";
             break;
 
+        case "youtube":
+            if (action == 'pause')
+                classStr = classStrStart + 'pause';
+            else
+                classStr = classStrStart + 'play';
+            break;
+
         default:
             classStr = classStrStart + 'exclamation';
             break;
