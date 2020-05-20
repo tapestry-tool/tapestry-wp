@@ -191,7 +191,7 @@
             <b-form-group>
               <b-form-checkbox
                 v-model="addThumbnail"
-                data-testid="node-appearance-add-thumbnail"
+                data-testid="node-appearance-thumbnail"
               >
                 Add a thumbnail
               </b-form-checkbox>
@@ -199,7 +199,7 @@
             <b-form-group v-if="addThumbnail">
               <file-upload
                 v-model="node.imageURL"
-                data-testid="node-imageUrl"
+                input-test-id="thumbnail-url"
                 placeholder="Enter the URL for the thumbnail"
               />
             </b-form-group>
@@ -221,7 +221,7 @@
             <b-form-group>
               <b-form-checkbox
                 v-model="node.hideTitle"
-                data-testid="node-appearance-hide-title"
+                data-testid="node-appearance-hideTitle"
               >
                 Hide node title
               </b-form-checkbox>
@@ -229,7 +229,7 @@
             <b-form-group>
               <b-form-checkbox
                 v-model="node.hideProgress"
-                data-testid="node-appearance-hide-progress"
+                data-testid="node-appearance-hideProgress"
               >
                 Hide progress bar
               </b-form-checkbox>
@@ -237,7 +237,7 @@
             <b-form-group>
               <b-form-checkbox
                 v-model="node.hideMedia"
-                data-testid="node-appearance-hide-media"
+                data-testid="node-appearance-hideMedia"
               >
                 Hide media button
               </b-form-checkbox>

@@ -106,3 +106,10 @@ Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
 
   return cy.wrap(node.id)
 })
+
+Cypress.Commands.add("getDOMNodeByIndex", index =>
+  cy
+    .getNodeByIndex(index)
+    .its("id")
+    .then(getNode)
+)

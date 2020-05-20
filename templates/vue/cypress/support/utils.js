@@ -54,17 +54,9 @@ export const normalizeUrl = url => {
 }
 
 export const applyModalChanges = newNode => {
-  const { mediaType, quiz, typeId, typeData, ...rest } = newNode
+  const { appearance, mediaType, quiz, typeData, ...rest } = newNode
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
-  }
-
-  if (typeId) {
-    getByTestId(`node-${mediaType}-id`)
-      .click()
-      .within(() => {
-        cy.contains(typeId).click()
-      })
   }
 
   if (typeData) {
@@ -111,6 +103,23 @@ export const applyModalChanges = newNode => {
       .clear()
       .type(value)
   })
+
+  if (appearance) {
+    cy.contains(/appearance/i).click()
+    Object.entries(appearance).forEach(([prop, value]) => {
+      if (value) {
+        getByTestId(`node-appearance-${prop}`).check({ force: true })
+      } else {
+        getByTestId(`node-appearance-${prop}`).uncheck({ force: true })
+      }
+      if (prop === "thumbnail" && value) {
+        const { url } = value
+        getByTestId("thumbnail-url")
+          .clear()
+          .type(url)
+      }
+    })
+  }
 
   if (quiz) {
     cy.contains(/quiz/i).click()
