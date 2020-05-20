@@ -1,19 +1,6 @@
+import { setup, cleanup } from "../support/utils"
+
 describe("Authoring", () => {
-  const setup = fixture => {
-    cy.login("admin")
-    if (fixture) {
-      cy.get(fixture).then(tapestry => {
-        cy.addTapestry(tapestry).visitTapestry()
-      })
-    } else {
-      cy.addTapestry().visitTapestry()
-    }
-  }
-
-  const cleanup = () => {
-    cy.deleteTapestry()
-  }
-
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")

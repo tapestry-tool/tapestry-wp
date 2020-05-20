@@ -161,3 +161,21 @@ export const applyModalChanges = newNode => {
     })
   }
 }
+
+export const setup = (fixture, role = "admin") => {
+  if (fixture) {
+    cy.get(fixture).then(tapestry => {
+      cy.addTapestry(tapestry)
+    })
+  } else {
+    cy.addTapestry()
+  }
+  if (role !== "public") {
+    cy.login(role)
+  }
+  cy.visitTapestry()
+}
+
+export const cleanup = () => {
+  cy.deleteTapestry()
+}

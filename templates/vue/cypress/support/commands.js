@@ -113,3 +113,12 @@ Cypress.Commands.add("getDOMNodeByIndex", index =>
     .its("id")
     .then(getNode)
 )
+
+Cypress.Commands.add("findNode", pred => {
+  return cy
+    .store()
+    .its("nodes")
+    .then(nodes => nodes.find(pred))
+})
+
+Cypress.Commands.add("store", () => getStore().its("state"))
