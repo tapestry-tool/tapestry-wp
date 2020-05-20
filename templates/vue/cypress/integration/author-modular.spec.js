@@ -109,28 +109,32 @@ describe("Authoring", () => {
     })
 
     describe("Media types", () => {
-      it("Should be able to add a text node and verify that the text matches what was entered", () => {
+      beforeEach(() => {
         setup("@oneNode")
+      })
 
+      it("Should be able to add a text node and verify that the text matches what was entered", () => {
         const newNode = {
           mediaType: "text",
-          textContent: "Hello world!",
+          typeData: {
+            textContent: "Hello world!",
+          },
         }
         cy.getNodeByIndex(0)
           .editNode(newNode)
           .openLightbox()
-          .contains(newNode.textContent)
+          .contains(newNode.typeData.textContent)
           .should("exist")
       })
 
       it("Should be able to add a video url and length and have the video load", () => {
-        setup("@oneNode")
-
         const newNode = {
           mediaType: "video",
-          videoUrl:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          videoDuration: 15,
+          typeData: {
+            url:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            duration: 15,
+          },
         }
         cy.getNodeByIndex(0)
           .editNode(newNode)
@@ -141,13 +145,13 @@ describe("Authoring", () => {
       })
 
       it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {
-        setup("@oneNode")
-
         const newNode = {
           mediaType: "video",
-          videoUrl:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          videoDuration: 15,
+          typeData: {
+            url:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            duration: 15,
+          },
           quiz: [
             {
               title: "What's your name?",
@@ -170,6 +174,37 @@ describe("Authoring", () => {
               cy.contains(/take quiz/i).click()
               cy.contains(newNode.quiz[0].title).should("exist")
             })
+          })
+      })
+
+      it("Should be able to add a Gravity Form and have the form be visible", () => {
+        const newNode = {
+          mediaType: "gravity-form",
+          typeData: {
+            id: 1,
+          },
+        }
+        cy.getNodeByIndex(0)
+          .editNode(newNode)
+          .openLightbox()
+          .within(() => cy.get(".gf-container").should("exist"))
+      })
+
+      it("Should be able to add an external link node and have it show a summary of the external page", () => {
+        const newNode = {
+          mediaType: "url-embed",
+          typeData: {
+            behaviour: "new-window",
+            title: "5 JavaScript Tricks That Are Good To Know",
+            url:
+              "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
+          },
+        }
+        cy.getNodeByIndex(0)
+          .editNode(newNode)
+          .openLightbox()
+          .within(() => {
+            cy.contains(newNode.typeData.title).should("exist")
           })
       })
     })

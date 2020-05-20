@@ -54,10 +54,58 @@ export const normalizeUrl = url => {
 }
 
 export const applyModalChanges = newNode => {
-  const { mediaType, quiz, ...rest } = newNode
+  const { mediaType, quiz, typeId, typeData, ...rest } = newNode
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
   }
+
+  if (typeId) {
+    getByTestId(`node-${mediaType}-id`)
+      .click()
+      .within(() => {
+        cy.contains(typeId).click()
+      })
+  }
+
+  if (typeData) {
+    switch (mediaType) {
+      case "gravity-form": {
+        getByTestId(`node-gravity-form-id`)
+          .click()
+          .within(() => {
+            cy.contains(typeData.id).click()
+          })
+        break
+      }
+      case "text": {
+        getByTestId(`node-textContent`)
+          .clear()
+          .type(typeData.textContent)
+        break
+      }
+      case "url-embed": {
+        getByTestId(`node-url-embed-url`)
+          .clear()
+          .type(typeData.url)
+        getByTestId(`node-url-embed-behaviour-${typeData.behaviour}`).click({
+          force: true,
+        })
+        break
+      }
+      case "video": {
+        getByTestId(`node-videoUrl`)
+          .clear()
+          .type(typeData.url)
+        getByTestId(`node-videoDuration`)
+          .clear()
+          .type(typeData.duration)
+        break
+      }
+      default:
+        break
+    }
+  }
+
   Object.entries(rest).forEach(([testId, value]) => {
     getByTestId(`node-${testId}`)
       .clear()

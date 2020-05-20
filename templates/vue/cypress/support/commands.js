@@ -23,6 +23,7 @@ Cypress.Commands.add("login", role => {
 Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
+  cy.scrollTo(0, 0)
   const nodeId = id || node.id
   getMediaButton(nodeId).click()
   return cy.get("#lightbox")

@@ -140,7 +140,7 @@
               <combobox
                 v-else
                 v-model="selectedGravityFormContent"
-                data-testid="combobox-gravity-form"
+                data-testid="node-gravity-form-id"
                 item-text="title"
                 item-value="id"
                 empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
@@ -160,7 +160,7 @@
             >
               <file-upload
                 v-model="node.typeData.mediaURL"
-                data-testid="node-linkUrl"
+                input-test-id="node-url-embed-url"
                 placeholder="Enter embed link (starting with http)"
               />
             </b-form-group>
@@ -169,12 +169,15 @@
                 id="external-link-behaviour"
                 v-model="node.behaviour"
               >
-                <b-form-radio value="embed" data-testid="node-linkBehaviour-embed">
+                <b-form-radio
+                  value="embed"
+                  data-testid="node-url-embed-behaviour-embed"
+                >
                   Embed in Tapestry
                 </b-form-radio>
                 <b-form-radio
                   value="new-window"
-                  data-testid="node-linkBehaviour-new-window"
+                  data-testid="node-url-embed-behaviour-new-window"
                 >
                   Open in a New Window
                 </b-form-radio>
