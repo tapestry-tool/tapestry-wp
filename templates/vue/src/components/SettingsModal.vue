@@ -38,11 +38,7 @@
         </b-tab>
         <b-tab title="Advanced">
           <b-button @click="exportTapestry">Export Tapestry</b-button>
-          <b-button @click="duplicateTapestry">Duplicate Tapestry</b-button>
-          <div v-if="showDuplicateConfirmation">
-            <p>Your new Tapestry is ready! Click on the link below to view it.</p>
-            <a :href="duplicateLink" target="_blank">{{ duplicateLink }}</a>
-          </div>
+          <duplicate-tapestry-button />
         </b-tab>
       </b-tabs>
     </b-container>
@@ -64,15 +60,14 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryApi from "@/services/TapestryAPI"
 import FileUpload from "./FileUpload"
-
-const client = new TapestryApi(wpPostId)
+import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    DuplicateTapestryButton,
   },
   props: {
     wpCanEditTapestry: {
@@ -143,14 +138,6 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
-    },
-    duplicateTapestry() {
-      const tapestry = this.tapestryJson
-      client.addTapestry({ title: this.settings.title, ...tapestry }).then(res => {
-        const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
-        this.duplicateLink = href
-        this.showDuplicateConfirmation = true
-      })
     },
   },
 }
