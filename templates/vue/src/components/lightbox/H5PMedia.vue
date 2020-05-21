@@ -25,6 +25,7 @@
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
+      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateH5pSettings"
     />
   </div>
@@ -49,6 +50,10 @@ export default {
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    dimensions: {
       type: Object,
       required: true,
     },
@@ -89,7 +94,6 @@ export default {
       this.showEndScreen = true
     },
     play() {
-      this.showPlayScreen = false
       this.$refs.h5pIframe.play()
     },
     handleLoad() {
