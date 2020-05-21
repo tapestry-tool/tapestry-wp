@@ -118,6 +118,8 @@ get_header(); ?>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/dragselect.min.js"></script>
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment.min.js"></script>
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment-timezone-with-data-2015-2025.js"></script>
 
         <script>
             // EXAMPLE OF USAGE:
