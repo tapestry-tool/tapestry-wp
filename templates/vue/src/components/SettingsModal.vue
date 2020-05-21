@@ -38,6 +38,11 @@
         </b-tab>
         <b-tab title="Advanced">
           <b-button @click="exportTapestry">Export Tapestry</b-button>
+          <b-button @click="duplicateTapestry">Duplicate Tapestry</b-button>
+          <div v-if="showDuplicateConfirmation">
+            <p>Your new Tapestry is ready! Click on the link below to view it.</p>
+            <a :href="duplicateLink" target="_blank">{{ duplicateLink }}</a>
+          </div>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -59,7 +64,10 @@
 
 <script>
 import { mapGetters } from "vuex"
+import TapestryApi from "@/services/TapestryAPI"
 import FileUpload from "./FileUpload"
+
+const client = new TapestryApi(wpPostId)
 
 export default {
   name: "settings-modal",
@@ -78,10 +86,12 @@ export default {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
+      showDuplicateConfirmation: false,
+      duplicateLink: null,
     }
   },
   computed: {
-    ...mapGetters(["settings"]),
+    ...mapGetters(["settings", "tapestryJson"]),
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -120,7 +130,7 @@ export default {
       location.reload()
     },
     exportTapestry() {
-      const tapestry = this.prepareTapestry()
+      const tapestry = this.tapestryJson
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
       })
@@ -134,26 +144,13 @@ export default {
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
     },
-    prepareTapestry() {
-      const state = this.$store.state
-      const exportedTapestry = {
-        nodes: state.nodes.map(node => {
-          const newNode = { ...node }
-          if (newNode.quiz) {
-            newNode.quiz = newNode.quiz.map(question => {
-              return { ...question, completed: false, entries: null }
-            })
-          }
-          return newNode
-        }),
-        links: state.links.map(link => ({
-          ...link,
-          source: link.source.id,
-          target: link.target.id,
-        })),
-        groups: state.groups,
-      }
-      return exportedTapestry
+    duplicateTapestry() {
+      const tapestry = this.tapestryJson
+      client.addTapestry({ title: this.settings.title, ...tapestry }).then(res => {
+        const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
+        this.duplicateLink = href
+        this.showDuplicateConfirmation = true
+      })
     },
   },
 }

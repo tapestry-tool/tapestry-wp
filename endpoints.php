@@ -381,8 +381,15 @@ function addTapestry($request)
 {
     $tapestryData = json_decode($request->get_body());
     try {
-        if (get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
-            throw new TapestryError('POST_EXISTS');
+        $title = $tapestryData->title;
+        $page = get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry');
+        if (page) {
+            $count = 1;
+            $title = $tapestryData->title . ' (' . $count . ')';
+            while (get_page_by_title($title, 'OBJECT', 'tapestry')) {
+                $count++;
+                $title = $tapestryData->title . ' (' . $count . ')';
+            }
         }
         $user = wp_get_current_user();
     
@@ -391,7 +398,7 @@ function addTapestry($request)
             'post_author'       => $user->ID ? $user->ID : 1,
             'ping_status'       => 'closed',
             'post_status'       => 'publish',
-            'post_title'        => $tapestryData->title,
+            'post_title'        => $title,
             'post_type'         => 'tapestry'
         ), true);
         if (is_wp_error($postId)) {
