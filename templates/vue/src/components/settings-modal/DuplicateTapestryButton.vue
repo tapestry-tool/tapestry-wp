@@ -1,10 +1,13 @@
 <template>
   <div>
-    <b-button @click="duplicateTapestry">Duplicate Tapestry</b-button>
-    <div v-if="showConfirmation">
-      <p>Your new Tapestry is ready! Click on the link below to view it.</p>
+    <b-button block variant="light" @click="duplicateTapestry">
+      Duplicate Tapestry
+    </b-button>
+    <b-alert :show="showConfirmation" variant="success" style="margin-top: 1em;">
+      Your new Tapestry is ready! Click on the link below to view it.
+      <br />
       <a :href="link" target="_blank">{{ link }}</a>
-    </div>
+    </b-alert>
   </div>
 </template>
 

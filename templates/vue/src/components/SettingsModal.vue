@@ -37,8 +37,10 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button @click="exportTapestry">Export Tapestry</b-button>
-          <duplicate-tapestry-button />
+          <b-button block variant="light" @click="exportTapestry">
+            Export Tapestry
+          </b-button>
+          <duplicate-tapestry-button style="margin-top: 12px;" />
         </b-tab>
       </b-tabs>
     </b-container>
