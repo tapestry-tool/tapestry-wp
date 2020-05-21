@@ -22,6 +22,12 @@ export default class {
     return response.data
   }
 
+  async importTapestry(data) {
+    const url = `${apiUrl}/tapestries/${this.postId}`
+    const response = await axios.put(url, data)
+    return response.data
+  }
+
   async getNode(id) {
     const data = await this.getTapestry()
     return data.nodes[Helpers.findNodeIndex(id, data)]

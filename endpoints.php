@@ -44,19 +44,26 @@ $REST_API_ENDPOINTS = [
             'callback'  => 'deleteTapestry'
         ]
     ],
+    'GET_TAPESTRY' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getTapestry'
+        ]
+    ],
+    'PUT_TAPESTRY'  => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_PUT_METHOD,
+            'callback'              => 'putTapestry',
+        ]
+    ],
     'PUT_TAPESTRY_SETTINGS' => (object) [
         'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
         'ARGUMENTS' => [
             'methods'               => $REST_API_PUT_METHOD,
             'callback'              => 'updateTapestrySettings',
             'permission_callback'   => 'TapestryPermissions::putTapestrySettings'
-        ]
-    ],
-    'GET_TAPESTRY' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
-        'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'getTapestry'
         ]
     ],
     'GET_GF_EXISTS'  => (object) [
@@ -390,35 +397,63 @@ function addTapestry($request)
         if (is_wp_error($postId)) {
             throw new TapestryError('FAILED_TO_CREATE_POST');
         }
-        $tapestry = new Tapestry($postId);
-        $data = new stdClass();
-        $data->groups = $tapestryData->groups;
-        $tapestry->set($data);
-    
-        if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
-            $idMap = new stdClass();
-    
-            foreach ($tapestryData->nodes as $node) {
-                $oldNodeId = $node->id;
-                $newNode = $tapestry->addNode($node);
-                $newNodeId = $newNode->id;
-                $idMap->$oldNodeId = $newNodeId;
-            }
-            
-            foreach ($tapestryData->links as $link) {
-                $oldSource = $link->source;
-                $oldTarget = $link->target;
-    
-                $link->source = $idMap->$oldSource;
-                $link->target = $idMap->$oldTarget;
-    
-                $tapestry->addLink($link);
-            }
-        }
-        return $tapestry->save();
+        return importTapestry($postId, $tapestryData);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Get a Tapestry
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function putTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+    $tapestryData = json_decode($request->get_body());
+    try {
+        return importTapestry($postId, $tapestryData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function importTapestry($postId, $tapestryData)
+{
+    $tapestry = new Tapestry($postId);
+
+    if (!$tapestry->isEmpty()) {
+        throw new TapestryError('TAPESTRY_NOT_EMPTY');
+    }
+
+    $data = new stdClass();
+    $data->groups = $tapestryData->groups;
+    $tapestry->set($data);
+
+    if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
+        $idMap = new stdClass();
+
+        foreach ($tapestryData->nodes as $node) {
+            $oldNodeId = $node->id;
+            $newNode = $tapestry->addNode($node);
+            $newNodeId = $newNode->id;
+            $idMap->$oldNodeId = $newNodeId;
+        }
+        
+        foreach ($tapestryData->links as $link) {
+            $oldSource = $link->source;
+            $oldTarget = $link->target;
+
+            $link->source = $idMap->$oldSource;
+            $link->target = $idMap->$oldTarget;
+
+            $tapestry->addLink($link);
+        }
+    }
+    return $tapestry->save();
 }
 
 function deleteTapestry($request)

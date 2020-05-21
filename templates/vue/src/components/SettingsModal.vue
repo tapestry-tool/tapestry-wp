@@ -120,17 +120,8 @@ export default {
       location.reload()
     },
     exportTapestry() {
-      const state = this.$store.state
-      const exportedTapestry = {
-        nodes: state.nodes,
-        links: state.links.map(link => ({
-          ...link,
-          source: link.source.id,
-          target: link.target.id,
-        })),
-        groups: state.groups,
-      }
-      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
+      const tapestry = this.prepareTapestry()
+      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
@@ -142,6 +133,19 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+    },
+    prepareTapestry() {
+      const state = this.$store.state
+      const exportedTapestry = {
+        nodes: state.nodes,
+        links: state.links.map(link => ({
+          ...link,
+          source: link.source.id,
+          target: link.target.id,
+        })),
+        groups: state.groups,
+      }
+      return exportedTapestry
     },
   },
 }
