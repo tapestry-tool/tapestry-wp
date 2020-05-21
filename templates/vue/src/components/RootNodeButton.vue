@@ -25,7 +25,9 @@ const client = new TapestryApi(wpPostId)
 export default {
   name: "root-node-button",
   data() {
-    return {}
+    return {
+      error: null,
+    }
   },
   methods: {
     showModal() {
@@ -43,7 +45,8 @@ export default {
       reader.onload = e => {
         client
           .importTapestry(JSON.parse(e.target.result))
-          .then(res => console.log(res))
+          .then(() => location.reload()) // TODO: Change this so a refresh isn't required
+          .catch(err => (this.error = err))
       }
       reader.readAsText(file)
     },
