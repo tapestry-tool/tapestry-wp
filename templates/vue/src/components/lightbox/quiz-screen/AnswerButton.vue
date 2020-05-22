@@ -99,7 +99,7 @@ button {
   height: 56px;
 
   &-fa {
-    font-size: 3.5em;
+    font-size: 56px;
   }
 }
 </style>

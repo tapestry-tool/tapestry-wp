@@ -193,7 +193,7 @@ body.tapestry-stage-open {
 
     h1 {
       font-family: inherit;
-      font-size: 4em;
+      font-size: 3.2em;
 
       &::before {
         display: none;
