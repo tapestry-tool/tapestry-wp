@@ -48,7 +48,7 @@
                 <a
                   v-if="!disableRow(index)"
                   :disabled="readOnly"
-                  @click="updateFavourites(row.node.id)"
+                  @click="toggleFavourite(row.node.id)"
                 >
                   <i
                     v-if="isFavourite(row.node.id)"
@@ -160,7 +160,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
     ...mapState(["selectedModuleId"]),
     confirmationStyles() {
       return {
@@ -217,16 +217,13 @@ export default {
     moduleOpened() {
       return this.selectedModuleId !== null
     },
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -282,22 +279,6 @@ export default {
             this.$emit("complete")
           }
         }
-      }
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      if (!this.readOnly) {
-        let updatedFavouritesList = [...this.favourites]
-        nodeId = nodeId.toString()
-        if (this.isFavourite(nodeId)) {
-          updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-        } else {
-          updatedFavouritesList.push(nodeId)
-        }
-        this.updateUserFavourites(updatedFavouritesList)
       }
     },
     showActivityIcon(mediaType) {

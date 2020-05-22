@@ -20,6 +20,14 @@
                   <p class="button-row-description">{{ node.description }}</p>
                 </div>
               </button>
+              <a style="margin-right: 16px;" @click="toggleFavourite(node.id)">
+                <i
+                  v-if="isFavourite(node.id)"
+                  class="fas fa-heart fa-lg"
+                  style="color:red;"
+                ></i>
+                <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
+              </a>
             </div>
             <div v-if="index === activeIndex" class="content">
               <tapestry-media
@@ -47,10 +55,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapActions } from "vuex"
+import AccordionMedia from "@/components/lightbox/AccordionMedia"
 import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
-import AccordionMedia from "@/components/lightbox/AccordionMedia"
 import Helpers from "../../utils/Helpers"
 
 export default {
@@ -72,7 +80,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "isFavourite"]),
     favouriteNodes() {
       return this.favourites.map(this.getNode)
     },
@@ -89,6 +97,9 @@ export default {
   },
   mounted() {
     this.isMounted = true
+  },
+  methods: {
+    ...mapActions(["toggleFavourite"]),
   },
 }
 </script>
@@ -111,6 +122,7 @@ h4 {
 
 .button-row {
   display: flex;
+  align-items: center;
 
   &-trigger {
     display: flex;
