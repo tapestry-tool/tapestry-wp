@@ -20,13 +20,8 @@
                   <p class="button-row-description">{{ node.description }}</p>
                 </div>
               </button>
-              <a style="margin-right: 16px;" @click="toggleFavourite(node.id)">
-                <i
-                  v-if="isFavourite(node.id)"
-                  class="fas fa-heart fa-lg"
-                  style="color:red;"
-                ></i>
-                <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
+              <a style="margin-right: 16px;" @click="handleUnfavourite(node.id)">
+                <i class="fas fa-heart fa-lg" style="color:red;"></i>
               </a>
             </div>
             <div v-if="index === activeIndex" class="content">
@@ -51,6 +46,17 @@
         </div>
       </template>
     </tapestry-accordion>
+    <div v-if="showUnfavouriteDialog" class="unfavourite-dialog">
+      Are you sure you want to remove {{ focusedNode.title }} from your favourites?
+      <div>
+        <b-button @click="handleCancel">
+          Cancel
+        </b-button>
+        <b-button @click="handleConfirm">
+          Yes
+        </b-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -77,10 +83,12 @@ export default {
   data() {
     return {
       isMounted: false,
+      showUnfavouriteDialog: false,
+      focusedNode: null,
     }
   },
   computed: {
-    ...mapGetters(["getNode", "isFavourite"]),
+    ...mapGetters(["getNode"]),
     favouriteNodes() {
       return this.favourites.map(this.getNode)
     },
@@ -100,13 +108,50 @@ export default {
   },
   methods: {
     ...mapActions(["toggleFavourite"]),
+    handleCancel() {
+      this.showUnfavouriteDialog = false
+      this.focusedNode = null
+    },
+    async handleConfirm() {
+      await this.toggleFavourite(this.focusedNode.id)
+      this.showUnfavouriteDialog = false
+    },
+    handleUnfavourite(id) {
+      this.focusedNode = this.getNode(id)
+      this.showUnfavouriteDialog = true
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-h4 {
-  margin-bottom: 16px;
+.unfavourite-dialog {
+  position: fixed;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--tapestry-light-gray);
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  > div {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .btn {
+    background: var(--tapestry-med-gray);
+    border: none;
+    margin-right: 8px;
+    width: 75px;
+
+    &:last-child {
+      background: var(--tapestry-light-blue);
+      margin-right: 0;
+    }
+  }
 }
 
 .favourite {
