@@ -5,6 +5,40 @@ export function getParent(state) {
   }
 }
 
+export function getModuleFavourites(_, { isFavourite, getNode, getDirectChildren }) {
+  return moduleId => {
+    const favourites = []
+    if (isFavourite(moduleId)) {
+      favourites.push(moduleId)
+    }
+    const stages = getDirectChildren(moduleId)
+    stages.forEach(stageId => {
+      const stage = getNode(stageId)
+      const grouping = {
+        title: stage.title,
+      }
+      const favouritesInStage = []
+      if (isFavourite(stageId)) {
+        favouritesInStage.push(stageId)
+      }
+      const topics = getDirectChildren(stageId).map(getNode)
+      const accordionRows = topics
+        .filter(topic => topic.mediaType === "accordion")
+        .flatMap(topic => getDirectChildren(topic.id).map(getNode))
+      const subAccordionRows = accordionRows
+        .filter(row => getDirectChildren(row.id).length > 0)
+        .flatMap(row => getDirectChildren(row).map(getNode))
+      const allTopics = [...topics, ...accordionRows, ...subAccordionRows]
+      allTopics
+        .filter(topic => isFavourite(topic.id))
+        .forEach(topic => favouritesInStage.push(topic.id))
+      grouping.rows = favouritesInStage
+      favourites.push(grouping)
+    })
+    return favourites
+  }
+}
+
 export function getModuleContent(_, { getNode, getDirectChildren }) {
   return moduleId => {
     const module = getNode(moduleId)

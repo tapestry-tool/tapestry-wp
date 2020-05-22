@@ -1,7 +1,7 @@
 <template>
   <div ref="container" class="sub-container">
     <tapestry-accordion :rows="rows" :default-index="-1">
-      <template v-slot="{ activeIndex, toggle }">
+      <template v-slot="{ isVisible, toggle }">
         <div>
           <div
             v-for="(row, index) in rows"
@@ -10,10 +10,8 @@
             class="sub-accordion-row"
           >
             <div class="button-row">
-              <button class="button-row-trigger" @click="toggle(index)">
-                <i
-                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
-                ></i>
+              <button class="button-row-trigger" @click="toggle(row)">
+                <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.title }}
               </button>
               <a @click="toggleFavourite(row.id)">
@@ -26,7 +24,7 @@
               </a>
             </div>
             <tapestry-media
-              v-if="index === activeIndex"
+              v-if="isVisible(row)"
               :node-id="row.id"
               :dimensions="dimensions"
               :autoplay="false"

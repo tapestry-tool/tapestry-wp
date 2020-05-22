@@ -5,7 +5,7 @@
       <img :src="node.imageURL" />
     </header>
     <tapestry-accordion :rows="rows">
-      <template v-slot="{ activeIndex, hasNext, next, toggle }">
+      <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div class="rows">
           <div
             v-for="(row, index) in rows"
@@ -17,12 +17,10 @@
               <button
                 class="button-row-trigger"
                 :disabled="disableRow(index)"
-                @click="toggle(index)"
+                @click="toggle(row)"
               >
                 <div class="button-row-icon">
-                  <i
-                    :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
-                  ></i>
+                  <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 </div>
                 <div>
                   <p class="button-row-title">{{ row.node.title }}</p>
@@ -59,7 +57,7 @@
                 </a>
               </div>
             </div>
-            <div v-if="index === activeIndex" class="content">
+            <div v-if="isVisible(row)" class="content">
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
@@ -67,7 +65,7 @@
                 :read-only="readOnly"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
-                @close="toggle(index)"
+                @close="toggle(row)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
               <p v-if="row.children.length > 0" class="sub-accordion-text">
@@ -81,7 +79,7 @@
               ></sub-accordion>
             </div>
             <button
-              v-if="row.node.completed && index === activeIndex"
+              v-if="row.node.completed && isVisible(row)"
               class="mt-2"
               @click="hasNext ? next() : (showCompletion = true)"
             >

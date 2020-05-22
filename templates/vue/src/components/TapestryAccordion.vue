@@ -14,31 +14,43 @@ export default {
   },
   data() {
     return {
-      activeIndex: this.defaultIndex,
+      activeRow: null,
     }
   },
   computed: {
     hasNext() {
-      return this.activeIndex < this.rows.length - 1
+      return this.rows.indexOf(this.activeRow) < this.rows.length - 1
     },
   },
+  created() {
+    if (this.defaultIndex >= 0) {
+      const row = this.rows[this.defaultIndex]
+      if (row) {
+        this.activeRow = row
+      }
+    }
+  },
   methods: {
-    toggle(index) {
-      if (this.activeIndex === index) {
-        this.activeIndex = -1
+    isVisible(row) {
+      return row === this.activeRow
+    },
+    toggle(row) {
+      if (this.isVisible(row)) {
+        this.activeRow = null
       } else {
-        this.activeIndex = index
+        this.activeRow = row
       }
     },
     next() {
       if (this.hasNext) {
-        this.activeIndex++
+        const currIndex = this.rows.indexOf(this.activeRow)
+        this.activeRow = this.rows[currIndex + 1]
       }
     },
   },
   render() {
     return this.$scopedSlots.default({
-      activeIndex: this.activeIndex,
+      isVisible: this.isVisible,
       hasNext: this.hasNext,
       next: this.next,
       toggle: this.toggle,

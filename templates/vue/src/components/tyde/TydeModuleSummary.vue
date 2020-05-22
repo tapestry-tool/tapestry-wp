@@ -93,7 +93,7 @@ export default {
       "getNode",
       "getModuleContent",
       "getModuleActivities",
-      "inModule",
+      "getModuleFavourites",
     ]),
     tabs() {
       return ["Content", "Activities", "Favourites"]
@@ -108,8 +108,7 @@ export default {
       return this.getModuleActivities(this.nodeId)
     },
     favourites() {
-      const allFavourites = this.$store.state.favourites.map(id => parseInt(id))
-      return allFavourites.filter(id => this.inModule(this.nodeId, id))
+      return this.getModuleFavourites(this.nodeId)
     },
   },
   methods: {

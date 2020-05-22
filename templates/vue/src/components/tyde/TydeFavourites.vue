@@ -1,46 +1,33 @@
 <template>
   <div ref="container">
-    <tapestry-accordion :rows="favouriteNodes" :default-index="-1">
-      <template v-slot="{ activeIndex, toggle }">
-        <div>
+    <tapestry-accordion :rows="rows" :default-index="-1">
+      <template v-slot="{ isVisible, toggle }">
+        <div class="favourites">
           <div
-            v-for="(node, index) in favouriteNodes"
-            :key="node.id"
-            class="favourite"
+            v-for="nodeOrGroup in favouriteNodes"
+            :key="nodeOrGroup.id || nodeOrGroup.title"
           >
-            <div class="button-row">
-              <button class="button-row-trigger" @click="toggle(index)">
-                <div class="button-row-icon">
-                  <i
-                    :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
-                  ></i>
-                </div>
-                <div>
-                  <p class="button-row-title">{{ node.title }}</p>
-                  <p class="button-row-description">{{ node.description }}</p>
-                </div>
-              </button>
-              <a style="margin-right: 16px;" @click="handleUnfavourite(node.id)">
-                <i class="fas fa-heart fa-lg" style="color:red;"></i>
-              </a>
-            </div>
-            <div v-if="index === activeIndex" class="content">
-              <tapestry-media
-                v-if="node.mediaType !== 'accordion'"
-                :node-id="node.id"
-                :autoplay="false"
-                :dimensions="dimensions"
-                read-only
-              />
-              <accordion-media
-                v-else
-                read-only
-                :node="node"
-                :style="{
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                }"
-              ></accordion-media>
+            <tyde-favourites-row
+              v-if="nodeOrGroup.id"
+              :node="nodeOrGroup"
+              :dimensions="dimensions"
+              :visible="isVisible(nodeOrGroup)"
+              @toggle="toggle(nodeOrGroup)"
+              @unfavourite="handleUnfavourite(nodeOrGroup.id)"
+            />
+            <div v-else>
+              <h4 class="group-title">{{ nodeOrGroup.title }}</h4>
+              <div class="group-rows">
+                <tyde-favourites-row
+                  v-for="node in nodeOrGroup.rows"
+                  :key="node.id"
+                  :node="node"
+                  :dimensions="dimensions"
+                  :visible="isVisible(node)"
+                  @toggle="toggle(node)"
+                  @unfavourite="handleUnfavourite(node.id)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -62,17 +49,15 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import AccordionMedia from "@/components/lightbox/AccordionMedia"
 import TapestryAccordion from "@/components/TapestryAccordion"
-import TapestryMedia from "@/components/TapestryMedia"
+import TydeFavouritesRow from "./tyde-favourites/TydeFavouritesRow"
 import Helpers from "../../utils/Helpers"
 
 export default {
   name: "tyde-favourites",
   components: {
-    AccordionMedia,
     TapestryAccordion,
-    TapestryMedia,
+    TydeFavouritesRow,
   },
   props: {
     favourites: {
@@ -90,7 +75,20 @@ export default {
   computed: {
     ...mapGetters(["getNode"]),
     favouriteNodes() {
-      return this.favourites.map(this.getNode)
+      return this.favourites.map(idOrObject => {
+        if (typeof idOrObject === "object") {
+          return {
+            ...idOrObject,
+            rows: idOrObject.rows.map(this.getNode),
+          }
+        }
+        return this.getNode(idOrObject)
+      })
+    },
+    rows() {
+      return this.favouriteNodes.flatMap(
+        nodeOrObject => nodeOrObject.rows || [nodeOrObject]
+      )
     },
     dimensions() {
       if (!this.isMounted) {
@@ -125,6 +123,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.favourites {
+  > * {
+    margin-bottom: 1em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .group-title {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+
+  .group-rows {
+    > * {
+      margin-bottom: 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
 .unfavourite-dialog {
   position: fixed;
   top: 48px;
@@ -152,62 +175,5 @@ export default {
       margin-right: 0;
     }
   }
-}
-
-.favourite {
-  background-color: var(--tapestry-med-gray);
-  border-radius: 16px;
-  margin-bottom: 16px;
-  padding: 24px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.button-row {
-  display: flex;
-  align-items: center;
-
-  &-trigger {
-    display: flex;
-    align-items: center;
-    background: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    text-align: left;
-  }
-
-  &-icon {
-    background: #b29ac9;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin-right: 24px;
-  }
-
-  p {
-    display: block;
-    margin: 0;
-    padding: 0;
-    line-height: 1.1;
-    font-size: 1.2em;
-  }
-
-  &-title {
-    font-weight: bold;
-  }
-
-  &-description {
-    font-weight: 400;
-  }
-}
-
-.content {
-  margin-top: 24px;
 }
 </style>
