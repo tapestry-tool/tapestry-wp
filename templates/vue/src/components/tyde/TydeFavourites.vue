@@ -1,6 +1,5 @@
 <template>
   <div ref="container">
-    <h4>Your Favourite Topics</h4>
     <tapestry-accordion :rows="favouriteNodes" :default-index="-1">
       <template v-slot="{ activeIndex, toggle }">
         <div>

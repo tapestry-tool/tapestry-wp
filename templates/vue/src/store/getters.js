@@ -45,7 +45,7 @@ export function inModule(_, { getNode, getDirectChildren }) {
       }
       const topic = getNode(id)
       if (topic.mediaType === "accordion") {
-        return getDirectChildren(id).some(rowId => rowId === id)
+        return getDirectChildren(topic.id).some(rowId => rowId == nodeId)
       }
       return false
     })

@@ -2,7 +2,7 @@
   <div :class="['video-container', { fullscreen: node.fullscreen }]">
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
-      v-if="showEndScreen"
+      v-if="showEndScreen && !readOnly"
       :node="node"
       @rewatch="rewatch"
       @close="close"
