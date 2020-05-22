@@ -3,6 +3,10 @@
     :class="[
       'media-wrapper',
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
+      {
+        'media-wrapper-no-scroll':
+          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
+      },
     ]"
     :style="containerStyles"
   >
@@ -25,17 +29,16 @@
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"
-      :node="node"
       :dimensions="dimensions"
-      @mounted="handleLoad"
+      :node="node"
+      @load="handleLoad"
       @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
-      :width="dimensions.width"
-      :height="dimensions.height"
       :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @timeupdate="updateProgress"
@@ -165,8 +168,13 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
-}
-.media-wrapper-embed {
-  background: white;
+
+  &-embed {
+    background: white;
+  }
+
+  &-no-scroll {
+    overflow: hidden;
+  }
 }
 </style>

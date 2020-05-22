@@ -129,7 +129,7 @@ export default {
       width: 100%;
       top: -20px;
       right: -20px;
-      z-index: 100;
+      z-index: 1000;
     }
   }
 
