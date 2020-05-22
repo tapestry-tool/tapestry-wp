@@ -60,11 +60,16 @@
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
-      <tyde-favourites
-        v-if="activePage === 'favourites'"
-        :favourites="favourites"
-        class="mt-3"
-      ></tyde-favourites>
+      <div v-if="activePage === 'favourites'">
+        <tyde-favourites
+          v-if="favourites.length"
+          :favourites="favourites"
+          class="mt-3"
+        ></tyde-favourites>
+        <p v-else style="font-size: 1.5em; padding: 1em;">
+          You have not added any items to your favourites.
+        </p>
+      </div>
     </div>
   </div>
 </template>

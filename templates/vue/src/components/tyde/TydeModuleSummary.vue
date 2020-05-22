@@ -41,8 +41,8 @@
         </div>
       </div>
     </div>
-    <div v-else-if="activeTab === 1">
-      <div v-if="activities.length > 0" class="content pt-4">
+    <div v-else-if="activeTab === 1" class="content p-4">
+      <div v-if="activities.length > 0">
         <tyde-activity-summary
           v-for="activity in activities"
           :key="activity.id"
@@ -50,12 +50,15 @@
           :module="module"
         />
       </div>
-      <div v-else class="content empty-message">
+      <div v-else class="empty-message">
         There are no completed activities yet.
       </div>
     </div>
     <div v-else-if="activeTab === 2" class="content p-4">
-      <tyde-favourites :favourites="favourites"></tyde-favourites>
+      <div v-if="!favourites.length" class="empty-message">
+        You have not added any items to your favourites in this module.
+      </div>
+      <tyde-favourites v-else :favourites="favourites"></tyde-favourites>
     </div>
   </div>
 </template>
@@ -187,11 +190,6 @@ export default {
         width: 20%;
       }
     }
-
-    &.empty-message {
-      padding: 1.5rem;
-      text-align: center;
-    }
   }
 
   .grid {
@@ -199,5 +197,9 @@ export default {
     grid-gap: 16px;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
+}
+
+.empty-message {
+  text-align: center;
 }
 </style>

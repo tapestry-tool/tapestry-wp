@@ -33,7 +33,9 @@ export function getModuleFavourites(_, { isFavourite, getNode, getDirectChildren
         .filter(topic => isFavourite(topic.id))
         .forEach(topic => favouritesInStage.push(topic.id))
       grouping.rows = favouritesInStage
-      favourites.push(grouping)
+      if (favouritesInStage.length) {
+        favourites.push(grouping)
+      }
     })
     return favourites
   }
@@ -60,28 +62,22 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
       if (topic.mediaType === "accordion") {
         // look at the rows for questions
         const rows = getDirectChildren(topic.id).map(getNode)
-        return rows.filter(row => row.quiz).flatMap(getCompletedActivities)
+        const rowActivities = rows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        const subRows = rows
+          .map(row => getDirectChildren(row.id))
+          .filter(child => child.length > 0)
+          .map(getNode)
+        const subRowActivities = subRows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        return rowActivities.concat(subRowActivities)
       }
       if (topic.quiz) {
         return getCompletedActivities(topic)
       }
       return []
-    })
-  }
-}
-
-export function inModule(_, { getNode, getDirectChildren }) {
-  return (moduleId, nodeId) => {
-    const topics = getDirectChildren(moduleId).flatMap(getDirectChildren)
-    return topics.some(id => {
-      if (id === nodeId) {
-        return true
-      }
-      const topic = getNode(id)
-      if (topic.mediaType === "accordion") {
-        return getDirectChildren(topic.id).some(rowId => rowId == nodeId)
-      }
-      return false
     })
   }
 }
