@@ -2583,18 +2583,20 @@ function tapestryTool(config){
             const { conditions } = node
             conditions.forEach(condition => {
                 const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                let mayUnlockNodes = conditionNode.mayUnlockNodes
-                    mayUnlockNodes.push({id: node.id, condition: condition})
-                    conditionNode.mayUnlockNodes = mayUnlockNodes
-                    switch (condition.type) {
-                        case conditionTypes.NODE_COMPLETED: {
-                            condition.fulfilled = conditionNode.completed
-                            break
+                if (conditionNode) {
+                    let mayUnlockNodes = conditionNode.mayUnlockNodes
+                        mayUnlockNodes.push({id: node.id, condition: condition})
+                        conditionNode.mayUnlockNodes = mayUnlockNodes
+                        switch (condition.type) {
+                            case conditionTypes.NODE_COMPLETED: {
+                                condition.fulfilled = conditionNode.completed
+                                break
+                            }
+                            default:
+                                condition.fulfilled = false
+                                break
                         }
-                        default:
-                            condition.fulfilled = false
-                            break
-                    }
+                }
             })
             node.unlocked = conditions.every(cond => cond.fulfilled)
         })
