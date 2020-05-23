@@ -267,6 +267,7 @@ button {
   justify-content: space-between;
   height: 100%;
   width: 100%;
+  font-size: 0.8em;
 
   &.question-h5p {
     max-width: 600px;
@@ -282,6 +283,10 @@ button {
     .image-choices-choice-image-wrap img.image-choices-choice-image {
       max-width: 100px;
     }
+  }
+  
+  h3 {
+    font-size: 2em;
   }
 }
 
@@ -330,10 +335,10 @@ button {
 
   &-title {
     position: relative;
-    font-size: 24px;
+    font-size: 0.8em;
     font-weight: 600 !important;
     padding-top: 16px;
-    margin-bottom: 36px;
+    margin: 15px 0 36px 25px;
 
     &-step {
       position: absolute;
@@ -347,7 +352,7 @@ button {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 1.5em;
     }
 
     &:before {
@@ -376,7 +381,7 @@ button {
   &-answer-text {
     width: 100%;
     padding: 0;
-    font-size: 28px;
+    font-size: 1.75em;
     font-style: italic;
   }
 }

@@ -119,7 +119,7 @@ export default {
   .icon {
     width: 96px;
     height: 96px;
-    font-size: 56px;
+    font-size: 3.5em;
     color: white;
     display: flex;
     align-items: center;

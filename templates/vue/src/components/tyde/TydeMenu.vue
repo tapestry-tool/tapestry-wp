@@ -178,7 +178,7 @@ export default {
       line-height: 44px;
       margin: 0;
       font-weight: 900;
-      font-size: 30px;
+      font-size: 1.88em;
       text-transform: uppercase;
       z-index: 10;
 

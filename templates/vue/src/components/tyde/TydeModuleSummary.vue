@@ -141,6 +141,7 @@ export default {
   .spaceship-icon {
     position: absolute;
     right: 16px;
+    max-height: 120px;
   }
 
   header {

@@ -26,9 +26,7 @@ export default {
   padding: 12px 16px;
   margin-bottom: 15px;
   border-radius: 1.2em;
-  font-size: 1em;
   font-style: italic;
-  line-height: 1.2;
 
   &:after {
     content: "";

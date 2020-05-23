@@ -214,9 +214,10 @@ export default {
 
 <style lang="scss">
 .gf-container {
-  max-width: 700px;
+  width: 100%;
   padding-left: 20%;
   float: right;
+  font-size: 1.4em;
 }
 
 .read-only {

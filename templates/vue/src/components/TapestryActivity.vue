@@ -46,6 +46,7 @@ export default {
   margin-bottom: 8px;
   padding: 8px 16px 8px 38px;
   justify-content: center;
+  font-size: 1.5em;
 
   &:last-child {
     margin-bottom: 0;

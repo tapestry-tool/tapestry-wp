@@ -43,7 +43,7 @@ export default {
 
   div {
     font-family: "Source Sans Pro", sans-serif;
-    font-size: 16px;
+    font-size: 1em;
     white-space: pre-wrap;
     margin: 0 auto 1em;
   }
