@@ -120,7 +120,7 @@ export default {
     }
 
     i.log-thumbnail-icon {
-      font-size: 100px;
+      font-size: 6.25em;
       text-shadow: 2px 2px 100px #000;
     }
   }
@@ -131,7 +131,7 @@ export default {
 
   .log-details {
     float: right;
-    font-size: 20px;
+    font-size: 1.25em;
     width: calc(100% - 280px);
     word-break: break-word;
     > h1::before {

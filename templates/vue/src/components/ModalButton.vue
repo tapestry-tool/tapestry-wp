@@ -81,7 +81,7 @@ export default {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  font-size: 1.2em;
+  font-size: 18px;
   justify-content: center;
   align-items: center;
   box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
