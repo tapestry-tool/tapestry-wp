@@ -78,6 +78,7 @@ body {
 
 #tapestry-controls-wrapper {
     margin: 40px 10% 20px;
+    margin-top: 0;
     padding: 10px 16px;
     float: right;
     width: auto;
@@ -90,7 +91,6 @@ body {
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
 		position: absolute;
-		margin-top: -60px;
 		right: 0;
 	}
 }
@@ -435,6 +435,12 @@ input[type="checkbox"][disabled] {
     padding: 0;
 }
 
+.button-node-tooltip {
+    padding: 0;
+    background: 0;
+    text-decoration: underline;
+}
+
 rect.selectable {
     fill: #11a6d8;
     fill-opacity: 0;
@@ -451,4 +457,10 @@ rect.selectable {
 
 .node-selected rect.selectable {
     fill-opacity: 0.7;
+}
+
+#depth-warning-message {
+    position: absolute;
+    top: calc(100% + 16px);
+    font-size: 0.9em;
 }

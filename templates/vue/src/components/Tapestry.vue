@@ -139,6 +139,7 @@ export default {
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("tapestry-open-node", this.openNode)
   },
   methods: {
     ...mapMutations([
@@ -150,6 +151,9 @@ export default {
       "updateTydeProgress",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    openNode({ detail: { id } }) {
+      this.$router.push(`/nodes/${id}`)
+    },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         event.detail.dataset["favourites"] = this.favourites
