@@ -160,7 +160,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 2.5em;
   color: white;
   margin: 0;
   margin-right: 12px;
@@ -186,7 +186,7 @@ export default {
   margin: 0;
   padding: 0;
   font-weight: bold;
-  font-size: 40px;
+  font-size: 2.5em;
   color: $tyde-blue;
   margin-right: 32px;
 }

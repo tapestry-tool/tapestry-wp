@@ -1,9 +1,11 @@
 <template>
   <div class="end-screen" :style="{ backgroundImage: backgroundUrl }">
     <speech-bubble v-if="showQuizButton">
-      We've got a question for you!
-      <br />
-      Do you wanna...
+      <h3>
+        We've got a question for you!
+        <br />
+        Do you wanna...
+      </h3>
     </speech-bubble>
     <div class="button-container" :class="{ 'pt-4': !showQuizButton }">
       <button
@@ -110,7 +112,7 @@ export default {
       border-radius: 4px;
       opacity: 1;
       transition: opacity 0.1s ease-out;
-      font-size: 32px;
+      font-size: 2em;
       margin-bottom: 32px;
 
       &:last-child {

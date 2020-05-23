@@ -178,7 +178,7 @@ body.tapestry-stage-open {
       position: relative;
       font-family: inherit;
       color: white;
-      font-size: 29px;
+      font-size: 1.81em;
 
       img {
         width: 80px;
@@ -193,7 +193,7 @@ body.tapestry-stage-open {
 
     h1 {
       font-family: inherit;
-      font-size: 64px;
+      font-size: 3.2em;
 
       &::before {
         display: none;
@@ -253,7 +253,7 @@ body.tapestry-stage-open {
           margin: 0.5em 0 0;
           font-family: inherit;
           color: inherit;
-          font-size: 32px;
+          font-size: 2em;
           transition: transform 0.2s ease-out;
           line-height: 0.9em;
           max-width: 200px;
