@@ -18,7 +18,7 @@ export async function addNode({ commit }, { newNode, parentId }) {
 
   const nodeToAdd = { ...newNode }
   nodeToAdd.id = response.data.id
-  nodeToAdd.author = wpData.wpUserId
+  nodeToAdd.author = response.data.author
 
   commit("addNode", nodeToAdd)
   return nodeToAdd.id

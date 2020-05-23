@@ -188,7 +188,7 @@ export default {
       }
     },
     close() {
-      this.$router.push("/")
+      this.$router.go(-1)
     },
     handleLoad(dimensions) {
       if (dimensions) {
