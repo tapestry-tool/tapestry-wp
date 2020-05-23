@@ -62,6 +62,30 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.favourite {
+
+  .quiz-screen {
+    padding-left: 24px !important;
+    background-image: none !important;
+
+    .speech-bubble {
+      border: none !important;
+      padding: 0 !important;
+      margin-left: 0 !important;
+
+      &:after, .bubble-corner, .question-title-step {
+        display: none !important;
+      }
+    }
+
+    .answer-container {
+      width: 100% !important;
+    }
+  }
+}
+</style>
+
 <style lang="scss" scoped>
 .favourite {
   background-color: var(--tapestry-med-gray);
