@@ -30,8 +30,7 @@ button {
   margin: 0;
   padding: 0;
   background: none;
-  color: var(--tyde-border-green);
-  font-family: var(--tyde-font-mono);
+  font-family: inherit;
   flex-direction: column;
 
   &:hover p {
@@ -57,6 +56,7 @@ button {
       border-radius: 50%;
       font-size: 1.5em;
       padding: 5px;
+      color: var(--tyde-border-green);
     }
   }
 
@@ -70,6 +70,11 @@ button {
     line-height: 1.3em;
     max-width: 200px;
     min-height: 2em;
+    text-shadow: 0px 0px 1px #1C0544,
+              1px 1px 1px #1C0544,
+              1px -1px 1px #1C0544,
+              -1px 1px 1px #1C0544,
+              -1px -1px 1px #1C0544;
   }
 }
 </style>
