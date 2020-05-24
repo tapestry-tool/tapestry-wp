@@ -17,9 +17,9 @@
       <section>
         <tyde-star-celebration v-if="showStar" @close="showStar = false" />
         <tyde-topic
-          v-for="topicID in node.childOrdering"
-          :key="topicID"
-          :topic="getNode(topicID)"
+          v-for="topic in filteredTopics"
+          :key="topic.id"
+          :topic="topic"
           :show-complete="true"
           style="align-self: flex-start;"
           @click="openLightbox(topic.id)"
@@ -107,6 +107,9 @@ export default {
     topics() {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
+    },
+    filteredTopics() {
+      return this.node.childOrdering.map( topicID => this.getNode(topicID) ).filter( topic => topic )
     },
     activeStarSrc() {
       return Helpers.getImagePath(ActiveStar)
