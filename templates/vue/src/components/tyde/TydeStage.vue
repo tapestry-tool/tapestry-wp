@@ -129,7 +129,6 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-stage-open")
     this.notCompleted = this.getNode(this.nodeId).tydeProgress !== 1
-    console.log(this.node.childOrdering)
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-stage-open")
