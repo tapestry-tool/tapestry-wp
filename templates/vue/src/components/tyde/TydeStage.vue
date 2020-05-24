@@ -109,7 +109,9 @@ export default {
       return childrenIds.map(id => this.getNode(id))
     },
     filteredTopics() {
-      return this.node.childOrdering.map( topicID => this.getNode(topicID) ).filter( topic => topic )
+      return this.node.childOrdering
+        .map(topicID => this.getNode(topicID))
+        .filter(topic => topic)
     },
     activeStarSrc() {
       return Helpers.getImagePath(ActiveStar)
