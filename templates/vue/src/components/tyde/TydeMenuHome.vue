@@ -113,7 +113,7 @@ export default {
 #tyde-menu-home {
   nav ul {
     display: flex;
-    font-size: 16px;
+    font-size: 1em;
     justify-content: left;
     list-style: none;
     margin: 0;

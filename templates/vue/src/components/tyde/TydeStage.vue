@@ -159,6 +159,8 @@ body.tapestry-stage-open {
   background-size: cover;
   height: 100%;
   width: 100%;
+  font-family: inherit;
+  color: #fff;
 
   .stage-header {
     display: flex;
@@ -166,8 +168,7 @@ body.tapestry-stage-open {
     width: 100vw;
     top: 32px;
     right: 32px;
-    font-family: "Roboto", monospace;
-    color: var(--tyde-border-green);
+    font-family: inherit;
     align-items: center;
 
     .stage-star {
@@ -177,7 +178,8 @@ body.tapestry-stage-open {
       position: relative;
       font-family: inherit;
       color: white;
-      font-size: 29px;
+      font-size: 1.5em;
+      line-height: 2em;
 
       img {
         width: 80px;
@@ -192,7 +194,20 @@ body.tapestry-stage-open {
 
     h1 {
       font-family: inherit;
-      font-size: 64px;
+      font-size: 3.2em;
+      text-shadow: 0px 0px 1px #1C0544,
+                  1px 1px 1px #1C0544,
+                  1px -1px 1px #1C0544,
+                  -1px 1px 1px #1C0544,
+                  -1px -1px 1px #1C0544,
+                  2px 1px 1px #1C0544,
+                  2px -1px 1px #1C0544,
+                  -2px 1px 1px #1C0544,
+                  -2px -2px 1px #1C0544,
+                  1px 2px 1px #1C0544,
+                  1px -2px 1px #1C0544,
+                  -1px 2px 1px #1C0544,
+                  2px 2px 1px #1C0544;
 
       &::before {
         display: none;
@@ -213,12 +228,11 @@ body.tapestry-stage-open {
     position: absolute;
     top: 32px;
     right: 32px;
-    font-family: "Roboto", monospace;
+    font-family: inherit;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 64px;
-    color: var(--tyde-border-green);
 
     > section {
       margin-left: 30vw;
@@ -232,6 +246,7 @@ body.tapestry-stage-open {
         background: none;
         color: inherit;
         align-self: flex-start;
+        flex: auto;
 
         &:hover p {
           transform: translateY(-8px);
@@ -252,7 +267,7 @@ body.tapestry-stage-open {
           margin: 0.5em 0 0;
           font-family: inherit;
           color: inherit;
-          font-size: 32px;
+          font-size: 2em;
           transition: transform 0.2s ease-out;
           line-height: 0.9em;
           max-width: 200px;
