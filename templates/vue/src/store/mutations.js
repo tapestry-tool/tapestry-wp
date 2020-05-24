@@ -10,7 +10,8 @@ export function init(state, dataset) {
       n =>
         n.tydeType === tydeTypes.MODULE ||
         n.mediaType === "accordion" ||
-        n.isSubAccordion
+        n.isSubAccordion ||
+        n.tydeType === tydeTypes.STAGE
     )
     .forEach(n => initializeOrdering(state, n.id))
 }
@@ -160,7 +161,7 @@ export function initializeOrdering(state, id) {
     .filter(cid => !node.childOrdering.includes(cid))
     .forEach(id => node.childOrdering.push(id))
   const children = getChildIds(state, id)
-  node.childOrdering.filter(id => children.includes(id))
+  node.childOrdering = node.childOrdering.filter(id => children.includes(id))
 }
 
 export function updateOrdering(state, payload) {

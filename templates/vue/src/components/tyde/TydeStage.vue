@@ -2,12 +2,10 @@
   <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
-        <tyde-progress-bar :node-id="this.selectedModuleId" />
+        <tyde-progress-bar :node-id="selectedModuleId" />
         <div class="stage-star">
-          <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
-          <div v-if="!this.done">
-            {{ this.numComplete }}/{{ this.topics.length }}
-          </div>
+          <img :src="done ? activeStarSrc : inactiveStarSrc" />
+          <div v-if="!done">{{ numComplete }}/{{ topics.length }}</div>
         </div>
         <h1>{{ node.title }}</h1>
         <tyde-button
@@ -19,7 +17,7 @@
       <section>
         <tyde-star-celebration v-if="showStar" @close="showStar = false" />
         <tyde-topic
-          v-for="topic in topics"
+          v-for="topic in filteredTopics"
           :key="topic.id"
           :topic="topic"
           :show-complete="true"
@@ -109,6 +107,11 @@ export default {
     topics() {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
+    },
+    filteredTopics() {
+      return this.node.childOrdering
+        .map(topicID => this.getNode(topicID))
+        .filter(topic => topic)
     },
     activeStarSrc() {
       return Helpers.getImagePath(ActiveStar)

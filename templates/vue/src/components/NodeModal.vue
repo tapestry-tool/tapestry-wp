@@ -488,7 +488,8 @@
           v-if="
             node.tydeType === tydeTypes.MODULE ||
               node.mediaType === 'accordion' ||
-              hasSubAccordion
+              hasSubAccordion ||
+              node.tydeType === tydeTypes.STAGE
           "
           title="Ordering"
         >
