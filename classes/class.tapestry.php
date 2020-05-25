@@ -377,18 +377,8 @@ class Tapestry implements ITapestry
         $nodes = array_map(
             function ($nodeMetaId) use ($userId) {
                 $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
-                if ((!TapestryUserRoles::isEditor())
-                    && (!TapestryUserRoles::isAdministrator())
-                    && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
-                ) {
-                    if ($tapestryNode->isLocked($userId)) {
-                        $nodeData = $tapestryNode->getMeta();
-                        $nodeData->unlocked = false;
-                        return $nodeData;
-                    }
-                }
-                $nodeData = $tapestryNode->get();
-                $nodeData->unlocked = true;
+                $nodeData = !TapestryUserRoles::canEdit($this->postId) && $tapestryNode->isLocked($userId) ? $tapestryNode->getMeta() : $tapestryNode->get();
+                $nodeData->unlocked = !$tapestryNode->isLocked($userId);
                 return $nodeData;
             },
             $nodeIds
