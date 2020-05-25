@@ -2398,6 +2398,52 @@ function tapestryTool(config){
             }
         }
     }
+    
+    /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
+    function setUnlocked() {
+        const { nodes } = tapestry.dataset
+        nodes.forEach(node => {
+            const { conditions } = node
+            conditions.forEach(condition => {
+                switch (condition.type) {
+                    case conditionTypes.NODE_COMPLETED: {
+                        const conditionNode = nodes[findNodeIndex(condition.nodeId)]
+                        if (conditionNode) {
+                            let mayUnlockNodes = conditionNode.mayUnlockNodes
+                            mayUnlockNodes.push({ id: node.id, condition: condition })
+                            conditionNode.mayUnlockNodes = mayUnlockNodes
+                            condition.fulfilled = conditionNode.completed
+                        }
+                        break
+                    }
+                    case conditionTypes.DATE_NOT_PASSED: {
+                        const currentDate = new Date()
+                        const conditionDate = parseDate(condition)
+                        condition.fulfilled = currentDate <= conditionDate
+                        break
+                    }   
+                    case conditionTypes.DATE_PASSED: {
+                        const currentDate = new Date()
+                        const conditionDate = parseDate(condition)
+                        condition.fulfilled = currentDate >= conditionDate
+                        break
+                    }
+                    default:
+                        condition.fulfilled = false
+                        break
+                }
+            })
+            node.unlocked = conditions.every(cond => cond.fulfilled)
+        })
+    }
+
+    function parseDate(condition) {
+        const { date, time, timezone } = condition
+        if (time) {
+            return moment.tz(`${date} ${time}`, timezone).toDate()
+        }
+        return moment.tz(date, timezone).toDate()
+    }
 
     /**
      * when node is being deleted, iterate over conditions to find nodes that unlocked this
