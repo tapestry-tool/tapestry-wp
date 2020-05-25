@@ -2398,52 +2398,6 @@ function tapestryTool(config){
             }
         }
     }
-    
-    /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
-    function setUnlocked() {
-        const { nodes } = tapestry.dataset
-        nodes.forEach(node => {
-            const { conditions } = node
-            conditions.forEach(condition => {
-                switch (condition.type) {
-                    case conditionTypes.NODE_COMPLETED: {
-                        const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                        if (conditionNode) {
-                            let mayUnlockNodes = conditionNode.mayUnlockNodes
-                            mayUnlockNodes.push({ id: node.id, condition: condition })
-                            conditionNode.mayUnlockNodes = mayUnlockNodes
-                            condition.fulfilled = conditionNode.completed
-                        }
-                        break
-                    }
-                    case conditionTypes.DATE_NOT_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
-                        condition.fulfilled = currentDate <= conditionDate
-                        break
-                    }   
-                    case conditionTypes.DATE_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
-                        condition.fulfilled = currentDate >= conditionDate
-                        break
-                    }
-                    default:
-                        condition.fulfilled = false
-                        break
-                }
-            })
-            node.unlocked = conditions.every(cond => cond.fulfilled)
-        })
-    }
-
-    function parseDate(condition) {
-        const { date, time, timezone } = condition
-        if (time) {
-            return moment.tz(`${date} ${time}`, timezone).toDate()
-        }
-        return moment.tz(date, timezone).toDate()
-    }
 
     /**
      * when node is being deleted, iterate over conditions to find nodes that unlocked this
@@ -2461,35 +2415,6 @@ function tapestryTool(config){
             });
             conditionNode.mayUnlockNodes = mayUnlockNodes;
         })
-    }
-    
-    /**
-     * Sets the accessible status of all nodes starting with the root node
-     */
-    function setAccessibleStatus() {
-        if (tapestry.dataset.nodes.length == 0) {
-            return;
-        }
-
-        tapestry.dataset.nodes.forEach(node => {
-            node.accessible = false;
-        });
-
-        function recursivelySetAccessible(id, visited) {
-            visited.add(id);
-            const node = getNodeById(id);
-            node.accessible = node.unlocked;
-            if (node.accessible) {
-                getNeighbours(id)
-                    .filter(child => !visited.has(child))
-                    .forEach(child => {
-                        visited.add(child);
-                        recursivelySetAccessible(child, visited);
-                    })
-            }
-        }
-
-        recursivelySetAccessible(tapestry.dataset.nodes[0].id, new Set());
     }
     
     // ALL the checks for whether a certain node is viewable
