@@ -64,7 +64,6 @@ export default {
 
 <style lang="scss">
 .favourite {
-
   .quiz-screen {
     padding-left: 24px !important;
     background-image: none !important;
@@ -74,7 +73,9 @@ export default {
       padding: 0 !important;
       margin-left: 0 !important;
 
-      &:after, .bubble-corner, .question-title-step {
+      &:after,
+      .bubble-corner,
+      .question-title-step {
         display: none !important;
       }
     }

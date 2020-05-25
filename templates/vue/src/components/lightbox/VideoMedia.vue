@@ -1,5 +1,10 @@
 <template>
-  <div :class="['video-container', { fullscreen: node.fullscreen, 'allow-scroll': showQuizScreen }]">
+  <div
+    :class="[
+      'video-container',
+      { fullscreen: node.fullscreen, 'allow-scroll': showQuizScreen },
+    ]"
+  >
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen && !readOnly"
@@ -88,7 +93,7 @@ export default {
       if (width / height <= 1) {
         return { height: "100%", width: "auto" }
       }
-      if (this.node.fullscreen && this.node.fitWindow) {
+      if (this.node.fullscreen && this.node.fitWindow && !this.readOnly) {
         if (width > window.innerWidth) {
           const resizeRatio = window.innerWidth / width
           const newHeight = height * resizeRatio

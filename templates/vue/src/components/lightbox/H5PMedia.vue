@@ -21,6 +21,7 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :node="node"
+      :read-only="readOnly"
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @is-loaded="handleLoad"

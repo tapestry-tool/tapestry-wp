@@ -37,6 +37,11 @@ export default {
       required: false,
       default: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -60,7 +65,11 @@ export default {
   methods: {
     setFrameHeight() {
       const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
-      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
+      if (
+        videoHeight > this.dimensions.height &&
+        this.node.fitWindow &&
+        !this.readOnly
+      ) {
         const scaleFactor = this.dimensions.height / videoHeight
         this.frameHeight = this.dimensions.height
         this.frameWidth = 100 * scaleFactor + "%"
