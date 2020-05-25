@@ -1021,7 +1021,6 @@ export default {
     },
     handleYouTubeload(event) {
       // Set media duration and ID if youtube video loads
-      console.log(event)
       this.node.mediaDuration = event.target.getDuration()
       this.node.typeData.youtubeID = this.videoUrlYoutubeID
       this.youtubeLoaded = true
