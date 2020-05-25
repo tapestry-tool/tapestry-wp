@@ -29,7 +29,7 @@
               :dimensions="dimensions"
               :autoplay="false"
               :read-only="readOnly"
-              @close="toggle(index)"
+              @close="toggle(row)"
               @load="handleLoad(index)"
             />
           </div>

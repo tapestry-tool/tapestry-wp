@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     isVisible(row) {
-      return row === this.activeRow
+      return this.activeRow === row
     },
     toggle(row) {
       if (this.isVisible(row)) {
