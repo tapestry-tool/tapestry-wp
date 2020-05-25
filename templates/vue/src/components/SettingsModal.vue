@@ -83,8 +83,6 @@ export default {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
-      showDuplicateConfirmation: false,
-      duplicateLink: null,
     }
   },
   computed: {
