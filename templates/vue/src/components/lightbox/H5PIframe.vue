@@ -140,8 +140,6 @@ export default {
       })
     },
     handleLoad() {
-      this.$emit("is-loaded")
-
       $("iframe").each(function() {
         $(this)
           .data("ratio", this.height / this.width)
@@ -259,6 +257,7 @@ export default {
           h5pVideo.on("loaded", handleH5pAfterLoad)
         }
       }
+      this.$emit("is-loaded")
     },
     toggleMuteIcon() {
       const body = this.$refs.h5p.contentWindow.H5P.$body[0]

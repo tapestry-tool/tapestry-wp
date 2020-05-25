@@ -83,26 +83,14 @@
             >
               <file-upload
                 id="node-video-media-url"
-                v-model="node.typeData.mediaURL"
+                v-model="videoSrc"
                 data-testid="node-videoUrl"
-                placeholder="Enter URL for MP4 Video"
+                placeholder="Enter URL for MP4 or Youtube Video"
                 required
               />
               <b-form-text v-if="showVideoDescription">
                 This video should not include any screenshots of the stage layout.
               </b-form-text>
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video Duration"
-            >
-              <b-form-input
-                id="node-video-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-videoDuration"
-                placeholder="Enter duration (in seconds)"
-                required
-              />
             </b-form-group>
             <b-form-group v-show="nodeType === 'h5p'" :label="h5pLabel">
               <combobox
@@ -123,24 +111,44 @@
                 This H5P should not include any screenshots of the stage layout.
               </b-form-text>
             </b-form-group>
-            <b-form-group
-              v-show="nodeType === 'h5p'"
-              label="H5P Video Duration"
-              description="This only applies to video H5P content"
-            >
-              <b-form-input
-                id="node-h5p-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-h5pDuration"
-                placeholder="Enter duration (in seconds)"
-                required
+            <div class="duration-calculation-video-containers">
+              <video
+                v-if="
+                  videoUrlEntered &&
+                    node.mediaType === 'video' &&
+                    nodeType !== 'h5p' &&
+                    videoUrlYoutubeID === ''
+                "
+                ref="video"
+                controls
+                :src="videoSrc"
+                style="display:none;"
               />
-            </b-form-group>
+              <iframe
+                v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
+                ref="h5pNone"
+                :src="node.typeData && node.typeData.mediaURL"
+                style="display: none;"
+                @load="handleH5Pload"
+              ></iframe>
+              <youtube
+                v-if="
+                  videoUrlEntered &&
+                    node.mediaType === 'video' &&
+                    nodeType !== 'h5p' &&
+                    videoUrlYoutubeID !== ''
+                "
+                :video-id="videoUrlYoutubeID"
+                :player-vars="{ autoplay: 0 }"
+                style="display: none;"
+                @ready="handleYouTubeload"
+              />
+            </div>
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
-              <span v-if="!this.gravityFormExists" class="text-muted">
+              <span v-if="!gravityFormExists" class="text-muted">
                 Gravity Forms plugin is not installed. Please install Gravity Forms
                 to use this content type.
               </span>
@@ -516,8 +524,15 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">
-        Submit
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :class="accessSubmit ? '' : 'disabled'"
+        @click="submitNode()"
+      >
+        <b-spinner v-if="!accessSubmit"></b-spinner>
+        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -607,6 +622,9 @@ export default {
       addThumbnail: false,
       addLockedThumbnail: false,
       tydeTypes: tydeTypes,
+      videoUrlEntered: false,
+      videoSrc: null,
+      youtubeLoaded: false,
     }
   },
   computed: {
@@ -660,6 +678,9 @@ export default {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
       }
+      if (this.videoUrlYoutubeID !== "") {
+        return "youtube"
+      }
       return this.node.mediaType
     },
     modalTitle() {
@@ -676,7 +697,10 @@ export default {
     nodeData() {
       return [
         { name: "title", value: this.node.title },
-        { name: "conditions", value: this.lockNode ? this.node.conditions || [] : [] },
+        {
+          name: "conditions",
+          value: this.lockNode ? this.node.conditions || [] : [],
+        },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
         { name: "mediaType", value: this.nodeType },
@@ -748,6 +772,15 @@ export default {
       })
       return ordered
     },
+    videoUrlYoutubeID() {
+      return this.videoUrlEntered
+        ? Helpers.getYoutubeID(this.node.typeData.mediaURL)
+        : ""
+    },
+    accessSubmit() {
+      // Locks access to submit button while youtube video loads to grab duration
+      return this.videoUrlYoutubeID === "" ? true : this.youtubeLoaded
+    },
   },
   watch: {
     selectedH5pContent() {
@@ -755,6 +788,10 @@ export default {
     },
     selectedGravityFormContent(id) {
       this.node.typeData.mediaURL = id
+    },
+    videoSrc(newUrl) {
+      this.node.typeData.mediaURL = newUrl
+      this.videoUrlEntered = true
     },
   },
   async mounted() {
@@ -786,6 +823,7 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+        this.videoSrc = this.node.typeData.mediaURL
         this.lockNode = this.node.conditions && this.node.conditions.length > 0
         this.addThumbnail = this.node.imageURL.length > 0
         this.addLockedThumbnail = this.node.lockedImageURL.length > 0
@@ -883,6 +921,13 @@ export default {
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
+        if (
+          this.node.mediaType === "video" &&
+          this.nodeType !== "h5p" &&
+          this.videoUrlYoutubeID === ""
+        ) {
+          this.setVideoDuration()
+        }
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
@@ -919,15 +964,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
-        }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -970,6 +1009,22 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    setVideoDuration() {
+      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
+    },
+    handleH5Pload() {
+      // Set media duration if video is loaded
+      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
+      const h5pVideo = h5pFrame.instances[0].video
+      this.node.mediaDuration = h5pVideo.getDuration()
+    },
+    handleYouTubeload(event) {
+      // Set media duration and ID if youtube video loads
+      console.log(event)
+      this.node.mediaDuration = event.target.getDuration()
+      this.node.typeData.youtubeID = this.videoUrlYoutubeID
+      this.youtubeLoaded = true
     },
   },
 }
@@ -1036,6 +1091,16 @@ table {
 
     &:last-child {
       margin-bottom: 0;
+    }
+  }
+
+  #submit-button {
+    position: relative;
+    > span {
+      position: absolute;
+      height: 1.5em;
+      width: 1.5em;
+      left: 33%;
     }
   }
 
