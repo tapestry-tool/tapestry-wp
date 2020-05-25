@@ -228,7 +228,7 @@ export default {
   button {
     background-color: rgba(26, 26, 26, 0.8);
     border-radius: 30px;
-    font-size: 24px;
+    font-size: 1.5em;
     height: 56px;
     width: auto;
     min-width: 56px;
@@ -236,7 +236,7 @@ export default {
     &.main-button {
       width: 122px;
       height: 122px;
-      font-size: 72px;
+      font-size: 4.5em;
       border-radius: 72px;
     }
 

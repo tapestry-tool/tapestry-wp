@@ -183,9 +183,10 @@ export default {
 
 <style lang="scss">
 .gf-container {
-  max-width: 700px;
+  width: 100%;
   padding-left: 20%;
   float: right;
+  font-size: 1.4em;
 }
 
 .gform_footer {
@@ -194,7 +195,6 @@ export default {
 }
 
 .gform_wrapper .image-choices-use-images .ginput_container {
-
   .gfield_checkbox {
     display: flex;
     align-items: flex-start;

@@ -136,15 +136,17 @@ get_header(); ?>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jquery-ui.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
-        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/h5p-resizer.min.js" charset="UTF-8"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/dragselect.min.js"></script>
-        
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment.min.js"></script>
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment-timezone-with-data-2015-2025.js"></script>
+
         <script>
             // EXAMPLE OF USAGE:
             // thisTapestryTool.setDataset({'abc':'123'});
             // thisTapestryTool.redraw(false);
 
             var wpPostId = "<?php echo get_the_ID(); ?>";
+            var wpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
 

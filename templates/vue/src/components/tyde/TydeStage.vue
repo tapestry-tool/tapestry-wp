@@ -2,12 +2,10 @@
   <div :id="`stage-${nodeId}`" class="stage-wrapper" :style="nodeStyles">
     <div>
       <div class="stage-header">
-        <tyde-progress-bar :node-id="this.selectedModuleId" />
+        <tyde-progress-bar :node-id="selectedModuleId" />
         <div class="stage-star">
-          <img :src="this.done ? this.activeStarSrc : this.inactiveStarSrc" />
-          <div v-if="!this.done">
-            {{ this.numComplete }}/{{ this.topics.length }}
-          </div>
+          <img :src="done ? activeStarSrc : inactiveStarSrc" />
+          <div v-if="!done">{{ numComplete }}/{{ topics.length }}</div>
         </div>
         <h1>{{ node.title }}</h1>
         <tyde-button
@@ -19,7 +17,7 @@
       <section>
         <tyde-star-celebration v-if="showStar" @close="showStar = false" />
         <tyde-topic
-          v-for="topic in topics"
+          v-for="topic in filteredTopics"
           :key="topic.id"
           :topic="topic"
           :show-complete="true"
@@ -110,6 +108,11 @@ export default {
       const childrenIds = this.getDirectChildren(this.nodeId)
       return childrenIds.map(id => this.getNode(id))
     },
+    filteredTopics() {
+      return this.node.childOrdering
+        .map(topicID => this.getNode(topicID))
+        .filter(topic => topic)
+    },
     activeStarSrc() {
       return Helpers.getImagePath(ActiveStar)
     },
@@ -160,6 +163,8 @@ body.tapestry-stage-open {
   background-size: cover;
   height: 100%;
   width: 100%;
+  font-family: inherit;
+  color: #fff;
 
   .stage-header {
     display: flex;
@@ -167,8 +172,7 @@ body.tapestry-stage-open {
     width: 100vw;
     top: 32px;
     right: 32px;
-    font-family: "Roboto", monospace;
-    color: var(--tyde-border-green);
+    font-family: inherit;
     align-items: center;
 
     .stage-star {
@@ -178,7 +182,8 @@ body.tapestry-stage-open {
       position: relative;
       font-family: inherit;
       color: white;
-      font-size: 29px;
+      font-size: 1.5em;
+      line-height: 2em;
 
       img {
         width: 80px;
@@ -193,7 +198,20 @@ body.tapestry-stage-open {
 
     h1 {
       font-family: inherit;
-      font-size: 64px;
+      font-size: 3.2em;
+      text-shadow: 0px 0px 1px #1C0544,
+                  1px 1px 1px #1C0544,
+                  1px -1px 1px #1C0544,
+                  -1px 1px 1px #1C0544,
+                  -1px -1px 1px #1C0544,
+                  2px 1px 1px #1C0544,
+                  2px -1px 1px #1C0544,
+                  -2px 1px 1px #1C0544,
+                  -2px -2px 1px #1C0544,
+                  1px 2px 1px #1C0544,
+                  1px -2px 1px #1C0544,
+                  -1px 2px 1px #1C0544,
+                  2px 2px 1px #1C0544;
 
       &::before {
         display: none;
@@ -214,12 +232,11 @@ body.tapestry-stage-open {
     position: absolute;
     top: 32px;
     right: 32px;
-    font-family: "Roboto", monospace;
+    font-family: inherit;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 64px;
-    color: var(--tyde-border-green);
 
     > section {
       margin-left: 30vw;
@@ -233,6 +250,7 @@ body.tapestry-stage-open {
         background: none;
         color: inherit;
         align-self: flex-start;
+        flex: auto;
 
         &:hover p {
           transform: translateY(-8px);
@@ -253,7 +271,7 @@ body.tapestry-stage-open {
           margin: 0.5em 0 0;
           font-family: inherit;
           color: inherit;
-          font-size: 32px;
+          font-size: 2em;
           transition: transform 0.2s ease-out;
           line-height: 0.9em;
           max-width: 200px;

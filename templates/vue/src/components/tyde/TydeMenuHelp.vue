@@ -26,7 +26,7 @@ export default {
     left: -3em;
     width: 64px;
     height: 64px;
-    font-size: 32px;
+    font-size: 2em;
   }
 
   h1 {

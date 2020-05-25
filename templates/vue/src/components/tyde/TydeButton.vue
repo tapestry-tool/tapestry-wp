@@ -48,7 +48,7 @@ export default {
   justify-content: center;
   color: black;
   background: white;
-  font-size: 30px;
+  font-size: 1.88em;
   margin-right: 16px;
   transition: all 0.2s ease;
   padding: 0em 0.4em;

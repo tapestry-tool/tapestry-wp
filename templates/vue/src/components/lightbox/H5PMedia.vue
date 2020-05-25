@@ -18,14 +18,14 @@
     <h5p-iframe
       ref="h5pIframe"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
-      :width="width"
-      :height="height"
       :settings="h5pSettings"
       @complete="$emit('complete')"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
+      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateH5pSettings"
     />
   </div>
@@ -53,12 +53,8 @@ export default {
       type: Object,
       required: true,
     },
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
+    dimensions: {
+      type: Object,
       required: true,
     },
     allowEndScreen: {
@@ -103,8 +99,11 @@ export default {
       this.showEndScreen = true
     },
     play() {
-      this.showPlayScreen = false
       this.$refs.h5pIframe.play()
+    },
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load")
     },
   },
 }

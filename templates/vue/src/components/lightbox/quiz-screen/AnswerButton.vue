@@ -66,7 +66,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: normal;
-  font-size: 24px;
+  font-size: 1.5em;
   transition: all 0.1s ease-out;
   margin-right: 16px;
 

@@ -81,8 +81,8 @@ export default {
       if (this.node.fullscreen) {
         styles.top = "auto"
         styles.left = "auto"
-        styles.width = "auto"
-        styles.height = "100%"
+        styles.width = "100vw"
+        styles.height = "100vh"
         styles.position = "relative"
       }
 
@@ -101,7 +101,6 @@ export default {
       return styles
     },
     lightboxDimensions() {
-      const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
       if (!this.node) {
         return {}
       }
@@ -109,6 +108,13 @@ export default {
       const { mediaWidth: width, mediaHeight: height } = this.node.typeData
       const browserWidth = Helpers.getBrowserWidth()
       const browserHeight = Helpers.getBrowserHeight()
+
+      if (this.node.fullscreen) {
+        return {
+          width: browserWidth,
+          height: browserHeight,
+        }
+      }
 
       let resizeRatio = 1
       let videoWidth = width
@@ -126,9 +132,8 @@ export default {
         videoHeight *= resizeRatio
       }
 
-      const nodeSpace = NORMAL_RADIUS * 2 * 1.3
-      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
-      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
+      const adjustedVideoHeight = Math.min(videoHeight, browserHeight)
+      const adjustedVideoWidth = Math.min(videoWidth, browserWidth)
 
       const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
       const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
@@ -183,7 +188,7 @@ export default {
       }
     },
     close() {
-      this.$router.push("/")
+      this.$router.go(-1)
     },
     handleLoad(dimensions) {
       if (dimensions) {
@@ -225,36 +230,6 @@ body.tapestry-lightbox-open {
 #lightbox {
   &.full-screen {
     background: #000;
-
-    &[format="h5p"] #spotlight-content {
-      width: 100vw !important;
-      height: 100vh !important;
-
-      iframe {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-    &[format="mp4"] #spotlight-content video {
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-    }
-
-    #spotlight-content {
-      top: 0 !important;
-      left: 0 !important;
-      width: auto !important;
-      height: auto !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      border-radius: 0;
-    }
 
     .close-btn {
       position: fixed;

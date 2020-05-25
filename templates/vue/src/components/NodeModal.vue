@@ -264,9 +264,25 @@
               <b-form-checkbox
                 v-model="node.fullscreen"
                 data-testid="node-behaviour-fullscreen"
+                @input="setDefaultFullscreenOption"
               >
                 Open content in fullscreen
               </b-form-checkbox>
+            </b-form-group>
+            <b-form-group
+              v-if="node.fullscreen && (nodeType === 'video' || nodeType === 'h5p')"
+              class="indented-options"
+            >
+              <b-form-radio v-model="node.fitWindow" name="fit-window" :value="true">
+                Fit whole video in window
+              </b-form-radio>
+              <b-form-radio
+                v-model="node.fitWindow"
+                name="fit-window"
+                :value="false"
+              >
+                Crop video to fill window (not recommended)
+              </b-form-radio>
             </b-form-group>
           </div>
         </b-tab>
@@ -480,7 +496,8 @@
           v-if="
             node.tydeType === tydeTypes.MODULE ||
               node.mediaType === 'accordion' ||
-              hasSubAccordion
+              hasSubAccordion ||
+              node.tydeType === tydeTypes.STAGE
           "
           title="Ordering"
         >
@@ -759,6 +776,7 @@ export default {
         },
         { name: "subAccordionText", value: this.node.typeData.subAccordionText },
         { name: "childOrdering", value: this.node.childOrdering },
+        { name: "fitWindow", value: this.node.fitWindow },
       ]
     },
     newPermissions() {
@@ -848,6 +866,9 @@ export default {
             ? tydeTypes.QUESTION_SET
             : tydeTypes.REGULAR
       }
+    },
+    setDefaultFullscreenOption() {
+      this.node.fitWindow = true
     },
     filterContent(content) {
       if (this.node.mediaFormat !== "h5p") {
@@ -1152,5 +1173,10 @@ table {
   > span:last-of-type {
     margin-left: auto;
   }
+}
+
+.indented-options {
+  border-left: solid 2px #ccc;
+  padding-left: 1em;
 }
 </style>

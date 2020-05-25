@@ -3,15 +3,16 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="node.typeData.mediaURL"
+    :height="frameHeight"
+    :src="node.typeData && node.typeData.mediaURL"
+    :width="frameWidth"
+    scrolling="no"
     @load="handleLoad"
   ></iframe>
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
-import { mapActions } from "vuex"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -20,10 +21,11 @@ export default {
   props: {
     node: {
       type: Object,
-      required: false,
-      default: () => {
-        return {}
-      },
+      required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
     },
     settings: {
       type: [Object],
@@ -36,19 +38,41 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      instance: null,
+      frameHeight: 0,
+      frameWidth: 0,
+      played: false,
+    }
+  },
   watch: {
     node(_, oldNode) {
       this.handlePause(oldNode)
     },
   },
+  created() {
+    this.frameWidth = "100%"
+  },
   beforeDestroy() {
     this.handlePause(this.node)
   },
   methods: {
+    setFrameHeight() {
+      const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
+      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
+        const scaleFactor = this.dimensions.height / videoHeight
+        this.frameHeight = this.dimensions.height
+        this.frameWidth = 100 * scaleFactor + "%"
+      } else {
+        this.frameHeight = videoHeight
+      }
+    },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
       if (h5pVideo) {
+        this.played = true
         h5pVideo.play()
       }
     },
@@ -126,6 +150,7 @@ export default {
       }
     },
     handlePlay(node) {
+      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
@@ -133,6 +158,7 @@ export default {
       })
     },
     handlePause(node) {
+      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
@@ -169,10 +195,11 @@ export default {
       }
       $(window).resize(setIframeDimensions)
       setIframeDimensions()
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
+      this.instance = h5pInstance
+      this.setFrameHeight()
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
 
@@ -207,6 +234,10 @@ export default {
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
               case h5pObj.Video.PLAYING: {
+                if (!h5pIframeComponent.played) {
+                  h5pVideo.pause()
+                  return
+                }
                 h5pIframeComponent.updateInterval = setInterval(() => {
                   const currentPlayedTime = h5pVideo.getCurrentTime()
                   const amountViewed = currentPlayedTime / videoDuration
@@ -240,6 +271,7 @@ export default {
           })
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
+              h5pIframeComponent.played = true
               h5pVideo.play()
               thisTapestryTool.recordAnalyticsEvent(
                 "app",
@@ -267,9 +299,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-#h5p {
-  width: 100% !important;
-}
-</style>
