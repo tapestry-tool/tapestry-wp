@@ -81,7 +81,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings"]),
+    ...mapGetters(["settings", "tapestryJson"]),
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -120,17 +120,8 @@ export default {
       location.reload()
     },
     exportTapestry() {
-      const state = this.$store.state
-      const exportedTapestry = {
-        nodes: state.nodes,
-        links: state.links.map(link => ({
-          ...link,
-          source: link.source.id,
-          target: link.target.id,
-        })),
-        groups: state.groups,
-      }
-      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
+      const tapestry = this.tapestryJson
+      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
