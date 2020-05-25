@@ -2639,35 +2639,6 @@ function tapestryTool(config){
         })
     }
     
-    /**
-     * Sets the accessible status of all nodes starting with the root node
-     */
-    function setAccessibleStatus() {
-        if (tapestry.dataset.nodes.length == 0) {
-            return;
-        }
-
-        tapestry.dataset.nodes.forEach(node => {
-            node.accessible = false;
-        });
-
-        function recursivelySetAccessible(id, visited) {
-            visited.add(id);
-            const node = getNodeById(id);
-            node.accessible = node.unlocked;
-            if (node.accessible) {
-                getNeighbours(id)
-                    .filter(child => !visited.has(child))
-                    .forEach(child => {
-                        visited.add(child);
-                        recursivelySetAccessible(child, visited);
-                    })
-            }
-        }
-
-        recursivelySetAccessible(tapestry.dataset.nodes[0].id, new Set());
-    }
-    
     // ALL the checks for whether a certain node is viewable
     function getViewable(node) {
         // CHECK 1: If the node is currently in view (ie: root/child/grandchild)
