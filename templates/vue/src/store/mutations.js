@@ -113,7 +113,7 @@ export function initializeOrdering(state, id) {
     .filter(cid => !node.childOrdering.includes(cid))
     .forEach(id => node.childOrdering.push(id))
   const children = getChildIds(state, id)
-  node.childOrdering.filter(id => children.includes(id))
+  node.childOrdering = node.childOrdering.filter(id => children.includes(id))
 }
 
 export function updateOrdering(state, payload) {
