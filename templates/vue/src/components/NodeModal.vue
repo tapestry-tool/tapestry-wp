@@ -104,37 +104,39 @@
                 </template>
               </combobox>
             </b-form-group>
-            <video
-              v-if="
-                videoUrlEntered &&
-                  node.mediaType === 'video' &&
-                  nodeType !== 'h5p' &&
-                  videoUrlYoutubeID === ''
-              "
-              ref="video"
-              controls
-              :src="videoSrc"
-              style="display:none;"
-            ></video>
-            <iframe
-              v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
-              ref="h5pNone"
-              :src="node.typeData && node.typeData.mediaURL"
-              style="display: none;"
-              @load="handleH5Pload"
-            ></iframe>
-            <youtube
-              v-if="
-                videoUrlEntered &&
-                  node.mediaType === 'video' &&
-                  nodeType !== 'h5p' &&
-                  videoUrlYoutubeID !== ''
-              "
-              :video-id="videoUrlYoutubeID"
-              :player-vars="{ autoplay: 0 }"
-              style="display: none;"
-              @ready="handleYouTubeload"
-            />
+            <div class="duration-calculation-video-containers">
+              <video
+                v-if="
+                  videoUrlEntered &&
+                    node.mediaType === 'video' &&
+                    nodeType !== 'h5p' &&
+                    videoUrlYoutubeID === ''
+                "
+                ref="video"
+                controls
+                :src="videoSrc"
+                style="display:none;"
+              ></video>
+              <iframe
+                v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
+                ref="h5pNone"
+                :src="node.typeData && node.typeData.mediaURL"
+                style="display: none;"
+                @load="handleH5Pload"
+              ></iframe>
+              <youtube
+                v-if="
+                  videoUrlEntered &&
+                    node.mediaType === 'video' &&
+                    nodeType !== 'h5p' &&
+                    videoUrlYoutubeID !== ''
+                "
+                :video-id="videoUrlYoutubeID"
+                :player-vars="{ autoplay: 0 }"
+                style="display: none;"
+                @ready="handleYouTubeload"
+              />
+            </div>
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
@@ -513,7 +515,7 @@ export default {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
       }
-      if (this.node.typeData.youtubeID !== "") {
+      if (this.videoUrlYoutubeID !== "") {
         return "youtube"
       }
       return this.node.mediaType
@@ -821,7 +823,7 @@ export default {
       this.node.mediaDuration = event.target.getDuration()
       this.node.typeData.youtubeID = this.videoUrlYoutubeID
       this.youtubeLoaded = true
-    }
+    },
   },
 }
 </script>
@@ -928,7 +930,7 @@ table {
     left: 33%;
   }
 }
-  
+
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;

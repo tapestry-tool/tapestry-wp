@@ -13,11 +13,17 @@
       @back="back"
       @close="close"
     />
-    <youtube 
+    <youtube
       :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width - 15"
       :player-height="dimensions.height - 40"
-      :player-vars="{autoplay: autoplay, modestbranding: 1, rel: 0, iv_load_policy: 3, enablejsapi: 1}"
+      :player-vars="{
+        autoplay: autoplay,
+        modestbranding: 1,
+        rel: 0,
+        iv_load_policy: 3,
+        enablejsapi: 1,
+      }"
       @ready="ready"
       @paused="handlePause(player.getCurrentTime())"
       @ended="handleEnd"
@@ -28,8 +34,8 @@
 <script>
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
-import { mapState, mapActions } from 'vuex'
-import Helpers from '../../utils/Helpers'
+import { mapState, mapActions } from "vuex"
+import Helpers from "../../utils/Helpers"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -78,9 +84,10 @@ export default {
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
-    ready(event){  
+    ready(event) {
       this.player = event.target
-      const startTime = this.node.typeData.progress[0].value * this.node.mediaDuration
+      const startTime =
+        this.node.typeData.progress[0].value * this.node.mediaDuration
       this.player.seekTo(startTime, true)
       this.applySettings()
     },
@@ -132,30 +139,34 @@ export default {
         }
       }
     },
-    handlePause(time){
+    handlePause(time) {
       this.updateVideoProgress(time)
       this.updateSettings()
     },
-    handleEnd(){
+    handleEnd() {
       this.updateVideoProgress(this.node.mediaDuration) // Pass update with video duration because video may be a few milliseconds short
       this.updateSettings()
       this.showEndScreen = true
     },
-    applySettings(){
-      if(!this.h5pSettings || Object.keys(this.h5pSettings).length === 0) return;
+    applySettings() {
+      if (!this.h5pSettings || Object.keys(this.h5pSettings).length === 0) return
       this.h5pSettings.muted ? this.player.mute() : this.player.unMute()
-      this.h5pSettings.volume ? this.player.setVolume(this.h5pSettings.volume) : false
-      this.h5pSettings.playbackRate ? this.player.setPlaybackRate(this.h5pSettings.playbackRate) : false
+      this.h5pSettings.volume
+        ? this.player.setVolume(this.h5pSettings.volume)
+        : false
+      this.h5pSettings.playbackRate
+        ? this.player.setPlaybackRate(this.h5pSettings.playbackRate)
+        : false
     },
-    updateSettings(){
+    updateSettings() {
       var newSettings = { ...this.h5pSettings }
       newSettings.muted = this.player.isMuted()
       newSettings.volume = this.player.getVolume()
       newSettings.playbackRate = this.player.getPlaybackRate()
-      if(Helpers.isDifferent(this.h5pSettings, newSettings)){
+      if (Helpers.isDifferent(this.h5pSettings, newSettings)) {
         this.updateH5pSettings(newSettings)
       }
-    }
+    },
   },
 }
 </script>
@@ -173,8 +184,8 @@ export default {
     padding-right: 30px;
 
     > iframe {
-    margin: 0;
-    padding: 0;
+      margin: 0;
+      padding: 0;
     }
   }
 }
