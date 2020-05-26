@@ -6,7 +6,6 @@ import {
   getByTestId,
   submitModal,
   getNode,
-  SITE_URL,
   openRootNodeModal,
   openEditNodeModal,
   TEST_TAPESTRY_NAME,
@@ -46,7 +45,7 @@ Cypress.Commands.add("deleteTapestry", () => {
 })
 
 Cypress.Commands.add("visitTapestry", () => {
-  cy.visit(`${SITE_URL}/tapestry/${TEST_TAPESTRY_NAME}`)
+  cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
   cy.contains(/loading/i).should("not.exist")
 })
 

@@ -1,11 +1,10 @@
 {
-    "env": {
-        "BASE_URL": "http://localhost:8888",
-        "TEST_TAPESTRY_NAME": "testing",
-        "USER_TAPESTRY_NAME": "testing-user",
-        "ADMIN_USERNAME": "admin_user",
-        "ADMIN_PASSWORD": "admin_pass",
-        "SUBSCRIBER_USERNAME": "subscriber_user",
-        "SUBSCRIBER_PASSWORD": "subscriber_pass"
-    }
+  "env": {
+    "ENV": "TYDE",
+    "ADMIN_USERNAME": "admin_name",
+    "ADMIN_PASSWORD": "admin_password",
+    "SUBSCRIBER_USERNAME": "subscriber_name",
+    "SUBSCRIBER_PASSWORD": "subscriber_password"
+  },
+  "baseUrl": "http://localhost:8888"
 }
