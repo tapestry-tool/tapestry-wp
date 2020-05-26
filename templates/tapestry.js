@@ -1536,7 +1536,7 @@ function tapestryTool(config){
         const str = "This node will be unlocked: <br />";
         const wrapper = document.createElement("ul");
 
-        if (node.conditions.length === 0) {
+        if (node.conditions.length === 0 || node.conditions.every(cond => cond.fulfilled)) {
             const listItem = document.createElement("li");
             listItem.innerText = "When this parent is unlocked.";
             wrapper.appendChild(listItem);
