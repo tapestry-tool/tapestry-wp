@@ -317,10 +317,7 @@ import ContentForm from "./node-modal/ContentForm"
 import Helpers from "../utils/Helpers"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import FileUpload from "./FileUpload"
-import H5PApi from "../services/H5PApi"
 import { tydeTypes } from "../utils/constants"
-import WordpressApi from "../services/WordpressApi"
-import GravityFormsApi from "../services/GravityFormsApi"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -365,24 +362,7 @@ export default {
   data() {
     return {
       userId: null,
-      mediaTypes: [
-        { value: "", text: "Select content type" },
-        { value: "text", text: "Text" },
-        { value: "video", text: "Video" },
-        { value: "h5p", text: "H5P" },
-        { value: "url-embed", text: "External Link" },
-        { value: "wp-post", text: "Wordpress Post" },
-        { value: "activity", text: "Activity" },
-        { value: "accordion", text: "Accordion" },
-      ],
       lockNode: false,
-      gravityFormExists: false,
-      gravityFormOptions: [],
-      h5pContentOptions: [],
-      selectedGravityFormContent: "",
-      selectedH5pContent: "",
-      selectedWpPost: "",
-      wpPosts: [],
       formErrors: "",
       maxDescriptionLength: 250,
       addThumbnail: false,
@@ -437,12 +417,6 @@ export default {
       }
       return false
     },
-    nodeType() {
-      if (this.node.mediaFormat === "h5p") {
-        return "h5p"
-      }
-      return this.node.mediaType
-    },
     modalTitle() {
       if (this.modalType === "add-new-node") {
         return `Add new sub-topic to ${this.rootNodeTitle}`
@@ -466,7 +440,7 @@ export default {
         { name: "mediaType", value: this.nodeType },
         {
           name: "mediaURL",
-          value: this.getMediaUrl(),
+          value: this.node.typeData.mediaURL,
         },
         {
           name: "textContent",
@@ -530,24 +504,7 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
   },
-  watch: {
-    selectedH5pContent() {
-      this.node.typeData.mediaURL = this.getMediaUrl()
-    },
-    selectedGravityFormContent(id) {
-      this.node.typeData.mediaURL = id
-    },
-  },
   async mounted() {
-    this.gravityFormExists = await GravityFormsApi.exists()
-    this.mediaTypes.push({
-      value: "gravity-form",
-      text: "Gravity Form",
-      disabled: !this.gravityFormExists,
-    })
-    this.gravityFormOptions = await GravityFormsApi.getAllForms()
-    this.h5pContentOptions = await H5PApi.getAllContent()
-    this.wpPosts = await WordpressApi.getPosts()
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.formErrors = ""
@@ -557,16 +514,6 @@ export default {
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.setInitialTydeType()
-        const selectedContent = this.h5pContentOptions.find(content =>
-          this.filterContent(content)
-        )
-        if (this.node.mediaType === "gravity-form") {
-          const selectedForm = this.gravityFormOptions.find(form => {
-            return form.id === this.node.typeData.mediaURL
-          })
-          this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
-        }
-        this.selectedH5pContent = selectedContent ? selectedContent.id : ""
         this.lockNode = this.node.conditions && this.node.conditions.length > 0
         this.addThumbnail = this.node.imageURL.length > 0
         this.addLockedThumbnail = this.node.lockedImageURL.length > 0
@@ -594,29 +541,6 @@ export default {
     },
     setDefaultFullscreenOption() {
       this.node.fitWindow = true
-    },
-    filterContent(content) {
-      if (this.node.mediaFormat !== "h5p") {
-        return false
-      }
-      const id = this.node.typeData.mediaURL.split("&id=")[1]
-      return content.id == id
-    },
-    getMediaUrl() {
-      if (this.nodeType !== "h5p") {
-        return this.node.typeData && this.node.typeData.mediaURL
-      }
-
-      const adminAjaxUrl = wpData.adminAjaxUrl
-      return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
-    },
-    handleTypeChange(event) {
-      this.$set(this.node, "mediaType", event)
-      if (event === "video" || event === "h5p") {
-        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
-      } else {
-        this.$set(this.node, "mediaFormat", "")
-      }
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
