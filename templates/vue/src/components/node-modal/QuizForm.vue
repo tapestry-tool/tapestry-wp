@@ -192,7 +192,7 @@ const defaultQuestion = {
 }
 
 export default {
-  name: "quiz-modal",
+  name: "quiz-form",
   components: {
     Combobox,
   },
