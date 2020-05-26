@@ -254,26 +254,30 @@ class TapestryNode implements ITapestryNode
         }
     }
 
-    public function isLocked($userId = 0)
+    public function getLockedState($userId = 0)
     {
-        $numFulfilled = 0;
+        $conditions = $this->conditions;
         $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
 
-        foreach ($this->conditions as $condition) {
+        foreach ($conditions as $condition) {
+            $condition->fulfilled = false;
+        }
+
+        foreach ($conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
                     if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
-                        $numFulfilled++;
+                        $condition->fulfilled = true;
                     }
                     break;
                 case ConditionTypes::DATE_NOT_PASSED:
                     if (new DateTime() <= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
-                        $numFulfilled++;
+                        $condition->fulfilled = true;
                     }
                     break;
                 case ConditionTypes::DATE_PASSED:
                     if (new DateTime() >= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
-                        $numFulfilled++;
+                        $condition->fulfilled = true;
                     }
                     break;
                 default:
@@ -281,7 +285,21 @@ class TapestryNode implements ITapestryNode
             }
         }
 
-        return $numFulfilled !== count($this->conditions);
+        return $conditions;
+    }
+
+    public function isLocked($userId = 0)
+    {
+        $conditions = $this->getLockedState($userId);
+
+        $numFulfilled = 0;
+        foreach ($conditions as $condition) {
+            if ($condition->fulfilled) {
+                $numFulfilled++;
+            }
+        }
+
+        return $numFulfilled !== count($conditions);
     }
 
     public function getMeta()
