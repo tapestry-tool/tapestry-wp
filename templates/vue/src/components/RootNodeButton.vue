@@ -8,12 +8,23 @@
     <b-button class="import-button" @click="openFileBrowser">
       Import a Tapestry
     </b-button>
+    <div v-if="error" style="margin-top: 16px;">
+      {{ error.message }}
+    </div>
     <input
       ref="fileInput"
       type="file"
       style="display: none;"
       @change="handleFileChange"
     />
+    <div
+      :class="['dropbox', { 'drag-over': isDragover }]"
+      @dragenter="handleDragStart"
+      @dragover="handleDragStart"
+      @dragleave="handleDragEnd"
+      @dragend="handleDragEnd"
+      @drop="handleDragDrop"
+    ></div>
   </div>
 </template>
 
@@ -27,6 +38,7 @@ export default {
   data() {
     return {
       error: null,
+      isDragover: false,
     }
   },
   methods: {
@@ -35,6 +47,28 @@ export default {
     },
     openFileBrowser() {
       this.$refs.fileInput.click()
+    },
+    handleDragStart(evt) {
+      evt.preventDefault()
+      this.error = null
+      this.isDragover = true
+    },
+    handleDragEnd(evt) {
+      evt.preventDefault()
+      this.isDragover = false
+    },
+    handleDragDrop(evt) {
+      this.isDragover = false
+      evt.preventDefault()
+      evt.stopPropagation()
+      const file = evt.dataTransfer.files[0]
+      if (!file.name.endsWith("json")) {
+        this.error = {
+          message: "Please upload a JSON file.",
+        }
+      } else {
+        this.importTapestry(file)
+      }
     },
     handleFileChange() {
       const file = this.$refs.fileInput.files[0]
@@ -60,13 +94,15 @@ export default {
   display: flex;
   align-items: center;
   flex-direction: column;
+  z-index: 0;
 
-  > div {
+  > div:first-child {
     display: inline-block;
     margin-top: 20vh;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
+    z-index: 10;
 
     &:hover,
     &:active {
@@ -92,9 +128,26 @@ export default {
 .import-button {
   background-color: #2c3e50;
   border: none;
+  z-index: 10;
 
   &:hover {
     background-color: #11a6d8;
+  }
+}
+
+.dropbox {
+  width: 90vw;
+  height: 90vh;
+  border: 3px dashed black;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  z-index: 0;
+
+  &.drag-over {
+    opacity: 1;
   }
 }
 </style>
