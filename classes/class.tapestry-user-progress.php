@@ -241,6 +241,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             }         
 
             $progress->$nodeId->accessible = $node->accessible;
+            $progress->$nodeId->conditions = $node->conditions;
             $progress->$nodeId->unlocked = $node->unlocked;
 
             if ($node->accessible) {

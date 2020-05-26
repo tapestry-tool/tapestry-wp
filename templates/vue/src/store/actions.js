@@ -46,7 +46,13 @@ export async function updateNodeProgress({ commit }, payload) {
   thisTapestryTool.updateProgressBars()
 }
 
-export async function completeNode({ commit, getters }, nodeId) {
+export async function updateUserProgress() {
+  const progress = await client.getUserProgress()
+  thisTapestryTool.setDatasetProgress(progress)
+  thisTapestryTool.reload()
+}
+
+export async function completeNode({ commit, dispatch, getters }, nodeId) {
   await client.completeNode(nodeId)
   commit("updateNode", {
     id: nodeId,
@@ -62,6 +68,7 @@ export async function completeNode({ commit, getters }, nodeId) {
     })
     thisTapestryTool.updateProgressBars()
   }
+  dispatch("updateUserProgress")
 }
 
 export function updateMayUnlockNodes({ commit, getters }, nodeId) {

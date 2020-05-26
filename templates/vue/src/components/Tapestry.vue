@@ -130,7 +130,13 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateUserProgress",
+    ]),
     openNode({ detail: { id } }) {
       this.$router.push(`/nodes/${id}`)
     },
@@ -423,6 +429,8 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
+
+      await this.updateUserProgress()
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)

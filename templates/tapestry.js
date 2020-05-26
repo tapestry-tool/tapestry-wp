@@ -1944,6 +1944,7 @@ function tapestryTool(config){
     this.reload = () => {
         setNodeListeners(nodes);
         filterTapestry();
+        renderTooltips();
     }
 
     this.reloadTooltips = renderTooltips
@@ -2300,6 +2301,7 @@ function tapestryTool(config){
                 var node = tapestry.dataset.nodes[index];
                 node.unlocked = progressObj[id].unlocked;
                 node.accessible = progressObj[id].accessible;
+                node.conditions = progressObj[id].conditions;
                 const content = progressObj[id].content
                 if (content) {
                     node.quiz = content.quiz
@@ -2333,6 +2335,7 @@ function tapestryTool(config){
         }
         return true;
     }
+    this.setDatasetProgress = setDatasetProgress;
     
     /* For setting the "type" field of nodes in dataset */
     function setNodeTypes(rootId) {
