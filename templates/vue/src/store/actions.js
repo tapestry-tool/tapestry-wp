@@ -60,24 +60,12 @@ export async function completeNode({ commit, dispatch, getters }, nodeId) {
     newNode: { completed: true },
   })
   if (node.mediaType !== "video") {
-    commit("updateNodeProgress", {
+    await dispatch("updateNodeProgress", {
       id: nodeId,
       progress: 1,
     })
-    thisTapestryTool.updateProgressBars()
   }
   dispatch("updateUserProgress")
-}
-
-export function updateMayUnlockNodes({ commit, getters }, nodeId) {
-  const node = getters.getNode(nodeId)
-  node.mayUnlockNodes.forEach(element => {
-    commit("fulfillNodeCondition", {
-      id: element.id,
-      condition: element.condition,
-    })
-  })
-  thisTapestryTool.reloadTooltips()
 }
 
 export function updateNodePermissions(_, payload) {

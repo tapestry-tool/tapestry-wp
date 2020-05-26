@@ -641,7 +641,6 @@ function tapestryTool(config){
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                 method: API_DELETE_METHOD,
                 success: function() {
-                    updatedMayUnlockNodesAfterDelete(nodeId);
                     location.reload();
                 },
                 error: function(e) {
@@ -925,6 +924,7 @@ function tapestryTool(config){
 
     function removeAllLinks() {
         if (links !== undefined) {
+            svg.select("g.links").remove()
             svg.selectAll('line')
                 .remove();
         }
@@ -2423,12 +2423,6 @@ function tapestryTool(config){
         return maxDepth;
     }
 
-    function getNeighbours(id) {
-        return tapestry.dataset.links
-            .filter(link => link.source.id === id || link.target.id === id)
-            .map(link => link.source.id === id ? link.target.id : link.source.id)
-    }
-
     /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
     function getChildren(id, depth = tapestryDepth, visited = []) {
@@ -2622,24 +2616,6 @@ function tapestryTool(config){
                 link.type = "";
             }
         }
-    }
-
-    /**
-     * when node is being deleted, iterate over conditions to find nodes that unlocked this
-     * node and remove this node from the list of nodes that those nodes unlocked
-     * @param {integer} nodeId
-     */
-    function updatedMayUnlockNodesAfterDelete(nodeId) {
-        const { nodes } = tapestry.dataset
-        const node = nodes[findNodeIndex(nodeId)];
-        const { conditions } = node;
-        conditions.forEach(condition => {
-            const conditionNode = nodes[findNodeIndex(condition.nodeId)];
-            const mayUnlockNodes = conditionNode.mayUnlockNodes.filter(thisNode => {
-                return thisNode.id != nodeId;
-            });
-            conditionNode.mayUnlockNodes = mayUnlockNodes;
-        })
     }
     
     // ALL the checks for whether a certain node is viewable
