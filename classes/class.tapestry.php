@@ -379,8 +379,9 @@ class Tapestry implements ITapestry
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
                 $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
-                $data->unlocked = $nodeData->unlocked;
+                $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
+                $data->unlocked = $nodeData->unlocked;
                 return $data;
             },
             $nodes

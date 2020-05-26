@@ -1,6 +1,9 @@
 <template>
   <div>
-    <b-form-group class="mb-3">
+    <b-form-group
+      class="mb-3"
+      description="Users who are not logged in won't be able to unlock this node."
+    >
       <b-form-checkbox v-model="lock" @change="$emit('changed', !lock)">
         Prevent access until specified conditions are met
       </b-form-checkbox>
