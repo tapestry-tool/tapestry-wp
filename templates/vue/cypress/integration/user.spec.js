@@ -93,14 +93,14 @@ describe("User", () => {
   describe("Quiz", () => {
     beforeEach(() => {
       cy.findNode(node => node.mediaFormat === "mp4" && node.quiz).openLightbox()
-      cy.contains(/quiz/i).click()
+      cy.contains(/quiz/i).click({ force: true })
     })
 
     it("Should be able to complete a gravity form quiz", () => {
-      cy.contains(/text/i).click()
+      cy.contains(/text/i).click({ force: true })
       cy.get("form").within(() => {
         cy.get("input[type=text]").type("Dave")
-        cy.get("input[type=submit]").click()
+        cy.get("input[type=submit]").click({ force: true })
       })
       cy.get(".completion-screen").should("be.visible")
     })

@@ -158,7 +158,7 @@ describe("Authoring", () => {
             })
             cy.get("video").then(el => {
               el.get(0).currentTime = 15
-              cy.contains(/take quiz/i).click()
+              cy.contains(/take quiz/i).click({ force: true })
               cy.contains(newNode.quiz[0].title).should("exist")
             })
           })

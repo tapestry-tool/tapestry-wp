@@ -3,7 +3,6 @@ import {
   API_URL,
   getStore,
   openAddNodeModal,
-  getByTestId,
   submitModal,
   getNode,
   openRootNodeModal,
@@ -24,7 +23,7 @@ Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
   cy.scrollTo(0, 0)
   const nodeId = id || node.id
-  getMediaButton(nodeId).click()
+  getMediaButton(nodeId).click({ force: true })
   return cy.get("#lightbox")
 })
 
@@ -99,7 +98,7 @@ Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
   cy.route("GET", `${API_URL}/tapestries/**`).as("getTapestry")
 
   openEditNodeModal(node.id)
-  cy.contains(/delete/i).click()
+  cy.contains(/delete/i).click({ force: true })
   cy.wait("@deleteNode")
   cy.wait("@getTapestry")
 

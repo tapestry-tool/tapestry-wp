@@ -12,23 +12,24 @@ export const visitTapestry = (name = "empty") => {
   cy.get("#content")
 }
 
-export const openRootNodeModal = () => cy.get("#root-node-button > div").click()
+export const openRootNodeModal = () =>
+  cy.get("#root-node-button > div").click({ force: true })
 
 export const openAddNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
-  getAddNodeButton(id).click()
+  getAddNodeButton(id).click({ force: true })
   return cy.get(`#node-modal-container`)
 }
 
 export const openEditNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
-  getEditNodeButton(id).click()
+  getEditNodeButton(id).click({ force: true })
   return cy.get(`#node-modal-container`)
 }
 
 export const getModal = () => cy.get("#node-modal-container")
 
-export const submitModal = () => cy.contains("Submit").click()
+export const submitModal = () => cy.contains("Submit").click({ force: true })
 
 export const getMediaButton = id => cy.get(`#mediaButton${id}`)
 
@@ -61,9 +62,9 @@ export const applyModalChanges = newNode => {
     switch (mediaType) {
       case "gravity-form": {
         getByTestId(`node-gravity-form-id`)
-          .click()
+          .click({ force: true })
           .within(() => {
-            cy.contains(typeData.id).click()
+            cy.contains(typeData.id).click({ force: true })
           })
         break
       }
@@ -103,7 +104,7 @@ export const applyModalChanges = newNode => {
   })
 
   if (appearance) {
-    cy.contains(/appearance/i).click()
+    cy.contains(/appearance/i).click({ force: true })
     Object.entries(appearance).forEach(([prop, value]) => {
       if (value) {
         getByTestId(`node-appearance-${prop}`).check({ force: true })
@@ -120,11 +121,11 @@ export const applyModalChanges = newNode => {
   }
 
   if (quiz) {
-    cy.contains(/quiz/i).click()
+    cy.contains(/quiz/i).click({ force: true })
     getByTestId("add-question-checkbox").click({ force: true })
     quiz.forEach((question, index) => {
       if (index > 0) {
-        cy.contains(/add question/i).click()
+        cy.contains(/add question/i).click({ force: true })
       }
       const { title, answerTypes } = question
       getByTestId(`question-title-${index}`)
@@ -135,9 +136,9 @@ export const applyModalChanges = newNode => {
           getByTestId(`question-answer-${type}-${index}`).check()
         } else {
           getByTestId(`question-answer-${type}-${index}`)
-            .click()
+            .click({ force: true })
             .within(() => {
-              cy.contains(id).click()
+              cy.contains(id).click({ force: true })
             })
         }
       })
@@ -145,7 +146,7 @@ export const applyModalChanges = newNode => {
   }
 
   if (permissions) {
-    cy.contains(/access/i).click()
+    cy.contains(/access/i).click({ force: true })
     Object.entries(permissions).forEach(([role, allowedPermissions]) => {
       const permissionTypes = ["read", "add", "edit"]
       permissionTypes.forEach(type => {
