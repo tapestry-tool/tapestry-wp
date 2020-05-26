@@ -299,8 +299,10 @@ class Tapestry implements ITapestry
                 return $node;
             },
             $nodes
-        );        
-        $this->_recursivelySetAccessible($newNodes[0], array(), $newNodes);
+        );
+        if (count($newNodes)) {
+            $this->_recursivelySetAccessible($newNodes[0], array(), $newNodes);
+        }
         return $newNodes;
     }
 
