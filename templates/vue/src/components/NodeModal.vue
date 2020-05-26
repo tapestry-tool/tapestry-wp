@@ -19,175 +19,7 @@
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
-          <div id="modal-content-details">
-            <b-form-group label="Title">
-              <b-form-input
-                id="node-title"
-                v-model="node.title"
-                data-testid="node-title"
-                placeholder="Enter title"
-                autofocus
-                required
-              />
-            </b-form-group>
-            <b-form-group label="Description">
-              <b-form-textarea
-                id="node-description"
-                v-model="node.description"
-                data-testid="node-description"
-                placeholder="Enter description"
-              ></b-form-textarea>
-            </b-form-group>
-            <tyde-type-input :node="node" :parent="parent" />
-            <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
-              <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Content Type">
-              <b-form-select
-                id="node-media-type"
-                data-testid="node-mediaType"
-                :value="nodeType"
-                :options="mediaTypes"
-                @change="handleTypeChange"
-              ></b-form-select>
-            </b-form-group>
-            <quiz-form v-if="node.mediaType === 'activity'" :node="node" />
-            <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
-            <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
-              <combobox
-                v-model="node.typeData.mediaURL"
-                item-text="title"
-                item-value="id"
-                empty-message="There are no Wordpress posts yet. Please add one in your WP dashboard."
-                :options="wpPosts"
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
-                  </p>
-                </template>
-              </combobox>
-            </b-form-group>
-            <b-form-group v-show="node.mediaType === 'text'" label="Text content">
-              <b-form-textarea
-                id="node-text-content"
-                v-model="node.typeData.textContent"
-                data-testid="node-textContent"
-                placeholder="Enter text here"
-              ></b-form-textarea>
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              :label="videoLabel"
-            >
-              <file-upload
-                id="node-video-media-url"
-                v-model="node.typeData.mediaURL"
-                data-testid="node-videoUrl"
-                placeholder="Enter URL for MP4 Video"
-                required
-              />
-              <b-form-text v-if="showVideoDescription">
-                This video should not include any screenshots of the stage layout.
-              </b-form-text>
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video Duration"
-            >
-              <b-form-input
-                id="node-video-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-videoDuration"
-                placeholder="Enter duration (in seconds)"
-                required
-              />
-            </b-form-group>
-            <b-form-group v-show="nodeType === 'h5p'" :label="h5pLabel">
-              <combobox
-                v-model="selectedH5pContent"
-                item-text="title"
-                item-value="id"
-                empty-message="There's no H5P content yet. Please add one in your WP dashboard."
-                :options="h5pContentOptions"
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
-                  </p>
-                </template>
-              </combobox>
-              <b-form-text v-if="showVideoDescription">
-                This H5P should not include any screenshots of the stage layout.
-              </b-form-text>
-            </b-form-group>
-            <b-form-group
-              v-show="nodeType === 'h5p'"
-              label="H5P Video Duration"
-              description="This only applies to video H5P content"
-            >
-              <b-form-input
-                id="node-h5p-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-h5pDuration"
-                placeholder="Enter duration (in seconds)"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'gravity-form'"
-              label="Gravity Form"
-            >
-              <span v-if="!this.gravityFormExists" class="text-muted">
-                Gravity Forms plugin is not installed. Please install Gravity Forms
-                to use this content type.
-              </span>
-              <combobox
-                v-else
-                v-model="selectedGravityFormContent"
-                data-testid="combobox-gravity-form"
-                item-text="title"
-                item-value="id"
-                empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
-                :options="gravityFormOptions"
-              >
-                <template v-slot="slotProps">
-                  <p>
-                    <code>{{ slotProps.option.id }}</code>
-                    {{ slotProps.option.title }}
-                  </p>
-                </template>
-              </combobox>
-            </b-form-group>
-            <b-form-group
-              v-if="node.mediaType === 'url-embed'"
-              label="External Link"
-            >
-              <file-upload
-                v-model="node.typeData.mediaURL"
-                data-testid="node-linkUrl"
-                placeholder="Enter embed link (starting with http)"
-              />
-            </b-form-group>
-            <b-form-group v-if="node.mediaType === 'url-embed'" label="Behaviour">
-              <b-form-radio-group
-                id="external-link-behaviour"
-                v-model="node.behaviour"
-              >
-                <b-form-radio value="embed" data-testid="node-linkBehaviour-embed">
-                  Embed in Tapestry
-                </b-form-radio>
-                <b-form-radio
-                  value="new-window"
-                  data-testid="node-linkBehaviour-new-window"
-                >
-                  Open in a New Window
-                </b-form-radio>
-              </b-form-radio-group>
-            </b-form-group>
-          </div>
+          <content-form :node="node" />
         </b-tab>
         <b-tab title="Appearance">
           <div id="modal-appearance">
@@ -308,7 +140,7 @@
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Quiz"
         >
-          <quiz-form :node="node" />
+          <activity-form :node="node" />
         </b-tab>
         <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
           <div id="modal-spaceship-icons">
@@ -481,16 +313,14 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex"
+import ContentForm from "./node-modal/ContentForm"
 import Helpers from "../utils/Helpers"
-import Combobox from "./Combobox"
-import QuizForm from "./node-modal/QuizForm"
+import ActivityForm from "./node-modal/content-form/ActivityForm"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
 import { tydeTypes } from "../utils/constants"
-import TydeTypeInput from "./node-modal/TydeTypeInput"
 import WordpressApi from "../services/WordpressApi"
 import GravityFormsApi from "../services/GravityFormsApi"
-import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -498,10 +328,8 @@ import PermissionsTable from "./node-modal/PermissionsTable"
 export default {
   name: "node-modal",
   components: {
-    AccordionForm,
-    Combobox,
-    TydeTypeInput,
-    QuizForm,
+    ContentForm,
+    ActivityForm,
     ConditionsForm,
     FileUpload,
     SlickItem,
