@@ -50,7 +50,7 @@
                 @change="handleTypeChange"
               ></b-form-select>
             </b-form-group>
-            <quiz-modal v-if="node.mediaType === 'activity'" :node="node" />
+            <quiz-form v-if="node.mediaType === 'activity'" :node="node" />
             <accordion-form v-if="node.mediaType === 'accordion'" :node="node" />
             <b-form-group v-show="node.mediaType === 'wp-post'" label="Post Name">
               <combobox
@@ -296,7 +296,7 @@
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Quiz"
         >
-          <quiz-modal :node="node" />
+          <quiz-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'accordion' || hasSubAccordion"
@@ -348,7 +348,7 @@
 import { mapGetters, mapMutations } from "vuex"
 import Helpers from "../utils/Helpers"
 import Combobox from "./Combobox"
-import QuizModal from "./node-modal/QuizModal"
+import QuizForm from "./node-modal/QuizForm"
 import FileUpload from "./FileUpload"
 import H5PApi from "../services/H5PApi"
 import WordpressApi from "../services/WordpressApi"
@@ -363,7 +363,7 @@ export default {
   components: {
     AccordionForm,
     Combobox,
-    QuizModal,
+    QuizForm,
     ConditionsForm,
     FileUpload,
     SlickItem,
