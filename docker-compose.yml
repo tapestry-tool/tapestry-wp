@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    container_name: db
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+     - ./wordpress:/var/www/html/
+    container_name: wp
+    
+  dev:
+    depends_on:
+      - db
+    build:
+      context: ./wordpress/wp-content/plugins/tapestry-wp/templates/vue
+      target: 'develop-stage'
+    ports:
+      - '8080:8080'
+    volumes: 
+      - ./wordpress/wp-content/plugins/tapestry-wp/templates/vue:/app
+      - node_modules:/app/node_modules
+    command: npm run dev:container
+    container_name: app
+
+volumes:
+    db_data:
+    node_modules:
