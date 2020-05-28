@@ -8,14 +8,13 @@
     body-class="p-0"
   >
     <div v-if="formErrors.length" class="modal-header-row">
-      <b-alert
-        id="tapestry-modal-form-errors"
-        variant="danger"
-        show
-        v-html="formErrors"
-      ></b-alert>
+      <b-alert id="tapestry-modal-form-errors" variant="danger" show>
+        <ul>
+          <li v-for="error in formErrors" :key="error">{{ error }}</li>
+        </ul>
+      </b-alert>
     </div>
-    <b-container fluid class="px-0">
+    <b-container v-if="ready" fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
           <content-form :node="node" />
@@ -71,20 +70,23 @@
         </b-tab>
       </b-tabs>
     </b-container>
+    <b-container v-else class="spinner">
+      <b-spinner variant="secondary"></b-spinner>
+    </b-container>
     <template slot="modal-footer">
       <b-button
         v-show="modalType === 'edit'"
         size="sm"
         variant="danger"
-        @click="$emit('delete-node')"
+        @click="deleteNode"
       >
         Delete Node
       </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="close">
+      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">
+      <b-button size="sm" variant="primary" @click="submit">
         Submit
       </b-button>
     </template>
@@ -92,7 +94,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
@@ -100,7 +102,16 @@ import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
-import Helpers from "../utils/Helpers"
+import Helpers from "@/utils/Helpers"
+import { getLinkMetadata } from "@/services/LinkPreviewApi"
+
+const shouldFetch = (url, selectedNode) => {
+  if (!selectedNode.typeData.linkMetadata) {
+    return true
+  }
+  const oldUrl = selectedNode.typeData.linkMetadata.url
+  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
+}
 
 export default {
   name: "node-modal",
@@ -130,8 +141,9 @@ export default {
   },
   data() {
     return {
+      ready: false,
       userId: null,
-      formErrors: "",
+      formErrors: [],
       maxDescriptionLength: 250,
       node: null,
     }
@@ -163,45 +175,6 @@ export default {
       }
       return ""
     },
-    nodeData() {
-      return [
-        { name: "title", value: this.node.title },
-        {
-          name: "conditions",
-          value: this.node.conditions,
-        },
-        { name: "description", value: this.node.description },
-        { name: "behaviour", value: this.node.behaviour },
-        { name: "mediaType", value: this.node.mediaType },
-        {
-          name: "mediaURL",
-          value: this.node.typeData.mediaURL,
-        },
-        {
-          name: "textContent",
-          value: this.node.typeData && this.node.typeData.textContent,
-        },
-        { name: "mediaDuration", value: this.node.mediaDuration },
-        {
-          name: "imageURL",
-          value: this.addThumbnail ? this.node.imageURL || "" : "",
-        },
-        {
-          name: "lockedImageURL",
-          value: this.addLockedThumbnail ? this.node.lockedImageURL || "" : "",
-        },
-        { name: "permissions", value: this.node.permissions },
-        { name: "hideTitle", value: this.node.hideTitle },
-        { name: "hideProgress", value: this.node.hideProgress },
-        { name: "hideMedia", value: this.node.hideMedia },
-        { name: "skippable", value: this.node.skippable },
-        { name: "quiz", value: this.node.quiz || [] },
-        { name: "fullscreen", value: this.node.fullscreen },
-        { name: "subAccordionText", value: this.node.typeData.subAccordionText },
-        { name: "childOrdering", value: this.node.childOrdering },
-        { name: "fitWindow", value: this.node.fitWindow },
-      ]
-    },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
@@ -229,16 +202,19 @@ export default {
         }
         copy.hasSubAccordion = this.hasSubAccordion(copy)
         this.node = copy
+        this.ready = true
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId == "node-modal") {
         thisTapestryTool.enableMovements()
+        this.ready = false
       }
     })
   },
   methods: {
-    ...mapMutations(["updateOrdering"]),
+    ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     hasSubAccordion(node) {
       const parents = this.getDirectParents(node.id)
       if (parents && parents[0]) {
@@ -251,22 +227,82 @@ export default {
     close() {
       this.$bvModal.hide("node-modal")
     },
-    submitNode() {
-      this.formErrors = this.validateNode(this.nodeData)
+    deleteNode() {
+      thisTapestryTool.deleteNodeFromTapestry()
+    },
+    async submit() {
+      this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
-        if (this.modalType === "add-root-node") {
-          this.$emit("add-edit-node", this.nodeData, false, true)
-        } else if (this.modalType === "add-new-node") {
-          this.$emit("add-edit-node", this.nodeData, false)
-        } else if (this.modalType === "edit-node") {
-          this.$emit("add-edit-node", this.nodeData, true)
-        } else {
-          console.error(`Undefined modalType: ${this.modalType}`)
+        this.updateNodeCoordinates()
+        this.ready = false
+
+        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+          if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+            const url = this.node.typeData.mediaURL
+            const { data } = await getLinkMetadata(url)
+
+            if (data) {
+              this.node.typeData.linkMetadata = data
+
+              if (
+                !this.node.imageURL ||
+                confirm(
+                  "Would you like to use the link preview image as the thumbnail image?"
+                )
+              ) {
+                this.node.imageURL = data.image
+              }
+              if (
+                !this.node.lockedImageURL ||
+                confirm(
+                  "Would you like to use the link preview image as the locked thumbnail image?"
+                )
+              ) {
+                this.node.lockedImageURL = data.image
+              }
+            }
+          }
         }
+
+        if (this.modalType === "add") {
+          const id = await this.addNode(this.node)
+          this.node.id = id
+          if (this.parent) {
+            // Add link from parent node to this node
+            const newLink = {
+              source: this.parent.id,
+              target: id,
+              value: 1,
+              type: "",
+            }
+            await this.addLink(newLink)
+            this.parent.childOrdering.push(id)
+          } else {
+            this.updateRootNode(id)
+            this.updateSelectedNode(id)
+          }
+        } else {
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+        }
+
+        this.$emit("submit")
+      }
+    },
+    updateNodeCoordinates() {
+      const NORMAL_RADIUS = 140
+      const ROOT_RADIUS_DIFF = 70
+
+      if (this.modalType === "add" && this.parent) {
+        this.node.coordinates.x =
+          this.parent.x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
+        this.node.coordinates.y = this.parent.y
       }
     },
     validateNode() {
-      var errMsgs = []
+      const errMsgs = []
 
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
@@ -313,7 +349,7 @@ export default {
         }
       }
 
-      return errMsgs.join("<br>")
+      return errMsgs
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
@@ -374,6 +410,13 @@ table {
 </style>
 
 <style lang="scss" scoped>
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #node-modal-container {
   * {
     outline: none;

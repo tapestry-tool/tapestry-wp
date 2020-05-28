@@ -13,6 +13,7 @@
       <b-form-input
         id="node-video-media-duration"
         v-model="node.mediaDuration"
+        type="number"
         data-testid="node-videoDuration"
         placeholder="Enter duration (in seconds)"
         required
