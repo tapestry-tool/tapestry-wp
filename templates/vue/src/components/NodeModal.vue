@@ -22,88 +22,7 @@
           <content-form :node="node" />
         </b-tab>
         <b-tab title="Appearance">
-          <div id="modal-appearance">
-            <h6 class="mb-3 text-muted">Node Appearance</h6>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="addThumbnail"
-                data-testid="node-appearance-add-thumbnail"
-              >
-                Add a thumbnail
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group v-if="addThumbnail">
-              <file-upload
-                v-model="node.imageURL"
-                data-testid="node-imageUrl"
-                placeholder="Enter the URL for the thumbnail"
-              />
-            </b-form-group>
-            <b-form-group v-if="addThumbnail">
-              <b-form-checkbox
-                v-model="addLockedThumbnail"
-                data-testid="node-appearance-add-locked-thumbnail"
-              >
-                Show a different thumbnail when locked
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group v-if="addThumbnail && addLockedThumbnail">
-              <file-upload
-                v-model="node.lockedImageURL"
-                data-testid="node-lockedImageURL"
-                placeholder="Enter the URL for the thumbnail"
-              />
-            </b-form-group>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.hideTitle"
-                data-testid="node-appearance-hide-title"
-              >
-                Hide node title
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.hideProgress"
-                data-testid="node-appearance-hide-progress"
-              >
-                Hide progress bar
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.hideMedia"
-                data-testid="node-appearance-hide-media"
-              >
-                Hide media button
-              </b-form-checkbox>
-            </b-form-group>
-            <h6 class="mt-4 mb-3 text-muted">Content Appearance</h6>
-            <b-form-group>
-              <b-form-checkbox
-                v-model="node.fullscreen"
-                data-testid="node-behaviour-fullscreen"
-                @input="setDefaultFullscreenOption"
-              >
-                Open content in fullscreen
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group
-              v-if="node.fullscreen && (nodeType === 'video' || nodeType === 'h5p')"
-              class="indented-options"
-            >
-              <b-form-radio v-model="node.fitWindow" name="fit-window" :value="true">
-                Fit whole video in window
-              </b-form-radio>
-              <b-form-radio
-                v-model="node.fitWindow"
-                name="fit-window"
-                :value="false"
-              >
-                Crop video to fill window (not recommended)
-              </b-form-radio>
-            </b-form-group>
-          </div>
+          <appearance-form :node="node" />
         </b-tab>
         <b-tab
           v-if="
@@ -113,17 +32,7 @@
           "
           title="Behaviour"
         >
-          <div id="modal-behaviour">
-            <b-form-group>
-              <b-form-checkbox
-                v-if="node.mediaType !== 'accordion'"
-                v-model="node.skippable"
-                data-testid="node-behaviour-skippable"
-              >
-                Allow skipping video if user has not watched at least once
-              </b-form-checkbox>
-            </b-form-group>
-          </div>
+          <behaviour-form :node="node" />
         </b-tab>
         <b-tab v-if="viewAccess" title="Access">
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
@@ -185,21 +94,23 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex"
-import ContentForm from "./node-modal/ContentForm"
-import Helpers from "../utils/Helpers"
-import ActivityForm from "./node-modal/content-form/ActivityForm"
-import FileUpload from "./FileUpload"
-import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
+import ActivityForm from "./node-modal/content-form/ActivityForm"
+import AppearanceForm from "./node-modal/AppearanceForm"
+import BehaviourForm from "./node-modal/BehaviourForm"
+import ConditionsForm from "./node-modal/ConditionsForm"
+import ContentForm from "./node-modal/ContentForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import Helpers from "../utils/Helpers"
 
 export default {
   name: "node-modal",
   components: {
+    AppearanceForm,
+    BehaviourForm,
     ContentForm,
     ActivityForm,
     ConditionsForm,
-    FileUpload,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -231,8 +142,6 @@ export default {
       lockNode: false,
       formErrors: "",
       maxDescriptionLength: 250,
-      addThumbnail: false,
-      addLockedThumbnail: false,
     }
   },
   computed: {
@@ -266,7 +175,7 @@ export default {
         },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
-        { name: "mediaType", value: this.nodeType },
+        { name: "mediaType", value: this.node.mediaType },
         {
           name: "mediaURL",
           value: this.node.typeData.mediaURL,
@@ -314,8 +223,6 @@ export default {
     this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
       if (modalId == "node-modal-container") {
         this.lockNode = this.node.conditions && this.node.conditions.length > 0
-        this.addThumbnail = this.node.imageURL.length > 0
-        this.addLockedThumbnail = this.node.lockedImageURL.length > 0
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
@@ -326,9 +233,6 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering"]),
-    setDefaultFullscreenOption() {
-      this.node.fitWindow = true
-    },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
