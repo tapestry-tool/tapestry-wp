@@ -64,8 +64,8 @@ function formatEntry(answers, answerType) {
   }
 }
 
-export function defaultNode({ settings }) {
-  return {
+export function createDefaultNode({ settings }) {
+  return () => ({
     title: "",
     behaviour: "embed",
     mediaType: "",
@@ -89,5 +89,5 @@ export function defaultNode({ settings }) {
     description: "",
     quiz: [],
     childOrdering: [],
-  }
+  })
 }

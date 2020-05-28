@@ -46,7 +46,7 @@
           <activity-form :node="node" />
         </b-tab>
         <b-tab
-          v-if="node.mediaType === 'accordion' || hasSubAccordion"
+          v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
           title="Ordering"
         >
           <div>
@@ -133,11 +133,12 @@ export default {
       userId: null,
       formErrors: "",
       maxDescriptionLength: 250,
+      node: null,
     }
   },
   computed: {
     ...mapGetters([
-      "defaultNode",
+      "createDefaultNode",
       "getDirectChildren",
       "getDirectParents",
       "getNode",
@@ -152,13 +153,6 @@ export default {
       }
       return null
     },
-    node() {
-      if (this.modalType === "edit") {
-        const node = this.getNode(this.nodeId)
-        return Helpers.deepCopy(node)
-      }
-      return this.defaultNode
-    },
     title() {
       if (this.modalType === "add") {
         return this.parent
@@ -168,15 +162,6 @@ export default {
         return `Edit node: ${this.node.title}`
       }
       return ""
-    },
-    hasSubAccordion() {
-      const parents = this.getDirectParents(this.node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
-        const children = this.getDirectChildren(this.node.id)
-        return parent.mediaType === "accordion" && children.length > 0
-      }
-      return false
     },
     nodeData() {
       return [
@@ -226,13 +211,24 @@ export default {
     },
   },
   created() {
-    this.node = this.defaultNode
+    this.node = this.createDefaultNode()
   },
   mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
         thisTapestryTool.disableMovements()
+      }
+    })
+    this.$root.$on("bv::modal::shown", (_, modalId) => {
+      if (modalId == "node-modal") {
+        let copy = this.createDefaultNode()
+        if (this.modalType === "edit") {
+          const node = this.getNode(this.nodeId)
+          copy = Helpers.deepCopy(node)
+        }
+        copy.hasSubAccordion = this.hasSubAccordion(copy)
+        this.node = copy
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
@@ -243,6 +239,15 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering"]),
+    hasSubAccordion(node) {
+      const parents = this.getDirectParents(node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
+    },
     close() {
       this.$bvModal.hide("node-modal")
     },
