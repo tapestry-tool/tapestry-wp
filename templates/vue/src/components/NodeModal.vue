@@ -162,7 +162,7 @@
           v-if="
             node.tydeType === tydeTypes.MODULE ||
               node.mediaType === 'accordion' ||
-              hasSubAccordion ||
+              node.hasSubAccordion ||
               node.tydeType === tydeTypes.STAGE
           "
           title="Ordering"
@@ -263,11 +263,12 @@ export default {
       formErrors: "",
       maxDescriptionLength: 250,
       tydeTypes: tydeTypes,
+      node: null,
     }
   },
   computed: {
     ...mapGetters([
-      "defaultNode",
+      "createDefaultNode",
       "getDirectChildren",
       "getDirectParents",
       "getNode",
@@ -309,13 +310,6 @@ export default {
       }
       return false
     },
-    node() {
-      if (this.modalType === "edit") {
-        const node = this.getNode(this.nodeId)
-        return Helpers.deepCopy(node)
-      }
-      return this.defaultNode
-    },
     title() {
       if (this.modalType === "add") {
         return this.parent
@@ -325,15 +319,6 @@ export default {
         return `Edit node: ${this.node.title}`
       }
       return ""
-    },
-    hasSubAccordion() {
-      const parents = this.getDirectParents(this.node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
-        const children = this.getDirectChildren(this.node.id)
-        return parent.mediaType === "accordion" && children.length > 0
-      }
-      return false
     },
     nodeData() {
       return [
@@ -412,7 +397,7 @@ export default {
     },
   },
   created() {
-    this.node = this.defaultNode
+    this.node = this.createDefaultNode()
   },
   mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
@@ -421,9 +406,16 @@ export default {
         thisTapestryTool.disableMovements()
       }
     })
-    this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
-      if (modalId == "node-modal-container") {
+    this.$root.$on("bv::modal::shown", (_, modalId) => {
+      if (modalId == "node-modal") {
         this.setInitialTydeType()
+        let copy = this.createDefaultNode()
+        if (this.modalType === "edit") {
+          const node = this.getNode(this.nodeId)
+          copy = Helpers.deepCopy(node)
+        }
+        copy.hasSubAccordion = this.hasSubAccordion(copy)
+        this.node = copy
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
@@ -445,6 +437,15 @@ export default {
             ? tydeTypes.QUESTION_SET
             : tydeTypes.REGULAR
       }
+    },
+    hasSubAccordion(node) {
+      const parents = this.getDirectParents(node.id)
+      if (parents && parents[0]) {
+        const parent = this.getNode(parents[0])
+        const children = this.getDirectChildren(node.id)
+        return parent.mediaType === "accordion" && children.length > 0
+      }
+      return false
     },
     close() {
       this.$bvModal.hide("node-modal")

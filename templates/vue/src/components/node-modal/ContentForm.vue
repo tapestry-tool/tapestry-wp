@@ -18,14 +18,14 @@
         placeholder="Enter description"
       ></b-form-textarea>
     </b-form-group>
-    <b-form-group v-if="hasSubAccordion" label="Subaccordion Text">
+    <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
         id="node-media-type"
         data-testid="node-mediaType"
-        :value="nodeType"
+        :value="node.mediaType"
         :options="mediaTypes"
         @change="handleTypeChange"
       ></b-form-select>
@@ -80,22 +80,7 @@ export default {
   computed: {
     ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
     activeForm() {
-      return this.nodeType ? this.nodeType + "-form" : null
-    },
-    hasSubAccordion() {
-      const parents = this.getDirectParents(this.node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
-        const children = this.getDirectChildren(this.node.id)
-        return parent.mediaType === "accordion" && children.length > 0
-      }
-      return false
-    },
-    nodeType() {
-      if (this.node.mediaFormat === "h5p") {
-        return "h5p"
-      }
-      return this.node.mediaType
+      return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
   },
   mounted() {

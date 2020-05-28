@@ -66,7 +66,9 @@
       </b-form-checkbox>
     </b-form-group>
     <b-form-group
-      v-if="node.fullscreen && (nodeType === 'video' || nodeType === 'h5p')"
+      v-if="
+        node.fullscreen && (node.mediaType === 'video' || node.mediaType === 'h5p')
+      "
       class="indented-options"
     >
       <b-form-radio v-model="node.fitWindow" name="fit-window" :value="true">
@@ -97,14 +99,6 @@ export default {
       addThumbnail: false,
       addLockedThumbnail: false,
     }
-  },
-  computed: {
-    nodeType() {
-      if (this.node.mediaFormat === "h5p") {
-        return "h5p"
-      }
-      return this.node.mediaType
-    },
   },
   created() {
     this.addThumbnail = this.node.imageURL.length > 0
