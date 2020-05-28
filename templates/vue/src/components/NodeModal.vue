@@ -1,15 +1,14 @@
 <template>
   <b-modal
-    id="node-modal-container"
-    :title="modalTitle"
+    id="node-modal"
+    :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
   >
-    <div class="modal-header-row">
+    <div v-if="formErrors.length" class="modal-header-row">
       <b-alert
-        v-if="formErrors.length"
         id="tapestry-modal-form-errors"
         variant="danger"
         show
@@ -38,11 +37,11 @@
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
           <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
-          <conditions-form :node="node" @changed="lockNode = $event" />
+          <conditions-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
-          title="Quiz"
+          title="Activity"
         >
           <activity-form :node="node" />
         </b-tab>
@@ -57,15 +56,15 @@
               @input="updateOrderingArray"
             >
               <slick-item
-                v-for="(id, index) in node.childOrdering"
+                v-for="(childId, index) in node.childOrdering"
                 :key="index"
                 class="slick-list-item"
                 :index="index"
                 style="z-index: 9999 !important;"
               >
                 <span class="fas fa-bars fa-xs"></span>
-                <span>{{ getNode(id).title }}</span>
-                <span style="color: grey;">id: {{ id }}</span>
+                <span>{{ getNode(childId).title }}</span>
+                <span style="color: grey;">id: {{ childId }}</span>
               </slick-item>
             </slick-list>
           </div>
@@ -74,7 +73,7 @@
     </b-container>
     <template slot="modal-footer">
       <b-button
-        v-show="modalType === 'edit-node'"
+        v-show="modalType === 'edit'"
         size="sm"
         variant="danger"
         @click="$emit('delete-node')"
@@ -82,7 +81,7 @@
         Delete Node
       </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button size="sm" variant="primary" @click="submitNode()">
@@ -116,36 +115,60 @@ export default {
     PermissionsTable,
   },
   props: {
-    node: {
-      type: Object,
+    nodeId: {
+      type: Number,
       required: false,
-      default: () => ({}),
+      default: null,
     },
     modalType: {
       type: String,
       required: true,
-      validator: function(value) {
-        return (
-          ["add-new-node", "edit-node", "add-root-node", ""].indexOf(value) !== -1
-        )
+      validator: value => {
+        return ["", "add", "edit"].includes(value)
       },
-    },
-    rootNodeTitle: {
-      type: String,
-      required: false,
-      default: "Node",
     },
   },
   data() {
     return {
       userId: null,
-      lockNode: false,
       formErrors: "",
       maxDescriptionLength: 250,
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode", "settings"]),
+    ...mapGetters([
+      "defaultNode",
+      "getDirectChildren",
+      "getDirectParents",
+      "getNode",
+      "settings",
+    ]),
+    parent() {
+      if (this.modalType === "add") {
+        const parent = this.getNode(this.nodeId)
+        if (parent) {
+          return parent
+        }
+      }
+      return null
+    },
+    node() {
+      if (this.modalType === "edit") {
+        const node = this.getNode(this.nodeId)
+        return Helpers.deepCopy(node)
+      }
+      return this.defaultNode
+    },
+    title() {
+      if (this.modalType === "add") {
+        return this.parent
+          ? `Add new sub-topic to ${this.parent.title}`
+          : "Add root node"
+      } else if (this.modalType === "edit") {
+        return `Edit node: ${this.node.title}`
+      }
+      return ""
+    },
     hasSubAccordion() {
       const parents = this.getDirectParents(this.node.id)
       if (parents && parents[0]) {
@@ -155,23 +178,12 @@ export default {
       }
       return false
     },
-    modalTitle() {
-      if (this.modalType === "add-new-node") {
-        return `Add new sub-topic to ${this.rootNodeTitle}`
-      } else if (this.modalType === "edit-node") {
-        return `Edit node: ${this.rootNodeTitle}`
-      } else if (this.modalType === "add-root-node") {
-        return "Add root node"
-      } else {
-        return ""
-      }
-    },
     nodeData() {
       return [
         { name: "title", value: this.node.title },
         {
           name: "conditions",
-          value: this.lockNode ? this.node.conditions || [] : [],
+          value: this.node.conditions,
         },
         { name: "description", value: this.node.description },
         { name: "behaviour", value: this.node.behaviour },
@@ -213,26 +225,27 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
   },
-  async mounted() {
+  created() {
+    this.node = this.defaultNode
+  },
+  mounted() {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-      if (modalId == "node-modal-container") {
+      if (modalId == "node-modal") {
         this.formErrors = ""
         thisTapestryTool.disableMovements()
       }
     })
-    this.$root.$on("bv::modal::shown", (bvEvent, modalId) => {
-      if (modalId == "node-modal-container") {
-        this.lockNode = this.node.conditions && this.node.conditions.length > 0
-      }
-    })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId == "node-modal-container") {
+      if (modalId == "node-modal") {
         thisTapestryTool.enableMovements()
       }
     })
   },
   methods: {
     ...mapMutations(["updateOrdering"]),
+    close() {
+      this.$bvModal.hide("node-modal")
+    },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {

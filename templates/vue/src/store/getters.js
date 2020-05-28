@@ -63,3 +63,31 @@ function formatEntry(answers, answerType) {
     return { type: "checklist", entry: answers.filter(answer => answer !== "") }
   }
 }
+
+export function defaultNode({ settings }) {
+  return {
+    title: "",
+    behaviour: "embed",
+    mediaType: "",
+    typeData: {
+      mediaURL: "",
+      textContent: "",
+      subAccordionText: "More content:",
+    },
+    mediaDuration: "",
+    imageURL: "",
+    lockedImageURL: "",
+    hideTitle: false,
+    hideProgress: false,
+    hideMedia: false,
+    skippable: true,
+    fullscreen: false,
+    permissions: settings.defaultPermissions || {
+      public: ["read"],
+      authenticated: ["read"],
+    },
+    description: "",
+    quiz: [],
+    childOrdering: [],
+  }
+}

@@ -26,9 +26,9 @@
       The requested tapestry is empty.
     </div>
     <node-modal
-      :node="populatedNode"
+      ref="modal"
+      :node-id="populatedNode.id"
       :modal-type="modalType"
-      :root-node-title="selectedNode.title"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -170,19 +170,20 @@ export default {
       }
     },
     addRootNode() {
-      this.modalType = "add-root-node"
+      this.modalType = "add"
       this.populatedNode = this.getEmptyNode()
-      this.$bvModal.show("node-modal-container")
+      this.$bvModal.show("node-modal")
     },
     addNewNode() {
-      this.modalType = "add-new-node"
+      this.modalType = "add"
       this.populatedNode = this.getEmptyNode()
-      this.$bvModal.show("node-modal-container")
+      this.populatedNode.id = this.selectedNode.id
+      this.$bvModal.show("node-modal")
     },
     editNode() {
-      this.modalType = "edit-node"
+      this.modalType = "edit"
       this.populatedNode = this.selectedNode
-      this.$bvModal.show("node-modal-container")
+      this.$bvModal.show("node-modal")
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
