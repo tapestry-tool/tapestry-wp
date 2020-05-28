@@ -30,7 +30,7 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
-    <component :is="activeForm" :node="node"></component>
+    <component :is="activeForm" v-if="activeForm" :node="node"></component>
   </div>
 </template>
 
@@ -80,7 +80,7 @@ export default {
   computed: {
     ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
     activeForm() {
-      return this.nodeType + "-form"
+      return this.nodeType ? this.nodeType + "-form" : null
     },
     hasSubAccordion() {
       const parents = this.getDirectParents(this.node.id)

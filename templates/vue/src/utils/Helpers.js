@@ -1,7 +1,7 @@
 /**
  * Helper Functions
  */
-export default class {
+export default class Helpers {
   /**
    * Check if a string only contains digits
    *
@@ -146,5 +146,30 @@ export default class {
       }
     }
     return false
+  }
+
+  /**
+   * Returns a deep copy of a given object.
+   * Source: https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
+   * @param {Object | Array} obj
+   */
+  static deepCopy(obj) {
+    let outObject, value, key
+
+    if (typeof obj !== "object" || obj === null) {
+      return obj // Return the value if inObject is not an object
+    }
+
+    // Create an array or object to hold the values
+    outObject = Array.isArray(obj) ? [] : {}
+
+    for (key in obj) {
+      value = obj[key]
+
+      // Recursively (deep) copy for nested objects, including arrays
+      outObject[key] = Helpers.deepCopy(value)
+    }
+
+    return outObject
   }
 }
