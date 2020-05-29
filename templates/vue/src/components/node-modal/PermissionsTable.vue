@@ -12,31 +12,13 @@
       <b-tbody>
         <b-tr v-for="[rowName, permissionsList] in permissions" :key="rowName">
           <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
-          <b-td class="text-center">
+          <b-td v-for="type in types" :key="type" class="text-center">
             <b-form-checkbox
               :checked="permissionsList"
-              value="read"
-              :disabled="isPermissionDisabled(rowName, 'read')"
-              :data-testid="`node-permissions-${rowName}-read`"
-              @change="updatePermissions($event, rowName, 'read')"
-            ></b-form-checkbox>
-          </b-td>
-          <b-td class="text-center">
-            <b-form-checkbox
-              :checked="permissionsList"
-              value="add"
-              :disabled="isPermissionDisabled(rowName, 'add')"
-              :data-testid="`node-permissions-${rowName}-add`"
-              @change="updatePermissions($event, rowName, 'add')"
-            ></b-form-checkbox>
-          </b-td>
-          <b-td class="text-center">
-            <b-form-checkbox
-              :checked="permissionsList"
-              value="edit"
-              :disabled="isPermissionDisabled(rowName, 'edit')"
-              :data-testid="`node-permissions-${rowName}-edit`"
-              @change="updatePermissions($event, rowName, 'edit')"
+              :value="type"
+              :disabled="isPermissionDisabled(rowName, type)"
+              :data-testid="`node-permissions-${rowName}-${type}`"
+              @change="updatePermissions($event, rowName, type)"
             ></b-form-checkbox>
           </b-td>
         </b-tr>
@@ -103,6 +85,9 @@ export default {
       return orderedPermissions
     },
   },
+  created() {
+    this.types = ["read", "add", "edit"]
+  },
   methods: {
     updatePermissions(value, rowName, type) {
       const newPermissions = { ...this.value }
@@ -117,7 +102,8 @@ export default {
       this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
+      // If the row is the first in order, it should never be disabled
+      if (rowName === PERMISSIONS_ORDER[0]) {
         return false
       }
       // keep going up until we find a non-user higher row
@@ -132,19 +118,16 @@ export default {
       }
       return false
     },
-    changeIndividualPermission(value, rowName, type, permissionsObj) {
-      let currentPermissions = permissionsObj[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
+    changeIndividualPermission(isChecked, rowName, type, permissionsObj) {
+      const currentPermissions = permissionsObj[rowName] || []
       let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
-        }
-      } else {
+
+      if (!isChecked) {
         newPermissions = currentPermissions.filter(permission => permission !== type)
+      } else if (!currentPermissions.includes(type)) {
+        newPermissions.push(type)
       }
+
       permissionsObj[rowName] = newPermissions
     },
     addUserPermissionRow() {
@@ -154,14 +137,13 @@ export default {
         const higherRowPermissions = this.value[higherRow]
         const newPermissions = { ...this.value }
         const newUserPermissions = []
-        const types = ["read", "add", "edit"]
-        types
-          .filter(type => this.shouldCascade(higherRow, type))
-          .forEach(type => {
-            if (higherRowPermissions.includes(type)) {
-              newUserPermissions.push(type)
-            }
-          })
+        this.types
+          .filter(
+            type =>
+              this.shouldCascade(higherRow, type) &&
+              higherRowPermissions.includes(type)
+          )
+          .forEach(type => newUserPermissions.push(type))
         newPermissions[`user-${userId}`] = newUserPermissions
         this.userId = null
         this.$emit("input", newPermissions)
