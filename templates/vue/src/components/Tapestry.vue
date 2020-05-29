@@ -21,13 +21,15 @@
       <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
     </div>
     <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
-    <root-node-button v-if="showRootNodeButton" @add-root-node="addRootNode" />
-    <div v-if="showEmpty" style="margin-top: 40vh;">
-      The requested tapestry is empty.
+    <div v-if="tapestryLoaded && !tapestry.rootId">
+      <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
+      <div v-else style="margin-top: 40vh;">
+        The requested tapestry is empty.
+      </div>
     </div>
     <node-modal
       :parent="parentNode"
-      :node-id="populatedNode.id"
+      :node-id="nodeId"
       :modal-type="modalType"
       @cancel="closeModal"
       @submit="handleSubmit"
@@ -36,7 +38,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
 import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
@@ -52,62 +54,14 @@ export default {
   },
   data() {
     return {
-      loadedH5pId: 0,
-      TapestryAPI: new TapestryApi(wpPostId),
       tapestryLoaded: false,
       modalType: "",
       parentNode: null,
-      populatedNode: {
-        title: "",
-        description: "",
-        mediaType: "",
-        typeData: {
-          mediaURL: "",
-          textContent: "",
-        },
-        mediaDuration: "",
-        imageURL: "",
-        lockedImageURL: "",
-        showInBackpack: true,
-        permissions: {
-          public: ["read"],
-          authenticated: ["read"],
-        },
-        quiz: [],
-        skippable: true,
-        tydeType: tydeTypes.REGULAR,
-      },
-      favourites: [],
+      nodeId: null,
     }
   },
   computed: {
-    ...mapGetters([
-      "selectedNode",
-      "tapestry",
-      "getNode",
-      "getDirectParents",
-      "settings",
-    ]),
-    showRootNodeButton: function() {
-      return (
-        this.tapestryLoaded &&
-        !this.tapestry.rootId &&
-        thisTapestryTool.canCurrentUserEdit()
-      )
-    },
-    showEmpty: function() {
-      return (
-        this.tapestryLoaded &&
-        !this.tapestry.rootId &&
-        !thisTapestryTool.canCurrentUserEdit()
-      )
-    },
-    xORfx: function() {
-      return this.tapestry.settings.autoLayout ? "x" : "fx"
-    },
-    yORfy: function() {
-      return this.tapestry.settings.autoLayout ? "y" : "fy"
-    },
+    ...mapGetters(["selectedNode", "tapestry"]),
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
@@ -133,11 +87,8 @@ export default {
       "init",
       "setDataset",
       "updateSelectedNode",
-      "updateRootNode",
-      "updateNodeCoordinates",
       "updateTydeProgress",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     openNode({ detail: { id } }) {
       this.$router.push(`/nodes/${id}`)
     },
@@ -154,56 +105,22 @@ export default {
         this.updateTydeProgress({ parentId: n.id, isParentModule: false })
       )
     },
-    getEmptyNode() {
-      return {
-        title: "",
-        behaviour: "embed",
-        mediaType: "",
-        typeData: {
-          mediaURL: "",
-          textContent: "",
-          subAccordionText: "More content:",
-        },
-        mediaDuration: "",
-        imageURL: "",
-        lockedImageURL: "",
-        hideTitle: false,
-        hideProgress: false,
-        hideMedia: false,
-        skippable: true,
-        fullscreen: false,
-        showInBackpack: true,
-        permissions: this.settings.defaultPermissions
-          ? this.settings.defaultPermissions
-          : this.populatedNode.permissions,
-        description: "",
-        quiz: [],
-        tydeType: tydeTypes.REGULAR,
-        childOrdering: [],
-      }
-    },
     addRootNode() {
       this.parentNode = null
       this.modalType = "add"
-      this.populatedNode = this.getEmptyNode()
       this.$bvModal.show("node-modal")
     },
     addNewNode() {
       this.parentNode = this.selectedNode
       this.modalType = "add"
-      this.populatedNode = this.getEmptyNode()
-      this.populatedNode.id = this.selectedNode.id
+      this.nodeId = this.selectedNode.id
       this.$bvModal.show("node-modal")
     },
     editNode() {
       this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
       this.modalType = "edit"
-      this.populatedNode = this.selectedNode
+      this.nodeId = this.selectedNode.id
       this.$bvModal.show("node-modal")
-    },
-    deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry()
-      this.closeModal()
     },
     closeModal() {
       this.modalType = ""
@@ -217,11 +134,8 @@ export default {
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
       thisTapestryTool.initialize(true)
-
       this.closeModal()
     },
   },
 }
 </script>
-
-<style lang="scss" scoped></style>
