@@ -216,7 +216,10 @@ export function createDefaultNode({ settings }) {
     mediaDuration: 0,
     typeId: 1,
     group: 1,
-    permissions: settings.defaultPermissions,
+    permissions: settings.defaultPermissions || {
+      public: ["read"],
+      authenticated: ["read"],
+    },
     typeData: {
       linkMetadata: null,
       progress: [
