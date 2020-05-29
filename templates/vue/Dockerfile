@@ -3,7 +3,6 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install
-RUN npm rebuild node-saas
 COPY . .
 
 # build stage
