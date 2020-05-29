@@ -1,6 +1,6 @@
 <template>
   <div id="root-node-button">
-    <div data-testid="root-node-button" @click="showModal">
+    <div data-testid="root-node-button" @click="$emit('click')">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
@@ -10,14 +10,6 @@
 <script>
 export default {
   name: "root-node-button",
-  data() {
-    return {}
-  },
-  methods: {
-    showModal() {
-      this.$emit("add-root-node")
-    },
-  },
 }
 </script>
 
