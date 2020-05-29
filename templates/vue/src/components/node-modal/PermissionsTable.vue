@@ -88,6 +88,11 @@ export default {
   },
   created() {
     this.types = ["read", "add", "edit"]
+    for (const [rowName, permissionsList] of this.permissions) {
+      for (const type of permissionsList) {
+        this.addedByUser.add(`${rowName}-${type}`)
+      }
+    }
   },
   methods: {
     updatePermissions(isChecked, rowName, type) {
