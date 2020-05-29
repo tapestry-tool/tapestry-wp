@@ -63,6 +63,7 @@ export default {
   data() {
     return {
       userId: "",
+      addedByUser: new Set(),
     }
   },
   computed: {
@@ -89,14 +90,28 @@ export default {
     this.types = ["read", "add", "edit"]
   },
   methods: {
-    updatePermissions(value, rowName, type) {
+    updatePermissions(isChecked, rowName, type) {
       const newPermissions = { ...this.value }
-      this.changeIndividualPermission(value, rowName, type, newPermissions)
+      this.changeIndividualPermission(isChecked, rowName, type, newPermissions)
+
+      if (type === "add" || type === "edit") {
+        const key = `${rowName}-read`
+        if (isChecked) {
+          if (!newPermissions[rowName].includes("read")) {
+            newPermissions[rowName].push("read")
+          }
+        } else if (!this.addedByUser.has(key)) {
+          newPermissions[rowName] = newPermissions[rowName].filter(
+            perm => perm !== "read"
+          )
+        }
+      }
+
       if (this.shouldCascade(rowName, type)) {
         const rowIndex = this.getPermissionRowIndex(rowName)
         const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
         lowerPriorityPermissions.forEach(newRow => {
-          this.changeIndividualPermission(value, newRow[0], type, newPermissions)
+          this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
         })
       }
       this.$emit("input", newPermissions)
@@ -122,10 +137,13 @@ export default {
       const currentPermissions = permissionsObj[rowName] || []
       let newPermissions = [...currentPermissions]
 
+      const key = `${rowName}-${type}`
       if (!isChecked) {
         newPermissions = currentPermissions.filter(permission => permission !== type)
+        this.addedByUser.delete(key)
       } else if (!currentPermissions.includes(type)) {
         newPermissions.push(type)
+        this.addedByUser.add(key)
       }
 
       permissionsObj[rowName] = newPermissions
