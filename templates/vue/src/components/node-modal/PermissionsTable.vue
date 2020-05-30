@@ -95,6 +95,15 @@ export default {
     }
   },
   methods: {
+    cascade(isChecked, rowName, type, newPermissions) {
+      if (this.shouldCascade(rowName, type)) {
+        const rowIndex = this.getPermissionRowIndex(rowName)
+        const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
+        lowerPriorityPermissions.forEach(newRow => {
+          this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
+        })
+      }
+    },
     updatePermissions(isChecked, rowName, type) {
       const newPermissions = { ...this.value }
       this.changeIndividualPermission(isChecked, rowName, type, newPermissions)
@@ -105,6 +114,7 @@ export default {
         if (isChecked) {
           if (!currentPermissions.includes("read")) {
             currentPermissions.push("read")
+            this.cascade(isChecked, rowName, "read", newPermissions)
           }
         } else if (
           !this.addedByUser.has(key) &&
@@ -113,16 +123,11 @@ export default {
           newPermissions[rowName] = currentPermissions.filter(
             perm => perm !== "read"
           )
+          this.cascade(isChecked, rowName, "read", newPermissions)
         }
       }
 
-      if (this.shouldCascade(rowName, type)) {
-        const rowIndex = this.getPermissionRowIndex(rowName)
-        const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
-        lowerPriorityPermissions.forEach(newRow => {
-          this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
-        })
-      }
+      this.cascade(isChecked, rowName, type, newPermissions)
       this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
