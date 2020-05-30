@@ -131,10 +131,19 @@ export default {
       this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
+      const currentPermissions = this.value[rowName]
+      if (
+        currentPermissions.includes("add") ||
+        currentPermissions.includes("edit")
+      ) {
+        return type === "read"
+      }
+
       // If the row is the first in order, it should never be disabled
       if (rowName === PERMISSIONS_ORDER[0]) {
         return false
       }
+
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
       const higherRow = this.permissions[rowIndex - 1][0]
