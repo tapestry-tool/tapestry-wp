@@ -100,13 +100,17 @@ export default {
       this.changeIndividualPermission(isChecked, rowName, type, newPermissions)
 
       if (type === "add" || type === "edit") {
+        const currentPermissions = newPermissions[rowName]
         const key = `${rowName}-read`
         if (isChecked) {
-          if (!newPermissions[rowName].includes("read")) {
-            newPermissions[rowName].push("read")
+          if (!currentPermissions.includes("read")) {
+            currentPermissions.push("read")
           }
-        } else if (!this.addedByUser.has(key)) {
-          newPermissions[rowName] = newPermissions[rowName].filter(
+        } else if (
+          !this.addedByUser.has(key) &&
+          !currentPermissions.find(type => type === "add" || type === "edit")
+        ) {
+          newPermissions[rowName] = currentPermissions.filter(
             perm => perm !== "read"
           )
         }
