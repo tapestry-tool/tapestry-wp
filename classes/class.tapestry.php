@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
 
 /**
  * Add/update/retrieve a Tapestry
- *
+ * 
  */
 class Tapestry implements ITapestry
 {
@@ -23,9 +23,9 @@ class Tapestry implements ITapestry
 
     /**
      * Constructor
-     *
+     * 
      * @param   Number  $postId post ID
-     *
+     * 
      * @return  NULL
      */
     public function __construct($postId = 0)
@@ -51,7 +51,7 @@ class Tapestry implements ITapestry
 
     /**
      * Save the Tapestry
-     *
+     * 
      * @return  Object  $tapestry
      */
     public function save()
@@ -62,7 +62,7 @@ class Tapestry implements ITapestry
 
     /**
      * Save the Tapestry automatically on publish
-     *
+     * 
      * @return  Object  $tapestry
      */
     public function saveOnPublish()
@@ -73,7 +73,7 @@ class Tapestry implements ITapestry
 
     /**
      * Set Tapestry
-     *
+     * 
      * @param   Object  $tapestry  tapestry
      *
      * @return  NULL
@@ -99,7 +99,7 @@ class Tapestry implements ITapestry
 
     /**
      * Retrieve a Tapestry post
-     *
+     * 
      * @return  Object  $tapestry
      */
     public function get()
@@ -112,7 +112,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get node IDs
-     *
+     * 
      * @return  Array  $nodes  node ids
      */
     public function getNodeIds()
@@ -123,11 +123,12 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
+
     /**
      * Add a new node
-     *
+     * 
      * @param   Object  $node   Tapestry node
-     *
+     * 
      * @return  Object  $node   Tapestry node
      */
     public function addNode($node)
@@ -197,9 +198,9 @@ class Tapestry implements ITapestry
 
     /**
      * Add a new link
-     *
+     * 
      * @param  Object   $link   Tapestry link
-     *
+     * 
      * @return  Object  $link   Tapestry link
      */
     public function addLink($link)
@@ -211,9 +212,9 @@ class Tapestry implements ITapestry
 
     /**
      * Delete a link from links array
-     *
+     * 
      * @param  Integer $linkIndex Link Index
-     *
+     * 
      * @return Array   $links     Tapestry links
      */
     public function removeLink($linkIndex)
@@ -225,9 +226,9 @@ class Tapestry implements ITapestry
 
     /**
      * Add a new group
-     *
+     * 
      * @param   Object  $group   Tapestry group
-     *
+     * 
      * @return  Object  $group   Tapestry group
      */
     public function addGroup($group)
@@ -243,7 +244,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get the node controller with associated node meta ID
-     *
+     * 
      * @param   Number  $nodeMetaId node meta ID
      *
      * @return  Object  $node       node controller
@@ -255,7 +256,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get the group controller with associated group meta ID
-     *
+     * 
      * @param   Number  $groupMetaId    group meta ID
      *
      * @return  Object  $group          group controller
@@ -284,7 +285,7 @@ class Tapestry implements ITapestry
                 'links' => [],
                 'groups' => [],
                 'rootId' => 0,
-                'settings' => (object) [],
+                'settings' => (object) []
             ];
         }
         return $tapestry;
@@ -302,11 +303,11 @@ class Tapestry implements ITapestry
     private function _formTapestry()
     {
         return (object) [
-            'nodes' => $this->nodes,
-            'groups' => $this->groups,
-            'links' => $this->links,
-            'settings' => $this->settings,
-            'rootId' => $this->rootId,
+            'nodes'     => $this->nodes,
+            'groups'    => $this->groups,
+            'links'     => $this->links,
+            'settings'  => $this->settings,
+            'rootId'    => $this->rootId
         ];
     }
 
@@ -327,8 +328,8 @@ class Tapestry implements ITapestry
     private function _resetAuthor()
     {
         wp_update_post(array(
-            'ID' => $this->postId,
-            'post_author' => $this->author,
+            'ID'            => $this->postId,
+            'post_author'   => $this->author
         ));
     }
 
@@ -405,7 +406,8 @@ class Tapestry implements ITapestry
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId))) {
+        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId)))
+        {
             if ($from == $to) {
                 return true;
             }
@@ -413,11 +415,11 @@ class Tapestry implements ITapestry
             $checked[] = $from;
 
             foreach ($this->links as $link) {
-                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) ||
+                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) || 
                     ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked))) {
                     return true;
                 }
-            }
+            }   
         }
 
         return false;
