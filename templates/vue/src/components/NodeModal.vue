@@ -113,12 +113,7 @@
             </b-form-group>
             <div class="duration-calculation-video-containers">
               <video
-                v-if="
-                  videoUrlEntered &&
-                    node.mediaType === 'video' &&
-                    nodeType !== 'h5p' &&
-                    videoUrlYoutubeID === ''
-                "
+                v-if="nodeMediaFormat === 'mp4'"
                 ref="video"
                 controls
                 :src="videoSrc"
@@ -131,12 +126,7 @@
                 @load="handleIframeload"
               ></iframe>
               <youtube
-                v-if="
-                  videoUrlEntered &&
-                    node.mediaType === 'video' &&
-                    nodeType !== 'h5p' &&
-                    videoUrlYoutubeID !== ''
-                "
+                v-if="nodeMediaFormat === 'youtube'"
                 :video-id="videoUrlYoutubeID"
                 :player-vars="{ autoplay: 0 }"
                 style="display: none;"
@@ -694,9 +684,6 @@ export default {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
       }
-      if (this.videoUrlYoutubeID !== "") {
-        return "youtube"
-      }
       return this.node.mediaType
     },
     modalTitle() {
@@ -723,6 +710,10 @@ export default {
         {
           name: "mediaURL",
           value: this.getMediaUrl(),
+        },
+        {
+          name: "mediaFormat",
+          value: this.nodeMediaFormat,
         },
         {
           name: "textContent",
@@ -945,22 +936,11 @@ export default {
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
-      if (event === "video" || event === "h5p") {
-        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
-      } else {
-        this.$set(this.node, "mediaFormat", "")
-      }
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if (
-          this.node.mediaType === "video" &&
-          this.nodeType !== "h5p" &&
-          this.videoUrlYoutubeID === ""
-        ) {
-          this.setVideoDuration()
-        }
+        if (this.nodeMediaFormat === "mp4") this.setVideoDuration()
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
@@ -1193,6 +1173,11 @@ table {
   }
   > span:last-of-type {
     margin-left: auto;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
   }
 }
 

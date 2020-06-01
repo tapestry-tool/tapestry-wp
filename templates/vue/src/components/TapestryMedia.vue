@@ -7,7 +7,7 @@
         'media-wrapper-no-scroll':
           node.mediaFormat === 'mp4' ||
           node.mediaFormat === 'h5p' ||
-          node.mediaFormat === 'youtube',
+          node.mediaFormat === 'youtube'
       },
     ]"
     :style="containerStyles"
@@ -30,7 +30,7 @@
       @close="$emit('close')"
     />
     <youtube-media
-      v-if="node.mediaType === 'youtube'"
+      v-if="node.mediaFormat === 'youtube'"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
@@ -185,12 +185,12 @@ export default {
   height: 100%;
   padding: 0;
 
-  &-embed {
-    background: white;
-  }
-
   &-no-scroll {
     overflow: hidden;
+  }
+
+  &-embed {
+    background: white;
   }
 }
 </style>
