@@ -114,5 +114,7 @@ export function createDefaultNode({ settings }) {
     },
     childOrdering: [],
     quiz: [],
+    license: "",
+    references: "",
   })
 }
