@@ -106,12 +106,7 @@
             </b-form-group>
             <div class="duration-calculation-video-containers">
               <video
-                v-if="
-                  videoUrlEntered &&
-                    node.mediaType === 'video' &&
-                    nodeType !== 'h5p' &&
-                    videoUrlYoutubeID === ''
-                "
+                v-if="nodeMediaFormat === 'mp4'"
                 ref="video"
                 controls
                 :src="videoSrc"
@@ -125,12 +120,7 @@
                 @load="handleH5Pload"
               ></iframe>
               <youtube
-                v-if="
-                  videoUrlEntered &&
-                    node.mediaType === 'video' &&
-                    nodeType !== 'h5p' &&
-                    videoUrlYoutubeID !== ''
-                "
+                v-if="nodeMediaFormat === 'youtube'"
                 :video-id="videoUrlYoutubeID"
                 :player-vars="{ autoplay: 0 }"
                 style="display: none;"
@@ -515,9 +505,6 @@ export default {
       if (this.node.mediaFormat === "h5p") {
         return "h5p"
       }
-      if (this.videoUrlYoutubeID !== "") {
-        return "youtube"
-      }
       return this.node.mediaType
     },
     modalTitle() {
@@ -544,6 +531,10 @@ export default {
         {
           name: "mediaURL",
           value: this.getMediaUrl(),
+        },
+        {
+          name: "mediaFormat",
+          value: this.nodeMediaFormat,
         },
         {
           name: "textContent",
@@ -588,7 +579,15 @@ export default {
     },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
-      return this.videoUrlYoutubeID === "" ? true : this.youtubeLoaded
+      return this.nodeMediaFormat !== "youtube" || this.youtubeLoaded
+    },
+    nodeMediaFormat() {
+      if (this.nodeType === "h5p") {
+        return "h5p"
+      } else if (this.nodeType === "video") {
+        return this.videoUrlYoutubeID === "" ? "mp4" : "youtube"
+      }
+      return ""
     },
   },
   watch: {
@@ -600,6 +599,7 @@ export default {
     },
     videoSrc(newUrl) {
       this.node.typeData.mediaURL = newUrl
+      this.youtubeLoaded = false
       this.videoUrlEntered = true
     },
   },
@@ -711,22 +711,11 @@ export default {
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
-      if (event === "video" || event === "h5p") {
-        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
-      } else {
-        this.$set(this.node, "mediaFormat", "")
-      }
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
-        if (
-          this.node.mediaType === "video" &&
-          this.nodeType !== "h5p" &&
-          this.videoUrlYoutubeID === ""
-        ) {
-          this.setVideoDuration()
-        }
+        if (this.nodeMediaFormat === "mp4") this.setVideoDuration()
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
@@ -928,6 +917,11 @@ table {
     height: 1.5em;
     width: 1.5em;
     left: 33%;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
   }
 }
 

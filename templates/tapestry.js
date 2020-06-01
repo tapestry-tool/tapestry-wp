@@ -1650,7 +1650,7 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video' || d.mediaType === "youtube") {
+                if (d.mediaType === 'video') {
                     if (d.mediaDuration) {
                         base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                     }
@@ -2598,13 +2598,6 @@ function getIconClass(mediaType, action, accessible=true) {
 
         case "accordion":
             classStr = "fas fa-bars";
-            break;
-
-        case "youtube":
-            if (action == 'pause')
-                classStr = classStrStart + 'pause';
-            else
-                classStr = classStrStart + 'play';
             break;
 
         default:

@@ -7,7 +7,7 @@
         'media-wrapper-no-scroll':
           node.mediaFormat === 'mp4' ||
           node.mediaFormat === 'h5p' ||
-          node.typeData.youtubeID,
+          node.mediaFormat === 'youtube'
       },
     ]"
   >
@@ -18,7 +18,7 @@
       @load="handleLoad"
     />
     <video-media
-      v-if="node.mediaFormat === 'mp4' && !node.typeData.youtubeID"
+      v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
@@ -28,7 +28,7 @@
       @close="$emit('close')"
     />
     <youtube-media
-      v-if="node.typeData.youtubeID && node.typeData.youtubeID !== ''"
+      v-if="node.mediaFormat === 'youtube'"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
@@ -166,16 +166,9 @@ export default {
   &-no-scroll {
     overflow: hidden;
   }
-}
 
-.media-wrapper-embed {
-  background: white;
   &-embed {
     background: white;
-  }
-
-  &-no-scroll {
-    overflow: hidden;
   }
 }
 </style>
