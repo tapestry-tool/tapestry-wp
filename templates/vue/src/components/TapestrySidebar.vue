@@ -2,11 +2,12 @@
   <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
     <div v-show="isClosed" class="sidebar-preview">
       <tapestry-icon icon="angle-double-left" />
-      <p class="title">{{ node.title }}</p>
+      <p class="preview-title">{{ node.title }}</p>
     </div>
     <div class="sidebar-content">
-      <h3>{{ node.title }}</h3>
-      <p>{{ node.description }}</p>
+      <h3 class="content-title">{{ node.title }}</h3>
+      <h4 class="content-separator">About</h4>
+      <p class="content-description">{{ node.description }}</p>
     </div>
   </aside>
 </template>
@@ -80,9 +81,9 @@ export default {
     text-align: left;
   }
 
-  .title {
+  .preview-title {
     display: block;
-    margin: 0;
+    margin-top: 1em;
     transform: translateX(8px) rotate(90deg);
     transform-origin: left center;
   }
@@ -90,5 +91,31 @@ export default {
 
 .sidebar-content {
   grid-column: 2;
+
+  .content-title {
+    text-align: left;
+    margin-bottom: 1em;
+  }
+
+  .content-separator {
+    margin-bottom: 1em;
+    position: relative;
+    text-align: left;
+
+    &:after {
+      content: "";
+      position: absolute;
+      width: 50%;
+      height: 3px;
+      background: white;
+      left: 0;
+      bottom: -8px;
+    }
+  }
+
+  .content-description {
+    display: block;
+    text-align: left;
+  }
 }
 </style>
