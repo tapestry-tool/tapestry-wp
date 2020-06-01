@@ -93,7 +93,7 @@ function tapestryTool(config){
      ****************************************************/
 
     /* Import data from json file, then start D3 */
-    jQuery.ajaxSetup({
+    $.ajaxSetup({
         beforeSend: function (xhr) {
             if (wpApiSettings && wpApiSettings.nonce) {
                 xhr.setRequestHeader( 'X-WP-Nonce', wpApiSettings.nonce );
