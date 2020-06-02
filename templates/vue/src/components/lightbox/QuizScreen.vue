@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="$emit('close')">
+      <button v-else class="button-completion" @click="close">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -86,11 +86,23 @@ export default {
     },
     next() {
       this.showCompletionScreen = false
+      globals.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+        to: this.activeQuestionIndex + 1,
+      })
       this.activeQuestionIndex++
     },
     prev() {
       this.showCompletionScreen = false
+      globals.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+        to: this.activeQuestionIndex - 1,
+      })
       this.activeQuestionIndex--
+    },
+    close() {
+      globals.recordAnalyticsEvent("user", "close", "activity", this.node.id)
+      this.$emit("close")
     },
   },
 }
