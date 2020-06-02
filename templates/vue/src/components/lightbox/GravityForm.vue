@@ -57,6 +57,7 @@ export default {
 
     this.disableAutocomplete()
     this.styleImageUI()
+    this.addInputListeners()
 
     if (this.entry) {
       this.populateForm()
@@ -122,6 +123,7 @@ export default {
             delete window[`gf_submitting_${this.id}`]
             this.html = response.data
           } else {
+            globals.recordAnalyticsEvent("user", "submit", "gf", this.id)
             this.$emit("submit")
           }
         })
