@@ -68,6 +68,40 @@ export default {
     }
   },
   methods: {
+    addInputListeners() {
+      const form = this.$refs.formContainer.querySelector("form")
+
+      const textareas = form.querySelectorAll("textarea")
+      textareas.forEach(textarea => {
+        const events = ["focus", "blur"]
+        events.forEach(event =>
+          textarea.addEventListener(event, () =>
+            globals.recordAnalyticsEvent("user", event, "gf-textarea", this.id)
+          )
+        )
+      })
+
+      const inputs = form.querySelectorAll("input")
+      inputs.forEach(input => {
+        if (input.type === "text") {
+          const events = ["focus", "blur"]
+          events.forEach(event =>
+            input.addEventListener(event, () =>
+              globals.recordAnalyticsEvent("user", event, "gf-input", this.id)
+            )
+          )
+        } else {
+          input.addEventListener("input", () => {
+            globals.recordAnalyticsEvent(
+              "user",
+              "input",
+              `gf-${input.type}`,
+              this.id
+            )
+          })
+        }
+      })
+    },
     handleSubmit(event) {
       // stop the original form event
       event.preventDefault()
