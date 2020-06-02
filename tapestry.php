@@ -203,11 +203,68 @@ function gf_button_ajax_get_form()
 }
 // End of Gravity Forms Pluggin
 
+// ANALYTICS
+
+function create_analytics_schema() {
+    global $wpdb;
+
+    add_option( "tapestry_analytics_schema_version", "0.1" );
+
+    // Create table for logging events
+    $table_name = $wpdb->prefix . "tapestry_analytics_events";
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                timestamp timestamp,
+                actor tinytext NOT NULL,
+                action tinytext NOT NULL,
+                object text NOT NULL,
+                user_guid tinytext,
+                object_id tinytext,
+                details text,
+                PRIMARY KEY  (id)
+            ) $charset_collate;";
+
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    dbDelta( $sql );
+}
+
+add_action( 'wp_ajax_tapestry_log_analytics_event', 'tapestry_log_analytics_event' );
+add_action( 'wp_ajax_nopriv_tapestry_log_analytics_event', 'tapestry_log_analytics_event' );
+function tapestry_log_analytics_event() {
+
+	global $wpdb;
+
+	$actor = $_POST['actor'];
+	$action = $_POST['action2'];
+	$object = $_POST['object'];
+	$user_guid = $_POST['user_guid'];
+	$object_id = $_POST['object_id'];
+	$details = $_POST['details'];
+
+    $table_name = $wpdb->prefix . "tapestry_analytics_events";
+
+	$wpdb->insert( 
+		$table_name, 
+		array( 
+			'actor' => $actor, 
+			'action' => $action, 
+			'object' => $object, 
+			'user_guid' => $user_guid, 
+			'object_id' => $object_id, 
+			'details' => $details
+		) 
+	);
+
+	wp_die();
+}
+
 // TYDE CUSTOMIZATIONS
 
 register_activation_hook( __FILE__, 'tapestry_activation' );
 function tapestry_activation() {
     create_copilot_role();
+    create_analytics_schema();
 }
 
 /**

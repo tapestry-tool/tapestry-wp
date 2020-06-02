@@ -326,7 +326,7 @@ function tapestryTool(config){
         
             // Attach the link line to the tapestry SVG (it won't appear for now)
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
-            recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
+            recordAnalyticsEvent('app', 'load', 'tapestry', config.wpPostId);
         }
 
         if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
@@ -2900,55 +2900,6 @@ function screenToSVG(screenX, screenY) {
     return p.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-/****************************************************
- * ANALYTICS FUNCTIONS
- ****************************************************/
-
-var analyticsAJAXUrl = '',  // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
-    analyticsAJAXAction = 'tapestry_tool_log_event';// Analytics
-
-function recordAnalyticsEvent(actor, action, object, objectID, details){
-
-    if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length)
-        return false;
-
-    // TODO: Also need to save the tapestry slug or ID in the events
-
-    var userUUID = Cookies.get("user-uuid");
-    if (userUUID === undefined) {
-        userUUID = createUUID();
-        Cookies.set("user-uuid", userUUID);
-    }
-
-    if (details === undefined) {
-        details = {};
-    }
-
-    details['user-ip'] = $('#user-ip').text();
-
-    var data = {
-        'action': analyticsAJAXAction,
-        'actor': actor,
-        'action2': action,
-        'object': object,
-        'user_guid': userUUID,
-        'object_id': objectID,
-        'details': JSON.stringify(details),
-    };
-
-    // Send the event to an AJAX URL to be saved
-    jQuery.post(analyticsAJAXUrl, data, function(response) {
-        // Event posted
-    });
-}
-
-function createUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
 function isEmptyObject(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -2956,18 +2907,3 @@ function isEmptyObject(obj) {
     }
     return true;
 }
-
-// Capture click events anywhere inside or outside tapestry
-$(document).ready(function(){
-    document.body.addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'screen', null, {'x': x, 'y': y});
-    }, true);
-
-    document.getElementById('tapestry').addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'tapestry', null, {'x': x, 'y': y});
-    }, true);
-});
