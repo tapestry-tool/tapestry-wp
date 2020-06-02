@@ -447,6 +447,7 @@ function tapestryTool(config){
 
             // Every time the slider's value is changed, do the following
             tapestryDepthSlider.onchange = function() {
+                globals.recordAnalyticsEvent('user', 'change', 'depth-slider', null, { from: tapestryDepth, to: this.value })
                 tapestryDepth = this.value;
                 updateDepthMessage();
             
@@ -1094,26 +1095,27 @@ function tapestryTool(config){
             }
         });
     }
-    
-    /* Draws the components that make up node */
-    function buildNodeContents() {
-        const handleClick = d => {
-            if (root === d.id && d.hideMedia) {
-                if (config.wpCanEditTapestry || d.accessible) {
-                    if (d.tydeType === "Module") {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'start-module',
-                                { detail: d.id }
-                            )
+
+    function handleClick(d) {
+        if (root === d.id && d.hideMedia) {
+            if (config.wpCanEditTapestry || d.accessible) {
+                if (d.tydeType === "Module") {
+                    recordAnalyticsEvent('user', 'click', 'module', d.id, { x: d3.event.x, y: d3.event.y })
+                    dispatchEvent(
+                        new CustomEvent(
+                            'start-module',
+                            { detail: d.id }
                         )
-                    } else {
-                        goToNode(d.id)
-                    }
+                    )
+                } else {
+                    goToNode(d.id)
                 }
             }
         }
-        
+    }
+    
+    /* Draws the components that make up node */
+    function buildNodeContents() {
         if (tapestryDepth) {
             tapestryDepthSlider.max = findMaxDepth(root) + 1;
         }
@@ -1411,7 +1413,7 @@ function tapestryTool(config){
                 .on("end", dragended)
             )
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         if (!isMultiSelect) {
@@ -1427,7 +1429,7 @@ function tapestryTool(config){
         else {
             nodes
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
                         tapestry.selectNode(d.id);
@@ -1826,13 +1828,7 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            })
+            .on("click keydown", handleClick)
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
