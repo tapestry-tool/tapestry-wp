@@ -30,7 +30,6 @@
       :parent="parentNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -86,7 +85,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
+    ...mapGetters([
+      "selectedNode",
+      "tapestry",
+      "getNode",
+      "getDirectParents",
+      "settings",
+    ]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -106,20 +111,6 @@ export default {
     },
     yORfy: function() {
       return this.tapestry.settings.autoLayout ? "y" : "fy"
-    },
-    permissionsOrder: function() {
-      switch (this.modalType) {
-        case "edit-node":
-          return this.selectedNode.permissionsOrder
-        default:
-          return [
-            "public",
-            "authenticated",
-            ...Object.keys(wpData.roles).filter(
-              role => role !== "administrator" && role !== "author"
-            ),
-          ]
-      }
     },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
@@ -186,10 +177,9 @@ export default {
         skippable: true,
         fullscreen: false,
         showInBackpack: true,
-        permissions: {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        permissions: this.settings.defaultPermissions
+          ? this.settings.defaultPermissions
+          : this.populatedNode.permissions,
         description: "",
         quiz: [],
         tydeType: tydeTypes.REGULAR,
