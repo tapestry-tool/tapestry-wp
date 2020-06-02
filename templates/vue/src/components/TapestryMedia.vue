@@ -7,7 +7,7 @@
         'media-wrapper-no-scroll':
           node.mediaFormat === 'mp4' ||
           node.mediaFormat === 'h5p' ||
-          node.typeData.youtubeID,
+          node.mediaFormat === 'youtube',
       },
     ]"
     :style="containerStyles"

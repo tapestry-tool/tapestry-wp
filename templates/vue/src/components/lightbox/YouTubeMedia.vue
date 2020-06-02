@@ -161,7 +161,7 @@ export default {
         : false
     },
     updateSettings() {
-      var newSettings = { ...this.h5pSettings }
+      const newSettings = { ...this.h5pSettings }
       newSettings.muted = this.player.isMuted()
       newSettings.volume = this.player.getVolume()
       newSettings.playbackRate = this.player.getPlaybackRate()
