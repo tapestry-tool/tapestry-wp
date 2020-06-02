@@ -229,36 +229,6 @@ function create_analytics_schema() {
     dbDelta( $sql );
 }
 
-add_action( 'wp_ajax_tapestry_log_analytics_event', 'tapestry_log_analytics_event' );
-add_action( 'wp_ajax_nopriv_tapestry_log_analytics_event', 'tapestry_log_analytics_event' );
-function tapestry_log_analytics_event() {
-
-	global $wpdb;
-
-	$actor = $_POST['actor'];
-	$action = $_POST['action2'];
-	$object = $_POST['object'];
-	$user_guid = $_POST['user_guid'];
-	$object_id = $_POST['object_id'];
-	$details = $_POST['details'];
-
-    $table_name = $wpdb->prefix . "tapestry_analytics_events";
-
-	$wpdb->insert( 
-		$table_name, 
-		array( 
-			'actor' => $actor, 
-			'action' => $action, 
-			'object' => $object, 
-			'user_guid' => $user_guid, 
-			'object_id' => $object_id, 
-			'details' => $details
-		) 
-	);
-
-	wp_die();
-}
-
 // TYDE CUSTOMIZATIONS
 
 register_activation_hook( __FILE__, 'tapestry_activation' );

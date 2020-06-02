@@ -1,5 +1,10 @@
 <template>
-  <div :class="['video-container', { fullscreen: node.fullscreen, 'allow-scroll': showQuizScreen }]">
+  <div
+    :class="[
+      'video-container',
+      { fullscreen: node.fullscreen, 'allow-scroll': showQuizScreen },
+    ]"
+  >
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"

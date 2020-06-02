@@ -177,9 +177,8 @@ get_header(); ?>
                 details['user-ip'] = $('#user-ip').text();
 
                 var data = {
-                    'action': 'tapestry_log_analytics_event',
                     'actor': actor,
-                    'action2': action,
+                    'action': action,
                     'object': object,
                     'user_guid': userUUID,
                     'object_id': objectID,
@@ -187,7 +186,13 @@ get_header(); ?>
                 };
 
                 // Send the event to an AJAX URL to be saved
-                jQuery.post('/wp-admin/admin-ajax.php', data);
+                jQuery.ajax({
+                    url: apiUrl + '/analytics',
+                    method: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                });
             }
 
             recordAnalyticsEvent('user', 'request', 'tapestry', wpPostId);
@@ -197,10 +202,7 @@ get_header(); ?>
                 document.body.addEventListener('click', function(event) {
                     var x = event.clientX + $(window).scrollLeft();
                     var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'screen', null, {
-                        'x': x,
-                        'y': y
-                    });
+                    recordAnalyticsEvent('user', 'click', 'screen', null, { x, y });
                 }, true);
 
                 document.getElementById('tapestry').addEventListener('click', function(event) {
