@@ -151,6 +151,7 @@ get_header(); ?>
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
 
+            var globals = { recordAnalyticsEvent }
             /****************************************************
              * ANALYTICS FUNCTIONS
              ****************************************************/
