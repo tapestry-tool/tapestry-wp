@@ -11,19 +11,19 @@
       <button
         v-if="showQuizButton"
         class="end-screen-button button-quiz"
-        @click="$emit('show-quiz')"
+        @click="handleClick($event, 'show-quiz')"
       >
         <i class="fas fa-question-circle"></i>
         <p class="end-screen-button-text">{{ buttonText }}</p>
       </button>
-      <button class="end-screen-button" @click="$emit('rewatch')">
+      <button class="end-screen-button" @click="handleClick($event, 'rewatch')">
         <i class="fas fa-play"></i>
         <p class="end-screen-button-text">Replay Video</p>
       </button>
       <button
         v-if="!showQuizButton"
         class="end-screen-button"
-        @click="$emit('close')"
+        @click="handleClick($event, 'close')"
       >
         <i class="fas fa-arrow-circle-right"></i>
         <p class="end-screen-button-text">Continue</p>
@@ -31,7 +31,7 @@
       <button
         v-if="showQuizButton"
         class="end-screen-button"
-        @click="$emit('close')"
+        @click="handleClick($event, 'close')"
       >
         <i class="fas fa-history"></i>
         <p class="end-screen-button-text">Come Back Later</p>
@@ -69,6 +69,15 @@ export default {
     },
     backgroundUrl() {
       return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
+    },
+  },
+  methods: {
+    handleClick(evt, type) {
+      globals.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit(type)
     },
   },
 }

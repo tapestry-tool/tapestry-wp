@@ -26,7 +26,7 @@
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
       @show-play-screen="showPlayScreen = $event"
-      @update-settings="updateH5pSettings"
+      @update-settings="updateSettings"
     />
   </div>
 </template>
@@ -104,6 +104,16 @@ export default {
     handleLoad() {
       this.isLoading = false
       this.$emit("load")
+    },
+    updateSettings(settings) {
+      globals.recordAnalyticsEvent(
+        "user",
+        "update-settings",
+        "h5p-video",
+        this.node.id,
+        { from: this.h5pSettings, to: settings }
+      )
+      this.updateH5pSettings(settings)
     },
   },
 }

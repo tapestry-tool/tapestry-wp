@@ -74,6 +74,7 @@ export default {
       if (h5pVideo) {
         this.played = true
         h5pVideo.play()
+        this.handlePlay(this.node)
       }
     },
     rewatch() {
@@ -81,6 +82,7 @@ export default {
       const h5pVideo = h5pObj.instances[0].video
       h5pVideo.seek(0)
       h5pVideo.play()
+      this.handlePlay(this.node)
     },
     close() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -153,7 +155,7 @@ export default {
       this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
+      globals.recordAnalyticsEvent("user", "play", "h5p-video", id, {
         time: node.typeData.progress[0].value * node.mediaDuration,
       })
     },
@@ -161,7 +163,7 @@ export default {
       this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+      globals.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
         time: node.typeData.progress[0].value * node.mediaDuration,
       })
     },
