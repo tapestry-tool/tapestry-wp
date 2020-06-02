@@ -71,6 +71,9 @@ export default {
       player: null,
     }
   },
+  computed: {
+    ...mapState(["h5pSettings"]),
+  },
   beforeDestroy() {
     if (this.player) {
       const time = this.player.getCurrentTime()
@@ -78,9 +81,6 @@ export default {
       this.updateVideoProgress(time)
       this.updateSettings()
     }
-  },
-  computed: {
-    ...mapState(["h5pSettings"]),
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
@@ -159,7 +159,7 @@ export default {
         : false
     },
     updateSettings() {
-      var newSettings = { ...this.h5pSettings }
+      const newSettings = { ...this.h5pSettings }
       newSettings.muted = this.player.isMuted()
       newSettings.volume = this.player.getVolume()
       newSettings.playbackRate = this.player.getPlaybackRate()

@@ -5,7 +5,7 @@ import store from "./store"
 import router from "./router"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
-import VueYouTubeEmbed from 'vue-youtube-embed'
+import VueYouTubeEmbed from "vue-youtube-embed"
 
 Vue.use(VueYouTubeEmbed)
 Vue.use(BootstrapVue)
