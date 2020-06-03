@@ -258,7 +258,7 @@ button {
       max-width: 100px;
     }
   }
-  
+
   h3 {
     font-size: 2em;
   }

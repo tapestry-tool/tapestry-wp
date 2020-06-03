@@ -24,6 +24,7 @@
       @load="handleLoad"
       @close="close"
       @complete="complete"
+      @change:dimensions="updateDimensions"
     />
   </tapestry-modal>
 </template>

@@ -199,19 +199,11 @@ body.tapestry-stage-open {
     h1 {
       font-family: inherit;
       font-size: 3.2em;
-      text-shadow: 0px 0px 1px #1C0544,
-                  1px 1px 1px #1C0544,
-                  1px -1px 1px #1C0544,
-                  -1px 1px 1px #1C0544,
-                  -1px -1px 1px #1C0544,
-                  2px 1px 1px #1C0544,
-                  2px -1px 1px #1C0544,
-                  -2px 1px 1px #1C0544,
-                  -2px -2px 1px #1C0544,
-                  1px 2px 1px #1C0544,
-                  1px -2px 1px #1C0544,
-                  -1px 2px 1px #1C0544,
-                  2px 2px 1px #1C0544;
+      text-shadow: 0px 0px 1px #1c0544, 1px 1px 1px #1c0544, 1px -1px 1px #1c0544,
+        -1px 1px 1px #1c0544, -1px -1px 1px #1c0544, 2px 1px 1px #1c0544,
+        2px -1px 1px #1c0544, -2px 1px 1px #1c0544, -2px -2px 1px #1c0544,
+        1px 2px 1px #1c0544, 1px -2px 1px #1c0544, -1px 2px 1px #1c0544,
+        2px 2px 1px #1c0544;
 
       &::before {
         display: none;
