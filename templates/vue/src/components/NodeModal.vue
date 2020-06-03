@@ -128,8 +128,7 @@
                 v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
                 ref="h5pNone"
                 :src="node.typeData && node.typeData.mediaURL"
-                style="display: none;"
-                @load="handleH5Pload"
+                @load="handleIframeload"
               ></iframe>
               <youtube
                 v-if="
@@ -641,7 +640,7 @@ export default {
       tydeTypes: tydeTypes,
       videoUrlEntered: false,
       videoSrc: null,
-      youtubeLoaded: false,
+      videoLoaded: true,
     }
   },
   computed: {
@@ -797,18 +796,31 @@ export default {
     },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
-      return this.videoUrlYoutubeID === "" ? true : this.youtubeLoaded
+      return (
+        (this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
+        this.videoLoaded
+      )
+    },
+    nodeMediaFormat() {
+      if (this.nodeType === "h5p") {
+        return "h5p"
+      } else if (this.nodeType === "video") {
+        return this.videoUrlYoutubeID === "" ? "mp4" : "youtube"
+      }
+      return ""
     },
   },
   watch: {
-    selectedH5pContent() {
+    selectedH5pContent(newH5P) {
       this.node.typeData.mediaURL = this.getMediaUrl()
+      this.videoLoaded = newH5P === ""
     },
     selectedGravityFormContent(id) {
       this.node.typeData.mediaURL = id
     },
     videoSrc(newUrl) {
       this.node.typeData.mediaURL = newUrl
+      this.videoLoaded = newUrl === ""
       this.videoUrlEntered = true
     },
   },
@@ -1034,17 +1046,26 @@ export default {
     setVideoDuration() {
       this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
     },
-    handleH5Pload() {
+    handleIframeload() {
       // Set media duration if video is loaded
       const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
       const h5pVideo = h5pFrame.instances[0].video
-      this.node.mediaDuration = h5pVideo.getDuration()
+      const handleH5PLoad = () => {
+        console.log("Handled")
+        this.node.mediaDuration = h5pVideo.getDuration()
+        this.videoLoaded = true
+      }
+      if (h5pVideo.getDuration() !== undefined) {
+        handleH5PLoad()
+      } else {
+        h5pVideo.on("loaded", handleH5PLoad)
+      }
     },
     handleYouTubeload(event) {
       // Set media duration and ID if youtube video loads
       this.node.mediaDuration = event.target.getDuration()
       this.node.typeData.youtubeID = this.videoUrlYoutubeID
-      this.youtubeLoaded = true
+      this.videoLoaded = true
     },
   },
 }
@@ -1178,5 +1199,11 @@ table {
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
+}
+
+.duration-calculation-video-containers {
+  position: fixed;
+  left: 101vw;
+  width: 1px;
 }
 </style>
