@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container">
+  <div>
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -24,6 +24,7 @@
         iv_load_policy: 3,
         enablejsapi: 1,
       }"
+      class="video-container"
       @ready="ready"
       @paused="handlePause(player.getCurrentTime())"
       @ended="handleEnd"
@@ -175,12 +176,13 @@ export default {
 
 <style lang="scss" scoped>
 .video-container {
+  border-radius: 15px;
   position: absolute;
-  left: 15px;
   top: 15px;
   width: 100%;
   height: 100%;
   max-width: 100vw;
+  overflow: hidden;
   > div {
     padding-right: 30px;
     > iframe {
@@ -188,5 +190,9 @@ export default {
       padding: 0;
     }
   }
+}
+
+.end-screen {
+  border-radius: 12px;
 }
 </style>
