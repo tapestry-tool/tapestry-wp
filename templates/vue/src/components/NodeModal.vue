@@ -1031,7 +1031,6 @@ export default {
       const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
       const h5pVideo = h5pFrame.instances[0].video
       const handleH5PLoad = () => {
-        console.log("Handled")
         this.node.mediaDuration = h5pVideo.getDuration()
         this.videoLoaded = true
       }
