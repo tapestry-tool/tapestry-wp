@@ -42,7 +42,7 @@
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
     "cypress": "^3.8.0",
-    "eslint": "^7.1.0",
+    "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-loader": "^3.0.2",
     "eslint-plugin-cypress": "^2.8.1",

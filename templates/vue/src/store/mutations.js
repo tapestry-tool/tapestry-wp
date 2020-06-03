@@ -32,7 +32,6 @@ export function updateH5pSettings(state, newSettings) {
 
 export function updateSelectedNode(state, newNodeId) {
   state.selectedNodeId = newNodeId
-  console.log(state.nodes[Helpers.findNodeIndex(newNodeId, state)])
 }
 
 export function updateRootNode(state, newNodeId) {
