@@ -40,7 +40,7 @@ export default {
   },
   data() {
     return {
-      frameHeight: "auto",
+      frameHeight: 0,
       frameWidth: "100%",
       instance: null,
       played: false,
@@ -50,9 +50,6 @@ export default {
     node(_, oldNode) {
       this.handlePause(oldNode)
     },
-  },
-  created() {
-    this.frameHeight = this.dimensions.height
   },
   beforeDestroy() {
     this.handlePause(this.node)
@@ -178,6 +175,10 @@ export default {
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
       this.type = h5pLibraryName
+
+      if (h5pLibraryName !== "H5P.InteractiveVideo") {
+        this.frameHeight = this.dimensions.height
+      }
 
       // Check to see whether this is an H5P recorder
       // If it is, we can emit an event to load the recorded audio (if exists)
