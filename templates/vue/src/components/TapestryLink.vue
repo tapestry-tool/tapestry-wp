@@ -10,19 +10,21 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 export default {
   name: "tapestry-link",
   props: {
-    autoLayout: {
-      type: Boolean,
-      required: true,
-    },
     link: {
       type: Object,
       required: true,
     },
   },
   computed: {
+    ...mapState(["settings"]),
+    autoLayout() {
+      return this.settings.autolayout
+    },
     xCoord() {
       return this.autoLayout ? "x" : "fx"
     },

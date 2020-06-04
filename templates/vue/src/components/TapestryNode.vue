@@ -16,17 +16,20 @@
 
 <script>
 import * as d3 from "d3"
+import { mapState } from "vuex"
 
 export default {
   name: "tapestry-node",
   props: {
-    autoLayout: {
-      type: Boolean,
-      required: true,
-    },
     node: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    ...mapState(["settings"]),
+    autoLayout() {
+      return this.settings.autolayout
     },
   },
   mounted() {
