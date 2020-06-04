@@ -170,11 +170,8 @@ export default class {
   }
 
   async updateH5pSettings(settings) {
-    const url = `${apiUrl}/users/h5pSettings`
-    const response = await axios.post(url, {
-      post_id: this.postId,
-      json: settings,
-    })
+    const url = `${apiUrl}/users/h5pSettings/${this.postId}`
+    const response = await axios.post(url, settings)
     return response
   }
 

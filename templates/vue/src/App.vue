@@ -3,18 +3,25 @@
     <tapestry />
     <tapestry-svg />
     <router-view></router-view>
+    <tapestry-filter v-if="tapestryIsLoaded" />
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex"
 import Tapestry from "./components/Tapestry"
 import TapestrySvg from "./components/TapestrySvg"
+import TapestryFilter from "./components/TapestryFilter"
 
 export default {
   name: "app",
   components: {
     Tapestry,
     TapestrySvg,
+    TapestryFilter,
+  },
+  computed: {
+    ...mapState(["tapestryIsLoaded"]),
   },
 }
 </script>

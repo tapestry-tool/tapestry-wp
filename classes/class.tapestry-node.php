@@ -35,6 +35,7 @@ class TapestryNode implements ITapestryNode
     private $quiz;
     private $fullscreen;
     private $childOrdering;
+    private $fitWindow;
 
     /**
      * Constructor
@@ -50,7 +51,7 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = 0;
         $this->nodeMetaId = (int) $nodeMetaId;
 
-        $this->author = wp_get_current_user()->ID;
+        $this->author = $this->_getAuthorInfo(wp_get_current_user()->ID);
         $this->conditions = [];
         $this->size = '';
         $this->title = '';
@@ -65,7 +66,7 @@ class TapestryNode implements ITapestryNode
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
-        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions($tapestryPostId);
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
@@ -73,11 +74,12 @@ class TapestryNode implements ITapestryNode
         $this->quiz = array();
         $this->fullscreen = false;
         $this->childOrdering = array();
+        $this->fitWindow = true;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->set($node);
-            $this->author = get_post_field( 'post_author', $this->nodePostId );
+            $this->author = $this->_getAuthorInfo(get_post_field( 'post_author', $this->nodePostId ));
         }
     }
 
@@ -166,6 +168,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->childOrdering) && is_array($node->childOrdering)) {
             $this->childOrdering = $node->childOrdering;
         }
+        if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
+            $this->fitWindow = $node->fitWindow;
+        }
     }
 
     /**
@@ -251,7 +256,7 @@ class TapestryNode implements ITapestryNode
     {
         wp_update_post(array(
             'ID'            => $this->nodePostId,
-            'post_author'   => $this->author
+            'post_author'   => $this->author['id']
         ));
     }
 
@@ -308,6 +313,7 @@ class TapestryNode implements ITapestryNode
             'fullscreen'    => $this->fullscreen,
             'conditions'    => $this->conditions,
             'childOrdering' => $this->childOrdering,
+            'fitWindow'     => $this->fitWindow
         ];
     }
 
@@ -349,5 +355,14 @@ class TapestryNode implements ITapestryNode
             $nodeData->lockedImageURL = $nodeMetadata->meta_value->lockedImageURL;
         }
         return $nodeData;
+    }
+
+    private function _getAuthorInfo($id)
+    {
+        $user = get_user_by('id', $id);
+        return [
+            "id"    => $id,
+            "name"  => $user->display_name,
+        ];
     }
 }

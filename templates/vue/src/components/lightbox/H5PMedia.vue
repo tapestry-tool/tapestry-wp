@@ -18,19 +18,21 @@
     <h5p-iframe
       ref="h5pIframe"
       :autoplay="autoplay"
+      :dimensions="dimensions"
       :node="node"
-      :width="width"
-      :height="height"
-      :settings="settings"
+      :settings="h5pSettings"
       @complete="$emit('complete')"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
+      @show-play-screen="showPlayScreen = $event"
+      @update-settings="updateH5pSettings"
     />
   </div>
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
@@ -51,16 +53,8 @@ export default {
       type: Object,
       required: true,
     },
-    settings: {
+    dimensions: {
       type: Object,
-      required: true,
-    },
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
       required: true,
     },
     autoplay: {
@@ -77,7 +71,11 @@ export default {
       showPlayScreen: !this.autoplay,
     }
   },
+  computed: {
+    ...mapState(["h5pSettings"]),
+  },
   methods: {
+    ...mapActions(["updateH5pSettings"]),
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true
@@ -96,8 +94,11 @@ export default {
       this.showEndScreen = true
     },
     play() {
-      this.showPlayScreen = false
       this.$refs.h5pIframe.play()
+    },
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load")
     },
   },
 }

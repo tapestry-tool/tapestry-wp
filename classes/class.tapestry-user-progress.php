@@ -102,13 +102,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function updateH5PSettings($h5pSettingsData)
     {
         $this->_checkUserAndPostId();
-
-        if ($this->_isJson($h5pSettingsData)) {
-            $h5pSettingsData = json_decode($h5pSettingsData);
-        } else {
-            throw new Exception('Invalid json');
-        }
-
         $this->_updateUserH5PSettings($h5pSettingsData);
     }
 
@@ -291,7 +284,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getUserH5PSettings()
     {
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
-        return json_encode($settings);
+        return $settings ? json_decode($settings) : (object) [];
     }
 
     /**

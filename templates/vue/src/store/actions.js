@@ -8,7 +8,7 @@ export async function updateSettings({ commit }, newSettings) {
 }
 
 export async function updateH5pSettings({ commit }, newSettings) {
-  await client.updateH5pSettings(JSON.stringify(newSettings))
+  await client.updateH5pSettings(newSettings)
   commit("updateH5pSettings", newSettings)
 }
 
@@ -18,7 +18,7 @@ export async function addNode({ commit }, newNode) {
 
   const nodeToAdd = { ...newNode }
   nodeToAdd.id = response.data.id
-  nodeToAdd.author = wpData.wpUserId
+  nodeToAdd.author = response.data.author
 
   commit("addNode", nodeToAdd)
   return nodeToAdd.id

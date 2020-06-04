@@ -3,12 +3,17 @@
     id="h5p"
     ref="h5p"
     frameborder="0"
-    :src="node.typeData.mediaURL"
+    :height="frameHeight"
+    :src="node.typeData && node.typeData.mediaURL"
+    :width="frameWidth"
+    scrolling="no"
     @load="handleLoad"
   ></iframe>
 </template>
 
 <script>
+import Helpers from "@/utils/Helpers"
+
 const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
@@ -16,17 +21,16 @@ export default {
   props: {
     node: {
       type: Object,
-      required: false,
-      default: () => {
-        return {}
-      },
+      required: true,
+    },
+    dimensions: {
+      type: Object,
+      required: true,
     },
     settings: {
-      type: [Object, String],
+      type: Object,
       required: false,
-      default: () => {
-        return {}
-      },
+      default: () => ({}),
     },
     autoplay: {
       type: Boolean,
@@ -34,15 +38,35 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      frameHeight: 0,
+      frameWidth: 0,
+      instance: null,
+    }
+  },
   watch: {
     node(_, oldNode) {
       this.handlePause(oldNode)
     },
   },
+  created() {
+    this.frameWidth = "100%"
+  },
   beforeDestroy() {
     this.handlePause(this.node)
   },
   methods: {
+    setFrameHeight() {
+      const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
+      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
+        const scaleFactor = this.dimensions.height / videoHeight
+        this.frameHeight = this.dimensions.height
+        this.frameWidth = 100 * scaleFactor + "%"
+      } else {
+        this.frameHeight = videoHeight
+      }
+    },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pVideo = h5pObj.instances[0].video
@@ -63,7 +87,68 @@ export default {
         h5pVideo.pause()
       }
     },
+    updateSettings(h5pVideo) {
+      let newSettings = {}
+
+      try {
+        newSettings.volume = h5pVideo.getVolume()
+      } catch (Error) {
+        console.error("H5P volume not saved", Error)
+      }
+
+      try {
+        newSettings.muted = h5pVideo.isMuted()
+      } catch (Error) {
+        console.error("H5P mute status not saved", Error)
+      }
+
+      try {
+        newSettings.playbackRate = h5pVideo.getPlaybackRate()
+      } catch (Error) {
+        console.error("H5P playback rate not saved", Error)
+      }
+
+      try {
+        newSettings.quality = h5pVideo.getQuality()
+      } catch (Error) {
+        console.error("H5P quality settings not saved", Error)
+      }
+
+      try {
+        newSettings.caption = h5pVideo.getCaptionsTrack()
+      } catch (Error) {
+        console.error("H5P caption selection not saved", Error)
+      }
+
+      if (Helpers.isDifferent(newSettings, this.settings)) {
+        this.$emit("update-settings", newSettings)
+      }
+    },
+    applySettings(h5pVideo) {
+      const settings = this.settings
+      if (settings.volume !== undefined) {
+        h5pVideo.setVolume(settings.volume)
+      }
+      if (settings.muted !== undefined) {
+        if (settings.muted) {
+          h5pVideo.mute()
+          this.toggleMuteIcon()
+        } else {
+          h5pVideo.unMute()
+        }
+      }
+      if (settings.playbackRate !== undefined) {
+        h5pVideo.setPlaybackRate(settings.playbackRate)
+      }
+      if (settings.quality !== undefined) {
+        h5pVideo.setQuality(settings.quality)
+      }
+      if (settings.caption !== undefined) {
+        h5pVideo.setCaptionsTrack(settings.caption)
+      }
+    },
     handlePlay(node) {
+      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
@@ -71,6 +156,7 @@ export default {
       })
     },
     handlePause(node) {
+      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
@@ -80,39 +166,11 @@ export default {
     handleLoad() {
       this.$emit("is-loaded")
 
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
-          }
-        })
-      }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
+      this.instance = h5pInstance
+      this.setFrameHeight()
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
 
@@ -131,16 +189,20 @@ export default {
         const h5pVideo = h5pInstance.video
         const h5pIframeComponent = this
 
-        h5pVideo.on("loaded", function() {
-          const videoDuration = h5pVideo.getDuration()
+        const handleH5pAfterLoad = function() {
           h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-          const settings = h5pIframeComponent.settings
-
-          let seeked = false
           let currentPlayedTime
 
+          const videoDuration = h5pVideo.getDuration()
           h5pVideo.seek(mediaProgress * videoDuration)
+
+          const viewedAmount = mediaProgress * videoDuration
+          if (viewedAmount === videoDuration) {
+            h5pIframeComponent.$emit("show-end-screen")
+          }
+
+          h5pIframeComponent.applySettings(h5pVideo)
 
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
@@ -156,6 +218,8 @@ export default {
                     h5pIframeComponent.$emit("timeupdate", amountViewed)
                     thisTapestryTool.updateProgressBars()
 
+                    h5pIframeComponent.updateSettings(h5pVideo)
+
                     if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
                       h5pIframeComponent.$emit("complete")
                     }
@@ -167,48 +231,12 @@ export default {
                     clearInterval(updateVideoInterval)
                   }
                 }, 1000)
-
-                if (!seeked) {
-                  // Change the video settings to whatever the user had set before
-                  if (settings.volume !== undefined) {
-                    h5pVideo.setVolume(settings.volume)
-
-                    if (settings.muted) {
-                      h5pVideo.mute()
-                    } else {
-                      h5pVideo.unMute()
-                    }
-
-                    h5pVideo.setCaptionsTrack(settings.caption)
-                    h5pVideo.setQuality(settings.quality)
-                    h5pVideo.setPlaybackRate(settings.playbackRate)
-                  }
-
-                  const viewedAmount = mediaProgress * videoDuration
-                  if (viewedAmount > 0) {
-                    h5pVideo.seek(viewedAmount)
-                  }
-                  if (viewedAmount === videoDuration) {
-                    h5pIframeComponent.$emit("show-end-screen")
-                  }
-                  seeked = true
-                }
                 h5pIframeComponent.handlePlay(h5pIframeComponent.node)
                 break
               }
 
               case h5pObj.Video.PAUSED: {
-                const newSettings = {
-                  volume: h5pVideo.getVolume(),
-                  muted: h5pVideo.isMuted(),
-                  caption: h5pVideo.getCaptionsTrack(),
-                  quality: h5pVideo.getQuality(),
-                  playbackRate: h5pVideo.getPlaybackRate(),
-                  time: h5pVideo.getCurrentTime(),
-                }
-                seeked = true
                 h5pIframeComponent.handlePause(h5pIframeComponent.node)
-                h5pIframeComponent.$emit("update-settings", newSettings)
                 break
               }
 
@@ -230,11 +258,20 @@ export default {
               )
             }, 1000)
           }
-        })
+        }
+
+        if (h5pVideo.getDuration() !== undefined) {
+          handleH5pAfterLoad()
+        } else {
+          h5pVideo.on("loaded", handleH5pAfterLoad)
+        }
       }
+    },
+    toggleMuteIcon() {
+      const body = this.$refs.h5p.contentWindow.H5P.$body[0]
+      const btn = body.querySelector(".h5p-mute")
+      btn.classList.toggle("h5p-muted")
     },
   },
 }
 </script>
-
-<style lang="scss" scoped></style>

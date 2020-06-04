@@ -29,7 +29,6 @@
       :node="populatedNode"
       :modal-type="modalType"
       :root-node-title="selectedNode.title"
-      :permissions-order="permissionsOrder"
       @close-modal="closeModal"
       @add-edit-node="addEditNode"
       @delete-node="deleteNode"
@@ -81,7 +80,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
+    ...mapGetters([
+      "selectedNode",
+      "tapestry",
+      "getNode",
+      "getDirectParents",
+      "settings",
+    ]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -102,33 +107,20 @@ export default {
     yORfy: function() {
       return this.tapestry.settings.autoLayout ? "y" : "fy"
     },
-    permissionsOrder: function() {
-      switch (this.modalType) {
-        case "edit-node":
-          return this.selectedNode.permissionsOrder
-        default:
-          return [
-            "public",
-            "authenticated",
-            ...Object.keys(wpData.roles).filter(
-              role => role !== "administrator" && role !== "author"
-            ),
-          ]
-      }
-    },
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
   async created() {
     const tapestryApi = new TapestryApi(wpPostId)
-    return await tapestryApi.getUserFavourites()
+    this.favourites = await tapestryApi.getUserFavourites()
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
     window.addEventListener("add-new-node", this.addNewNode)
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
+    window.addEventListener("tapestry-open-node", this.openNode)
   },
   methods: {
     ...mapMutations([
@@ -139,6 +131,9 @@ export default {
       "updateNodeCoordinates",
     ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    openNode({ detail: { id } }) {
+      this.$router.push(`/nodes/${id}`)
+    },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
         event.detail.dataset["favourites"] = this.favourites
@@ -166,10 +161,9 @@ export default {
         hideMedia: false,
         skippable: true,
         fullscreen: false,
-        permissions: {
-          public: ["read"],
-          authenticated: ["read"],
-        },
+        permissions: this.settings.defaultPermissions
+          ? this.settings.defaultPermissions
+          : this.populatedNode.permissions,
         description: "",
         quiz: [],
         childOrdering: [],
@@ -363,23 +357,26 @@ export default {
         ) {
           const url = newNodeEntry.typeData.mediaURL
           const { data } = await getLinkMetadata(url)
-          newNodeEntry.typeData.linkMetadata = data
 
-          let shouldChange = true
-          if (newNodeEntry.imageURL) {
-            shouldChange = confirm("Change thumbnail to new image?")
-          }
+          if (data) {
+            newNodeEntry.typeData.linkMetadata = data
 
-          if (shouldChange) {
-            newNodeEntry.imageURL = data.image
-          }
-
-          if (newNodeEntry.lockedImageURL) {
-            shouldChange = confirm("Change locked thumbnail to new image?")
-          }
-
-          if (shouldChange) {
-            newNodeEntry.lockedImageURL = data.image
+            if (
+              newNodeEntry.imageURL &&
+              confirm(
+                "Would you like to use the link preview image as the thumbnail image?"
+              )
+            ) {
+              newNodeEntry.imageURL = data.image
+            }
+            if (
+              newNodeEntry.lockedImageURL &&
+              confirm(
+                "Would you like to use the link preview image as the locked thumbnail image?"
+              )
+            ) {
+              newNodeEntry.lockedImageURL = data.image
+            }
           }
         }
       }
