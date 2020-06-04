@@ -6,7 +6,7 @@
     :height="frameHeight"
     :src="node.typeData && node.typeData.mediaURL"
     :width="frameWidth"
-    scrolling="no"
+    :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -40,7 +40,7 @@ export default {
   },
   data() {
     return {
-      frameHeight: 0,
+      frameHeight: "auto",
       frameWidth: "100%",
       instance: null,
       played: false,
@@ -50,6 +50,9 @@ export default {
     node(_, oldNode) {
       this.handlePause(oldNode)
     },
+  },
+  created() {
+    this.frameHeight = this.dimensions.height
   },
   beforeDestroy() {
     this.handlePause(this.node)
@@ -174,6 +177,7 @@ export default {
       const loadedH5PId = h5pInstance.contentId
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
+      this.type = h5pLibraryName
 
       // Check to see whether this is an H5P recorder
       // If it is, we can emit an event to load the recorded audio (if exists)
