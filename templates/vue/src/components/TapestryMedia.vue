@@ -42,6 +42,7 @@
       :node="node"
       :allow-end-screen="allowEndScreen"
       :read-only="readOnly"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
       @complete="complete"
