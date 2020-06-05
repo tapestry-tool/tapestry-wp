@@ -40,9 +40,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  label {
-    color: white;
-  }
+  color: inherit;
 }
 </style>

@@ -1,25 +1,10 @@
 <template>
   <div id="tapestry">
-    <div
+    <loading
       v-if="!tapestryLoaded"
-      class="d-flex justify-content-center mb-3"
       style="padding: 30vh 0;"
-    >
-      <label>Loading Tapestry</label>
-      <b-spinner
-        type="grow"
-        variant="secondary"
-        small
-        style="margin: 5px 5px 5px 20px;"
-      ></b-spinner>
-      <b-spinner
-        type="grow"
-        variant="primary"
-        small
-        style="margin: 5px;"
-      ></b-spinner>
-      <b-spinner type="grow" variant="danger" small style="margin: 5px;"></b-spinner>
-    </div>
+      label="Loading Tapestry"
+    />
     <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
       <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
@@ -42,6 +27,7 @@ import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
+import Loading from "@/components/Loading"
 
 export default {
   name: "tapestry",
@@ -49,6 +35,7 @@ export default {
     NodeModal,
     RootNodeButton,
     SettingsModal,
+    Loading,
   },
   data() {
     return {
