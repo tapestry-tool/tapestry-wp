@@ -35,6 +35,15 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group v-if="maxDepth >= 2" label="Default Depth">
+            <b-form-input
+              v-model="defaultDepth"
+              class="depth-slider"
+              type="range"
+              min="1"
+              :max="maxDepth"
+            ></b-form-input>
+          </b-form-group>
         </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
@@ -104,10 +113,14 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      defaultDepth: 3,
     }
   },
   computed: {
-    ...mapGetters(["settings"]),
+    ...mapGetters(["settings", "selectedNode"]),
+    maxDepth() {
+      return thisTapestryTool.findMaxDepth(this.selectedNode.id) + 1
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -135,12 +148,14 @@ export default {
         nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
+        defaultDepth = 3,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
+      this.defaultDepth = defaultDepth
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -149,6 +164,7 @@ export default {
         nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
+        defaultDepth: parseInt(this.defaultDepth),
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
@@ -160,4 +176,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.depth-slider {
+  border: none;
+}
+</style>

@@ -292,15 +292,20 @@ function tapestryTool(config){
         // 3. SET NODES/LINKS AND CREATE THE SVG OBJECTS
         //---------------------------------------------------
 
-        setNodeTypes(root);
-        setLinkTypes(root);
-        setUnlocked();
-        addDepthToNodes(root, 0, []);
-        setAccessibleStatus();
-
         if (!isReload) {
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
         }
+
+        tapestryDepth = tapestry.dataset.settings.defaultDepth || 3
+
+        addDepthToNodes(root, 0, []);
+        setNodeTypes(root);
+        setLinkTypes(root);
+        setUnlocked();
+        setAccessibleStatus();
+
+        // add in the controls
+        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         links = createLinks();
         nodes = createNodes();
@@ -415,7 +420,6 @@ function tapestryTool(config){
         //--------------------------------------------------
         // Add in Depth Slider
         //--------------------------------------------------
-
         if (tapestryDepth) {
 
             // Create wrapper div 
@@ -885,9 +889,6 @@ function tapestryTool(config){
 
         // hide the container so we can smoothly fade it in at the end of this function
         $("#"+TAPESTRY_CONTAINER_ID).hide();
-
-        // add in the controls
-        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
@@ -2205,6 +2206,7 @@ function tapestryTool(config){
     
         return maxDepth;
     }
+    this.findMaxDepth = findMaxDepth;
 
     function getNeighbours(id) {
         return tapestry.dataset.links
