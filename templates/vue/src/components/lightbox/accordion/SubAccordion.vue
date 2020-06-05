@@ -14,7 +14,7 @@
                 <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.title }}
               </button>
-              <a @click="updateFavourites(row.id)">
+              <a @click="toggleFavourite(row.id)">
                 <i
                   v-if="isFavourite(row.id)"
                   class="fas fa-heart fa-sm"
@@ -28,6 +28,7 @@
               :node-id="row.id"
               :dimensions="dimensions"
               :autoplay="false"
+              :read-only="readOnly"
               @close="toggle(row)"
               @load="handleLoad(index)"
             />
@@ -59,6 +60,11 @@ export default {
       type: Array,
       required: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -66,32 +72,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
+    ...mapGetters(["isFavourite"]),
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
-    ...mapActions(["updateUserFavourites"]),
+    ...mapActions(["toggleFavourite"]),
     handleLoad(idx) {
       this.$emit("load", this.$refs.rowRefs[idx])
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }

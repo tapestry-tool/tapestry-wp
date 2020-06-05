@@ -7,7 +7,7 @@
   >
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
-      v-if="showEndScreen"
+      v-if="showEndScreen && !readOnly"
       :node="node"
       @rewatch="rewatch"
       @close="close"
@@ -16,6 +16,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -69,6 +70,11 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -87,7 +93,7 @@ export default {
       if (width / height <= 1) {
         return { height: "100%", width: "auto" }
       }
-      if (this.node.fullscreen && this.node.fitWindow) {
+      if (this.node.fullscreen && this.node.fitWindow && !this.readOnly) {
         if (width > window.innerWidth) {
           const resizeRatio = window.innerWidth / width
           const newHeight = height * resizeRatio

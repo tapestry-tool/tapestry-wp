@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <end-screen
-      v-if="showEndScreen"
+      v-if="showEndScreen && !readOnly"
       :node="node"
       @rewatch="rewatch"
       @close="close"
@@ -10,6 +10,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -19,6 +20,7 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :node="node"
+      :read-only="readOnly"
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @change:dimensions="$emit('change:dimensions', $event)"
@@ -64,6 +66,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

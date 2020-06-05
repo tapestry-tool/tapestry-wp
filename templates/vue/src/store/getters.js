@@ -5,6 +5,42 @@ export function getParent(state) {
   }
 }
 
+export function getModuleFavourites(_, { isFavourite, getNode, getDirectChildren }) {
+  return moduleId => {
+    const favourites = []
+    if (isFavourite(moduleId)) {
+      favourites.push(moduleId)
+    }
+    const stages = getDirectChildren(moduleId)
+    stages.forEach(stageId => {
+      const stage = getNode(stageId)
+      const grouping = {
+        title: stage.title,
+      }
+      const favouritesInStage = []
+      if (isFavourite(stageId)) {
+        favouritesInStage.push(stageId)
+      }
+      const topics = getDirectChildren(stageId).map(getNode)
+      const accordionRows = topics
+        .filter(topic => topic.mediaType === "accordion")
+        .flatMap(topic => getDirectChildren(topic.id).map(getNode))
+      const subAccordionRows = accordionRows
+        .filter(row => getDirectChildren(row.id).length > 0)
+        .flatMap(row => getDirectChildren(row).map(getNode))
+      const allTopics = [...topics, ...accordionRows, ...subAccordionRows]
+      allTopics
+        .filter(topic => isFavourite(topic.id))
+        .forEach(topic => favouritesInStage.push(topic.id))
+      grouping.rows = favouritesInStage
+      if (favouritesInStage.length) {
+        favourites.push(grouping)
+      }
+    })
+    return favourites
+  }
+}
+
 export function getModuleContent(_, { getNode, getDirectChildren }) {
   return moduleId => {
     const module = getNode(moduleId)
@@ -26,7 +62,17 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
       if (topic.mediaType === "accordion") {
         // look at the rows for questions
         const rows = getDirectChildren(topic.id).map(getNode)
-        return rows.filter(row => row.quiz).flatMap(getCompletedActivities)
+        const rowActivities = rows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        const subRows = rows
+          .map(row => getDirectChildren(row.id))
+          .filter(child => child.length > 0)
+          .map(getNode)
+        const subRowActivities = subRows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        return rowActivities.concat(subRowActivities)
       }
       if (topic.quiz) {
         return getCompletedActivities(topic)
@@ -117,6 +163,14 @@ export function getEntry(_, { getQuestion }) {
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
   }
+}
+
+export function favourites(state) {
+  return state.favourites || []
+}
+
+export function isFavourite(_, { favourites }) {
+  return id => favourites.find(fid => fid == id) > -1
 }
 
 /* An answer is a value where its key is numeric */

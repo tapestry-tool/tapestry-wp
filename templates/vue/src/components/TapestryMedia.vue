@@ -22,6 +22,7 @@
       :node="node"
       :allow-end-screen="allowEndScreen"
       :dimensions="dimensions"
+      :read-only="readOnly"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -40,6 +41,7 @@
       :dimensions="dimensions"
       :node="node"
       :allow-end-screen="allowEndScreen"
+      :read-only="readOnly"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
@@ -50,6 +52,7 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       :node="node"
+      :read-only="readOnly"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
@@ -62,6 +65,7 @@
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
+      :read-only="readOnly"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -120,6 +124,11 @@ export default {
       required: false,
       default: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -151,12 +160,14 @@ export default {
       this.$emit("load", args)
     },
     updateProgress: Helpers.throttle(function(amountViewed) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     }, SAVE_INTERVAL),
     complete() {
-      this.$emit("complete")
+      if (!this.readOnly) {
+        this.$emit("complete")
+      }
     },
   },
 }

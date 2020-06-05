@@ -43,7 +43,11 @@
                   class="icon"
                   icon="lock"
                 ></tyde-icon>
-                <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+                <a
+                  v-if="!disableRow(index)"
+                  :disabled="readOnly"
+                  @click="toggleFavourite(row.node.id)"
+                >
                   <i
                     v-if="isFavourite(row.node.id)"
                     class="fas fa-heart fa-lg"
@@ -58,6 +62,7 @@
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 :autoplay="false"
+                :read-only="readOnly"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
                 @close="toggle(row)"
@@ -69,6 +74,7 @@
               <sub-accordion
                 v-if="row.children.length > 0"
                 :rows="row.children"
+                :read-only="readOnly"
                 @load="handleLoad"
               ></sub-accordion>
             </div>
@@ -94,7 +100,7 @@
       <tyde-progress-bar
         v-if="moduleOpened"
         class="modal-progress"
-        :node-id="this.selectedModuleId"
+        :node-id="selectedModuleId"
       />
       <div class="button-container">
         <button class="button-completion" @click="$emit('close')">
@@ -138,6 +144,11 @@ export default {
       type: Object,
       required: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -147,7 +158,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
     ...mapState(["selectedModuleId"]),
     confirmationStyles() {
       return {
@@ -204,16 +215,13 @@ export default {
     moduleOpened() {
       return this.selectedModuleId !== null
     },
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -250,7 +258,7 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     async updateProgress(rowId) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         const { accordionProgress } = this.node
         if (!accordionProgress.includes(rowId)) {
           accordionProgress.push(rowId)
@@ -270,20 +278,6 @@ export default {
           }
         }
       }
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
     showActivityIcon(mediaType) {
       return mediaType === "gravity-form" || mediaType === "activity"

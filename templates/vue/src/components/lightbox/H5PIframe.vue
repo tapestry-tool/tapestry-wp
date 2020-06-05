@@ -37,6 +37,11 @@ export default {
       required: false,
       default: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -58,7 +63,11 @@ export default {
     setFrameHeight() {
       const box = this.instance.parent.$container[0].getBoundingClientRect()
       const videoHeight = box.height
-      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
+      if (
+        videoHeight > this.dimensions.height &&
+        this.node.fitWindow &&
+        !this.readOnly
+      ) {
         const scaleFactor = this.dimensions.height / videoHeight
         this.frameHeight = this.dimensions.height
         this.frameWidth = 100 * scaleFactor + "%"
@@ -226,6 +235,7 @@ export default {
 
                   if (amountViewed >= 1) {
                     h5pIframeComponent.$emit("show-end-screen")
+                    clearInterval(h5pIframeComponent.updateInterval)
                   }
                 }, 1000)
                 h5pIframeComponent.handlePlay(h5pIframeComponent.node)

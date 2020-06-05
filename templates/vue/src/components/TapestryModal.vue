@@ -9,11 +9,11 @@
             v-if="showFav"
             icon="heart"
             icon-size="sm"
-            :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
-            :icon-color="isFavourite ? 'red' : ''"
-            :bg-color="isFavourite ? '#fff' : ''"
-            :bg-hover-color="isFavourite ? '#fff' : 'red'"
-            @clicked="updateFavourites"
+            :title="favourited ? 'Remove from Favourites' : 'Add to Favourites'"
+            :icon-color="favourited ? 'red' : ''"
+            :bg-color="favourited ? '#fff' : ''"
+            :bg-hover-color="favourited ? '#fff' : 'red'"
+            @clicked="toggleFavourite(nodeId)"
           />
         </div>
         <slot></slot>
@@ -72,28 +72,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
-    isFavourite() {
-      return this.favourites.find(id => id == this.nodeId)
+    ...mapGetters(["isFavourite"]),
+    favourited() {
+      return this.isFavourite(this.nodeId)
     },
   },
   mounted() {
     this.load = true
   },
   methods: {
-    ...mapActions(["updateUserFavourites"]),
-    updateFavourites() {
-      let updatedFavouritesList = [...this.favourites]
-      if (this.isFavourite) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != this.nodeId)
-      } else {
-        updatedFavouritesList.push(this.nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
-    },
+    ...mapActions(["toggleFavourite"]),
   },
 }
 </script>
