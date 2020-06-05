@@ -40,6 +40,7 @@
       :dimensions="dimensions"
       :node="node"
       :allow-end-screen="allowEndScreen"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
       @complete="complete"

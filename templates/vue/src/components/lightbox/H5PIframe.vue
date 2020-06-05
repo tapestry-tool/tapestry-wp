@@ -42,7 +42,7 @@ export default {
     return {
       instance: null,
       frameHeight: 0,
-      frameWidth: 0,
+      frameWidth: "100%",
       played: false,
     }
   },
@@ -51,15 +51,13 @@ export default {
       this.handlePause(oldNode)
     },
   },
-  created() {
-    this.frameWidth = "100%"
-  },
   beforeDestroy() {
     this.handlePause(this.node)
   },
   methods: {
     setFrameHeight() {
-      const videoHeight = this.instance.$container[0].parentNode.offsetHeight + 5
+      const box = this.instance.parent.$container[0].getBoundingClientRect()
+      const videoHeight = box.height
       if (videoHeight > this.dimensions.height && this.node.fitWindow) {
         const scaleFactor = this.dimensions.height / videoHeight
         this.frameHeight = this.dimensions.height
@@ -67,6 +65,10 @@ export default {
       } else {
         this.frameHeight = videoHeight
       }
+      this.$emit("change:dimensions", {
+        width: this.frameWidth,
+        height: this.frameHeight,
+      })
     },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -171,8 +173,6 @@ export default {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
-      this.instance = h5pInstance
-      this.setFrameHeight()
 
       const h5pLibraryName = h5pInstance.libraryInfo.machineName
 
@@ -191,7 +191,9 @@ export default {
         const h5pVideo = h5pInstance.video
         const h5pIframeComponent = this
 
-        const handleH5pAfterLoad = function() {
+        const handleH5pAfterLoad = () => {
+          this.instance = h5pVideo
+          this.setFrameHeight()
           h5pIframeComponent.$emit("load", { el: h5pVideo })
 
           const videoDuration = h5pVideo.getDuration()
