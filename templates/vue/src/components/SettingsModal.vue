@@ -43,6 +43,9 @@
               min="1"
               :max="maxDepth"
             ></b-form-input>
+            <div class="depth-slider-description">
+              Selected depth: {{ defaultDepth }}
+            </div>
           </b-form-group>
         </b-tab>
         <b-tab title="Access">
@@ -78,7 +81,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
@@ -117,9 +120,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings", "selectedNode"]),
+    ...mapState(["settings", "rootId"]),
     maxDepth() {
-      return thisTapestryTool.findMaxDepth(this.selectedNode.id) + 1
+      return thisTapestryTool.findMaxDepth(this.rootId) + 1
     },
   },
   created() {
@@ -179,5 +182,11 @@ export default {
 <style lang="scss" scoped>
 .depth-slider {
   border: none;
+  padding: 0;
+}
+
+.depth-slider-description {
+  color: #6c757d;
+  font-size: 80%;
 }
 </style>
