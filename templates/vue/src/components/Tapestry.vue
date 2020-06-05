@@ -5,7 +5,7 @@
       class="d-flex justify-content-center mb-3"
       style="padding: 30vh 0;"
     >
-      <label>Loading Tapestry</label>
+      <label>Loading</label>
       <b-spinner
         type="grow"
         variant="secondary"

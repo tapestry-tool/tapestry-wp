@@ -45,8 +45,7 @@ function tapestryTool(config){
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
         nodesBeforeDrag,
-        h5pVideoSettings = {},
-        tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepth = 0,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
         tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -93,7 +92,7 @@ function tapestryTool(config){
      ****************************************************/
 
     /* Import data from json file, then start D3 */
-    jQuery.ajaxSetup({
+    $.ajaxSetup({
         beforeSend: function (xhr) {
             if (wpApiSettings && wpApiSettings.nonce) {
                 xhr.setRequestHeader( 'X-WP-Nonce', wpApiSettings.nonce );
@@ -101,13 +100,13 @@ function tapestryTool(config){
         }
     });
 
-    jQuery.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
+    $.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
 
                 // change http(s):// to // in media URLs
-                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
+                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
 
@@ -158,26 +157,17 @@ function tapestryTool(config){
             
             if (config.wpUserId) { // Get from database if user is logged in
 
-                jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(retrievedUserProgress);
                     }
 
-                    jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
-                        if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
-                            h5pVideoSettings = retrievedH5PSettings;
-                        }
-                    }).fail(function(e) {
-                        console.error("Error with retrieving h5p video settings");
-                        console.error(e);
-                    }).complete(function(){
-                        tapestry.init();
-                    });
-
                 }).fail(function(e) {
                     console.error("Error with retrieving node progress");
                     console.error(e);
+                }).complete(function(){
+                    tapestry.init();
                 });
             }
             else {  // Get from cookie if user is NOT logged in
@@ -186,14 +176,7 @@ function tapestryTool(config){
 
                 if (cookieProgress) {
                     cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
-                }
-
-                // Update H5P Video Settings from cookie (if any)
-                var cookieH5PVideoSettings = Cookies.get("h5p-video-settings");
-                if (cookieH5PVideoSettings) {
-                    cookieH5PVideoSettings = JSON.parse( cookieH5PVideoSettings );
-                    h5pVideoSettings = cookieH5PVideoSettings;
+                    setDatasetProgress(cookieProgress);    
                 }
 
                 tapestry.init();
@@ -274,7 +257,7 @@ function tapestryTool(config){
         this.updateAccordionProgress();
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
+            detail: { dataset: { ...this.dataset } }
         }));
 
         if (!root) {
@@ -2054,6 +2037,9 @@ function tapestryTool(config){
                 .selectAll("path")
                 .data(function (d, i) {
                     var data = d.typeData.progress;
+                    if (!data) {
+                        data = [ {'value': 0}, {'value': 1 } ];
+                    }
                     data.forEach(function (e) {
                         e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
                     })
@@ -2515,7 +2501,7 @@ function tapestryTool(config){
             
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
-                if (node.mediaType !== "accordion") {
+                if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
                     //Update the dataset with new values
                     tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                     tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
