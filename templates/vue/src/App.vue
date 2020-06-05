@@ -1,23 +1,23 @@
 <template>
   <div id="app">
     <tapestry />
-    <tapestry-svg />
-    <router-view></router-view>
     <tapestry-filter v-if="tapestryIsLoaded" />
+    <tapestry-app />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import Tapestry from "./components/Tapestry"
-import TapestrySvg from "./components/TapestrySvg"
+import TapestryApp from "./components/TapestryApp"
 import TapestryFilter from "./components/TapestryFilter"
 
 export default {
   name: "app",
   components: {
     Tapestry,
-    TapestrySvg,
+    TapestryApp,
     TapestryFilter,
   },
   computed: {
