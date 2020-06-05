@@ -5,6 +5,7 @@ services:
     image: mysql:5.7
     volumes:
       - db_data:/var/lib/mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: somewordpress
       MYSQL_DATABASE: wordpress
@@ -15,17 +16,12 @@ services:
   wordpress:
     depends_on:
       - db
-    image: wordpress:latest
+    build: .
+    restart: always
     ports:
       - "8000:80"
-    # environment:
-    #   WORDPRESS_DB_HOST: db:3306
-    #   WORDPRESS_DB_USER: wordpress
-    #   WORDPRESS_DB_PASSWORD: wordpress
-    #   WORDPRESS_DB_NAME: wordpress
     volumes:
      - ../../:/var/www/html/wp-content/plugins
-     - ./wp-config.php:/var/www/html/wp-config.php
     container_name: wp
     
   dev:
@@ -34,6 +30,7 @@ services:
     build:
       context: ../templates/vue
       target: 'develop-stage'
+    restart: always
     ports:
       - '8080:8080'
     volumes: 
