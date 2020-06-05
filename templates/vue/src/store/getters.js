@@ -116,3 +116,26 @@ export function createDefaultNode({ settings }) {
     quiz: [],
   })
 }
+
+export function traverseBfs(_, { getDirectChildren, getNode }) {
+  return (visit, start) => {
+    const queue = []
+    const visited = new Set()
+
+    queue.push(start)
+    visited.add(start)
+
+    while (queue.length) {
+      const nodeId = queue.shift()
+      visit(getNode(nodeId))
+
+      const children = getDirectChildren(nodeId)
+      children
+        .filter(child => !visited.includes(child))
+        .forEach(child => {
+          queue.push(child)
+          visited.add(child)
+        })
+    }
+  }
+}

@@ -1,6 +1,7 @@
 <template>
   <g>
     <circle
+      v-show="isVisible"
       ref="node"
       :cx="autoLayout ? node.x : node.fx"
       :cy="autoLayout ? node.y : node.fy"
@@ -9,7 +10,7 @@
           ? `url('#node-thumb-2059')`
           : `currentColor`
       "
-      r="140"
+      :r="radius"
     ></circle>
   </g>
 </template>
@@ -30,6 +31,19 @@ export default {
     ...mapState(["settings"]),
     autoLayout() {
       return this.settings.autolayout
+    },
+    isVisible() {
+      return this.node.visibility !== "hidden"
+    },
+    radius() {
+      switch (this.node.visibility) {
+        case "root":
+          return 210
+        case "grandchild":
+          return 40
+        default:
+          return 140
+      }
     },
   },
   mounted() {
