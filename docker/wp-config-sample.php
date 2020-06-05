@@ -82,6 +82,7 @@ define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', true );
 
 /* That's all, stop editing! Happy publishing. */
+define('FS_METHOD', 'direct');
 
 /** Absolute path to the WordPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
