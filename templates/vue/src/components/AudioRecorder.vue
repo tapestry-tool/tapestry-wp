@@ -41,11 +41,7 @@
       <i class="fas fa-check"></i>
       Done
     </button>
-    <button
-      v-if="state === states.DONE"
-      class="my-3"
-      @click="$emit('submit', audio)"
-    >
+    <button v-if="state === states.DONE" class="my-3" @click="handleSubmit">
       <i class="fas fa-check"></i>
       Submit
     </button>
@@ -175,25 +171,30 @@ export default {
       clearInterval(this.durationInterval)
     },
     startRecording() {
+      globals.recordAnalyticsEvent("user", "start", "audio-recorder", this.id)
       this.recorder.start()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     pauseRecording() {
+      globals.recordAnalyticsEvent("user", "pause", "audio-recorder", this.id)
       this.recorder.pause()
       this.stopDurationCount()
       this.state = this.states.PAUSED
     },
     resumeRecording() {
+      globals.recordAnalyticsEvent("user", "resume", "audio-recorder", this.id)
       this.recorder.resume()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     stopRecording() {
+      globals.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
     },
     resetRecording() {
+      globals.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
     },
@@ -209,6 +210,10 @@ export default {
           this.startRecording()
           break
       }
+    },
+    handleSubmit() {
+      globals.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
+      this.$emit("submit", this.audio)
     },
   },
 }

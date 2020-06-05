@@ -126,6 +126,9 @@ export default {
     },
     play() {
       if (this.$refs.video) {
+        globals.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.$refs.video.play()
       }
     },
@@ -134,6 +137,9 @@ export default {
       this.showEndScreen = false
       if (this.$refs.video) {
         this.$refs.video.currentTime = 0
+        globals.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: 0,
+        })
         this.$refs.video.play()
       }
     },
@@ -144,6 +150,9 @@ export default {
     close() {
       if (this.$refs.video) {
         this.$refs.video.pause()
+        globals.recordAnalyticsEvent("app", "pause", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.updateVideoProgress()
       }
       this.$emit("close")
@@ -166,7 +175,7 @@ export default {
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+        globals.recordAnalyticsEvent("user", "play", "video", id, {
           time: video.currentTime,
         })
       }
@@ -177,7 +186,7 @@ export default {
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+        globals.recordAnalyticsEvent("user", "pause", "video", id, {
           time: video.currentTime,
         })
       }

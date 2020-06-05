@@ -1,5 +1,5 @@
 <template>
-  <button @click="$emit('click')">
+  <button @click="$emit('click', $event)">
     <div>
       <img :src="topic.imageURL" />
       <i v-if="topic.completed && showComplete" class="fas fa-check fa-3x"></i>

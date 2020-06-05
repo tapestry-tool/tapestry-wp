@@ -95,7 +95,7 @@
       :allow-close="false"
       :show-fav="false"
       :content-container-style="confirmationStyles"
-      @close="showCompletion = false"
+      @close="handleCancel"
     >
       <tyde-progress-bar
         v-if="moduleOpened"
@@ -103,10 +103,10 @@
         :node-id="selectedModuleId"
       />
       <div class="button-container">
-        <button class="button-completion" @click="$emit('close')">
+        <button class="button-completion" @click="handleClose">
           {{ node.typeData.continueButtonText }}
         </button>
-        <button class="button-completion" @click="showCompletion = false">
+        <button class="button-completion" @click="handleCancel">
           {{ node.typeData.cancelLinkText }}
         </button>
       </div>
@@ -225,8 +225,14 @@ export default {
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
+          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: 0,
+          })
           this.$refs.container.scrollTop = 0
         } else {
+          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: el.offsetTop - 12,
+          })
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
@@ -234,22 +240,61 @@ export default {
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
+        globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          to: 0,
+        })
         el.scrollTop = 0
       }
     },
     toggle(index) {
       if (this.activeIndex === index) {
+        const activeRowId = this.rows[this.activeIndex].node.id
         this.activeIndex = -1
+        globals.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       } else {
         this.activeIndex = index
+        const activeRowId = this.rows[this.activeIndex].node.id
+        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       }
     },
-    next() {
+    next(evt) {
+      globals.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
       if (this.hasNext) {
         this.activeIndex++
+        const activeRowId = this.rows[this.activeIndex].node.id
+        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       } else {
         this.showCompletion = true
       }
+    },
+    handleClose(evt) {
+      globals.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit("close")
+    },
+    handleCancel(evt) {
+      globals.recordAnalyticsEvent(
+        "user",
+        "close",
+        "accordion-completion-screen",
+        this.node.id,
+        {
+          x: evt.clientX,
+          y: evt.clientY,
+        }
+      )
+      this.showCompletion = false
     },
     disableRow(index) {
       if (this.node.userType === "teen") {

@@ -9,12 +9,12 @@
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
-    @close="close"
+    @close="handleUserClose"
   >
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
     />
     <tapestry-media
@@ -22,7 +22,7 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       @load="handleLoad"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
       @change:dimensions="updateDimensions"
     />
@@ -187,6 +187,14 @@ export default {
           this.updateTydeProgress({ parentId: sid, isParentModule: false })
         )
       }
+    },
+    handleUserClose() {
+      globals.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
+      this.close()
+    },
+    handleAutoClose() {
+      globals.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
+      this.close()
     },
     close() {
       this.$router.go(-1)
