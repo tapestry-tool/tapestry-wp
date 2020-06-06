@@ -108,7 +108,15 @@ export async function addLink({ commit }, newLink) {
 }
 
 // favourites
+export function toggleFavourite({ dispatch, getters }, id) {
+  const favourites = getters.favourites
+  const newFavourites = getters.isFavourite(id)
+    ? favourites.filter(fid => fid != id)
+    : [...favourites, id]
+  dispatch("updateUserFavourites", newFavourites)
+}
+
 export async function updateUserFavourites({ commit }, favourites) {
-  commit("updateFavourites", { favourites })
   await client.updateUserFavourites(JSON.stringify(favourites))
+  commit("updateFavourites", { favourites })
 }

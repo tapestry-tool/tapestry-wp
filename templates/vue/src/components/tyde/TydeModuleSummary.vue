@@ -9,11 +9,13 @@
     <header class="p-3">
       <h1 class="title">{{ module.title }}</h1>
       <ul>
-        <tyde-tab :is-active="activeTab === 0" @click="activeTab = 0">
-          Content
-        </tyde-tab>
-        <tyde-tab :is-active="activeTab === 1" @click="activeTab = 1">
-          Activities
+        <tyde-tab
+          v-for="(tab, index) in tabs"
+          :key="tab"
+          :is-active="activeTab === index"
+          @click="activeTab = index"
+        >
+          {{ tab }}
         </tyde-tab>
       </ul>
     </header>
@@ -39,16 +41,24 @@
         </div>
       </div>
     </div>
-    <div v-else-if="activities.length > 0" class="content pt-4">
-      <tyde-activity-summary
-        v-for="activity in activities"
-        :key="activity.id"
-        :activity="activity"
-        :module="module"
-      />
+    <div v-else-if="activeTab === 1" class="content p-4">
+      <div v-if="activities.length > 0">
+        <tyde-activity-summary
+          v-for="activity in activities"
+          :key="activity.id"
+          :activity="activity"
+          :module="module"
+        />
+      </div>
+      <div v-else class="empty-message">
+        There are no completed activities yet.
+      </div>
     </div>
-    <div v-else class="content empty-message">
-      There are no completed activities yet.
+    <div v-else-if="activeTab === 2" class="content p-4">
+      <div v-if="!favourites.length" class="empty-message">
+        You have not added any items to your favourites in this module.
+      </div>
+      <tyde-favourites v-else :favourites="favourites"></tyde-favourites>
     </div>
   </div>
 </template>
@@ -57,6 +67,7 @@
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
 import TydeButton from "./TydeButton"
+import TydeFavourites from "./TydeFavourites"
 import TydeTab from "./TydeTab"
 import TydeTopic from "./TydeTopic"
 
@@ -65,6 +76,7 @@ export default {
   components: {
     TydeActivitySummary,
     TydeButton,
+    TydeFavourites,
     TydeTab,
     TydeTopic,
   },
@@ -80,7 +92,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getModuleContent", "getModuleActivities"]),
+    ...mapGetters([
+      "getNode",
+      "getModuleContent",
+      "getModuleActivities",
+      "getModuleFavourites",
+    ]),
+    tabs() {
+      return ["Content", "Activities", "Favourites"]
+    },
     module() {
       return this.getNode(this.nodeId)
     },
@@ -89,6 +109,9 @@ export default {
     },
     activities() {
       return this.getModuleActivities(this.nodeId)
+    },
+    favourites() {
+      return this.getModuleFavourites(this.nodeId)
     },
   },
   methods: {
@@ -168,11 +191,6 @@ export default {
         width: 20%;
       }
     }
-
-    &.empty-message {
-      padding: 1.5rem;
-      text-align: center;
-    }
   }
 
   .grid {
@@ -180,5 +198,9 @@ export default {
     grid-gap: 16px;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
+}
+
+.empty-message {
+  text-align: center;
 }
 </style>

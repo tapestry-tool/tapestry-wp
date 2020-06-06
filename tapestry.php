@@ -203,11 +203,38 @@ function gf_button_ajax_get_form()
 }
 // End of Gravity Forms Pluggin
 
+// ANALYTICS
+
+function create_analytics_schema() {
+    global $wpdb;
+
+    add_option( "tapestry_analytics_schema_version", "0.1" );
+
+    // Create table for logging events
+    $table_name = $wpdb->prefix . "tapestry_analytics_events";
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                timestamp timestamp,
+                actor tinytext NOT NULL,
+                action tinytext NOT NULL,
+                object text NOT NULL,
+                user_guid tinytext,
+                object_id tinytext,
+                details text,
+                PRIMARY KEY  (id)
+            ) $charset_collate;";
+
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    dbDelta( $sql );
+}
+
 // TYDE CUSTOMIZATIONS
 
 register_activation_hook( __FILE__, 'tapestry_activation' );
 function tapestry_activation() {
     create_copilot_role();
+    create_analytics_schema();
 }
 
 /**

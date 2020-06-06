@@ -295,70 +295,9 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Access">
-          <h6 class="mb-3 text-muted">General Permissions</h6>
-          <div id="modal-permissions">
-            <b-table-simple class="text-center" striped responsive>
-              <b-thead>
-                <b-tr>
-                  <b-th></b-th>
-                  <b-th>Read</b-th>
-                  <b-th>Add</b-th>
-                  <b-th>Edit</b-th>
-                </b-tr>
-              </b-thead>
-              <b-tbody>
-                <b-tr
-                  v-for="(value, rowName) in permissions"
-                  :key="rowName"
-                  :value="value"
-                >
-                  <b-th>{{ rowName }}</b-th>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="read"
-                      :disabled="isPermissionDisabled(rowName, 'read')"
-                      :data-testid="`node-permissions-${rowName}-read`"
-                      @change="updatePermissions($event, rowName, 'read')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="add"
-                      :disabled="isPermissionDisabled(rowName, 'add')"
-                      :data-testid="`node-permissions-${rowName}-add`"
-                      @change="updatePermissions($event, rowName, 'add')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="edit"
-                      :disabled="isPermissionDisabled(rowName, 'edit')"
-                      :data-testid="`node-permissions-${rowName}-edit`"
-                      @change="updatePermissions($event, rowName, 'edit')"
-                    ></b-form-checkbox>
-                  </b-td>
-                </b-tr>
-                <b-tr>
-                  <b-td colspan="4">
-                    <b-input-group>
-                      <b-form-input
-                        v-model="userId"
-                        placeholder="Enter user ID"
-                      ></b-form-input>
-                      <b-button variant="secondary" @click="addUserPermissionRow()">
-                        <span class="fas fa-plus mr-1"></span>
-                        User
-                      </b-button>
-                    </b-input-group>
-                  </b-td>
-                </b-tr>
-              </b-tbody>
-            </b-table-simple>
-          </div>
+        <b-tab v-if="viewAccess" title="Access">
+          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
+          <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
@@ -558,6 +497,7 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
+import PermissionsTable from "./node-modal/PermissionsTable"
 
 export default {
   name: "node-modal",
@@ -570,6 +510,7 @@ export default {
     FileUpload,
     SlickItem,
     SlickList,
+    PermissionsTable,
   },
   props: {
     node: {
@@ -595,11 +536,6 @@ export default {
       type: String,
       required: false,
       default: "Node",
-    },
-    permissionsOrder: {
-      type: Array,
-      required: false,
-      default: () => [],
     },
   },
   data() {
@@ -634,7 +570,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode", "settings"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -769,16 +705,12 @@ export default {
         { name: "fitWindow", value: this.node.fitWindow },
       ]
     },
-    newPermissions() {
-      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
-      return [...this.node.permissions[last]]
-    },
-    permissions() {
-      const ordered = {}
-      this.permissionsOrder.forEach(permission => {
-        ordered[permission] = this.node.permissions[permission]
-      })
-      return ordered
+    viewAccess() {
+      return this.settings.showAccess === undefined
+        ? true
+        : this.settings.showAccess
+        ? true
+        : wpData.wpCanEditTapestry !== ""
     },
     videoUrlYoutubeID() {
       return this.videoUrlEntered
@@ -888,52 +820,6 @@ export default {
       const adminAjaxUrl = wpData.adminAjaxUrl
       return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
     },
-    getPermissionRowIndex(rowName) {
-      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
-    },
-    isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
-        return false
-      }
-
-      // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
-      }
-
-      const permissions = this.node.permissions[higherRow]
-      if (permissions) {
-        return permissions.includes(type)
-      }
-      return false
-    },
-    changeIndividualPermission(value, rowName, type) {
-      let currentPermissions = this.node.permissions[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
-      let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
-        }
-      } else {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
-      }
-      this.$set(this.node.permissions, rowName, newPermissions)
-    },
-    updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
-        return this.changeIndividualPermission(value, rowName, type)
-      }
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
-      lowerPriorityPermissions.forEach(newRow => {
-        this.changeIndividualPermission(value, newRow, type)
-      })
-    },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
     },
@@ -1002,20 +888,6 @@ export default {
           value => value && value.length > 0
         )
       })
-    },
-    addUserPermissionRow() {
-      const userId = this.userId
-      if (
-        userId &&
-        Helpers.onlyContainsDigits(userId) &&
-        $("#user-" + userId + "-editcell").val() != ""
-      ) {
-        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
-        this.permissionsOrder.push(`user-${userId}`)
-        this.userId = null
-      } else {
-        alert("Enter valid user id")
-      }
     },
     updateOrderingArray(arr) {
       this.updateOrdering({
