@@ -220,8 +220,12 @@ export default {
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
               case h5pObj.Video.PLAYING: {
-                if (!h5pIframeComponent.played) {
+                if (
+                  !h5pIframeComponent.played &&
+                  h5pVideo.getHandlerName() === "YouTube"
+                ) {
                   h5pVideo.pause()
+                  h5pIframeComponent.played = true
                   return
                 }
                 h5pIframeComponent.updateInterval = setInterval(() => {
