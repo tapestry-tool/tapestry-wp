@@ -1354,7 +1354,6 @@ function tapestryTool(config){
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("opacity", 0)
             .attr("width", d => Math.min(getRadius(d) * 2 + 48, 400))
             .attr("height", d => getRadius(d) * 2)
             .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 400) / 2))
@@ -1423,8 +1422,7 @@ function tapestryTool(config){
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     const pointer = this.querySelector("polygon.tooltip-pointer");
                     pointer.style.opacity = 1;
-                    wrapper.style.opacity = 1;
-                    wrapper.style.pointerEvents = "all";
+                    wrapper.style.display = "block";
                 }
             })
             .on("mouseleave", function () {
@@ -1432,8 +1430,7 @@ function tapestryTool(config){
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
-                wrapper.style.opacity = 0;
-                wrapper.style.pointerEvents = "none";
+                wrapper.style.display = "none";
             })
     }
 
