@@ -100,6 +100,8 @@ export default {
         const rowIndex = this.getPermissionRowIndex(rowName)
         const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
         lowerPriorityPermissions.forEach(newRow => {
+          const key = `${newRow[0]}-${type}`
+          this.addedByUser.delete(key)
           this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
         })
       }
@@ -163,7 +165,14 @@ export default {
 
       const key = `${rowName}-${type}`
       if (!isChecked) {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
+        if (
+          type !== "read" ||
+          !currentPermissions.find(perm => perm === "add" || perm === "edit")
+        ) {
+          newPermissions = currentPermissions.filter(
+            permission => permission !== type
+          )
+        }
         this.addedByUser.delete(key)
       } else if (!currentPermissions.includes(type)) {
         newPermissions.push(type)
