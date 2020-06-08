@@ -1,1 +1,2 @@
-*.sh text eol=lf
+wp-init.sh text eol=lf
+uploads.ini text eol=lf
