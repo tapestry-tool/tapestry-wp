@@ -131,7 +131,9 @@ export default {
       this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
-      const currentPermissions = this.value[rowName]
+      const currentPermissions = this.permissions[
+        this.getPermissionRowIndex(rowName)
+      ]
       if (
         currentPermissions.includes("add") ||
         currentPermissions.includes("edit")
@@ -146,11 +148,10 @@ export default {
 
       // keep going up until we find a non-user higher row
       const rowIndex = this.getPermissionRowIndex(rowName)
-      const higherRow = this.permissions[rowIndex - 1][0]
+      const [higherRow, permissions] = this.permissions[rowIndex - 1]
       if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
         return this.isPermissionDisabled(higherRow, type)
       }
-      const permissions = this.value[higherRow]
       if (permissions) {
         return permissions.includes(type)
       }
@@ -174,9 +175,10 @@ export default {
     addUserPermissionRow() {
       const userId = this.userId
       if (userId && Helpers.onlyContainsDigits(userId) && this.userId != "") {
-        const higherRow = this.permissions[this.permissions.length - 1][0]
-        const higherRowPermissions = this.value[higherRow]
-        const newPermissions = { ...this.value }
+        const [higherRow, higherRowPermissions] = this.permissions[
+          this.permissions.length - 1
+        ]
+        const newPermissions = Object.fromEntries(this.permissions)
         const newUserPermissions = []
         this.types
           .filter(
