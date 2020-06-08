@@ -383,7 +383,7 @@ function addTapestry($request)
     try {
         $title = $tapestryData->title;
         $page = get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry');
-        if (page) {
+        if ($page) {
             $count = 1;
             $title = $tapestryData->title . ' (' . $count . ')';
             while (get_page_by_title($title, 'OBJECT', 'tapestry')) {
@@ -443,11 +443,31 @@ function importTapestry($postId, $tapestryData)
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
         $idMap = new stdClass();
 
+        // Construct ID map and add nodes to new Tapestry
         foreach ($tapestryData->nodes as $node) {
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
+        }
+
+        // Now update any node data that relies on IDs
+        foreach ($tapestryData->nodes as $oldNode) {
+            $oldNodeId = $oldNode->id;
+            $newNodeId = $idMap->$oldNodeId;
+
+            $tapestryNode = $tapestry->getNode($newNodeId);
+            $node = $tapestryNode->get();
+
+            foreach ($node->conditions as $condition) {
+                if ($condition->nodeId) {
+                    $oldDependency = $condition->nodeId;
+                    $condition->nodeId = $idMap->$oldDependency;
+                }
+            }
+
+            $tapestryNode->set($node);
+            $tapestryNode->save();
         }
         
         foreach ($tapestryData->links as $link) {
