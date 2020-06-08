@@ -1,7 +1,8 @@
 <template>
   <div>
     <b-button block variant="light" @click="duplicateTapestry">
-      Duplicate Tapestry
+      <b-spinner v-if="loading"></b-spinner>
+      <div v-else>Duplicate Tapestry</div>
     </b-button>
     <b-alert :show="showConfirmation" variant="success" style="margin-top: 1em;">
       Your new Tapestry is ready! Click on the link below to view it.
@@ -23,6 +24,7 @@ export default {
     return {
       showConfirmation: false,
       link: null,
+      loading: false,
     }
   },
   computed: {
@@ -30,12 +32,18 @@ export default {
   },
   methods: {
     duplicateTapestry() {
+      this.loading = true
       const tapestry = this.tapestryJson
-      client.addTapestry({ title: this.settings.title, ...tapestry }).then(res => {
-        const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
-        this.link = href
-        this.showConfirmation = true
-      })
+      client
+        .addTapestry({ title: this.settings.title, ...tapestry })
+        .then(res => {
+          const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
+          this.link = href
+          this.showConfirmation = true
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
   },
 }
