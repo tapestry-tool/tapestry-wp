@@ -24,252 +24,254 @@ $REST_API_DELETE_METHOD = 'DELETE';
 
 $REST_API_ENDPOINTS = [
     'POST_TAPESTRY_NODE' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryNode'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryNode',
+        ],
     ],
     'POST_TAPESTRY' => (object) [
-        'ROUTE'     => '/tapestries',
+        'ROUTE' => '/tapestries',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestry',
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestry',
+        ],
     ],
     'DELETE_TAPESTRY' => (object) [
-        'ROUTE'     => '/tapestries',
+        'ROUTE' => '/tapestries',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_DELETE_METHOD,
-            'callback'  => 'deleteTapestry'
-        ]
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'deleteTapestry',
+        ],
     ],
     'PUT_TAPESTRY_SETTINGS' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestrySettings',
-            'permission_callback'   => 'TapestryPermissions::putTapestrySettings'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestrySettings',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
     ],
     'GET_TAPESTRY' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'getTapestry'
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestry',
+        ],
     ],
-    'GET_GF_EXISTS'  => (object) [
-        'ROUTE'     => '/gf/exists',
+    'GET_GF_EXISTS' => (object) [
+        'ROUTE' => '/gf/exists',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'getGfExists'
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getGfExists',
+        ],
     ],
-    'GET_GF_FORMS'  => (object) [
-        'ROUTE'     => '/gf/forms',
+    'GET_GF_FORMS' => (object) [
+        'ROUTE' => '/gf/forms',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'getGfForms'
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getGfForms',
+        ],
     ],
     'POST_TAPESTRY_GROUP' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/groups',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryGroup',
-            'permission_callback'   => 'TapestryPermissions::postTapestryGroup'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryGroup',
+            'permission_callback' => 'TapestryPermissions::postTapestryGroup',
+        ],
     ],
     'PUT_TAPESTRY_NODE' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNode'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNode',
+        ],
     ],
     'DELETE_TAPESTRY_NODE' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryNode'
-        ]
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'deleteTapestryNode',
+        ],
     ],
     'PUT_TAPESTRY_NODE_SIZE' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/size',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeSize'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeSize',
+        ],
     ],
     'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodePermissions'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodePermissions',
+        ],
     ],
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeDescription'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeDescription',
+        ],
     ],
     'PUT_TAPESTRY_NODE_TITLE' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/title',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTitle'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeTitle',
+        ],
     ],
     'PUT_TAPESTRY_NODE_IMAGE_URL' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/imageURL',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeImageURL'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeImageURL',
+        ],
     ],
     'PUT_TAPESTRY_NODE_LOCKED_IMAGE_URL' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/lockedImageURL',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/lockedImageURL',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeLockedImageURL'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeLockedImageURL',
+        ],
     ],
     'PUT_TAPESTRY_NODE_TYPE_DATA' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/typeData',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeTypeData'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeTypeData',
+        ],
     ],
     'PUT_TAPESTRY_NODE_COORDINATES' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/coordinates',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_PUT_METHOD,
-            'callback'              => 'updateTapestryNodeCoordinates'
-        ]
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateTapestryNodeCoordinates',
+        ],
     ],
     'POST_TAPESTRY_LINK' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'addTapestryLink'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryLink',
+        ],
     ],
     'DELETE_TAPESTRY_LINK' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_DELETE_METHOD,
-            'callback'              => 'deleteTapestryLink'
-        ]
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'deleteTapestryLink',
+        ],
     ],
     'GET_TAPESTRY_USER_PROGRESS' => (object) [
-        'ROUTE'     => 'users/progress',
+        'ROUTE' => 'users/progress',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserProgressByPostId',
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserProgressByPostId',
+        ],
     ],
-    'GET_TAPESTRY_USER_ENTRY'   => (object) [
-        'ROUTE'     => 'users/entries',
+    'GET_TAPESTRY_USER_ENTRY' => (object) [
+        'ROUTE' => 'users/entries',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserEntry',
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserEntry',
+        ],
     ],
     'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
-        'ROUTE'     => 'users/progress',
+        'ROUTE' => 'users/progress',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'updateProgressByNodeId',
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateProgressByNodeId',
+        ],
     ],
-    'UPDATE_TAPESTRY_USER_COMPLETED'  => (object) [
-        'ROUTE'     => 'users/completed',
+    'UPDATE_TAPESTRY_USER_COMPLETED' => (object) [
+        'ROUTE' => 'users/completed',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'completeByNodeId'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'completeByNodeId',
+        ],
     ],
     'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
-        'ROUTE'     => 'users/quiz',
+        'ROUTE' => 'users/quiz',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'completeQuestionById'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'completeQuestionById',
+        ],
     ],
     'GET_TAPESTRY_USER_H5P_SETTING' => (object) [
-        'ROUTE'     => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
+        'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserH5PSettingsByPostId',
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserH5PSettingsByPostId',
+        ],
     ],
     'UPDATE_TAPESTRY_USER_H5P_SETTING' => (object) [
-        'ROUTE'     => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
+        'ROUTE' => 'users/h5psettings/(?P<tapestryPostId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'updateUserH5PSettingsByPostId',
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateUserH5PSettingsByPostId',
+        ],
     ],
     'GET_USER_AUDIO' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<questionId>[\d]+)',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<questionId>[\d]+)',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserAudio',
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserAudio',
+        ],
     ],
     'POST_USER_AUDIO' => (object) [
-        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'postUserAudio',
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'postUserAudio',
+        ],
     ],
     'GET_ALL_H5P' => (object) [
         'ROUTE' => '/h5p',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getAllH5P'
-        ]
+            'callback' => 'getAllH5P',
+        ],
     ],
     'GET_FORM_ENTRY' => (object) [
         'ROUTE' => '/gf/entries',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => 'getGfEntry'
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getGfEntry',
+        ],
     ],
     'GET_TAPESTRY_USER_FAVOURITES' => (object) [
-        'ROUTE'     => 'users/favourites',
+        'ROUTE' => 'users/favourites',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_GET_METHOD,
-            'callback'              => 'getUserFavourites',
-        ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserFavourites',
+        ],
     ],
     'UPDATE_TAPESTRY_USER_FAVOURITES' => (object) [
-        'ROUTE'     => 'users/favourites',
+        'ROUTE' => 'users/favourites',
         'ARGUMENTS' => [
-            'methods'               => $REST_API_POST_METHOD,
-            'callback'              => 'updateUserFavourites',
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'updateUserFavourites',
+        ],
     ],
     'LOGIN' => (object) [
         'ROUTE' => '/login',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_POST_METHOD,
-            'callback'  => 'login'
-        ]
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'login',
+        ],
     ],
     'LOGOUT' => (object) [
         'ROUTE' => '/logout',
         'ARGUMENTS' => [
-            'methods'   => $REST_API_GET_METHOD,
-            'callback'  => function() { wp_logout(); }
-        ]
-    ]
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => function () {
+                wp_logout();
+            },
+        ],
+    ],
 ];
 
 /**
@@ -347,9 +349,9 @@ function getGfEntry($request)
 
 /**
  * Get a Tapestry
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getTapestry($request)
@@ -365,9 +367,9 @@ function getTapestry($request)
 
 /**
  * Add a tapestry
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestry($request)
@@ -375,11 +377,11 @@ function addTapestry($request)
     $tapestryData = json_decode($request->get_body());
     if (!get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
         $postId = wp_insert_post(array(
-            'comment_status'    => 'closed',
-            'ping_status'       => 'closed',
-            'post_status'       => 'publish',
-            'post_title'        => $tapestryData->title,
-            'post_type'         => 'tapestry'
+            'comment_status' => 'closed',
+            'ping_status' => 'closed',
+            'post_status' => 'publish',
+            'post_title' => $tapestryData->title,
+            'post_type' => 'tapestry',
         ), true);
         if (is_wp_error($postId)) {
             return $post;
@@ -403,10 +405,10 @@ function deleteTapestry($request)
 
 /**
  * Add a tapestry node
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
- * @return  Object  HTTP response 
+ *
+ * @return  Object  HTTP response
  */
 function addTapestryNode($request)
 {
@@ -438,9 +440,9 @@ function addTapestryNode($request)
 
 /**
  * Add a Tapestry Group
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestryGroup($request)
@@ -462,9 +464,9 @@ function addTapestryGroup($request)
 
 /**
  * Add A Tapestry Link
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestryLink($request)
@@ -499,9 +501,9 @@ function addTapestryLink($request)
 
 /**
  * Delete A Tapestry Link
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function deleteTapestryLink($request)
@@ -521,10 +523,10 @@ function deleteTapestryLink($request)
 
 /**
  * Update Tapestry Settings
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response 
+ *
+ * @return  Object  $response   HTTP response
  */
 function updateTapestrySettings($request)
 {
@@ -545,9 +547,9 @@ function updateTapestrySettings($request)
 
 /**
  * Update Tapestry Node
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNode($request)
@@ -616,12 +618,11 @@ function deleteTapestryNode($request)
     }
 }
 
-
 /**
  * Update Tapestry Node Size
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeSize($request)
@@ -657,9 +658,9 @@ function updateTapestryNodeSize($request)
 
 /**
  * Update Tapestry Node Permissions
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodePermissions($request)
@@ -695,9 +696,9 @@ function updateTapestryNodePermissions($request)
 
 /**
  * Update Tapestry Node Permissions
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeDescription($request)
@@ -733,9 +734,9 @@ function updateTapestryNodeDescription($request)
 
 /**
  * Update Tapestry Node Title
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeTitle($request)
@@ -771,9 +772,9 @@ function updateTapestryNodeTitle($request)
 
 /**
  * Update Tapestry Node Image Url
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeImageURL($request)
@@ -809,9 +810,9 @@ function updateTapestryNodeImageURL($request)
 
 /**
  * Update Tapestry Node Locked Image Url
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeLockedImageURL($request)
@@ -844,12 +845,11 @@ function updateTapestryNodeLockedImageURL($request)
     }
 }
 
-
-/** 
+/**
  * Update Tapestry Node Type Data
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeTypeData($request)
@@ -885,9 +885,9 @@ function updateTapestryNodeTypeData($request)
 
 /**
  * Update Tapestry Node Coordinates
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeCoordinates($request)
@@ -922,7 +922,7 @@ function updateTapestryNodeCoordinates($request)
 }
 
 /**
- * 
+ *
  */
 function getUserEntry($request)
 {
@@ -941,9 +941,9 @@ function getUserEntry($request)
 /**
  * Update a single node progress for the current user by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateProgressByNodeId($request)
 {
@@ -962,9 +962,9 @@ function updateProgressByNodeId($request)
 /**
  * Set node as completed for the current user
  * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return null
  */
 function completeByNodeId($request)
@@ -983,9 +983,9 @@ function completeByNodeId($request)
 /**
  * Set quiz as completed for the current user
  * Example: /wp-json/tapestry-tool/v1/users/quiz?post_id=44&node_id=1&question_id=abcd
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return null
  */
 function completeQuestionById($request)
@@ -1005,9 +1005,9 @@ function completeQuestionById($request)
 /**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings/42
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserH5PSettingsByPostId($request)
@@ -1023,7 +1023,7 @@ function getUserH5PSettingsByPostId($request)
 
 /**
  * Update the user's h5p settings by post id
- * 
+ *
  * Example endpoint: /wp-json/tapestry-tool/v1/users/h5psettings/44
  * Example body:
  * {
@@ -1034,9 +1034,9 @@ function getUserH5PSettingsByPostId($request)
  *  "playbackRate": 0.5,
  *  "time": 11.934346
  * }
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateUserH5PSettingsByPostId($request)
 {
@@ -1051,11 +1051,11 @@ function updateUserH5PSettingsByPostId($request)
 }
 
 /**
- * Get user progress on a tapestry page by post id. 
+ * Get user progress on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserProgressByPostId($request)
@@ -1071,9 +1071,9 @@ function getUserProgressByPostId($request)
 
 /**
  * Saves a user's recorded audio file
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function postUserAudio($request)
@@ -1106,9 +1106,9 @@ function postUserAudio($request)
 
 /**
  * Get recorded audio of a node for a user
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserAudio($request)
@@ -1135,11 +1135,11 @@ function getUserAudio($request)
 }
 
 /**
- * Get user favourite nodes on a tapestry page by post id. 
+ * Get user favourite nodes on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserFavourites($request)
@@ -1156,9 +1156,9 @@ function getUserFavourites($request)
 /**
  * Update favourite nodes for the current user by passing in post id and favourites array
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&favourites=[409, 411]
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateUserFavourites($request)
 {

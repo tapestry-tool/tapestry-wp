@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-group.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
- * 
+ *
  */
 class TapestryGroup implements ITapestryGroup
 {
@@ -20,10 +20,10 @@ class TapestryGroup implements ITapestryGroup
 
     /**
      * Constructor
-     * 
+     *
      * @param   Number  $postId post ID
      * @param   Number  $groupMetaId meta ID
-     * 
+     *
      * @return  NULL
      */
     public function __construct($postId = 0, $groupMetaId = 0)
@@ -47,7 +47,7 @@ class TapestryGroup implements ITapestryGroup
 
     /**
      * Save the Tapestry group
-     * 
+     *
      * @return  Object  $group
      */
     public function save()
@@ -57,7 +57,7 @@ class TapestryGroup implements ITapestryGroup
 
     /**
      * Set Gode
-     * 
+     *
      * @param   Object  $group  group
      *
      * @return  NULL
@@ -80,7 +80,7 @@ class TapestryGroup implements ITapestryGroup
 
     /**
      * Get the Tapestry group
-     * 
+     *
      * @return  Object  $group
      */
     public function get()
@@ -113,11 +113,11 @@ class TapestryGroup implements ITapestryGroup
     private function _formGroup()
     {
         return (object) [
-            'id'        => $this->groupMetaId,
-            'nodes'     => $this->nodes,
-            'members'   => $this->members,
-            'name'      => $this->name,
-            'type'      => $this->type
+            'id' => $this->groupMetaId,
+            'nodes' => $this->nodes,
+            'members' => $this->members,
+            'name' => $this->name,
+            'type' => $this->type,
         ];
     }
 }
