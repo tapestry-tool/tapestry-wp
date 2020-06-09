@@ -1,12 +1,30 @@
 <template>
   <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
     <div class="sidebar-preview">
-      <tapestry-icon icon="angle-double-left" />
+      <button @click.stop="scrollToRef('info')">
+        <tapestry-icon icon="angle-double-left" />
+      </button>
+      <button @click.stop="scrollToRef('license')">
+        <tapestry-icon icon="angle-double-left" />
+      </button>
+      <button @click.stop="scrollToRef('references')">
+        <tapestry-icon icon="angle-double-left" />
+      </button>
     </div>
-    <div class="sidebar-content">
-      <h3 class="content-title">{{ node.title }}</h3>
-      <h4 class="content-separator">About</h4>
-      <p class="content-description">{{ node.description }}</p>
+    <div ref="content" class="sidebar-content">
+      <h3 ref="info" class="content-title">{{ node.title }}</h3>
+      <section>
+        <h4 class="content-separator">About</h4>
+        <p class="content-description">{{ node.description }}</p>
+      </section>
+      <section v-if="node.license" ref="license">
+        <h4 class="content-separator">Copyright</h4>
+        <p class="content-description">{{ node.license }}</p>
+      </section>
+      <section v-if="node.references" ref="references">
+        <h4 class="content-separator">References</h4>
+        <p class="content-description">{{ node.references }}</p>
+      </section>
     </div>
   </aside>
 </template>
@@ -44,6 +62,12 @@ export default {
       },
     },
   },
+  methods: {
+    scrollToRef(refName) {
+      const el = this.$refs[refName]
+      this.$refs.content.scroll(0, el.offsetTop - 48)
+    },
+  },
 }
 </script>
 
@@ -52,7 +76,7 @@ export default {
   background: white;
   color: inherit;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 2.5em 1fr;
   height: 100vh;
   min-width: 300px;
   position: fixed;
@@ -61,6 +85,7 @@ export default {
   transform: translateX(0);
   transition: all 0.2s ease-out;
   width: 30vw;
+  max-width: 400px;
 
   &.closed {
     cursor: pointer;
@@ -86,6 +111,15 @@ export default {
 
 .sidebar-content {
   grid-column: 2;
+  padding: 3rem 2rem;
+  overflow: scroll;
+
+  section {
+    margin-bottom: 1em;
+    &:last-child {
+      margin-bottom: 3rem;
+    }
+  }
 
   .content-title {
     text-align: left;
@@ -93,7 +127,7 @@ export default {
   }
 
   .content-separator {
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
     position: relative;
     text-align: left;
 
@@ -102,9 +136,9 @@ export default {
       position: absolute;
       width: 50%;
       height: 3px;
-      background: white;
+      background: black;
       left: 0;
-      bottom: -8px;
+      bottom: -12px;
     }
   }
 
