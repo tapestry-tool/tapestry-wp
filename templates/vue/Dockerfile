@@ -1,7 +1,6 @@
 FROM node:12 as develop-stage
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
+COPY package*.json ./
 RUN npm install
 COPY . .
 
