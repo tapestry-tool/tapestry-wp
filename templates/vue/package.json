@@ -19,6 +19,7 @@
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.13.1",
+    "jquery": "^1.9.1",
     "moment": "^2.25.3",
     "moment-timezone": "^0.5.28",
     "vue": "^2.6.10",
@@ -41,7 +42,7 @@
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
     "cypress": "^3.8.0",
-    "eslint": "^6.5.1",
+    "eslint": "^5.16.0",
     "eslint-config-prettier": "^6.4.0",
     "eslint-loader": "^3.0.2",
     "eslint-plugin-cypress": "^2.8.1",
@@ -54,7 +55,7 @@
     "style-loader": "^1.0.0",
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",
-    "webpack": "^3.6.0",
+    "webpack": "^3.12.0",
     "webpack-dev-server": "^2.9.1"
   }
 }
