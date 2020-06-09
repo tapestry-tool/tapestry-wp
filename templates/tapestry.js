@@ -2624,6 +2624,7 @@ function getIconClass(mediaType, action, accessible=true) {
 
     switch (mediaType) {
 
+        case "h5p":
         case "video":
             if (action == 'pause')
                 classStr = classStrStart + 'pause';
