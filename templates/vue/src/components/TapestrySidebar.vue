@@ -1,14 +1,15 @@
 <template>
   <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
     <div class="sidebar-preview">
-      <button @click.stop="scrollToRef('info')">
-        <tapestry-icon icon="angle-double-left" />
+      <button class="anchor-button active" @click.stop="scrollToRef('info')">
+        <tapestry-icon icon="info-circle" />
       </button>
-      <button @click.stop="scrollToRef('license')">
-        <tapestry-icon icon="angle-double-left" />
-      </button>
-      <button @click.stop="scrollToRef('references')">
-        <tapestry-icon icon="angle-double-left" />
+      <button
+        v-if="node.license || node.references"
+        class="anchor-button"
+        @click.stop="scrollToRef('copyright')"
+      >
+        <tapestry-icon icon="copyright" />
       </button>
     </div>
     <div ref="content" class="sidebar-content">
@@ -17,13 +18,15 @@
         <h4 class="content-separator">About</h4>
         <p class="content-description">{{ node.description }}</p>
       </section>
-      <section v-if="node.license" ref="license">
-        <h4 class="content-separator">Copyright</h4>
-        <p class="content-description">{{ node.license }}</p>
-      </section>
-      <section v-if="node.references" ref="references">
-        <h4 class="content-separator">References</h4>
-        <p class="content-description">{{ node.references }}</p>
+      <section v-if="node.license || node.references" ref="copyright">
+        <section v-if="node.license">
+          <h4 class="content-separator">Copyright</h4>
+          <p class="content-description">{{ node.license }}</p>
+        </section>
+        <section v-if="node.references">
+          <h4 class="content-separator">References</h4>
+          <p class="content-description">{{ node.references }}</p>
+        </section>
       </section>
     </div>
   </aside>
@@ -72,6 +75,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.anchor-button {
+  padding: 0;
+  background: 0;
+  width: 40px;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+
+  &:hover {
+    background: var(--teal);
+  }
+
+  &.active {
+    background: var(--teal);
+  }
+}
+
 .sidebar {
   background: white;
   color: inherit;
@@ -95,6 +117,7 @@ export default {
 
 .sidebar-preview {
   background: var(--gray);
+  padding: 32px 0;
 
   i {
     display: block;
