@@ -1,8 +1,7 @@
 <template>
   <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
-    <div v-show="isClosed" class="sidebar-preview">
+    <div class="sidebar-preview">
       <tapestry-icon icon="angle-double-left" />
-      <p class="preview-title">{{ node.title }}</p>
     </div>
     <div class="sidebar-content">
       <h3 class="content-title">{{ node.title }}</h3>
@@ -50,13 +49,12 @@ export default {
 
 <style lang="scss" scoped>
 .sidebar {
-  background: var(--gray);
-  color: white;
+  background: white;
+  color: inherit;
   display: grid;
-  grid-template-columns: 10% 80% 10%;
+  grid-template-columns: 40px 1fr;
   height: 100vh;
   min-width: 300px;
-  padding: 3rem 0;
   position: fixed;
   right: 0;
   top: 0;
@@ -66,15 +64,12 @@ export default {
 
   &.closed {
     cursor: pointer;
-    transform: translateX(90%);
+    transform: translateX(calc(100% - 40px));
   }
 }
 
 .sidebar-preview {
-  height: 100vh;
-  padding: 48px 0;
-  padding-left: 1em;
-  position: absolute;
+  background: var(--gray);
 
   i {
     display: block;
