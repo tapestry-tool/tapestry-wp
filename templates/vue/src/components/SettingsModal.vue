@@ -105,6 +105,12 @@
             </b-button>
           </b-row>
         </b-tab>
+        <b-tab title="Advanced">
+          <b-button block variant="light" @click="exportTapestry">
+            Export Tapestry
+          </b-button>
+          <duplicate-tapestry-button style="margin-top: 12px;" />
+        </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
           <permissions-table v-model="defaultPermissions" />
@@ -145,6 +151,7 @@ import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import Combobox from "../components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
+import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
 const defaultPermissions = Object.fromEntries(
@@ -164,6 +171,7 @@ export default {
     Combobox,
     SlickList,
     SlickItem,
+    DuplicateTapestryButton,
     PermissionsTable,
   },
   props: {

@@ -97,6 +97,10 @@ class TapestryError extends Error
         'FAILED_TO_CREATE_POST' => [
             'MESSAGE'   => 'Unable to create new Tapestry',
             'STATUS'    => ['status' => 500]
+        ],
+        'TAPESTRY_NOT_EMPTY' => [
+            'MESSAGE'   => 'The Tapestry is not empty',
+            'STATUS'    => ['status' => 400]
         ]
     ];
 
