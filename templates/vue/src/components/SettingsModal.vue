@@ -37,7 +37,10 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button @click="exportTapestry">Export Tapestry</b-button>
+          <b-button block variant="light" @click="exportTapestry">
+            Export Tapestry
+          </b-button>
+          <duplicate-tapestry-button style="margin-top: 12px;" />
         </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
@@ -74,6 +77,7 @@
 <script>
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
+import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
 const defaultPermissions = Object.fromEntries(
@@ -90,6 +94,7 @@ export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    DuplicateTapestryButton,
     PermissionsTable,
   },
   props: {
