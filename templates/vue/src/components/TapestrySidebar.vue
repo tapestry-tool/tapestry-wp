@@ -1,24 +1,27 @@
 <template>
   <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
     <div class="sidebar-preview">
-      <button class="anchor-button active" @click.stop="scrollToRef('info')">
+      <button
+        :class="['anchor-button', { active: active === 'info' }]"
+        @click.stop="scrollToRef('info')"
+      >
         <tapestry-icon icon="info-circle" />
       </button>
       <button
         v-if="node.license || node.references"
-        class="anchor-button"
+        :class="['anchor-button', { active: active === 'copyright' }]"
         @click.stop="scrollToRef('copyright')"
       >
         <tapestry-icon icon="copyright" />
       </button>
     </div>
     <div ref="content" class="sidebar-content">
-      <h3 ref="info" class="content-title">{{ node.title }}</h3>
+      <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
       <section>
         <h4 class="content-separator">About</h4>
         <p class="content-description">{{ node.description }}</p>
       </section>
-      <section v-if="node.license || node.references" ref="copyright">
+      <section ref="copyright" data-name="copyright">
         <section v-if="node.license">
           <h4 class="content-separator">Copyright</h4>
           <p class="content-description">{{ node.license }}</p>
@@ -43,6 +46,7 @@ export default {
   data() {
     return {
       isClosed: true,
+      active: null,
     }
   },
   computed: {
@@ -65,7 +69,21 @@ export default {
       },
     },
   },
+  mounted() {
+    const observer = new IntersectionObserver(this.handleObserve, {
+      threshold: 0.5,
+    })
+    observer.observe(this.$refs.info)
+    observer.observe(this.$refs.copyright)
+  },
   methods: {
+    handleObserve(entries) {
+      entries.forEach(entry => {
+        if (entry.intersectionRatio > 0.5) {
+          this.active = entry.target.dataset.name
+        }
+      })
+    },
     scrollToRef(refName) {
       const el = this.$refs[refName]
       this.$refs.content.scroll(0, el.offsetTop - 48)
