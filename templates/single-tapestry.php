@@ -81,7 +81,8 @@ function enqueue_vue_app_build()
             'adminAjaxUrl' => admin_url('admin-ajax.php'),
             'file_upload_nonce' => wp_create_nonce('media-form'),
             'upload_url' => admin_url('async-upload.php'),
-            'roles' => $wp_roles->get_names()
+            'roles' => $wp_roles->get_names(),
+            'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
         )
     );
 
@@ -118,6 +119,8 @@ get_header(); ?>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/jscookie.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/d3.v5.min.js" type="application/javascript"></script>
         <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/dragselect.min.js"></script>
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment.min.js"></script>
+        <script src="<?php echo plugin_dir_url(__FILE__) ?>libs/moment-timezone-with-data-2015-2025.js"></script>
 
         <script>
             // EXAMPLE OF USAGE:
