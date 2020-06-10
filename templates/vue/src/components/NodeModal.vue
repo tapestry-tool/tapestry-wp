@@ -82,21 +82,9 @@
             >
               <file-upload
                 id="node-video-media-url"
-                v-model="node.typeData.mediaURL"
-                input-test-id="node-videoUrl"
-                placeholder="Enter URL for MP4 Video"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              v-show="node.mediaType === 'video' && nodeType !== 'h5p'"
-              label="Video Duration"
-            >
-              <b-form-input
-                id="node-video-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-videoDuration"
-                placeholder="Enter duration (in seconds)"
+                v-model="videoSrc"
+                data-testid="node-videoUrl"
+                placeholder="Enter URL for MP4 or Youtube Video"
                 required
               />
             </b-form-group>
@@ -116,24 +104,33 @@
                 </template>
               </combobox>
             </b-form-group>
-            <b-form-group
-              v-show="nodeType === 'h5p'"
-              label="H5P Video Duration"
-              description="This only applies to video H5P content"
-            >
-              <b-form-input
-                id="node-h5p-media-duration"
-                v-model="node.mediaDuration"
-                data-testid="node-h5pDuration"
-                placeholder="Enter duration (in seconds)"
-                required
+            <div class="duration-calculation-video-containers">
+              <video
+                v-if="nodeMediaFormat === 'mp4'"
+                ref="video"
+                controls
+                :src="videoSrc"
+                style="display:none;"
+              ></video>
+              <iframe
+                v-if="nodeType === 'h5p' && selectedH5pContent !== ''"
+                ref="h5pNone"
+                :src="node.typeData && node.typeData.mediaURL"
+                @load="handleIframeload"
+              ></iframe>
+              <youtube
+                v-if="nodeMediaFormat === 'youtube'"
+                :video-id="videoUrlYoutubeID"
+                :player-vars="{ autoplay: 0 }"
+                style="display: none;"
+                @ready="handleYouTubeload"
               />
-            </b-form-group>
+            </div>
             <b-form-group
               v-show="node.mediaType === 'gravity-form'"
               label="Gravity Form"
             >
-              <span v-if="!this.gravityFormExists" class="text-muted">
+              <span v-if="!gravityFormExists" class="text-muted">
                 Gravity Forms plugin is not installed. Please install Gravity Forms
                 to use this content type.
               </span>
@@ -289,70 +286,9 @@
             </b-form-group>
           </div>
         </b-tab>
-        <b-tab title="Access">
-          <h6 class="mb-3 text-muted">General Permissions</h6>
-          <div id="modal-permissions">
-            <b-table-simple class="text-center" striped responsive>
-              <b-thead>
-                <b-tr>
-                  <b-th></b-th>
-                  <b-th>Read</b-th>
-                  <b-th>Add</b-th>
-                  <b-th>Edit</b-th>
-                </b-tr>
-              </b-thead>
-              <b-tbody>
-                <b-tr
-                  v-for="(value, rowName) in permissions"
-                  :key="rowName"
-                  :value="value"
-                >
-                  <b-th>{{ rowName }}</b-th>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="read"
-                      :disabled="isPermissionDisabled(rowName, 'read')"
-                      :data-testid="`node-permissions-${rowName}-read`"
-                      @change="updatePermissions($event, rowName, 'read')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="add"
-                      :disabled="isPermissionDisabled(rowName, 'add')"
-                      :data-testid="`node-permissions-${rowName}-add`"
-                      @change="updatePermissions($event, rowName, 'add')"
-                    ></b-form-checkbox>
-                  </b-td>
-                  <b-td>
-                    <b-form-checkbox
-                      v-model="node.permissions[rowName]"
-                      value="edit"
-                      :disabled="isPermissionDisabled(rowName, 'edit')"
-                      :data-testid="`node-permissions-${rowName}-edit`"
-                      @change="updatePermissions($event, rowName, 'edit')"
-                    ></b-form-checkbox>
-                  </b-td>
-                </b-tr>
-                <b-tr>
-                  <b-td colspan="4">
-                    <b-input-group>
-                      <b-form-input
-                        v-model="userId"
-                        placeholder="Enter user ID"
-                      ></b-form-input>
-                      <b-button variant="secondary" @click="addUserPermissionRow()">
-                        <span class="fas fa-plus mr-1"></span>
-                        User
-                      </b-button>
-                    </b-input-group>
-                  </b-td>
-                </b-tr>
-              </b-tbody>
-            </b-table-simple>
-          </div>
+        <b-tab v-if="viewAccess" title="Access">
+          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
+          <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
           <conditions-form :node="node" @changed="lockNode = $event" />
         </b-tab>
@@ -401,8 +337,15 @@
       <b-button size="sm" variant="secondary" @click="$emit('close-modal')">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="submitNode()">
-        Submit
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :class="accessSubmit ? '' : 'disabled'"
+        @click="submitNode()"
+      >
+        <b-spinner v-if="!accessSubmit"></b-spinner>
+        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -420,6 +363,7 @@ import GravityFormsApi from "../services/GravityFormsApi"
 import AccordionForm from "./node-modal/AccordionForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import { SlickList, SlickItem } from "vue-slicksort"
+import PermissionsTable from "./node-modal/PermissionsTable"
 
 export default {
   name: "node-modal",
@@ -431,6 +375,7 @@ export default {
     FileUpload,
     SlickItem,
     SlickList,
+    PermissionsTable,
   },
   props: {
     node: {
@@ -451,11 +396,6 @@ export default {
       type: String,
       required: false,
       default: "Node",
-    },
-    permissionsOrder: {
-      type: Array,
-      required: false,
-      default: () => [],
     },
   },
   data() {
@@ -483,10 +423,13 @@ export default {
       maxDescriptionLength: 250,
       addThumbnail: false,
       addLockedThumbnail: false,
+      videoUrlEntered: false,
+      videoSrc: null,
+      videoLoaded: true,
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode", "settings"]),
     hasSubAccordion() {
       const parents = this.getDirectParents(this.node.id)
       if (parents && parents[0]) {
@@ -528,6 +471,10 @@ export default {
           value: this.getMediaUrl(),
         },
         {
+          name: "mediaFormat",
+          value: this.nodeMediaFormat,
+        },
+        {
           name: "textContent",
           value: this.node.typeData && this.node.typeData.textContent,
         },
@@ -552,24 +499,46 @@ export default {
         { name: "fitWindow", value: this.node.fitWindow },
       ]
     },
-    newPermissions() {
-      const last = this.permissionsOrder[this.permissionsOrder.length - 1]
-      return [...this.node.permissions[last]]
+    viewAccess() {
+      return this.settings.showAccess === undefined
+        ? true
+        : this.settings.showAccess
+        ? true
+        : wpData.wpCanEditTapestry !== ""
     },
-    permissions() {
-      const ordered = {}
-      this.permissionsOrder.forEach(permission => {
-        ordered[permission] = this.node.permissions[permission]
-      })
-      return ordered
+    videoUrlYoutubeID() {
+      return this.videoUrlEntered
+        ? Helpers.getYoutubeID(this.node.typeData.mediaURL)
+        : ""
+    },
+    accessSubmit() {
+      // Locks access to submit button while youtube video loads to grab duration
+      return (
+        (this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
+        this.videoLoaded
+      )
+    },
+    nodeMediaFormat() {
+      if (this.nodeType === "h5p") {
+        return "h5p"
+      } else if (this.nodeType === "video") {
+        return this.videoUrlYoutubeID === "" ? "mp4" : "youtube"
+      }
+      return ""
     },
   },
   watch: {
-    selectedH5pContent() {
+    selectedH5pContent(newH5P) {
       this.node.typeData.mediaURL = this.getMediaUrl()
+      this.videoLoaded = newH5P === ""
     },
     selectedGravityFormContent(id) {
       this.node.typeData.mediaURL = id
+    },
+    videoSrc(newUrl) {
+      this.node.typeData.mediaURL = newUrl
+      this.videoLoaded = newUrl === ""
+      this.videoUrlEntered = true
     },
   },
   async mounted() {
@@ -600,6 +569,7 @@ export default {
           this.selectedGravityFormContent = selectedForm ? selectedForm.id : ""
         }
         this.selectedH5pContent = selectedContent ? selectedContent.id : ""
+        this.videoSrc = this.node.typeData.mediaURL
         this.lockNode = this.node.conditions && this.node.conditions.length > 0
         this.addThumbnail = this.node.imageURL.length > 0
         this.addLockedThumbnail = this.node.lockedImageURL.length > 0
@@ -631,63 +601,13 @@ export default {
       const adminAjaxUrl = wpData.adminAjaxUrl
       return `${adminAjaxUrl}?action=h5p_embed&id=${this.selectedH5pContent}`
     },
-    getPermissionRowIndex(rowName) {
-      return this.permissionsOrder.findIndex(thisRow => thisRow === rowName)
-    },
-    isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
-        return false
-      }
-
-      // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const higherRow = this.permissionsOrder[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
-      }
-
-      const permissions = this.node.permissions[higherRow]
-      if (permissions) {
-        return permissions.includes(type)
-      }
-      return false
-    },
-    changeIndividualPermission(value, rowName, type) {
-      let currentPermissions = this.node.permissions[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
-      let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
-        }
-      } else {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
-      }
-      this.$set(this.node.permissions, rowName, newPermissions)
-    },
-    updatePermissions(value, rowName, type) {
-      if (rowName.startsWith("user") || wpData.roles.hasOwnProperty(rowName)) {
-        return this.changeIndividualPermission(value, rowName, type)
-      }
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const lowerPriorityPermissions = this.permissionsOrder.slice(rowIndex + 1)
-      lowerPriorityPermissions.forEach(newRow => {
-        this.changeIndividualPermission(value, newRow, type)
-      })
-    },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
-      if (event === "video" || event === "h5p") {
-        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
-      } else {
-        this.$set(this.node, "mediaFormat", "")
-      }
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
       if (!this.formErrors.length) {
+        if (this.nodeMediaFormat === "mp4") this.setVideoDuration()
         if (this.modalType === "add-root-node") {
           this.$emit("add-edit-node", this.nodeData, false, true)
         } else if (this.modalType === "add-new-node") {
@@ -724,15 +644,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
-        }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -756,25 +670,34 @@ export default {
         )
       })
     },
-    addUserPermissionRow() {
-      const userId = this.userId
-      if (
-        userId &&
-        Helpers.onlyContainsDigits(userId) &&
-        $("#user-" + userId + "-editcell").val() != ""
-      ) {
-        this.$set(this.node.permissions, `user-${userId}`, this.newPermissions)
-        this.permissionsOrder.push(`user-${userId}`)
-        this.userId = null
-      } else {
-        alert("Enter valid user id")
-      }
-    },
     updateOrderingArray(arr) {
       this.updateOrdering({
         id: this.node.id,
         ord: arr,
       })
+    },
+    setVideoDuration() {
+      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
+    },
+    handleIframeload() {
+      // Set media duration if video is loaded
+      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
+      const h5pVideo = h5pFrame.instances[0].video
+      const handleH5PLoad = () => {
+        this.node.mediaDuration = h5pVideo.getDuration()
+        this.videoLoaded = true
+      }
+      if (h5pVideo.getDuration() !== undefined) {
+        handleH5PLoad()
+      } else {
+        h5pVideo.on("loaded", handleH5PLoad)
+      }
+    },
+    handleYouTubeload(event) {
+      // Set media duration and ID if youtube video loads
+      this.node.mediaDuration = event.target.getDuration()
+      this.node.typeData.youtubeID = this.videoUrlYoutubeID
+      this.videoLoaded = true
     },
   },
 }
@@ -872,8 +795,30 @@ table {
   }
 }
 
+#submit-button {
+  position: relative;
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
+}
+
+.duration-calculation-video-containers {
+  position: fixed;
+  left: 101vw;
+  width: 1px;
 }
 </style>

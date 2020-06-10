@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -22,9 +21,11 @@
       :node="node"
       :settings="h5pSettings"
       @complete="$emit('complete')"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
+      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateH5pSettings"
     />
   </div>
@@ -34,7 +35,6 @@
 import { mapActions, mapState } from "vuex"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
-import PlayScreen from "./PlayScreen"
 import H5PIframe from "./H5PIframe"
 import QuizScreen from "./QuizScreen"
 
@@ -45,10 +45,13 @@ export default {
     "h5p-iframe": H5PIframe,
     Loading,
     QuizScreen,
-    PlayScreen,
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    dimensions: {
       type: Object,
       required: true,
     },
@@ -87,10 +90,6 @@ export default {
     back() {
       this.showQuizScreen = false
       this.showEndScreen = true
-    },
-    play() {
-      this.showPlayScreen = false
-      this.$refs.h5pIframe.play()
     },
     handleLoad() {
       this.isLoading = false

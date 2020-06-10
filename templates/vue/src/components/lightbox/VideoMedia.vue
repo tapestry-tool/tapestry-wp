@@ -1,5 +1,10 @@
 <template>
-  <div :class="['video-container', { fullscreen: node.fullscreen }]">
+  <div
+    :class="[
+      'video-container',
+      { fullscreen: node.fullscreen, 'allow-scroll': showQuizScreen },
+    ]"
+  >
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
       v-if="showEndScreen"
@@ -110,11 +115,11 @@ export default {
     },
     play() {
       if (this.$refs.video) {
-        this.showPlayScreen = false
         this.$refs.video.play()
       }
     },
     rewatch() {
+      this.showPlayScreen = false
       this.showEndScreen = false
       if (this.$refs.video) {
         this.$refs.video.currentTime = 0
@@ -144,6 +149,8 @@ export default {
       return false
     },
     handlePlay(node) {
+      this.showPlayScreen = false
+      this.showEndScreen = false
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
@@ -154,6 +161,7 @@ export default {
       }
     },
     handlePause(node) {
+      this.showPlayScreen = true
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
