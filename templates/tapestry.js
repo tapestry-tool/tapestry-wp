@@ -1432,7 +1432,6 @@ function tapestryTool(config){
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("opacity", 0)
             .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
             .attr("x", d => -(tooltipWidth(d) / 2))
@@ -1483,38 +1482,30 @@ function tapestryTool(config){
             if (linkToDragStarted) {
                 linkToNode = thisNode;
             }
+
+            // Show unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                const pointer = this.querySelector("polygon.tooltip-pointer");
+                pointer.style.opacity = 1;
+                wrapper.style.display = "block";
+            }
+
         }).on("mouseout", function () {
 
             // Unmark this node as the node to link to
             if (linkToDragStarted) {
                 linkToNode = undefined;
             }
-        });
 
-        nodes
-            .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
-
-                // Place this node at the end of the svg so that it appears on top
-                $(this).insertAfter($(this).parent().children().last())
-
-                // Show unlock conditions tooltip
-                if (d.nodeType !== "grandchild") {
-                    const wrapper = this.querySelector(".tooltip-wrapper");
-                    const pointer = this.querySelector("polygon.tooltip-pointer");
-                    pointer.style.opacity = 1;
-                    wrapper.style.opacity = 1;
-                    wrapper.style.pointerEvents = "all";
-                }
-            })
-            .on("mouseleave", function () {
-                // Hide unlock conditions tooltip
+            // Hide unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
-                wrapper.style.opacity = 0;
-                wrapper.style.pointerEvents = "none";
-            })
+                wrapper.style.display = "none";
+            }
+        });
     }
 
     function getTooltipHtml(node) {
@@ -1523,7 +1514,8 @@ function tapestryTool(config){
 
         if (node.conditions.length === 0) {
             const listItem = document.createElement("li");
-            listItem.innerText = "When this parent is unlocked.";
+            const btn = createNodeButton(getParent(node))
+            listItem.innerHTML = `When ${btn} is unlocked.`;
             wrapper.appendChild(listItem);
         } else {
             node.conditions.forEach(cond => {
@@ -1555,6 +1547,9 @@ function tapestryTool(config){
     }
 
     function createNodeButton(node) {
+		if (!node) {
+			return "preceding content"
+		}
         return `<button class="button-node-tooltip" data-node=${node.id}>${node.title}</button>`
     }
 
