@@ -86,6 +86,7 @@
                 data-testid="node-videoUrl"
                 placeholder="Enter URL for MP4 or Youtube Video"
                 required
+                @isUploading="isUploading"
               />
             </b-form-group>
             <b-form-group v-show="nodeType === 'h5p'" label="H5P Content">
@@ -159,6 +160,7 @@
                 v-model="node.typeData.mediaURL"
                 data-testid="node-linkUrl"
                 placeholder="Enter embed link (starting with http)"
+                @isUploading="isUploading"
               />
             </b-form-group>
             <b-form-group v-if="node.mediaType === 'url-embed'" label="Behaviour">
@@ -195,6 +197,7 @@
                 v-model="node.imageURL"
                 data-testid="node-imageUrl"
                 placeholder="Enter the URL for the thumbnail"
+                @isUploading="isUploading"
               />
             </b-form-group>
             <b-form-group v-if="addThumbnail">
@@ -210,6 +213,7 @@
                 v-model="node.lockedImageURL"
                 data-testid="node-lockedImageURL"
                 placeholder="Enter the URL for the thumbnail"
+                @isUploading="isUploading"
               />
             </b-form-group>
             <b-form-group>
@@ -338,9 +342,10 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :class="accessSubmit ? '' : 'disabled'"
+        :disabled = !accessSubmit
         @click="submitNode()"
       >
+
         <b-spinner v-if="!accessSubmit"></b-spinner>
         <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
@@ -409,6 +414,7 @@ export default {
         { value: "accordion", text: "Accordion" },
       ],
       lockNode: false,
+      lockSubmit: false,
       gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
@@ -511,8 +517,8 @@ export default {
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
       return (
-        (this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
-        this.videoLoaded
+        ((this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
+        this.videoLoaded) && !this.lockSubmit
       )
     },
     nodeMediaFormat() {
@@ -600,6 +606,11 @@ export default {
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
+    },
+    isUploading(status) {
+      this.lockSubmit = status;
+      console.log("uploading status is now " + status);
+
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
