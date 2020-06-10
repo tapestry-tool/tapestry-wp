@@ -375,10 +375,26 @@ class Tapestry implements ITapestry
     public function setUnlocked($nodeIds, $userId = 0)
     {
         $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
+
+        $nodes = array_map(
+            function ($node) {
+                $tapestryNode = new TapestryNode($this->postId, $node->id);
+                if (TapestryUserRoles::isRole('copilot')) {
+                    if ($tapestryNode->isCopilotOnly()) {
+                        $node->userType = 'copilot';
+                    } else {
+                        $node->userType = 'teen';
+                    }
+                }
+                return $node;
+            },
+            $nodes
+        );
+
         return array_map(
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
-                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
+                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible || $nodeData->userType === 'teen' ? $node->get() : $node->getMeta();
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
