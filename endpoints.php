@@ -35,6 +35,7 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods'               => $REST_API_POST_METHOD,
             'callback'              => 'addTapestry',
+            'permission_callback'   => 'TapestryPermissions::postTapestry'
         ]
     ],
     'DELETE_TAPESTRY' => (object) [
