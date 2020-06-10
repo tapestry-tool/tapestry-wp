@@ -1,7 +1,7 @@
 <template>
   <div id="tyde">
     <tapestry />
-    <tyde-module v-if="showModule" :node-id="moduleId" @done="showModule = false" />
+    <tyde-module v-if="showModule" :node-id="moduleId" @done="closeModule" />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>
 </template>
@@ -30,6 +30,12 @@ export default {
       this.moduleId = evt.detail
       this.$store.commit("updateSelectedModule", this.moduleId)
     })
+  },
+  methods: {
+    closeModule() {
+      globals.recordAnalyticsEvent("app", "close", "module", this.moduleId)
+      this.showModule = false
+    },
   },
 }
 </script>

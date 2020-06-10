@@ -105,6 +105,20 @@
             </b-button>
           </b-row>
         </b-tab>
+        <b-tab title="Access">
+          <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
+          <permissions-table v-model="defaultPermissions" />
+          <b-form-group
+            label="Show Access Tab"
+            description="When shown, users will see the Access tab when adding or editing a node
+              and can change the permissions for each node that they add. Hiding the Access tab 
+              will hide it from all users except you, editors of this tapestry, and admins."
+          >
+            <b-form-checkbox v-model="showAccess" switch>
+              {{ showAccess ? "Show" : "Hide" }}
+            </b-form-checkbox>
+          </b-form-group>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -128,6 +142,17 @@ import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import Combobox from "../components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
+import PermissionsTable from "./node-modal/PermissionsTable"
+
+const defaultPermissions = Object.fromEntries(
+  [
+    "public",
+    "authenticated",
+    ...Object.keys(wpData.roles).filter(
+      role => role !== "administrator" && role !== "author"
+    ),
+  ].map(rowName => [rowName, ["read"]])
+)
 
 export default {
   name: "settings-modal",
@@ -136,6 +161,7 @@ export default {
     Combobox,
     SlickList,
     SlickItem,
+    PermissionsTable,
   },
   props: {
     wpCanEditTapestry: {
@@ -151,6 +177,9 @@ export default {
       nodeDraggable: true,
       spaceshipBackgroundUrl: "",
       profileActivities: [],
+      userId: "",
+      showAccess: true,
+      defaultPermissions,
     }
   },
   computed: {
@@ -159,6 +188,11 @@ export default {
     activities() {
       return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
     },
+  },
+  created() {
+    if (this.settings.defaultPermissions) {
+      this.defaultPermissions = this.settings.defaultPermissions
+    }
   },
   mounted() {
     window.addEventListener("open-settings-modal", this.openModal)
@@ -195,12 +229,16 @@ export default {
         nodeDraggable = true,
         spaceshipBackgroundUrl = "",
         profileActivities = [],
+        defaultPermissions = this.defaultPermissions,
+        showAccess = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
       this.profileActivities = profileActivities
+      this.defaultPermissions = defaultPermissions
+      this.showAccess = showAccess
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -209,6 +247,8 @@ export default {
         nodeDraggable: this.nodeDraggable,
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
         profileActivities: this.profileActivities,
+        defaultPermissions: this.defaultPermissions,
+        showAccess: this.showAccess,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)

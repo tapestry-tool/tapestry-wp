@@ -24,7 +24,7 @@ export default {
   props: {
     question: {
       type: Object,
-      required: false,
+      required: true,
     },
   },
 }

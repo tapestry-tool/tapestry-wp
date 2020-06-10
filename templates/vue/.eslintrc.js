@@ -40,6 +40,7 @@ module.exports = {
     wpPostId: "readonly",
     apiUrl: "readonly",
     thisTapestryTool: "readonly",
+    globals: "readonly",
   },
   env: {
     jquery: true,

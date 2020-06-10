@@ -4,102 +4,109 @@
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
     </header>
-    <div class="rows">
-      <accordion-row
-        v-for="(row, index) in rows"
-        :key="row.node.id"
-        ref="rowRefs"
-        :visible="index === activeIndex"
-      >
-        <template v-slot:trigger>
-          <div class="button-row">
-            <button
-              class="button-row-trigger"
-              :disabled="disableRow(index)"
-              @click="toggle(index)"
-            >
-              <div class="button-row-icon">
-                <i
-                  :class="index === activeIndex ? 'fas fa-minus' : 'fas fa-plus'"
-                ></i>
+    <tapestry-accordion :rows="rows">
+      <template v-slot="{ isVisible, hasNext, next, toggle }">
+        <div class="rows">
+          <div
+            v-for="(row, index) in rows"
+            :key="row.node.id"
+            ref="rowRefs"
+            class="accordion-row"
+          >
+            <div class="button-row">
+              <button
+                class="button-row-trigger"
+                :disabled="disableRow(index)"
+                @click="toggle(row)"
+              >
+                <div class="button-row-icon">
+                  <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
+                </div>
+                <div>
+                  <p class="button-row-title">{{ row.node.title }}</p>
+                  <p class="button-row-description">{{ row.node.description }}</p>
+                </div>
+              </button>
+              <div class="icon-container">
+                <tyde-icon
+                  v-if="showActivityIcon(row.node.mediaType)"
+                  class="icon icon-activity"
+                  icon="activity"
+                ></tyde-icon>
+                <tyde-icon
+                  v-if="row.node.completed"
+                  class="icon"
+                  icon="checkmark"
+                ></tyde-icon>
+                <tyde-icon
+                  v-if="disableRow(index)"
+                  class="icon"
+                  icon="lock"
+                ></tyde-icon>
+                <a
+                  v-if="!disableRow(index)"
+                  :disabled="readOnly"
+                  @click="toggleFavourite(row.node.id)"
+                >
+                  <i
+                    v-if="isFavourite(row.node.id)"
+                    class="fas fa-heart fa-lg"
+                    style="color:red;"
+                  ></i>
+                  <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
+                </a>
               </div>
-              <div>
-                <p class="button-row-title">{{ row.node.title }}</p>
-                <p class="button-row-description">{{ row.node.description }}</p>
-              </div>
-            </button>
-            <div class="icon-container">
-              <tyde-icon
-                v-if="showActivityIcon(row.node.mediaType)"
-                class="icon icon-activity"
-                icon="activity"
-              ></tyde-icon>
-              <tyde-icon
-                v-if="row.node.completed"
-                class="icon"
-                icon="checkmark"
-              ></tyde-icon>
-              <tyde-icon
-                v-if="disableRow(index)"
-                class="icon"
-                icon="lock"
-              ></tyde-icon>
-              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
-                <i
-                  v-if="isFavourite(row.node.id)"
-                  class="fas fa-heart fa-lg"
-                  style="color:red;"
-                ></i>
-                <i v-else class="fas fa-heart fa-lg" style="color:white;"></i>
-              </a>
             </div>
+            <div v-if="isVisible(row)" class="content">
+              <tapestry-media
+                :node-id="row.node.id"
+                :dimensions="dimensions"
+                :autoplay="false"
+                :read-only="readOnly"
+                style="margin-bottom: 24px;"
+                @complete="updateProgress(row.node.id)"
+                @close="toggle(row)"
+                @load="handleLoad($refs.rowRefs[index])"
+              />
+              <p v-if="row.children.length > 0" class="sub-accordion-text">
+                {{ row.node.typeData.subAccordionText }}
+              </p>
+              <sub-accordion
+                v-if="row.children.length > 0"
+                :rows="row.children"
+                :read-only="readOnly"
+                @load="handleLoad"
+              ></sub-accordion>
+            </div>
+            <button
+              v-if="row.node.completed && isVisible(row)"
+              class="mt-2"
+              @click="hasNext ? next() : (showCompletion = true)"
+            >
+              {{ node.typeData.finishButtonText }}
+            </button>
           </div>
-        </template>
-        <template v-slot:content>
-          <tapestry-media
-            :node-id="row.node.id"
-            :dimensions="dimensions"
-            :autoplay="false"
-            style="margin-bottom: 24px;"
-            @complete="updateProgress(row.node.id)"
-            @close="toggle(index)"
-            @load="handleLoad($refs.rowRefs[index].$el)"
-          />
-          <p v-if="row.children.length > 0" class="sub-accordion-text">
-            {{ row.node.typeData.subAccordionText }}
-          </p>
-          <sub-accordion
-            v-if="row.children.length > 0"
-            :dimensions="dimensions"
-            :rows="row.children"
-            @load="handleLoad"
-          ></sub-accordion>
-        </template>
-        <template v-slot:footer>
-          <button v-if="row.node.completed" class="mt-2" @click="next">
-            {{ node.typeData.finishButtonText }}
-          </button>
-        </template>
-      </accordion-row>
-    </div>
+        </div>
+      </template>
+    </tapestry-accordion>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
       :allow-close="false"
       :show-fav="false"
       :content-container-style="confirmationStyles"
-      @close="showCompletion = false"
+      @close="handleCancel"
     >
       <tyde-progress-bar
         v-if="moduleOpened"
         class="modal-progress"
-        :node-id="this.selectedModuleId"
+        :node-id="selectedModuleId"
       />
       <div class="button-container">
-        <button class="button-completion" @click="$emit('close')">
+        <button class="button-completion" @click="handleClose">
           {{ node.typeData.continueButtonText }}
         </button>
-        <button class="button-completion" @click="showCompletion = false">
+        <button class="button-completion" @click="handleCancel">
           {{ node.typeData.cancelLinkText }}
         </button>
       </div>
@@ -114,7 +121,7 @@
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
-import AccordionRow from "../AccordionRow"
+import TapestryAccordion from "../TapestryAccordion"
 import TydeProgressBar from "../tyde/TydeProgressBar"
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
@@ -127,7 +134,7 @@ export default {
   components: {
     TapestryMedia,
     TapestryModal,
-    AccordionRow,
+    TapestryAccordion,
     TydeIcon,
     TydeProgressBar,
     SubAccordion,
@@ -136,6 +143,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -146,7 +158,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
     ...mapState(["selectedModuleId"]),
     confirmationStyles() {
       return {
@@ -203,21 +215,24 @@ export default {
     moduleOpened() {
       return this.selectedModuleId !== null
     },
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
+          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: 0,
+          })
           this.$refs.container.scrollTop = 0
         } else {
+          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: el.offsetTop - 12,
+          })
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
@@ -225,22 +240,61 @@ export default {
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
+        globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          to: 0,
+        })
         el.scrollTop = 0
       }
     },
     toggle(index) {
       if (this.activeIndex === index) {
+        const activeRowId = this.rows[this.activeIndex].node.id
         this.activeIndex = -1
+        globals.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       } else {
         this.activeIndex = index
+        const activeRowId = this.rows[this.activeIndex].node.id
+        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       }
     },
-    next() {
+    next(evt) {
+      globals.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
       if (this.hasNext) {
         this.activeIndex++
+        const activeRowId = this.rows[this.activeIndex].node.id
+        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+          accordion: this.node.id,
+        })
       } else {
         this.showCompletion = true
       }
+    },
+    handleClose(evt) {
+      globals.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit("close")
+    },
+    handleCancel(evt) {
+      globals.recordAnalyticsEvent(
+        "user",
+        "close",
+        "accordion-completion-screen",
+        this.node.id,
+        {
+          x: evt.clientX,
+          y: evt.clientY,
+        }
+      )
+      this.showCompletion = false
     },
     disableRow(index) {
       if (this.node.userType === "teen") {
@@ -249,7 +303,7 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     async updateProgress(rowId) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         const { accordionProgress } = this.node
         if (!accordionProgress.includes(rowId)) {
           accordionProgress.push(rowId)
@@ -269,20 +323,6 @@ export default {
           }
         }
       }
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
     showActivityIcon(mediaType) {
       return mediaType === "gravity-form" || mediaType === "activity"
@@ -466,5 +506,25 @@ button[disabled] {
 
 .sub-accordion-text {
   margin-bottom: 0;
+}
+
+.accordion-row {
+  background: #643493;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    box-shadow: 4px 8px 8px rgba(0, 0, 0, 0.16);
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <button @click="$emit('click')">
+  <button @click="$emit('click', $event)">
     <div>
       <img :src="topic.imageURL" />
       <i v-if="topic.completed && showComplete" class="fas fa-check fa-3x"></i>
@@ -70,11 +70,8 @@ button {
     line-height: 1.3em;
     max-width: 200px;
     min-height: 2em;
-    text-shadow: 0px 0px 1px #1C0544,
-              1px 1px 1px #1C0544,
-              1px -1px 1px #1C0544,
-              -1px 1px 1px #1C0544,
-              -1px -1px 1px #1C0544;
+    text-shadow: 0px 0px 1px #1c0544, 1px 1px 1px #1c0544, 1px -1px 1px #1c0544,
+      -1px 1px 1px #1c0544, -1px -1px 1px #1c0544;
   }
 }
 </style>

@@ -48,12 +48,15 @@ export default {
   watch: {
     activeStage(newStage) {
       if (this.isLightboxOpen) {
+        globals.recordAnalyticsEvent("app", "close", "lightbox", newStage)
         this.closeLightbox()
       }
+      globals.recordAnalyticsEvent("app", "open", "lightbox", newStage)
       this.openLightbox(newStage)
     },
   },
   mounted() {
+    globals.recordAnalyticsEvent("app", "open", "lightbox", this.activeStage)
     this.openLightbox(this.activeStage)
   },
   methods: {
@@ -67,7 +70,12 @@ export default {
     next() {
       if (this.activeStageIndex < this.stages.length - 1) {
         this.activeStageIndex++
+        globals.recordAnalyticsEvent("app", "next", "stage", this.nodeId, {
+          from: this.activeStageIndex - 1,
+          to: this.activeStageIndex,
+        })
       } else {
+        globals.recordAnalyticsEvent("app", "open", "lightbox", this.nodeId)
         this.openLightbox(this.nodeId)
         this.$emit("done")
       }
@@ -75,6 +83,10 @@ export default {
     prev() {
       if (this.activeStageIndex > 0) {
         this.activeStageIndex--
+        globals.recordAnalyticsEvent("app", "prev", "stage", this.nodeId, {
+          from: this.activeStageIndex + 1,
+          to: this.activeStageIndex,
+        })
       }
     },
   },

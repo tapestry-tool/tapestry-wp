@@ -269,6 +269,13 @@ $REST_API_ENDPOINTS = [
             'methods'   => $REST_API_GET_METHOD,
             'callback'  => function() { wp_logout(); }
         ]
+    ],
+    'ANALYTICS' => (object) [
+        'ROUTE' => '/analytics',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_POST_METHOD,
+            'callback'  => 'saveAnalytics'
+        ]
     ]
 ];
 
@@ -286,6 +293,38 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function saveAnalytics($request)
+{
+    global $wpdb;
+    $body = json_decode($request->get_body());
+
+	$actor = $body->actor;
+	$action = $body->action;
+	$object = $body->object;
+	$user_guid = $body->user_guid;
+	$object_id = $body->object_id;
+	$details = $body->details;
+
+    $table_name = $wpdb->prefix . "tapestry_analytics_events";
+
+	$success = $wpdb->insert( 
+		$table_name, 
+		array( 
+			'actor' => $actor, 
+			'action' => $action, 
+			'object' => $object, 
+			'user_guid' => $user_guid, 
+			'object_id' => $object_id, 
+			'details' => $details
+		) 
+    );
+    
+    if (!$success) {
+        return new WP_Error('fail_add_analytics', 'Failed to save analytics data', array('status' => 500));
+    }
+    return new WP_REST_Response(null, 201);
 }
 
 function login($request)
