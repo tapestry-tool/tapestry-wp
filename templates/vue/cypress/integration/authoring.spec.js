@@ -120,7 +120,6 @@ describe("Authoring", () => {
           typeData: {
             url:
               "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-            duration: 15,
           },
         }
         cy.getNodeByIndex(0)
@@ -261,7 +260,7 @@ describe("Authoring", () => {
         },
       }
       cy.getNodeByIndex(0).editNode(newNode)
-      cy.getDOMNodeByIndex(0).click({ force: true })
+      cy.getDOMNodeByIndex(0).click()
       cy.get("#lightbox").should("exist")
     })
   })

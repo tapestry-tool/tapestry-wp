@@ -28,7 +28,7 @@ Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => 
 })
 
 Cypress.Commands.add("addTapestry", (body = {}) => {
-  cy.request({
+  return cy.request({
     url: `${API_URL}/tapestries`,
     body: { title: TEST_TAPESTRY_NAME, ...body },
     method: "POST",
@@ -36,7 +36,7 @@ Cypress.Commands.add("addTapestry", (body = {}) => {
 })
 
 Cypress.Commands.add("deleteTapestry", () => {
-  cy.request({
+  return cy.request({
     url: `${API_URL}/tapestries`,
     body: { title: TEST_TAPESTRY_NAME },
     method: "DELETE",

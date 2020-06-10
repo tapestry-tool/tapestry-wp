@@ -12,8 +12,7 @@ export const visitTapestry = (name = "empty") => {
   cy.get("#content")
 }
 
-export const openRootNodeModal = () =>
-  cy.get("#root-node-button > div").click({ force: true })
+export const openRootNodeModal = () => getByTestId("root-node-button").click()
 
 export const openAddNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
@@ -31,7 +30,7 @@ export const getModal = () => cy.get("#node-modal-container")
 
 export const submitModal = () => cy.contains("Submit").click({ force: true })
 
-export const getMediaButton = id => cy.get(`#mediaButton${id}`)
+export const getMediaButton = id => cy.get(`#mediaButton${id} > i`)
 
 export const getAddNodeButton = id => cy.get(`#addNodeIcon${id}`)
 
@@ -53,6 +52,8 @@ export const normalizeUrl = url => {
 }
 
 export const applyModalChanges = newNode => {
+  getModal().should("be.visible")
+
   const { appearance, mediaType, quiz, typeData, permissions, ...rest } = newNode
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
@@ -62,9 +63,9 @@ export const applyModalChanges = newNode => {
     switch (mediaType) {
       case "gravity-form": {
         getByTestId(`node-gravity-form-id`)
-          .click({ force: true })
+          .click()
           .within(() => {
-            cy.contains(typeData.id).click({ force: true })
+            cy.contains(typeData.id).click()
           })
         break
       }
@@ -87,9 +88,6 @@ export const applyModalChanges = newNode => {
         getByTestId(`node-videoUrl`)
           .clear()
           .type(typeData.url)
-        getByTestId(`node-videoDuration`)
-          .clear()
-          .type(typeData.duration)
         break
       }
       default:
@@ -104,12 +102,16 @@ export const applyModalChanges = newNode => {
   })
 
   if (appearance) {
-    cy.contains(/appearance/i).click({ force: true })
+    cy.contains(/appearance/i).click()
     Object.entries(appearance).forEach(([prop, value]) => {
       if (value) {
-        getByTestId(`node-appearance-${prop}`).check({ force: true })
+        getByTestId(`node-appearance-${prop}`)
+          .should("exist")
+          .check({ force: true })
       } else {
-        getByTestId(`node-appearance-${prop}`).uncheck({ force: true })
+        getByTestId(`node-appearance-${prop}`)
+          .should("exist")
+          .uncheck({ force: true })
       }
       if (prop === "thumbnail" && value) {
         const { url } = value
@@ -136,9 +138,9 @@ export const applyModalChanges = newNode => {
           getByTestId(`question-answer-${type}-${index}`).check()
         } else {
           getByTestId(`question-answer-${type}-${index}`)
-            .click({ force: true })
+            .click()
             .within(() => {
-              cy.contains(id).click({ force: true })
+              cy.contains(id).click()
             })
         }
       })
@@ -146,7 +148,7 @@ export const applyModalChanges = newNode => {
   }
 
   if (permissions) {
-    cy.contains(/access/i).click({ force: true })
+    cy.contains(/access/i).click()
     Object.entries(permissions).forEach(([role, allowedPermissions]) => {
       const permissionTypes = ["read", "add", "edit"]
       permissionTypes.forEach(type => {
