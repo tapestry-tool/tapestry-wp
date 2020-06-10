@@ -1,12 +1,13 @@
 <template>
   <div>
-    <b-form-group
-      class="mb-3"
-      description="Users who are not logged in won't be able to unlock this node."
-    >
+    <b-form-group class="mb-3">
       <b-form-checkbox v-model="lock" @change="$emit('changed', !lock)">
         Prevent access until specified conditions are met
       </b-form-checkbox>
+      <b-form-invalid-feedback :force-show="lock">
+        Please note: Currently, locked nodes cannot be unlocked by users who are not
+        logged in.
+      </b-form-invalid-feedback>
     </b-form-group>
     <div v-if="lock">
       <b-card
