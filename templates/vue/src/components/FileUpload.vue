@@ -101,7 +101,7 @@ export default {
           },
           onUploadProgress: progressEvent => {
             this.isUploading = true
-            this.$emit("isUploading", this.isUploading);
+            this.$emit("isUploading", this.isUploading)
             setTimeout(() => {
               this.uploadPercentage = parseInt(
                 Math.round((progressEvent.loaded / progressEvent.total) * 100)
@@ -120,7 +120,7 @@ export default {
       this.doneUploading = false
       this.isUploading = false
       this.uploadPercentage = 0
-      this.$emit("isUploading", this.isUploading);
+      this.$emit("isUploading", this.isUploading)
     },
   },
 }

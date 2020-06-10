@@ -342,10 +342,9 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled = !accessSubmit
+        :disabled="!accessSubmit"
         @click="submitNode()"
       >
-
         <b-spinner v-if="!accessSubmit"></b-spinner>
         <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
@@ -518,7 +517,8 @@ export default {
       // Locks access to submit button while youtube video loads to grab duration
       return (
         ((this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
-        this.videoLoaded) && !this.lockSubmit
+          this.videoLoaded) &&
+        !this.lockSubmit
       )
     },
     nodeMediaFormat() {
@@ -608,9 +608,8 @@ export default {
       this.$set(this.node, "mediaType", event)
     },
     isUploading(status) {
-      this.lockSubmit = status;
-      console.log("uploading status is now " + status);
-
+      this.lockSubmit = status
+      console.log("uploading status is now " + status)
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
