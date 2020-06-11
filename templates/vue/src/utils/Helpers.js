@@ -81,7 +81,7 @@ export default class Helpers {
   static getYoutubeID(url) {
     const linkRegex = /(?:youtube\.com\/\S*(?:(?:e(?:mbed))?\/|watch\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/
     const matchArray = url.match(linkRegex)
-    return matchArray === null ? "" : matchArray[1] // Returns '' if link is not youtube URL
+    return matchArray === null ? null : matchArray[1] // Returns '' if link is not youtube URL
   }
 
   /**
