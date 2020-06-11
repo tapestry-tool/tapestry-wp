@@ -1491,7 +1491,9 @@ function tapestryTool(config){
                 wrapper.style.display = "block";
             }
 
-        }).on("mouseout", function () {
+        })
+        
+        nodes.on("mouseout", function (thisNode) {
 
             // Unmark this node as the node to link to
             if (linkToDragStarted) {
