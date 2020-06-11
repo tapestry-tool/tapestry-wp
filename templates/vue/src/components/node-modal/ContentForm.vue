@@ -30,7 +30,12 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
-    <component :is="activeForm" v-if="activeForm" :node="node"></component>
+    <component
+      :is="activeForm"
+      v-if="activeForm"
+      :node="node"
+      @load="$emit('load')"
+    ></component>
   </div>
 </template>
 
