@@ -72,11 +72,11 @@
         id="save-button"
         size="sm"
         variant="primary"
-        :disabled="!accessSave"
+        :disabled="fileUploading"
         @click="updateSettings"
       >
-        <b-spinner v-if="!accessSave"></b-spinner>
-        <div :style="accessSave ? '' : 'opacity: 50%;'">Save</div>
+        <b-spinner v-if="fileUploading"></b-spinner>
+        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Save</div>
       </b-button>
     </template>
   </b-modal>
@@ -125,9 +125,6 @@ export default {
   },
   computed: {
     ...mapGetters(["settings", "tapestryJson"]),
-    accessSave() {
-      return !this.fileUploading
-    },
   },
   created() {
     if (this.settings.defaultPermissions) {
