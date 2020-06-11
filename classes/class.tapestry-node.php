@@ -2,6 +2,8 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry-user-progress.php";
+require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
@@ -221,6 +223,81 @@ class TapestryNode implements ITapestryNode
         }
     }
 
+    public function getLockedState($userId = 0)
+    {
+        $conditions = $this->conditions;
+        $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
+
+        foreach ($conditions as $condition) {
+            $condition->fulfilled = false;
+        }
+
+        foreach ($conditions as $condition) {
+            switch ($condition->type) {
+                case ConditionTypes::NODE_COMPLETED:
+                    if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                case ConditionTypes::DATE_NOT_PASSED:
+                    if (new DateTime() <= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                case ConditionTypes::DATE_PASSED:
+                    if (new DateTime() >= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $conditions;
+    }
+
+    public function isLocked($userId = 0)
+    {
+        $conditions = $this->getLockedState($userId);
+
+        $numFulfilled = 0;
+        foreach ($conditions as $condition) {
+            if ($condition->fulfilled) {
+                $numFulfilled++;
+            }
+        }
+
+        return $numFulfilled !== count($conditions);
+    }
+
+    public function getMeta()
+    {
+        $node = $this->get();
+        $node->quiz = [];
+        $node->typeData = (object) [
+            'progress' => [
+                0   => [
+                    'group' => 'viewed',
+                    'value' => 0
+                ],
+                1   => [
+                    'group' => 'unviewed',
+                    'value' => 1
+                ]
+            ]
+        ];
+        return $node;
+    }
+
+    public function getContent()
+    {
+        return [
+            'quiz'      => (array) $this->quiz,
+            'typeData'  => $this->typeData
+        ];
+    }
+
     private function _saveToDatabase()
     {
         $node = $this->_formNode();
@@ -360,9 +437,11 @@ class TapestryNode implements ITapestryNode
     private function _getAuthorInfo($id)
     {
         $user = get_user_by('id', $id);
-        return [
-            "id"    => $id,
-            "name"  => $user->display_name,
-        ];
+        if ($user) {
+            return [
+                "id"    => $id,
+                "name"  => $user->display_name,
+            ];
+        }
     }
 }
