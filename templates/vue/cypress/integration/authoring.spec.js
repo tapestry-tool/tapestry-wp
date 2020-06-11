@@ -95,6 +95,10 @@ describe("Authoring", () => {
       })
     })
 
+    it.only("Should work in headless mode", () => {
+      setup("@oneNode")
+    })
+
     describe("Media types", () => {
       beforeEach(() => {
         setup("@oneNode")
