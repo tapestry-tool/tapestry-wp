@@ -33,7 +33,8 @@
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
-import Helpers from "../utils/Helpers"
+import Helpers from "@/utils/Helpers"
+import { sizes } from "@/utils/constants"
 import { mapActions, mapGetters, mapState } from "vuex"
 
 export default {
@@ -101,7 +102,6 @@ export default {
       return styles
     },
     lightboxDimensions() {
-      const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
       if (!this.node) {
         return {}
       }
@@ -133,7 +133,7 @@ export default {
         videoHeight *= resizeRatio
       }
 
-      const nodeSpace = NORMAL_RADIUS * 2 * 1.3
+      const nodeSpace = sizes.NODE_RADIUS * 2 * 1.3
       const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
       const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
 

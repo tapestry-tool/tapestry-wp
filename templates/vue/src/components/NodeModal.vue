@@ -103,6 +103,7 @@ import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import Helpers from "@/utils/Helpers"
+import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 
 const shouldFetch = (url, selectedNode) => {
@@ -292,12 +293,9 @@ export default {
       }
     },
     updateNodeCoordinates() {
-      const NORMAL_RADIUS = 140
-      const ROOT_RADIUS_DIFF = 70
-
       if (this.modalType === "add" && this.parent) {
         this.node.coordinates.x =
-          this.parent.x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
+          this.parent.x + (sizes.NODE_RADIUS_SELECTED) * 2 + 50
         this.node.coordinates.y = this.parent.y
       }
     },
