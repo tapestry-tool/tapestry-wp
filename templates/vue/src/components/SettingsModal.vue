@@ -12,8 +12,8 @@
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
-              @isUploading="isUploading"
               autofocus
+              @isUploading="isUploading"
             />
           </b-form-group>
           <b-form-group
@@ -62,8 +62,15 @@
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings" :disabled="!accessSave">
-        Save
+      <b-button
+        id="save-button"
+        size="sm"
+        variant="primary"
+        :disabled="!accessSave"
+        @click="updateSettings"
+      >
+        <b-spinner v-if="!accessSave"></b-spinner>
+        <div :style="accessSave ? '' : 'opacity: 50%;'">Save</div>
       </b-button>
     </template>
   </b-modal>
@@ -105,13 +112,13 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
-      lockSave: false,
+      fileUploading: false,
     }
   },
   computed: {
     ...mapGetters(["settings"]),
     accessSave() {
-      return !this.lockSave;
+      return !this.fileUploading
     },
   },
   created() {
@@ -162,10 +169,26 @@ export default {
       location.reload()
     },
     isUploading(status) {
-      this.lockSave = status
+      this.fileUploading = status
     },
   },
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+#save-button {
+  position: relative;
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 27%;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+</style>

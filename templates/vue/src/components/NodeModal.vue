@@ -413,7 +413,7 @@ export default {
         { value: "accordion", text: "Accordion" },
       ],
       lockNode: false,
-      lockSubmit: false,
+      fileUploading: false,
       gravityFormExists: false,
       gravityFormOptions: [],
       h5pContentOptions: [],
@@ -518,7 +518,7 @@ export default {
       return (
         ((this.nodeMediaFormat !== "youtube" && this.nodeMediaFormat !== "h5p") ||
           this.videoLoaded) &&
-        !this.lockSubmit
+        !this.fileUploading
       )
     },
     nodeMediaFormat() {
@@ -614,7 +614,7 @@ export default {
       this.videoSrc = ""
     },
     isUploading(status) {
-      this.lockSubmit = status
+      this.fileUploading = status
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
