@@ -101,7 +101,7 @@ export default class {
   async getUserProgress() {
     const url = `${apiUrl}/users/progress?post_id=${this.postId}`
     const response = await axios.get(url)
-    return JSON.parse(response.data)
+    return response.data
   }
 
   async updateUserProgress(id, progressValue) {
