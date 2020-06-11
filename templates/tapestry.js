@@ -2294,7 +2294,7 @@ function tapestryTool(config){
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
                 const willLock = node.unlocked && !progressObj[id].unlocked
-                if (willLock) {
+                if (willLock && !wpCanEditTapestry) {
                     node.quiz = []
                     node.typeData = {
                         progress: node.typeData.progress
