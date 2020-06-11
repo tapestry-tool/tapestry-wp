@@ -686,6 +686,10 @@ export default {
       // Set media duration if video is loaded
       const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
       const h5pVideo = h5pFrame.instances[0].video
+      if (!h5pVideo) {
+        this.videoLoaded = true
+        return
+      }
       const handleH5PLoad = () => {
         this.node.mediaDuration = h5pVideo.getDuration()
         this.videoLoaded = true
