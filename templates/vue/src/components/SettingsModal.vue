@@ -12,6 +12,7 @@
               id="background-url"
               v-model="backgroundUrl"
               placeholder="Enter background URL"
+              @isUploading="isUploading"
               autofocus
             />
           </b-form-group>
@@ -42,7 +43,7 @@
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
-              and can change the permissions for each node that they add. Hiding the Access tab 
+              and can change the permissions for each node that they add. Hiding the Access tab
               will hide it from all users except you, editors of this tapestry, and admins."
           >
             <b-form-checkbox v-model="showAccess" switch>
@@ -61,7 +62,7 @@
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings">
+      <b-button size="sm" variant="primary" @click="updateSettings" :disabled="!accessSave">
         Save
       </b-button>
     </template>
@@ -104,10 +105,14 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      lockSave: false,
     }
   },
   computed: {
     ...mapGetters(["settings"]),
+    accessSave() {
+      return !this.lockSave;
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -155,6 +160,10 @@ export default {
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
+    },
+    isUploading(status) {
+      this.lockSave = status;
+      console.log("lockSave status is " + status);
     },
   },
 }

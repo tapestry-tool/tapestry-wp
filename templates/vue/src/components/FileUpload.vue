@@ -114,13 +114,13 @@ export default {
         })
         .then(response => {
           this.$emit("input", response.data.data.url)
+          this.$emit("isUploading", false)
         })
     },
     reset() {
       this.doneUploading = false
       this.isUploading = false
       this.uploadPercentage = 0
-      this.$emit("isUploading", this.isUploading)
     },
   },
 }
