@@ -37,6 +37,12 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab title="Advanced">
+          <b-button block variant="light" @click="exportTapestry">
+            Export Tapestry
+          </b-button>
+          <duplicate-tapestry-button style="margin-top: 12px;" />
+        </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
           <permissions-table v-model="defaultPermissions" />
@@ -79,6 +85,7 @@
 <script>
 import { mapGetters } from "vuex"
 import FileUpload from "./FileUpload"
+import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
 const defaultPermissions = Object.fromEntries(
@@ -95,6 +102,7 @@ export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    DuplicateTapestryButton,
     PermissionsTable,
   },
   props: {
@@ -116,7 +124,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings"]),
+    ...mapGetters(["settings", "tapestryJson"]),
     accessSave() {
       return !this.fileUploading
     },
@@ -170,6 +178,21 @@ export default {
     },
     isUploading(status) {
       this.fileUploading = status
+    },
+    exportTapestry() {
+      const tapestry = this.tapestryJson
+      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+        type: "application/json",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = `${this.settings.title}.json`
+      document.body.appendChild(a)
+      a.click()
+      URL.revokeObjectURL(fileUrl)
+      document.body.removeChild(a)
     },
   },
 }

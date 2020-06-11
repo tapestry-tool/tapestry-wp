@@ -32,10 +32,11 @@ export default {
       const numberCompleted = this.node.quiz.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.quiz.length
-      this.updateNodeProgress({ id: this.node.id, progress })
-      if (progress === 1) {
-        this.$emit("complete")
-      }
+      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
+        if (progress === 1) {
+          this.$emit("complete")
+        }
+      })
     },
   },
 }
