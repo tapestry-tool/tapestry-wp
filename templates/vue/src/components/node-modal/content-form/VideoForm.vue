@@ -5,7 +5,7 @@
         id="node-video-media-url"
         v-model="node.typeData.mediaURL"
         data-testid="node-videoUrl"
-        placeholder="Enter URL for MP4 Video"
+        placeholder="Enter URL for MP4 or YouTube video"
         required
       />
     </b-form-group>
@@ -61,9 +61,11 @@ export default {
   methods: {
     setYouTubeDuration(evt) {
       this.node.mediaDuration = evt.target.getDuration()
+      this.$emit("load")
     },
     setVideoDuration() {
       this.node.mediaDuration = this.$refs.video.duration
+      this.$emit("load")
     },
   },
 }
