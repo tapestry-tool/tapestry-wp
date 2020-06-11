@@ -11,7 +11,7 @@
         <tyde-button
           class="close-button"
           icon="times"
-          @click="$emit('close')"
+          @click="handleClick($event, 'close')"
         ></tyde-button>
       </div>
       <section>
@@ -22,19 +22,19 @@
           :topic="topic"
           :show-complete="true"
           style="align-self: flex-start;"
-          @click="openLightbox(topic.id)"
+          @click="openTopic($event, topic.id)"
         />
       </section>
       <footer>
         <tyde-button
           :disabled="!stageIndex"
           label="Prev"
-          @click="$emit(stageIndex ? 'prev' : '')"
+          @click="handleClick($event, 'prev')"
         ></tyde-button>
         <tyde-button
           :disabled="!done"
           label="Next"
-          @click="$emit(done ? 'next' : '')"
+          @click="handleClick($event, 'next')"
         ></tyde-button>
       </footer>
     </div>
@@ -142,11 +142,23 @@ export default {
       }
       return {}
     },
+    openTopic(evt, id) {
+      globals.recordAnalyticsEvent("user", "click", "topic", id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.openLightbox(id)
+    },
     openLightbox(id) {
+      globals.recordAnalyticsEvent("user", "open", "topic", id)
       this.$router.push(`/nodes/${id}`)
     },
-    closeLightbox() {
-      this.$router.push(`/`)
+    handleClick(evt, type) {
+      globals.recordAnalyticsEvent("user", "click", `stage-${type}-button`, null, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit(type)
     },
   },
 }
@@ -199,19 +211,11 @@ body.tapestry-stage-open {
     h1 {
       font-family: inherit;
       font-size: 3.2em;
-      text-shadow: 0px 0px 1px #1C0544,
-                  1px 1px 1px #1C0544,
-                  1px -1px 1px #1C0544,
-                  -1px 1px 1px #1C0544,
-                  -1px -1px 1px #1C0544,
-                  2px 1px 1px #1C0544,
-                  2px -1px 1px #1C0544,
-                  -2px 1px 1px #1C0544,
-                  -2px -2px 1px #1C0544,
-                  1px 2px 1px #1C0544,
-                  1px -2px 1px #1C0544,
-                  -1px 2px 1px #1C0544,
-                  2px 2px 1px #1C0544;
+      text-shadow: 0px 0px 1px #1c0544, 1px 1px 1px #1c0544, 1px -1px 1px #1c0544,
+        -1px 1px 1px #1c0544, -1px -1px 1px #1c0544, 2px 1px 1px #1c0544,
+        2px -1px 1px #1c0544, -2px 1px 1px #1c0544, -2px -2px 1px #1c0544,
+        1px 2px 1px #1c0544, 1px -2px 1px #1c0544, -1px 2px 1px #1c0544,
+        2px 2px 1px #1c0544;
 
       &::before {
         display: none;

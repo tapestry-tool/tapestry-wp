@@ -2,7 +2,7 @@
   <button
     :class="['tyde-button', { 'has-label': label.length > 0 }]"
     :style="cssProps"
-    @click="$emit('click')"
+    @click="$emit('click', $event)"
   >
     <i v-if="icon.length" :class="iconClass"></i>
     <slot></slot>

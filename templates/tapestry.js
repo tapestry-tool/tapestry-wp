@@ -326,7 +326,7 @@ function tapestryTool(config){
         
             // Attach the link line to the tapestry SVG (it won't appear for now)
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
-            recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
+            recordAnalyticsEvent('app', 'load', 'tapestry', config.wpPostId);
         }
 
         if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
@@ -447,6 +447,7 @@ function tapestryTool(config){
 
             // Every time the slider's value is changed, do the following
             tapestryDepthSlider.onchange = function() {
+                globals.recordAnalyticsEvent('user', 'change', 'depth-slider', null, { from: tapestryDepth, to: this.value })
                 tapestryDepth = this.value;
                 updateDepthMessage();
             
@@ -1094,26 +1095,27 @@ function tapestryTool(config){
             }
         });
     }
-    
-    /* Draws the components that make up node */
-    function buildNodeContents() {
-        const handleClick = d => {
-            if (root === d.id && d.hideMedia) {
-                if (config.wpCanEditTapestry || d.accessible) {
-                    if (d.tydeType === "Module") {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'start-module',
-                                { detail: d.id }
-                            )
+
+    function handleClick(d) {
+        if (root === d.id && d.hideMedia) {
+            if (config.wpCanEditTapestry || d.accessible) {
+                if (d.tydeType === "Module") {
+                    recordAnalyticsEvent('user', 'click', 'module', d.id, { x: d3.event.x, y: d3.event.y })
+                    dispatchEvent(
+                        new CustomEvent(
+                            'start-module',
+                            { detail: d.id }
                         )
-                    } else {
-                        goToNode(d.id)
-                    }
+                    )
+                } else {
+                    goToNode(d.id)
                 }
             }
         }
-        
+    }
+    
+    /* Draws the components that make up node */
+    function buildNodeContents() {
         if (tapestryDepth) {
             tapestryDepthSlider.max = findMaxDepth(root) + 1;
         }
@@ -1411,7 +1413,7 @@ function tapestryTool(config){
                 .on("end", dragended)
             )
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         if (!isMultiSelect) {
@@ -1427,7 +1429,7 @@ function tapestryTool(config){
         else {
             nodes
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
                         tapestry.selectNode(d.id);
@@ -1826,13 +1828,7 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            })
+            .on("click keydown", handleClick)
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
@@ -2900,55 +2896,6 @@ function screenToSVG(screenX, screenY) {
     return p.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-/****************************************************
- * ANALYTICS FUNCTIONS
- ****************************************************/
-
-var analyticsAJAXUrl = '',  // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
-    analyticsAJAXAction = 'tapestry_tool_log_event';// Analytics
-
-function recordAnalyticsEvent(actor, action, object, objectID, details){
-
-    if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length)
-        return false;
-
-    // TODO: Also need to save the tapestry slug or ID in the events
-
-    var userUUID = Cookies.get("user-uuid");
-    if (userUUID === undefined) {
-        userUUID = createUUID();
-        Cookies.set("user-uuid", userUUID);
-    }
-
-    if (details === undefined) {
-        details = {};
-    }
-
-    details['user-ip'] = $('#user-ip').text();
-
-    var data = {
-        'action': analyticsAJAXAction,
-        'actor': actor,
-        'action2': action,
-        'object': object,
-        'user_guid': userUUID,
-        'object_id': objectID,
-        'details': JSON.stringify(details),
-    };
-
-    // Send the event to an AJAX URL to be saved
-    jQuery.post(analyticsAJAXUrl, data, function(response) {
-        // Event posted
-    });
-}
-
-function createUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
 function isEmptyObject(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -2956,18 +2903,3 @@ function isEmptyObject(obj) {
     }
     return true;
 }
-
-// Capture click events anywhere inside or outside tapestry
-$(document).ready(function(){
-    document.body.addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'screen', null, {'x': x, 'y': y});
-    }, true);
-
-    document.getElementById('tapestry').addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'tapestry', null, {'x': x, 'y': y});
-    }, true);
-});
