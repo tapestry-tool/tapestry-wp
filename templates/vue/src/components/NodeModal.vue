@@ -606,10 +606,15 @@ export default {
     },
     handleTypeChange(event) {
       this.$set(this.node, "mediaType", event)
+      if (event === "video" || event === "h5p") {
+        this.$set(this.node, "mediaFormat", event === "video" ? "mp4" : "h5p")
+      } else {
+        this.$set(this.node, "mediaFormat", "")
+      }
+      this.videoSrc = ""
     },
     isUploading(status) {
       this.lockSubmit = status
-      console.log("uploading status is now " + status)
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)

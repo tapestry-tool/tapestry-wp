@@ -162,8 +162,7 @@ export default {
       location.reload()
     },
     isUploading(status) {
-      this.lockSave = status;
-      console.log("lockSave status is " + status);
+      this.lockSave = status
     },
   },
 }
