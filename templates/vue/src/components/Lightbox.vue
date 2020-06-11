@@ -176,10 +176,9 @@ export default {
     thisTapestryTool.enableMovements()
   },
   methods: {
-    ...mapActions(["completeNode", "updateMayUnlockNodes"]),
+    ...mapActions(["completeNode"]),
     complete() {
       this.completeNode(this.nodeId)
-      this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
       this.$router.go(-1)

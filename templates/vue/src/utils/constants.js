@@ -6,5 +6,5 @@ export const conditionTypes = {
 
 export const sizes = {
   NODE_RADIUS: 140,
-  NODE_RADIUS_SELECTED: 210
+  NODE_RADIUS_SELECTED: 210,
 }
