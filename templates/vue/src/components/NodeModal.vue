@@ -827,6 +827,7 @@ export default {
       } else {
         this.$set(this.node, "mediaFormat", "")
       }
+      this.videoSrc = ""
     },
     submitNode() {
       this.formErrors = this.validateNode(this.nodeData)
