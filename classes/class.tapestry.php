@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
 
 /**
  * Add/update/retrieve a Tapestry
- * 
+ *
  */
 class Tapestry implements ITapestry
 {
@@ -23,9 +23,9 @@ class Tapestry implements ITapestry
 
     /**
      * Constructor
-     * 
+     *
      * @param   Number  $postId post ID
-     * 
+     *
      * @return  NULL
      */
     public function __construct($postId = 0)
@@ -51,7 +51,7 @@ class Tapestry implements ITapestry
 
     /**
      * Save the Tapestry
-     * 
+     *
      * @return  Object  $tapestry
      */
     public function save()
@@ -62,7 +62,7 @@ class Tapestry implements ITapestry
 
     /**
      * Save the Tapestry automatically on publish
-     * 
+     *
      * @return  Object  $tapestry
      */
     public function saveOnPublish()
@@ -73,7 +73,7 @@ class Tapestry implements ITapestry
 
     /**
      * Set Tapestry
-     * 
+     *
      * @param   Object  $tapestry  tapestry
      *
      * @return  NULL
@@ -99,7 +99,7 @@ class Tapestry implements ITapestry
 
     /**
      * Retrieve a Tapestry post
-     * 
+     *
      * @return  Object  $tapestry
      */
     public function get()
@@ -112,7 +112,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get node IDs
-     * 
+     *
      * @return  Array  $nodes  node ids
      */
     public function getNodeIds()
@@ -123,12 +123,11 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
-
     /**
      * Add a new node
-     * 
+     *
      * @param   Object  $node   Tapestry node
-     * 
+     *
      * @return  Object  $node   Tapestry node
      */
     public function addNode($node)
@@ -198,9 +197,9 @@ class Tapestry implements ITapestry
 
     /**
      * Add a new link
-     * 
+     *
      * @param  Object   $link   Tapestry link
-     * 
+     *
      * @return  Object  $link   Tapestry link
      */
     public function addLink($link)
@@ -212,9 +211,9 @@ class Tapestry implements ITapestry
 
     /**
      * Delete a link from links array
-     * 
+     *
      * @param  Integer $linkIndex Link Index
-     * 
+     *
      * @return Array   $links     Tapestry links
      */
     public function removeLink($linkIndex)
@@ -226,9 +225,9 @@ class Tapestry implements ITapestry
 
     /**
      * Add a new group
-     * 
+     *
      * @param   Object  $group   Tapestry group
-     * 
+     *
      * @return  Object  $group   Tapestry group
      */
     public function addGroup($group)
@@ -244,7 +243,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get the node controller with associated node meta ID
-     * 
+     *
      * @param   Number  $nodeMetaId node meta ID
      *
      * @return  Object  $node       node controller
@@ -256,7 +255,7 @@ class Tapestry implements ITapestry
 
     /**
      * Get the group controller with associated group meta ID
-     * 
+     *
      * @param   Number  $groupMetaId    group meta ID
      *
      * @return  Object  $group          group controller
@@ -276,6 +275,87 @@ class Tapestry implements ITapestry
         return empty($this->rootId);
     }
 
+    public function setUnlocked($nodeIds, $userId = 0)
+    {
+        $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
+        return array_map(
+            function ($nodeData) {
+                $node = new TapestryNode($this->postId, $nodeData->id);
+                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
+                $data->accessible = $nodeData->accessible;
+                $data->conditions = $nodeData->conditions;
+                $data->unlocked = $nodeData->unlocked;
+                return $data;
+            },
+            $nodes
+        );
+    }
+
+    private function _setAccessibleStatus($nodes, $userId)
+    {
+        $newNodes = array_map(
+            function ($nodeId) use ($userId) {
+                $node = new TapestryNode($this->postId, $nodeId);
+                $data = new stdClass();
+                $data->id = $nodeId;
+                $data->accessible = false;
+                $data->unlocked = !$node->isLocked($userId);
+                $data->conditions = $node->getLockedState($userId);
+                return $data;
+            },
+            $nodes
+        );
+        if (count($newNodes)) {
+            $this->_recursivelySetAccessible($newNodes[0], array(), $newNodes);
+        }
+        return $newNodes;
+    }
+
+    private function _recursivelySetAccessible($node, $visited, $nodeList)
+    {
+        if (!in_array($node, $visited)) {
+            array_push($visited, $node);
+        }
+        $node->accessible = $node->unlocked;
+        if ($node->accessible) {
+            $neighbourIds = $this->_getNeighbours($node);
+
+            $neighbours = array_map(
+                function ($nodeId) use ($nodeList) {
+                    foreach ($nodeList as $otherNode) {
+                        if ($otherNode->id === $nodeId) {
+                            return $otherNode;
+                        }
+                    }
+                },
+                $neighbourIds
+            );
+
+            foreach ($neighbours as $neighbour) {
+                if (!in_array($neighbour, $visited)) {
+                    array_push($visited, $neighbour);
+                    $this->_recursivelySetAccessible($neighbour, $visited, $nodeList);
+                }
+            }
+        }
+    }
+
+    private function _getNeighbours($node)
+    {
+        $neighbourIds = array();
+
+        foreach ($this->links as $link) {
+            if ($link->source === $node->id || $link->target === $node->id) {
+                array_push(
+                    $neighbourIds,
+                    $link->source === $node->id ? $link->target : $link->source
+                );
+            }
+        }
+
+        return $neighbourIds;
+    }
+
     private function _loadFromDatabase()
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
@@ -285,7 +365,7 @@ class Tapestry implements ITapestry
                 'links' => [],
                 'groups' => [],
                 'rootId' => 0,
-                'settings' => (object) []
+                'settings' => (object) [],
             ];
         }
         return $tapestry;
@@ -303,11 +383,11 @@ class Tapestry implements ITapestry
     private function _formTapestry()
     {
         return (object) [
-            'nodes'     => $this->nodes,
-            'groups'    => $this->groups,
-            'links'     => $this->links,
-            'settings'  => $this->settings,
-            'rootId'    => $this->rootId
+            'nodes' => $this->nodes,
+            'groups' => $this->groups,
+            'links' => $this->links,
+            'settings' => $this->settings,
+            'rootId' => $this->rootId,
         ];
     }
 
@@ -328,8 +408,8 @@ class Tapestry implements ITapestry
     private function _resetAuthor()
     {
         wp_update_post(array(
-            'ID'            => $this->postId,
-            'post_author'   => $this->author
+            'ID' => $this->postId,
+            'post_author' => $this->author,
         ));
     }
 
@@ -337,13 +417,7 @@ class Tapestry implements ITapestry
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry());
 
-        $tapestry->nodes = array_map(
-            function ($nodeMetaId) {
-                $tapestryNode = new TapestryNode($this->postId, $nodeMetaId);
-                return $tapestryNode->get();
-            },
-            $tapestry->nodes
-        );
+        $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
 
         $tapestry->groups = array_map(
             function ($groupMetaId) {
@@ -415,11 +489,11 @@ class Tapestry implements ITapestry
             $checked[] = $from;
 
             foreach ($this->links as $link) {
-                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) || 
+                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) ||
                     ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked))) {
                     return true;
                 }
-            }   
+            }
         }
 
         return false;
