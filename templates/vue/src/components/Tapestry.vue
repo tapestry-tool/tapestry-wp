@@ -13,7 +13,7 @@
       </div>
     </div>
     <node-modal
-      :parent="parentNode"
+      :parent-id="parentId"
       :node-id="nodeId"
       :modal-type="modalType"
       @cancel="closeModal"
@@ -43,19 +43,19 @@ export default {
     return {
       tapestryLoaded: false,
       modalType: "",
-      parentNode: null,
+      parentId: null,
       nodeId: null,
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry"]),
+    ...mapGetters(["selectedNode", "tapestry", "getDirectParents"]),
     wpCanEditTapestry: function() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
   },
   watch: {
     selectedNode() {
-      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
+      this.parentId = this.getDirectParents(this.selectedNode)[0]
     },
   },
   async created() {
@@ -98,13 +98,13 @@ export default {
       this.$bvModal.show("node-modal")
     },
     addNewNode() {
-      this.parentNode = this.selectedNode
+      this.parentId = this.selectedNode.id
       this.modalType = "add"
       this.nodeId = this.selectedNode.id
       this.$bvModal.show("node-modal")
     },
     editNode() {
-      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
+      this.parentId = this.getDirectParents(this.selectedNode.id)[0]
       this.modalType = "edit"
       this.nodeId = this.selectedNode.id
       this.$bvModal.show("node-modal")

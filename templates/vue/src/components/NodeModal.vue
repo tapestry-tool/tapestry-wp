@@ -267,10 +267,10 @@ export default {
       required: false,
       default: null,
     },
-    parent: {
-      type: Object,
+    parentId: {
+      type: Number,
       required: false,
-      default: () => ({}),
+      default: null,
     },
     modalType: {
       type: String,
@@ -299,6 +299,9 @@ export default {
       "getNode",
       "settings",
     ]),
+    parent() {
+      return this.getNode(this.parentId)
+    },
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -679,5 +682,19 @@ table {
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
+}
+
+#submit-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
+  }
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 </style>
