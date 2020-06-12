@@ -72,7 +72,8 @@ export default {
     },
     parent: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   data() {
