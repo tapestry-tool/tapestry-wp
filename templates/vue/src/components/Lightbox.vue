@@ -101,7 +101,6 @@ export default {
       return styles
     },
     lightboxDimensions() {
-      const NORMAL_RADIUS = 140 // TODO: Refactor this to "constants" folder
       if (!this.node) {
         return {}
       }
@@ -133,9 +132,8 @@ export default {
         videoHeight *= resizeRatio
       }
 
-      const nodeSpace = NORMAL_RADIUS * 2 * 1.3
-      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
-      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
+      const adjustedVideoHeight = Math.min(videoHeight, browserHeight)
+      const adjustedVideoWidth = Math.min(videoWidth, browserWidth)
 
       const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
       const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
@@ -176,10 +174,9 @@ export default {
     thisTapestryTool.enableMovements()
   },
   methods: {
-    ...mapActions(["completeNode", "updateMayUnlockNodes"]),
+    ...mapActions(["completeNode"]),
     complete() {
       this.completeNode(this.nodeId)
-      this.updateMayUnlockNodes(this.nodeId)
     },
     close() {
       this.$router.go(-1)
