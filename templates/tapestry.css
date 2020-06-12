@@ -69,7 +69,7 @@ body {
     margin: 40px 10% 20px;
     margin-top: 0;
     padding: 10px 16px;
-    float: right;
+    float: left;
     width: auto;
 	background: #fbfbfb;
     box-shadow: 0 0 7px 0 #DDD;
@@ -80,7 +80,7 @@ body {
 @media (min-width:1000px) {
 	#tapestry-controls-wrapper {
 		position: absolute;
-		right: 0;
+		left: 0;
 	}
 }
 #tapestry-controls-wrapper > * {
