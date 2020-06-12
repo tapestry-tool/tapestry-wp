@@ -53,6 +53,7 @@ export default {
   watch: {
     mediaUrl(val) {
       this.node.typeData.mediaURL = val
+      this.$emit("unload")
     },
   },
   mounted() {
@@ -85,6 +86,8 @@ export default {
             h5pVideo.on("loaded", handleH5PLoad)
           }
           return
+        } else {
+          this.node.mediaDuration = 0
         }
       }
       this.$emit("load")

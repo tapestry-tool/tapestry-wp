@@ -35,6 +35,7 @@
       v-if="activeForm"
       :node="node"
       @load="$emit('load')"
+      @unload="$emit('unload')"
     ></component>
   </div>
 </template>
