@@ -116,10 +116,9 @@ export default {
           this.$emit("input", response.data.data.url)
         })
         .finally(() => {
-          this.isUploading = false;
-          this.$emit("isUploading", this.isUploading);
-        }
-        )
+          this.isUploading = false
+          this.$emit("isUploading", this.isUploading)
+        })
     },
     reset() {
       this.doneUploading = false
