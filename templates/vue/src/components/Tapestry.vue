@@ -313,10 +313,8 @@ export default {
               newNodeEntry["mediaType"] = "text"
             } else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video"
-              newNodeEntry["mediaFormat"] = "mp4"
             } else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video"
-              newNodeEntry["mediaFormat"] = "h5p"
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"

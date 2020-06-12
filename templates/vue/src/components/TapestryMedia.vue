@@ -5,7 +5,9 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
-          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
+          node.mediaFormat === 'mp4' ||
+          node.mediaFormat === 'h5p' ||
+          node.mediaFormat === 'youtube'
       },
     ]"
     :style="containerStyles"
@@ -20,9 +22,19 @@
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
-      :allow-end-screen="allowEndScreen"
       :dimensions="dimensions"
-      :read-only="readOnly"
+      :allow-end-screen="allowEndScreen"
+      @load="handleLoad"
+      @complete="complete"
+      @timeupdate="updateProgress"
+      @close="$emit('close')"
+    />
+    <youtube-media
+      v-if="node.mediaFormat === 'youtube'"
+      :autoplay="autoplay"
+      :node="node"
+      :dimensions="dimensions"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -85,6 +97,7 @@ import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
 import Helpers from "@/utils/Helpers"
+import YoutubeMedia from "./lightbox/YoutubeMedia"
 
 const SAVE_INTERVAL = 5
 
@@ -99,6 +112,7 @@ export default {
     WpPostMedia,
     CompletionScreen,
     QuizMedia,
+    YoutubeMedia,
   },
   props: {
     nodeId: {
@@ -180,13 +194,14 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
-
-  &-embed {
-    background: white;
-  }
+  padding: 0;
 
   &-no-scroll {
     overflow: hidden;
+  }
+
+  &-embed {
+    background: white;
   }
 }
 </style>
