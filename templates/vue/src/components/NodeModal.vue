@@ -17,7 +17,11 @@
     <b-container v-if="ready" fluid class="px-0">
       <b-tabs card>
         <b-tab title="Content" active>
-          <content-form :node="node" @load="videoLoaded = true" />
+          <content-form
+            :node="node"
+            @load="videoLoaded = true"
+            @unload="videoLoaded = false"
+          />
         </b-tab>
         <b-tab title="Appearance">
           <appearance-form :node="node" />
@@ -191,22 +195,12 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    videoUrlYoutubeID() {
-      return this.videoUrlEntered
-        ? Helpers.getYoutubeID(this.node.typeData.mediaURL)
-        : ""
-    },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
-      return this.node.mediaType !== "video" || this.videoLoaded
-    },
-    nodeMediaFormat() {
-      if (this.nodeType === "h5p") {
-        return "h5p"
-      } else if (this.nodeType === "video") {
-        return this.videoUrlYoutubeID === "" ? "mp4" : "youtube"
-      }
-      return ""
+      return (
+        (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
+        this.videoLoaded
+      )
     },
   },
   created() {
@@ -379,29 +373,6 @@ export default {
         id: this.node.id,
         ord: arr,
       })
-    },
-    setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
-    },
-    handleIframeload() {
-      // Set media duration if video is loaded
-      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
-      const h5pVideo = h5pFrame.instances[0].video
-      const handleH5PLoad = () => {
-        this.node.mediaDuration = h5pVideo.getDuration()
-        this.videoLoaded = true
-      }
-      if (h5pVideo.getDuration() !== undefined) {
-        handleH5PLoad()
-      } else {
-        h5pVideo.on("loaded", handleH5PLoad)
-      }
-    },
-    handleYouTubeload(event) {
-      // Set media duration and ID if youtube video loads
-      this.node.mediaDuration = event.target.getDuration()
-      this.node.typeData.youtubeID = this.videoUrlYoutubeID
-      this.videoLoaded = true
     },
   },
 }

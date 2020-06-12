@@ -88,6 +88,11 @@ export default {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
   },
+  watch: {
+    activeForm() {
+      this.$emit("unload")
+    },
+  },
   mounted() {
     GravityFormsApi.exists().then(exists => {
       this.mediaTypes.push({
