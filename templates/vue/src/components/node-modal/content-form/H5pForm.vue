@@ -84,8 +84,10 @@ export default {
           } else {
             h5pVideo.on("loaded", handleH5PLoad)
           }
+          return
         }
       }
+      this.$emit("load")
     },
   },
 }
