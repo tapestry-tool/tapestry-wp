@@ -497,10 +497,4 @@ table {
   border-left: solid 2px #ccc;
   padding-left: 1em;
 }
-
-.duration-calculation-video-containers {
-  position: fixed;
-  left: 101vw;
-  width: 1px;
-}
 </style>
