@@ -1833,10 +1833,8 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video') {
-                    if (d.mediaDuration) {
-                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
-                    }
+                if (d.mediaDuration) {
+                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 }
                 return base;
                 });
