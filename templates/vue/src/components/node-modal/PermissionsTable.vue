@@ -29,7 +29,7 @@
                 v-model="userId"
                 placeholder="Enter user ID"
               ></b-form-input>
-              <b-button variant="secondary" @click="addUserPermissionRow()">
+              <b-button variant="secondary" @click="addUserPermissionRow">
                 <span class="fas fa-plus mr-1"></span>
                 User
               </b-button>
@@ -101,14 +101,15 @@ export default {
         const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
         lowerPriorityPermissions.forEach(newRow => {
           const key = `${newRow[0]}-${type}`
-          this.addedByUser.delete(key)
+          isChecked ? this.addedByUser.add(key) : this.addedByUser.delete(key)
           this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
         })
       }
     },
     updatePermissions(isChecked, rowName, type) {
-      const newPermissions = { ...this.value }
+      const newPermissions = Object.fromEntries(this.permissions)
       this.changeIndividualPermission(isChecked, rowName, type, newPermissions)
+      this.cascade(isChecked, rowName, type, newPermissions)
 
       if (type === "add" || type === "edit") {
         const currentPermissions = newPermissions[rowName]
@@ -129,13 +130,12 @@ export default {
         }
       }
 
-      this.cascade(isChecked, rowName, type, newPermissions)
       this.$emit("input", newPermissions)
     },
     isPermissionDisabled(rowName, type) {
       const currentPermissions = this.permissions[
         this.getPermissionRowIndex(rowName)
-      ]
+      ][1]
       if (
         currentPermissions.includes("add") ||
         currentPermissions.includes("edit")
