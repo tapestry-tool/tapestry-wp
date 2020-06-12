@@ -388,15 +388,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
-        }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -425,6 +419,33 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    setVideoDuration() {
+      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
+    },
+    handleIframeload() {
+      // Set media duration if video is loaded
+      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
+      const h5pVideo = h5pFrame.instances[0].video
+      if (!h5pVideo) {
+        this.videoLoaded = true
+        return
+      }
+      const handleH5PLoad = () => {
+        this.node.mediaDuration = h5pVideo.getDuration()
+        this.videoLoaded = true
+      }
+      if (h5pVideo.getDuration() !== undefined) {
+        handleH5PLoad()
+      } else {
+        h5pVideo.on("loaded", handleH5PLoad)
+      }
+    },
+    handleYouTubeload(event) {
+      // Set media duration and ID if youtube video loads
+      this.node.mediaDuration = event.target.getDuration()
+      this.node.typeData.youtubeID = this.videoUrlYoutubeID
+      this.videoLoaded = true
     },
   },
 }
@@ -501,6 +522,16 @@ table {
     }
   }
 
+  #submit-button {
+    position: relative;
+    > span {
+      position: absolute;
+      height: 1.5em;
+      width: 1.5em;
+      left: 33%;
+    }
+  }
+
   .slick-list-item {
     display: flex;
     height: 25px;
@@ -549,6 +580,11 @@ table {
   }
   > span:last-of-type {
     margin-left: auto;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
   }
 }
 
