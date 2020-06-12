@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group label="Video URL">
+    <b-form-group :label="videoLabel">
       <file-upload
         id="node-video-media-url"
         v-model="node.typeData.mediaURL"
@@ -8,6 +8,9 @@
         placeholder="Enter URL for MP4 or YouTube video"
         required
       />
+      <b-form-text v-if="showVideoDescription">
+        This video should not include any screenshots of the stage layout.
+      </b-form-text>
     </b-form-group>
     <div>
       <video
@@ -31,6 +34,7 @@
 <script>
 import FileUpload from "@/components/FileUpload"
 import Helpers from "@/utils/Helpers"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   components: {
@@ -45,6 +49,19 @@ export default {
   computed: {
     youtubeId() {
       return Helpers.getYoutubeID(this.node.typeData.mediaURL)
+    },
+    showVideoDescription() {
+      return (
+        this.node.tydeType === tydeTypes.STAGE ||
+        this.node.tydeType === tydeTypes.MODULE
+      )
+    },
+    videoLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage Video URL",
+        [tydeTypes.MODULE]: "Module Completion Video URL",
+      }
+      return labels[this.node.tydeType] || "Video URL"
     },
   },
   watch: {

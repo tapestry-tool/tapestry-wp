@@ -19,6 +19,7 @@
         <b-tab title="Content" active>
           <content-form
             :node="node"
+            :parent="parent"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
           />
@@ -302,26 +303,6 @@ export default {
     parent() {
       return this.getNode(this.parentId)
     },
-    videoLabel() {
-      const labels = {
-        [tydeTypes.STAGE]: "Pre-Stage Video URL",
-        [tydeTypes.MODULE]: "Module Completion Video URL",
-      }
-      return labels[this.node.tydeType] || "Video URL"
-    },
-    h5pLabel() {
-      const labels = {
-        [tydeTypes.STAGE]: "Pre-Stage H5P Content",
-        [tydeTypes.MODULE]: "Module Completion H5P Content",
-      }
-      return labels[this.node.tydeType] || "H5P Content"
-    },
-    showVideoDescription() {
-      return (
-        this.node.tydeType === tydeTypes.STAGE ||
-        this.node.tydeType === tydeTypes.MODULE
-      )
-    },
     hasChildren() {
       if (this.modalType === "edit-node") {
         return this.getDirectChildren(this.node.id).length > 0
@@ -398,7 +379,7 @@ export default {
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     setInitialTydeType() {
       // only set node types if adding a new node
-      if (this.parent && this.modalType === "add-new-node") {
+      if (this.parent && this.modalType === "add") {
         const parentType = this.parent.tydeType
         this.node.tydeType =
           parentType === tydeTypes.MODULE

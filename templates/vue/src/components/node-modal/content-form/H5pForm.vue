@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group label="H5P Content">
+    <b-form-group :label="h5pLabel">
       <combobox
         v-model="selectedId"
         item-text="title"
@@ -15,6 +15,9 @@
           </p>
         </template>
       </combobox>
+      <b-form-text v-if="showVideoDescription">
+        This H5P should not include any screenshots of the stage layout.
+      </b-form-text>
     </b-form-group>
     <iframe
       ref="frame"
@@ -28,6 +31,7 @@
 <script>
 import Combobox from "@/components/Combobox"
 import H5PApi from "@/services/H5PApi"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   components: {
@@ -46,8 +50,21 @@ export default {
     }
   },
   computed: {
+    h5pLabel() {
+      const labels = {
+        [tydeTypes.STAGE]: "Pre-Stage H5P Content",
+        [tydeTypes.MODULE]: "Module Completion H5P Content",
+      }
+      return labels[this.node.tydeType] || "H5P Content"
+    },
     mediaUrl() {
       return `${wpData.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
+    },
+    showVideoDescription() {
+      return (
+        this.node.tydeType === tydeTypes.STAGE ||
+        this.node.tydeType === tydeTypes.MODULE
+      )
     },
   },
   watch: {
