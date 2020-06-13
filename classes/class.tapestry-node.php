@@ -392,6 +392,9 @@ class TapestryNode implements ITapestryNode
 
     private function _getAuthorInfo($id)
     {
+        if (!$id) {
+            $id = 1;
+        }
         $user = get_user_by('id', $id);
         return [
             "id"    => $id,
