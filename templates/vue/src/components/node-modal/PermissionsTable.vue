@@ -14,9 +14,11 @@
           <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
           <b-td v-for="type in types" :key="type" class="text-center">
             <b-form-checkbox
-              :checked="permissionsList"
-              :value="type"
-              :disabled="isPermissionDisabled(rowName, type)"
+              :checked="
+                permissionsList.includes(type) ||
+                  isPermissionOverridden(rowName, type)
+              "
+              :disabled="isPermissionOverridden(rowName, type)"
               :data-testid="`node-permissions-${rowName}-${type}`"
               @change="updatePermissions($event, rowName, type)"
             ></b-form-checkbox>
@@ -132,10 +134,11 @@ export default {
 
       this.$emit("input", newPermissions)
     },
-    isPermissionDisabled(rowName, type) {
+    isPermissionOverridden(rowName, type) {
       const currentPermissions = this.permissions[
         this.getPermissionRowIndex(rowName)
       ][1]
+
       if (
         currentPermissions.includes("add") ||
         currentPermissions.includes("edit")
@@ -143,7 +146,7 @@ export default {
         return type === "read"
       }
 
-      // If the row is the first in order, it should never be disabled
+      // If the row is the first in order, it should never be overridden
       if (rowName === PERMISSIONS_ORDER[0]) {
         return false
       }
@@ -152,7 +155,7 @@ export default {
       const rowIndex = this.getPermissionRowIndex(rowName)
       const [higherRow, permissions] = this.permissions[rowIndex - 1]
       if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
+        return this.isPermissionOverridden(higherRow, type)
       }
       if (permissions) {
         return permissions.includes(type)
@@ -210,7 +213,7 @@ export default {
       if (rowName === "public" || rowName === "authenticated") {
         return true
       }
-      return this.isPermissionDisabled(rowName, type)
+      return this.isPermissionOverridden(rowName, type)
     },
   },
 }
