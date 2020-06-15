@@ -39,6 +39,9 @@
 import { mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 
+const INTERSECTION_THRESHOLD = 0.5
+const PADDING_OFFSET = 48
+
 export default {
   components: {
     TapestryIcon,
@@ -63,6 +66,7 @@ export default {
         const tapestryContainer = document.getElementById("tapestry")
         if (isClosed) {
           tapestryContainer.classList.remove("sidebar-open")
+          this.active = null
         } else {
           tapestryContainer.classList.add("sidebar-open")
         }
@@ -71,7 +75,7 @@ export default {
   },
   mounted() {
     const observer = new IntersectionObserver(this.handleObserve, {
-      threshold: 0.5,
+      threshold: INTERSECTION_THRESHOLD,
     })
     observer.observe(this.$refs.info)
     observer.observe(this.$refs.copyright)
@@ -79,14 +83,14 @@ export default {
   methods: {
     handleObserve(entries) {
       entries.forEach(entry => {
-        if (entry.intersectionRatio > 0.5) {
+        if (entry.intersectionRatio > INTERSECTION_THRESHOLD) {
           this.active = entry.target.dataset.name
         }
       })
     },
     scrollToRef(refName) {
       const el = this.$refs[refName]
-      this.$refs.content.scroll(0, el.offsetTop - 48)
+      this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
     },
   },
 }
