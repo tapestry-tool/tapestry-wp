@@ -1,3 +1,6 @@
 package-lock.json
 .DS_Store
 docker/wp-config.php
+templates/e2e/cypress.json
+templates/e2e/cypress/screenshots/
+templates/e2e/cypress/videos/
