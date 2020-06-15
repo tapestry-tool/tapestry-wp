@@ -1,10 +1,10 @@
 {
   "env": {
     "ENV": "TYDE",
-    "ADMIN_USERNAME": "liam",
-    "ADMIN_PASSWORD": "root",
-    "SUBSCRIBER_USERNAME": "liam2",
-    "SUBSCRIBER_PASSWORD": "root"
-  },
-  "baseUrl": "http://localhost:8888"
+    "ADMIN_USERNAME": "admin_name",
+    "ADMIN_PASSWORD": "admin_password",
+    "SUBSCRIBER_USERNAME": "subscriber_name",
+    "SUBSCRIBER_PASSWORD": "subscriber_password"
+  }
 }
+
