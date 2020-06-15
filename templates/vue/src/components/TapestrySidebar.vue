@@ -1,6 +1,6 @@
 <template>
-  <aside :class="['sidebar', { closed: isClosed }]" @click="isClosed = !isClosed">
-    <div class="sidebar-preview">
+  <div class="wrapper">
+    <div class="sidebar-preview" @click="isClosed = false">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
         @click.stop="scrollToRef('info')"
@@ -14,25 +14,33 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
+      <button
+        :class="['close-button', { closed: isClosed }]"
+        @click.stop="isClosed = true"
+      >
+        <tapestry-icon icon="chevron-down" />
+      </button>
     </div>
-    <div ref="content" class="sidebar-content">
-      <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
-      <section>
-        <h4 class="content-separator">About</h4>
-        <p class="content-description">{{ node.description }}</p>
-      </section>
-      <section ref="copyright" data-name="copyright">
-        <section v-if="node.license">
-          <h4 class="content-separator">Copyright</h4>
-          <p class="content-description">{{ node.license }}</p>
+    <aside :class="['sidebar', { closed: isClosed }]">
+      <div ref="content" class="sidebar-content">
+        <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
+        <section>
+          <h4 class="content-separator">About</h4>
+          <p class="content-description">{{ node.description }}</p>
         </section>
-        <section v-if="node.references">
-          <h4 class="content-separator">References</h4>
-          <p class="content-description">{{ node.references }}</p>
+        <section ref="copyright" data-name="copyright">
+          <section v-if="node.license">
+            <h4 class="content-separator">Copyright</h4>
+            <p class="content-description">{{ node.license }}</p>
+          </section>
+          <section v-if="node.references">
+            <h4 class="content-separator">References</h4>
+            <p class="content-description">{{ node.references }}</p>
+          </section>
         </section>
-      </section>
-    </div>
-  </aside>
+      </div>
+    </aside>
+  </div>
 </template>
 
 <script>
@@ -89,19 +97,33 @@ export default {
       })
     },
     scrollToRef(refName) {
-      const el = this.$refs[refName]
-      this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+      if (this.isClosed) {
+        this.isClosed = false
+      }
+      this.$nextTick(() => {
+        const el = this.$refs[refName]
+        this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+      })
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+$sm-breakpoint: 400px;
+$md-breakpoint: 960px;
+$lg-breakpoint: 1280px;
+$button-width: 4em;
+
+.wrapper {
+  z-index: 0;
+}
+
 .anchor-button {
   padding: 0;
   background: 0;
-  width: 100%;
-  height: 2em;
+  height: 100%;
+  width: $button-width;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,50 +138,87 @@ export default {
   }
 }
 
+.close-button {
+  padding: 0;
+  background: var(--gray);
+  position: absolute;
+  right: 0.5em;
+  bottom: calc($button-width + 0.5em);
+  width: 2.5em;
+  height: 2.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  &.closed {
+    display: none;
+  }
+}
+
 .sidebar {
   background: white;
   color: inherit;
-  display: grid;
-  grid-template-columns: 2.5em 1fr;
   height: 100vh;
-  min-width: 300px;
+  padding-bottom: $button-width;
   position: fixed;
   right: 0;
   top: 0;
-  transform: translateX(0);
+  transform: translateY(0);
   transition: all 0.2s ease-out;
-  width: 30vw;
-  max-width: 400px;
-  font-size: calc(14px + (2 * (100vw - 960px) / 320));
+  width: 100vw;
+  font-size: 14px;
+  z-index: 0;
 
   &.closed {
     cursor: pointer;
-    transform: translateX(calc(100% - 40px));
+    transform: translateY(100%);
   }
 
-  @media screen and (max-width: 960px) {
-    font-size: 14px;
+  @media screen and (min-width: $sm-breakpoint) {
+    min-width: 300px;
+    width: 30vw;
+    max-width: 400px;
+    transform: translateX(0);
+    display: grid;
+    grid-template-columns: $button-width 1fr;
+
+    &.closed {
+      transform: translateX(calc(100% - $button-width));
+    }
   }
 
-  @media screen and (min-width: 1280px) {
+  @media screen and (min-width: $md-breakpoint) {
+    font-size: calc(
+      14px + (2 * (100vw - $md-breakpoint) / $lg-breakpoint - $md-breakpoint)
+    );
+  }
+
+  @media screen and (min-width: $lg-breakpoint) {
     font-size: 16px;
   }
 }
 
 .sidebar-preview {
   background: var(--gray);
-  padding: 32px 0;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 2.5em;
+  z-index: 10;
 
   i {
     display: block;
     text-align: left;
   }
 
-  .preview-title {
-    display: block;
-    margin-top: 1em;
-    transform: translateX(8px) rotate(90deg);
-    transform-origin: left center;
+  @media screen and (min-width: $sm-breakpoint) {
+    position: relative;
+    padding: 32px 0;
   }
 }
 
