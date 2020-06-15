@@ -15,9 +15,12 @@ body {
     transition: all 0.2s ease-out;
 }
 
-#tapestry.sidebar-open {
-    transform: scale(0.7);
+@media screen and (min-width: 500px) {
+    #tapestry.sidebar-open {
+        transform: scale(0.7);
+    }
 }
+
 
 #header {
     position: fixed;

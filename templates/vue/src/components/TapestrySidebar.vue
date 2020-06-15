@@ -110,7 +110,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$sm-breakpoint: 400px;
+$sm-breakpoint: 500px;
 $md-breakpoint: 960px;
 $lg-breakpoint: 1280px;
 $button-width: 4em;
@@ -123,11 +123,11 @@ $button-width: 4em;
   padding: 0;
   background: 0;
   height: 100%;
-  width: $button-width;
+  width: 2.5em;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4em;
+  font-size: 2em;
 
   &:hover {
     background: var(--teal);
@@ -142,8 +142,8 @@ $button-width: 4em;
   padding: 0;
   background: var(--gray);
   position: absolute;
-  right: 0.5em;
-  bottom: calc($button-width + 0.5em);
+  right: 1em;
+  bottom: 5em;
   width: 2.5em;
   height: 2.5em;
   display: flex;
@@ -208,7 +208,7 @@ $button-width: 4em;
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: 2.5em;
+  height: $button-width;
   z-index: 10;
 
   i {
