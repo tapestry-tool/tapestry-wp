@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    container_name: db
+
+  wordpress:
+    depends_on:
+      - db
+    build: .
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+     - ../../:/var/www/html/wp-content/plugins
+    container_name: wp
+    
+  dev:
+    depends_on:
+      - db
+    build:
+      context: ../templates/vue
+      target: 'develop-stage'
+    restart: always
+    ports:
+      - '8080:8080'
+    volumes: 
+      - ../templates/vue:/app
+      - node_modules:/app/node_modules
+    command: npm run dev:container
+    container_name: app
+
+  e2e:
+    image: "cypress/included:4.8.0"
+    depends_on: 
+      - dev
+      - wordpress
+    links:
+      - wordpress
+    environment:
+      - CYPRESS_baseUrl=http://host.docker.internal:8000
+    volumes: 
+      - ../templates/e2e:/e2e
+    working_dir: /e2e
+    container_name: cypress
+
+volumes:
+    db_data:
+    node_modules:

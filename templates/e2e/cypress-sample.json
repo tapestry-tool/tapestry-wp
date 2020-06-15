@@ -1,0 +1,10 @@
+{
+  "env": {
+    "ENV": "TYDE",
+    "ADMIN_USERNAME": "liam",
+    "ADMIN_PASSWORD": "root",
+    "SUBSCRIBER_USERNAME": "liam2",
+    "SUBSCRIBER_PASSWORD": "root"
+  },
+  "baseUrl": "http://localhost:8888"
+}
