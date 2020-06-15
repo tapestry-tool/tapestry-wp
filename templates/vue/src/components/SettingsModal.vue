@@ -105,6 +105,12 @@
             </b-button>
           </b-row>
         </b-tab>
+        <b-tab title="Advanced">
+          <b-button block variant="light" @click="exportTapestry">
+            Export Tapestry
+          </b-button>
+          <duplicate-tapestry-button style="margin-top: 12px;" />
+        </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
           <permissions-table v-model="defaultPermissions" />
@@ -118,6 +124,9 @@
               {{ showAccess ? "Show" : "Hide" }}
             </b-form-checkbox>
           </b-form-group>
+        </b-tab>
+        <b-tab title="Advanced">
+          <b-button @click="exportTapestry">Export Tapestry</b-button>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -142,6 +151,7 @@ import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import Combobox from "../components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
+import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 
 const defaultPermissions = Object.fromEntries(
@@ -161,6 +171,7 @@ export default {
     Combobox,
     SlickList,
     SlickItem,
+    DuplicateTapestryButton,
     PermissionsTable,
   },
   props: {
@@ -183,8 +194,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
-    ...mapGetters(["settings"]),
+    ...mapState(["nodes", "settings"]),
+    ...mapGetters(["tapestryJson"]),
     activities() {
       return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
     },
@@ -255,6 +266,21 @@ export default {
       // this.$emit("settings-updated", settings);
       // this.closeModal();
       location.reload()
+    },
+    exportTapestry() {
+      const tapestry = this.tapestryJson
+      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+        type: "application/json",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = `${this.settings.title}.json`
+      document.body.appendChild(a)
+      a.click()
+      URL.revokeObjectURL(fileUrl)
+      document.body.removeChild(a)
     },
   },
 }

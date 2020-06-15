@@ -177,8 +177,6 @@ export default {
       })
     },
     handleLoad() {
-      this.$emit("is-loaded")
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
@@ -278,6 +276,7 @@ export default {
           h5pVideo.on("loaded", handleH5pAfterLoad)
         }
       }
+      this.$emit("is-loaded")
     },
     toggleMuteIcon() {
       const body = this.$refs.h5p.contentWindow.H5P.$body[0]
