@@ -16,18 +16,12 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group
-      label="H5P Video Duration"
-      description="This only applies to video H5P content"
-    >
-      <b-form-input
-        id="node-h5p-media-duration"
-        v-model="node.mediaDuration"
-        data-testid="node-h5pDuration"
-        placeholder="Enter duration (in seconds)"
-        required
-      />
-    </b-form-group>
+    <iframe
+      ref="frame"
+      class="duration-calculator"
+      :src="mediaUrl"
+      @load="handleLoad"
+    ></iframe>
   </div>
 </template>
 
@@ -59,6 +53,7 @@ export default {
   watch: {
     mediaUrl(val) {
       this.node.typeData.mediaURL = val
+      this.$emit("unload")
     },
   },
   mounted() {
@@ -73,5 +68,38 @@ export default {
       }
     })
   },
+  methods: {
+    handleLoad() {
+      const h5p = this.$refs.frame.contentWindow.H5P
+      if (h5p) {
+        const instance = h5p.instances[0]
+        const libraryName = instance.libraryInfo.machineName
+        if (libraryName === "H5P.InteractiveVideo") {
+          const h5pVideo = instance.video
+          const handleH5PLoad = () => {
+            this.node.mediaDuration = parseInt(h5pVideo.getDuration())
+            this.$emit("load")
+          }
+          if (h5pVideo.getDuration() !== undefined) {
+            handleH5PLoad()
+          } else {
+            h5pVideo.on("loaded", handleH5PLoad)
+          }
+          return
+        } else {
+          this.node.mediaDuration = 0
+        }
+      }
+      this.$emit("load")
+    },
+  },
 }
 </script>
+
+<style lang="scss" scoped>
+.duration-calculator {
+  position: fixed;
+  left: 101vw;
+  width: 1px;
+}
+</style>

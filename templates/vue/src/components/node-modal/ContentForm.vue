@@ -30,7 +30,13 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
-    <component :is="activeForm" v-if="activeForm" :node="node"></component>
+    <component
+      :is="activeForm"
+      v-if="activeForm"
+      :node="node"
+      @load="$emit('load')"
+      @unload="$emit('unload')"
+    ></component>
   </div>
 </template>
 
@@ -81,6 +87,11 @@ export default {
     ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
+    },
+  },
+  watch: {
+    activeForm() {
+      this.$emit("unload")
     },
   },
   mounted() {
