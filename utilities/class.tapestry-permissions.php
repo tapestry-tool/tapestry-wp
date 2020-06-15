@@ -13,6 +13,10 @@ class TapestryPermissions
      */
     public static function postTapestry()
     {
+        global $TAPESTRY_USE_DEV_MODE;
+        if ($TAPESTRY_USE_DEV_MODE) {
+            return true;
+        }
         return current_user_can('publish_posts');
     }
 

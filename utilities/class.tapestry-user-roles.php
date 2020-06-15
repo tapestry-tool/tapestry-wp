@@ -4,6 +4,13 @@
  */
 class TapestryUserRoles
 {
+    static function canEdit($postId = 0)
+    {
+        return TapestryUserRoles::isEditor()
+        || TapestryUserRoles::isAdministrator()
+        || TapestryUserRoles::isAuthorOfThePost($postId);
+    }
+
     /**
      * Check if the current user is a particular role
      *

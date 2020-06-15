@@ -33,9 +33,10 @@ $REST_API_ENDPOINTS = [
     'POST_TAPESTRY' => (object) [
         'ROUTE' => '/tapestries',
         'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'addTapestry',
-        ],
+            'methods'               => $REST_API_POST_METHOD,
+            'callback'              => 'addTapestry',
+            'permission_callback'   => 'TapestryPermissions::postTapestry'
+        ]
     ],
     'DELETE_TAPESTRY' => (object) [
         'ROUTE' => '/tapestries',
@@ -43,6 +44,20 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_DELETE_METHOD,
             'callback' => 'deleteTapestry',
         ],
+    ],
+    'GET_TAPESTRY' => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'   => $REST_API_GET_METHOD,
+            'callback'  => 'getTapestry'
+        ]
+    ],
+    'PUT_TAPESTRY'  => (object) [
+        'ROUTE'     => '/tapestries/(?P<tapestryPostId>[\d]+)',
+        'ARGUMENTS' => [
+            'methods'               => $REST_API_PUT_METHOD,
+            'callback'              => 'putTapestry',
+        ]
     ],
     'PUT_TAPESTRY_SETTINGS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/settings',
@@ -52,15 +67,8 @@ $REST_API_ENDPOINTS = [
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'GET_TAPESTRY' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getTapestry',
-        ],
-    ],
-    'GET_GF_EXISTS' => (object) [
-        'ROUTE' => '/gf/exists',
+    'GET_GF_EXISTS'  => (object) [
+        'ROUTE'     => '/gf/exists',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getGfExists',
@@ -375,25 +383,107 @@ function getTapestry($request)
 function addTapestry($request)
 {
     $tapestryData = json_decode($request->get_body());
-    if (!get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry')) {
+    try {
+        $title = $tapestryData->title;
+        $page = get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry');
+        if ($page) {
+            $count = 1;
+            $title = $tapestryData->title . ' (' . $count . ')';
+            while (get_page_by_title($title, 'OBJECT', 'tapestry')) {
+                $count++;
+                $title = $tapestryData->title . ' (' . $count . ')';
+            }
+        }
+        $user = wp_get_current_user();
+    
         $postId = wp_insert_post(array(
-            'comment_status' => 'closed',
-            'ping_status' => 'closed',
-            'post_status' => 'publish',
-            'post_title' => $tapestryData->title,
-            'post_type' => 'tapestry',
+            'comment_status'    => 'closed',
+            'post_author'       => $user->ID ? $user->ID : 1,
+            'ping_status'       => 'closed',
+            'post_status'       => 'publish',
+            'post_title'        => $title,
+            'post_type'         => 'tapestry'
         ), true);
         if (is_wp_error($postId)) {
-            return $post;
+            throw new TapestryError('FAILED_TO_CREATE_POST');
         }
-        $tapestry = new Tapestry($postId);
-        try {
-            $tapestry->set($tapestryData);
-            return $tapestry->save();
-        } catch (TapestryError $e) {
-            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        return importTapestry($postId, $tapestryData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Get a Tapestry
+ * 
+ * @param Object $request HTTP request
+ * 
+ * @return Object $response HTTP response
+ */
+function putTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+    $tapestryData = json_decode($request->get_body());
+    try {
+        return importTapestry($postId, $tapestryData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function importTapestry($postId, $tapestryData)
+{
+    $tapestry = new Tapestry($postId);
+
+    if (!$tapestry->isEmpty()) {
+        throw new TapestryError('TAPESTRY_NOT_EMPTY');
+    }
+
+    $data = new stdClass();
+    $data->groups = $tapestryData->groups;
+    $tapestry->set($data);
+
+    if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
+        $idMap = new stdClass();
+
+        // Construct ID map and add nodes to new Tapestry
+        foreach ($tapestryData->nodes as $node) {
+            $oldNodeId = $node->id;
+            $newNode = $tapestry->addNode($node);
+            $newNodeId = $newNode->id;
+            $idMap->$oldNodeId = $newNodeId;
+        }
+
+        // Now update any node data that relies on IDs
+        foreach ($tapestryData->nodes as $oldNode) {
+            $oldNodeId = $oldNode->id;
+            $newNodeId = $idMap->$oldNodeId;
+
+            $tapestryNode = $tapestry->getNode($newNodeId);
+            $node = $tapestryNode->get();
+
+            foreach ($node->conditions as $condition) {
+                if ($condition->nodeId) {
+                    $oldDependency = $condition->nodeId;
+                    $condition->nodeId = $idMap->$oldDependency;
+                }
+            }
+
+            $tapestryNode->set($node);
+            $tapestryNode->save();
+        }
+        
+        foreach ($tapestryData->links as $link) {
+            $oldSource = $link->source;
+            $oldTarget = $link->target;
+
+            $link->source = $idMap->$oldSource;
+            $link->target = $idMap->$oldTarget;
+
+            $tapestry->addLink($link);
         }
     }
+    return $tapestry->save();
 }
 
 function deleteTapestry($request)

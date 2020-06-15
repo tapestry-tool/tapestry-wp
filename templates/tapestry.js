@@ -107,7 +107,7 @@ function tapestryTool(config){
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
 
                 // change http(s):// to // in media URLs
-                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
+                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
 
@@ -294,9 +294,7 @@ function tapestryTool(config){
 
         setNodeTypes(root);
         setLinkTypes(root);
-        setUnlocked();
         addDepthToNodes(root, 0, []);
-        setAccessibleStatus();
 
         if (!isReload) {
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
@@ -639,7 +637,6 @@ function tapestryTool(config){
                 url: apiUrl + "/tapestries/" + config.wpPostId + "/nodes/" + nodeId,
                 method: API_DELETE_METHOD,
                 success: function() {
-                    updatedMayUnlockNodesAfterDelete(nodeId);
                     location.reload();
                 },
                 error: function(e) {
@@ -923,6 +920,7 @@ function tapestryTool(config){
 
     function removeAllLinks() {
         if (links !== undefined) {
+            svg.select("g.links").remove()
             svg.selectAll('line')
                 .remove();
         }
@@ -1354,7 +1352,6 @@ function tapestryTool(config){
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("opacity", 0)
             .attr("width", d => Math.min(getRadius(d) * 2 + 48, 400))
             .attr("height", d => getRadius(d) * 2)
             .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 400) / 2))
@@ -1423,8 +1420,7 @@ function tapestryTool(config){
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     const pointer = this.querySelector("polygon.tooltip-pointer");
                     pointer.style.opacity = 1;
-                    wrapper.style.opacity = 1;
-                    wrapper.style.pointerEvents = "all";
+                    wrapper.style.display = "block";
                 }
             })
             .on("mouseleave", function () {
@@ -1432,8 +1428,7 @@ function tapestryTool(config){
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
-                wrapper.style.opacity = 0;
-                wrapper.style.pointerEvents = "none";
+                wrapper.style.display = "none";
             })
     }
 
@@ -1441,7 +1436,7 @@ function tapestryTool(config){
         const str = "This node will be unlocked: <br />";
         const wrapper = document.createElement("ul");
 
-        if (node.conditions.length === 0) {
+        if (node.conditions.length === 0 || node.conditions.every(cond => cond.fulfilled)) {
             const listItem = document.createElement("li");
             listItem.innerText = "When this parent is unlocked.";
             wrapper.appendChild(listItem);
@@ -1944,9 +1939,9 @@ function tapestryTool(config){
      ****************************************************/
 
     this.reload = () => {
-        setAccessibleStatus();
         setNodeListeners(nodes);
         filterTapestry();
+        renderTooltips();
     }
 
     this.reloadTooltips = renderTooltips
@@ -2206,12 +2201,6 @@ function tapestryTool(config){
         return maxDepth;
     }
 
-    function getNeighbours(id) {
-        return tapestry.dataset.links
-            .filter(link => link.source.id === id || link.target.id === id)
-            .map(link => link.source.id === id ? link.target.id : link.source.id)
-    }
-
     /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
     function getChildren(id, depth = tapestryDepth, visited = []) {
@@ -2301,12 +2290,30 @@ function tapestryTool(config){
             
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
+                const willLock = node.unlocked && !progressObj[id].unlocked
+                if (willLock && !wpCanEditTapestry) {
+                    node.quiz = []
+                    node.typeData = {
+                        progress: node.typeData.progress
+                    }
+                }
+                
+                node.unlocked = progressObj[id].unlocked;
+                node.accessible = progressObj[id].accessible;
+                node.conditions = progressObj[id].conditions;
+                const content = progressObj[id].content
+                if (content) {
+                    node.quiz = content.quiz
+                    node.typeData = content.typeData
+                }
+
                 if (node.mediaType !== "accordion") {
                     //Update the dataset with new values
-                    tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
-                    tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
 
-                    var questions = tapestry.dataset.nodes[index].quiz;
+                    node.typeData.progress[0].value = amountViewed;
+                    node.typeData.progress[1].value = amountUnviewed;
+
+                    var questions = node.quiz;
                     if (quizCompletionInfo) {
                         Object.entries(quizCompletionInfo).forEach(([questionId, completionInfo]) => {
                             var question = questions.find(question => question.id === questionId);
@@ -2321,12 +2328,13 @@ function tapestryTool(config){
                             }
                         })
                     }
-                    tapestry.dataset.nodes[index].completed = completed;
+                    node.completed = completed;
                 }
             }
         }
         return true;
     }
+    this.setDatasetProgress = setDatasetProgress;
     
     /* For setting the "type" field of nodes in dataset */
     function setNodeTypes(rootId) {
@@ -2391,99 +2399,6 @@ function tapestryTool(config){
                 link.type = "";
             }
         }
-    }
-    
-    /* For setting the "unlocked" field of nodes in dataset if logic shows node to be unlocked */
-    function setUnlocked() {
-        const { nodes } = tapestry.dataset
-        nodes.forEach(node => {
-            const { conditions } = node
-            conditions.forEach(condition => {
-                switch (condition.type) {
-                    case conditionTypes.NODE_COMPLETED: {
-                        const conditionNode = nodes[findNodeIndex(condition.nodeId)]
-                        if (conditionNode) {
-                            let mayUnlockNodes = conditionNode.mayUnlockNodes
-                            mayUnlockNodes.push({ id: node.id, condition: condition })
-                            conditionNode.mayUnlockNodes = mayUnlockNodes
-                            condition.fulfilled = conditionNode.completed
-                        }
-                        break
-                    }
-                    case conditionTypes.DATE_NOT_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
-                        condition.fulfilled = currentDate <= conditionDate
-                        break
-                    }   
-                    case conditionTypes.DATE_PASSED: {
-                        const currentDate = new Date()
-                        const conditionDate = parseDate(condition)
-                        condition.fulfilled = currentDate >= conditionDate
-                        break
-                    }
-                    default:
-                        condition.fulfilled = false
-                        break
-                }
-            })
-            node.unlocked = conditions.every(cond => cond.fulfilled)
-        })
-    }
-
-    function parseDate(condition) {
-        const { date, time, timezone } = condition
-        if (time) {
-            return moment.tz(`${date} ${time}`, timezone).toDate()
-        }
-        return moment.tz(date, timezone).toDate()
-    }
-
-    /**
-     * when node is being deleted, iterate over conditions to find nodes that unlocked this
-     * node and remove this node from the list of nodes that those nodes unlocked
-     * @param {integer} nodeId
-     */
-    function updatedMayUnlockNodesAfterDelete(nodeId) {
-        const { nodes } = tapestry.dataset
-        const node = nodes[findNodeIndex(nodeId)];
-        const { conditions } = node;
-        conditions.forEach(condition => {
-            const conditionNode = nodes[findNodeIndex(condition.nodeId)];
-            const mayUnlockNodes = conditionNode.mayUnlockNodes.filter(thisNode => {
-                return thisNode.id != nodeId;
-            });
-            conditionNode.mayUnlockNodes = mayUnlockNodes;
-        })
-    }
-    
-    /**
-     * Sets the accessible status of all nodes starting with the root node
-     */
-    function setAccessibleStatus() {
-        if (tapestry.dataset.nodes.length == 0) {
-            return;
-        }
-
-        tapestry.dataset.nodes.forEach(node => {
-            node.accessible = false;
-        });
-
-        function recursivelySetAccessible(id, visited) {
-            visited.add(id);
-            const node = getNodeById(id);
-            node.accessible = node.unlocked;
-            if (node.accessible) {
-                getNeighbours(id)
-                    .filter(child => !visited.has(child))
-                    .forEach(child => {
-                        visited.add(child);
-                        recursivelySetAccessible(child, visited);
-                    })
-            }
-        }
-
-        recursivelySetAccessible(tapestry.dataset.nodes[0].id, new Set());
     }
     
     // ALL the checks for whether a certain node is viewable
