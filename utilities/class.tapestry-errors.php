@@ -102,9 +102,9 @@ class TapestryError extends Error
 
     /**
      * Constructor
-     * 
+     *
      * @param   String  $code   error code
-     * 
+     *
      * @return  NULL
      */
     public function __construct($code)
@@ -117,7 +117,7 @@ class TapestryError extends Error
 
     /**
      * Get Error Status
-     * 
+     *
      * @return  $status
      */
     public function getStatus()

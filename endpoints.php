@@ -275,7 +275,9 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => '/logout',
         'ARGUMENTS' => [
             'methods'   => $REST_API_GET_METHOD,
-            'callback'  => function() { wp_logout(); }
+            'callback'  => function () {
+                wp_logout();
+            }
         ]
     ],
     'ANALYTICS' => (object) [
@@ -308,25 +310,25 @@ function saveAnalytics($request)
     global $wpdb;
     $body = json_decode($request->get_body());
 
-	$actor = $body->actor;
-	$action = $body->action;
-	$object = $body->object;
-	$user_guid = $body->user_guid;
-	$object_id = $body->object_id;
-	$details = $body->details;
+    $actor = $body->actor;
+    $action = $body->action;
+    $object = $body->object;
+    $user_guid = $body->user_guid;
+    $object_id = $body->object_id;
+    $details = $body->details;
 
     $table_name = $wpdb->prefix . "tapestry_analytics_events";
 
-	$success = $wpdb->insert( 
-		$table_name, 
-		array( 
-			'actor' => $actor, 
-			'action' => $action, 
-			'object' => $object, 
-			'user_guid' => $user_guid, 
-			'object_id' => $object_id, 
-			'details' => $details
-		) 
+    $success = $wpdb->insert(
+        $table_name,
+        array(
+            'actor' => $actor,
+            'action' => $action,
+            'object' => $object,
+            'user_guid' => $user_guid,
+            'object_id' => $object_id,
+            'details' => $details
+        )
     );
     
     if (!$success) {
@@ -395,9 +397,9 @@ function getGfEntry($request)
 
 /**
  * Get a Tapestry
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getTapestry($request)
@@ -413,9 +415,9 @@ function getTapestry($request)
 
 /**
  * Add a tapestry
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestry($request)
@@ -453,9 +455,9 @@ function addTapestry($request)
 
 /**
  * Get a Tapestry
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function putTapestry($request)
@@ -533,10 +535,10 @@ function deleteTapestry($request)
 
 /**
  * Add a tapestry node
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
- * @return  Object  HTTP response 
+ *
+ * @return  Object  HTTP response
  */
 function addTapestryNode($request)
 {
@@ -569,9 +571,9 @@ function addTapestryNode($request)
 
 /**
  * Add a Tapestry Group
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestryGroup($request)
@@ -593,9 +595,9 @@ function addTapestryGroup($request)
 
 /**
  * Add A Tapestry Link
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function addTapestryLink($request)
@@ -630,9 +632,9 @@ function addTapestryLink($request)
 
 /**
  * Delete A Tapestry Link
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function deleteTapestryLink($request)
@@ -652,10 +654,10 @@ function deleteTapestryLink($request)
 
 /**
  * Update Tapestry Settings
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
- * @return  Object  $response   HTTP response 
+ *
+ * @return  Object  $response   HTTP response
  */
 function updateTapestrySettings($request)
 {
@@ -676,9 +678,9 @@ function updateTapestrySettings($request)
 
 /**
  * Update Tapestry Node
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNode($request)
@@ -755,9 +757,9 @@ function deleteTapestryNode($request)
 
 /**
  * Update Tapestry Node Size
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeSize($request)
@@ -793,9 +795,9 @@ function updateTapestryNodeSize($request)
 
 /**
  * Update Tapestry Node Permissions
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodePermissions($request)
@@ -831,9 +833,9 @@ function updateTapestryNodePermissions($request)
 
 /**
  * Update Tapestry Node Permissions
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeDescription($request)
@@ -869,9 +871,9 @@ function updateTapestryNodeDescription($request)
 
 /**
  * Update Tapestry Node Title
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeTitle($request)
@@ -907,9 +909,9 @@ function updateTapestryNodeTitle($request)
 
 /**
  * Update Tapestry Node Image Url
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeImageURL($request)
@@ -945,9 +947,9 @@ function updateTapestryNodeImageURL($request)
 
 /**
  * Update Tapestry Node Locked Image Url
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeLockedImageURL($request)
@@ -980,11 +982,11 @@ function updateTapestryNodeLockedImageURL($request)
     }
 }
 
-/** 
+/**
  * Update Tapestry Node Type Data
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeTypeData($request)
@@ -1020,9 +1022,9 @@ function updateTapestryNodeTypeData($request)
 
 /**
  * Update Tapestry Node Coordinates
- * 
+ *
  * @param   Object  $request    HTTP request
- * 
+ *
  * @return  Object  $response   HTTP response
  */
 function updateTapestryNodeCoordinates($request)
@@ -1057,7 +1059,7 @@ function updateTapestryNodeCoordinates($request)
 }
 
 /**
- * 
+ *
  */
 function getUserEntry($request)
 {
@@ -1076,9 +1078,9 @@ function getUserEntry($request)
 /**
  * Update a single node progress for the current user by passing in node id, post id and progress value
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&node_id=1&progress_value=0.2
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateProgressByNodeId($request)
 {
@@ -1097,9 +1099,9 @@ function updateProgressByNodeId($request)
 /**
  * Set node as completed for the current user
  * Example: /wp-json/tapestry-tool/v1/users/completed?post_id=44&node_id=1
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return null
  */
 function completeByNodeId($request)
@@ -1118,9 +1120,9 @@ function completeByNodeId($request)
 /**
  * Set quiz as completed for the current user
  * Example: /wp-json/tapestry-tool/v1/users/quiz?post_id=44&node_id=1&question_id=abcd
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return null
  */
 function completeQuestionById($request)
@@ -1140,9 +1142,9 @@ function completeQuestionById($request)
 /**
  * Get user h5p video setting on a tapestry page by post id. Will need to pass these as query parameters
  * Example: /wp-json/tapestry-tool/v1/users/h5psettings/42
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserH5PSettingsByPostId($request)
@@ -1169,9 +1171,9 @@ function getUserH5PSettingsByPostId($request)
  *  "playbackRate": 0.5,
  *  "time": 11.934346
  * }
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateUserH5PSettingsByPostId($request)
 {
@@ -1187,11 +1189,11 @@ function updateUserH5PSettingsByPostId($request)
 }
 
 /**
- * Get user progress on a tapestry page by post id. 
+ * Get user progress on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserProgressByPostId($request)
@@ -1207,9 +1209,9 @@ function getUserProgressByPostId($request)
 
 /**
  * Saves a user's recorded audio file
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function postUserAudio($request)
@@ -1242,9 +1244,9 @@ function postUserAudio($request)
 
 /**
  * Get recorded audio of a node for a user
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserAudio($request)
@@ -1271,11 +1273,11 @@ function getUserAudio($request)
 }
 
 /**
- * Get user favourite nodes on a tapestry page by post id. 
+ * Get user favourite nodes on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  * @return Object $response HTTP response
  */
 function getUserFavourites($request)
@@ -1292,9 +1294,9 @@ function getUserFavourites($request)
 /**
  * Update favourite nodes for the current user by passing in post id and favourites array
  * Example: /wp-json/tapestry-tool/v1/users/progress?post_id=44&favourites=[409, 411]
- * 
+ *
  * @param Object $request HTTP request
- * 
+ *
  */
 function updateUserFavourites($request)
 {
@@ -1306,4 +1308,4 @@ function updateUserFavourites($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-} 
+}

@@ -2,11 +2,11 @@
 
 /**
  * Tapestry Node Interface
- * 
+ *
  */
 interface ITapestryNode
 {
-    /**	
+    /**
      * Save the Tapestry node
      *
      * @return  Object  $node
@@ -15,7 +15,7 @@ interface ITapestryNode
 
     /**
      * Set Node
-     * 
+     *
      * @param   Object  $node  node
      *
      * @return  NULL
@@ -24,7 +24,7 @@ interface ITapestryNode
 
     /**
      * Get the node
-     * 
+     *
      * @return  $node    node
      */
     public function get();
