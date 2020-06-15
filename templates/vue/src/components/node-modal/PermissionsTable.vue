@@ -14,10 +14,7 @@
           <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
           <b-td v-for="type in types" :key="type" class="text-center">
             <b-form-checkbox
-              :checked="
-                permissionsList.includes(type) ||
-                  isPermissionOverridden(rowName, type)
-              "
+              :checked="permissionsList.includes(type)"
               :disabled="isPermissionOverridden(rowName, type)"
               :data-testid="`node-permissions-${rowName}-${type}`"
               @change="updatePermissions($event, rowName, type)"
@@ -98,7 +95,7 @@ export default {
   },
   methods: {
     cascade(isChecked, rowName, type, newPermissions) {
-      if (this.shouldCascade(rowName, type)) {
+      if (this.shouldCascade(rowName)) {
         const rowIndex = this.getPermissionRowIndex(rowName)
         const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
         lowerPriorityPermissions.forEach(newRow => {
@@ -151,16 +148,26 @@ export default {
         return false
       }
 
-      // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const [higherRow, permissions] = this.permissions[rowIndex - 1]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionOverridden(higherRow, type)
+      const publicPermissions = this.permissions.find(
+        permList => permList[0] === "public"
+      )
+
+      if (rowName === "authenticated") {
+        return publicPermissions && publicPermissions[1].includes(type)
       }
-      if (permissions) {
-        return permissions.includes(type)
+
+      const authenticatedPermissions = this.permissions.find(
+        permList => permList[0] === "authenticated"
+      )
+
+      if (!publicPermissions || !authenticatedPermissions) {
+        return false
       }
-      return false
+
+      return (
+        publicPermissions[1].includes(type) ||
+        authenticatedPermissions[1].includes(type)
+      )
     },
     changeIndividualPermission(isChecked, rowName, type, permissionsObj) {
       const currentPermissions = permissionsObj[rowName] || []
@@ -195,7 +202,7 @@ export default {
         this.types
           .filter(
             type =>
-              this.shouldCascade(higherRow, type) &&
+              this.isPermissionOverridden(higherRow, type) &&
               higherRowPermissions.includes(type)
           )
           .forEach(type => newUserPermissions.push(type))
@@ -209,11 +216,8 @@ export default {
     getPermissionRowIndex(rowName) {
       return this.permissions.findIndex(thisRow => thisRow[0] === rowName)
     },
-    shouldCascade(rowName, type) {
-      if (rowName === "public" || rowName === "authenticated") {
-        return true
-      }
-      return this.isPermissionOverridden(rowName, type)
+    shouldCascade(rowName) {
+      return rowName === "public" || rowName === "authenticated"
     },
   },
 }
