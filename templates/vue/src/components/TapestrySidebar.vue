@@ -100,7 +100,7 @@ export default {
 .anchor-button {
   padding: 0;
   background: 0;
-  width: 40px;
+  width: 100%;
   height: 2em;
   display: flex;
   align-items: center;
@@ -130,10 +130,19 @@ export default {
   transition: all 0.2s ease-out;
   width: 30vw;
   max-width: 400px;
+  font-size: calc(14px + (2 * (100vw - 960px) / 320));
 
   &.closed {
     cursor: pointer;
     transform: translateX(calc(100% - 40px));
+  }
+
+  @media screen and (max-width: 960px) {
+    font-size: 14px;
+  }
+
+  @media screen and (min-width: 1280px) {
+    font-size: 16px;
   }
 }
 
