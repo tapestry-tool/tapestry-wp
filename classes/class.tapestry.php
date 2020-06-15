@@ -346,9 +346,9 @@ class Tapestry implements ITapestry
 
         if ($parentType == TydeTypes::MODULE) {
             return $tydeType == TydeTypes::STAGE;
-        } else if ($parentType == TydeTypes::STAGE) {
+        } elseif ($parentType == TydeTypes::STAGE) {
             return $tydeType == TydeTypes::QUESTION_SET;
-        } else if ($parentType == TydeTypes::REGULAR) {
+        } elseif ($parentType == TydeTypes::REGULAR) {
             return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
         } else {
             // otherwise parent is a question set, so only valid if parent
