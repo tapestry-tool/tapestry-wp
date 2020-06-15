@@ -171,16 +171,16 @@ export default {
       const { accordionProgress } = this.node
       if (!accordionProgress.includes(rowId)) {
         accordionProgress.push(rowId)
-        await this.completeNode(rowId)
 
-        this.updateNodeProgress({
+        await this.updateNodeProgress({
           id: this.node.id,
           progress: accordionProgress.length / this.rows.length,
         })
-        this.updateNode({
+        await this.updateNode({
           id: this.node.id,
           newNode: { accordionProgress },
         })
+        await this.completeNode(rowId)
 
         if (accordionProgress.length === this.rows.length) {
           this.$emit("complete")

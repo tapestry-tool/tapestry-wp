@@ -374,6 +374,10 @@ input[type="checkbox"][disabled] {
     cursor: not-allowed;
 }
 
+.tooltip-wrapper {
+    display: none;
+}
+
 .tapestry-tooltip {
     height: 100%;
     display: flex;
@@ -381,7 +385,6 @@ input[type="checkbox"][disabled] {
 }
 
 .tapestry-tooltip-content {
-    pointer-events: none;
     background: black;
     color: white;
     padding: 12px 16px;
