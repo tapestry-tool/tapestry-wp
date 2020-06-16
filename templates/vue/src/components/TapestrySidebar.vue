@@ -1,5 +1,5 @@
 <template>
-  <div :class="['sidebar-container', { closed: isClosed }]">
+  <div ref="wrapper" :class="['sidebar-container', { closed: isClosed }]">
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
@@ -114,6 +114,9 @@ export default {
       threshold: INTERSECTION_THRESHOLD,
     })
     observer.observe(this.$refs.info)
+    this.$root.$on("bv::modal::shown", (_, modalId) => {
+      this.updateNodeModalPosition(modalId)
+    })
   },
   methods: {
     handleObserve(entries) {
@@ -140,6 +143,17 @@ export default {
     },
     viewNode() {
       this.$router.push(`/nodes/${this.selectedNodeId}`)
+    },
+    updateNodeModalPosition(modalId) {
+      if (!this.isClosed) {
+        const { width: sidebarWidth } = this.$refs.wrapper.getBoundingClientRect()
+        const browserWidth = Helpers.getBrowserWidth()
+        if (browserWidth >= 1280) {
+          const modal = document.querySelector(`#${modalId} .modal-dialog`)
+          const modalSpace = browserWidth - sidebarWidth
+          modal.style.marginLeft = (modalSpace - 800) / 2 + "px"
+        }
+      }
     },
   },
 }
