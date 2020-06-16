@@ -109,12 +109,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-$sm-breakpoint: 500px;
-$md-breakpoint: 960px;
-$lg-breakpoint: 1280px;
-$button-width: 4em;
-
+<style lang="scss">
 .sidebar-container {
   position: fixed;
   right: 0;
@@ -127,12 +122,12 @@ $button-width: 4em;
     transform: translateX(0);
   }
 
-  @media screen and (min-width: $sm-breakpoint) {
+  @media screen and (min-width: 500px) {
     display: grid;
-    grid-template-columns: $button-width 1fr;
+    grid-template-columns: 2.5em 1fr;
 
     &.closed {
-      transform: translateX(calc(100% - 4em));
+      transform: translateX(calc(100% - 2.5em));
     }
   }
 }
@@ -154,6 +149,11 @@ $button-width: 4em;
   &.active {
     background: var(--teal);
   }
+
+  @media screen and (min-width: 500px) {
+    width: 100%;
+    height: 2em;
+  }
 }
 
 .close-button {
@@ -172,13 +172,29 @@ $button-width: 4em;
   &.closed {
     display: none;
   }
+
+  &:hover {
+    background: var(--gray);
+  }
+
+  @media screen and (min-width: 500px) {
+    bottom: auto;
+    right: -1.2em;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    align-items: flex-end;
+
+    i {
+      margin-bottom: 4px;
+    }
+  }
 }
 
 .sidebar {
   background: white;
   color: inherit;
   height: 100vh;
-  padding-bottom: $button-width;
+  padding-bottom: 4em;
   transform: translateY(0);
   transition: all 0.2s ease-out;
   width: 100vw;
@@ -190,24 +206,23 @@ $button-width: 4em;
     transform: translateY(100%);
   }
 
-  @media screen and (min-width: $sm-breakpoint) {
+  @media screen and (min-width: 500px) {
     min-width: 300px;
     width: 30vw;
     max-width: 400px;
     grid-column: 2;
+    padding-bottom: 0;
 
     &.closed {
       transform: translateY(0);
     }
   }
 
-  @media screen and (min-width: $md-breakpoint) {
-    font-size: calc(
-      14px + (2 * (100vw - $md-breakpoint) / $lg-breakpoint - $md-breakpoint)
-    );
+  @media screen and (min-width: 960px) {
+    font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
   }
 
-  @media screen and (min-width: $lg-breakpoint) {
+  @media screen and (min-width: 1280px) {
     font-size: 16px;
   }
 }
@@ -221,7 +236,7 @@ $button-width: 4em;
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: $button-width;
+  height: 4em;
   z-index: 10;
 
   i {
@@ -229,11 +244,13 @@ $button-width: 4em;
     text-align: left;
   }
 
-  @media screen and (min-width: $sm-breakpoint) {
+  @media screen and (min-width: 500px) {
     position: relative;
     padding: 32px 0;
     height: 100vh;
-    width: 4em;
+    width: 2.5em;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 }
 
