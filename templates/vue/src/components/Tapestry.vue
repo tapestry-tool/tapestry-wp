@@ -130,7 +130,13 @@ export default {
       "updateRootNode",
       "updateNodeCoordinates",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateUserProgress",
+    ]),
     openNode({ detail: { id } }) {
       this.$router.push(`/nodes/${id}`)
     },
@@ -281,10 +287,8 @@ export default {
               newNodeEntry["mediaType"] = "text"
             } else if (fieldValue === "video") {
               newNodeEntry["mediaType"] = "video"
-              newNodeEntry["mediaFormat"] = "mp4"
             } else if (fieldValue === "h5p") {
               newNodeEntry["mediaType"] = "video"
-              newNodeEntry["mediaFormat"] = "h5p"
             } else if (fieldValue === "url-embed") {
               newNodeEntry["mediaType"] = "url-embed"
               newNodeEntry["mediaFormat"] = "embed"
@@ -423,6 +427,8 @@ export default {
           [this.yORfy]: newNodeEntry.coordinates.y,
         },
       })
+
+      await this.updateUserProgress()
 
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
