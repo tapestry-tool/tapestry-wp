@@ -23,7 +23,23 @@
     </div>
     <aside :class="['sidebar', { closed: isClosed }]">
       <div ref="content" class="sidebar-content">
-        <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
+        <header class="sidebar-header">
+          <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
+          <div class="button-container">
+            <button
+              v-if="node.accessible || canEdit"
+              class="action-button"
+              @click="viewNode"
+            >
+              <tapestry-icon icon="eye" />
+              View
+            </button>
+            <button v-if="canEdit" class="action-button" @click="$emit('edit')">
+              <tapestry-icon icon="pencil-alt" />
+              Edit
+            </button>
+          </div>
+        </header>
         <section>
           <h4 class="content-separator">About</h4>
           <p class="content-description">{{ node.description }}</p>
@@ -46,6 +62,7 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import Helpers from "@/utils/Helpers"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
@@ -65,6 +82,12 @@ export default {
     ...mapState(["selectedNodeId"]),
     node() {
       return this.getNode(this.selectedNodeId)
+    },
+    canEdit() {
+      return (
+        wpApiSettings.wpCanEditTapestry === "1" ||
+        Helpers.hasPermission(this.node, "edit")
+      )
     },
   },
   watch: {
@@ -104,6 +127,9 @@ export default {
         const el = this.$refs[refName]
         this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
       })
+    },
+    viewNode() {
+      this.$router.push(`/nodes/${this.selectedNodeId}`)
     },
   },
 }
@@ -153,6 +179,22 @@ export default {
   @media screen and (min-width: 500px) {
     width: 100%;
     height: 2em;
+  }
+}
+
+.action-button {
+  padding: 0;
+  background: none;
+  color: inherit;
+  margin-right: 1em;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    background: none;
+    color: var(--teal);
   }
 }
 
@@ -225,6 +267,11 @@ export default {
   @media screen and (min-width: 1280px) {
     font-size: 16px;
   }
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
 }
 
 .sidebar-preview {
