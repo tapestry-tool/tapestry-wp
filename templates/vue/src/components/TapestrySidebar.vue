@@ -1,6 +1,6 @@
 <template>
   <div :class="['sidebar-container', { closed: isClosed }]">
-    <div class="sidebar-preview" @click="isClosed = false">
+    <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
         @click.stop="scrollToRef('info')"
@@ -21,8 +21,8 @@
         <tapestry-icon icon="chevron-down" />
       </button>
     </div>
-    <aside :class="['sidebar', { closed: isClosed }]">
-      <div ref="content" class="sidebar-content">
+    <aside ref="content" :class="['sidebar', { closed: isClosed }]">
+      <div class="sidebar-content">
         <header class="sidebar-header">
           <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
           <div class="button-container">
@@ -103,21 +103,30 @@ export default {
         }
       },
     },
+    selectedNodeId() {
+      if (!this.isClosed) {
+        this.active = "info"
+      }
+    },
   },
   mounted() {
     const observer = new IntersectionObserver(this.handleObserve, {
       threshold: INTERSECTION_THRESHOLD,
     })
     observer.observe(this.$refs.info)
-    observer.observe(this.$refs.copyright)
   },
   methods: {
     handleObserve(entries) {
-      entries.forEach(entry => {
-        if (entry.intersectionRatio > INTERSECTION_THRESHOLD) {
-          this.active = entry.target.dataset.name
-        }
-      })
+      if (this.isClosed) {
+        return
+      }
+
+      const entry = entries[0]
+      if (entry.intersectionRatio > INTERSECTION_THRESHOLD) {
+        this.active = "info"
+      } else {
+        this.active = "copyright"
+      }
     },
     scrollToRef(refName) {
       if (this.isClosed) {
@@ -126,6 +135,7 @@ export default {
       this.$nextTick(() => {
         const el = this.$refs[refName]
         this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+        this.active = refName
       })
     },
     viewNode() {
@@ -242,6 +252,7 @@ export default {
   width: 100vw;
   font-size: 14px;
   z-index: 0;
+  overflow-y: scroll;
 
   &.closed {
     cursor: pointer;
@@ -303,7 +314,6 @@ export default {
 
 .sidebar-content {
   padding: 3rem 2rem;
-  overflow-y: scroll;
 
   section {
     margin-bottom: 1em;
