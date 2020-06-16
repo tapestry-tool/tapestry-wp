@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div :class="['sidebar-container', { closed: isClosed }]">
     <div class="sidebar-preview" @click="isClosed = false">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
@@ -115,8 +115,26 @@ $md-breakpoint: 960px;
 $lg-breakpoint: 1280px;
 $button-width: 4em;
 
-.wrapper {
+.sidebar-container {
+  position: fixed;
+  right: 0;
+  top: 0;
   z-index: 0;
+  transform: translateX(0);
+  transition: all 0.2s ease-out;
+
+  &.closed {
+    transform: translateX(0);
+  }
+
+  @media screen and (min-width: $sm-breakpoint) {
+    display: grid;
+    grid-template-columns: $button-width 1fr;
+
+    &.closed {
+      transform: translateX(calc(100% - 4em));
+    }
+  }
 }
 
 .anchor-button {
@@ -161,9 +179,6 @@ $button-width: 4em;
   color: inherit;
   height: 100vh;
   padding-bottom: $button-width;
-  position: fixed;
-  right: 0;
-  top: 0;
   transform: translateY(0);
   transition: all 0.2s ease-out;
   width: 100vw;
@@ -179,12 +194,10 @@ $button-width: 4em;
     min-width: 300px;
     width: 30vw;
     max-width: 400px;
-    transform: translateX(0);
-    display: grid;
-    grid-template-columns: $button-width 1fr;
+    grid-column: 2;
 
     &.closed {
-      transform: translateX(calc(100% - $button-width));
+      transform: translateY(0);
     }
   }
 
@@ -219,13 +232,14 @@ $button-width: 4em;
   @media screen and (min-width: $sm-breakpoint) {
     position: relative;
     padding: 32px 0;
+    height: 100vh;
+    width: 4em;
   }
 }
 
 .sidebar-content {
-  grid-column: 2;
   padding: 3rem 2rem;
-  overflow: scroll;
+  overflow-y: scroll;
 
   section {
     margin-bottom: 1em;
