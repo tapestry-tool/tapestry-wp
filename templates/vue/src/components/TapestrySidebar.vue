@@ -20,6 +20,12 @@
       >
         <tapestry-icon icon="chevron-down" />
       </button>
+      <button
+        :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
+        @click.stop="isClosed = true"
+      >
+        <tapestry-icon icon="times" />
+      </button>
     </div>
     <aside ref="content" :class="['sidebar', { closed: isClosed }]">
       <div class="sidebar-content">
@@ -209,36 +215,48 @@ export default {
 }
 
 .close-button {
-  padding: 0;
-  background: var(--gray);
+  display: none;
+
+  @media screen and (min-width: 500px) {
+    padding: 0;
+    background: var(--gray);
+    position: absolute;
+    width: 2.5em;
+    height: 2.5em;
+    bottom: auto;
+    right: -1.2em;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-radius: 50%;
+
+    &.closed {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--gray);
+    }
+
+    i {
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.close-button-mobile {
   position: absolute;
-  right: 1em;
-  bottom: 5em;
-  width: 2.5em;
-  height: 2.5em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  right: 0;
+  bottom: 0;
 
   &.closed {
     display: none;
   }
 
-  &:hover {
-    background: var(--gray);
-  }
-
   @media screen and (min-width: 500px) {
-    bottom: auto;
-    right: -1.2em;
-    top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    align-items: flex-end;
-
-    i {
-      margin-bottom: 4px;
-    }
+    display: none;
   }
 }
 
