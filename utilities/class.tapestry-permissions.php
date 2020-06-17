@@ -8,10 +8,10 @@ class TapestryPermissions
 {
     /**
      * Post Tapestry Permission
-     * 
+     *
      * @return  Object  $permission permission
      */
-    static function postTapestry()
+    public static function postTapestry()
     {
         global $TAPESTRY_USE_DEV_MODE;
         if ($TAPESTRY_USE_DEV_MODE) {
@@ -22,12 +22,12 @@ class TapestryPermissions
 
     /**
      * Post Tapestry Group
-     * 
+     *
      * @param   Object  $request    request
-     * 
+     *
      * @return  Object  $permission permission
      */
-    static function postTapestryGroup($request)
+    public static function postTapestryGroup($request)
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
@@ -38,12 +38,12 @@ class TapestryPermissions
 
     /**
      * Post Tapestry Settings
-     * 
+     *
      * @param   Object  $request    request
-     * 
+     *
      * @return  Object  $permission permission
      */
-    static function putTapestrySettings($request)
+    public static function putTapestrySettings($request)
     {
         $postId = $request['tapestryPostId'];
         if (isset($postId)) {
