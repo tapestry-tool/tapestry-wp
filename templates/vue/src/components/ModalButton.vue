@@ -81,15 +81,17 @@ export default {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  font-size: 18px;
+  font-size: 1.2em;
   justify-content: center;
   align-items: center;
   box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.16);
   transition: all 0.25s ease;
   border: solid 2px #fff;
+
   &:hover {
     transform: scale(1.15);
   }
+
   i {
     background: none;
   }

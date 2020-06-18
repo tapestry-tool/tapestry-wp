@@ -101,15 +101,11 @@ export default {
   text-align: left;
 }
 
-.sub-container {
-  padding: 16px;
-}
-
 .sub-accordion-row {
-  background: rgb(223, 223, 223);
-  border-radius: 8px;
-  margin-bottom: 8px;
+  background: rgb(30, 30, 30);
+  border-radius: 4px;
   padding: 8px 16px;
+  margin-bottom: 8px;
 
   &:last-child {
     margin-bottom: 0;

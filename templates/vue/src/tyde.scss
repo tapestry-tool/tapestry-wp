@@ -1,0 +1,383 @@
+#app {
+  .recorder {
+    audio {
+      border-radius: 8px;
+    }
+
+    button {
+      font-size: 1.5em;
+
+      &.main-button {
+        font-size: 4.5em;
+      }
+    }
+
+    .teen-status {
+      display: block;
+    }
+  }
+
+  .modal-button {
+    font-size: 18px;
+  }
+
+  .tapestry-activity {
+    background: #eee;
+    font-size: 1.5em;
+
+    .icon {
+      color: #ccc;
+    }
+
+    img {
+      filter: brightness(0.8);
+    }
+
+    .checklist {
+      li {
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .accordion {
+    &.media-container {
+      padding: 0;
+    }
+
+    .header {
+      color: white;
+      text-align: left;
+      padding: 24px 48px;
+      background-size: cover;
+      border-radius: 8px 8px 0px 0px;
+      display: flex;
+      justify-content: space-between;
+
+      img {
+        height: 96px;
+        margin: -24px 0;
+      }
+    }
+
+    .title {
+      color: inherit;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .rows {
+      padding: 32px;
+    }
+
+    .button-completion {
+      display: block;
+      width: 100%;
+      background: #3fa9f5;
+      padding: 16px 24px;
+      margin: 0;
+      color: white;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1.5em;
+      margin-bottom: 24px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        color: white;
+        opacity: 0.9;
+      }
+
+      p {
+        margin: 0;
+        padding: 0;
+        font-weight: 700;
+      }
+    }
+
+    .modal-progress {
+      top: 10px;
+    }
+
+    .button-container {
+      display: block;
+      width: 250px;
+    }
+
+    .button-row {
+      display: flex;
+      width: auto;
+      border-radius: 0;
+
+      i {
+        margin-right: auto;
+      }
+
+      &-trigger {
+        display: flex;
+        align-items: center;
+        background: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        text-align: left;
+      }
+
+      &-icon {
+        background: #b29ac9;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        margin-right: 24px;
+      }
+
+      p {
+        display: block;
+        margin: 0;
+        padding: 0;
+        line-height: 1.1;
+        font-size: 1.2em;
+      }
+
+      &-title {
+        font-weight: bold;
+      }
+
+      &-description {
+        font-weight: 400;
+      }
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+
+      &-activity {
+        width: 52px;
+        margin-right: 10px;
+      }
+
+      a {
+        cursor: pointer;
+      }
+    }
+
+    .icon-container {
+      display: flex;
+      margin-right: 10px;
+      align-items: center;
+      flex: auto;
+    }
+
+    .button-finished {
+      background: #bbd8ee;
+      border-radius: 16px;
+      margin: 0;
+      padding: 8px 36px;
+      color: #026c93;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .button-scroll-top {
+      background: white;
+      border: 2px solid #3fa9f5;
+      color: #3fa9f5;
+    }
+
+    .sub-accordion-text {
+      margin-bottom: 0;
+    }
+
+    .accordion-row {
+      background: #643493;
+      border-radius: 16px;
+      padding: 24px;
+
+      .content {
+        position: relative;
+        background: white;
+        border-radius: 16px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+        box-shadow: 4px 8px 8px rgba(0, 0, 0, 0.16);
+      }
+    }
+  }
+
+  .h5p-media {
+    height: auto;
+    min-height: 100%;
+  }
+
+  .quiz-screen {
+    padding-left: 20%;
+    color: black;
+    background-color: #fff;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: 0 80%;
+
+    .button-nav {
+      background: var(--tyde-blue);
+      font-size: 2.5em;
+
+      &:hover {
+        background: var(--tyde-blue);
+        opacity: 0.8;
+      }
+    }
+
+    .question-step {
+      font-size: 2.5em;
+      color: var(--tyde-blue);
+    }
+  }
+
+  .text-media div {
+    font-size: 1em;
+    margin: 0 auto 1em;
+  }
+
+  .video-container.allow-scroll {
+    overflow: scroll;
+  }
+
+  .youtube-media {
+    .youtube-video-container {
+      border-radius: 15px;
+      left: auto;
+      overflow: hidden;
+    }
+
+    .end-screen {
+      border-radius: 12px;
+    }
+  }
+
+  .sub-container {
+    padding: 16px;
+
+    .sub-accordion-row {
+      background: rgb(223, 223, 223);
+      border-radius: 8px;
+    }
+  }
+
+  .answer-button {
+    background-color: var(--tyde-orange);
+    font-size: 1.5em;
+    margin-right: 16px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &:hover {
+      background-color: var(--tyde-orange-light);
+    }
+  }
+
+  .question {
+    font-size: 0.8em;
+
+    &.question-h5p {
+      max-width: 600px;
+    }
+
+    &.question-gf textarea {
+      max-height: 180px !important;
+    }
+
+    .button-nav {
+      background: var(--tyde-blue);
+
+      &:hover {
+        background: var(--tyde-blue);
+        opacity: 0.8;
+      }
+    }
+
+    &-title {
+      font-size: 0.8em;
+      margin: 15px 0 36px 25px;
+
+      &-step {
+        position: absolute;
+        border: 2px solid black;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        top: -16px;
+        left: -24px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+      }
+    }
+
+    &-answer-text {
+      font-size: 1.75em;
+    }
+  }
+
+  .end-screen {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    height: auto;
+    min-height: 100%;
+    background-color: none;
+    background-size: cover;
+    color: black;
+    padding: 24px;
+    padding-left: 38%;
+    padding-right: 64px;
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      padding-left: 96px;
+      margin-top: 64px;
+    }
+
+    button {
+      background-color: var(--tyde-blue);
+      padding: 4px 32px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: stretch;
+      color: white;
+      border-radius: 4px;
+      opacity: 1;
+      transition: opacity 0.1s ease-out;
+      font-size: 2em;
+      margin-bottom: 32px;
+
+      &:hover {
+        color: white;
+        opacity: 0.9;
+      }
+
+      .button-quiz {
+        background-color: var(--tyde-orange);
+      }
+
+      p {
+        margin: 0;
+        padding: 0;
+        margin-left: 32px;
+      }
+    }
+  }
+}

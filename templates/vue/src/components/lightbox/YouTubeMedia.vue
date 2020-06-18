@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="youtube-media">
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -24,7 +24,7 @@
         iv_load_policy: 3,
         enablejsapi: 1,
       }"
-      class="video-container"
+      class="youtube-video-container"
       @ready="ready"
       @paused="handlePause(player.getCurrentTime())"
       @ended="handleEnd"
@@ -177,14 +177,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.video-container {
-  border-radius: 15px;
+.youtube-video-container {
   position: absolute;
+  left: 15px;
   top: 15px;
   width: 100%;
   height: 100%;
   max-width: 100vw;
-  overflow: hidden;
 
   > div {
     padding-right: 30px;
@@ -194,9 +193,5 @@ export default {
       padding: 0;
     }
   }
-}
-
-.end-screen {
-  border-radius: 12px;
 }
 </style>

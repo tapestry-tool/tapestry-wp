@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="h5p-media">
     <end-screen
       v-if="showEndScreen && !readOnly"
       :node="node"
@@ -122,10 +122,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.h5p-media {
   position: relative;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   max-width: 100vw;
   padding: 0;
 }

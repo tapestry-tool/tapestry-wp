@@ -243,10 +243,6 @@ export default {
   height: 100%;
   max-width: 100vw;
 
-  &.allow-scroll {
-    overflow: scroll;
-  }
-
   &.fullscreen {
     display: flex;
     align-items: center;

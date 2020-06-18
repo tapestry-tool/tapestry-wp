@@ -10,6 +10,7 @@
 import Tapestry from "./Tapestry"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
+import "../tyde.scss"
 
 export default {
   name: "tyde",
@@ -49,5 +50,8 @@ export default {
   --tyde-green: #205a27;
   --tyde-border-green: #39b54a;
   --tyde-font-mono: "Roboto", monospace;
+  --tyde-orange: #f79621;
+  --tyde-orange-light: #f9b664;
+  --tyde-blue: #1074bb;
 }
 </style>

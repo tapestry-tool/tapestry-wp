@@ -95,8 +95,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 .activity {
   background: rgba(0, 0, 0, 0.03);
   border-radius: 16px;

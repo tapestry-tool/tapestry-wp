@@ -226,14 +226,13 @@ export default {
   }
 
   audio {
-    border-radius: 8px;
     margin-bottom: 16px;
   }
 
   button {
     background-color: rgba(26, 26, 26, 0.8);
     border-radius: 30px;
-    font-size: 1.5em;
+    font-size: 24px;
     height: 56px;
     width: auto;
     min-width: 56px;
@@ -241,7 +240,7 @@ export default {
     &.main-button {
       width: 122px;
       height: 122px;
-      font-size: 4.5em;
+      font-size: 72px;
       border-radius: 72px;
     }
 
@@ -258,10 +257,6 @@ export default {
 
   i {
     margin: auto;
-  }
-
-  .teen-status {
-    display: block;
   }
 }
 </style>

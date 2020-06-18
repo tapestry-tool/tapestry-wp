@@ -84,18 +84,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 .end-screen {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  min-height: 100%;
-  background-size: cover;
-  color: black;
+  height: 100%;
+  background: #111;
+  color: #eee;
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
@@ -103,45 +102,28 @@ export default {
   padding-left: 38%;
   padding-right: 64px;
 
-  .button-container {
+  button {
+    background: none;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    padding-left: 96px;
-    margin-top: 64px;
+    justify-content: center;
+    color: inherit;
+    margin-right: 3em;
 
-    button {
-      background: none;
-      background-color: $tyde-blue;
-      padding: 4px 32px;
-      margin: 0;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: white;
-      border-radius: 4px;
-      opacity: 1;
-      transition: opacity 0.1s ease-out;
-      font-size: 2em;
-      margin-bottom: 32px;
+    &:last-child {
+      margin-right: 0;
+    }
 
-      &:last-child {
-        margin-right: 0;
-      }
+    &:hover {
+      color: #11a6d8;
+    }
 
-      &:hover {
-        opacity: 0.9;
-      }
-
-      .button-quiz {
-        background-color: $tyde-orange;
-      }
-
-      p {
-        margin: 0;
-        padding: 0;
-        font-weight: 600;
-        margin-left: 32px;
-      }
+    p {
+      margin: 1em auto 0;
+      padding: 0;
+      font-weight: 600;
     }
   }
 }
