@@ -5,7 +5,7 @@
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
  * Version: 2.23.0-tyde-beta
- * Author: Tapestry Team, University of British Coloumbia
+ * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
@@ -15,119 +15,121 @@ $TAPESTRY_VERSION_NUMBER = '2.25.0-tyde-beta';
 $TAPESTRY_USE_DEV_MODE = true;
 
 /**
- * Register endpoints
+ * Register endpoints.
  */
-require_once dirname(__FILE__) . '/endpoints.php';
+require_once dirname(__FILE__).'/endpoints.php';
 
 /**
- * Register Tapestry type on initialization
+ * Register Tapestry type on initialization.
  */
 function create_tapestry_type()
 {
-    $labels = array(
-        "name" => __("Tapestries"),
-        "singular_name" => __("Tapestry"),
-        "all_items" => __("All Tapestries")
-    );
-    $args = array(
-        "label" => __("tapestry"),
-        "labels" => $labels,
-        "description" => "",
-        "public" => true,
-        "publicly_queryable" => true,
-        "show_ui" => true,
-        "delete_with_user" => false,
-        "show_in_rest" => true,
-        "rest_base" => "",
-        "rest_controller_class" => "WP_REST_Posts_Controller",
-        "has_archive" => false,
-        "show_in_menu" => true,
-        "show_in_nav_menus" => true,
-        "exclude_from_search" => false,
-        "capability_type" => "post",
-        "map_meta_cap" => true,
-        "hierarchical" => false,
-        "rewrite" => array("with_front" => true),
-        "query_var" => true,
-        "supports" => array("title", "editor", "thumbnail", "author"),
-    );
+    $labels = [
+        'name' => __('Tapestries'),
+        'singular_name' => __('Tapestry'),
+        'all_items' => __('All Tapestries'),
+    ];
+    $args = [
+        'label' => __('tapestry'),
+        'labels' => $labels,
+        'description' => '',
+        'public' => true,
+        'publicly_queryable' => true,
+        'show_ui' => true,
+        'delete_with_user' => false,
+        'show_in_rest' => true,
+        'rest_base' => '',
+        'rest_controller_class' => 'WP_REST_Posts_Controller',
+        'has_archive' => false,
+        'show_in_menu' => true,
+        'show_in_nav_menus' => true,
+        'exclude_from_search' => false,
+        'capability_type' => 'post',
+        'map_meta_cap' => true,
+        'hierarchical' => false,
+        'rewrite' => ['with_front' => true],
+        'query_var' => true,
+        'supports' => ['title', 'editor', 'thumbnail', 'author'],
+    ];
     register_post_type('tapestry', $args);
 }
 add_action('init', 'create_tapestry_type');
 
 /**
- * Register Tapestry Node type on initialization
+ * Register Tapestry Node type on initialization.
  */
 function create_tapestry_node_type()
 {
-    $labels = array(
-        "name" => __("Tapestry Nodes"),
-        "singular_name" => __("Tapestry Node"),
-        "all_items" => __("Tapestry Nodes")
-    );
-    $args = array(
-        "label" => __("tapestry-node"),
-        "labels" => $labels,
-        "description" => "",
-        "public" => true,
-        "publicly_queryable" => true,
-        "show_ui" => true,
-        "delete_with_user" => false,
-        "show_in_rest" => true,
-        "rest_base" => "",
-        "rest_controller_class" => "WP_REST_Posts_Controller",
-        "has_archive" => false,
-        "show_in_menu" => 'edit.php?post_type=tapestry',
-        "show_in_nav_menus" => false,
-        "exclude_from_search" => false,
-        "capability_type" => "post",
-        "map_meta_cap" => true,
-        "hierarchical" => false,
-        "rewrite" => array("with_front" => true),
-        "query_var" => true,
-        "supports" => array("title", "editor", "thumbnail", "author"),
-    );
+    $labels = [
+        'name' => __('Tapestry Nodes'),
+        'singular_name' => __('Tapestry Node'),
+        'all_items' => __('Tapestry Nodes'),
+    ];
+    $args = [
+        'label' => __('tapestry-node'),
+        'labels' => $labels,
+        'description' => '',
+        'public' => true,
+        'publicly_queryable' => true,
+        'show_ui' => true,
+        'delete_with_user' => false,
+        'show_in_rest' => true,
+        'rest_base' => '',
+        'rest_controller_class' => 'WP_REST_Posts_Controller',
+        'has_archive' => false,
+        'show_in_menu' => 'edit.php?post_type=tapestry',
+        'show_in_nav_menus' => false,
+        'exclude_from_search' => false,
+        'capability_type' => 'post',
+        'map_meta_cap' => true,
+        'hierarchical' => false,
+        'rewrite' => ['with_front' => true],
+        'query_var' => true,
+        'supports' => ['title', 'editor', 'thumbnail', 'author'],
+    ];
     register_post_type('tapestry_node', $args);
 }
 add_action('init', 'create_tapestry_node_type');
 
 /**
- * Show posts of Tapestry type on the home page
+ * Show posts of Tapestry type on the home page.
  */
 function add_tapestry_post_types_to_query($query)
 {
     if (is_home() && $query->is_main_query()) {
-        $query->set('post_type', array('post', 'tapestry', 'tapestry-node'));
+        $query->set('post_type', ['post', 'tapestry', 'tapestry-node']);
     }
+
     return $query;
 }
 add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 
 /**
- * Filter the template for Tapestry post
+ * Filter the template for Tapestry post.
  */
 function load_tapestry_template($singleTemplate)
 {
     global $post;
-    if ($post->post_type === 'tapestry') {
-        $singleTemplate = dirname(__FILE__) . '/templates/single-tapestry.php';
+    if ('tapestry' === $post->post_type) {
+        $singleTemplate = dirname(__FILE__).'/templates/single-tapestry.php';
     }
+
     return $singleTemplate;
 }
 add_filter('single_template', 'load_tapestry_template');
 
 /**
- * Set Up Tapestry Post Upon Insertion
+ * Set Up Tapestry Post Upon Insertion.
  *
- * @param   Integer $postId Post ID
- * @param   Object  $post   Post Object
- * @param   Boolean $update Post Object
+ * @param int    $postId Post ID
+ * @param object $post   Post Object
+ * @param bool   $update Post Object
  *
- * @return  Object  Null
+ * @return object Null
  */
 function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
 {
-    if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
+    if (!isset($postId) || !isset($post) || 'tapestry' != get_post_type($postId)) {
         return;
     }
 
@@ -139,11 +141,11 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
         $tapestryData->settings->title = $post->post_title;
         $tapestryData->settings->status = $post->post_status;
     } else {
-        $tapestryData->settings = (object) array(
-            'tapestrySlug'  => $post->post_name,
-            'title'         => $post->post_title,
-            'status'        => $post->post_status
-        );
+        $tapestryData->settings = (object) [
+            'tapestrySlug' => $post->post_name,
+            'title' => $post->post_title,
+            'status' => $post->post_status,
+        ];
     }
 
     $tapestry->set((object) ['settings' => $tapestryData->settings]);
@@ -162,13 +164,13 @@ add_action('wp_ajax_gf_button_get_form', 'gf_button_ajax_get_form');
 add_filter('gform_shortcode_button', 'gf_button_shortcode', 10, 3);
 function gf_button_shortcode($shortcode_string, $attributes, $content)
 {
-    $a = shortcode_atts(array(
+    $a = shortcode_atts([
         'id' => 0,
         'text' => 'Show me the form!',
-    ), $attributes);
+    ], $attributes);
 
     $form_id = absint($a['id']);
-    
+
     if ($form_id < 1) {
         return 'Missing the ID attribute.';
     }
@@ -192,6 +194,7 @@ function gf_button_shortcode($shortcode_string, $attributes, $content)
 				});
 			}(window.SHFormLoader = window.SHFormLoader || {}, jQuery));
 			</script>";
+
     return $html;
 }
 
@@ -209,10 +212,10 @@ function create_analytics_schema()
 {
     global $wpdb;
 
-    add_option("tapestry_analytics_schema_version", "0.1");
+    add_option('tapestry_analytics_schema_version', '0.1');
 
     // Create table for logging events
-    $table_name = $wpdb->prefix . "tapestry_analytics_events";
+    $table_name = $wpdb->prefix.'tapestry_analytics_events';
     $charset_collate = $wpdb->get_charset_collate();
     $sql = "CREATE TABLE IF NOT EXISTS $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -226,7 +229,7 @@ function create_analytics_schema()
                 PRIMARY KEY  (id)
             ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once ABSPATH.'wp-admin/includes/upgrade.php';
     dbDelta($sql);
 }
 
@@ -240,29 +243,29 @@ function tapestry_activation()
 }
 
 /**
- * Add the copilot role on plugin activation
+ * Add the copilot role on plugin activation.
  */
 function create_copilot_role()
 {
     add_role(
         'copilot',
         'Copilot',
-        array(
-            'read'  => true,
-            'edit_posts' => true
-        )
+        [
+            'read' => true,
+            'edit_posts' => true,
+        ]
     );
 }
 
 /**
- * Show the teen input label if the user is a copilot
+ * Show the teen input label if the user is a copilot.
  */
 function add_copilot_teen_field($user)
 {
-    if (in_array("copilot", $user->roles)): ?>
+    if (in_array('copilot', $user->roles)): ?>
         <table class="form-table">
         <tr>
-            <th><label for="teen_id"><?php _e("Teen ID"); ?></label></th>
+            <th><label for="teen_id"><?php _e('Teen ID'); ?></label></th>
             <td>
                 <input type="text" name="teen_id" id="teen_id" value="<?php echo esc_attr(get_the_author_meta('teen_id', $user->ID)); ?>" class="regular-text" /><br />
                 <span class="description"><?php _e("Please enter your teen's user ID."); ?></span>
