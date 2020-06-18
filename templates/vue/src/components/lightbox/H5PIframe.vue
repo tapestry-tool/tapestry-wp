@@ -40,9 +40,9 @@ export default {
   },
   data() {
     return {
+      instance: null,
       frameHeight: 0,
       frameWidth: "100%",
-      instance: null,
       played: false,
     }
   },

@@ -1,13 +1,14 @@
 <?php
 
 /*
-Template Name: Tapestry Page Template
+ Template Name: Tapestry Page Template
  */
 /**
  * Register Script with Nonce
  *
  * @return Object null
  */
+
 function addNonceToScript()
 {
     global $TAPESTRY_VERSION_NUMBER;
@@ -148,10 +149,7 @@ get_header();?>
                 document.getElementById('tapestry').addEventListener('click', function(event) {
                     var x = event.clientX + $(window).scrollLeft();
                     var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'tapestry', null, {
-                        'x': x,
-                        'y': y
-                    });
+                    recordAnalyticsEvent('user', 'click', 'tapestry', null, { x, y });
                 }, true);
             });
         </script>

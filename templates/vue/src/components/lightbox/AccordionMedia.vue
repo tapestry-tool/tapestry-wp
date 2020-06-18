@@ -1,6 +1,8 @@
 <template>
   <div ref="container" class="media-container">
-    <h1 class="title">{{ node.title }}</h1>
+    <header>
+      <h1 class="title">{{ node.title }}</h1>
+    </header>
     <tapestry-accordion :rows="rows">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
@@ -19,7 +21,7 @@
                 <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.node.title }}
               </button>
-              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+              <a v-if="!disableRow(index)" @click="toggleFavourite(row.node.id)">
                 <i
                   v-if="isFavourite(row.node.id)"
                   class="fas fa-heart fa-sm"
@@ -86,17 +88,17 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from "vuex"
-import TapestryAccordion from "../TapestryAccordion"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
+import TapestryAccordion from "../TapestryAccordion"
 import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
   components: {
-    TapestryAccordion,
     TapestryMedia,
     TapestryModal,
+    TapestryAccordion,
     SubAccordion,
   },
   props: {
@@ -112,7 +114,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -125,8 +127,8 @@ export default {
     dimensions() {
       if (!this.isMounted) {
         return {
-          height: 0,
           width: 0,
+          height: 0,
         }
       }
       const box = this.$refs.container
@@ -139,16 +141,13 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
   },
   mounted() {
     this.isMounted = true
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -186,20 +185,6 @@ export default {
           this.$emit("complete")
         }
       }
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }
