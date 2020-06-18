@@ -2425,7 +2425,7 @@ function tapestryTool(config){
         if (config.wpCanEditTapestry) {
             return true;
         }
-        if (node.author == config.wpUserId) {
+        if (node.author.id == config.wpUserId) {
             return true;
         }
 
