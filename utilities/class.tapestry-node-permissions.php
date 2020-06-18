@@ -1,22 +1,21 @@
 <?php
 
 /**
- * Tapestry Node Permissions
- *
+ * Tapestry Node Permissions.
  */
 class TapestryNodePermissions
 {
     /**
-     * Get Default Node Permissions
+     * Get Default Node Permissions.
      *
-     * @return  Array   DefaultNodePermissions
+     * @return array DefaultNodePermissions
      */
     public static function getDefaultNodePermissions($tapestryPostId)
     {
-        if ($tapestryPostId == 0) {
+        if (0 == $tapestryPostId) {
             return (object) [
-                'public'        => ['read'],
-                'authenticated'    => ['read']
+                'public' => ['read'],
+                'authenticated' => ['read'],
             ];
         }
 
@@ -25,8 +24,8 @@ class TapestryNodePermissions
 
         if (!$defaultPermissions) {
             return (object) [
-                'public'        => ['read'],
-                'authenticated'    => ['read']
+                'public' => ['read'],
+                'authenticated' => ['read'],
             ];
         }
 
@@ -34,19 +33,19 @@ class TapestryNodePermissions
     }
 
     /**
-     * Get All Node Permission Options
+     * Get All Node Permission Options.
      *
-     * @return  Array   NodePermission
+     * @return array NodePermission
      */
     public static function getNodePermissions()
     {
         return [
-            'ADD'           => 'add',
-            'READ'          => 'read',
-            'EDIT'          => 'edit',
-            'APPROVE'       => 'approve',
-            'EDIT_SUBMIT'   => 'edit_submit',
-            'ADD_SUBMIT'    => 'add_submit',
+            'ADD' => 'add',
+            'READ' => 'read',
+            'EDIT' => 'edit',
+            'APPROVE' => 'approve',
+            'EDIT_SUBMIT' => 'edit_submit',
+            'ADD_SUBMIT' => 'add_submit',
         ];
     }
 }

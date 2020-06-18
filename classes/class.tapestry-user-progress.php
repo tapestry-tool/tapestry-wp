@@ -1,12 +1,12 @@
 <?php
+
 // TODO Change exceptions to using an ERROR class
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-user-progress.php";
-require_once dirname(__FILE__) . "/../classes/class.tapestry-node.php";
-require_once dirname(__FILE__) . "/../classes/class.tapestry.php";
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry-user-progress.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-node.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry.php';
 
 /**
- * Add/update/retrieve User progress
- *
+ * Add/update/retrieve User progress.
  */
 class TapestryUserProgress implements ITapestryUserProgress
 {
@@ -15,12 +15,12 @@ class TapestryUserProgress implements ITapestryUserProgress
     private $nodeMetaId;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param   Number  $postId     post ID
-     * @param   Number  $nodeMetaId node meta ID
+     * @param Number $postId     post ID
+     * @param Number $nodeMetaId node meta ID
      *
-     * @return  NULL
+     * @return null
      */
     public function __construct($postId = null, $nodeMetaId = null)
     {
@@ -30,9 +30,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get User's video progress for a tapestry post
+     * Get User's video progress for a tapestry post.
      *
-     * @return String progress   of each node in json format
+     * @return string progress   of each node in json format
      */
     public function get()
     {
@@ -46,17 +46,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Update User's video progress for a tapestry post
+     * Update User's video progress for a tapestry post.
      *
-     * @param Float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
+     * @param float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
      *
-     * @return Null
+     * @return null
      */
     public function updateUserProgress($progressValue)
     {
         $this->_checkUserAndPostId();
 
-        if ($progressValue !== null) {
+        if (null !== $progressValue) {
             $progressValue = floatval($progressValue);
         }
 
@@ -69,9 +69,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set 'completed' status of a Tapestry Node for this User to true
+     * Set 'completed' status of a Tapestry Node for this User to true.
      *
-     * @return Null
+     * @return null
      */
     public function complete()
     {
@@ -80,11 +80,11 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Set the question with the given id to be marked as 'completed'
+     * Set the question with the given id to be marked as 'completed'.
      *
-     * @param Integer $questionId the question to mark
+     * @param int $questionId the question to mark
      *
-     * @return Null
+     * @return null
      */
     public function completeQuestion($questionId)
     {
@@ -93,12 +93,12 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Update User's h5p video setting for a tapestry post
+     * Update User's h5p video setting for a tapestry post.
      *
-     * @param   String  $h5pSettingsData stores volume,
-     * playbackRate, quality of h5p video
+     * @param string $h5pSettingsData stores volume,
+     *                                playbackRate, quality of h5p video
      *
-     * @return  Null
+     * @return null
      */
     public function updateH5PSettings($h5pSettingsData)
     {
@@ -107,44 +107,46 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get User's h5p video setting for a tapestry post
+     * Get User's h5p video setting for a tapestry post.
      *
-     * @return String h5p $setting
+     * @return string h5p $setting
      */
     public function getH5PSettings()
     {
         $this->_isValidTapestryPost();
         $this->_checkUserAndPostId();
+
         return $this->_getUserH5PSettings();
     }
 
     /**
-     * Get all gravity form entries submitted by this user
+     * Get all gravity form entries submitted by this user.
      *
-     * @return String user entries in json format
+     * @return string user entries in json format
      */
     public function getUserEntries($userId = 0, $formId = 0)
     {
-        if (!class_exists("GFAPI")) {
+        if (!class_exists('GFAPI')) {
             return [];
         }
         if (!$userId) {
             $userId = $this->_userId;
         }
-        $search_criteria['field_filters'][] = array(
+        $search_criteria['field_filters'][] = [
             'key' => 'created_by',
             'value' => $userId,
-        );
+        ];
         $entries = GFAPI::get_entries($formId, $search_criteria);
+
         return $this->_formatEntries($entries);
     }
 
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-        $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
-        if ($completed_value !== null) {
-            return $completed_value === "1";
+        $completed_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_completed_'.$nodeId, true);
+        if (null !== $completed_value) {
+            return '1' === $completed_value;
         } else {
             return isset($nodeMetadata->completed) && $nodeMetadata->completed ? true : false;
         }
@@ -155,11 +157,11 @@ class TapestryUserProgress implements ITapestryUserProgress
         $formEntryMap = new stdClass();
 
         foreach ($entries as $entry) {
-            $formId = $entry["form_id"];
+            $formId = $entry['form_id'];
 
             if (property_exists($formEntryMap, $formId)) {
                 $latestEntry = $formEntryMap->$formId;
-                if ($entry["date_updated"] > $latestEntry["date_updated"]) {
+                if ($entry['date_updated'] > $latestEntry['date_updated']) {
                     $formEntryMap->$formId = $entry;
                 }
             } else {
@@ -170,15 +172,16 @@ class TapestryUserProgress implements ITapestryUserProgress
         foreach ((array) $formEntryMap as $formId => $entry) {
             $formEntryMap->$formId = $this->_getImageChoices($formId, $entry);
         }
+
         return $formEntryMap;
     }
 
     private function _getImageChoices($formId, &$entry)
     {
-        $field_types = array('checkbox', 'radio');
+        $field_types = ['checkbox', 'radio'];
         $form = GFAPI::get_form($formId);
         $fields = GFAPI::get_fields_by_type($form, $field_types);
-        $image_choices_fields = array();
+        $image_choices_fields = [];
         foreach ($fields as &$field) {
             if (is_object($field) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
                 $image_choices_fields[$field->id] = $field;
@@ -193,7 +196,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                         return $e['value'] == $label;
                     }
                 ))[0];
-                if ($entry[$input['id']] != '') {
+                if ('' != $entry[$input['id']]) {
                     $inputMap = new stdClass();
                     $inputMap->choiceText = $label;
                     $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
@@ -207,12 +210,12 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _updateUserProgress($progressValue)
     {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_progress_node_' . $this->nodeMetaId, $progressValue);
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);
     }
 
     private function _complete()
     {
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_completed_' . $this->nodeMetaId, true);
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
     }
 
     private function _completeQuestion($questionId)
@@ -220,7 +223,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);
         $quiz[$questionId]['completed'] = true;
-        update_user_meta($this->_userId, 'tapestry_' . $this->postId . '_node_quiz_' . $this->nodeMetaId, $quiz);
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId, $quiz);
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
@@ -234,9 +237,9 @@ class TapestryUserProgress implements ITapestryUserProgress
         foreach ($nodes as $node) {
             $nodeId = $node->id;
 
-            $progress_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_progress_node_' . $nodeId, true);
+            $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
             $progress->$nodeId = new stdClass();
-            if ($progress_value !== null) {
+            if (null !== $progress_value) {
                 $progress->$nodeId->progress = (float) $progress_value;
             } else {
                 $progress->$nodeId->progress = 0;
@@ -248,11 +251,11 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             if ($node->accessible) {
                 $progress->$nodeId->content = [
-                    'quiz'      => $node->quiz,
-                    'typeData'  => $node->typeData
+                    'quiz' => $node->quiz,
+                    'typeData' => $node->typeData,
                 ];
             }
-            
+
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
@@ -260,25 +263,26 @@ class TapestryUserProgress implements ITapestryUserProgress
             $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
             $progress->$nodeId->quiz = $quiz;
         }
+
         return $progress;
     }
 
     private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
     {
-        $quiz = array();
-        $completed_values = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_quiz_' . $nodeId, true);
+        $quiz = [];
+        $completed_values = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId, true);
 
         $entries = $this->getUserEntries($userId);
 
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
             foreach ($nodeMetadata->quiz as $question) {
-                $quiz[$question->id] = array(
+                $quiz[$question->id] = [
                     'completed' => false,
-                );
+                ];
 
                 foreach ($question->answers as $type => $gfOrH5pId) {
-                    if ($gfOrH5pId !== "") {
-                        if ($type == 'audioId') {
+                    if ('' !== $gfOrH5pId) {
+                        if ('audioId' == $type) {
                             $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id, $userId);
                             if ($tapestryAudio->audioExists()) {
                                 $quiz[$question->id][$type] = $tapestryAudio->get();
@@ -302,43 +306,45 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _updateUserH5PSettings($h5pSettingsData)
     {
-        update_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, $h5pSettingsData);
+        update_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, $h5pSettingsData);
     }
 
     private function _getUserH5PSettings()
     {
-        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_' . $this->postId, true);
+        $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
+
         return $settings ? json_decode($settings) : (object) [];
     }
 
     /**
-     * Get User's video progress for a tapestry post
+     * Get User's video progress for a tapestry post.
      *
-     * @return Array $favourites array of nodeIds
+     * @return array $favourites array of nodeIds
      */
     public function getFavourites()
     {
         $this->_isValidTapestryPost();
         $this->_checkUserAndPostId();
 
-        $favourites = get_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, true);
+        $favourites = get_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, true);
         if ($favourites) {
             return json_decode($favourites);
         }
+
         return [];
     }
 
     /**
-     * Update User's favourite nodes for a tapestry post
+     * Update User's favourite nodes for a tapestry post.
      *
-     * @param Array $favourites update the favourite nodes
+     * @param array $favourites update the favourite nodes
      *
-     * @return Null
+     * @return null
      */
     public function updateFavourites($favourites)
     {
         $this->_checkUserAndPostId();
-        update_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, $favourites);
+        update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
     }
 
     /* Helpers */
@@ -362,7 +368,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
 
         // Post type is correct
-        if (get_post_type($this->postId) != "tapestry") {
+        if ('tapestry' != get_post_type($this->postId)) {
             throw new Exception('post type is invalid');
         }
     }
@@ -370,7 +376,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _isJson($string)
     {
         $test_json = json_decode($string);
-        if ($test_json !== null) {
+        if (null !== $test_json) {
             return true;
         } else {
             return false;

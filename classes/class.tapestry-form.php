@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-form.php";
+
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry-form.php';
 
 class TapestryForm implements ITapestryForm
 {
@@ -11,15 +12,16 @@ class TapestryForm implements ITapestryForm
     }
 
     /**
-     * Returns the form object of all created forms
+     * Returns the form object of all created forms.
      *
-     * @return  Array
+     * @return array
      */
     public function getAll()
     {
         if (!$this::exists()) {
             return [];
         }
+
         return GFAPI::get_forms();
     }
 
@@ -27,7 +29,7 @@ class TapestryForm implements ITapestryForm
      * Get the latest entry for the given form id for
      * the current logged in user.
      *
-     * @return Object the corresponding entry
+     * @return object the corresponding entry
      */
     public function getEntry($formId, $userId = 0)
     {
@@ -37,20 +39,21 @@ class TapestryForm implements ITapestryForm
         if (!$userId) {
             $userId = apply_filters('determine_current_user', false);
         }
-        $search_criteria['field_filters'][] = array(
+        $search_criteria['field_filters'][] = [
             'key' => 'created_by',
             'value' => $userId,
-        );
+        ];
+
         return GFAPI::get_entries($formId, $search_criteria);
     }
 
     /**
-     * Returns the form object of all created forms
+     * Returns the form object of all created forms.
      *
-     * @return  Array
+     * @return array
      */
     public static function exists()
     {
-        return class_exists("GFAPI");
+        return class_exists('GFAPI');
     }
 }
