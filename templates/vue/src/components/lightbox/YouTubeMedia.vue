@@ -37,7 +37,9 @@ import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
 import { mapState, mapActions } from "vuex"
 import Helpers from "../../utils/Helpers"
+
 const ALLOW_SKIP_THRESHOLD = 0.95
+
 export default {
   name: "video-media",
   components: {
@@ -183,8 +185,10 @@ export default {
   height: 100%;
   max-width: 100vw;
   overflow: hidden;
+
   > div {
     padding-right: 30px;
+
     > iframe {
       margin: 0;
       padding: 0;

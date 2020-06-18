@@ -53,11 +53,6 @@ export default {
       type: Object,
       required: true,
     },
-    allowEndScreen: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     autoplay: {
       type: Boolean,
       required: false,
@@ -69,6 +64,11 @@ export default {
       validator: val => {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
+    },
+    allowEndScreen: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     readOnly: {
       type: Boolean,

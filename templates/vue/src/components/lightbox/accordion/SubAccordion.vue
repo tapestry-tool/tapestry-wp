@@ -66,16 +66,8 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      isMounted: false,
-    }
-  },
   computed: {
     ...mapGetters(["isFavourite"]),
-  },
-  mounted() {
-    this.isMounted = true
   },
   methods: {
     ...mapActions(["toggleFavourite"]),

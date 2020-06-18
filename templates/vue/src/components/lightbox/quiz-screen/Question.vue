@@ -87,25 +87,29 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
-import SpeechBubble from "../../SpeechBubble"
+import AudioRecorder from "@/components/AudioRecorder"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
-import Helpers from "@/utils/Helpers"
-import AudioRecorder from "@/components/AudioRecorder"
 import TapestryActivity from "@/components/TapestryActivity"
+import SpeechBubble from "@/components/SpeechBubble"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    SpeechBubble,
+    AudioRecorder,
     GravityForm,
     Loading,
-    AudioRecorder,
     TapestryActivity,
+    SpeechBubble,
   },
   props: {
     question: {
+      type: Object,
+      required: true,
+    },
+    node: {
       type: Object,
       required: true,
     },
@@ -113,10 +117,6 @@ export default {
       type: String,
       required: false,
       default: "1/1",
-    },
-    node: {
-      type: Object,
-      required: true,
     },
     readOnly: {
       type: Boolean,

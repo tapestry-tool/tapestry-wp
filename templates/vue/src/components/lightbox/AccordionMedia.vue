@@ -121,13 +121,13 @@
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
+import SubAccordion from "./accordion/SubAccordion"
 import TapestryAccordion from "../TapestryAccordion"
 import TydeProgressBar from "../tyde/TydeProgressBar"
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
-import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -135,9 +135,9 @@ export default {
     TapestryMedia,
     TapestryModal,
     TapestryAccordion,
+    SubAccordion,
     TydeIcon,
     TydeProgressBar,
-    SubAccordion,
   },
   props: {
     node: {
@@ -152,9 +152,9 @@ export default {
   },
   data() {
     return {
-      activeIndex: 0,
       showCompletion: false,
       isMounted: false,
+      activeIndex: 0,
     }
   },
   computed: {

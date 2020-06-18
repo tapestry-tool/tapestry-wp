@@ -33,10 +33,10 @@
 
 <script>
 import Question from "./quiz-screen/Question"
-import Helpers from "@/utils/Helpers"
-import BackgroundImg from "@/assets/question-screen-bg.png"
 import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
+import Helpers from "@/utils/Helpers"
+import BackgroundImg from "@/assets/question-screen-bg.png"
 
 export default {
   name: "quiz-screen",
@@ -72,9 +72,6 @@ export default {
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
     },
-    backgroundImage() {
-      return `url(${Helpers.getImagePath(BackgroundImg)})`
-    },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
     },
@@ -83,6 +80,9 @@ export default {
     },
     hasPrev() {
       return this.activeQuestionIndex !== 0
+    },
+    backgroundImage() {
+      return `url(${Helpers.getImagePath(BackgroundImg)})`
     },
   },
   methods: {
