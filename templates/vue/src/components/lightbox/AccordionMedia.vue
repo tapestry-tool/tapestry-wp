@@ -152,7 +152,6 @@ export default {
   },
   data() {
     return {
-      activeIndex: 0,
       showCompletion: false,
       isMounted: false,
     }
@@ -182,9 +181,6 @@ export default {
     },
     headerBackground() {
       return { backgroundImage: `url(${Helpers.getImagePath(AccordionHeader)})` }
-    },
-    hasNext() {
-      return this.activeIndex < this.rows.length - 1
     },
     rows() {
       return this.node.childOrdering.map(id => {
@@ -224,17 +220,10 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
-        if (this.activeIndex < 0) {
-          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
-            to: 0,
-          })
-          this.$refs.container.scrollTop = 0
-        } else {
-          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
-            to: el.offsetTop - 12,
-          })
-          this.$refs.container.scrollTop = el.offsetTop - 12
-        }
+        globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          to: el.offsetTop - 12,
+        })
+        this.$refs.container.scrollTop = el.offsetTop - 12
       })
     },
     scrollToTop() {
@@ -244,36 +233,6 @@ export default {
           to: 0,
         })
         el.scrollTop = 0
-      }
-    },
-    toggle(index) {
-      if (this.activeIndex === index) {
-        const activeRowId = this.rows[this.activeIndex].node.id
-        this.activeIndex = -1
-        globals.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      } else {
-        this.activeIndex = index
-        const activeRowId = this.rows[this.activeIndex].node.id
-        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      }
-    },
-    next(evt) {
-      globals.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
-        x: evt.clientX,
-        y: evt.clientY,
-      })
-      if (this.hasNext) {
-        this.activeIndex++
-        const activeRowId = this.rows[this.activeIndex].node.id
-        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      } else {
-        this.showCompletion = true
       }
     },
     handleClose(evt) {

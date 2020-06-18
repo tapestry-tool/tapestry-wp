@@ -40,6 +40,7 @@ export default {
       } else {
         this.activeRow = row
       }
+      this.$emit("toggle", row)
     },
     next() {
       if (this.hasNext) {
