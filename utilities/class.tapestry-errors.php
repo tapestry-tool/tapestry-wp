@@ -86,13 +86,21 @@ class TapestryError extends Error
             'MESSAGE'   => 'Root node can only be deleted if there are no other nodes in the tapestry',
             'STATUS'    => ['status' => 400]
         ],
+        'FAILED_TO_CREATE_POST' => [
+            'MESSAGE'   => 'Unable to create new Tapestry',
+            'STATUS'    => ['status' => 500]
+        ],
+        'TAPESTRY_NOT_EMPTY' => [
+            'MESSAGE'   => 'The Tapestry is not empty',
+            'STATUS'    => ['status' => 400]
+        ]
     ];
 
     /**
      * Constructor
-     * 
+     *
      * @param   String  $code   error code
-     * 
+     *
      * @return  NULL
      */
     public function __construct($code)
@@ -105,7 +113,7 @@ class TapestryError extends Error
 
     /**
      * Get Error Status
-     * 
+     *
      * @return  $status
      */
     public function getStatus()

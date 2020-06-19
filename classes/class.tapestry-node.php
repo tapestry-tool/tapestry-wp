@@ -2,10 +2,12 @@
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
 require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
 require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
+require_once dirname(__FILE__) . "/../classes/class.tapestry-user-progress.php";
+require_once dirname(__FILE__) . "/../classes/class.constants.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
- * 
+ *
  */
 class TapestryNode implements ITapestryNode
 {
@@ -39,10 +41,10 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Constructor
-     * 
+     *
      * @param   Number  $tapestryPostId tapestry post ID
      * @param   Number  $nodeMetaId node meta ID
-     * 
+     *
      * @return  NULL
      */
     public function __construct($tapestryPostId = 0, $nodeMetaId = 0)
@@ -79,11 +81,11 @@ class TapestryNode implements ITapestryNode
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->set($node);
-            $this->author = $this->_getAuthorInfo(get_post_field( 'post_author', $this->nodePostId ));
+            $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
         }
     }
 
-    /**	
+    /**
      * Save the Tapestry node
      *
      * @return  Object  $node
@@ -95,7 +97,7 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Set Node
-     * 
+     *
      * @param   Object  $node  node
      *
      * @return  NULL
@@ -175,7 +177,7 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Get the node
-     * 
+     *
      * @return  $node    node
      */
     public function get()
@@ -204,13 +206,13 @@ class TapestryNode implements ITapestryNode
      * Update node conditions by removing conditions by nodeId
      *
      * @param   String  $nodeId  nodeId
-     * 
+     *
      * @return NULL
      */
     public function removeConditionsById($nodeId)
     {
         $listModified = false;
-        foreach($this->conditions as $conditionId => $condition) {
+        foreach ($this->conditions as $conditionId => $condition) {
             if ($condition->nodeId == $nodeId) {
                 array_splice($this->conditions, $conditionId, 1);
                 $listModified = true;
@@ -219,6 +221,81 @@ class TapestryNode implements ITapestryNode
         if ($listModified) {
             $this->_saveToDatabase();
         }
+    }
+
+    public function getLockedState($userId = 0)
+    {
+        $conditions = $this->conditions;
+        $userProgress = new TapestryUserProgress($this->tapestryPostId, $this->nodeMetaId);
+
+        foreach ($conditions as $condition) {
+            $condition->fulfilled = false;
+        }
+
+        foreach ($conditions as $condition) {
+            switch ($condition->type) {
+                case ConditionTypes::NODE_COMPLETED:
+                    if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                case ConditionTypes::DATE_NOT_PASSED:
+                    if (new DateTime() <= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                case ConditionTypes::DATE_PASSED:
+                    if (new DateTime() >= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                        $condition->fulfilled = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $conditions;
+    }
+
+    public function isLocked($userId = 0)
+    {
+        $conditions = $this->getLockedState($userId);
+
+        $numFulfilled = 0;
+        foreach ($conditions as $condition) {
+            if ($condition->fulfilled) {
+                $numFulfilled++;
+            }
+        }
+
+        return $numFulfilled !== count($conditions);
+    }
+
+    public function getMeta()
+    {
+        $node = $this->get();
+        $node->quiz = [];
+        $node->typeData = (object) [
+            'progress' => [
+                0   => [
+                    'group' => 'viewed',
+                    'value' => 0
+                ],
+                1   => [
+                    'group' => 'unviewed',
+                    'value' => 1
+                ]
+            ]
+        ];
+        return $node;
+    }
+
+    public function getContent()
+    {
+        return [
+            'quiz'      => (array) $this->quiz,
+            'typeData'  => $this->typeData
+        ];
     }
 
     private function _saveToDatabase()
@@ -251,12 +328,12 @@ class TapestryNode implements ITapestryNode
 
         return $node;
     }
-    
+
     private function _resetAuthor()
     {
         wp_update_post(array(
-            'ID'            => $this->nodePostId,
-            'post_author'   => $this->author['id']
+            'ID' => $this->nodePostId,
+            'post_author' => $this->author['id'],
         ));
     }
 
@@ -289,42 +366,42 @@ class TapestryNode implements ITapestryNode
     private function _formNode()
     {
         return (object) [
-            'id'            => $this->nodeMetaId,
-            'author'        => $this->author,
-            'type'          => $this->type,
-            'size'          => $this->size,
-            'title'         => $this->title,
-            'status'        => $this->status,
-            'imageURL'      => $this->imageURL,
-            'lockedImageURL'=> $this->lockedImageURL,
-            'mediaType'     => $this->mediaType,
-            'mediaFormat'   => $this->mediaFormat,
+            'id' => $this->nodeMetaId,
+            'author' => $this->author,
+            'type' => $this->type,
+            'size' => $this->size,
+            'title' => $this->title,
+            'status' => $this->status,
+            'imageURL' => $this->imageURL,
+            'lockedImageURL' => $this->lockedImageURL,
+            'mediaType' => $this->mediaType,
+            'mediaFormat' => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
-            'description'   => $this->description,
-            'behaviour'     => $this->behaviour,
-            'typeData'      => $this->typeData,
-            'coordinates'   => $this->coordinates,
-            'permissions'   => $this->permissions,
-            'hideTitle'     => $this->hideTitle,
-            'hideProgress'  => $this->hideProgress,
-            'hideMedia'     => $this->hideMedia,
-            'skippable'     => $this->skippable,
-            'quiz'          => $this->quiz,
-            'fullscreen'    => $this->fullscreen,
-            'conditions'    => $this->conditions,
+            'description' => $this->description,
+            'behaviour' => $this->behaviour,
+            'typeData' => $this->typeData,
+            'coordinates' => $this->coordinates,
+            'permissions' => $this->permissions,
+            'hideTitle' => $this->hideTitle,
+            'hideProgress' => $this->hideProgress,
+            'hideMedia' => $this->hideMedia,
+            'skippable' => $this->skippable,
+            'quiz' => $this->quiz,
+            'fullscreen' => $this->fullscreen,
+            'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
-            'fitWindow'     => $this->fitWindow
+            'fitWindow' => $this->fitWindow,
         ];
     }
 
     private function _makeMetadata($node, $nodePostId)
     {
         return (object) array(
-            'post_id'       => $nodePostId,
-            'title'         => $node->title,
-            'permissions'   => $node->permissions,
-            'coordinates'   => $node->coordinates,
-            'quiz'       => $node->quiz
+            'post_id' => $nodePostId,
+            'title' => $node->title,
+            'permissions' => $node->permissions,
+            'coordinates' => $node->coordinates,
+            'quiz' => $node->quiz,
         );
     }
 
@@ -359,10 +436,15 @@ class TapestryNode implements ITapestryNode
 
     private function _getAuthorInfo($id)
     {
+        if (!$id) {
+            $id = 1;
+        }
         $user = get_user_by('id', $id);
-        return [
-            "id"    => $id,
-            "name"  => $user->display_name,
-        ];
+        if ($user) {
+            return [
+                "id"    => $id,
+                "name"  => $user->display_name,
+            ];
+        }
     }
 }
