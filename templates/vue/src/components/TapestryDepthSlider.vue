@@ -8,24 +8,93 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations } from "vuex"
+
 export default {
   data() {
     return {
-      currentDepth: 0,
+      currentDepth: 1,
     }
   },
   computed: {
+    ...mapState(["selectedNodeId", "nodes"]),
+    ...mapGetters(["getDirectChildren"]),
+    levels() {
+      const levels = {}
+      const queue = []
+      const visited = new Set()
+
+      queue.push(this.selectedNodeId)
+      visited.add(this.selectedNodeId)
+      levels[this.selectedNodeId] = 0
+
+      while (queue.length > 0) {
+        const currentNodeId = queue.shift()
+        const neighbours = this.getDirectChildren(currentNodeId)
+        neighbours
+          .filter(childId => !visited.has(childId))
+          .forEach(childId => {
+            levels[childId] = levels[currentNodeId] + 1
+            queue.push(childId)
+            visited.add(childId)
+          })
+      }
+
+      const levelsArray = []
+      Object.entries(levels).forEach(([nodeId, level]) => {
+        const nodesAtLevel = levelsArray[level] || []
+        nodesAtLevel.push(nodeId)
+        levelsArray[level] = nodesAtLevel
+      })
+      return levelsArray
+    },
     maxDepth() {
-      return 4
+      return this.levels.length
     },
   },
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function() {
-        // TODO: Update node visibility type here
+      handler: function(rawDepth) {
+        const depth = parseInt(rawDepth)
+        this.nodes.forEach(node => {
+          if (node.id !== this.selectedNodeId) {
+            this.updateNode({
+              id: node.id,
+              newNode: {
+                nodeType: "child",
+              },
+            })
+          }
+        })
+        const nodesAtCurrentDepth = this.levels[depth]
+        nodesAtCurrentDepth.forEach(nodeId => {
+          this.updateNode({
+            id: nodeId,
+            newNode: {
+              nodeType: "grandchild",
+            },
+          })
+        })
+        const hiddenNodes = this.levels
+          .filter((_, level) => level > depth)
+          .flatMap(nodes => nodes)
+        hiddenNodes.forEach(nodeId => {
+          this.updateNode({
+            id: nodeId,
+            newNode: {
+              nodeType: "",
+            },
+          })
+        })
       },
     },
+  },
+  created() {
+    this.currentDepth = Math.floor((this.maxDepth - 1) / 2)
+  },
+  methods: {
+    ...mapMutations(["updateNode"]),
   },
 }
 </script>

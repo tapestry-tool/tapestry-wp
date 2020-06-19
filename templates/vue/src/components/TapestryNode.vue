@@ -33,10 +33,10 @@ export default {
       return this.settings.autolayout
     },
     isVisible() {
-      return this.node.visibility !== "hidden"
+      return this.node.nodeType !== ""
     },
     radius() {
-      switch (this.node.visibility) {
+      switch (this.node.nodeType) {
         case "root":
           return 210
         case "grandchild":

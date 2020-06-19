@@ -39,9 +39,11 @@ export function addNode(state, node) {
 export function updateNode(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
   const thisNode = state.nodes[nodeIndex]
+  const copy = { ...thisNode }
   Object.entries(payload.newNode).forEach(([key, value]) => {
-    thisNode[key] = value
+    copy[key] = value
   })
+  state.nodes[nodeIndex] = copy
   state.nodes = [...state.nodes]
 }
 
