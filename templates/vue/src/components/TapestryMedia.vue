@@ -5,7 +5,9 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
-          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
+          node.mediaFormat === 'mp4' ||
+          node.mediaFormat === 'h5p' ||
+          node.mediaFormat === 'youtube',
       },
     ]"
   >
@@ -17,6 +19,16 @@
     />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
+      :autoplay="autoplay"
+      :node="node"
+      :dimensions="dimensions"
+      @load="handleLoad"
+      @complete="complete"
+      @timeupdate="updateProgress"
+      @close="$emit('close')"
+    />
+    <youtube-media
+      v-if="node.mediaFormat === 'youtube'"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
@@ -76,6 +88,7 @@ import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
+import YoutubeMedia from "./lightbox/YoutubeMedia"
 
 export default {
   name: "tapestry-media",
@@ -88,6 +101,7 @@ export default {
     WpPostMedia,
     CompletionScreen,
     QuizMedia,
+    YoutubeMedia,
   },
   props: {
     nodeId: {
@@ -148,13 +162,14 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
-
-  &-embed {
-    background: white;
-  }
+  padding: 0;
 
   &-no-scroll {
     overflow: hidden;
+  }
+
+  &-embed {
+    background: white;
   }
 }
 </style>

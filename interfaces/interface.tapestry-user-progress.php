@@ -2,7 +2,7 @@
 
 /**
  * Tapestry Interface
- * 
+ *
  */
 interface ITapestryUserProgress
 {
@@ -25,16 +25,16 @@ interface ITapestryUserProgress
 
     /**
      * Set 'skippable' status of a Tapestry Node for this User to true
-     * 
+     *
      * @return Null
      */
     public function complete();
 
     /**
      * Set the question with the given id to be marked as 'completed'
-     * 
+     *
      * @param Integer $questionId the question to mark
-     * 
+     *
      * @return Null
      */
     public function completeQuestion($questionId);
@@ -44,14 +44,14 @@ interface ITapestryUserProgress
      *
      * @param String $h5pSettingsData stores volume,
      * playbackRate, quality of h5p video
-     * 
+     *
      * @return Null
      */
     public function updateH5PSettings($h5pSettingsData);
 
     /**
      * Get User's h5p video setting for a tapestry post
-     * 
+     *
      * @return String h5p $setting
      */
     public function getH5PSettings();
@@ -59,7 +59,7 @@ interface ITapestryUserProgress
     /**
      * Get all gravity form entries submitted by this user.
      * If $formId is passed, returns entries for only that form.
-     * 
+     *
      * @param Integer $formId
      * @return String user entries in json format
      */
