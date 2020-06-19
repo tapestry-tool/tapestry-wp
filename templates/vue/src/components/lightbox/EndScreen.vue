@@ -7,7 +7,7 @@
         Do you wanna...
       </h3>
     </speech-bubble>
-    <div class="button-container" :class="{ 'pt-4': !showQuizButton }">
+    <div class="end-screen-button-container" :class="{ 'pt-4': !showQuizButton }">
       <button
         v-if="showQuizButton"
         class="end-screen-button button-quiz"
@@ -98,9 +98,6 @@ export default {
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
-  padding: 24px;
-  padding-left: 38%;
-  padding-right: 64px;
 
   button {
     background: none;

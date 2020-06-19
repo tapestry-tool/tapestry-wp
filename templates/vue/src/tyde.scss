@@ -114,10 +114,6 @@
       width: auto;
       border-radius: 0;
 
-      i {
-        margin-right: auto;
-      }
-
       &-trigger {
         display: flex;
         align-items: center;
@@ -137,6 +133,10 @@
         width: 48px;
         height: 48px;
         margin-right: 24px;
+
+        i {
+          margin-right: 0;
+        }
       }
 
       p {
@@ -297,7 +297,7 @@
       max-height: 180px !important;
     }
 
-    .button-nav {
+    &-button-nav {
       background: var(--tyde-blue);
 
       &:hover {
@@ -335,20 +335,18 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: stretch;
-    height: auto;
-    min-height: 100%;
-    background-color: none;
+    height: 100%;
+    background-color: 0;
     background-size: cover;
     color: black;
     padding: 24px;
-    padding-left: 38%;
+    padding-left: 30%;
     padding-right: 64px;
 
-    .button-container {
+    .end-screen-button-container {
       display: flex;
       flex-direction: column;
       padding-left: 96px;
-      margin-top: 64px;
     }
 
     button {
@@ -362,6 +360,7 @@
       opacity: 1;
       transition: opacity 0.1s ease-out;
       font-size: 2em;
+      margin-right: 0;
       margin-bottom: 32px;
 
       &:hover {

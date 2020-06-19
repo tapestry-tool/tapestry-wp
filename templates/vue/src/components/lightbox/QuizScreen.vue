@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="close">
+      <button v-else class="quiz-screen-button-completion" @click="close">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -139,7 +139,7 @@ export default {
   align-items: center;
 }
 
-.button-completion {
+.quiz-screen-button-completion {
   background: none;
   padding: 0;
   margin: 0;

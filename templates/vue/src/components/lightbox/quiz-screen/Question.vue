@@ -3,7 +3,7 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button v-if="!readOnly" class="button-nav" @click="back">
+    <button v-if="!readOnly" class="question-button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -53,7 +53,7 @@
       <div v-else>
         <div class="question-content">
           <p class="question-answer-text">I want to answer with...</p>
-          <div class="button-container">
+          <div class="buttons">
             <answer-button
               v-if="hasId('textId')"
               :completed="textFormCompleted"
@@ -308,7 +308,7 @@ button {
     font-size: 2em;
   }
 
-  .button-nav {
+  .question-button-nav {
     border-radius: 50%;
     width: 80px;
     height: 80px;
@@ -373,7 +373,7 @@ button {
     align-items: center;
     justify-content: center;
 
-    .button-container {
+    .buttons {
       width: 100%;
       display: flex;
       justify-content: center;

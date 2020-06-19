@@ -1,10 +1,10 @@
 <template>
   <button class="answer-button" :disabled="disabled" @click="$emit('click')">
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
-    <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
+    <div v-if="isFaIcon" class="answer-button-icon">
+      <i :class="`fas fa-${icon} answer-button-icon-fa`"></i>
     </div>
-    <img v-else :src="textIcon" class="icon" />
+    <img v-else :src="textIcon" class="answer-button-icon" />
     <div>
       <slot></slot>
     </div>
@@ -84,7 +84,7 @@ button {
   }
 }
 
-.icon {
+.answer-button-icon {
   height: 56px;
 
   &-fa {
