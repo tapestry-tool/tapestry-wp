@@ -875,6 +875,7 @@ function tapestryTool(config){
         }
 
         updateSvgDimensions();
+        renderTooltips();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -1355,9 +1356,16 @@ function tapestryTool(config){
             .attr("width", d => Math.min(getRadius(d) * 2 + 48, 400))
             .attr("height", d => getRadius(d) * 2)
             .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 400) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 20))
+            .attr("y", d => {
+                const onBottom = d.y - tapestry.getTapestryDimensions().startY < getRadius(d) * 2.5 && d.x > 0 && d.y > 0
+                return onBottom ? getRadius(d) + 27.5 + 5 : -(getRadius(d) * 3 + 27.5 + 20)
+            })
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
+            .style("align-items", d => {
+                const onBottom = d.y - tapestry.getTapestryDimensions().startY < getRadius(d) * 2.5 && d.x > 0 && d.y > 0
+                return onBottom ? "flex-start" : "flex-end"
+            })
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip-content")
             .html(getTooltipHtml)
@@ -1371,13 +1379,15 @@ function tapestryTool(config){
                 goToNode(this.dataset.node)
             })
 
+        nodes.selectAll(".tooltip-pointer").remove();
         nodes
             .filter(d => !d.accessible)
             .append("polygon")
             .attr("class", "tooltip-pointer")
             .attr("points", function(d) {
-                const yOffset = getRadius(d) * 3 + 27.5 + 20 - getRadius(d) * 2
-                const points = [[-16, -16 - yOffset], [16, -16 - yOffset], [0, 16 - yOffset]]
+                const onBottom = d.y - tapestry.getTapestryDimensions().startY < getRadius(d) * 2.5 && d.x > 0 && d.y > 0
+                const yOffset = onBottom ? -(getRadius(d) * 3 + 27.5 + 5 - getRadius(d) * 2) : getRadius(d) * 3 + 27.5 + 20 - getRadius(d) * 2
+                const points = onBottom ? [[-16, 16 - yOffset], [16, 16 - yOffset], [0, -16 - yOffset]] : [[-16, -16 - yOffset], [16, -16 - yOffset], [0, 16 - yOffset]]
                 return points.map(point => point.join(",")).join(" ")
             })
             .attr("fill", "black")
@@ -1425,10 +1435,10 @@ function tapestryTool(config){
             })
             .on("mouseleave", function () {
                 // Hide unlock conditions tooltip
-                const wrapper = this.querySelector(".tooltip-wrapper");
-                const pointer = this.querySelector("polygon.tooltip-pointer");
-                pointer.style.opacity = 0;
-                wrapper.style.display = "none";
+                // const wrapper = this.querySelector(".tooltip-wrapper");
+                // const pointer = this.querySelector("polygon.tooltip-pointer");
+                // pointer.style.opacity = 0;
+                // wrapper.style.display = "none";
             })
     }
 
