@@ -1,8 +1,9 @@
 <template>
-  <g>
+  <g v-show="isVisible" @click="updateSelectedNode(node.id)">
     <circle
-      v-show="isVisible"
       ref="node"
+      :cx="node.fx"
+      :cy="node.fy"
       :class="[
         'tapestry-node',
         {
@@ -10,20 +11,28 @@
           grandchild: node.nodeType === 'grandchild',
         },
       ]"
-      :cx="node.fx"
-      :cy="node.fy"
-      :fill="
-        node.imageURL && node.imageURL.length
-          ? `url('#node-thumb-2059')`
-          : `currentColor`
-      "
-      r="140"
-      :transform="
-        `matrix(${scale}, 0, 0, ${scale}, ${node.fx - scale * node.fx}, ${node.fy -
-          scale * node.fy})`
-      "
-      @click="updateSelectedNode(node.id)"
+      fill="currentColor"
+      :r="radius"
     ></circle>
+    <g v-if="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
+      <foreignObject
+        class="node-button"
+        :x="node.fx - 30"
+        :y="node.fy - radius - 30"
+      >
+        <button @click="openNode">Play</button>
+      </foreignObject>
+      <foreignObject
+        class="node-button"
+        :x="node.fx - 65"
+        :y="node.fy + radius - 30"
+      >
+        <button @click="addNode">Add</button>
+      </foreignObject>
+      <foreignObject class="node-button" :x="node.fx + 5" :y="node.fy + radius - 30">
+        <button @click="editNode">Edit</button>
+      </foreignObject>
+    </g>
   </g>
 </template>
 
@@ -44,14 +53,14 @@ export default {
     isVisible() {
       return this.node.nodeType !== ""
     },
-    scale() {
+    radius() {
       if (this.node.id == this.selectedNodeId) {
-        return 1.5
+        return 210
       }
       if (this.node.nodeType === "grandchild") {
-        return 0.3
+        return 40
       }
-      return 1
+      return 140
     },
   },
   mounted() {
@@ -65,12 +74,22 @@ export default {
   },
   methods: {
     ...mapMutations(["updateSelectedNode"]),
+    openNode() {
+      this.$router.push(`/nodes/${this.node.id}`)
+    },
+    addNode() {
+      this.$root.$emit("add-node", this.node.id)
+    },
+    editNode() {
+      this.$root.$emit("edit-node", this.node.id)
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.tapestry-node {
-  transition: all 0.2s ease-out;
+.node-button {
+  height: 60px;
+  width: 60px;
 }
 </style>

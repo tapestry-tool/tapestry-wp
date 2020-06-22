@@ -57,6 +57,18 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("tapestry-open-node", this.openNode)
+
+    this.$root.$on("add-node", to => {
+      this.modalType = "add"
+      this.nodeId = to
+      this.$bvModal.show("node-modal")
+    })
+
+    this.$root.$on("edit-node", nodeId => {
+      this.modalType = "edit"
+      this.nodeId = nodeId
+      this.$bvModal.show("node-modal")
+    })
   },
   methods: {
     ...mapMutations(["init", "setDataset", "updateSelectedNode"]),
