@@ -10,6 +10,7 @@
         required
       />
     </b-form-group>
+
     <b-form-group label="Description">
       <b-form-textarea
         id="node-description"
@@ -18,7 +19,11 @@
         placeholder="Enter description"
       ></b-form-textarea>
     </b-form-group>
-    <RichTextForm />
+    <rich-text-form
+      id="node-description"
+      v-model="node.description"
+      data-testid="node-description"
+    />
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>

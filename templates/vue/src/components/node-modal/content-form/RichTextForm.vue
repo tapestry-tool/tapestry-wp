@@ -1,15 +1,13 @@
 <template>
   <div class="editor">
-    <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
+    <editor-menu-bar v-slot="{ commands, isActive }" :editor="editor">
       <div class="menubar">
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.bold() }"
           @click="commands.bold"
         >
           Bold
-
         </button>
 
         <button
@@ -25,7 +23,7 @@
           :class="{ 'is-active': isActive.strike() }"
           @click="commands.strike"
         >
-         Strike
+          Strike
         </button>
 
         <button
@@ -33,7 +31,7 @@
           :class="{ 'is-active': isActive.underline() }"
           @click="commands.underline"
         >
-        Underline
+          Underline
         </button>
 
         <button
@@ -41,7 +39,7 @@
           :class="{ 'is-active': isActive.code() }"
           @click="commands.code"
         >
-         Code
+          Code
         </button>
 
         <button
@@ -49,7 +47,7 @@
           :class="{ 'is-active': isActive.paragraph() }"
           @click="commands.paragraph"
         >
-         Paragraph
+          Paragraph
         </button>
 
         <button
@@ -89,7 +87,7 @@
           :class="{ 'is-active': isActive.ordered_list() }"
           @click="commands.ordered_list"
         >
-         Numbered List
+          Numbered List
         </button>
 
         <button
@@ -97,7 +95,7 @@
           :class="{ 'is-active': isActive.blockquote() }"
           @click="commands.blockquote"
         >
-        Quote
+          Quote
         </button>
 
         <button
@@ -105,39 +103,34 @@
           :class="{ 'is-active': isActive.code_block() }"
           @click="commands.code_block"
         >
-         Code
+          Code
         </button>
 
-        <button
-          class="menubar__button"
-          @click="commands.horizontal_rule"
-        >
-         Horizontal Break
+        <button class="menubar__button" @click="commands.horizontal_rule">
+          Horizontal Break
         </button>
 
-        <button
-          class="menubar__button"
-          @click="commands.undo"
-        >
-         Undo
+        <button class="menubar__button" @click="commands.undo">
+          Undo
         </button>
 
-        <button
-          class="menubar__button"
-          @click="commands.redo"
-        >
-        Redo
+        <button class="menubar__button" @click="commands.redo">
+          Redo
         </button>
-
       </div>
     </editor-menu-bar>
 
-    <editor-content class="editor__content" :editor="editor" />
+    <editor-content
+      class="editor__content"
+      :editor="editor"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    />
   </div>
 </template>
 
 <script>
-import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
+import { Editor, EditorContent, EditorMenuBar } from "tiptap"
 import {
   Blockquote,
   CodeBlock,
@@ -156,15 +149,23 @@ import {
   Strike,
   Underline,
   History,
-} from 'tiptap-extensions'
+} from "tiptap-extensions"
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
   },
+  props: ["nodeDescription"],
   data() {
     return {
+      html: "",
+      content: "",
       editor: new Editor({
+        onUpdate: ({ getHTML }) => {
+          this.html = getHTML()
+          if (this.html === "<p></p>") this.content = ""
+          else this.content = this.html
+        },
         extensions: [
           new Blockquote(),
           new BulletList(),
@@ -196,16 +197,16 @@ export default {
 }
 </script>
 
-<style >
-.editor-box> * {
-    border-color: grey;
-    border-style: solid;
-    border-width: 1px;
+<style>
+.editor-box > * {
+  border-color: grey;
+  border-style: solid;
+  border-width: 1px;
 }
 
-.is-active{
-    border-color: grey;
-    border-style: solid;
-    border-width: 1px;
+.is-active {
+  border-color: grey;
+  border-style: solid;
+  border-width: 1px;
 }
 </style>
