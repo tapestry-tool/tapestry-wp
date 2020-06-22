@@ -155,18 +155,15 @@ export default {
     EditorContent,
     EditorMenuBar,
   },
-  props: ["nodeDescription"],
+  props: [ 'value' ],
   data() {
     return {
-      html: "",
-      content: "",
-      editor: new Editor({
-        onUpdate: ({ getHTML }) => {
-          this.html = getHTML()
-          if (this.html === "<p></p>") this.content = ""
-          else this.content = this.html
-        },
-        extensions: [
+      editor: null,
+    }
+  },
+  mounted() {
+  this.editor = new Editor({
+    extensions: [
           new Blockquote(),
           new BulletList(),
           new CodeBlock(),
@@ -185,16 +182,29 @@ export default {
           new Underline(),
           new History(),
         ],
-        content: `
-          Enter description
-        `,
-      }),
-    }
-  },
-  beforeDestroy() {
+    content: this.value,
+    onUpdate: ({ getHTML }) => {
+      this.$emit('input', getHTML())
+    },
+  })
+
+  this.editor.setContent(this.value)
+},
+beforeDestroy() {
+  if (this.editor) {
     this.editor.destroy()
-  },
+  }
+},
+watch: {
+  value (val) {
+    // so cursor doesn't jump to start on typing
+   if (this.editor && val !== this.value) {
+      this.editor.setContent(val, true)
+    }
+  }
 }
+}
+
 </script>
 
 <style>
