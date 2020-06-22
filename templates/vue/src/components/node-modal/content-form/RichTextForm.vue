@@ -119,7 +119,6 @@
         </button>
       </div>
     </editor-menu-bar>
-
     <editor-content
       class="editor__content"
       :editor="editor"
@@ -149,62 +148,69 @@ import {
   Strike,
   Underline,
   History,
+  Placeholder,
 } from "tiptap-extensions"
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
   },
-  props: [ 'value' ],
+  props: ["value"],
   data() {
     return {
       editor: null,
     }
   },
-  mounted() {
-  this.editor = new Editor({
-    extensions: [
-          new Blockquote(),
-          new BulletList(),
-          new CodeBlock(),
-          new HardBreak(),
-          new Heading({ levels: [1, 2, 3] }),
-          new HorizontalRule(),
-          new ListItem(),
-          new OrderedList(),
-          new TodoItem(),
-          new TodoList(),
-          new Link(),
-          new Bold(),
-          new Code(),
-          new Italic(),
-          new Strike(),
-          new Underline(),
-          new History(),
-        ],
-    content: this.value,
-    onUpdate: ({ getHTML }) => {
-      this.$emit('input', getHTML())
+  watch: {
+    value(val) {
+      // so cursor doesn't jump to start on typing
+      if (this.editor && val !== this.value) {
+        this.editor.setContent(val, true)
+      }
     },
-  })
+  },
+  mounted() {
+    this.editor = new Editor({
+      extensions: [
+        new Blockquote(),
+        new BulletList(),
+        new CodeBlock(),
+        new HardBreak(),
+        new Heading({ levels: [1, 2, 3] }),
+        new HorizontalRule(),
+        new ListItem(),
+        new OrderedList(),
+        new TodoItem(),
+        new TodoList(),
+        new Link(),
+        new Bold(),
+        new Code(),
+        new Italic(),
+        new Strike(),
+        new Underline(),
+        new History(),
+        new Placeholder({
+            emptyEditorClass: 'is-editor-empty',
+            emptyNodeClass: 'is-empty',
+            emptyNodeText: 'Enter description',
+            showOnlyWhenEditable: true,
+            showOnlyCurrent: true,
+          }),
+      ],
+      content: this.value,
+      onUpdate: ({ getHTML }) => {
+        this.$emit("input", getHTML())
+      },
+    })
 
-  this.editor.setContent(this.value)
-},
-beforeDestroy() {
-  if (this.editor) {
-    this.editor.destroy()
-  }
-},
-watch: {
-  value (val) {
-    // so cursor doesn't jump to start on typing
-   if (this.editor && val !== this.value) {
-      this.editor.setContent(val, true)
+    this.editor.setContent(this.value)
+  },
+  beforeDestroy() {
+    if (this.editor) {
+      this.editor.destroy()
     }
-  }
+  },
 }
-}
-
 </script>
 
 <style>
@@ -218,5 +224,14 @@ watch: {
   border-color: grey;
   border-style: solid;
   border-width: 1px;
+}
+
+.editor p.is-editor-empty:first-child::before {
+  content: attr(data-empty-text);
+  float: left;
+  color: #aaa;
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
 }
 </style>
