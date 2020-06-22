@@ -64,16 +64,19 @@ export default {
       handler: function() {
         this.updateNodeTypes()
         if (this.currentDepth > this.maxDepth) {
-          this.currentDepth = Math.floor((this.maxDepth - 1) / 2)
+          this.setDefaultDepth()
         }
       },
     },
   },
   created() {
-    this.currentDepth = Math.floor((this.maxDepth - 1) / 2)
+    this.setDefaultDepth()
   },
   methods: {
     ...mapMutations(["updateNode"]),
+    setDefaultDepth() {
+      this.currentDepth = Math.ceil((this.maxDepth - 1) / 2)
+    },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
       this.nodes.forEach(node => {
