@@ -1,5 +1,5 @@
 <template>
-  <div class="depth-slider">
+  <div v-if="maxDepth > 1" class="depth-slider">
     <input v-model="currentDepth" type="range" min="1" :max="maxDepth" />
     <p v-if="currentDepth < maxDepth">
       Some nodes might be hidden because you're not at max depth.
@@ -118,12 +118,14 @@ export default {
 
 <style lang="scss" scoped>
 .depth-slider {
-  position: absolute;
-  right: 0;
-  top: 0;
-
+  border-left: 1px solid #a1a1a1;
+  padding-left: 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+
+  p {
+    display: block;
+  }
 }
 </style>

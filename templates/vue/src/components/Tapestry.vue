@@ -5,7 +5,6 @@
       style="padding: 30vh 0;"
       label="Loading Tapestry"
     />
-    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
       <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
       <div v-else style="margin-top: 40vh;">
@@ -24,7 +23,6 @@
 <script>
 import { mapGetters, mapMutations } from "vuex"
 import NodeModal from "./NodeModal"
-import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
 import Loading from "@/components/Loading"
@@ -34,7 +32,6 @@ export default {
   components: {
     NodeModal,
     RootNodeButton,
-    SettingsModal,
     Loading,
   },
   data() {

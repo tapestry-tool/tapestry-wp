@@ -1,5 +1,11 @@
 <template>
-  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
+  <b-modal
+    id="settings-modal"
+    v-model="show"
+    size="lg"
+    title="Tapestry Settings"
+    body-class="p-0"
+  >
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Appearance" active>
@@ -16,7 +22,6 @@
             />
           </b-form-group>
           <b-form-group
-            v-show="wpCanEditTapestry"
             label="Users can move nodes"
             description="If enabled, you allow users to move nodes to different positions on the screen.
               However, changes made by the users won't be saved."
@@ -98,10 +103,9 @@ export default {
     PermissionsTable,
   },
   props: {
-    wpCanEditTapestry: {
+    show: {
       type: Boolean,
-      required: false,
-      default: false,
+      required: true,
     },
   },
   data() {
@@ -123,18 +127,11 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener("open-settings-modal", this.openModal)
-  },
-  beforeDestroy() {
-    window.removeEventListener("open-settings-modal")
+    this.getSettings()
   },
   methods: {
-    openModal() {
-      this.$bvModal.show("settings-modal")
-      this.getSettings()
-    },
     closeModal() {
-      this.$bvModal.hide("settings-modal")
+      this.$emit("close")
     },
     getSettings() {
       const {

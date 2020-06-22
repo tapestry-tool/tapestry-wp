@@ -1,19 +1,19 @@
 <template>
   <main>
-    <tapestry-svg />
-    <tapestry-depth-slider v-if="tapestryIsLoaded" />
+    <tapestry-svg></tapestry-svg>
+    <t-toolbar v-if="tapestryIsLoaded"></t-toolbar>
   </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import TapestrySvg from "@/components/TapestrySvg"
-import TapestryDepthSlider from "@/components/TapestryDepthSlider"
+import TToolbar from "@/components/TToolbar"
 
 export default {
   components: {
     TapestrySvg,
-    TapestryDepthSlider,
+    TToolbar,
   },
   computed: {
     ...mapState(["tapestryIsLoaded"]),
