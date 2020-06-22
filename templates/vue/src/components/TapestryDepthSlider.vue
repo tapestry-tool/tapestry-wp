@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     ...mapState(["selectedNodeId", "nodes"]),
-    ...mapGetters(["getDirectChildren"]),
+    ...mapGetters(["getNeighbours"]),
     levels() {
       const levels = {}
       const queue = []
@@ -30,7 +30,7 @@ export default {
 
       while (queue.length > 0) {
         const currentNodeId = queue.shift()
-        const neighbours = this.getDirectChildren(currentNodeId)
+        const neighbours = this.getNeighbours(currentNodeId)
         neighbours
           .filter(childId => !visited.has(childId))
           .forEach(childId => {
@@ -55,38 +55,17 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function(rawDepth) {
-        const depth = parseInt(rawDepth)
-        this.nodes.forEach(node => {
-          if (node.id !== this.selectedNodeId) {
-            this.updateNode({
-              id: node.id,
-              newNode: {
-                nodeType: "child",
-              },
-            })
-          }
-        })
-        const nodesAtCurrentDepth = this.levels[depth]
-        nodesAtCurrentDepth.forEach(nodeId => {
-          this.updateNode({
-            id: nodeId,
-            newNode: {
-              nodeType: "grandchild",
-            },
-          })
-        })
-        const hiddenNodes = this.levels
-          .filter((_, level) => level > depth)
-          .flatMap(nodes => nodes)
-        hiddenNodes.forEach(nodeId => {
-          this.updateNode({
-            id: nodeId,
-            newNode: {
-              nodeType: "",
-            },
-          })
-        })
+      handler: function() {
+        this.updateNodeTypes()
+      },
+    },
+    levels: {
+      immediate: true,
+      handler: function() {
+        this.updateNodeTypes()
+        if (this.currentDepth > this.maxDepth) {
+          this.currentDepth = Math.floor((this.maxDepth - 1) / 2)
+        }
       },
     },
   },
@@ -95,6 +74,41 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
+    updateNodeTypes() {
+      const depth = parseInt(this.currentDepth)
+      this.nodes.forEach(node => {
+        if (node.id !== this.selectedNodeId) {
+          this.updateNode({
+            id: node.id,
+            newNode: {
+              nodeType: "child",
+            },
+          })
+        }
+      })
+      const nodesAtCurrentDepth = this.levels[depth]
+      if (nodesAtCurrentDepth) {
+        nodesAtCurrentDepth.forEach(nodeId => {
+          this.updateNode({
+            id: nodeId,
+            newNode: {
+              nodeType: "grandchild",
+            },
+          })
+        })
+      }
+      const hiddenNodes = this.levels
+        .filter((_, level) => level > depth)
+        .flatMap(nodes => nodes)
+      hiddenNodes.forEach(nodeId => {
+        this.updateNode({
+          id: nodeId,
+          newNode: {
+            nodeType: "",
+          },
+        })
+      })
+    },
   },
 }
 </script>

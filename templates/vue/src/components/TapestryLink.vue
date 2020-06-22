@@ -1,16 +1,17 @@
 <template>
   <line
-    :x1="link.source[xCoord]"
-    :x2="link.target[xCoord]"
-    :y1="link.source[yCoord]"
-    :y2="link.target[yCoord]"
+    v-show="isVisible"
+    :x1="source.fx"
+    :x2="target.fx"
+    :y1="source.fy"
+    :y2="target.fy"
     stroke="currentColor"
     stroke-width="6"
   ></line>
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 
 export default {
   name: "tapestry-link",
@@ -21,15 +22,15 @@ export default {
     },
   },
   computed: {
-    ...mapState(["settings"]),
-    autoLayout() {
-      return this.settings.autolayout
+    ...mapGetters(["getNode"]),
+    source() {
+      return this.getNode(this.link.source.id)
     },
-    xCoord() {
-      return this.autoLayout ? "x" : "fx"
+    target() {
+      return this.getNode(this.link.target.id)
     },
-    yCoord() {
-      return this.autoLayout ? "y" : "fy"
+    isVisible() {
+      return this.source.nodeType !== "" && this.target.nodeType !== ""
     },
   },
 }

@@ -1,5 +1,5 @@
 <template>
-  <component :is="svg" id="vue-svg">
+  <svg id="vue-svg">
     <g>
       <tapestry-node
         v-for="node in nodes"
@@ -14,27 +14,22 @@
         :link="link"
       ></tapestry-link>
     </g>
-  </component>
+  </svg>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import SimulationController from "./SimulationController"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 
 export default {
   name: "tapestry-svg",
   components: {
-    SimulationController,
     TapestryNode,
     TapestryLink,
   },
   computed: {
-    ...mapState(["nodes", "links", "settings"]),
-    svg() {
-      return this.settings.autolayout ? "simulation-controller" : "svg"
-    },
+    ...mapState(["nodes", "links"]),
   },
 }
 </script>
