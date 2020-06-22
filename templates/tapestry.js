@@ -823,6 +823,7 @@ function tapestryTool(config){
                 .from(selection.data)
                 .map(node => ({ id: node.id, x: node.x, y: node.y }));
 
+            renderTooltips()
             recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
     }
