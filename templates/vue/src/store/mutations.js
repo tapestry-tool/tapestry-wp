@@ -7,6 +7,7 @@ export function init(state, dataset) {
   state.nodes
     .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(state, n.id))
+  state.visibleNodes = state.nodes.map(node => node.id)
 }
 
 export function setDataset(state, dataset) {
@@ -121,4 +122,8 @@ export function initializeOrdering(state, id) {
 export function updateOrdering(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
   state.nodes[nodeIndex].childOrdering = payload.ord
+}
+
+export function updateVisibleNodes(state, nodes) {
+  state.visibleNodes = nodes
 }

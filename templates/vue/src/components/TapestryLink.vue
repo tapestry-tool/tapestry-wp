@@ -1,6 +1,9 @@
 <template>
   <line
     v-show="isVisible"
+    :class="{
+      opaque: !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+    }"
     :x1="source.fx"
     :x2="target.fx"
     :y1="source.fy"
@@ -11,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapState, mapGetters } from "vuex"
 
 export default {
   name: "tapestry-link",
@@ -22,6 +25,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(["visibleNodes"]),
     ...mapGetters(["getNode"]),
     source() {
       return this.getNode(this.link.source.id)
@@ -35,3 +39,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.opaque {
+  opacity: 0.2;
+}
+</style>

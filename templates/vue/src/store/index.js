@@ -21,6 +21,7 @@ const store = new Vuex.Store({
     selectedNodeId: null,
     tapestryIsLoaded: false,
     favourites: [],
+    visibleNodes: [],
   },
   getters: {
     selectedNode: state => {

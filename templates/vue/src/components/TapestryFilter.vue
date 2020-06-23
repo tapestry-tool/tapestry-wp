@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
 
 const filterOptions = {
@@ -88,6 +88,20 @@ export default {
           return []
       }
     },
+    visibleNodes() {
+      if (this.isActive && this.activeFilterOption && this.activeFilterValue) {
+        switch (this.activeFilterOption) {
+          case filterOptions.AUTHOR: {
+            return this.nodes
+              .filter(node => node.author.id == this.activeFilterValue)
+              .map(node => node.id)
+          }
+          default:
+            break
+        }
+      }
+      return this.nodes.map(node => node.id)
+    },
   },
   watch: {
     $route(to, from) {
@@ -96,8 +110,12 @@ export default {
         from.fullPath.slice(1)
       )
     },
+    visibleNodes(nodes) {
+      this.updateVisibleNodes(nodes)
+    },
   },
   methods: {
+    ...mapMutations(["updateVisibleNodes"]),
     toggleFilter() {
       this.isActive
         ? this.$router.push(`/`)

@@ -1,20 +1,20 @@
 <template>
-  <g v-show="isVisible" @click="updateSelectedNode(node.id)">
+  <g
+    v-show="isVisible"
+    :class="{ opaque: !visibleNodes.includes(node.id) }"
+    @click="updateSelectedNode(node.id)"
+  >
     <circle
       ref="node"
       :cx="node.fx"
       :cy="node.fy"
-      :class="[
-        'tapestry-node',
-        {
-          root: node.id == selectedNodeId,
-          grandchild: node.nodeType === 'grandchild',
-        },
-      ]"
       fill="currentColor"
       :r="radius"
     ></circle>
     <g v-if="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
+      <text :x="node.fx" :y="node.fy" fill="white" text-anchor="middle">
+        {{ node.title }}
+      </text>
       <foreignObject
         class="node-button"
         :x="node.fx - 30"
@@ -49,7 +49,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["selectedNodeId"]),
+    ...mapState(["selectedNodeId", "visibleNodes"]),
     isVisible() {
       return this.node.nodeType !== ""
     },
@@ -91,5 +91,9 @@ export default {
 .node-button {
   height: 60px;
   width: 60px;
+}
+
+.opaque {
+  opacity: 0.2;
 }
 </style>
