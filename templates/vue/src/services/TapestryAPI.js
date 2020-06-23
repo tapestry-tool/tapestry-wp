@@ -98,6 +98,11 @@ export default class {
     return response
   }
 
+  async updateNodeCoordinates(id, coordinates) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/coordinates`
+    return await axios.put(url, coordinates)
+  }
+
   async getUserProgress() {
     const url = `${apiUrl}/users/progress?post_id=${this.postId}`
     const response = await axios.get(url)

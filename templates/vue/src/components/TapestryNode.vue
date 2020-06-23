@@ -38,7 +38,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapState, mapMutations } from "vuex"
+import { mapActions, mapState, mapMutations } from "vuex"
 
 export default {
   name: "tapestry-node",
@@ -66,13 +66,33 @@ export default {
   mounted() {
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
-      d3.drag().on("drag", () => {
-        this.node.fx += d3.event.dx
-        this.node.fy += d3.event.dy
-      })
+      d3
+        .drag()
+        .on("start", () => {
+          this.originalFx = this.node.fx
+          this.originalFy = this.node.fy
+        })
+        .on("drag", () => {
+          this.node.fx += d3.event.dx
+          this.node.fy += d3.event.dy
+        })
+        .on("end", () => {
+          this.updateNodeCoordinates({
+            id: this.node.id,
+            coordinates: {
+              x: this.node.fx,
+              y: this.node.fy,
+            },
+          }).catch(() => {
+            alert("Failed to save coordinates.")
+            this.node.fx = this.originalFx
+            this.node.fy = this.originalFy
+          })
+        })
     )
   },
   methods: {
+    ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["updateSelectedNode"]),
     openNode() {
       this.$router.push(`/nodes/${this.node.id}`)

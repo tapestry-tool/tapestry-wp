@@ -70,6 +70,11 @@ export async function updateUserProgress() {
   thisTapestryTool.reload()
 }
 
+export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
+  await client.updateNodeCoordinates(id, coordinates)
+  commit("updateNode", { id, newNode: { fx: coordinates.x, fy: coordinates.y } })
+}
+
 export async function completeNode({ commit, dispatch, getters }, nodeId) {
   await client.completeNode(nodeId)
   commit("updateNode", {
