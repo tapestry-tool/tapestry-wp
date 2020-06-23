@@ -28,10 +28,12 @@ export default {
     ...mapState(["visibleNodes"]),
     ...mapGetters(["getNode"]),
     source() {
-      return this.getNode(this.link.source.id)
+      const id = this.link.source.id || this.link.source
+      return this.getNode(id)
     },
     target() {
-      return this.getNode(this.link.target.id)
+      const id = this.link.target.id || this.link.target
+      return this.getNode(id)
     },
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""

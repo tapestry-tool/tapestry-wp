@@ -3,6 +3,7 @@
     v-show="isVisible"
     :class="{ opaque: !visibleNodes.includes(node.id) }"
     @click="updateSelectedNode(node.id)"
+    @mouseover="handleMouseover"
   >
     <circle
       ref="node"
@@ -11,7 +12,7 @@
       fill="currentColor"
       :r="radius"
     ></circle>
-    <g v-if="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
+    <g v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
       <text :x="node.fx" :y="node.fy" fill="white" text-anchor="middle">
         {{ node.title }}
       </text>
@@ -22,13 +23,11 @@
       >
         <button @click="openNode">Play</button>
       </foreignObject>
-      <foreignObject
-        class="node-button"
+      <add-child-button
+        :node="node"
         :x="node.fx - 65"
         :y="node.fy + radius - 30"
-      >
-        <button @click="addNode">Add</button>
-      </foreignObject>
+      ></add-child-button>
       <foreignObject class="node-button" :x="node.fx + 5" :y="node.fy + radius - 30">
         <button @click="editNode">Edit</button>
       </foreignObject>
@@ -39,9 +38,14 @@
 <script>
 import * as d3 from "d3"
 import { mapActions, mapState, mapMutations } from "vuex"
+import { bus } from "@/utils/event-bus"
+import AddChildButton from "./t-node/AddChildButton"
 
 export default {
   name: "tapestry-node",
+  components: {
+    AddChildButton,
+  },
   props: {
     node: {
       type: Object,
@@ -97,11 +101,11 @@ export default {
     openNode() {
       this.$router.push(`/nodes/${this.node.id}`)
     },
-    addNode() {
-      this.$root.$emit("add-node", this.node.id)
-    },
     editNode() {
       this.$root.$emit("edit-node", this.node.id)
+    },
+    handleMouseover() {
+      bus.$emit("mouseover", this.node.id)
     },
   },
 }

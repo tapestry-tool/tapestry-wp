@@ -102,14 +102,6 @@ export async function deleteNode({ commit }, id) {
   commit("deleteNode", id)
 }
 
-export async function deleteLink({ state, commit }, [source, target]) {
-  const linkIndex = state.links.findIndex(
-    link => link.source.id === source && link.target.id === target
-  )
-  await client.deleteLink(linkIndex)
-  commit("deleteLink", linkIndex)
-}
-
 export async function completeQuestion(
   { commit },
   { answerType, formId, nodeId, questionId }
@@ -136,6 +128,14 @@ export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
 export async function addLink({ commit }, newLink) {
   await client.addLink(JSON.stringify(newLink))
   commit("addLink", newLink)
+}
+
+export async function deleteLink({ state, commit }, [source, target]) {
+  const linkIndex = state.links.findIndex(
+    link => link.source.id === source && link.target.id === target
+  )
+  await client.deleteLink(linkIndex)
+  commit("deleteLink", linkIndex)
 }
 
 // favourites
