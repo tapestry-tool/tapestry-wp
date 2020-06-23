@@ -57,6 +57,11 @@ export default class {
     return response
   }
 
+  async deleteNode(id) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}`
+    return await axios.delete(url)
+  }
+
   /**
    * Add link
    *
@@ -68,6 +73,11 @@ export default class {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
     const response = await axios.post(url, link)
     return response
+  }
+
+  async deleteLink(linkIndex) {
+    const url = `${apiUrl}/tapestries/${this.postId}/links`
+    return await axios.delete(url, { data: linkIndex })
   }
 
   /**

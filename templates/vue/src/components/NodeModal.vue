@@ -74,14 +74,11 @@
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
     <template slot="modal-footer">
-      <b-button
+      <delete-node-button
         v-show="modalType === 'edit'"
-        size="sm"
-        variant="danger"
-        @click="deleteNode"
-      >
-        Delete Node
-      </b-button>
+        :node-id="nodeId"
+        @submit="handleDeleteNode"
+      ></delete-node-button>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
@@ -94,7 +91,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
@@ -102,6 +99,7 @@ import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 
@@ -124,6 +122,7 @@ export default {
     SlickItem,
     SlickList,
     PermissionsTable,
+    DeleteNodeButton,
   },
   props: {
     nodeId: {
@@ -156,6 +155,7 @@ export default {
       "getNode",
       "settings",
     ]),
+    ...mapState(["rootId"]),
     parent() {
       if (this.modalType === "add") {
         const parent = this.getNode(this.nodeId)
@@ -163,7 +163,8 @@ export default {
           return parent
         }
       }
-      return null
+      const parents = this.getDirectParents(this.nodeId)
+      return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {
       if (this.modalType === "add") {
@@ -216,19 +217,18 @@ export default {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     hasSubAccordion(node) {
-      const parents = this.getDirectParents(node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
+      if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return parent.mediaType === "accordion" && children.length > 0
+        return this.parent.mediaType === "accordion" && children.length > 0
       }
       return false
     },
     close() {
       this.$bvModal.hide("node-modal")
     },
-    deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry()
+    handleDeleteNode() {
+      this.updateSelectedNode(this.rootId)
+      this.close()
     },
     async submit() {
       this.formErrors = this.validateNode()
@@ -297,8 +297,8 @@ export default {
 
       if (this.modalType === "add" && this.parent) {
         this.node.coordinates.x =
-          this.parent.x + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
-        this.node.coordinates.y = this.parent.y
+          this.parent.fx + (NORMAL_RADIUS + ROOT_RADIUS_DIFF) * 2 + 50
+        this.node.coordinates.y = this.parent.fy
       }
     },
     validateNode() {

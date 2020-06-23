@@ -37,6 +37,10 @@ export function addNode(state, node) {
   state.nodes.push(node)
 }
 
+export function deleteNode(state, id) {
+  state.nodes = state.nodes.filter(node => node.id != id)
+}
+
 export function updateNode(state, payload) {
   const nodeIndex = Helpers.findNodeIndex(payload.id, state)
   const thisNode = state.nodes[nodeIndex]
@@ -79,6 +83,10 @@ export function fulfillNodeCondition(state, { id, condition }) {
 // links
 export function addLink(state, link) {
   state.links.push(link)
+}
+
+export function deleteLink(state, linkIndex) {
+  state.links = state.links.filter((_, i) => i !== linkIndex)
 }
 
 // quizzes

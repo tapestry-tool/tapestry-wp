@@ -97,6 +97,19 @@ export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }
 
+export async function deleteNode({ commit }, id) {
+  await client.deleteNode(id)
+  commit("deleteNode", id)
+}
+
+export async function deleteLink({ state, commit }, [source, target]) {
+  const linkIndex = state.links.findIndex(
+    link => link.source.id === source && link.target.id === target
+  )
+  await client.deleteLink(linkIndex)
+  commit("deleteLink", linkIndex)
+}
+
 export async function completeQuestion(
   { commit },
   { answerType, formId, nodeId, questionId }
