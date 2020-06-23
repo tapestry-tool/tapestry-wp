@@ -190,12 +190,12 @@ export default {
         new Underline(),
         new History(),
         new Placeholder({
-            emptyEditorClass: 'is-editor-empty',
-            emptyNodeClass: 'is-empty',
-            emptyNodeText: 'Enter description',
-            showOnlyWhenEditable: true,
-            showOnlyCurrent: true,
-          }),
+          emptyEditorClass: "is-editor-empty",
+          emptyNodeClass: "is-empty",
+          emptyNodeText: "Enter description",
+          showOnlyWhenEditable: true,
+          showOnlyCurrent: true,
+        }),
       ],
       content: this.value,
       onUpdate: ({ getHTML }) => {
