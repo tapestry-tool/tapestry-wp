@@ -39,7 +39,7 @@
 import * as d3 from "d3"
 import { mapActions, mapState, mapMutations } from "vuex"
 import { bus } from "@/utils/event-bus"
-import AddChildButton from "./t-node/AddChildButton"
+import AddChildButton from "./tapestry-node/AddChildButton"
 
 export default {
   name: "tapestry-node",

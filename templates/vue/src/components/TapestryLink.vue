@@ -8,13 +8,12 @@
     :x2="target.fx"
     :y1="source.fy"
     :y2="target.fy"
-    stroke="currentColor"
-    stroke-width="6"
+    @click="remove"
   ></line>
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex"
+import { mapActions, mapState, mapGetters } from "vuex"
 
 export default {
   name: "tapestry-link",
@@ -38,11 +37,34 @@ export default {
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""
     },
+    confirmMessage() {
+      return `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
+    },
+  },
+  methods: {
+    ...mapActions(["deleteLink"]),
+    remove() {
+      const shouldDelete = confirm(this.confirmMessage)
+      if (shouldDelete) {
+        this.deleteLink([this.source.id, this.target.id])
+      }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+line {
+  stroke: #999;
+  stroke-width: 6;
+
+  &:hover {
+    cursor: pointer;
+    stroke: red;
+    stroke-width: 11;
+  }
+}
+
 .opaque {
   opacity: 0.2;
 }
