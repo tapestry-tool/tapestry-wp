@@ -212,6 +212,10 @@ export default {
     background: none;
     color: var(--teal);
   }
+
+  &:focus {
+    background: none;
+  }
 }
 
 .close-button {
