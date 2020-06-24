@@ -10,16 +10,6 @@
         required
       />
     </b-form-group>
-    <!--
-    <b-form-group label="Description">
-      <b-form-textarea
-        id="node-description"
-        v-model="node.description"
-        data-testid="node-description"
-        placeholder="Enter description"
-      ></b-form-textarea>
-    </b-form-group>
-    -->
     <rich-text-form
       id="node-description"
       v-model="node.description"

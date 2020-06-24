@@ -156,14 +156,10 @@
                 placeholder="Thanks!"
               />
             </b-form-group>
-            <b-form-group label="Body">
-              <b-form-textarea
-                v-model="question.confirmationMessage"
+            <rich-text-form  v-model="question.confirmationMessage"
                 :data-testid="`question-confirmation-message-${index}`"
-                placeholder="Your response has been recorded."
-              ></b-form-textarea>
-            </b-form-group>
-          </b-card>
+                placeholder="Your response has been recorded." />
+            </b-card>
         </b-form-group>
       </b-card>
     </div>
@@ -181,6 +177,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/Combobox"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import Helpers from "@/utils/Helpers"
+import RichTextForm from "./RichTextForm"
 
 const defaultQuestion = {
   text: "",
@@ -194,6 +191,7 @@ const defaultQuestion = {
 export default {
   components: {
     Combobox,
+    RichTextForm
   },
   props: {
     node: {
