@@ -9,7 +9,9 @@
 import RichTextForm from "./RichTextForm"
 
 export default {
-  components: {RichTextForm},
+  components: {
+    RichTextForm
+  },
   props: {
     node: {
       type: Object,
