@@ -155,7 +155,7 @@ export default {
     EditorContent,
     EditorMenuBar,
   },
-  props: ["value"],
+  props: ["value", "placeholder"],
   data() {
     return {
       editor: null,
@@ -192,7 +192,7 @@ export default {
         new Placeholder({
           emptyEditorClass: "is-editor-empty",
           emptyNodeClass: "is-empty",
-          emptyNodeText: "Enter description",
+          emptyNodeText: this.placeholder,
           showOnlyWhenEditable: true,
           showOnlyCurrent: true,
         }),
