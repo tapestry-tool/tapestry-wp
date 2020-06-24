@@ -1,11 +1,11 @@
 <?php
 
 /*
- Template Name: Tapestry Page Template
+Template Name: Tapestry Page Template
  */
 /**
  * Register Script with Nonce
- * 
+ *
  * @return Object null
  */
 function addNonceToScript()
@@ -13,9 +13,9 @@ function addNonceToScript()
     global $TAPESTRY_VERSION_NUMBER;
     global $wp_roles;
     $params = array(
-        'nonce'  => wp_create_nonce('wp_rest'),
+        'nonce' => wp_create_nonce('wp_rest'),
         'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
-        'userLoggedIn' => get_current_user_id() != 0 ? 'true' : 'false'
+        'userLoggedIn' => get_current_user_id() != 0 ? 'true' : 'false',
     );
 
     wp_register_script(
@@ -29,16 +29,16 @@ function addNonceToScript()
     wp_localize_script('wp_tapestry_script', 'wp', array('roles' => $wp_roles->get_names()));
     wp_enqueue_script('wp_tapestry_script');
 
-    wp_add_inline_script( 'wp_tapestry_script', "
+    wp_add_inline_script('wp_tapestry_script', "
         var thisTapestryTool = new tapestryTool({
             'containerId': 'tapestry',
-            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
-            'wpUserId': '". apply_filters('determine_current_user', false) ."',
-            'wpPostId': '". get_the_ID() ."',
-            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
-            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
+            'apiUrl': '" . get_rest_url(null, 'tapestry-tool/v1') . "',
+            'wpUserId': '" . apply_filters('determine_current_user', false) . "',
+            'wpPostId': '" . get_the_ID() . "',
+            'wpCanEditTapestry': '" . current_user_can('edit_post', get_the_ID()) . "',
+            'addNodeModalUrl': '" . plugin_dir_url(__FILE__) . "modal-add-node.html',
         });
-    " );
+    ");
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
@@ -66,7 +66,7 @@ function enqueue_vue_app_build()
         'wpData', // javascript object that will made availabe to Vue.
         array( // wordpress data to be made available to the Vue app in 'wpData'
             'directory_uri' => plugin_dir_url(__FILE__) . 'vue/dist', // child theme directory path.
-            'vue_uri'  => $vueUrl, // path to vue
+            'vue_uri' => $vueUrl, // path to vue
             'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
             'app_path' => $post->post_name, // page where the custom page template is loaded.
             'post_categories' => get_terms(array(
@@ -91,24 +91,26 @@ function enqueue_vue_app_build()
 }
 add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
 
-get_header(); ?>
+get_header();?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="post-wrap<?php if (current_user_can('edit_post', get_the_ID())) { echo ' is-editor"'; } ?>" role="main">
+    <main id="main" class="post-wrap<?php if (current_user_can('edit_post', get_the_ID())) {
+    echo ' is-editor"';
+}?>" role="main">
 
         <div id="tapestry-container"></div>
 
-        <?php while (have_posts()) : the_post(); ?>
-            <?php get_template_part('content', 'page'); ?>
-            <?php
-            // If comments are open or we have at least one comment, load up the comment template
-            if (comments_open() || get_comments_number()) :
-                comments_template();
-            endif;
-            ?>
+        <?php while (have_posts()): the_post();?>
+	            <?php get_template_part('content', 'page');?>
+	            <?php
+    // If comments are open or we have at least one comment, load up the comment template
+    if (comments_open() || get_comments_number()):
+        comments_template();
+    endif;
+    ?>
 
-        <?php endwhile; // end of the loop. 
-        ?>
+	        <?php endwhile; // end of the loop.
+?>
 
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
         <link href="<?php echo plugin_dir_url(__FILE__) ?>tapestry.css?v=<?php echo $TAPESTRY_VERSION_NUMBER; ?>" rel="stylesheet" />
@@ -156,4 +158,4 @@ get_header(); ?>
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer(); ?>
+<?php get_footer();?>
