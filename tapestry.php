@@ -12,7 +12,7 @@
 $TAPESTRY_VERSION_NUMBER = '2.27.0-tyde-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
-$TAPESTRY_USE_DEV_MODE = TRUE;
+$TAPESTRY_USE_DEV_MODE = true;
 
 /**
  * Register endpoints
@@ -205,10 +205,11 @@ function gf_button_ajax_get_form()
 
 // ANALYTICS
 
-function create_analytics_schema() {
+function create_analytics_schema()
+{
     global $wpdb;
 
-    add_option( "tapestry_analytics_schema_version", "0.1" );
+    add_option("tapestry_analytics_schema_version", "0.1");
 
     // Create table for logging events
     $table_name = $wpdb->prefix . "tapestry_analytics_events";
@@ -225,14 +226,15 @@ function create_analytics_schema() {
                 PRIMARY KEY  (id)
             ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-    dbDelta( $sql );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
 }
 
 // TYDE CUSTOMIZATIONS
 
-register_activation_hook( __FILE__, 'tapestry_activation' );
-function tapestry_activation() {
+register_activation_hook(__FILE__, 'tapestry_activation');
+function tapestry_activation()
+{
     create_copilot_role();
     create_analytics_schema();
 }
@@ -255,14 +257,14 @@ function create_copilot_role()
 /**
  * Show the teen input label if the user is a copilot
  */
-function add_copilot_teen_field($user) 
-{ 
+function add_copilot_teen_field($user)
+{
     if (in_array("copilot", $user->roles)): ?>
         <table class="form-table">
         <tr>
             <th><label for="teen_id"><?php _e("Teen ID"); ?></label></th>
             <td>
-                <input type="text" name="teen_id" id="teen_id" value="<?php echo esc_attr( get_the_author_meta('teen_id', $user->ID)); ?>" class="regular-text" /><br />
+                <input type="text" name="teen_id" id="teen_id" value="<?php echo esc_attr(get_the_author_meta('teen_id', $user->ID)); ?>" class="regular-text" /><br />
                 <span class="description"><?php _e("Please enter your teen's user ID."); ?></span>
             </td>
         </tr>
