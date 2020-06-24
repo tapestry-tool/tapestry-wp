@@ -4,6 +4,10 @@
       <b-form-checkbox v-model="lock">
         Prevent access until specified conditions are met
       </b-form-checkbox>
+      <b-form-invalid-feedback :force-show="lock">
+        Please note: Currently, locked nodes cannot be unlocked by users who are not
+        logged in.
+      </b-form-invalid-feedback>
     </b-form-group>
     <div v-if="lock">
       <b-card

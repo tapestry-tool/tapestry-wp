@@ -4,12 +4,19 @@
  */
 class TapestryUserRoles
 {
+    public static function canEdit($postId = 0)
+    {
+        return TapestryUserRoles::isEditor()
+        || TapestryUserRoles::isAdministrator()
+        || TapestryUserRoles::isAuthorOfThePost($postId);
+    }
+
     /**
      * Check if the current user is a particular role
-     * 
+     *
      * @return Boolean
      */
-    static function isRole($role)
+    public static function isRole($role)
     {
         return in_array(
             $role,
@@ -19,42 +26,42 @@ class TapestryUserRoles
 
     /**
      * Check if the current user is an administrator
-     * 
+     *
      * @return Boolean
      */
-    static function isAdministrator()
+    public static function isAdministrator()
     {
         return TapestryUserRoles::isRole('administrator');
     }
 
     /**
      * Check if the current user is an editor
-     * 
+     *
      * @return Boolean
      */
-    static function isEditor()
+    public static function isEditor()
     {
         return TapestryUserRoles::isRole('editor');
     }
 
     /**
      * Check if the current user is an author
-     * 
+     *
      * @return Boolean
      */
-    static function isAuthor()
+    public static function isAuthor()
     {
         return TapestryUserRoles::isRole('author');
     }
 
     /**
      * Check if the current user is an author of a post
-     * 
+     *
      * @param   Integer $postId post ID
      *
      * @return  Boolean
      */
-    static function isAuthorOfThePost($postId)
+    public static function isAuthorOfThePost($postId)
     {
         return wp_get_current_user()->ID
             == get_post($postId)->post_author;
@@ -62,10 +69,10 @@ class TapestryUserRoles
 
     /**
      * Check if the current user is a subscriber
-     * 
+     *
      * @return Boolean
      */
-    static function isSubscriber()
+    public static function isSubscriber()
     {
         return TapestryUserRoles::isRole('subscriber');
     }
