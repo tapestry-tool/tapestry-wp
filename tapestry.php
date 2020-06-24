@@ -151,6 +151,24 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
 }
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
 
+function create_new_tapestry() {
+    return "
+        <script src='". plugin_dir_url(__FILE__) ."templates/libs/jquery.min.js' type='application/javascript'></script>
+
+        <button id='new_tapestry_button'>
+            Press me.
+        </button>
+        <script type='text/javascript'>
+            $('#new_tapestry_button').click(function() {alert('hi')})
+        </script>
+    ";
+}
+
+add_shortcode('new_tapestry_button', 'create_new_tapestry');
+
+// add_filter( 'widget_text', 'shortcode_unautop' );
+// add_filter( 'widget_text', 'do_shortcode' );
+
 // Gravity Forms Pluggin
 
 // Hook up the AJAX ajctions
