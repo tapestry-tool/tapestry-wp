@@ -191,3 +191,24 @@ function formatEntry(answers, answerType) {
     return { type: "checklist", entry: answers.filter(answer => answer !== "") }
   }
 }
+
+export function tapestryJson(state) {
+  const exportedTapestry = {
+    nodes: state.nodes.map(node => {
+      const newNode = { ...node }
+      if (newNode.quiz) {
+        newNode.quiz = newNode.quiz.map(question => {
+          return { ...question, completed: false, entries: null }
+        })
+      }
+      return newNode
+    }),
+    links: state.links.map(link => ({
+      ...link,
+      source: link.source.id,
+      target: link.target.id,
+    })),
+    groups: state.groups,
+  }
+  return exportedTapestry
+}
