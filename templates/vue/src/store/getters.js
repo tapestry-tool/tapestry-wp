@@ -63,3 +63,77 @@ function formatEntry(answers, answerType) {
     return { type: "checklist", entry: answers.filter(answer => answer !== "") }
   }
 }
+
+export function xOrFx({ settings }) {
+  return settings.autoLayout ? "x" : "fx"
+}
+
+export function yOrFy({ settings }) {
+  return settings.autoLayout ? "y" : "fy"
+}
+
+export function createDefaultNode({ settings }) {
+  return () => ({
+    type: "tapestry_node",
+    description: "",
+    conditions: [],
+    behaviour: "embed",
+    status: "publish",
+    nodeType: "",
+    title: "",
+    imageURL: "",
+    lockedImageURL: "",
+    mediaType: "text",
+    mediaFormat: "",
+    mediaDuration: 0,
+    typeId: 1,
+    group: 1,
+    permissions: settings.defaultPermissions || {
+      public: ["read"],
+      authenticated: ["read"],
+    },
+    typeData: {
+      linkMetadata: null,
+      progress: [
+        { group: "viewed", value: 0 },
+        { group: "unviewed", value: 1 },
+      ],
+      mediaURL: "",
+      mediaWidth: 960, //TODO: This needs to be flexible with H5P
+      mediaHeight: 600,
+      subAccordionText: "More content:",
+    },
+    hideTitle: false,
+    hideProgress: false,
+    hideMedia: false,
+    skippable: true,
+    fullscreen: false,
+    coordinates: {
+      x: 3000,
+      y: 3000,
+    },
+    childOrdering: [],
+    quiz: [],
+  })
+}
+
+export function tapestryJson(state) {
+  const exportedTapestry = {
+    nodes: state.nodes.map(node => {
+      const newNode = { ...node }
+      if (newNode.quiz) {
+        newNode.quiz = newNode.quiz.map(question => {
+          return { ...question, completed: false, entries: null }
+        })
+      }
+      return newNode
+    }),
+    links: state.links.map(link => ({
+      ...link,
+      source: link.source.id,
+      target: link.target.id,
+    })),
+    groups: state.groups,
+  }
+  return exportedTapestry
+}

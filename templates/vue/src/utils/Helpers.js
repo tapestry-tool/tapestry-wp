@@ -1,7 +1,7 @@
 /**
  * Helper Functions
  */
-export default class {
+export default class Helpers {
   /**
    * Check if a string only contains digits
    *
@@ -78,6 +78,12 @@ export default class {
     return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
 
+  static getYoutubeID(url) {
+    const linkRegex = /(?:youtube\.com\/\S*(?:(?:e(?:mbed))?\/|watch\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/
+    const matchArray = url.match(linkRegex)
+    return matchArray === null ? null : matchArray[1] // Returns '' if link is not youtube URL
+  }
+
   /**
    * Shallowly checks if two objects are different from one another
    * @param {Object} src
@@ -104,5 +110,30 @@ export default class {
       }
     }
     return false
+  }
+
+  /**
+   * Returns a deep copy of a given object.
+   * Source: https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
+   * @param {Object | Array} obj
+   */
+  static deepCopy(obj) {
+    let outObject, value, key
+
+    if (typeof obj !== "object" || obj === null) {
+      return obj // Return the value if inObject is not an object
+    }
+
+    // Create an array or object to hold the values
+    outObject = Array.isArray(obj) ? [] : {}
+
+    for (key in obj) {
+      value = obj[key]
+
+      // Recursively (deep) copy for nested objects, including arrays
+      outObject[key] = Helpers.deepCopy(value)
+    }
+
+    return outObject
   }
 }
