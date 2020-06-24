@@ -365,7 +365,13 @@ class Tapestry implements ITapestry
                 'links' => [],
                 'groups' => [],
                 'rootId' => 0,
-                'settings' => (object) [],
+                'settings' => (object) array(
+                    'backgroundUrl' => '',
+                    'autoLayout' => false,
+                    'nodeDraggable' => true,
+                    'showAccess' => true,
+                    'defaultPermissions' => TapestryNodePermissions::getDefaultNodePermissions($this->postId)
+                ),
             ];
         }
         return $tapestry;

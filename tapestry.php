@@ -8,7 +8,7 @@
  * Author: Tapestry Team, University of British Coloumbia
  */
 
-// Used to force-refresh assets 
+// Used to force-refresh assets
 $TAPESTRY_VERSION_NUMBER = '2.27.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
@@ -116,6 +116,24 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
+function get_default_permissions()
+{
+    global $wp_roles;
+    $roles = $wp_roles->get_names();
+    $permissions = array(
+        'public'        => ['read'],
+        'authenticated'    => ['read'],
+    );
+
+    foreach ($roles as $role) {
+        if ($role !== "Administrator" || $role !== "Author") {
+            $permissions[strtolower($role)] = ['read'];
+        }
+    }
+
+    return $permissions;
+}
+
 /**
  * Set Up Tapestry Post Upon Insertion
  *
@@ -143,6 +161,11 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
             'tapestrySlug' => $post->post_name,
             'title' => $post->post_title,
             'status' => $post->post_status,
+            'backgroundUrl' => '',
+            'autoLayout' => false,
+            'nodeDraggable' => true,
+            'showAccess' => true,
+            'defaultPermissions' => get_default_permissions()
         );
     }
 
