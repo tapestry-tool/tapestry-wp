@@ -545,7 +545,7 @@ function tapestryTool(config){
             }
         }
     
-        jQuery.post(config.apiUrl + "/tapestries/" + config.wpPostId + "/links", JSON.stringify({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt }), function() {
+        $.post(config.apiUrl + "/tapestries/" + config.wpPostId + "/links", JSON.stringify({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt }), function() {
             tapestry.dataset.links.push({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt });
             tapestry.init(true);
         }).fail(function(e) {
@@ -1667,10 +1667,8 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video') {
-                    if (d.mediaDuration) {
-                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
-                    }
+                if (d.mediaDuration) {
+                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 }
                 return base;
                 });
@@ -2416,7 +2414,7 @@ function tapestryTool(config){
         if (config.wpCanEditTapestry) {
             return true;
         }
-        if (node.author == config.wpUserId) {
+        if (node.author.id == config.wpUserId) {
             return true;
         }
 
@@ -2530,6 +2528,7 @@ function getIconClass(mediaType, action, accessible=true) {
 
     switch (mediaType) {
 
+        case "h5p":
         case "video":
             if (action == 'pause')
                 classStr = classStrStart + 'pause';
@@ -2616,7 +2615,7 @@ function recordAnalyticsEvent(actor, action, object, objectID, details){
     };
 
     // Send the event to an AJAX URL to be saved
-    jQuery.post(analyticsAJAXUrl, data, function(response) {
+    $.post(analyticsAJAXUrl, data, function(response) {
         // Event posted
     });
 }
