@@ -21,10 +21,11 @@ services:
     ports:
       - "8000:80"
     volumes:
-     - ../../:/var/www/html/wp-content/plugins
+     - plugins:/var/www/html/wp-content/plugins
+     - ../:/var/www/html/wp-content/plugins/tapestry-wp
     container_name: wp
     
-  dev:
+  app:
     depends_on:
       - db
     build:
@@ -42,3 +43,4 @@ services:
 volumes:
     db_data:
     node_modules:
+    plugins:
