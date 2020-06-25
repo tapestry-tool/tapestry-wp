@@ -1,10 +1,11 @@
 <template>
   <section id="tyde-menu-help">
-    <h1>How to Play</h1>
-    <p>Click on any icon to play.</p>
+    <h1>Do you need help with this game?</h1>
+    <p>If you are wondering how to play this game, click on the "Welcome" planet.</p>
     <p>
-      Once you are done viewing all the nodes, click the green next arrow to view
-      more content.
+      Send an email to
+      <a href="mailto:ask@tyde.ca">ask@tyde.ca</a>
+      and we'll be happy to help you out!
     </p>
   </section>
 </template>
