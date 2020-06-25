@@ -156,10 +156,41 @@ function create_new_tapestry() {
         <script src='". plugin_dir_url(__FILE__) ."templates/libs/jquery.min.js' type='application/javascript'></script>
 
         <button id='new_tapestry_button'>
-            Press me.
+            Add Tapestry
         </button>
         <script type='text/javascript'>
-            $('#new_tapestry_button').click(function() {alert('hi')})
+            $('#new_tapestry_button').click(function() {
+                let name = prompt(`Enter a name`);
+                let payload = {};
+                payload[`nodes`] = [];
+                payload[`groups`] = [];
+                payload[`links`] = [];
+                payload[`title`] = name;
+                console.log(payload);
+                return new Promise((fulfill, reject) => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/wordpress/wp-json/tapestry-tool/v1/tapestries');
+                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                    xhr.onload = () => {
+                        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                            fulfill(xhr.response);
+                            console.log('success');
+                        } else {
+                            reject({
+                                status: this.status,
+                                statusText: xhr.statusText
+                            });
+                        }
+                    };
+                    xhr.onerror = () => {
+                        reject({
+                            status: this.status,
+                            statusText: xhr.statusText
+                        });
+                    };
+                    xhr.send(JSON.stringify(payload));
+                });
+            })
         </script>
     ";
 }
