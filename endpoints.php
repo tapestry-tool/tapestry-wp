@@ -415,9 +415,9 @@ function addTapestry($request)
 
 /**
  * Get a Tapestry
- *
+ * 
  * @param Object $request HTTP request
- *
+ * 
  * @return Object $response HTTP response
  */
 function putTapestry($request)
