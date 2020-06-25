@@ -93,7 +93,7 @@ function tapestryTool(config){
      ****************************************************/
 
     /* Import data from json file, then start D3 */
-    jQuery.ajaxSetup({
+    $.ajaxSetup({
         beforeSend: function (xhr) {
             if (wpApiSettings && wpApiSettings.nonce) {
                 xhr.setRequestHeader( 'X-WP-Nonce', wpApiSettings.nonce );
@@ -101,7 +101,7 @@ function tapestryTool(config){
         }
     });
 
-    jQuery.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
+    $.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
@@ -158,13 +158,13 @@ function tapestryTool(config){
             
             if (config.wpUserId) { // Get from database if user is logged in
 
-                jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(retrievedUserProgress);
                     }
 
-                    jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
+                    $.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
                         if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
                             h5pVideoSettings = retrievedH5PSettings;
                         }
@@ -566,7 +566,7 @@ function tapestryTool(config){
             }
         }
     
-        jQuery.post(config.apiUrl + "/tapestries/" + config.wpPostId + "/links", JSON.stringify({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt }), function() {
+        $.post(config.apiUrl + "/tapestries/" + config.wpPostId + "/links", JSON.stringify({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt }), function() {
             tapestry.dataset.links.push({"source": source, "target": target, "value": value, "type": "", "appearsAt": appearsAt });
             tapestry.init(true);
         }).fail(function(e) {
@@ -2627,7 +2627,7 @@ function recordAnalyticsEvent(actor, action, object, objectID, details){
     };
 
     // Send the event to an AJAX URL to be saved
-    jQuery.post(analyticsAJAXUrl, data, function(response) {
+    $.post(analyticsAJAXUrl, data, function(response) {
         // Event posted
     });
 }
