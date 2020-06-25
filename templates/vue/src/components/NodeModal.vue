@@ -21,6 +21,7 @@
             :node="node"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -373,6 +374,11 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
     },
   },
 }
