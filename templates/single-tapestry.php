@@ -30,7 +30,7 @@ function addNonceToScript()
     wp_localize_script('wp_tapestry_script', 'wp', array('roles' => $wp_roles->get_names()));
     wp_enqueue_script('wp_tapestry_script');
 
-    wp_add_inline_script( 'wp_tapestry_script', "
+    wp_add_inline_script('wp_tapestry_script', "
         var thisTapestryTool;
         $(document).ready(function(){
             thisTapestryTool = new tapestryTool({

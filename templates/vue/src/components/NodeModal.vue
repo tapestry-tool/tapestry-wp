@@ -331,7 +331,10 @@ export default {
         }
 
         if (this.modalType === "add") {
-          const id = await this.addNode(this.node)
+          const id = await this.addNode({
+            newNode: this.node,
+            parentId: this.parent && this.parent.id,
+          })
           this.node.id = id
           if (this.parent) {
             // Add link from parent node to this node
