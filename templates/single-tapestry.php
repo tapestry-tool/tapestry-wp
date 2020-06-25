@@ -11,6 +11,20 @@ Template Name: Tapestry Page Template
 
 get_header();
 
+wp_add_inline_script( 'wp_tapestry_script', "
+    var thisTapestryTool;
+    $(document).ready(function(){
+        thisTapestryTool = new tapestryTool({
+            'containerId': 'tapestry',
+            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+            'wpUserId': '". apply_filters('determine_current_user', false) ."',
+            'wpPostId': '". get_the_ID() ."',
+            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
+            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
+        });
+    });
+");
+
 if (current_user_can('edit_post', get_the_ID())) { 
     $additionalClasses = 'is-editor"';
 }

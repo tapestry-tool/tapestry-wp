@@ -3,7 +3,7 @@
     <loading
       v-if="!tapestryLoaded"
       style="padding: 30vh 0;"
-      label="Loading Tapestry"
+      label="Loading"
     />
     <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
