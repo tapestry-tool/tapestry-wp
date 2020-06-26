@@ -159,9 +159,11 @@ export default {
   z-index: 0;
   transform: translateX(0);
   transition: all 0.2s ease-out;
+  pointer-events: all;
 
   &.closed {
     transform: translateX(0);
+    pointer-events: none;
   }
 
   @media screen and (min-width: 500px) {
@@ -318,6 +320,7 @@ export default {
   width: 100vw;
   height: 4em;
   z-index: 10;
+  pointer-events: all;
 
   i {
     display: block;
