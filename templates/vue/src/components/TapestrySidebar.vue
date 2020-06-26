@@ -18,7 +18,7 @@
         :class="['close-button', { closed: isClosed }]"
         @click.stop="isClosed = true"
       >
-        <tapestry-icon icon="chevron-down" />
+        <tapestry-icon icon="chevron-right" />
       </button>
       <button
         :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
@@ -32,18 +32,14 @@
         <header class="sidebar-header">
           <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
           <div class="button-container">
-            <button
-              v-if="node.accessible || canEdit"
-              class="action-button"
-              @click="viewNode"
-            >
+            <b-button v-if="node.accessible || canEdit" @click="viewNode">
               <tapestry-icon icon="eye" />
               View
-            </button>
-            <button v-if="canEdit" class="action-button" @click="$emit('edit')">
+            </b-button>
+            <b-button v-if="canEdit" @click="$emit('edit')">
               <tapestry-icon icon="pencil-alt" />
               Edit
-            </button>
+            </b-button>
           </div>
         </header>
         <section>
@@ -184,39 +180,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2em;
+  font-size: 1.8em;
+  opacity: 0.6;
 
-  &:hover {
-    background: var(--teal);
-  }
-
+  &:hover,
   &.active {
-    background: var(--teal);
+    background: none;
+    opacity: 1;
   }
 
   @media screen and (min-width: 500px) {
     width: 100%;
     height: 2em;
-  }
-}
-
-.action-button {
-  padding: 0;
-  background: none;
-  color: inherit;
-  margin-right: 1em;
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  &:hover {
-    background: none;
-    color: var(--teal);
-  }
-
-  &:focus {
-    background: none;
   }
 }
 
@@ -230,11 +205,11 @@ export default {
     width: 2.5em;
     height: 2.5em;
     bottom: auto;
-    right: -1.2em;
+    right: 1em;
     top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
+    transform: translateY(-50%);
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     border-radius: 50%;
 
@@ -247,7 +222,7 @@ export default {
     }
 
     i {
-      margin-bottom: 4px;
+      margin-bottom: 0;
     }
   }
 }
@@ -267,8 +242,8 @@ export default {
 }
 
 .sidebar {
-  background: white;
-  color: inherit;
+  background: #5d656c;
+  color: white;
   height: 100vh;
   padding-bottom: 4em;
   transform: translateY(0);
@@ -285,7 +260,7 @@ export default {
 
   @media screen and (min-width: 500px) {
     min-width: 300px;
-    width: 30vw;
+    width: 25vw;
     max-width: 400px;
     grid-column: 2;
     padding-bottom: 0;
@@ -304,9 +279,19 @@ export default {
   }
 }
 
+.button-container {
+  i {
+    margin-right: 4px;
+  }
+}
+
 .sidebar-header {
-  display: flex;
-  justify-content: space-between;
+  margin-bottom: 1.5em;
+  text-align: left;
+
+  .content-title {
+    margin-bottom: 0.8em;
+  }
 }
 
 .sidebar-preview {
@@ -341,31 +326,16 @@ export default {
   padding: 3rem 2rem;
 
   section {
-    margin-bottom: 1em;
+    margin-bottom: 2em;
     &:last-child {
       margin-bottom: 3rem;
     }
   }
 
-  .content-title {
-    text-align: left;
-    margin-bottom: 1em;
-  }
-
   .content-separator {
-    margin-bottom: 1.5em;
+    margin-bottom: 0.8em;
     position: relative;
     text-align: left;
-
-    &:after {
-      content: "";
-      position: absolute;
-      width: 50%;
-      height: 3px;
-      background: black;
-      left: 0;
-      bottom: -12px;
-    }
   }
 
   .content-description {
