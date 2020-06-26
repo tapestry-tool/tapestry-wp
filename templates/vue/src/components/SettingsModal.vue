@@ -35,7 +35,10 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group v-if="maxDepth >= 2" label="Default Depth">
+          <b-form-group
+            v-if="tapestryIsLoaded && maxDepth >= 2"
+            label="Default Depth"
+          >
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
@@ -87,7 +90,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -129,9 +132,12 @@ export default {
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId"]),
+    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
     maxDepth() {
-      return thisTapestryTool.findMaxDepth(this.rootId) + 1
+      if (this.tapestryIsLoaded) {
+        return thisTapestryTool.findMaxDepth(this.rootId) + 1
+      }
+      return 0
     },
   },
   created() {
