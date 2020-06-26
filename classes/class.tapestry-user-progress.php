@@ -5,21 +5,20 @@ require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
 
 /**
  * Add/update/retrieve User progress
- * 
+ *
  */
 class TapestryUserProgress implements ITapestryUserProgress
 {
-
     private $_userId = null;
     private $postId;
     private $nodeMetaId;
 
     /**
      * Constructor
-     * 
+     *
      * @param   Number  $postId     post ID
      * @param   Number  $nodeMetaId node meta ID
-     * 
+     *
      * @return  NULL
      */
     public function __construct($postId = null, $nodeMetaId = null)
@@ -80,7 +79,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     /**
      * Set 'completed' status of a Tapestry Node for this User to true
-     * 
+     *
      * @return Null
      */
     public function complete()
@@ -91,9 +90,9 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     /**
      * Set the question with the given id to be marked as 'completed'
-     * 
+     *
      * @param Integer $questionId the question to mark
-     * 
+     *
      * @return Null
      */
     public function completeQuestion($questionId)
@@ -107,7 +106,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @param   String  $h5pSettingsData stores volume,
      * playbackRate, quality of h5p video
-     * 
+     *
      * @return  Null
      */
     public function updateH5PSettings($h5pSettingsData)
@@ -118,7 +117,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     /**
      * Get User's h5p video setting for a tapestry post
-     * 
+     *
      * @return String h5p $setting
      */
     public function getH5PSettings()
@@ -130,13 +129,13 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     /**
      * Get all gravity form entries submitted by this user
-     * 
+     *
      * @return String user entries in json format
      */
     public function getUserEntries($userId, $formId = 0)
     {
         if (!class_exists("GFAPI")) {
-          return [];
+            return [];
         }
         $search_criteria['field_filters'][] = array(
             'key'   => 'created_by',
@@ -171,17 +170,17 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
     
     private function _getImageChoices($formId, &$entry)
-    {   
+    {
         $field_types = array('checkbox', 'radio');
-        $form = GFAPI::get_form( $formId );
-        $fields = GFAPI::get_fields_by_type( $form, $field_types );
+        $form = GFAPI::get_form($formId);
+        $fields = GFAPI::get_fields_by_type($form, $field_types);
         $image_choices_fields = array();
-        foreach($fields as &$field) {
-            if ( is_object( $field ) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
+        foreach ($fields as &$field) {
+            if (is_object($field) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
                 $image_choices_fields[$field->id] = $field;
             }
         }
-        foreach($image_choices_fields as $id => $field ) {
+        foreach ($image_choices_fields as $id => $field) {
             foreach ($field->inputs as $input) {
                 $label = $input['label'];
                 $correspondingChoice = array_values(array_filter(
@@ -190,7 +189,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                         return $e['value'] == $label;
                     }
                 ))[0];
-                if($entry[$input['id']] != ''){
+                if ($entry[$input['id']] != '') {
                     $inputMap = new stdClass();
                     $inputMap->choiceText = $label;
                     $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
@@ -232,7 +231,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 $progress->$nodeId->progress = (float) $progress_value;
             } else {
                 $progress->$nodeId->progress = 0;
-            }         
+            }
 
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = get_user_meta($userId, 'tapestry_' . $this->postId . '_node_completed_' . $nodeId, true);
@@ -268,7 +267,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                             if ($tapestryAudio->audioExists()) {
                                 $quiz[$question->id][$type] = $tapestryAudio->get();
                             }
-                        } else if (property_exists($entries, $gfOrH5pId)) {
+                        } elseif (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
                         }
                     }

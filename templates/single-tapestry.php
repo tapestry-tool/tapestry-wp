@@ -5,7 +5,7 @@
  */
 /**
  * Register Script with Nonce
- * 
+ *
  * @return Object null
  */
 
@@ -31,15 +31,18 @@ function addNonceToScript()
     wp_enqueue_script('wp_tapestry_script');
 
     wp_add_inline_script( 'wp_tapestry_script', "
-        var thisTapestryTool = new tapestryTool({
-            'containerId': 'tapestry',
-            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
-            'wpUserId': '". apply_filters('determine_current_user', false) ."',
-            'wpPostId': '". get_the_ID() ."',
-            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
-            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
+        var thisTapestryTool;
+        $(document).ready(function(){
+            thisTapestryTool = new tapestryTool({
+              'containerId': 'tapestry',
+              'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+              'wpUserId': '". apply_filters('determine_current_user', false) ."',
+              'wpPostId': '". get_the_ID() ."',
+              'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
+              'addNodeModalUrl': '". plugin_dir_url(__FILE__) ."modal-add-node.html',
+            });
         });
-    " );
+    ");
 }
 add_action('wp_enqueue_scripts', 'addNonceToScript');
 
@@ -101,7 +104,9 @@ add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
 get_header(); ?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="post-wrap<?php if (current_user_can('edit_post', get_the_ID())) { echo ' is-editor"'; } ?>" role="main">
+    <main id="main" class="post-wrap<?php if (current_user_can('edit_post', get_the_ID())) {
+    echo ' is-editor"';
+} ?>" role="main">
 
         <div id="tapestry-container"></div>
         <div id="user-ip" style="display:none;"><?php echo $_SERVER['REMOTE_ADDR']; ?></div>
@@ -115,7 +120,7 @@ get_header(); ?>
             endif;
             ?>
 
-        <?php endwhile; // end of the loop. 
+        <?php endwhile; // end of the loop.
         ?>
 
         <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" rel="stylesheet" />
