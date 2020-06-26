@@ -66,7 +66,7 @@ class TapestryNode implements ITapestryNode
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
         $this->description = '';
-        $this->behaviour = 'embed';
+        $this->behaviour = 'new-window';
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
