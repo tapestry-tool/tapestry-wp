@@ -421,7 +421,6 @@ function tapestryTool(config){
                 type:"range",
                 min:"1",
                 max:"4",
-                value:"4",
                 id:"tapestry-depth-slider"
             });
             depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -437,7 +436,7 @@ function tapestryTool(config){
                 filterTapestry();
                 updateSvgDimensions();
             };
-
+            tapestryDepthSlider.max = findMaxDepth(root) + 1;
             tapestryDepthSlider.value = tapestryDepth;
             tapestryControlsDiv.appendChild(depthSliderWrapper);
 
