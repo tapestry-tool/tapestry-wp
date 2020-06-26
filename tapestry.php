@@ -166,30 +166,36 @@ function create_new_tapestry() {
                 payload[`groups`] = [];
                 payload[`links`] = [];
                 payload[`title`] = name;
-                console.log(payload);
                 return new Promise((fulfill, reject) => {
                     let xhr = new XMLHttpRequest();
                     xhr.open('POST', '/wordpress/wp-json/tapestry-tool/v1/tapestries');
                     xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
                     xhr.onload = () => {
-                        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
                             fulfill(xhr.response);
-                            console.log('success');
                         } else {
                             reject({
-                                status: this.status,
+                                status: xhr.status,
                                 statusText: xhr.statusText
                             });
                         }
                     };
                     xhr.onerror = () => {
                         reject({
-                            status: this.status,
+                            status: xhr.status,
                             statusText: xhr.statusText
                         });
                     };
                     xhr.send(JSON.stringify(payload));
-                });
+                }).then(data => {
+                    let res = JSON.parse(data);
+                    console.log(res.settings.title);
+                    let destination = '/wordpress/tapestry/' + res.settings.title;
+                    window.location.href = destination;
+                }).catch(err => {
+                    console.log(err);
+                    alert(`Error occured while creating tapestry, please try again`);
+                })
             })
         </script>
     ";
