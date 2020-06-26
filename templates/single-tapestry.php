@@ -11,21 +11,7 @@ Template Name: Tapestry Page Template
 
 get_header();
 
-wp_add_inline_script( 'wp_tapestry_script', "
-    var thisTapestryTool;
-    $(document).ready(function(){
-        thisTapestryTool = new tapestryTool({
-            'containerId': 'tapestry',
-            'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
-            'wpUserId': '". apply_filters('determine_current_user', false) ."',
-            'wpPostId': '". get_the_ID() ."',
-            'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
-            'addNodeModalUrl': '". plugin_dir_url( __FILE__ ) ."modal-add-node.html',
-        });
-    });
-");
-
-if (current_user_can('edit_post', get_the_ID())) { 
+if (current_user_can('edit_post', get_the_ID())) {
     $additionalClasses = 'is-editor"';
 }
 
@@ -37,7 +23,7 @@ if (current_user_can('edit_post', get_the_ID())) {
 <?php
 
     global $post;
-    if( !post_password_required($post) ) { ?>
+    if (!post_password_required($post)) { ?>
         
         <div id="tapestry-container"></div>
 
@@ -86,10 +72,8 @@ if (current_user_can('edit_post', get_the_ID())) {
         </script>
         
         <?php
-    }
-    else {
-        // protected, show password form
-        ?>
+    } else {
+        // protected, show password form ?>
         <div class="entry">
             <header class="entry-header">
                 <h1 class="entry-title">Password required to continue</h1>
