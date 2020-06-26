@@ -40,7 +40,9 @@ export default {
 
 <style lang="scss" scoped>
 #tyde-cockpit {
-  background-size: cover;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
   margin: -16px -32px;
   height: calc(100% + 32px);
 }
