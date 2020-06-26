@@ -1,0 +1,23 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Cypress
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [579-containerize-modular-cypress]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Launch containers
+              run: docker-compose up -d
+              working-directory: docker
+            - name: Run tests
+              run: docker exec e2e cypress run --headless
+              working-directory: docker
