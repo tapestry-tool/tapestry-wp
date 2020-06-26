@@ -45,7 +45,6 @@ function tapestryTool(config){
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
         nodesBeforeDrag,
-        h5pVideoSettings = {},
         tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
         tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
@@ -164,20 +163,12 @@ function tapestryTool(config){
                         setDatasetProgress(retrievedUserProgress);
                     }
 
-                    $.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
-                        if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
-                            h5pVideoSettings = retrievedH5PSettings;
-                        }
-                    }).fail(function(e) {
-                        console.error("Error with retrieving h5p video settings");
-                        console.error(e);
-                    }).complete(function(){
-                        tapestry.init();
-                    });
-
                 }).fail(function(e) {
                     console.error("Error with retrieving node progress");
                     console.error(e);
+                })
+                .complete(function(){
+                    tapestry.init();
                 });
             }
             else {  // Get from cookie if user is NOT logged in
@@ -187,13 +178,6 @@ function tapestryTool(config){
                 if (cookieProgress) {
                     cookieProgress = JSON.parse( cookieProgress );
                     setDatasetProgress(cookieProgress);	
-                }
-
-                // Update H5P Video Settings from cookie (if any)
-                var cookieH5PVideoSettings = Cookies.get("h5p-video-settings");
-                if (cookieH5PVideoSettings) {
-                    cookieH5PVideoSettings = JSON.parse( cookieH5PVideoSettings );
-                    h5pVideoSettings = cookieH5PVideoSettings;
                 }
 
                 tapestry.init();
@@ -271,7 +255,7 @@ function tapestryTool(config){
         this.updateAccordionProgress();
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
+            detail: { dataset: { ...this.dataset } }
         }));
 
         if (!root) {
@@ -1074,7 +1058,11 @@ function tapestryTool(config){
     function initializeDragSelect() {
         new DragSelect({
             selectables: document.querySelectorAll(".node"),
-            onDragStart: () => {
+            onDragStart: (e) => {
+                let depthSliderWrapper = document.querySelector("#tapestry-controls-wrapper");
+                if (depthSliderWrapper === e.target || depthSliderWrapper.contains(e.target)) {
+                    this.break();
+                }    
                 if (!isMultiSelect) {
                     selection.clear()
                 }
@@ -1440,7 +1428,8 @@ function tapestryTool(config){
 
         if (node.conditions.length === 0 || node.conditions.every(cond => cond.fulfilled)) {
             const listItem = document.createElement("li");
-            listItem.innerText = "When this parent is unlocked.";
+            const btn = createNodeButton(getParent(node))
+            listItem.innerHTML = `When ${btn} is unlocked.`;
             wrapper.appendChild(listItem);
         } else {
             node.conditions.forEach(cond => {
@@ -1472,6 +1461,9 @@ function tapestryTool(config){
     }
 
     function createNodeButton(node) {
+        if (!node) {
+            return 'preceding content';
+        }
         return `<button class="button-node-tooltip" data-node=${node.id}>${node.title}</button>`
     }
 
@@ -1891,6 +1883,9 @@ function tapestryTool(config){
                 .selectAll("path")
                 .data(function (d, i) {
                     var data = d.typeData.progress;
+                    if (!data) {
+                        data = [ {'value': 0}, {'value': 1 } ];
+                    }
                     data.forEach(function (e) {
                         e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
                     })
@@ -2308,7 +2303,7 @@ function tapestryTool(config){
                     node.typeData = content.typeData
                 }
 
-                if (node.mediaType !== "accordion") {
+                if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
                     //Update the dataset with new values
 
                     node.typeData.progress[0].value = amountViewed;

@@ -4,7 +4,7 @@
  */
 class TapestryUserRoles
 {
-    static function canEdit($postId = 0)
+    public static function canEdit($postId = 0)
     {
         return TapestryUserRoles::isEditor()
         || TapestryUserRoles::isAdministrator()
