@@ -163,7 +163,6 @@ export default {
       }
     },
     handlePlay(node) {
-      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       globals.recordAnalyticsEvent("user", "play", "h5p-video", id, {
@@ -171,7 +170,6 @@ export default {
       })
     },
     handlePause(node) {
-      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       globals.recordAnalyticsEvent("user", "pause", "h5p-video", id, {

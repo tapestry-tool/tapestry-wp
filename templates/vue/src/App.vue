@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <tyde />
-    <router-view></router-view>
+    <router-view v-if="tapestryIsLoaded"></router-view>
     <tapestry-filter v-if="tapestryIsLoaded && enableFilter" />
   </div>
 </template>

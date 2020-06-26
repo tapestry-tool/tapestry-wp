@@ -97,7 +97,7 @@ import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
 import Helpers from "@/utils/Helpers"
-import YoutubeMedia from "./lightbox/YoutubeMedia"
+import YouTubeMedia from "./lightbox/YouTubeMedia"
 
 const SAVE_INTERVAL = 5
 
@@ -112,7 +112,7 @@ export default {
     WpPostMedia,
     CompletionScreen,
     QuizMedia,
-    YoutubeMedia,
+    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {

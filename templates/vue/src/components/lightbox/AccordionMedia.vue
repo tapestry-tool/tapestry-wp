@@ -111,9 +111,6 @@
         </button>
       </div>
     </tapestry-modal>
-    <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up"></i>
-    </button>
   </div>
 </template>
 
@@ -487,21 +484,6 @@ button[disabled] {
   color: #026c93;
   font-weight: bold;
   font-size: 1.2em;
-}
-
-.button-scroll-top {
-  cursor: pointer;
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  background: white;
-  border: 2px solid #3fa9f5;
-  color: #3fa9f5;
-  border-radius: 50%;
-  padding: 0;
-  width: 56px;
-  height: 56px;
-  z-index: 10;
 }
 
 .sub-accordion-text {
