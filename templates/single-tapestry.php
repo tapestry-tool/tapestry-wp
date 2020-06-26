@@ -11,7 +11,7 @@ Template Name: Tapestry Page Template
 
 get_header();
 
-if (current_user_can('edit_post', get_the_ID())) {
+if (current_user_can('edit_post', get_the_ID())) { 
     $additionalClasses = 'is-editor"';
 }
 
@@ -23,7 +23,7 @@ if (current_user_can('edit_post', get_the_ID())) {
 <?php
 
     global $post;
-    if (!post_password_required($post)) { ?>
+    if( !post_password_required($post) ) { ?>
         
         <div id="tapestry-container"></div>
 
@@ -72,8 +72,10 @@ if (current_user_can('edit_post', get_the_ID())) {
         </script>
         
         <?php
-    } else {
-        // protected, show password form ?>
+    }
+    else {
+        // protected, show password form
+        ?>
         <div class="entry">
             <header class="entry-header">
                 <h1 class="entry-title">Password required to continue</h1>
