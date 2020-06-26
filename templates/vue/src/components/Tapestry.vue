@@ -1,11 +1,13 @@
 <template>
-  <div id="tapestry">
-    <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
-    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
-    <div v-if="tapestryLoaded && !tapestry.rootId">
-      <root-node-button v-if="wpCanEditTapestry" @click="$emit('add-root')" />
-      <div v-else style="margin-top: 40vh;">
-        The requested tapestry is empty.
+  <div id="tapestry-container">
+    <div id="tapestry">
+      <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
+      <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
+      <div v-if="tapestryLoaded && !tapestry.rootId">
+        <root-node-button v-if="wpCanEditTapestry" @click="$emit('add-root')" />
+        <div v-else style="margin-top: 40vh;">
+          The requested tapestry is empty.
+        </div>
       </div>
     </div>
   </div>
