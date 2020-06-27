@@ -178,9 +178,9 @@
 
 <script>
 import { mapState } from "vuex"
-import Combobox from "../Combobox"
-import GravityFormsApi from "../../services/GravityFormsApi"
-import Helpers from "../../utils/Helpers"
+import Combobox from "@/components/Combobox"
+import GravityFormsApi from "@/services/GravityFormsApi"
+import Helpers from "@/utils/Helpers"
 
 const defaultQuestion = {
   text: "",
@@ -192,7 +192,6 @@ const defaultQuestion = {
 }
 
 export default {
-  name: "quiz-modal",
   components: {
     Combobox,
   },
