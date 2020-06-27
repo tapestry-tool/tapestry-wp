@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.23.0-tyde-beta
- * Author: Tapestry Team, University of British Coloumbia.
+ * Version: 2.27.0-tyde-beta
+ * Author: Tapestry Team, University of British Coloumbia
  */
 
-// Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.25.0-tyde-beta';
+// Used to force-refresh assets 
+$TAPESTRY_VERSION_NUMBER = '2.27.0-tyde-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
