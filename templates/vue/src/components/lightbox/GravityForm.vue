@@ -80,7 +80,10 @@ export default {
     const html = await GravityFormsApi.getFormHtml(this.id)
     this.html = html
 
-    const entry = await GravityFormsApi.getFormEntry(this.id, wpData.wpTeenId || 0)
+    const entry = await GravityFormsApi.getFormEntry(
+      this.id,
+      this.node.userType === "teen" ? wpData.wpTeenId : 0
+    )
     this.entry = entry
 
     this.loading = false
@@ -94,7 +97,7 @@ export default {
       this.populateForm()
     }
 
-    if (wpData.wpTeenId) {
+    if (this.node.userType === "teen") {
       this.disableSubmit()
       this.addNotAllowedText()
     }
