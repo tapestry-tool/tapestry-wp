@@ -2,7 +2,7 @@
   <button
     :class="['tyde-button', { 'has-label': label.length > 0 }]"
     :style="cssProps"
-    @click="$emit('click')"
+    @click="$emit('click', $event)"
   >
     <i v-if="icon.length" :class="iconClass"></i>
     <slot></slot>
@@ -40,16 +40,16 @@ export default {
 <style lang="scss" scoped>
 .tyde-button {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 2em;
+  height: 2em;
   border-radius: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: black;
   background: white;
-  font-size: 1.88em;
-  margin-right: 16px;
+  font-size: 1.4em;
+  margin-right: 0.4em;
   transition: all 0.2s ease;
   padding: 0em 0.4em;
   box-shadow: 0 0 20px -8px #000;

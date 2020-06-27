@@ -1,11 +1,11 @@
 <template>
   <div id="tyde-menu">
     <div class="buttons">
-      <tyde-button
+      <!--tyde-button
         icon="cog"
         label="Settings"
         @click="setActivePage('settings')"
-      ></tyde-button>
+      ></tyde-button-->
       <tyde-button
         icon="globe-asia"
         label="Map"
@@ -20,6 +20,11 @@
         icon="user-circle"
         label="Profile"
         @click="setActivePage('profile')"
+      ></tyde-button>
+      <tyde-button
+        icon="user-circle"
+        label="Favourites"
+        @click="setActivePage('favourites')"
       ></tyde-button>
       <tyde-button
         icon="space-shuttle"
@@ -55,6 +60,16 @@
         v-if="activePage === 'profile'"
         @back="setActivePage('home')"
       />
+      <div v-if="activePage === 'favourites'">
+        <tyde-favourites
+          v-if="favourites.length"
+          :favourites="favourites"
+          class="mt-3"
+        ></tyde-favourites>
+        <p v-else style="font-size: 1.5em; padding: 1em;">
+          You have not added any items to your favourites.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -67,6 +82,7 @@ import TydeMenuSettings from "./TydeMenuSettings"
 import TydeMenuHelp from "./TydeMenuHelp"
 import TydeMenuProfile from "./TydeMenuProfile"
 import TydeModuleSummary from "./TydeModuleSummary"
+import TydeFavourites from "./TydeFavourites"
 
 export default {
   name: "tyde-menu",
@@ -77,6 +93,7 @@ export default {
     TydeMenuHelp,
     TydeMenuProfile,
     TydeModuleSummary,
+    TydeFavourites,
   },
   data() {
     return {
@@ -89,7 +106,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "favourites"]),
     ...mapGetters(["getNode"]),
   },
   watch: {
@@ -198,7 +215,7 @@ export default {
     right: 15px;
     top: 17px;
     z-index: 10;
-    width: 60px !important;
+    width: 2em !important;
     border-radius: 50% !important;
   }
 

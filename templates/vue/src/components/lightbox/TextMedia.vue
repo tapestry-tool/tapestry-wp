@@ -35,7 +35,6 @@ export default {
     font-size: 1.75rem;
     font-weight: 500;
     margin: 1em auto;
-    max-width: 960px;
 
     :before {
       display: none;
@@ -46,7 +45,6 @@ export default {
     font-family: "Source Sans Pro", sans-serif;
     font-size: 1em;
     white-space: pre-wrap;
-    max-width: 960px;
     margin: 0 auto 1em;
   }
 }

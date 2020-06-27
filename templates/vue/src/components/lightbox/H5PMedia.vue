@@ -1,8 +1,7 @@
 <template>
   <div class="container">
-    <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
-      v-if="showEndScreen"
+      v-if="showEndScreen && !readOnly"
       :node="node"
       @rewatch="rewatch"
       @close="close"
@@ -11,6 +10,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -20,13 +20,14 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :node="node"
+      :read-only="readOnly"
       :settings="h5pSettings"
       @complete="$emit('complete')"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
-      @show-play-screen="showPlayScreen = $event"
-      @update-settings="updateH5pSettings"
+      @update-settings="updateSettings"
     />
   </div>
 </template>
@@ -35,7 +36,6 @@
 import { mapActions, mapState } from "vuex"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
-import PlayScreen from "./PlayScreen"
 import H5PIframe from "./H5PIframe"
 import QuizScreen from "./QuizScreen"
 
@@ -46,7 +46,6 @@ export default {
     "h5p-iframe": H5PIframe,
     Loading,
     QuizScreen,
-    PlayScreen,
   },
   props: {
     node: {
@@ -67,13 +66,17 @@ export default {
       required: false,
       default: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       isLoading: true,
       showEndScreen: false,
       showQuizScreen: false,
-      showPlayScreen: !this.autoplay,
     }
   },
   computed: {
@@ -98,12 +101,19 @@ export default {
       this.showQuizScreen = false
       this.showEndScreen = true
     },
-    play() {
-      this.$refs.h5pIframe.play()
-    },
     handleLoad() {
       this.isLoading = false
       this.$emit("load")
+    },
+    updateSettings(settings) {
+      globals.recordAnalyticsEvent(
+        "user",
+        "update-settings",
+        "h5p-video",
+        this.node.id,
+        { from: this.h5pSettings, to: settings }
+      )
+      this.updateH5pSettings(settings)
     },
   },
 }

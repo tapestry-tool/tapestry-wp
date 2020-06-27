@@ -45,8 +45,7 @@ function tapestryTool(config){
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
         nodesBeforeDrag,
-        h5pVideoSettings = {},
-        tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepth = 0,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
         tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -101,13 +100,13 @@ function tapestryTool(config){
         }
     });
 
-    jQuery.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
+    $.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
 
                 // change http(s):// to // in media URLs
-                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && typeof tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
+                if (typeof tapestry.dataset.nodes[i].typeData != "undefined" && tapestry.dataset.nodes[i].typeData.mediaURL && tapestry.dataset.nodes[i].typeData.mediaURL.length > 0) {
                     tapestry.dataset.nodes[i].typeData.mediaURL = tapestry.dataset.nodes[i].typeData.mediaURL.replace(/(http(s?)):\/\//gi, '//');
                 }
 
@@ -158,26 +157,17 @@ function tapestryTool(config){
             
             if (config.wpUserId) { // Get from database if user is logged in
 
-                jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(retrievedUserProgress);
                     }
 
-                    jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
-                        if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
-                            h5pVideoSettings = retrievedH5PSettings;
-                        }
-                    }).fail(function(e) {
-                        console.error("Error with retrieving h5p video settings");
-                        console.error(e);
-                    }).complete(function(){
-                        tapestry.init();
-                    });
-
                 }).fail(function(e) {
                     console.error("Error with retrieving node progress");
                     console.error(e);
+                }).complete(function(){
+                    tapestry.init();
                 });
             }
             else {  // Get from cookie if user is NOT logged in
@@ -186,14 +176,7 @@ function tapestryTool(config){
 
                 if (cookieProgress) {
                     cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
-                }
-
-                // Update H5P Video Settings from cookie (if any)
-                var cookieH5PVideoSettings = Cookies.get("h5p-video-settings");
-                if (cookieH5PVideoSettings) {
-                    cookieH5PVideoSettings = JSON.parse( cookieH5PVideoSettings );
-                    h5pVideoSettings = cookieH5PVideoSettings;
+                    setDatasetProgress(cookieProgress);    
                 }
 
                 tapestry.init();
@@ -274,7 +257,7 @@ function tapestryTool(config){
         this.updateAccordionProgress();
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
+            detail: { dataset: { ...this.dataset } }
         }));
 
         if (!root) {
@@ -326,7 +309,7 @@ function tapestryTool(config){
         
             // Attach the link line to the tapestry SVG (it won't appear for now)
             $("#" + TAPESTRY_CONTAINER_ID + " > svg").prepend(nodeLinkLine);
-            recordAnalyticsEvent('app', 'load', 'tapestry', tapestrySlug);
+            recordAnalyticsEvent('app', 'load', 'tapestry', config.wpPostId);
         }
 
         if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
@@ -447,6 +430,7 @@ function tapestryTool(config){
 
             // Every time the slider's value is changed, do the following
             tapestryDepthSlider.onchange = function() {
+                globals.recordAnalyticsEvent('user', 'change', 'depth-slider', null, { from: tapestryDepth, to: this.value })
                 tapestryDepth = this.value;
                 updateDepthMessage();
             
@@ -1094,26 +1078,27 @@ function tapestryTool(config){
             }
         });
     }
-    
-    /* Draws the components that make up node */
-    function buildNodeContents() {
-        const handleClick = d => {
-            if (root === d.id && d.hideMedia) {
-                if (config.wpCanEditTapestry || d.accessible) {
-                    if (d.tydeType === "Module") {
-                        dispatchEvent(
-                            new CustomEvent(
-                                'start-module',
-                                { detail: d.id }
-                            )
+
+    function handleClick(d) {
+        if (root === d.id && d.hideMedia) {
+            if (config.wpCanEditTapestry || d.accessible) {
+                if (d.tydeType === "Module") {
+                    recordAnalyticsEvent('user', 'click', 'module', d.id, { x: d3.event.x, y: d3.event.y })
+                    dispatchEvent(
+                        new CustomEvent(
+                            'start-module',
+                            { detail: d.id }
                         )
-                    } else {
-                        goToNode(d.id)
-                    }
+                    )
+                } else {
+                    goToNode(d.id)
                 }
             }
         }
-        
+    }
+    
+    /* Draws the components that make up node */
+    function buildNodeContents() {
         if (tapestryDepth) {
             tapestryDepthSlider.max = findMaxDepth(root) + 1;
         }
@@ -1411,7 +1396,7 @@ function tapestryTool(config){
                 .on("end", dragended)
             )
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
                         if (!isMultiSelect) {
@@ -1427,7 +1412,7 @@ function tapestryTool(config){
         else {
             nodes
             .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id);
+                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
                 if (root != d.id) { // prevent multiple clicks
                     if (config.wpCanEditTapestry || d.accessible) {
                         tapestry.selectNode(d.id);
@@ -1447,7 +1432,6 @@ function tapestryTool(config){
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("opacity", 0)
             .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
             .attr("x", d => -(tooltipWidth(d) / 2))
@@ -1498,38 +1482,32 @@ function tapestryTool(config){
             if (linkToDragStarted) {
                 linkToNode = thisNode;
             }
-        }).on("mouseout", function () {
+
+            // Show unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                const pointer = this.querySelector("polygon.tooltip-pointer");
+                pointer.style.opacity = 1;
+                wrapper.style.display = "block";
+            }
+
+        })
+        
+        nodes.on("mouseout", function (thisNode) {
 
             // Unmark this node as the node to link to
             if (linkToDragStarted) {
                 linkToNode = undefined;
             }
-        });
 
-        nodes
-            .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
-
-                // Place this node at the end of the svg so that it appears on top
-                $(this).insertAfter($(this).parent().children().last())
-
-                // Show unlock conditions tooltip
-                if (d.nodeType !== "grandchild") {
-                    const wrapper = this.querySelector(".tooltip-wrapper");
-                    const pointer = this.querySelector("polygon.tooltip-pointer");
-                    pointer.style.opacity = 1;
-                    wrapper.style.opacity = 1;
-                    wrapper.style.pointerEvents = "all";
-                }
-            })
-            .on("mouseleave", function () {
-                // Hide unlock conditions tooltip
+            // Hide unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
-                wrapper.style.opacity = 0;
-                wrapper.style.pointerEvents = "none";
-            })
+                wrapper.style.display = "none";
+            }
+        });
     }
 
     function getTooltipHtml(node) {
@@ -1538,7 +1516,8 @@ function tapestryTool(config){
 
         if (node.conditions.length === 0) {
             const listItem = document.createElement("li");
-            listItem.innerText = "When this parent is unlocked.";
+            const btn = createNodeButton(getParent(node))
+            listItem.innerHTML = `When ${btn} is unlocked.`;
             wrapper.appendChild(listItem);
         } else {
             node.conditions.forEach(cond => {
@@ -1570,6 +1549,9 @@ function tapestryTool(config){
     }
 
     function createNodeButton(node) {
+		if (!node) {
+			return "preceding content"
+		}
         return `<button class="button-node-tooltip" data-node=${node.id}>${node.title}</button>`
     }
 
@@ -1826,21 +1808,13 @@ function tapestryTool(config){
             })
             .attr("x", -NORMAL_RADIUS * NODE_TEXT_RATIO)
             .attr("y", -NORMAL_RADIUS * NODE_TEXT_RATIO)
-            .on("click keydown", function (d) {
-                if (root === d.id && d.hideMedia) {
-                    if (config.wpCanEditTapestry || d.accessible) {
-                        goToNode(d.id)
-                    }
-                }
-            })
+            .on("click keydown", handleClick)
             .append("xhtml:div")
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video') {
-                    if (d.mediaDuration) {
-                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
-                    }
+                if (d.mediaDuration) {
+                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 }
                 return base;
                 });
@@ -2058,6 +2032,9 @@ function tapestryTool(config){
                 .selectAll("path")
                 .data(function (d, i) {
                     var data = d.typeData.progress;
+                    if (!data) {
+                        data = [ {'value': 0}, {'value': 1 } ];
+                    }
                     data.forEach(function (e) {
                         e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
                     })
@@ -2519,7 +2496,7 @@ function tapestryTool(config){
             
             if (index !== -1) {
                 var node = tapestry.dataset.nodes[index];
-                if (node.mediaType !== "accordion") {
+                if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
                     //Update the dataset with new values
                     tapestry.dataset.nodes[index].typeData.progress[0].value = amountViewed;
                     tapestry.dataset.nodes[index].typeData.progress[1].value = amountUnviewed;
@@ -2851,6 +2828,7 @@ function getIconClass(mediaType, action, accessible=true) {
 
     switch (mediaType) {
 
+        case "h5p":
         case "video":
             if (action == 'pause')
                 classStr = classStrStart + 'pause';
@@ -2900,55 +2878,6 @@ function screenToSVG(screenX, screenY) {
     return p.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-/****************************************************
- * ANALYTICS FUNCTIONS
- ****************************************************/
-
-var analyticsAJAXUrl = '',  // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
-    analyticsAJAXAction = 'tapestry_tool_log_event';// Analytics
-
-function recordAnalyticsEvent(actor, action, object, objectID, details){
-
-    if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length)
-        return false;
-
-    // TODO: Also need to save the tapestry slug or ID in the events
-
-    var userUUID = Cookies.get("user-uuid");
-    if (userUUID === undefined) {
-        userUUID = createUUID();
-        Cookies.set("user-uuid", userUUID);
-    }
-
-    if (details === undefined) {
-        details = {};
-    }
-
-    details['user-ip'] = $('#user-ip').text();
-
-    var data = {
-        'action': analyticsAJAXAction,
-        'actor': actor,
-        'action2': action,
-        'object': object,
-        'user_guid': userUUID,
-        'object_id': objectID,
-        'details': JSON.stringify(details),
-    };
-
-    // Send the event to an AJAX URL to be saved
-    jQuery.post(analyticsAJAXUrl, data, function(response) {
-        // Event posted
-    });
-}
-
-function createUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
 function isEmptyObject(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -2956,18 +2885,3 @@ function isEmptyObject(obj) {
     }
     return true;
 }
-
-// Capture click events anywhere inside or outside tapestry
-$(document).ready(function(){
-    document.body.addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'screen', null, {'x': x, 'y': y});
-    }, true);
-
-    document.getElementById('tapestry').addEventListener('click', function(event) {
-        var x = event.clientX + $(window).scrollLeft();
-        var y = event.clientY + $(window).scrollTop();
-        recordAnalyticsEvent('user', 'click', 'tapestry', null, {'x': x, 'y': y});
-    }, true);
-});

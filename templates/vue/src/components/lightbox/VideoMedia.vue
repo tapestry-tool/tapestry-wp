@@ -7,7 +7,7 @@
   >
     <play-screen v-if="showPlayScreen" @play="play" />
     <end-screen
-      v-if="showEndScreen"
+      v-if="showEndScreen && !readOnly"
       :node="node"
       @rewatch="rewatch"
       @close="close"
@@ -16,6 +16,7 @@
     <quiz-screen
       v-else-if="showQuizScreen"
       :id="node.id"
+      :read-only="readOnly"
       @back="back"
       @close="close"
     />
@@ -69,6 +70,11 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -87,7 +93,7 @@ export default {
       if (width / height <= 1) {
         return { height: "100%", width: "auto" }
       }
-      if (this.node.fullscreen && this.node.fitWindow) {
+      if (this.node.fullscreen && this.node.fitWindow && !this.readOnly) {
         if (width > window.innerWidth) {
           const resizeRatio = window.innerWidth / width
           const newHeight = height * resizeRatio
@@ -120,6 +126,9 @@ export default {
     },
     play() {
       if (this.$refs.video) {
+        globals.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.$refs.video.play()
       }
     },
@@ -128,6 +137,9 @@ export default {
       this.showEndScreen = false
       if (this.$refs.video) {
         this.$refs.video.currentTime = 0
+        globals.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: 0,
+        })
         this.$refs.video.play()
       }
     },
@@ -138,6 +150,9 @@ export default {
     close() {
       if (this.$refs.video) {
         this.$refs.video.pause()
+        globals.recordAnalyticsEvent("app", "pause", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.updateVideoProgress()
       }
       this.$emit("close")
@@ -160,7 +175,7 @@ export default {
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+        globals.recordAnalyticsEvent("user", "play", "video", id, {
           time: video.currentTime,
         })
       }
@@ -171,7 +186,7 @@ export default {
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+        globals.recordAnalyticsEvent("user", "pause", "video", id, {
           time: video.currentTime,
         })
       }

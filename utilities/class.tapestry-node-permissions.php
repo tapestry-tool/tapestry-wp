@@ -8,23 +8,37 @@ class TapestryNodePermissions
 {
     /**
      * Get Default Node Permissions
-     * 
+     *
      * @return  Array   DefaultNodePermissions
      */
-    static function getDefaultNodePermissions()
+    public static function getDefaultNodePermissions($tapestryPostId)
     {
-        return (object) [
-            'public'        => ['read'],
-            'authenticated'    => ['read']
-        ];
+        if ($tapestryPostId == 0) {
+            return (object) [
+                'public'        => ['read'],
+                'authenticated'    => ['read']
+            ];
+        }
+
+        $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
+        $defaultPermissions = (isset($tapestry->settings->defaultPermissions) ? $tapestry->settings->defaultPermissions : false);
+
+        if (!$defaultPermissions) {
+            return (object) [
+                'public'        => ['read'],
+                'authenticated'    => ['read']
+            ];
+        }
+
+        return $defaultPermissions;
     }
 
     /**
      * Get All Node Permission Options
-     * 
+     *
      * @return  Array   NodePermission
      */
-    static function getNodePermissions()
+    public static function getNodePermissions()
     {
         return [
             'ADD'           => 'add',

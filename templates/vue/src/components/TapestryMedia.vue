@@ -5,7 +5,9 @@
       { 'media-wrapper-embed': node.mediaFormat === 'embed' },
       {
         'media-wrapper-no-scroll':
-          node.mediaFormat === 'mp4' || node.mediaFormat === 'h5p',
+          node.mediaFormat === 'mp4' ||
+          node.mediaFormat === 'h5p' ||
+          node.mediaFormat === 'youtube',
       },
     ]"
     :style="containerStyles"
@@ -20,8 +22,19 @@
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
-      :allow-end-screen="allowEndScreen"
       :dimensions="dimensions"
+      :allow-end-screen="allowEndScreen"
+      @load="handleLoad"
+      @complete="complete"
+      @timeupdate="updateProgress"
+      @close="$emit('close')"
+    />
+    <youtube-media
+      v-if="node.mediaFormat === 'youtube'"
+      :autoplay="autoplay"
+      :node="node"
+      :dimensions="dimensions"
+      :allow-end-screen="allowEndScreen"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -40,6 +53,8 @@
       :dimensions="dimensions"
       :node="node"
       :allow-end-screen="allowEndScreen"
+      :read-only="readOnly"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
       @complete="complete"
@@ -49,6 +64,7 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       :node="node"
+      :read-only="readOnly"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
@@ -61,6 +77,7 @@
     <quiz-media
       v-if="node.mediaType === 'activity'"
       :node="node"
+      :read-only="readOnly"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -80,6 +97,7 @@ import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
 import Helpers from "@/utils/Helpers"
+import YouTubeMedia from "./lightbox/YouTubeMedia"
 
 const SAVE_INTERVAL = 5
 
@@ -94,6 +112,7 @@ export default {
     WpPostMedia,
     CompletionScreen,
     QuizMedia,
+    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {
@@ -118,6 +137,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -150,12 +174,14 @@ export default {
       this.$emit("load", args)
     },
     updateProgress: Helpers.throttle(function(amountViewed) {
-      if (Helpers.canUserUpdateProgress(this.node)) {
+      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
         this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
       }
     }, SAVE_INTERVAL),
     complete() {
-      this.$emit("complete")
+      if (!this.readOnly) {
+        this.$emit("complete")
+      }
     },
   },
 }
@@ -168,13 +194,14 @@ export default {
   border-radius: 15px;
   overflow: scroll;
   height: 100%;
-
-  &-embed {
-    background: white;
-  }
+  padding: 0;
 
   &-no-scroll {
     overflow: hidden;
+  }
+
+  &-embed {
+    background: white;
   }
 }
 </style>

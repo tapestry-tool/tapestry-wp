@@ -5,6 +5,42 @@ export function getParent(state) {
   }
 }
 
+export function getModuleFavourites(_, { isFavourite, getNode, getDirectChildren }) {
+  return moduleId => {
+    const favourites = []
+    if (isFavourite(moduleId)) {
+      favourites.push(moduleId)
+    }
+    const stages = getDirectChildren(moduleId)
+    stages.forEach(stageId => {
+      const stage = getNode(stageId)
+      const grouping = {
+        title: stage.title,
+      }
+      const favouritesInStage = []
+      if (isFavourite(stageId)) {
+        favouritesInStage.push(stageId)
+      }
+      const topics = getDirectChildren(stageId).map(getNode)
+      const accordionRows = topics
+        .filter(topic => topic.mediaType === "accordion")
+        .flatMap(topic => getDirectChildren(topic.id).map(getNode))
+      const subAccordionRows = accordionRows
+        .filter(row => getDirectChildren(row.id).length > 0)
+        .flatMap(row => getDirectChildren(row).map(getNode))
+      const allTopics = [...topics, ...accordionRows, ...subAccordionRows]
+      allTopics
+        .filter(topic => isFavourite(topic.id))
+        .forEach(topic => favouritesInStage.push(topic.id))
+      grouping.rows = favouritesInStage
+      if (favouritesInStage.length) {
+        favourites.push(grouping)
+      }
+    })
+    return favourites
+  }
+}
+
 export function getModuleContent(_, { getNode, getDirectChildren }) {
   return moduleId => {
     const module = getNode(moduleId)
@@ -26,7 +62,17 @@ export function getModuleActivities(_, { getNode, getDirectChildren }) {
       if (topic.mediaType === "accordion") {
         // look at the rows for questions
         const rows = getDirectChildren(topic.id).map(getNode)
-        return rows.filter(row => row.quiz).flatMap(getCompletedActivities)
+        const rowActivities = rows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        const subRows = rows
+          .map(row => getDirectChildren(row.id))
+          .filter(child => child.length > 0)
+          .map(getNode)
+        const subRowActivities = subRows
+          .filter(row => row.quiz)
+          .flatMap(getCompletedActivities)
+        return rowActivities.concat(subRowActivities)
       }
       if (topic.quiz) {
         return getCompletedActivities(topic)
@@ -119,6 +165,14 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
+export function favourites(state) {
+  return state.favourites || []
+}
+
+export function isFavourite(_, { favourites }) {
+  return id => favourites.find(fid => fid == id) > -1
+}
+
 /* An answer is a value where its key is numeric */
 function getAnswersFromEntry(entry) {
   return Object.entries(entry)
@@ -136,4 +190,88 @@ function formatEntry(answers, answerType) {
   if (answerType === "checklistId") {
     return { type: "checklist", entry: answers.filter(answer => answer !== "") }
   }
+}
+
+export function xOrFx({ settings }) {
+  return settings.autoLayout ? "x" : "fx"
+}
+
+export function yOrFy({ settings }) {
+  return settings.autoLayout ? "y" : "fy"
+}
+
+export function createDefaultNode({ settings }) {
+  return () => ({
+    type: "tapestry_node",
+    description: "",
+    conditions: [],
+    behaviour: "embed",
+    status: "publish",
+    nodeType: "",
+    title: "",
+    imageURL: "",
+    lockedImageURL: "",
+    mediaType: "text",
+    mediaFormat: "",
+    mediaDuration: 0,
+    typeId: 1,
+    group: 1,
+    permissions: settings.defaultPermissions || {
+      public: ["read"],
+      authenticated: ["read"],
+    },
+    typeData: {
+      linkMetadata: null,
+      progress: [
+        { group: "viewed", value: 0 },
+        { group: "unviewed", value: 1 },
+      ],
+      mediaURL: "",
+      mediaWidth: 960, //TODO: This needs to be flexible with H5P
+      mediaHeight: 600,
+      subAccordionText: "More content:",
+      planetViewNotEarnedIconUrl: "",
+      planetViewEarnedIconUrl: "",
+      spaceshipPartNotEarnedIconUrl: "",
+      spaceshipPartEarnedIconUrl: "",
+      spaceshipPartHoverIconUrl: "",
+      spaceshipPartX: 0,
+      spaceshipPartY: 0,
+      spaceshipPartWidth: 0,
+      spaceshipPartHeight: 0,
+    },
+    hideTitle: false,
+    hideProgress: false,
+    hideMedia: false,
+    skippable: true,
+    fullscreen: false,
+    tydeType: "Regular",
+    coordinates: {
+      x: 3000,
+      y: 3000,
+    },
+    childOrdering: [],
+    quiz: [],
+  })
+}
+
+export function tapestryJson(state) {
+  const exportedTapestry = {
+    nodes: state.nodes.map(node => {
+      const newNode = { ...node }
+      if (newNode.quiz) {
+        newNode.quiz = newNode.quiz.map(question => {
+          return { ...question, completed: false, entries: null }
+        })
+      }
+      return newNode
+    }),
+    links: state.links.map(link => ({
+      ...link,
+      source: link.source.id,
+      target: link.target.id,
+    })),
+    groups: state.groups,
+  }
+  return exportedTapestry
 }

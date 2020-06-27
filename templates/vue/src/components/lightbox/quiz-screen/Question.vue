@@ -3,7 +3,7 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button class="button-nav" @click="back">
+    <button v-if="!readOnly" class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -12,11 +12,11 @@
         <div class="question-title-step">
           {{ currentStep }}
         </div>
-        <div v-if="question.isFollowUp && answers.length" class="follow-up">
+        <div v-if="question.isFollowUp && previousAnswers.length" class="follow-up">
           <div class="answer-container mx-auto mb-3">
             <h3 class="mb-4">{{ question.followUpText }}</h3>
             <tapestry-activity
-              v-for="answer in answers"
+              v-for="answer in previousAnswers"
               :key="answer.type"
               :type="answer.type"
               :entry="answer.entry"
@@ -26,8 +26,20 @@
         </div>
         <h3>{{ question.text }}</h3>
       </speech-bubble>
+      <div v-if="readOnly" style="margin-top: 4em;">
+        <p v-if="answers.length === 0">You haven't finished this activity yet.</p>
+        <div v-else>
+          <tapestry-activity
+            v-for="answer in answers"
+            :key="answer.type"
+            :type="answer.type"
+            :entry="answer.entry"
+            :src="answer.src"
+          ></tapestry-activity>
+        </div>
+      </div>
       <gravity-form
-        v-if="formOpened"
+        v-else-if="formOpened"
         :id="formId"
         :node="node"
         @submit="handleFormSubmit"
@@ -106,6 +118,11 @@ export default {
       type: Object,
       required: true,
     },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -118,20 +135,18 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntry", "getQuestion"]),
+    answers() {
+      return this.getAnswers(this.question)
+    },
     lastQuestion() {
       if (this.question.previousEntry) {
         return this.getQuestion(this.question.previousEntry)
       }
       return null
     },
-    answers() {
+    previousAnswers() {
       if (this.question.previousEntry) {
-        const answeredTypes = Object.entries(this.lastQuestion.answers)
-          .filter(entry => entry[1] && entry[1].length > 0)
-          .map(i => i[0])
-        return answeredTypes
-          .map(type => this.getEntry(this.question.previousEntry, type))
-          .filter(Boolean)
+        return this.getAnswers(this.lastQuestion)
       }
       return []
     },
@@ -161,7 +176,19 @@ export default {
   },
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
+    getAnswers(question) {
+      if (!question.entries) {
+        return []
+      }
+      const answeredTypes = Object.entries(question.answers)
+        .filter(entry => entry[1] && entry[1].length > 0)
+        .map(i => i[0])
+      return answeredTypes
+        .map(type => this.getEntry(question.id, type))
+        .filter(Boolean)
+    },
     back() {
+      globals.recordAnalyticsEvent("user", "back", "question", this.question.id)
       const wasOpened = this.formOpened || this.recorderOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
@@ -170,9 +197,28 @@ export default {
       this.recorderOpened = false
     },
     openRecorder() {
+      globals.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: "audio-recorder",
+        }
+      )
       this.recorderOpened = true
     },
     openForm(id, answerType) {
+      globals.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: answerType,
+          id,
+        }
+      )
       this.formId = id
       this.formType = answerType
       this.formOpened = true
@@ -188,6 +234,13 @@ export default {
           questionId: this.question.id,
         })
         this.loading = false
+        globals.recordAnalyticsEvent(
+          "user",
+          "submit",
+          "question",
+          this.question.id,
+          { type: this.formType, id: this.formId }
+        )
         this.$emit("submit")
       }
     },
@@ -206,6 +259,9 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
+      globals.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+        type: "audio",
+      })
       this.$emit("submit")
     },
     hasId(label) {

@@ -9,12 +9,12 @@
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
-    @close="close"
+    @close="handleUserClose"
   >
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
     />
     <tapestry-media
@@ -22,8 +22,9 @@
       :node-id="nodeId"
       :dimensions="dimensions"
       @load="handleLoad"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
+      @change:dimensions="updateDimensions"
     />
   </tapestry-modal>
 </template>
@@ -32,9 +33,9 @@
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
-import Helpers from "../utils/Helpers"
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
-import { tydeTypes } from "../utils/constants"
+import Helpers from "@/utils/Helpers"
+import { sizes, tydeTypes } from "@/utils/constants"
+import { mapActions, mapMutations, mapGetters, mapState } from "vuex"
 
 export default {
   name: "lightbox",
@@ -132,8 +133,9 @@ export default {
         videoHeight *= resizeRatio
       }
 
-      const adjustedVideoHeight = Math.min(videoHeight, browserHeight)
-      const adjustedVideoWidth = Math.min(videoWidth, browserWidth)
+      const nodeSpace = sizes.NODE_RADIUS * 2 * 1.3
+      const adjustedVideoHeight = Math.min(videoHeight, browserHeight - nodeSpace)
+      const adjustedVideoWidth = Math.min(videoWidth, browserWidth - nodeSpace)
 
       const heightAdjustmentRatio = adjustedVideoHeight / videoHeight
       const widthAdjustmentRatio = adjustedVideoWidth / videoWidth
@@ -186,6 +188,14 @@ export default {
           this.updateTydeProgress({ parentId: sid, isParentModule: false })
         )
       }
+    },
+    handleUserClose() {
+      globals.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
+      this.close()
+    },
+    handleAutoClose() {
+      globals.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
+      this.close()
     },
     close() {
       this.$router.go(-1)

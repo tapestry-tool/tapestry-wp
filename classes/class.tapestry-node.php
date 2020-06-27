@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes
- * 
+ *
  */
 class TapestryNode implements ITapestryNode
 {
@@ -41,10 +41,10 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Constructor
-     * 
+     *
      * @param   Number  $tapestryPostId tapestry post ID
      * @param   Number  $nodeMetaId node meta ID
-     * 
+     *
      * @return  NULL
      */
     public function __construct($tapestryPostId = 0, $nodeMetaId = 0)
@@ -68,7 +68,7 @@ class TapestryNode implements ITapestryNode
         $this->type = 'tapestry_node';
         $this->typeData = (object) [];
         $this->coordinates = (object) [];
-        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions();
+        $this->permissions = TapestryNodePermissions::getDefaultNodePermissions($tapestryPostId);
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
@@ -83,11 +83,11 @@ class TapestryNode implements ITapestryNode
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
             $this->set($node);
-            $this->author = $this->_getAuthorInfo(get_post_field( 'post_author', $this->nodePostId ));
+            $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
         }
     }
 
-    /**	
+    /**
      * Save the Tapestry node
      *
      * @return  Object  $node
@@ -99,7 +99,7 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Set Node
-     * 
+     *
      * @param   Object  $node  node
      *
      * @return  NULL
@@ -188,7 +188,7 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Get the node
-     * 
+     *
      * @return  $node    node
      */
     public function get()
@@ -201,7 +201,7 @@ class TapestryNode implements ITapestryNode
 
     /**
      * Returns whether this node is copilot only or not
-     * 
+     *
      * @return bool
      */
     public function isCopilotOnly()
@@ -209,7 +209,7 @@ class TapestryNode implements ITapestryNode
         if (!property_exists($this->permissions, "copilot")) {
             return false;
         }
-        foreach((array)$this->permissions as $role => $permissions) {
+        foreach ((array)$this->permissions as $role => $permissions) {
             if ($role !== "copilot" && count($permissions) > 0) {
                 return false;
             }
@@ -235,13 +235,13 @@ class TapestryNode implements ITapestryNode
      * Update node conditions by removing conditions by nodeId
      *
      * @param   String  $nodeId  nodeId
-     * 
+     *
      * @return NULL
      */
     public function removeConditionsById($nodeId)
     {
         $listModified = false;
-        foreach($this->conditions as $conditionId => $condition) {
+        foreach ($this->conditions as $conditionId => $condition) {
             if ($condition->nodeId == $nodeId) {
                 array_splice($this->conditions, $conditionId, 1);
                 $listModified = true;
@@ -392,6 +392,9 @@ class TapestryNode implements ITapestryNode
 
     private function _getAuthorInfo($id)
     {
+        if (!$id) {
+            $id = 1;
+        }
         $user = get_user_by('id', $id);
         return [
             "id"    => $id,
