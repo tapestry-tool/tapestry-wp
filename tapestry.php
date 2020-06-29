@@ -8,7 +8,7 @@
  * Author: Tapestry Team, University of British Coloumbia
  */
 
-// Used to force-refresh assets 
+// Used to force-refresh assets
 $TAPESTRY_VERSION_NUMBER = '2.27.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
@@ -137,12 +137,15 @@ function tapestry_enqueue_tapestry_js()
 		wp_enqueue_script('wp_tapestry_script');
 
 		wp_add_inline_script( 'wp_tapestry_script', "
-			var thisTapestryTool = new tapestryTool({
-				'containerId': 'tapestry',
-				'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
-				'wpUserId': '". apply_filters('determine_current_user', false) ."',
-				'wpPostId': '". get_the_ID() ."',
-				'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
+			var thisTapestryTool;
+			$(document).ready(function() {
+				thisTapestryTool = new tapestryTool({
+					'containerId': 'tapestry',
+					'apiUrl': '". get_rest_url(null, 'tapestry-tool/v1') ."',
+					'wpUserId': '". apply_filters('determine_current_user', false) ."',
+					'wpPostId': '". get_the_ID() ."',
+					'wpCanEditTapestry': '". current_user_can('edit_post', get_the_ID()) ."',
+				});
 			});
 		" );
 	}
