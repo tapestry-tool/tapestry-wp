@@ -486,7 +486,8 @@ class Tapestry implements ITapestry
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId)) {
+        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId)))
+        {
             if ($from == $to) {
                 return true;
             }
