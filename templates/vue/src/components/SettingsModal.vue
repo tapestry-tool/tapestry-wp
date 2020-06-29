@@ -125,9 +125,6 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
-        <b-tab title="Advanced">
-          <b-button @click="exportTapestry">Export Tapestry</b-button>
-        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
