@@ -8,7 +8,7 @@
  * Author: Tapestry Team, University of British Coloumbia
  */
 
-// Used to force-refresh assets 
+// Used to force-refresh assets
 $TAPESTRY_VERSION_NUMBER = '2.27.0-tyde-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
