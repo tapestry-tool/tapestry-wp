@@ -280,7 +280,9 @@ function tapestryTool(config){
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
         }
 
-        tapestryDepth = tapestry.dataset.settings.defaultDepth || 3
+        if (!isReload) {
+            tapestryDepth = tapestry.dataset.settings.defaultDepth || 3
+        }
 
         addDepthToNodes(root, 0, []);
         setNodeTypes(root);
@@ -288,8 +290,10 @@ function tapestryTool(config){
         addDepthToNodes(root, 0, []);
 
         // add in the controls
-        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
-
+        if (!isReload) {
+            document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
+        }
+        
         links = createLinks();
         nodes = createNodes();
 
