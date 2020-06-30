@@ -134,6 +134,7 @@ function tapestryTool(config){
             yORfy = autoLayout ? 'y' : 'fy';
         }
 
+		var nodeIds = [];
         for (var i=0; i < tapestry.dataset.nodes.length; i++) {
             if (autoLayout) {
                 delete tapestry.dataset.nodes[i].fx;
@@ -143,7 +144,12 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
                 tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
             }
+			nodeIds.push(tapestry.dataset.nodes[i].id);
         }
+
+		// Delete links that connect to a non-existing node due to possibly corrupted data
+		tapestry.dataset.links = tapestry.dataset.links.filter(
+            thisLink => nodeIds.includes(thisLink.source) && nodeIds.includes(thisLink.target));
 
         tapestry.originalDataset = tapestry.dataset;
         
@@ -2303,6 +2309,11 @@ function tapestryTool(config){
                 if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
                     //Update the dataset with new values
 
+                    // Error prevention
+					if (!node.typeData.progress) {
+						node.typeData.progress = [ {'value': 0}, {'value': 1 } ];
+                    }
+                    
                     node.typeData.progress[0].value = amountViewed;
                     node.typeData.progress[1].value = amountUnviewed;
 
