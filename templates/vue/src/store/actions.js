@@ -39,9 +39,11 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
     JSON.stringify(payload.newNode)
   )
   payload.newNode.id = response.data.id
+  const { newNode } = payload
+  const id = newNode.id
   commit("updateNode", {
-    id: payload.id,
-    newNode: payload.newNode,
+    id,
+    newNode,
   })
   commit("updateNodeCoordinates", {
     id,
