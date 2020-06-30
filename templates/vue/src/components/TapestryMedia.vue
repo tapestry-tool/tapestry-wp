@@ -130,14 +130,14 @@ export default {
       return this.getNode(this.nodeId)
     },
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
+  beforeDestroy() {
+    this.updateNodeProgress({
       id: this.nodeId,
       progress: this.node && this.node.typeData.progress[0].value,
     })
   },
   methods: {
-    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["updateNodeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -145,7 +145,7 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    async updateProgress(amountViewed) {
+    updateProgress(amountViewed) {
       this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
     complete() {

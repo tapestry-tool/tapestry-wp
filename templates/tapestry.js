@@ -154,33 +154,23 @@ function tapestryTool(config){
             //---------------------------------------------------
             // GET PROGRESS FROM DATABASE OR COOKIE (IF ENABLED)
             //---------------------------------------------------
-            
-            if (config.wpUserId) { // Get from database if user is logged in
-
+            const localProgress = localStorage.getItem("tapestry-progress");
+            if (!wpUserId && localProgress) {
+                setDatasetProgress(JSON.parse(localProgress));
+                tapestry.init()
+            } else {
                 $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
-
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(retrievedUserProgress);
                     }
-
-                }).fail(function(e) {
+                })
+                .fail(function(e) {
                     console.error("Error with retrieving node progress");
                     console.error(e);
                 })
                 .complete(function(){
                     tapestry.init();
                 });
-            }
-            else {  // Get from cookie if user is NOT logged in
-                
-                var cookieProgress = Cookies.get("progress-data-"+tapestrySlug);
-
-                if (cookieProgress) {
-                    cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
-                }
-
-                tapestry.init();
             }
         }
         else {
@@ -2271,6 +2261,10 @@ function tapestryTool(config){
     function setDatasetProgress(progressObj) {
         if (progressObj.length < 1) {
             return false;
+        }
+
+        if (!wpUserId) {
+            localStorage.setItem("tapestry-progress", JSON.stringify(progressObj));
         }
         
         for (var id in progressObj) {

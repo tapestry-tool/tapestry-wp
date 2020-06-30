@@ -24,9 +24,9 @@ module.exports = {
       {
         semi: false,
         htmlWhitespaceSensitivity: "ignore",
-        printWidth: 85,
+        printWidth: 80,
         trailingComma: "es5",
-        endOfLine: "auto"
+        endOfLine: "auto",
       },
     ],
   },
