@@ -78,9 +78,6 @@
         </button>
       </div>
     </tapestry-modal>
-    <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up fa-2x"></i>
-    </button>
   </div>
 </template>
 
@@ -157,12 +154,6 @@ export default {
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
-    },
-    scrollToTop() {
-      const el = this.$refs.container
-      if (el) {
-        el.scrollTop = 0
-      }
     },
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
@@ -278,19 +269,6 @@ button[disabled] {
   background: none;
   width: 100%;
   text-align: left;
-}
-
-.button-scroll-top {
-  cursor: pointer;
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  background: #262626;
-  border-radius: 50%;
-  padding: 0;
-  width: 56px;
-  height: 56px;
-  z-index: 10;
 }
 
 .accordion-row {
