@@ -291,6 +291,7 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
             'tapestrySlug' => $post->post_name,
             'title' => $post->post_title,
             'status' => $post->post_status,
+            'permalink' => get_permalink($postId),
         );
     }
 
@@ -338,9 +339,7 @@ function create_new_tapestry() {
                     xhr.send(JSON.stringify(payload));
                 }).then(data => {
                     let res = JSON.parse(data);
-                    console.log(res.settings.title);
-                    let destination = '/wordpress/tapestry/' + res.settings.title;
-                    window.location.href = destination;
+                    window.location.href = res.settings.permalink;
                 }).catch(err => {
                     console.log(err);
                     alert(`Error occured while creating tapestry, please try again`);
