@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-group.php";
+
+require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry-group.php';
 
 /**
- * Add/update/retrieve Tapestry post and its child nodes
- *
+ * Add/update/retrieve Tapestry post and its child nodes.
  */
 class TapestryGroup implements ITapestryGroup
 {
@@ -19,12 +19,12 @@ class TapestryGroup implements ITapestryGroup
     private $type;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param   Number  $postId post ID
-     * @param   Number  $groupMetaId meta ID
+     * @param Number $postId      post ID
+     * @param Number $groupMetaId meta ID
      *
-     * @return  NULL
+     * @return null
      */
     public function __construct($postId = 0, $groupMetaId = 0)
     {
@@ -46,9 +46,9 @@ class TapestryGroup implements ITapestryGroup
     }
 
     /**
-     * Save the Tapestry group
+     * Save the Tapestry group.
      *
-     * @return  Object  $group
+     * @return object $group
      */
     public function save()
     {
@@ -56,11 +56,11 @@ class TapestryGroup implements ITapestryGroup
     }
 
     /**
-     * Set Gode
+     * Set Gode.
      *
-     * @param   Object  $group  group
+     * @param object $group group
      *
-     * @return  NULL
+     * @return null
      */
     public function set($group)
     {
@@ -79,15 +79,16 @@ class TapestryGroup implements ITapestryGroup
     }
 
     /**
-     * Get the Tapestry group
+     * Get the Tapestry group.
      *
-     * @return  Object  $group
+     * @return object $group
      */
     public function get()
     {
         if (!$this->groupMetaId) {
             throw new TapestryError('INVALID_GROUP_META_ID');
         }
+
         return $this->_formGroup();
     }
 
@@ -113,11 +114,11 @@ class TapestryGroup implements ITapestryGroup
     private function _formGroup()
     {
         return (object) [
-            'id'        => $this->groupMetaId,
-            'nodes'     => $this->nodes,
-            'members'   => $this->members,
-            'name'      => $this->name,
-            'type'      => $this->type
+            'id' => $this->groupMetaId,
+            'nodes' => $this->nodes,
+            'members' => $this->members,
+            'name' => $this->name,
+            'type' => $this->type,
         ];
     }
 }
