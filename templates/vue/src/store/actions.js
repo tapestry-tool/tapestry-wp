@@ -68,6 +68,8 @@ export async function updateNodeProgress({ commit }, payload) {
   if (!wpData.wpUserId) {
     const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
     const nodeProgress = progressObj[id] || {}
+    nodeProgress.progress = progress
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
   }
 }
 
@@ -84,6 +86,13 @@ export async function completeNode({ commit, dispatch, getters }, nodeId) {
     newNode: { completed: true },
   })
   thisTapestryTool.updateAccordionProgress()
+
+  if (!wpData.wpUserId) {
+    const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+    const nodeProgress = progressObj[nodeId] || {}
+    nodeProgress.completed = true
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+  }
 
   const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {
