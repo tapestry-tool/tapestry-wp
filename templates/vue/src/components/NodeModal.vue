@@ -300,6 +300,7 @@ export default {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
+        const parent = this.parent
         this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
@@ -333,19 +334,19 @@ export default {
         if (this.modalType === "add") {
           const id = await this.addNode({
             newNode: this.node,
-            parentId: this.parent && this.parent.id,
+            parentId: parent && parent.id,
           })
           this.node.id = id
-          if (this.parent) {
+          if (parent) {
             // Add link from parent node to this node
             const newLink = {
-              source: this.parent.id,
+              source: parent.id,
               target: id,
               value: 1,
               type: "",
             }
             await this.addLink(newLink)
-            this.parent.childOrdering.push(id)
+            parent.childOrdering.push(id)
           } else {
             this.updateRootNode(id)
             this.updateSelectedNode(id)
