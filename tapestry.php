@@ -152,13 +152,14 @@ function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
 add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
 
 function create_new_tapestry() {
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');   
     return "
         <script src='". plugin_dir_url(__FILE__) ."templates/libs/jquery.min.js' type='application/javascript'></script>
-
         <button id='new_tapestry_button'>
             Add Tapestry
         </button>
         <script type='text/javascript'>
+        var apiUrl = '{$prefix}';
             $('#new_tapestry_button').click(function() {
                 let name = prompt(`Enter a name`);
                 let payload = {};
@@ -168,7 +169,7 @@ function create_new_tapestry() {
                 payload[`title`] = name;
                 return new Promise((fulfill, reject) => {
                     let xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/wordpress/wp-json/tapestry-tool/v1/tapestries');
+                    xhr.open('POST', apiUrl + '/tapestries');
                     xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
                     xhr.onload = () => {
                         if (xhr.status >= 200 && xhr.status < 300) {
@@ -200,6 +201,8 @@ function create_new_tapestry() {
         </script>
     ";
 }
+
+
 
 add_shortcode('new_tapestry_button', 'create_new_tapestry');
 
