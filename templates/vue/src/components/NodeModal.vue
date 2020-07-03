@@ -81,7 +81,7 @@
       <delete-node-button
         v-show="modalType === 'edit'"
         :node-id="nodeId"
-        @submit="handleDeleteNode"
+        @submit="close"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
@@ -245,10 +245,6 @@ export default {
     },
     close() {
       this.$bvModal.hide("node-modal")
-    },
-    handleDeleteNode() {
-      this.updateSelectedNode(this.rootId)
-      this.close()
     },
     async submit() {
       this.formErrors = this.validateNode()

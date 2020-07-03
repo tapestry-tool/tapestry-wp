@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 
 export default {
   props: {
@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectParents", "getNode", "getNeighbours"]),
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "rootId"]),
     parent() {
       const parents = this.getDirectParents(this.nodeId)
       return parents && parents[0] ? this.getNode(parents[0]) : null
@@ -47,7 +47,9 @@ export default {
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),
+    ...mapMutations(["updateSelectedNode"]),
     removeNode() {
+      this.updateSelectedNode(this.rootId)
       if (this.parent) {
         this.deleteLink([this.parent.id, this.nodeId])
       }
