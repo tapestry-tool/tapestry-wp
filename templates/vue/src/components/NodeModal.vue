@@ -1,11 +1,14 @@
 <template>
   <b-modal
     id="node-modal"
+    v-model="showModal"
     :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
+    @close="$emit('close')"
+    @cancel="$emit('close')"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -87,7 +90,7 @@
         Delete Node
       </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button
@@ -141,13 +144,13 @@ export default {
     nodeId: {
       type: Number,
       required: false,
-      default: null,
+      default: 0,
     },
     modalType: {
       type: String,
       required: true,
       validator: value => {
-        return ["", "add", "edit"].includes(value)
+        return ["", "root", "add", "edit"].includes(value)
       },
     },
   },
@@ -159,6 +162,7 @@ export default {
       maxDescriptionLength: 250,
       node: null,
       videoLoaded: false,
+      showModal: true,
     }
   },
   computed: {
@@ -203,34 +207,23 @@ export default {
       )
     },
   },
+  beforeDestroy() {
+    thisTapestryTool.enableMovements()
+    this.ready = false
+  },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
-    this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-      if (modalId == "node-modal") {
-        this.formErrors = ""
-        thisTapestryTool.disableMovements()
-      }
-    })
-    this.$root.$on("bv::modal::shown", (_, modalId) => {
-      if (modalId == "node-modal") {
-        let copy = this.createDefaultNode()
-        if (this.modalType === "edit") {
-          const node = this.getNode(this.nodeId)
-          copy = Helpers.deepCopy(node)
-        }
-        copy.hasSubAccordion = this.hasSubAccordion(copy)
-        this.node = copy
-        this.ready = true
-      }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId == "node-modal") {
-        thisTapestryTool.enableMovements()
-        this.ready = false
-      }
-    })
+    let copy = this.createDefaultNode()
+    if (this.modalType === "edit") {
+      const node = this.getNode(this.nodeId)
+      copy = Helpers.deepCopy(node)
+    }
+    copy.hasSubAccordion = this.hasSubAccordion(copy)
+    this.node = copy
+    this.ready = true
+    thisTapestryTool.disableMovements()
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
@@ -245,7 +238,7 @@ export default {
       return false
     },
     close() {
-      this.$bvModal.hide("node-modal")
+      this.$emit("close")
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()

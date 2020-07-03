@@ -1,10 +1,6 @@
 <template>
   <div id="tapestry">
-    <loading
-      v-if="!tapestryLoaded"
-      style="padding: 30vh 0;"
-      label="Loading"
-    />
+    <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
     <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
       <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
@@ -12,18 +8,11 @@
         The requested tapestry is empty.
       </div>
     </div>
-    <node-modal
-      :node-id="nodeId"
-      :modal-type="modalType"
-      @cancel="closeModal"
-      @submit="handleSubmit"
-    />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex"
-import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
@@ -32,7 +21,6 @@ import Loading from "@/components/Loading"
 export default {
   name: "tapestry",
   components: {
-    NodeModal,
     RootNodeButton,
     SettingsModal,
     Loading,
@@ -64,7 +52,7 @@ export default {
   methods: {
     ...mapMutations(["init", "setDataset", "updateSelectedNode"]),
     openNode({ detail: { id } }) {
-      this.$router.push(`/nodes/${id}`)
+      this.$router.push(`/nodes/view/${id}`)
     },
     tapestryUpdated(event) {
       if (!this.tapestryLoaded) {
@@ -82,16 +70,12 @@ export default {
     addNewNode() {
       this.modalType = "add"
       this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
+      this.$router.push(`/nodes/${this.nodeId}/${this.modalType}`)
     },
     editNode() {
       this.modalType = "edit"
       this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
-    },
-    closeModal() {
-      this.modalType = ""
-      this.$bvModal.hide("node-modal")
+      this.$router.push(`/nodes/${this.nodeId}/${this.modalType}`)
     },
     changeSelectedNode(event) {
       this.updateSelectedNode(event.detail)
@@ -100,7 +84,6 @@ export default {
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
       thisTapestryTool.initialize(true)
-      this.closeModal()
     },
   },
 }

@@ -20,6 +20,11 @@ export default {
   computed: {
     ...mapState(["tapestryIsLoaded"]),
   },
+  watch: {
+    tapestryIsLoaded() {
+      this.$router.start()
+    },
+  },
 }
 </script>
 
