@@ -7,28 +7,37 @@
   >
     <circle
       ref="node"
-      :cx="node.fx"
-      :cy="node.fy"
+      :cx="node.coordinates.x"
+      :cy="node.coordinates.y"
       fill="currentColor"
       :r="radius"
     ></circle>
     <g v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
-      <text :x="node.fx" :y="node.fy" fill="white" text-anchor="middle">
+      <text
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        fill="white"
+        text-anchor="middle"
+      >
         {{ node.title }}
       </text>
       <foreignObject
         class="node-button"
-        :x="node.fx - 30"
-        :y="node.fy - radius - 30"
+        :x="node.coordinates.x - 30"
+        :y="node.coordinates.y - radius - 30"
       >
         <button @click="openNode">Play</button>
       </foreignObject>
       <add-child-button
         :node="node"
-        :x="node.fx - 65"
-        :y="node.fy + radius - 30"
+        :x="node.coordinates.x - 65"
+        :y="node.coordinates.y + radius - 30"
       ></add-child-button>
-      <foreignObject class="node-button" :x="node.fx + 5" :y="node.fy + radius - 30">
+      <foreignObject
+        class="node-button"
+        :x="node.coordinates.x + 5"
+        :y="node.coordinates.y + radius - 30"
+      >
         <button @click="editNode">Edit</button>
       </foreignObject>
     </g>
@@ -73,24 +82,25 @@ export default {
       d3
         .drag()
         .on("start", () => {
-          this.originalFx = this.node.fx
-          this.originalFy = this.node.fy
+          this.originalFx = this.node.coordinates.x
+          this.originalFy = this.node.coordinates.y
         })
         .on("drag", () => {
-          this.node.fx += d3.event.dx
-          this.node.fy += d3.event.dy
+          this.node.coordinates.x += d3.event.dx
+          this.node.coordinates.y += d3.event.dy
         })
         .on("end", () => {
+          this.$emit("dragend")
           this.updateNodeCoordinates({
             id: this.node.id,
             coordinates: {
-              x: this.node.fx,
-              y: this.node.fy,
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
             },
           }).catch(() => {
             alert("Failed to save coordinates.")
-            this.node.fx = this.originalFx
-            this.node.fy = this.originalFy
+            this.node.coordinates.x = this.originalFx
+            this.node.coordinates.y = this.originalFy
           })
         })
     )

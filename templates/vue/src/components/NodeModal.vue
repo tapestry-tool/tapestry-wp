@@ -310,8 +310,8 @@ export default {
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
         this.node.coordinates.x =
-          this.parent.fx + sizes.NODE_RADIUS_SELECTED * 2 + 50
-        this.node.coordinates.y = this.parent.fy
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2 + 50
+        this.node.coordinates.y = this.parent.coordinates.y
       }
     },
     validateNode() {

@@ -4,10 +4,10 @@
     :class="{
       opaque: !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
     }"
-    :x1="source.fx"
-    :x2="target.fx"
-    :y1="source.fy"
-    :y2="target.fy"
+    :x1="source.coordinates.x"
+    :x2="target.coordinates.x"
+    :y1="source.coordinates.y"
+    :y2="target.coordinates.y"
     @click="remove"
   ></line>
 </template>
@@ -27,11 +27,11 @@ export default {
     ...mapState(["visibleNodes"]),
     ...mapGetters(["getNode"]),
     source() {
-      const id = this.link.source.id || this.link.source
+      const id = this.link.source
       return this.getNode(id)
     },
     target() {
-      const id = this.link.target.id || this.link.target
+      const id = this.link.target
       return this.getNode(id)
     },
     isVisible() {

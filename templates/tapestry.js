@@ -92,7 +92,7 @@ function tapestryTool(config){
      ****************************************************/
 
     /* Import data from json file, then start D3 */
-    $.ajaxSetup({
+    /* $.ajaxSetup({
         beforeSend: function (xhr) {
             if (wpApiSettings && wpApiSettings.nonce) {
                 xhr.setRequestHeader( 'X-WP-Nonce', wpApiSettings.nonce );
@@ -189,7 +189,7 @@ function tapestryTool(config){
     }).fail(function(e) {
         console.error("Error with loading tapestries");
         console.error(e);
-    });
+    }); */
 
     this.canCurrentUserEdit = () => Boolean(config.wpCanEditTapestry.length)
 
@@ -899,13 +899,13 @@ function tapestryTool(config){
                     Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
                 );
 
-        d3.select(`#vue-svg`)
+        /* d3.select(`#vue-svg`)
             .attr("viewBox", 
                     tapestryDimensions.startX + " " + 
                     tapestryDimensions.startY + " " + 
                     Math.max((tapestryDimensions.width - tapestryDimensions.startX), MIN_WIDTH) + " " + 
                     Math.max((tapestryDimensions.height - tapestryDimensions.startY), MIN_HEIGHT)
-                );
+                ); */
                 
         startSimulation();
     }
@@ -2066,6 +2066,7 @@ function tapestryTool(config){
         if ( (tapestryWidth - tapestryStartX - MAX_RADIUS*1.25) < windowWidth) {
             tapestryStartX -= (windowWidth - tapestryWidth + tapestryStartX) / 2 + MAX_RADIUS;
         }
+        console.log(tapestryStartX, tapestryStartY, tapestryWidth, tapestryHeight)
 
         // Transpose the tapestry so it's longest side is aligned with the longest side of the browser
         // For example, vertically long tapestries should be transposed so they are horizontally long on desktop,

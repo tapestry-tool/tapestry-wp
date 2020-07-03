@@ -1,17 +1,10 @@
 <template>
   <div id="tapestry">
-    <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
-    <div v-if="tapestryLoaded && !tapestry.rootId">
-      <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
-      <div v-else style="margin-top: 40vh;">
-        The requested tapestry is empty.
-      </div>
-    </div>
     <node-modal
       :node-id="nodeId"
       :modal-type="modalType"
       @cancel="closeModal"
-      @submit="handleSubmit"
+      @submit="closeModal"
     />
   </div>
 </template>
@@ -19,16 +12,12 @@
 <script>
 import { mapGetters, mapMutations } from "vuex"
 import NodeModal from "./NodeModal"
-import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
-import Loading from "@/components/Loading"
 
 export default {
   name: "tapestry",
   components: {
     NodeModal,
-    RootNodeButton,
-    Loading,
   },
   data() {
     return {
