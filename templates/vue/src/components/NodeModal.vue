@@ -284,6 +284,11 @@ export default {
           }
         }
 
+        if (this.node.conditions.length > 0) {
+          this.node.accessible = false;
+          this.node.unlocked = false;
+        }
+
         if (this.modalType === "add") {
           const id = await this.addNode(this.node)
           this.node.id = id
