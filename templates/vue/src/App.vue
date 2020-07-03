@@ -3,7 +3,7 @@
     <tapestry />
     <tapestry-filter v-if="tapestryIsLoaded" />
     <tapestry-app />
-    <router-view></router-view>
+    <router-view v-if="tapestryIsLoaded"></router-view>
   </div>
 </template>
 
