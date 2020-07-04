@@ -42,6 +42,9 @@
           drop-placeholder="Drop file here..."
           :disabled="isUploading"
           required
+          @dragover.prevent
+          @drop.prevent
+          @drop="uploadFile"
           @change="uploadFile"
         ></b-form-file>
       </b-col>
@@ -94,8 +97,8 @@ export default {
     uploadFile(event) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
-      formData.append("async-upload", event.target.files[0])
-      formData.append("name", event.target.files[0].name)
+      formData.append("async-upload", event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : event.target.files[0])
+      formData.append("name", event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : event.target.files[0].name)
       formData.append("_wpnonce", wpData.file_upload_nonce)
 
       axios
