@@ -234,7 +234,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     hasSubAccordion(node) {
       const parents = this.getDirectParents(node.id)
       if (parents && parents[0]) {
@@ -284,11 +290,6 @@ export default {
           }
         }
 
-        if (this.node.conditions.length > 0) {
-          this.node.accessible = false;
-          this.node.unlocked = false;
-        }
-
         if (this.modalType === "add") {
           const id = await this.addNode(this.node)
           this.node.id = id
@@ -313,6 +314,7 @@ export default {
           })
         }
 
+        await this.updateLockedStatus(this.node.id)
         this.$emit("submit")
       }
     },
