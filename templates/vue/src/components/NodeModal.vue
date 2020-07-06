@@ -198,6 +198,9 @@ export default {
     },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
+      if (!this.ready) {
+        return false
+      }
       return (
         (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
         this.videoLoaded
