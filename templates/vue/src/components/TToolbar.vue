@@ -20,8 +20,5 @@ export default {
 <style lang="scss" scoped>
 .toolbar {
   display: flex;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 </style>

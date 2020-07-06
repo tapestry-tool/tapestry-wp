@@ -134,9 +134,6 @@ export default {
 <style lang="scss" scoped>
 .filter {
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 10vw;
   height: 32px;
 
   button {

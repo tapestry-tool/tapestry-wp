@@ -12,6 +12,13 @@
       :fill="fill"
       :r="radius"
     ></circle>
+    <progress-bar
+      :x="node.coordinates.x"
+      :y="node.coordinates.y"
+      :radius="radius"
+      :progress="node.typeData.progress[0]"
+      :locked="!node.accessible"
+    ></progress-bar>
     <g v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
       <text
         :x="node.coordinates.x"
@@ -49,11 +56,13 @@ import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import { bus } from "@/utils/event-bus"
 import AddChildButton from "./tapestry-node/AddChildButton"
+import ProgressBar from "./tapestry-node/ProgressBar"
 
 export default {
   name: "tapestry-node",
   components: {
     AddChildButton,
+    ProgressBar,
   },
   props: {
     node: {
@@ -80,7 +89,7 @@ export default {
       if (this.selected) {
         return "#11a6d8"
       }
-      return "currentColor"
+      return "#8396a1"
     },
     selected() {
       return this.selection.includes(this.node.id)
