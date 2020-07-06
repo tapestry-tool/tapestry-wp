@@ -1,5 +1,5 @@
 <template>
-  <loading v-if="loading"></loading>
+  <loading v-if="loading" style="height: 75vh;"></loading>
   <main v-else>
     <root-node-button
       v-if="!rootId && canEdit"
