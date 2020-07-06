@@ -21,6 +21,7 @@
             :node="node"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -198,6 +199,9 @@ export default {
     },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
+      if (!this.ready) {
+        return false
+      }
       return (
         (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
         this.videoLoaded
@@ -376,6 +380,11 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
     },
   },
 }
