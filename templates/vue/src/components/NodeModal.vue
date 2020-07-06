@@ -241,7 +241,13 @@ export default {
       "updateRootNode",
       "updateVisibleNodes",
     ]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
@@ -316,6 +322,7 @@ export default {
           })
         }
 
+        await this.updateLockedStatus(this.node.id)
         this.$emit("submit")
       }
     },
