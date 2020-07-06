@@ -150,21 +150,11 @@ export default {
         h5pVideo.setCaptionsTrack(settings.caption)
       }
     },
-    handlePlay(node) {
+    handlePlay() {
       this.$emit("show-play-screen", false)
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
-      })
     },
-    handlePause(node) {
+    handlePause() {
       this.$emit("show-play-screen", true)
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
-      })
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -222,7 +212,6 @@ export default {
                     const amountViewed = currentPlayedTime / videoDuration
 
                     h5pIframeComponent.$emit("timeupdate", amountViewed)
-                    thisTapestryTool.updateProgressBars()
 
                     h5pIframeComponent.updateSettings(h5pVideo)
 
@@ -245,23 +234,11 @@ export default {
                 h5pIframeComponent.handlePause(h5pIframeComponent.node)
                 break
               }
-
-              case h5pObj.Video.BUFFERING: {
-                const { id, mediaType } = h5pIframeComponent.node
-                thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
-                break
-              }
             }
           })
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
               h5pVideo.play()
-              thisTapestryTool.recordAnalyticsEvent(
-                "app",
-                "auto-play",
-                "h5p-video",
-                h5pIframeComponent.node.id
-              )
             }, 1000)
           }
         }

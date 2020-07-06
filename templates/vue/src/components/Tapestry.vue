@@ -91,9 +91,6 @@ export default {
       this.updateSelectedNode(event.detail)
     },
     handleSubmit() {
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.setOriginalDataset(this.tapestry)
-      thisTapestryTool.initialize(true)
       this.closeModal()
     },
   },

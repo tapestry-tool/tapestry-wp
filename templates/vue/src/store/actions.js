@@ -61,13 +61,11 @@ export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
   await client.updateUserProgress(id, progress)
   commit("updateNodeProgress", { id, progress })
-  thisTapestryTool.updateProgressBars()
 }
 
 export async function updateUserProgress() {
-  const progress = await client.getUserProgress()
-  thisTapestryTool.setDatasetProgress(progress)
-  thisTapestryTool.reload()
+  //const progress = await client.getUserProgress()
+  //thisTapestryTool.setDatasetProgress(progress)
 }
 
 export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
@@ -81,7 +79,6 @@ export async function completeNode({ commit, dispatch, getters }, nodeId) {
     id: nodeId,
     newNode: { completed: true },
   })
-  thisTapestryTool.updateAccordionProgress()
 
   const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {

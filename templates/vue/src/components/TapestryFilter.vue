@@ -104,12 +104,6 @@ export default {
     },
   },
   watch: {
-    $route(to, from) {
-      thisTapestryTool.updateVisibleNodes(
-        to.fullPath.slice(1),
-        from.fullPath.slice(1)
-      )
-    },
     visibleNodes(nodes) {
       this.updateVisibleNodes(nodes)
     },

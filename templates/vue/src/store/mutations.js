@@ -75,7 +75,6 @@ export function fulfillNodeCondition(state, { id, condition }) {
     if (node.conditions.every(cond => cond.fulfilled)) {
       node.unlocked = true
       node.accessible = true
-      thisTapestryTool.reload()
     }
   }
 }

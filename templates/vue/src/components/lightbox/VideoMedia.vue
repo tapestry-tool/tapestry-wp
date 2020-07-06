@@ -148,28 +148,12 @@ export default {
       }
       return false
     },
-    handlePlay(node) {
+    handlePlay() {
       this.showPlayScreen = false
       this.showEndScreen = false
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      const video = this.$refs.video
-      if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
-          time: video.currentTime,
-        })
-      }
     },
-    handlePause(node) {
+    handlePause() {
       this.showPlayScreen = true
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      const video = this.$refs.video
-      if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
-          time: video.currentTime,
-        })
-      }
     },
     handleLoad() {
       const video = this.$refs.video
