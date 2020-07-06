@@ -80,6 +80,20 @@ export function fulfillNodeCondition(state, { id, condition }) {
   }
 }
 
+export function select(state, id) {
+  if (!state.selection.includes(id)) {
+    state.selection = [...state.selection, parseInt(id)]
+  }
+}
+
+export function unselect(state, id) {
+  state.selection = state.selection.filter(nodeId => nodeId !== parseInt(id))
+}
+
+export function clearSelection(state) {
+  state.selection = []
+}
+
 // links
 export function addLink(state, link) {
   state.links.push(link)

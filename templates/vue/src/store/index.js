@@ -17,6 +17,7 @@ const store = new Vuex.Store({
     progress: {},
     rootId: null,
     settings: {},
+    selection: [],
     h5pSettings: {},
     selectedNodeId: null,
     tapestryIsLoaded: false,

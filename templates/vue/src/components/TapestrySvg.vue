@@ -12,6 +12,8 @@
         v-for="node in nodes"
         :key="node.id"
         :node="node"
+        class="node"
+        :data-id="node.id"
         @dragend="updateViewBox"
       ></tapestry-node>
     </g>

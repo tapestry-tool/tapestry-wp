@@ -1,16 +1,19 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
-  <main v-else>
+  <div v-else>
     <root-node-button
       v-if="!rootId && canEdit"
       @click="addRootNode"
     ></root-node-button>
-    <tapestry-svg></tapestry-svg>
     <t-toolbar></t-toolbar>
-  </main>
+    <main ref="app">
+      <tapestry-svg></tapestry-svg>
+    </main>
+  </div>
 </template>
 
 <script>
+import DragSelect from "dragselect"
 import { mapMutations, mapState } from "vuex"
 import Loading from "@/components/Loading"
 import TapestrySvg from "@/components/TapestrySvg"
@@ -33,7 +36,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["tapestryIsLoaded", "rootId"]),
+    ...mapState(["tapestryIsLoaded", "rootId", "selection"]),
     canEdit() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
     },
@@ -42,10 +45,31 @@ export default {
     client.getTapestry().then(dataset => {
       this.init(dataset)
       this.loading = false
+
+      this.$nextTick(() => {
+        document.addEventListener("keydown", evt => {
+          if (evt.key === "Escape") {
+            this.clearSelection()
+          }
+        })
+
+        new DragSelect({
+          selectables: document.querySelectorAll(".node"),
+          area: this.$refs.app,
+          onDragStart: evt => {
+            if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+              return
+            }
+            this.clearSelection()
+          },
+          onElementSelect: el => this.select(el.dataset.id),
+          onElementUnselect: el => this.unselect(el.dataset.id),
+        })
+      })
     })
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
