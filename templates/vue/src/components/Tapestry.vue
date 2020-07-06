@@ -70,12 +70,12 @@ export default {
     addNewNode() {
       this.modalType = "add"
       this.nodeId = this.selectedNode.id
-      this.$router.push(`/nodes/${this.nodeId}/${this.modalType}`)
+      this.$router.push(`/nodes/${this.modalType}/${this.nodeId}`)
     },
     editNode() {
       this.modalType = "edit"
       this.nodeId = this.selectedNode.id
-      this.$router.push(`/nodes/${this.nodeId}/${this.modalType}`)
+      this.$router.push(`/nodes/${this.modalType}/${this.nodeId}`)
     },
     changeSelectedNode(event) {
       this.updateSelectedNode(event.detail)

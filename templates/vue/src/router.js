@@ -12,7 +12,7 @@ const routes = [
     props: true,
   },
   {
-    path: "/nodes/:nodeId/:modalType",
+    path: "/nodes/:modalType/:nodeId",
     component: NodeModalWrap,
     props: true,
     name: "node-modal",
