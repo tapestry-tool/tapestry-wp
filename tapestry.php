@@ -271,41 +271,6 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
-/**
- * Set Up Tapestry Post Upon Insertion.
- *
- * @param int    $postId Post ID
- * @param object $post   Post Object
- * @param bool   $update Post Object
- *
- * @return object Null
- */
-function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
-{
-    if (!isset($postId) || !isset($post) || 'tapestry' != get_post_type($postId)) {
-        return;
-    }
-
-    $tapestry = new Tapestry($postId);
-    $tapestryData = $tapestry->get();
-
-    if ($update && !empty($tapestryData->settings)) {
-        $tapestryData->settings->tapestrySlug = $post->post_name;
-        $tapestryData->settings->title = $post->post_title;
-        $tapestryData->settings->status = $post->post_status;
-    } else {
-        $tapestryData->settings = (object) [
-            'tapestrySlug' => $post->post_name,
-            'title' => $post->post_title,
-            'status' => $post->post_status,
-        ];
-    }
-
-    $tapestry->set((object) ['settings' => $tapestryData->settings]);
-    $tapestry->saveOnPublish();
-}
-add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
-
 // Gravity Forms Pluggin
 
 // Hook up the AJAX ajctions
