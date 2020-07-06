@@ -11,8 +11,8 @@ async function getPosts() {
 
 async function getPostById(id) {
   return axios
-    .get(`${API_URL}/posts/?filter[p]=${id}`)
-    .then(res => res.data[0])
+    .get(`${API_URL}/posts/${id}`)
+    .then(res => res.data)
     .then(parsePost)
 }
 
