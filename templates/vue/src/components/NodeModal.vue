@@ -22,6 +22,7 @@
             :parent="parent"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -427,32 +428,10 @@ export default {
         ord: arr,
       })
     },
-    setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
-    },
-    handleIframeload() {
-      // Set media duration if video is loaded
-      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
-      const h5pVideo = h5pFrame.instances[0].video
-      if (!h5pVideo) {
-        this.videoLoaded = true
-        return
-      }
-      const handleH5PLoad = () => {
-        this.node.mediaDuration = h5pVideo.getDuration()
-        this.videoLoaded = true
-      }
-      if (h5pVideo.getDuration() !== undefined) {
-        handleH5PLoad()
-      } else {
-        h5pVideo.on("loaded", handleH5PLoad)
-      }
-    },
-    handleYouTubeload(event) {
-      // Set media duration and ID if youtube video loads
-      this.node.mediaDuration = event.target.getDuration()
-      this.node.typeData.youtubeID = this.videoUrlYoutubeID
-      this.videoLoaded = true
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
     },
   },
 }
