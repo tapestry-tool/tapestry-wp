@@ -272,7 +272,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     setInitialTydeType() {
       // only set node types if adding a new node
       if (this.parent && this.modalType === "add") {
@@ -362,6 +368,7 @@ export default {
           })
         }
 
+        await this.updateLockedStatus(this.node.id)
         this.$emit("submit")
       }
     },

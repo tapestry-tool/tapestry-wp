@@ -56,6 +56,12 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
   return id
 }
 
+export async function updateLockedStatus({ commit }, id) {
+  const nodeProgress = await client.getNodeProgress(id)
+  const { accessible, unlocked } = nodeProgress
+  commit("updateNode", { id, newNode: { accessible, unlocked } })
+}
+
 export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
   await client.updateUserProgress(id, progress)
