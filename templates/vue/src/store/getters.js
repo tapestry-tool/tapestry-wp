@@ -114,6 +114,8 @@ export function createDefaultNode({ settings }) {
     },
     childOrdering: [],
     quiz: [],
+    unlocked: true,
+    accessible: true,
   })
 }
 

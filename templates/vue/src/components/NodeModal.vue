@@ -21,6 +21,7 @@
             :node="node"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -237,7 +238,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     hasSubAccordion(node) {
       const parents = this.getDirectParents(node.id)
       if (parents && parents[0]) {
@@ -311,6 +318,7 @@ export default {
           })
         }
 
+        await this.updateLockedStatus(this.node.id)
         this.$emit("submit")
       }
     },
@@ -376,6 +384,11 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
     },
   },
 }
