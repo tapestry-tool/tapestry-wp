@@ -171,6 +171,9 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       this.loading = true
       await this.completeQuestion({
         nodeId: this.node.id,
@@ -183,6 +186,9 @@ export default {
     },
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       this.loading = true
       await this.completeQuestion({
         nodeId: this.node.id,
