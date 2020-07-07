@@ -45,10 +45,10 @@ export default {
   methods: {
     updateViewBox() {
       const box = {
-        minX: 2500,
+        minX: 2200,
         minY: 3000,
-        width: 3500,
-        height: 3500,
+        width: 3800,
+        height: 3800,
       }
 
       for (const node of this.nodes) {

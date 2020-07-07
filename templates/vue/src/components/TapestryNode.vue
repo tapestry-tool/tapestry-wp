@@ -13,6 +13,7 @@
       :r="radius"
     ></circle>
     <progress-bar
+      v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'"
       :x="node.coordinates.x"
       :y="node.coordinates.y"
       :radius="radius"
