@@ -50,8 +50,8 @@ function setDatasetProgress(dataset, progress) {
       }
     } else {
       const rows = dataset.links
-        .filter(link => link.source == node.id || link.source.id == node.id)
-        .map(link => link.target.id || link.target)
+        .filter(link => link.source == node.id)
+        .map(link => link.target)
       const completedRows = rows
         .map(id => dataset.nodes.find(node => node.id == id))
         .filter(row => row.completed)
@@ -184,7 +184,7 @@ function getChildIds(state, nodeId) {
     .filter(link =>
       link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
     )
-    .map(link => (link.target.id == undefined ? link.target : link.target.id))
+    .map(link => link.target)
 }
 
 export function initializeOrdering(state, id) {

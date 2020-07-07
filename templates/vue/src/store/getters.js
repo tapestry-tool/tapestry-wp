@@ -128,11 +128,7 @@ export function tapestryJson(state) {
       }
       return newNode
     }),
-    links: state.links.map(link => ({
-      ...link,
-      source: link.source.id,
-      target: link.target.id,
-    })),
+    links: state.links,
     groups: state.groups,
   }
   return exportedTapestry
@@ -141,7 +137,7 @@ export function tapestryJson(state) {
 export function getNeighbours(state) {
   return id => {
     return state.links
-      .filter(link => link.source.id == id || link.target.id == id)
-      .map(link => (link.source.id == id ? link.target.id : link.source.id))
+      .filter(link => link.source == id || link.target == id)
+      .map(link => (link.source == id ? link.target : link.source))
   }
 }

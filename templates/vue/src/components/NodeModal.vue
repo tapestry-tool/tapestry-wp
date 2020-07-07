@@ -178,6 +178,7 @@ export default {
         }
       }
       const parents = this.getDirectParents(this.nodeId)
+      console.log(parents)
       return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {

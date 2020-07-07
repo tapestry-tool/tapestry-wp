@@ -29,11 +29,17 @@
         {{ node.title }}
       </text>
       <foreignObject
-        class="node-button"
+        class="node-button-wrapper"
         :x="node.coordinates.x - 30"
         :y="node.coordinates.y - radius - 30"
       >
-        <button @click="openNode">Play</button>
+        <button class="node-button" @click="openNode">
+          <tapestry-icon
+            v-if="node.mediaType !== 'text'"
+            :icon="icon"
+          ></tapestry-icon>
+          <span v-else>Aa</span>
+        </button>
       </foreignObject>
       <add-child-button
         :node="node"
@@ -41,11 +47,13 @@
         :y="node.coordinates.y + radius - 30"
       ></add-child-button>
       <foreignObject
-        class="node-button"
+        class="node-button-wrapper"
         :x="node.coordinates.x + 5"
         :y="node.coordinates.y + radius - 30"
       >
-        <button @click="editNode">Edit</button>
+        <button class="node-button" @click="editNode">
+          <tapestry-icon icon="pen"></tapestry-icon>
+        </button>
       </foreignObject>
     </g>
   </g>
@@ -54,6 +62,7 @@
 <script>
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
@@ -63,6 +72,7 @@ export default {
   components: {
     AddChildButton,
     ProgressBar,
+    TapestryIcon,
   },
   props: {
     node: {
@@ -73,6 +83,26 @@ export default {
   computed: {
     ...mapState(["selectedNodeId", "selection", "visibleNodes"]),
     ...mapGetters(["getNode"]),
+    icon() {
+      switch (this.node.mediaType) {
+        case "h5p":
+        case "video":
+          return "play"
+        case "text":
+          return "text"
+        case "activity":
+        case "gravity-form":
+          return "tasks"
+        case "url-embed":
+          return "window-maximize"
+        case "accordion":
+          return "bars"
+        case "wp-post":
+          return "post"
+        default:
+          return "exclamation"
+      }
+    },
     isVisible() {
       return this.node.nodeType !== ""
     },
@@ -184,12 +214,36 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.node-button {
-  height: 60px;
-  width: 60px;
-}
-
 .opaque {
   opacity: 0.2;
+}
+</style>
+
+<style lang="scss">
+.node-button {
+  height: 55px;
+  width: 55px;
+  background: #666;
+  border-radius: 50%;
+  border: 3px solid white;
+  color: white;
+  font-size: 30px;
+  position: relative;
+
+  > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  span {
+    font-size: 24px;
+  }
+
+  &-wrapper {
+    width: 65px;
+    height: 65px;
+  }
 }
 </style>

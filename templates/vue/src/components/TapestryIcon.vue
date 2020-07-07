@@ -1,5 +1,5 @@
 <template>
-  <i v-if="icon !== 'text'" :class="`fas fa-${iconSrc} icon-fa`"></i>
+  <i v-if="icon !== 'text'" :class="iconSrc"></i>
   <img v-else :src="iconSrc" />
 </template>
 
@@ -17,12 +17,17 @@ export default {
   },
   computed: {
     iconSrc() {
+      if (this.icon === "post") {
+        return "fab fa-wordpress-simple"
+      }
+      if (this.icon === "text") {
+        return Helpers.getImagePath(TextIcon)
+      }
       const icons = {
         audio: "microphone",
         checklist: "tasks",
-        text: Helpers.getImagePath(TextIcon),
       }
-      return icons[this.icon] || this.icon
+      return `fas fa-${icons[this.icon] || this.icon} icon-fa`
     },
   },
 }

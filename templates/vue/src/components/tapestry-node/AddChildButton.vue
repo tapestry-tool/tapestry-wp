@@ -1,7 +1,9 @@
 <template>
   <g>
-    <foreignObject class="node-button" :x="x" :y="y">
-      <button ref="addButton" @click="addNode">Add</button>
+    <foreignObject class="node-button-wrapper" :x="x" :y="y">
+      <button ref="addButton" class="node-button" @click="addNode">
+        <tapestry-icon icon="plus"></tapestry-icon>
+      </button>
     </foreignObject>
     <line
       v-if="linkDragging"
@@ -18,9 +20,13 @@
 <script>
 import * as d3 from "d3"
 import { mapActions, mapGetters } from "vuex"
+import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 
 export default {
+  components: {
+    TapestryIcon,
+  },
   props: {
     node: {
       type: Object,
@@ -87,10 +93,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.node-button {
-  height: 60px;
-  width: 60px;
-}
-</style>
