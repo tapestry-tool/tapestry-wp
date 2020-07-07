@@ -1,5 +1,8 @@
 <template>
-  <div class="icon" :class="[`icon--${name}`, `icon--${size}`, { 'has-align-fix': fixAlign }]">
+  <div
+    class="icon"
+    :class="[`icon--${name}`, `icon--${size}`, { 'has-align-fix': fixAlign }]"
+  >
     <img :src="iconSource" :alt="`${name}`" />
   </div>
 </template>
@@ -18,16 +21,15 @@ import hr from "../../../assets/icons/hr.svg"
 import undo from "../../../assets/icons/undo.svg"
 import redo from "../../../assets/icons/redo.svg"
 
-
 export default {
   props: {
     name: {
       type: String,
-      default: '',
+      default: "",
     },
     size: {
       type: String,
-      default: 'normal',
+      default: "normal",
     },
     modifier: {
       type: Object,
@@ -40,13 +42,39 @@ export default {
   },
   computed: {
     iconSource() {
-      let lookup = new Map();
-      let icons = [bold, italic, underline, strike, code, paragraph, ul, ol, quote, hr, undo, redo];
-      let iconsStrings = ["bold", "italic", "underline", "strike", "code", "paragraph", "ul", "ol", "quote", "hr", "undo", "redo"];
+      let lookup = new Map()
+      let icons = [
+        bold,
+        italic,
+        underline,
+        strike,
+        code,
+        paragraph,
+        ul,
+        ol,
+        quote,
+        hr,
+        undo,
+        redo,
+      ]
+      let iconsStrings = [
+        "bold",
+        "italic",
+        "underline",
+        "strike",
+        "code",
+        "paragraph",
+        "ul",
+        "ol",
+        "quote",
+        "hr",
+        "undo",
+        "redo",
+      ]
       for (let i in icons) {
-        lookup.set(iconsStrings[i], icons[i]);
+        lookup.set(iconsStrings[i], icons[i])
       }
-      let usedIcon = lookup.get(this.name);
+      let usedIcon = lookup.get(this.name)
       return `${wpData.vue_uri}/${usedIcon.split("dist")[1]}`
     },
   },
@@ -55,13 +83,7 @@ export default {
 
 <style lang="scss" scoped>
 .icon {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-
-  &.has-align-fix {
-    top: -.1rem;
-  }
+  width: 100%;
 }
 
 img {

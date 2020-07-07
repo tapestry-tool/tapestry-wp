@@ -10,12 +10,14 @@
         required
       />
     </b-form-group>
-    <rich-text-form
-      id="node-description"
-      v-model="node.description"
-      data-testid="node-description"
-      placeholder="Enter description"
-    />
+    <b-form-group label="Description">
+      <rich-text-form
+        id="node-description"
+        v-model="node.description"
+        data-testid="node-description"
+        placeholder="Enter description"
+      />
+    </b-form-group>
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>

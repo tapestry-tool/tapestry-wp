@@ -7,52 +7,43 @@
           :class="{ 'is-active': isActive.bold() }"
           @click="commands.bold"
         >
-        <icon name="bold" />
+          <icon name="bold" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.italic() }"
           @click="commands.italic"
         >
-        <icon name="italic" />
-
+          <icon name="italic" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.strike() }"
           @click="commands.strike"
         >
-        <icon name="strike" />
+          <icon name="strike" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.underline() }"
           @click="commands.underline"
         >
-                  <icon name="underline" />
+          <icon name="underline" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.code() }"
           @click="commands.code"
         >
-                  <icon name="code" />
-
+          <icon name="code" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.paragraph() }"
           @click="commands.paragraph"
         >
-                            <icon name="paragraph" />
-
+          <icon name="paragraph" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 2 }) }"
@@ -60,7 +51,6 @@
         >
           H1
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 3 }) }"
@@ -68,7 +58,6 @@
         >
           H2
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 4 }) }"
@@ -76,45 +65,35 @@
         >
           H3
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.bullet_list() }"
           @click="commands.bullet_list"
         >
-                  <icon name="ul" />
+          <icon name="ul" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.ordered_list() }"
           @click="commands.ordered_list"
         >
-                  <icon name="ol" />
+          <icon name="ol" />
         </button>
-
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.blockquote() }"
           @click="commands.blockquote"
         >
-                            <icon name="quote" />
-
+          <icon name="quote" />
         </button>
-
         <button class="menubar__button" @click="commands.horizontal_rule">
-                           <icon name="hr" />
-
+          <icon name="hr" />
         </button>
-
         <button class="menubar__button" @click="commands.undo">
-                            <icon name="undo" />
-
+          <icon name="undo" />
         </button>
-
         <button class="menubar__button" @click="commands.redo">
-                            <icon name="redo" />
-
+          <icon name="redo" />
         </button>
       </div>
     </editor-menu-bar>
@@ -128,7 +107,7 @@
 </template>
 
 <script>
-import Icon from './Icon'
+import Icon from "./Icon"
 import { Editor, EditorContent, EditorMenuBar } from "tiptap"
 import {
   Blockquote,
@@ -150,13 +129,23 @@ import {
   History,
   Placeholder,
 } from "tiptap-extensions"
+
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     Icon,
   },
-  props: ["value", "placeholder"],
+  props: {
+    value: {
+      type: String,
+      required: true,
+    },
+    placeholder: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       editor: null,
@@ -214,27 +203,17 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $color-black: #000000;
 $color-white: #ffffff;
 $color-grey: #dddddd;
 
-.menubar__button {
-    vertical-align: middle;
-    width: 1.8rem;
-    height: 2.4rem;
-    font-weight: bold;
-    display: inline-flex;
-    background: transparent;
-    border: 0;
-    color: #000000;
-    padding: 0.2rem 0.5rem;
-    margin-right: 0.2rem;
-    border-radius: 3px;
-    cursor: pointer;
+.editor {
+  border: 1px solid #ccc;
 }
-.menubar {
 
+.menubar {
+  display: flex;
   margin-bottom: 1rem;
   transition: visibility 0.2s 0.4s, opacity 0.2s 0.4s;
 
@@ -250,11 +229,13 @@ $color-grey: #dddddd;
   }
 
   &__button {
+    position: relative;
     vertical-align: middle;
     width: 1.8rem;
-    height: 2.4rem;
     font-weight: bold;
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: 0;
     color: $color-black;
@@ -275,6 +256,10 @@ $color-grey: #dddddd;
   span#{&}__button {
     font-size: 13.3333px;
   }
+}
+
+.editor__content {
+  padding: 0 1em;
 }
 
 .editor p.is-editor-empty:first-child::before {
