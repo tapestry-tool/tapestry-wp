@@ -41,7 +41,6 @@ export default {
       return this.icon === "tasks" || this.icon === "microphone"
     },
     textIcon() {
-      console.log(TextIcon);
       return `${wpData.vue_uri}/${TextIcon.split("dist")[1]}`
     },
   },

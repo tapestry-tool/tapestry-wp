@@ -7,8 +7,7 @@
           :class="{ 'is-active': isActive.bold() }"
           @click="commands.bold"
         >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>text-bold</title><path d="M17.194,10.962A6.271,6.271,0,0,0,12.844.248H4.3a1.25,1.25,0,0,0,0,2.5H5.313a.25.25,0,0,1,.25.25V21a.25.25,0,0,1-.25.25H4.3a1.25,1.25,0,1,0,0,2.5h9.963a6.742,6.742,0,0,0,2.93-12.786Zm-4.35-8.214a3.762,3.762,0,0,1,0,7.523H8.313a.25.25,0,0,1-.25-.25V3a.25.25,0,0,1,.25-.25Zm1.42,18.5H8.313a.25.25,0,0,1-.25-.25V13.021a.25.25,0,0,1,.25-.25h4.531c.017,0,.033,0,.049,0l.013,0h1.358a4.239,4.239,0,0,1,0,8.477Z"/></svg>
-
+        <icon name="bold" />
         </button>
 
         <button
@@ -16,7 +15,8 @@
           :class="{ 'is-active': isActive.italic() }"
           @click="commands.italic"
         >
-          Italic
+        <icon name="italic" />
+
         </button>
 
         <button
@@ -24,7 +24,7 @@
           :class="{ 'is-active': isActive.strike() }"
           @click="commands.strike"
         >
-          Strike
+        <icon name="strike" />
         </button>
 
         <button
@@ -32,7 +32,7 @@
           :class="{ 'is-active': isActive.underline() }"
           @click="commands.underline"
         >
-          Underline
+                  <icon name="underline" />
         </button>
 
         <button
@@ -40,7 +40,8 @@
           :class="{ 'is-active': isActive.code() }"
           @click="commands.code"
         >
-          Code
+                  <icon name="code" />
+
         </button>
 
         <button
@@ -48,7 +49,8 @@
           :class="{ 'is-active': isActive.paragraph() }"
           @click="commands.paragraph"
         >
-          Paragraph
+                            <icon name="paragraph" />
+
         </button>
 
         <button
@@ -80,7 +82,7 @@
           :class="{ 'is-active': isActive.bullet_list() }"
           @click="commands.bullet_list"
         >
-          Bulleted List
+                  <icon name="ul" />
         </button>
 
         <button
@@ -88,7 +90,7 @@
           :class="{ 'is-active': isActive.ordered_list() }"
           @click="commands.ordered_list"
         >
-          Numbered List
+                  <icon name="ol" />
         </button>
 
         <button
@@ -96,27 +98,23 @@
           :class="{ 'is-active': isActive.blockquote() }"
           @click="commands.blockquote"
         >
-          Quote
-        </button>
+                            <icon name="quote" />
 
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.code_block() }"
-          @click="commands.code_block"
-        >
-          Code
         </button>
 
         <button class="menubar__button" @click="commands.horizontal_rule">
-          Horizontal Break
+                           <icon name="hr" />
+
         </button>
 
         <button class="menubar__button" @click="commands.undo">
-          Undo
+                            <icon name="undo" />
+
         </button>
 
         <button class="menubar__button" @click="commands.redo">
-          Redo
+                            <icon name="redo" />
+
         </button>
       </div>
     </editor-menu-bar>
@@ -216,17 +214,67 @@ export default {
 }
 </script>
 
-<style>
-.editor-box > * {
-  border-color: grey;
-  border-style: solid;
-  border-width: 1px;
-}
+<style lang="scss">
+$color-black: #000000;
+$color-white: #ffffff;
+$color-grey: #dddddd;
 
-.is-active {
-  border-color: grey;
-  border-style: solid;
-  border-width: 1px;
+.menubar__button {
+    vertical-align: middle;
+    width: 1.8rem;
+    height: 2.4rem;
+    font-weight: bold;
+    display: inline-flex;
+    background: transparent;
+    border: 0;
+    color: #000000;
+    padding: 0.2rem 0.5rem;
+    margin-right: 0.2rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.menubar {
+
+  margin-bottom: 1rem;
+  transition: visibility 0.2s 0.4s, opacity 0.2s 0.4s;
+
+  &.is-hidden {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  &.is-focused {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0.2s, opacity 0.2s;
+  }
+
+  &__button {
+    vertical-align: middle;
+    width: 1.8rem;
+    height: 2.4rem;
+    font-weight: bold;
+    display: inline-flex;
+    background: transparent;
+    border: 0;
+    color: $color-black;
+    padding: 0.2rem 0.5rem;
+    margin-right: 0.2rem;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($color-black, 0.05);
+    }
+
+    &.is-active {
+      background-color: rgba($color-black, 0.1);
+    }
+  }
+
+  span#{&}__button {
+    font-size: 13.3333px;
+  }
 }
 
 .editor p.is-editor-empty:first-child::before {
