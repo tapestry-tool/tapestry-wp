@@ -42,36 +42,37 @@ export default {
     },
   },
   mounted() {
-    client.getTapestry().then(dataset => {
-      this.init(dataset)
+    const data = [client.getTapestry(), client.getUserProgress()]
+    Promise.all(data).then(([dataset, progress]) => {
+      this.init({ dataset, progress })
       this.loading = false
-
-      this.$nextTick(() => {
-        document.addEventListener("keydown", evt => {
-          if (evt.key === "Escape") {
-            this.clearSelection()
-          }
-        })
-
-        new DragSelect({
-          selectables: document.querySelectorAll(".node"),
-          area: this.$refs.app,
-          onDragStart: evt => {
-            if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-              return
-            }
-            this.clearSelection()
-          },
-          onElementSelect: el => this.select(el.dataset.id),
-          onElementUnselect: el => this.unselect(el.dataset.id),
-        })
-      })
+      this.$nextTick(this.initializeDragSelect)
     })
   },
   methods: {
     ...mapMutations(["init", "select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    initializeDragSelect() {
+      document.addEventListener("keydown", evt => {
+        if (evt.key === "Escape") {
+          this.clearSelection()
+        }
+      })
+
+      new DragSelect({
+        selectables: document.querySelectorAll(".node"),
+        area: this.$refs.app,
+        onDragStart: evt => {
+          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+            return
+          }
+          this.clearSelection()
+        },
+        onElementSelect: el => this.select(el.dataset.id),
+        onElementUnselect: el => this.unselect(el.dataset.id),
+      })
     },
   },
 }

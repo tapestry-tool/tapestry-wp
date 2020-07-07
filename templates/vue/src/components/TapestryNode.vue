@@ -16,7 +16,7 @@
       :x="node.coordinates.x"
       :y="node.coordinates.y"
       :radius="radius"
-      :progress="node.typeData.progress[0]"
+      :progress="node.progress"
       :locked="!node.accessible"
     ></progress-bar>
     <g v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
@@ -88,6 +88,9 @@ export default {
     fill() {
       if (this.selected) {
         return "#11a6d8"
+      }
+      if (!this.node.accessible) {
+        return "#8a8a8c"
       }
       return "#8396a1"
     },

@@ -1,13 +1,69 @@
 import Helpers from "../utils/Helpers"
 
-export function init(state, dataset) {
-  setDataset(state, dataset)
+export function init(state, { dataset, progress = {} }) {
+  const datasetWithProgress = setDatasetProgress(dataset, progress)
+  setDataset(state, datasetWithProgress)
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
   state.nodes
     .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(state, n.id))
   state.visibleNodes = state.nodes.map(node => node.id)
+}
+
+function setDatasetProgress(dataset, progress) {
+  for (const [id, nodeProgress] of Object.entries(progress)) {
+    const node = dataset.nodes.find(node => node.id == id)
+    const willLock = node.unlocked && !nodeProgress.unlocked
+    if (willLock && !wpData.wpCanEditTapestry) {
+      node.quiz = []
+      node.typeData = {}
+    }
+
+    node.unlocked = nodeProgress.unlocked
+    node.accessible = nodeProgress.accessible
+    node.conditions = nodeProgress.conditions
+    node.completed = nodeProgress.completed
+
+    const { content } = nodeProgress
+    if (content) {
+      node.quiz = content.quiz
+      node.typeData = content.typeData
+    }
+
+    if (node.mediaType !== "accordion") {
+      node.progress = nodeProgress.progress
+      const questions = node.quiz
+      if (nodeProgress.quiz) {
+        Object.entries(nodeProgress.quiz).forEach(([questionId, completionInfo]) => {
+          const question = questions.find(question => question.id === questionId)
+          if (question) {
+            question.completed = completionInfo.completed
+            question.entries = {}
+            Object.entries(completionInfo).forEach(([key, value]) => {
+              if (key !== "completed") {
+                question.entries[key] = value
+              }
+            })
+          }
+        })
+      }
+    } else {
+      const rows = dataset.links
+        .filter(link => link.source == node.id || link.source.id == node.id)
+        .map(link => link.target.id || link.target)
+      const completedRows = rows
+        .map(id => dataset.nodes.find(node => node.id == id))
+        .filter(row => row.completed)
+        .map(row => row.id)
+      completedRows.forEach(row => progress.push(row.id))
+      node.accordionProgress = completedRows
+
+      const currProgress = rows.length ? completedRows.length / rows.length : 1
+      node.progress = currProgress
+    }
+  }
+  return dataset
 }
 
 export function setDataset(state, dataset) {

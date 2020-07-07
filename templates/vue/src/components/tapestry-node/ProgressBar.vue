@@ -8,7 +8,12 @@
       :stroke-width="width"
       :stroke="locked ? '#999' : 'currentColor'"
     ></circle>
-    <path class="bar" :d="arc" :transform="`translate(${x}, ${y})`"></path>
+    <path
+      v-if="!locked"
+      class="bar"
+      :d="arc"
+      :transform="`translate(${x}, ${y})`"
+    ></path>
   </g>
 </template>
 
