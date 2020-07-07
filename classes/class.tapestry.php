@@ -381,7 +381,7 @@ class Tapestry implements ITapestry
         $tapestry->settings->nodeDraggable = true;
         $tapestry->settings->showAccess = true;
         $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
-        $tapestry->settings->superuserOverridePermissions = false;
+        $tapestry->settings->superuserOverridePermissions = true;
 
         return $tapestry;
     }

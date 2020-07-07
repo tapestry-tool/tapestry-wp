@@ -35,6 +35,15 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Superusers Override Permissions"
+            description="When this is enabled, all WordPress superusers (Administator roles, Editor roles or the
+             Author of this Tapestry) will be able to see and edit all nodes, regardless of the node's set permissions."
+          >
+            <b-form-checkbox v-model="superuserOverridePermissions" switch>
+              {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
           <b-button block variant="light" @click="exportTapestry">
@@ -112,6 +121,7 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      superuserOverridePermissions: true,
     }
   },
   computed: {
@@ -143,12 +153,14 @@ export default {
         nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
+        superuserOverridePermissions = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
+      this.superuserOverridePermissions = superuserOverridePermissions
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -157,6 +169,7 @@ export default {
         nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
+        superuserOverridePermissions: this.superuserOverridePermissions,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
