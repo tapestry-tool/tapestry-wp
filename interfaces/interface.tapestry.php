@@ -34,7 +34,7 @@ interface ITapestry
      *
      * @return  Object  $tapestry
      */
-    public function get();
+    public function get($filterUserId);
 
     /**
      * Get node IDs
