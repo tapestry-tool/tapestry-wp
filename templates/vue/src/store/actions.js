@@ -13,18 +13,27 @@ export async function updateH5pSettings({ commit }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit }, newNode) {
+export async function addNode({ commit, dispatch, getters }, newNode) {
   const response = await client.addNode(JSON.stringify(newNode))
 
   const nodeToAdd = { ...newNode }
-  nodeToAdd.id = response.data.id
+  const id = response.data.id
+  nodeToAdd.id = id
   nodeToAdd.author = response.data.author
 
   commit("addNode", nodeToAdd)
-  return nodeToAdd.id
+  commit("updateNodeCoordinates", {
+    id,
+    coordinates: {
+      [getters.xOrFx]: nodeToAdd.coordinates.x,
+      [getters.yOrFy]: nodeToAdd.coordinates.y,
+    },
+  })
+  dispatch("updateNodePermissions", { id, permissions: nodeToAdd.permissions })
+  return id
 }
 
-export async function updateNode({ commit }, payload) {
+export async function updateNode({ commit, dispatch, getters }, payload) {
   const response = await client.updateNode(
     payload.id,
     JSON.stringify(payload.newNode)
@@ -32,11 +41,26 @@ export async function updateNode({ commit }, payload) {
 
   const newNode = { ...payload.newNode }
   newNode.id = response.data.id
+  const id = payload.id
   commit("updateNode", {
-    id: payload.id,
+    id,
     newNode: newNode,
   })
-  return payload.id
+  commit("updateNodeCoordinates", {
+    id,
+    coordinates: {
+      [getters.xOrFx]: newNode.coordinates.x,
+      [getters.yOrFy]: newNode.coordinates.y,
+    },
+  })
+  dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
+  return id
+}
+
+export async function updateLockedStatus({ commit }, id) {
+  const nodeProgress = await client.getNodeProgress(id)
+  const { accessible, unlocked } = nodeProgress
+  commit("updateNode", { id, newNode: { accessible, unlocked } })
 }
 
 export async function updateNodeProgress({ commit }, payload) {
