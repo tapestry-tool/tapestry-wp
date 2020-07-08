@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
@@ -163,6 +163,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["nodes"]),
     ...mapGetters([
       "createDefaultNode",
       "getDirectChildren",
@@ -322,10 +323,31 @@ export default {
         this.$emit("submit")
       }
     },
+    getRandomNumber(min, max) {
+      return Math.random() * (max - min) + min;
+    },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
-        this.node.coordinates.x = this.parent.x + sizes.NODE_RADIUS_SELECTED * 2 + 50
-        this.node.coordinates.y = this.parent.y
+        let minX;
+        let maxX;
+        let minY;
+        let maxY;
+        this.nodes.forEach((node, index) => {
+          if (minX === undefined || node.x < minX) {
+            minX = node.x;
+          }
+          if (maxX === undefined || node.x > maxX) {
+            maxX = node.x;
+          }
+          if (minY === undefined || node.y < minY) {
+            minY = node.y;
+          }
+          if (maxY === undefined || node.y > maxY) {
+            maxY = node.y;
+          }
+        });
+        this.node.coordinates.x = this.getRandomNumber(minX, maxX) + this.getRandomNumber(sizes.NODE_RADIUS_SELECTED * -5, sizes.NODE_RADIUS_SELECTED * 5);
+        this.node.coordinates.y = this.getRandomNumber(minY, maxY) + this.getRandomNumber(sizes.NODE_RADIUS_SELECTED * -5, sizes.NODE_RADIUS_SELECTED * 5);
       }
     },
     validateNode() {
