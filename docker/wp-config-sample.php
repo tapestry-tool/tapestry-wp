@@ -1,6 +1,6 @@
 <?php
 /**
- * The base configuration for WordPress
+ * The base configuration for WordPress.
  *
  * The wp-config.php creation script uses this file during the
  * installation. You don't have to use the web site, you can
@@ -13,28 +13,26 @@
  * * Database table prefix
  * * ABSPATH
  *
- * @link https://wordpress.org/support/article/editing-wp-config-php/
- *
- * @package WordPress
+ * @see https://wordpress.org/support/article/editing-wp-config-php/
  */
 
 // ** MySQL settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
+/* The name of the database for WordPress */
 define('DB_NAME', 'wordpress');
 
-/** MySQL database username */
+/* MySQL database username */
 define('DB_USER', 'wordpress');
 
-/** MySQL database password */
+/* MySQL database password */
 define('DB_PASSWORD', 'wordpress');
 
-/** MySQL hostname */
+/* MySQL hostname */
 define('DB_HOST', 'db:3306');
 
-/** Database Charset to use in creating database tables. */
+/* Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
 
-/** The Database Collate type. Don't change this if in doubt. */
+/* The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
 
 /**#@+
@@ -65,7 +63,7 @@ define('NONCE_SALT', 'put your unique phrase here');
  */
 $table_prefix = 'wp_';
 
-/**
+/*
  * For developers: WordPress debugging mode.
  *
  * Change this to true to enable the display of notices during development.
@@ -84,10 +82,10 @@ define('WP_DEBUG_LOG', true);
 /* That's all, stop editing! Happy publishing. */
 define('FS_METHOD', 'direct');
 
-/** Absolute path to the WordPress directory. */
-if (! defined('ABSPATH')) {
-    define('ABSPATH', __DIR__ . '/');
+/* Absolute path to the WordPress directory. */
+if (!defined('ABSPATH')) {
+    define('ABSPATH', __DIR__.'/');
 }
 
 /** Sets up WordPress vars and included files. */
-require_once ABSPATH . 'wp-settings.php';
+require_once ABSPATH.'wp-settings.php';

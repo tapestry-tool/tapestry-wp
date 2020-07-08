@@ -1,22 +1,21 @@
 <?php
 
 /**
- * Tapestry Group Interface
- *
+ * Tapestry Group Interface.
  */
 interface ITapestryGroup
 {
     /**
-     * Save the Tapestry group
+     * Save the Tapestry group.
      *
-     * @return  Object  $group
+     * @return object $group
      */
     public function save();
 
     /**
-     * Get the Tapestry group
+     * Get the Tapestry group.
      *
-     * @return  Object  $group
+     * @return object $group
      */
     public function get();
 }

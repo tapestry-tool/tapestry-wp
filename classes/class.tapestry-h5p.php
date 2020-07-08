@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-h5p.php";
+
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry-h5p.php';
 
 class TapestryH5P implements ITapestryH5P
 {
@@ -11,14 +12,15 @@ class TapestryH5P implements ITapestryH5P
     }
 
     /**
-     * Returns the id and titles of all available h5p content
+     * Returns the id and titles of all available h5p content.
      *
-     * @return  Array   $content All available content
+     * @return array $content All available content
      */
     public function get()
     {
         global $wpdb;
-        $content = $wpdb->get_results("select id, title from " . $wpdb->prefix . "h5p_contents");
+        $content = $wpdb->get_results('select id, title from '.$wpdb->prefix.'h5p_contents');
+
         return $content;
     }
 }

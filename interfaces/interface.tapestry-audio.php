@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Tapestry Audio Interface
- *
+ * Tapestry Audio Interface.
  */
 interface ITapestryAudio
 {
     /**
-     * Save the audio
+     * Save the audio.
      *
-     * @param   String  $audio      base64 data string
-     * @return  Object  $audio
+     * @param string $audio base64 data string
+     *
+     * @return object $audio
      */
     public function save($audio);
 
     /**
-     * Get the audio
+     * Get the audio.
      *
-     * @return  $audio    audio
+     * @return $audio audio
      */
     public function get();
 }

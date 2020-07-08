@@ -4,9 +4,9 @@
  Template Name: Tapestry Page Template
  */
 /**
- * Register Script with Nonce
+ * Register Script with Nonce.
  *
- * @return Object null
+ * @return object null
  */
 
 get_header(); 
