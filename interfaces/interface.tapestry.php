@@ -94,4 +94,11 @@ interface ITapestry
      * @return  Boolean true if there is no root node, false otherwise
      */
     public function isEmpty();
+
+    /**
+     * Returns all users who have authored a node within the tapestry
+     *
+     * @return Array Wordpress users
+     */
+    public function getAllContributors();
 }

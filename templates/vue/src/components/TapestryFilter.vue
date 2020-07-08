@@ -40,8 +40,9 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapActions } from "vuex"
 import Combobox from "./Combobox"
+import TapestryApi from "../services/TapestryAPI"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -51,6 +52,11 @@ export default {
   name: "tapestry-filter",
   components: {
     Combobox,
+  },
+  data() {
+    return {
+      allContributors: null,
+    }
   },
   computed: {
     ...mapState(["nodes"]),
@@ -79,10 +85,14 @@ export default {
     comboboxValueOptions() {
       switch (this.activeFilterOption) {
         case filterOptions.AUTHOR: {
-          const authors = new Map(
-            this.nodes.map(node => [node.author.id, node.author])
-          )
-          return [...authors.values()]
+          // console.log(this.nodes.map(node => [node.author.id, node.author]))
+          return this.allContributors !== null
+            ? Object.values(this.allContributors)
+            : [
+                ...new Map(
+                  this.nodes.map(node => [node.author.id, node.author])
+                ).values(),
+              ]
         }
         default:
           return []
@@ -90,14 +100,27 @@ export default {
     },
   },
   watch: {
-    $route(to, from) {
+    async $route(to, from) {
+      if (from.query && from.query.q && from.query.q !== undefined) {
+        this.refetchTapestryData()
+      }
+      if (to.query && to.query.q && to.query.q !== undefined) {
+        this.refetchTapestryData(to.query.q)
+      }
       thisTapestryTool.updateVisibleNodes(
         to.fullPath.slice(1),
         from.fullPath.slice(1)
       )
     },
   },
+  async created() {
+    if (wpApiSettings && wpApiSettings.wpCanEditTapestry === "1") {
+      const tapestryApi = new TapestryApi(wpPostId)
+      this.allContributors = await tapestryApi.getAllContributors()
+    }
+  },
   methods: {
+    ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       this.isActive
         ? this.$router.push(`/`)

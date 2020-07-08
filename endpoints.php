@@ -280,6 +280,13 @@ $REST_API_ENDPOINTS = [
             },
         ],
     ],
+    'GET_TAPESTRY_CONTRIBUTORS' => (object) [
+        'ROUTE' => '/tapestries/contributors',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryContributors'
+        ],
+    ],
 ];
 
 /**
@@ -1257,6 +1264,22 @@ function updateUserFavourites($request)
     try {
         $userProgress = new TapestryUserProgress($postId);
         return $userProgress->updateFavourites($favourites);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function getTapestryContributors($request)
+{
+    $postId = $request['post_id'];
+    $roles = new TapestryUserRoles();
+
+    try {
+        if (!$roles->canEdit($postId)) {
+            throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
+        }
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getAllContributors();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

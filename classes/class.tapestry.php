@@ -288,6 +288,17 @@ class Tapestry implements ITapestry
         );
     }
 
+    public function getAllContributors()
+    {
+        return array_unique(array_map(
+            function ($node) {
+                $node = new TapestryNode($this->postId, $node);
+                return $node->get()->author;
+            },
+            $this->nodes
+        ), SORT_REGULAR);
+    }
+
     private function _setAccessibleStatus($nodes, $userId)
     {
         $newNodes = array_map(

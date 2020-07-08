@@ -131,3 +131,12 @@ export async function updateUserFavourites({ commit }, favourites) {
   commit("updateFavourites", { favourites })
   await client.updateUserFavourites(JSON.stringify(favourites))
 }
+
+export async function refetchTapestryData({ commit }, filterUserId = null) {
+  const query = filterUserId === null ? {} : { filterUserId: filterUserId }
+  const tapestry = await client.getTapestry(query)
+  thisTapestryTool.setDataset(tapestry)
+  thisTapestryTool.setOriginalDataset(tapestry)
+  thisTapestryTool.reinitialize()
+  // commit("init", tapestry)
+}

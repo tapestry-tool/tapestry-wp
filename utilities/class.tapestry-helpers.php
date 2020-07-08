@@ -148,14 +148,13 @@ class TapestryHelpers
     {
 
         $options = TapestryNodePermissions::getNodePermissions();
-        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
         $userId = $_userId;
         if(is_null($userId)){
             $userId = wp_get_current_user()->ID;
         }
+        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $roles = new TapestryUserRoles($userId);
-        error_log("userId is null: " . is_null($userId));
 
         if (($roles->canEdit($tapestryPostId) && $superuser_override) || $roles->isAuthorOfThePost($nodePostId)) {
             return true;
