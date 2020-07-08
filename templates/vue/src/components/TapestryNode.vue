@@ -13,15 +13,16 @@
       :r="radius"
     ></circle>
     <progress-bar
-      v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'"
+      v-show="!isGrandchild && !node.hideProgress"
       :x="node.coordinates.x"
       :y="node.coordinates.y"
       :radius="radius"
       :progress="node.progress"
       :locked="!node.accessible"
     ></progress-bar>
-    <g v-show="node.id == selectedNodeId || node.nodeType !== 'grandchild'">
+    <g v-show="!isGrandchild">
       <text
+        v-if="!node.hideTitle"
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         fill="white"
@@ -30,6 +31,7 @@
         {{ node.title }}
       </text>
       <foreignObject
+        v-if="!node.hideMedia"
         class="node-button-wrapper"
         :x="node.coordinates.x - 30"
         :y="node.coordinates.y - radius - 30"
@@ -57,6 +59,26 @@
         </button>
       </foreignObject>
     </g>
+    <defs v-if="node.imageURL">
+      <pattern
+        :id="`node-image-${node.id}`"
+        preserve-aspect-ratio="xMidYMid slice"
+        width="1"
+        height="1"
+      >
+        <image
+          :href="
+            node.lockedImageURL && !node.accessible
+              ? node.lockedImageURL
+              : node.imageURL
+          "
+          x="0"
+          y="0"
+          :width="radius * 2"
+          :height="radius * 2"
+        />
+      </pattern>
+    </defs>
   </g>
 </template>
 
@@ -104,6 +126,11 @@ export default {
           return "exclamation"
       }
     },
+    isGrandchild() {
+      return (
+        this.node.id != this.selectedNodeId && this.node.nodeType === "grandchild"
+      )
+    },
     isVisible() {
       return this.node.nodeType !== ""
     },
@@ -117,6 +144,9 @@ export default {
       return 140
     },
     fill() {
+      if (this.node.imageURL && !this.isGrandchild) {
+        return `url(#node-image-${this.node.id})`
+      }
       if (this.selected) {
         return "#11a6d8"
       }
@@ -207,7 +237,9 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else {
-        this.updateSelectedNode(this.node.id)
+        this.node.id == this.selectedNodeId && this.node.hideMedia
+          ? this.openNode()
+          : this.updateSelectedNode(this.node.id)
       }
     },
   },
