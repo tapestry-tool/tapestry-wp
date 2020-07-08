@@ -21,15 +21,19 @@
       :locked="!node.accessible"
     ></progress-bar>
     <g v-show="!isGrandchild">
-      <text
+      <foreignObject
         v-if="!node.hideTitle"
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
-        fill="white"
-        text-anchor="middle"
+        class="metaWrapper"
+        :width="(140 * 2 * 5) / 6"
+        :height="(140 * 2 * 5) / 6"
+        :x="node.coordinates.x - (140 * 5) / 6"
+        :y="node.coordinates.y - (140 * 5) / 6"
       >
-        {{ node.title }}
-      </text>
+        <div class="meta">
+          <p class="title">{{ node.title }}</p>
+          <p v-if="node.mediaDuration" class="timecode">{{ formatDuration() }}</p>
+        </div>
+      </foreignObject>
       <foreignObject
         v-if="!node.hideMedia"
         class="node-button-wrapper"
@@ -54,7 +58,7 @@
         :x="node.coordinates.x + 5"
         :y="node.coordinates.y + radius - 30"
       >
-        <button class="node-button" @click="editNode">
+        <button class="node-button" @click.stop="editNode">
           <tapestry-icon icon="pen"></tapestry-icon>
         </button>
       </foreignObject>
@@ -229,6 +233,20 @@ export default {
     },
     editNode() {
       this.$root.$emit("edit-node", this.node.id)
+    },
+    formatDuration() {
+      const seconds = this.node.mediaDuration
+      const hours = Math.floor(seconds / 3600)
+      let minutes = Math.floor((seconds - hours * 3600) / 60)
+      let sec = seconds - hours * 3600 - minutes * 60
+
+      if (sec < 10) sec = "0" + sec
+
+      if (hours > 0 && minutes < 10) minutes = "0" + minutes
+
+      if (hours === 0) return minutes + ":" + sec
+
+      return hours + ":" + minutes + ":" + sec
     },
     handleMouseover() {
       bus.$emit("mouseover", this.node.id)

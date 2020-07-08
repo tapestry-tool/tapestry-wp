@@ -269,10 +269,6 @@ body {
     opacity: 0;
 }
 
-.node:hover text {
-    display: none;
-}
-
 .links line {
     stroke-opacity: 5;
 }
