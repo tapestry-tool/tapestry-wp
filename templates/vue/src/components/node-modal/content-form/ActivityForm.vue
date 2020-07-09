@@ -156,10 +156,12 @@
                 placeholder="Thanks!"
               />
             </b-form-group>
-            <rich-text-form  v-model="question.confirmationMessage"
-                :data-testid="`question-confirmation-message-${index}`"
-                placeholder="Your response has been recorded." />
-            </b-card>
+            <rich-text-form
+              v-model="question.confirmationMessage"
+              :data-testid="`question-confirmation-message-${index}`"
+              placeholder="Your response has been recorded."
+            />
+          </b-card>
         </b-form-group>
       </b-card>
     </div>
@@ -191,7 +193,7 @@ const defaultQuestion = {
 export default {
   components: {
     Combobox,
-    RichTextForm
+    RichTextForm,
   },
   props: {
     node: {

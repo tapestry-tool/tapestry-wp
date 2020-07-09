@@ -2,13 +2,12 @@
   <div class="editor">
     <editor-menu-bar v-slot="{ commands, isActive }" :editor="editor">
       <div class="menubar">
-
         <button
           v-for="icon of icons_first_group"
+          :key="icon.name"
           class="menubar__button"
           :class="icon.vclass"
           @click="icon.click"
-          :key="icon.name"
         >
           <icon :name="icon.name" />
         </button>
@@ -152,7 +151,6 @@ export default {
           name: "paragraph",
         },
       ],
-
     }
   },
   watch: {
