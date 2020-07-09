@@ -163,7 +163,6 @@ export default {
       }
     },
     handlePlay(node) {
-      this.$emit("show-play-screen", false)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       globals.recordAnalyticsEvent("user", "play", "h5p-video", id, {
@@ -171,7 +170,6 @@ export default {
       })
     },
     handlePause(node) {
-      this.$emit("show-play-screen", true)
       const { id, mediaType } = node
       thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       globals.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
@@ -218,8 +216,12 @@ export default {
           h5pVideo.on("stateChange", event => {
             switch (event.data) {
               case h5pObj.Video.PLAYING: {
-                if (!h5pIframeComponent.played) {
+                if (
+                  !h5pIframeComponent.played &&
+                  h5pVideo.getHandlerName() === "YouTube"
+                ) {
                   h5pVideo.pause()
+                  h5pIframeComponent.played = true
                   return
                 }
                 h5pIframeComponent.updateInterval = setInterval(() => {

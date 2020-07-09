@@ -405,6 +405,107 @@ class Tapestry implements ITapestry
         return $neighbourIds;
     }
 
+    public function setUnlocked($nodeIds, $userId = 0)
+    {
+        $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
+
+        $nodes = array_map(
+            function ($node) {
+                $tapestryNode = new TapestryNode($this->postId, $node->id);
+                if (TapestryUserRoles::isRole('copilot')) {
+                    if ($tapestryNode->isCopilotOnly()) {
+                        $node->userType = 'copilot';
+                    } else {
+                        $node->userType = 'teen';
+                    }
+                }
+
+                return $node;
+            },
+            $nodes
+        );
+
+        return array_map(
+            function ($nodeData) {
+                $node = new TapestryNode($this->postId, $nodeData->id);
+                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible || 'teen' === $nodeData->userType ? $node->get() : $node->getMeta();
+                $data->accessible = $nodeData->accessible;
+                $data->conditions = $nodeData->conditions;
+                $data->unlocked = $nodeData->unlocked;
+
+                return $data;
+            },
+            $nodes
+        );
+    }
+
+    private function _setAccessibleStatus($nodes, $userId)
+    {
+        $newNodes = array_map(
+            function ($nodeId) use ($userId) {
+                $node = new TapestryNode($this->postId, $nodeId);
+                $data = new stdClass();
+                $data->id = $nodeId;
+                $data->accessible = false;
+                $data->unlocked = !$node->isLocked($userId);
+                $data->conditions = $node->getLockedState($userId);
+
+                return $data;
+            },
+            $nodes
+        );
+        if (count($newNodes)) {
+            $this->_recursivelySetAccessible($newNodes[0], [], $newNodes);
+        }
+
+        return $newNodes;
+    }
+
+    private function _recursivelySetAccessible($node, $visited, $nodeList)
+    {
+        if (!in_array($node, $visited)) {
+            array_push($visited, $node);
+        }
+        $node->accessible = $node->unlocked;
+        if ($node->accessible) {
+            $neighbourIds = $this->_getNeighbours($node);
+
+            $neighbours = array_map(
+                function ($nodeId) use ($nodeList) {
+                    foreach ($nodeList as $otherNode) {
+                        if ($otherNode->id === $nodeId) {
+                            return $otherNode;
+                        }
+                    }
+                },
+                $neighbourIds
+            );
+
+            foreach ($neighbours as $neighbour) {
+                if (!in_array($neighbour, $visited)) {
+                    array_push($visited, $neighbour);
+                    $this->_recursivelySetAccessible($neighbour, $visited, $nodeList);
+                }
+            }
+        }
+    }
+
+    private function _getNeighbours($node)
+    {
+        $neighbourIds = [];
+
+        foreach ($this->links as $link) {
+            if ($link->source === $node->id || $link->target === $node->id) {
+                array_push(
+                    $neighbourIds,
+                    $link->source === $node->id ? $link->target : $link->source
+                );
+            }
+        }
+
+        return $neighbourIds;
+    }
+
     private function _loadFromDatabase()
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);

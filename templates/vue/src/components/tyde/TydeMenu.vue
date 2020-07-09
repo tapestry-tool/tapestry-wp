@@ -1,11 +1,11 @@
 <template>
   <div id="tyde-menu">
     <div class="buttons">
-      <tyde-button
+      <!--tyde-button
         icon="cog"
         label="Settings"
         @click="setActivePage('settings')"
-      ></tyde-button>
+      ></tyde-button-->
       <tyde-button
         icon="globe-asia"
         label="Map"
@@ -215,7 +215,7 @@ export default {
     right: 15px;
     top: 17px;
     z-index: 10;
-    width: 60px !important;
+    width: 2em !important;
     border-radius: 50% !important;
   }
 

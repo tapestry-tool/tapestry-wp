@@ -49,7 +49,6 @@ export function updateNode(state, payload) {
   Object.entries(payload.newNode).forEach(([key, value]) => {
     thisNode[key] = value
   })
-  state.nodes = [...state.nodes]
 }
 
 export function updateNodeProgress(state, payload) {

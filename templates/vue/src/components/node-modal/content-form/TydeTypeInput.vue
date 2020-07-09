@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import { tydeTypes } from "../../utils/constants"
 import { mapGetters } from "vuex"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   name: "tyde-type-input",

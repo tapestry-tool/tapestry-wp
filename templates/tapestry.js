@@ -45,8 +45,7 @@ function tapestryTool(config){
         tapestrySlug, 
         saveProgress = true,                                    // Saving Progress
         nodesBeforeDrag,
-        h5pVideoSettings = {},
-        tapestryDepth = 3,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
+        tapestryDepth = 0,                                      // Default depth of Tapestry - set to 0 to disable depth change (show all)
         tapestryDepthSlider,                                    // Keeps track of the depth slider HTML
         childrenOfNodeAtDepth = {},                             // This keeps a type of "cache" for storing a list 
                                                                 // of children of each node at the given depth
@@ -93,7 +92,7 @@ function tapestryTool(config){
      ****************************************************/
 
     /* Import data from json file, then start D3 */
-    jQuery.ajaxSetup({
+    $.ajaxSetup({
         beforeSend: function (xhr) {
             if (wpApiSettings && wpApiSettings.nonce) {
                 xhr.setRequestHeader( 'X-WP-Nonce', wpApiSettings.nonce );
@@ -101,7 +100,7 @@ function tapestryTool(config){
         }
     });
 
-    jQuery.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
+    $.get(config.apiUrl + "/tapestries/" + config.wpPostId, function(result){
         tapestry.dataset = result;
         if (tapestry.dataset && tapestry.dataset.nodes && tapestry.dataset.nodes.length > 0) {
             for (var i=0; i<tapestry.dataset.nodes.length; i++) {
@@ -158,26 +157,17 @@ function tapestryTool(config){
             
             if (config.wpUserId) { // Get from database if user is logged in
 
-                jQuery.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
 
                     if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
                         setDatasetProgress(retrievedUserProgress);
                     }
 
-                    jQuery.get(`${TAPESTRY_H5P_SETTINGS_URL}/${config.wpPostId}`, function(retrievedH5PSettings) {
-                        if (retrievedH5PSettings && !isEmptyObject(retrievedH5PSettings)) {
-                            h5pVideoSettings = retrievedH5PSettings;
-                        }
-                    }).fail(function(e) {
-                        console.error("Error with retrieving h5p video settings");
-                        console.error(e);
-                    }).complete(function(){
-                        tapestry.init();
-                    });
-
                 }).fail(function(e) {
                     console.error("Error with retrieving node progress");
                     console.error(e);
+                }).complete(function(){
+                    tapestry.init();
                 });
             }
             else {  // Get from cookie if user is NOT logged in
@@ -186,14 +176,7 @@ function tapestryTool(config){
 
                 if (cookieProgress) {
                     cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
-                }
-
-                // Update H5P Video Settings from cookie (if any)
-                var cookieH5PVideoSettings = Cookies.get("h5p-video-settings");
-                if (cookieH5PVideoSettings) {
-                    cookieH5PVideoSettings = JSON.parse( cookieH5PVideoSettings );
-                    h5pVideoSettings = cookieH5PVideoSettings;
+                    setDatasetProgress(cookieProgress);    
                 }
 
                 tapestry.init();
@@ -274,7 +257,7 @@ function tapestryTool(config){
         this.updateAccordionProgress();
 
         dispatchEvent(new CustomEvent('tapestry-updated', { 
-            detail: { dataset: { ...this.dataset, h5pSettings: h5pVideoSettings } }
+            detail: { dataset: { ...this.dataset } }
         }));
 
         if (!root) {
@@ -1448,7 +1431,6 @@ function tapestryTool(config){
             .append("foreignObject")
             .attr("class", "tooltip-wrapper")
             .style("position", "relative")
-            .style("opacity", 0)
             .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 3)
             .attr("x", d => -(tooltipWidth(d) / 2))
@@ -1497,38 +1479,32 @@ function tapestryTool(config){
             if (linkToDragStarted) {
                 linkToNode = thisNode;
             }
-        }).on("mouseout", function () {
+
+            // Show unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
+                const wrapper = this.querySelector(".tooltip-wrapper");
+                const pointer = this.querySelector("polygon.tooltip-pointer");
+                pointer.style.opacity = 1;
+                wrapper.style.display = "block";
+            }
+
+        })
+        
+        nodes.on("mouseout", function (thisNode) {
 
             // Unmark this node as the node to link to
             if (linkToDragStarted) {
                 linkToNode = undefined;
             }
-        });
 
-        nodes
-            .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
-
-                // Place this node at the end of the svg so that it appears on top
-                $(this).insertAfter($(this).parent().children().last())
-
-                // Show unlock conditions tooltip
-                if (d.nodeType !== "grandchild") {
-                    const wrapper = this.querySelector(".tooltip-wrapper");
-                    const pointer = this.querySelector("polygon.tooltip-pointer");
-                    pointer.style.opacity = 1;
-                    wrapper.style.opacity = 1;
-                    wrapper.style.pointerEvents = "all";
-                }
-            })
-            .on("mouseleave", function () {
-                // Hide unlock conditions tooltip
+            // Hide unlock conditions tooltip
+            if (!thisNode.accessible && thisNode.nodeType !== "grandchild") {
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
-                wrapper.style.opacity = 0;
-                wrapper.style.pointerEvents = "none";
-            })
+                wrapper.style.display = "none";
+            }
+        });
     }
 
     function getTooltipHtml(node) {
@@ -1537,7 +1513,8 @@ function tapestryTool(config){
 
         if (node.conditions.length === 0 || node.conditions.every(cond => cond.fulfilled)) {
             const listItem = document.createElement("li");
-            listItem.innerText = "When this parent is unlocked.";
+            const btn = createNodeButton(getParent(node))
+            listItem.innerHTML = `When ${btn} is unlocked.`;
             wrapper.appendChild(listItem);
         } else {
             node.conditions.forEach(cond => {
@@ -1558,6 +1535,14 @@ function tapestryTool(config){
                             listItem.innerText = `Until ${formatDate(cond)}.`;
                             break;
                         }
+                        case conditionTypes.DATE_PASSED: {
+                            listItem.innerText = `This node will be unlocked after ${cond.date}`;
+                            break;
+                        }
+                        case conditionTypes.DATE_NOT_PASSED: {
+                            listItem.innerText = `This node is automatically locked after ${cond.date}`;
+                            break;
+                        }
                         default:
                             break;
                     }
@@ -1569,6 +1554,9 @@ function tapestryTool(config){
     }
 
     function createNodeButton(node) {
+		if (!node) {
+			return "preceding content"
+		}
         return `<button class="button-node-tooltip" data-node=${node.id}>${node.title}</button>`
     }
 
@@ -1830,10 +1818,8 @@ function tapestryTool(config){
                 .attr("class","meta")
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
-                if (d.mediaType === 'video') {
-                    if (d.mediaDuration) {
-                        base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
-                    }
+                if (d.mediaDuration) {
+                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
                 }
                 return base;
                 });
@@ -2049,6 +2035,9 @@ function tapestryTool(config){
                 .selectAll("path")
                 .data(function (d, i) {
                     var data = d.typeData.progress;
+                    if (!data) {
+                        data = [ {'value': 0}, {'value': 1 } ];
+                    }
                     data.forEach(function (e) {
                         e.extra = {'nodeType': d.nodeType, 'unlocked': d.unlocked };
                     })
@@ -2762,6 +2751,7 @@ function getIconClass(mediaType, action, accessible=true) {
 
     switch (mediaType) {
 
+        case "h5p":
         case "video":
             if (action == 'pause')
                 classStr = classStrStart + 'pause';

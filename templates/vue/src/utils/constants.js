@@ -4,6 +4,11 @@ export const conditionTypes = {
   DATE_PASSED: "date_passed",
 }
 
+export const sizes = {
+  NODE_RADIUS: 140,
+  NODE_RADIUS_SELECTED: 210,
+}
+
 export const tydeTypes = {
   REGULAR: "Regular",
   MODULE: "Module",

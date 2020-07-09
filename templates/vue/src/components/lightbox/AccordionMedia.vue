@@ -111,9 +111,6 @@
         </button>
       </div>
     </tapestry-modal>
-    <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up"></i>
-    </button>
   </div>
 </template>
 

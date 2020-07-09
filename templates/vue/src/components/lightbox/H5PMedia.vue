@@ -27,7 +27,6 @@
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
-      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateSettings"
     />
   </div>
@@ -78,7 +77,6 @@ export default {
       isLoading: true,
       showEndScreen: false,
       showQuizScreen: false,
-      showPlayScreen: !this.autoplay,
     }
   },
   computed: {
