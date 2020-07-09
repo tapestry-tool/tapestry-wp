@@ -33,19 +33,15 @@ class Tapestry implements ITapestry
         $this->postId = (int) $postId;
         $this->author = (int) $this->_getAuthor();
 
+        $this->nodes = [];
+        $this->links = [];
+        $this->groups = [];
+        $this->rootId = 0;
+        $this->settings = (object) [];
+
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
-            $this->nodes = $tapestry->nodes;
-            $this->links = $tapestry->links;
-            $this->groups = $tapestry->groups;
-            $this->rootId = $tapestry->rootId;
-            $this->settings = $tapestry->settings;
-        } else {
-            $this->nodes = [];
-            $this->links = [];
-            $this->groups = [];
-            $this->rootId = 0;
-            $this->settings = (object) [];
+            $this->set($tapestry);
         }
     }
 
@@ -373,14 +369,31 @@ class Tapestry implements ITapestry
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         if (empty($tapestry)) {
-            return (object) [
-                'nodes' => [],
-                'links' => [],
-                'groups' => [],
-                'rootId' => 0,
-                'settings' => (object) [],
-            ];
+            return $this->_getDefaultTapestry();
         }
+
+        return $tapestry;
+    }
+
+    private function _getDefaultTapestry()
+    {
+        $post = get_post($this->postId);
+        $tapestry = new stdClass();
+
+        $tapestry->nodes = [];
+        $tapestry->links = [];
+        $tapestry->groups = [];
+        $tapestry->rootId = 0;
+        $tapestry->settings = new stdClass();
+
+        $tapestry->settings->tapestrySlug = $post->post_name;
+        $tapestry->settings->title = $post->post_title;
+        $tapestry->settings->status = $post->post_status;
+        $tapestry->settings->backgroundUrl = "";
+        $tapestry->settings->autoLayout = false;
+        $tapestry->settings->nodeDraggable = true;
+        $tapestry->settings->showAccess = true;
+        $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
 
         return $tapestry;
     }
@@ -496,7 +509,7 @@ class Tapestry implements ITapestry
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId)) {
+        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId))) {
             if ($from == $to) {
                 return true;
             }
