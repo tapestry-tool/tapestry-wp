@@ -389,7 +389,7 @@ class Tapestry implements ITapestry
         $tapestry->settings->tapestrySlug = $post->post_name;
         $tapestry->settings->title = $post->post_title;
         $tapestry->settings->status = $post->post_status;
-        $tapestry->settings->backgroundUrl = "";
+        $tapestry->settings->backgroundUrl = '';
         $tapestry->settings->autoLayout = false;
         $tapestry->settings->nodeDraggable = true;
         $tapestry->settings->showAccess = true;

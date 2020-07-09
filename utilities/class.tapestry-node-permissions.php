@@ -14,18 +14,18 @@ class TapestryNodePermissions
     {
         global $wp_roles;
         $roles = $wp_roles->get_names();
-        $permissions = array(
-            'public'        => ['read'],
-            'authenticated'    => ['read'],
-        );
+        $permissions = [
+            'public' => ['read'],
+            'authenticated' => ['read'],
+        ];
 
         foreach ($roles as $role) {
-            if ($role !== "Administrator" && $role !== "Author") {
+            if ('Administrator' !== $role && 'Author' !== $role) {
                 $permissions[strtolower($role)] = ['read'];
             }
         }
 
-        if ($tapestryPostId == 0) {
+        if (0 == $tapestryPostId) {
             return (object) $permissions;
         }
 
