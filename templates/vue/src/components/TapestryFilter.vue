@@ -85,7 +85,6 @@ export default {
     comboboxValueOptions() {
       switch (this.activeFilterOption) {
         case filterOptions.AUTHOR: {
-          // console.log(this.nodes.map(node => [node.author.id, node.author]))
           return this.allContributors !== null
             ? Object.values(this.allContributors)
             : [

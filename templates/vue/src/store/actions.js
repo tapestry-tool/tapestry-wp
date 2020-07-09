@@ -147,5 +147,4 @@ export async function refetchTapestryData(_, filterUserId = null) {
   thisTapestryTool.setDataset(tapestry)
   thisTapestryTool.setOriginalDataset(tapestry)
   thisTapestryTool.reinitialize()
-  // commit("init", tapestry)
 }
