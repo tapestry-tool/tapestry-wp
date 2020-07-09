@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.27.0-beta
+ * Version: 2.28.0-beta
  * Author: Tapestry Team, University of British Coloumbia
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.27.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.28.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -263,41 +263,6 @@ function load_tapestry_template($singleTemplate)
     return $singleTemplate;
 }
 add_filter('single_template', 'load_tapestry_template');
-
-/**
- * Set Up Tapestry Post Upon Insertion
- *
- * @param   Integer $postId Post ID
- * @param   Object  $post   Post Object
- * @param   Boolean $update Post Object
- *
- * @return  Object  Null
- */
-function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
-{
-    if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
-        return;
-    }
-
-    $tapestry = new Tapestry($postId);
-    $tapestryData = $tapestry->get();
-
-    if ($update && !empty($tapestryData->settings)) {
-        $tapestryData->settings->tapestrySlug = $post->post_name;
-        $tapestryData->settings->title = $post->post_title;
-        $tapestryData->settings->status = $post->post_status;
-    } else {
-        $tapestryData->settings = (object) array(
-            'tapestrySlug' => $post->post_name,
-            'title' => $post->post_title,
-            'status' => $post->post_status,
-        );
-    }
-
-    $tapestry->set((object) ['settings' => $tapestryData->settings]);
-    $tapestry->saveOnPublish();
-}
-add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
 
 // Gravity Forms Pluggin
 
