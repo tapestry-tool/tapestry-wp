@@ -35,19 +35,16 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group
-            v-if="tapestryIsLoaded && maxDepth >= 2"
-            label="Default Depth"
-          >
+          <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
               type="range"
-              min="1"
-              :max="maxDepth"
+              min="0"
+              :max="maxDepth || 3"
             ></b-form-input>
             <div class="depth-slider-description">
-              Selected depth: {{ defaultDepth }}
+              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
             </div>
           </b-form-group>
         </b-tab>

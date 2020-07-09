@@ -286,8 +286,8 @@ function tapestryTool(config){
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
         }
 
-        if (!isReload) {
-            tapestryDepth = tapestry.dataset.settings.defaultDepth || 3
+        if (!isReload && typeof tapestry.dataset.settings.defaultDepth !== "undefined") {
+            tapestryDepth = tapestry.dataset.settings.defaultDepth
         }
 
         addDepthToNodes(root, 0, []);
