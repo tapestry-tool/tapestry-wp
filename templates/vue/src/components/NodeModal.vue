@@ -238,7 +238,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     hasSubAccordion(node) {
       const parents = this.getDirectParents(node.id)
       if (parents && parents[0]) {
@@ -312,6 +318,7 @@ export default {
           })
         }
 
+        await this.updateLockedStatus(this.node.id)
         this.$emit("submit")
       }
     },
