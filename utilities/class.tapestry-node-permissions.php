@@ -1,32 +1,31 @@
 <?php
 
 /**
- * Tapestry Node Permissions
- *
+ * Tapestry Node Permissions.
  */
 class TapestryNodePermissions
 {
     /**
-     * Get Default Node Permissions
+     * Get Default Node Permissions.
      *
-     * @return  Array   DefaultNodePermissions
+     * @return array DefaultNodePermissions
      */
     public static function getDefaultNodePermissions($tapestryPostId)
     {
         global $wp_roles;
         $roles = $wp_roles->get_names();
-        $permissions = array(
-            'public'        => ['read'],
-            'authenticated'    => ['read'],
-        );
+        $permissions = [
+            'public' => ['read'],
+            'authenticated' => ['read'],
+        ];
 
         foreach ($roles as $role) {
-            if ($role !== "Administrator" && $role !== "Author") {
+            if ('Administrator' !== $role && 'Author' !== $role) {
                 $permissions[strtolower($role)] = ['read'];
             }
         }
 
-        if ($tapestryPostId == 0) {
+        if (0 == $tapestryPostId) {
             return (object) $permissions;
         }
 
@@ -41,19 +40,19 @@ class TapestryNodePermissions
     }
 
     /**
-     * Get All Node Permission Options
+     * Get All Node Permission Options.
      *
-     * @return  Array   NodePermission
+     * @return array NodePermission
      */
     public static function getNodePermissions()
     {
         return [
-            'ADD'           => 'add',
-            'READ'          => 'read',
-            'EDIT'          => 'edit',
-            'APPROVE'       => 'approve',
-            'EDIT_SUBMIT'   => 'edit_submit',
-            'ADD_SUBMIT'    => 'add_submit',
+            'ADD' => 'add',
+            'READ' => 'read',
+            'EDIT' => 'edit',
+            'APPROVE' => 'approve',
+            'EDIT_SUBMIT' => 'edit_submit',
+            'ADD_SUBMIT' => 'add_submit',
         ];
     }
 }

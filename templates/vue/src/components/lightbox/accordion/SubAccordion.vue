@@ -14,7 +14,7 @@
                 <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.title }}
               </button>
-              <a @click="updateFavourites(row.id)">
+              <a @click="toggleFavourite(row.id)">
                 <i
                   v-if="isFavourite(row.id)"
                   class="fas fa-heart fa-sm"
@@ -61,29 +61,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
+    ...mapGetters(["isFavourite"]),
   },
   methods: {
-    ...mapActions(["updateUserFavourites"]),
+    ...mapActions(["toggleFavourite"]),
     handleLoad(idx) {
       this.$emit("load", this.$refs.rowRefs[idx])
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }
