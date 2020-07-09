@@ -1408,26 +1408,34 @@ function tapestryTool(config){
         });
 
         nodes
-            .filter(d => !d.accessible)
-            .on("mouseover", function (d) {
+            .filter(thisNode => !thisNode.accessible)
+            .on("mouseover", function (thisNode) {
 
                 // Place this node at the end of the svg so that it appears on top
                 $(this).insertAfter($(this).parent().children().last())
 
                 // Show unlock conditions tooltip
-                if (d.nodeType !== "grandchild") {
+                if (thisNode.nodeType !== "grandchild") {
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     const pointer = this.querySelector("polygon.tooltip-pointer");
                     pointer.style.opacity = 1;
                     wrapper.style.display = "block";
                 }
+
+                if (linkToDragStarted && checkPermission(thisNode, "add")) {
+                    linkToNode = thisNode;
+                }
             })
-            .on("mouseleave", function () {
+            .on("mouseleave", function (thisNode) {
                 // Hide unlock conditions tooltip
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
                 wrapper.style.display = "none";
+
+                if (linkToDragStarted && checkPermission(thisNode, "add")) {
+                    linkToNode = undefined;
+                }
             })
     }
 
