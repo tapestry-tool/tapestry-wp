@@ -134,7 +134,6 @@ function tapestryTool(config){
             yORfy = autoLayout ? 'y' : 'fy';
         }
 
-		var nodeIds = [];
         for (var i=0; i < tapestry.dataset.nodes.length; i++) {
             if (autoLayout) {
                 delete tapestry.dataset.nodes[i].fx;
@@ -144,12 +143,7 @@ function tapestryTool(config){
                 tapestry.dataset.nodes[i].fx = tapestry.dataset.nodes[i].coordinates.x;
                 tapestry.dataset.nodes[i].fy = tapestry.dataset.nodes[i].coordinates.y;
             }
-			nodeIds.push(tapestry.dataset.nodes[i].id);
         }
-
-		// Delete links that connect to a non-existing node due to possibly corrupted data
-		tapestry.dataset.links = tapestry.dataset.links.filter(
-            thisLink => nodeIds.includes(thisLink.source) && nodeIds.includes(thisLink.target));
 
         tapestry.originalDataset = tapestry.dataset;
         
@@ -282,24 +276,14 @@ function tapestryTool(config){
         // 3. SET NODES/LINKS AND CREATE THE SVG OBJECTS
         //---------------------------------------------------
 
-        if (!isReload) {
-            svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
-        }
-
-        if (!isReload && typeof tapestry.dataset.settings.defaultDepth !== "undefined") {
-            tapestryDepth = tapestry.dataset.settings.defaultDepth
-        }
-
-        addDepthToNodes(root, 0, []);
         setNodeTypes(root);
         setLinkTypes(root);
         addDepthToNodes(root, 0, []);
 
-        // add in the controls
         if (!isReload) {
-            document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
+            svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
         }
-        
+
         links = createLinks();
         nodes = createNodes();
 
@@ -413,6 +397,7 @@ function tapestryTool(config){
         //--------------------------------------------------
         // Add in Depth Slider
         //--------------------------------------------------
+
         if (tapestryDepth) {
 
             // Create wrapper div 
@@ -431,6 +416,7 @@ function tapestryTool(config){
                 type:"range",
                 min:"1",
                 max:"4",
+                value:"4",
                 id:"tapestry-depth-slider"
             });
             depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -446,7 +432,7 @@ function tapestryTool(config){
                 filterTapestry();
                 updateSvgDimensions();
             };
-            tapestryDepthSlider.max = findMaxDepth(root) + 1;
+
             tapestryDepthSlider.value = tapestryDepth;
             tapestryControlsDiv.appendChild(depthSliderWrapper);
 
@@ -880,6 +866,9 @@ function tapestryTool(config){
 
         // hide the container so we can smoothly fade it in at the end of this function
         $("#"+TAPESTRY_CONTAINER_ID).hide();
+
+        // add in the controls
+        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
@@ -1408,34 +1397,26 @@ function tapestryTool(config){
         });
 
         nodes
-            .filter(thisNode => !thisNode.accessible)
-            .on("mouseover", function (thisNode) {
+            .filter(d => !d.accessible)
+            .on("mouseover", function (d) {
 
                 // Place this node at the end of the svg so that it appears on top
                 $(this).insertAfter($(this).parent().children().last())
 
                 // Show unlock conditions tooltip
-                if (thisNode.nodeType !== "grandchild") {
+                if (d.nodeType !== "grandchild") {
                     const wrapper = this.querySelector(".tooltip-wrapper");
                     const pointer = this.querySelector("polygon.tooltip-pointer");
                     pointer.style.opacity = 1;
                     wrapper.style.display = "block";
                 }
-
-                if (linkToDragStarted && checkPermission(thisNode, "add")) {
-                    linkToNode = thisNode;
-                }
             })
-            .on("mouseleave", function (thisNode) {
+            .on("mouseleave", function () {
                 // Hide unlock conditions tooltip
                 const wrapper = this.querySelector(".tooltip-wrapper");
                 const pointer = this.querySelector("polygon.tooltip-pointer");
                 pointer.style.opacity = 0;
                 wrapper.style.display = "none";
-
-                if (linkToDragStarted && checkPermission(thisNode, "add")) {
-                    linkToNode = undefined;
-                }
             })
     }
 
@@ -1691,7 +1672,8 @@ function tapestryTool(config){
                 .html(function(d){
                 var base = "<p class='title'>" + d.title + "</p>";
                 if (d.mediaDuration) {
-                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) + "</p>";
+                    base += "\n<p class='timecode'>" + getVideoDuration(d.mediaDuration) +"</p>";
+            
                 }
                 return base;
                 });
@@ -1875,10 +1857,11 @@ function tapestryTool(config){
     }
 
     function getVideoDuration(seconds) {
+        seconds = Math.floor(seconds);
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds - (hours * 3600)) / 60);
-        var sec = seconds - (hours * 3600) - (minutes * 60);
-
+        var sec = Math.floor(seconds - (hours * 3600) - (minutes * 60));
+            
         if (sec < 10)
             sec = "0" + sec;
 
@@ -2212,7 +2195,6 @@ function tapestryTool(config){
     
         return maxDepth;
     }
-    this.findMaxDepth = findMaxDepth;
 
     /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
@@ -2323,11 +2305,6 @@ function tapestryTool(config){
                 if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
                     //Update the dataset with new values
 
-                    // Error prevention
-					if (!node.typeData.progress) {
-						node.typeData.progress = [ {'value': 0}, {'value': 1 } ];
-                    }
-                    
                     node.typeData.progress[0].value = amountViewed;
                     node.typeData.progress[1].value = amountUnviewed;
 
