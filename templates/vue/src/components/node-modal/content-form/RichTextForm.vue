@@ -2,48 +2,17 @@
   <div class="editor">
     <editor-menu-bar v-slot="{ commands, isActive }" :editor="editor">
       <div class="menubar">
+
         <button
+          v-for="icon of icons_first_group"
           class="menubar__button"
-          :class="{ 'is-active': isActive.bold() }"
-          @click="commands.bold"
+          :class="icon.vclass"
+          @click="icon.click"
+          :key="icon.name"
         >
-          <icon name="bold" />
+          <icon :name="icon.name" />
         </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.italic() }"
-          @click="commands.italic"
-        >
-          <icon name="italic" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.strike() }"
-          @click="commands.strike"
-        >
-          <icon name="strike" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.underline() }"
-          @click="commands.underline"
-        >
-          <icon name="underline" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.code() }"
-          @click="commands.code"
-        >
-          <icon name="code" />
-        </button>
-        <button
-          class="menubar__button"
-          :class="{ 'is-active': isActive.paragraph() }"
-          @click="commands.paragraph"
-        >
-          <icon name="paragraph" />
-        </button>
+
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 2 }) }"
@@ -65,6 +34,7 @@
         >
           H3
         </button>
+
         <button
           class="menubar__button"
           :class="{ 'is-active': isActive.bullet_list() }"
@@ -86,6 +56,7 @@
         >
           <icon name="quote" />
         </button>
+
         <button class="menubar__button" @click="commands.horizontal_rule">
           <icon name="hr" />
         </button>
@@ -149,6 +120,39 @@ export default {
   data() {
     return {
       editor: null,
+      icons_first_group: [
+        {
+          vclass: "{ 'is-active': isActive.bold() }",
+          click: "commands.bold",
+          name: "bold",
+        },
+        {
+          vclass: "{ 'is-active': isActive.italic() }",
+          click: "commands.italic",
+          name: "italic",
+        },
+        {
+          vclass: "{ 'is-active': isActive.strike() }",
+          click: "commands.strike",
+          name: "strike",
+        },
+        {
+          vclass: "{ 'is-active': isActive.underline() }",
+          click: "commands.underline",
+          name: "underline",
+        },
+        {
+          vclass: "{ 'is-active': isActive.code() }",
+          click: "commands.code",
+          name: "code",
+        },
+        {
+          vclass: "{ 'is-active': isActive.paragraph() }",
+          click: "commands.paragraph",
+          name: "paragraph",
+        },
+      ],
+
     }
   },
   watch: {
