@@ -205,7 +205,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $color-black: #000000;
 $color-white: #ffffff;
 $color-grey: #dddddd;
