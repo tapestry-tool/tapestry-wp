@@ -44,6 +44,18 @@
               {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
+            <b-form-input
+              v-model="defaultDepth"
+              class="depth-slider"
+              type="range"
+              min="0"
+              :max="maxDepth || 3"
+            ></b-form-input>
+            <div class="depth-slider-description">
+              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
+            </div>
+          </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
           <b-button block variant="light" @click="exportTapestry">
@@ -84,7 +96,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -105,6 +117,7 @@ const defaultSettings = {
   nodeDraggable: true,
   showAccess: true,
   superuserOverridePermissions: true,
+  defaultDepth: 3,
 }
 
 export default {
@@ -130,10 +143,18 @@ export default {
       showAccess: true,
       defaultPermissions,
       superuserOverridePermissions: true,
+      defaultDepth: 3,
     }
   },
   computed: {
-    ...mapGetters(["settings", "tapestryJson"]),
+    ...mapGetters(["tapestryJson"]),
+    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
+    maxDepth() {
+      if (this.tapestryIsLoaded) {
+        return thisTapestryTool.findMaxDepth(this.rootId) + 1
+      }
+      return 0
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -163,6 +184,7 @@ export default {
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
         superuserOverridePermissions = true,
+        defaultDepth = 3,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -170,6 +192,7 @@ export default {
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
+      this.defaultDepth = defaultDepth
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -179,6 +202,7 @@ export default {
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
+        defaultDepth: parseInt(this.defaultDepth),
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
@@ -213,4 +237,15 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.depth-slider {
+  border: none;
+  padding: 0;
+  max-width: 350px;
+}
+
+.depth-slider-description {
+  color: #6c757d;
+  font-size: 80%;
+}
+</style>

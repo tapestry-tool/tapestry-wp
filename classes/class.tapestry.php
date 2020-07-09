@@ -1,13 +1,13 @@
 <?php
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-user-roles.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-node-permissions.php";
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry.php";
+
+require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
 
 /**
- * Add/update/retrieve a Tapestry
- *
+ * Add/update/retrieve a Tapestry.
  */
 class Tapestry implements ITapestry
 {
@@ -22,11 +22,11 @@ class Tapestry implements ITapestry
     private $updateTapestryPost = true;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param   Number  $postId post ID
+     * @param Number $postId post ID
      *
-     * @return  NULL
+     * @return null
      */
     public function __construct($postId = 0)
     {
@@ -46,33 +46,35 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Save the Tapestry
+     * Save the Tapestry.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
     public function save()
     {
         $this->updateTapestryPost = true;
+
         return $this->_saveToDatabase();
     }
 
     /**
-     * Save the Tapestry automatically on publish
+     * Save the Tapestry automatically on publish.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
     public function saveOnPublish()
     {
         $this->updateTapestryPost = false;
+
         return $this->_saveToDatabase();
     }
 
     /**
-     * Set Tapestry
+     * Set Tapestry.
      *
-     * @param   Object  $tapestry  tapestry
+     * @param object $tapestry tapestry
      *
-     * @return  NULL
+     * @return null
      */
     public function set($tapestry)
     {
@@ -94,9 +96,9 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Retrieve a Tapestry post
+     * Retrieve a Tapestry post.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
     public function get($filterUserId)
     {
@@ -107,24 +109,25 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Get node IDs
+     * Get node IDs.
      *
-     * @return  Array  $nodes  node ids
+     * @return array $nodes  node ids
      */
     public function getNodeIds()
     {
         if (!$this->postId) {
             throw new TapestryError('INVALID_POST_ID');
         }
+
         return $this->nodes;
     }
 
     /**
-     * Add a new node
+     * Add a new node.
      *
-     * @param   Object  $node   Tapestry node
+     * @param object $node Tapestry node
      *
-     * @return  Object  $node   Tapestry node
+     * @return object $node   Tapestry node
      */
     public function addNode($node)
     {
@@ -139,15 +142,16 @@ class Tapestry implements ITapestry
         }
 
         $this->_saveToDatabase();
+
         return $node;
     }
 
     /**
-     * Delete a node
+     * Delete a node.
      *
-     * @param   Object  $nodeId  Tapestry node id
+     * @param object $nodeId Tapestry node id
      *
-     * @return  Object  $Array   Tapestry nodes
+     * @return object $Array   Tapestry nodes
      */
     public function deleteNodeFromTapestry($nodeId)
     {
@@ -188,43 +192,46 @@ class Tapestry implements ITapestry
 
         $tapestry = $this->_formTapestry();
         update_post_meta($this->postId, 'tapestry', $tapestry);
+
         return $this->nodes;
     }
 
     /**
-     * Add a new link
+     * Add a new link.
      *
-     * @param  Object   $link   Tapestry link
+     * @param object $link Tapestry link
      *
-     * @return  Object  $link   Tapestry link
+     * @return object $link   Tapestry link
      */
     public function addLink($link)
     {
         array_push($this->links, $link);
         $this->_saveToDatabase();
+
         return $link;
     }
 
     /**
-     * Delete a link from links array
+     * Delete a link from links array.
      *
-     * @param  Integer $linkIndex Link Index
+     * @param int $linkIndex Link Index
      *
-     * @return Array   $links     Tapestry links
+     * @return array $links     Tapestry links
      */
     public function removeLink($linkIndex)
     {
         array_splice($this->links, $linkIndex, 1);
         $this->_saveToDatabase();
+
         return $this->links;
     }
 
     /**
-     * Add a new group
+     * Add a new group.
      *
-     * @param   Object  $group   Tapestry group
+     * @param object $group Tapestry group
      *
-     * @return  Object  $group   Tapestry group
+     * @return object $group   Tapestry group
      */
     public function addGroup($group)
     {
@@ -234,15 +241,16 @@ class Tapestry implements ITapestry
 
         array_push($this->groups, $group->id);
         $this->_saveToDatabase();
+
         return $group;
     }
 
     /**
-     * Get the node controller with associated node meta ID
+     * Get the node controller with associated node meta ID.
      *
-     * @param   Number  $nodeMetaId node meta ID
+     * @param Number $nodeMetaId node meta ID
      *
-     * @return  Object  $node       node controller
+     * @return object $node       node controller
      */
     public function getNode($nodeMetaId)
     {
@@ -250,11 +258,11 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Get the group controller with associated group meta ID
+     * Get the group controller with associated group meta ID.
      *
-     * @param   Number  $groupMetaId    group meta ID
+     * @param Number $groupMetaId group meta ID
      *
-     * @return  Object  $group          group controller
+     * @return object $group          group controller
      */
     public function getGroup($groupMetaId)
     {
@@ -262,9 +270,9 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Returns true if the tapestry is empty
+     * Returns true if the tapestry is empty.
      *
-     * @return Boolean true if there is no root node, false otherwise
+     * @return bool true if there is no root node, false otherwise
      */
     public function isEmpty()
     {
@@ -274,6 +282,7 @@ class Tapestry implements ITapestry
     public function setUnlocked($nodeIds, $userId = 0)
     {
         $nodes = $this->_setAccessibleStatus($nodeIds, $userId);
+
         return array_map(
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
@@ -282,6 +291,7 @@ class Tapestry implements ITapestry
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
+
                 return $data;
             },
             $nodes
@@ -309,13 +319,15 @@ class Tapestry implements ITapestry
                 $data->accessible = false;
                 $data->unlocked = !$node->isLocked($userId);
                 $data->conditions = $node->getLockedState($userId);
+
                 return $data;
             },
             $nodes
         );
         if (count($newNodes)) {
-            $this->_recursivelySetAccessible($newNodes[0], array(), $newNodes);
+            $this->_recursivelySetAccessible($newNodes[0], [], $newNodes);
         }
+
         return $newNodes;
     }
 
@@ -350,7 +362,7 @@ class Tapestry implements ITapestry
 
     private function _getNeighbours($node)
     {
-        $neighbourIds = array();
+        $neighbourIds = [];
 
         foreach ($this->links as $link) {
             if ($link->source === $node->id || $link->target === $node->id) {
@@ -370,6 +382,7 @@ class Tapestry implements ITapestry
         if (empty($tapestry)) {
             return $this->_getDefaultTapestry();
         }
+
         return $tapestry;
     }
 
@@ -387,7 +400,7 @@ class Tapestry implements ITapestry
         $tapestry->settings->tapestrySlug = $post->post_name;
         $tapestry->settings->title = $post->post_title;
         $tapestry->settings->status = $post->post_status;
-        $tapestry->settings->backgroundUrl = "";
+        $tapestry->settings->backgroundUrl = '';
         $tapestry->settings->autoLayout = false;
         $tapestry->settings->nodeDraggable = true;
         $tapestry->settings->showAccess = true;
@@ -433,10 +446,10 @@ class Tapestry implements ITapestry
 
     private function _resetAuthor()
     {
-        wp_update_post(array(
+        wp_update_post([
             'ID' => $this->postId,
             'post_author' => $this->author,
-        ));
+        ]);
     }
 
     private function _getTapestry($filterUserId)
@@ -448,6 +461,7 @@ class Tapestry implements ITapestry
         $tapestry->groups = array_map(
             function ($groupMetaId) {
                 $tapestryGroup = new TapestryGroup($this->postId, $groupMetaId);
+
                 return $tapestryGroup->get();
             },
             $tapestry->groups
@@ -499,6 +513,7 @@ class Tapestry implements ITapestry
                     array_push($nodesPermitted, $nodeMetaId);
             }
         }
+
         return $nodesPermitted;
     }
 

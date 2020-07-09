@@ -1,58 +1,56 @@
 <?php
 
 /**
- * Tapestry Interface
- *
+ * Tapestry Interface.
  */
 interface ITapestryUserProgress
 {
-
     /**
-     * Get User's video progress for a tapestry post
+     * Get User's video progress for a tapestry post.
      *
-     * @return String progress of each node in json format
+     * @return string progress of each node in json format
      */
     public function get();
 
     /**
-     * Update User's video progress for a tapestry post
+     * Update User's video progress for a tapestry post.
      *
-     * @param Float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
+     * @param float $progressValue how much the video was viewed, value should be between >= 0 and <= 1
      *
-     * @return Null
+     * @return null
      */
     public function updateUserProgress($progressValue);
 
     /**
-     * Set 'skippable' status of a Tapestry Node for this User to true
+     * Set 'skippable' status of a Tapestry Node for this User to true.
      *
-     * @return Null
+     * @return null
      */
     public function complete();
 
     /**
-     * Set the question with the given id to be marked as 'completed'
+     * Set the question with the given id to be marked as 'completed'.
      *
-     * @param Integer $questionId the question to mark
+     * @param int $questionId the question to mark
      *
-     * @return Null
+     * @return null
      */
     public function completeQuestion($questionId);
 
     /**
-     * Update User's h5p video setting for a tapestry post
+     * Update User's h5p video setting for a tapestry post.
      *
-     * @param String $h5pSettingsData stores volume,
-     * playbackRate, quality of h5p video
+     * @param string $h5pSettingsData stores volume,
+     *                                playbackRate, quality of h5p video
      *
-     * @return Null
+     * @return null
      */
     public function updateH5PSettings($h5pSettingsData);
 
     /**
-     * Get User's h5p video setting for a tapestry post
+     * Get User's h5p video setting for a tapestry post.
      *
-     * @return String h5p $setting
+     * @return string h5p $setting
      */
     public function getH5PSettings();
 
@@ -60,24 +58,25 @@ interface ITapestryUserProgress
      * Get all gravity form entries submitted by this user.
      * If $formId is passed, returns entries for only that form.
      *
-     * @param Integer $formId
-     * @return String user entries in json format
+     * @param int $formId
+     *
+     * @return string user entries in json format
      */
     public function getUserEntries($formId);
 
     /**
-     * Get User's favourite nodes from a tapestry post
+     * Get User's favourite nodes from a tapestry post.
      *
-     * @return Array $nodes  node ids which are favourites
+     * @return array $nodes  node ids which are favourites
      */
     public function getFavourites();
 
     /**
-     * Update User's favourite nodes for a tapestry post
+     * Update User's favourite nodes for a tapestry post.
      *
-     * @param Array $favourites update the favourite nodes
+     * @param array $favourites update the favourite nodes
      *
-     * @return Null
+     * @return null
      */
     public function updateFavourites($favourites);
 }
