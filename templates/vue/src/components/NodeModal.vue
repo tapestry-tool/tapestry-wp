@@ -443,6 +443,9 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
+      if (this.modalType === "add") {
+        return true
+      }
       const oldNode = this.getNode(this.nodeId)
       const { youtubeID, mediaURL } = oldNode.typeData
       return this.node.mediaFormat === "youtube"
