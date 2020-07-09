@@ -1,10 +1,6 @@
 <template>
   <div id="tapestry">
-    <loading
-      v-if="!tapestryLoaded"
-      style="padding: 30vh 0;"
-      label="Loading Tapestry"
-    />
+    <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
     <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
       <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />

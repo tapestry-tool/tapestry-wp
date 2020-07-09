@@ -45,6 +45,14 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
+export function favourites(state) {
+  return state.favourites || []
+}
+
+export function isFavourite(_, { favourites }) {
+  return id => favourites.findIndex(fid => fid == id) > -1
+}
+
 /* An answer is a value where its key is numeric */
 function getAnswersFromEntry(entry) {
   return Object.entries(entry)
@@ -77,7 +85,7 @@ export function createDefaultNode({ settings }) {
     type: "tapestry_node",
     description: "",
     conditions: [],
-    behaviour: "embed",
+    behaviour: "new-window",
     status: "publish",
     nodeType: "",
     title: "",
@@ -114,6 +122,8 @@ export function createDefaultNode({ settings }) {
     },
     childOrdering: [],
     quiz: [],
+    unlocked: true,
+    accessible: true,
   })
 }
 

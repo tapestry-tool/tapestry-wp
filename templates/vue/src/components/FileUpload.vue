@@ -59,6 +59,9 @@
         />
       </b-col>
     </b-row>
+    <b-alert v-if="error" style="margin: 0 -15px;" show variant="danger">
+      File upload failed: {{ error.message }}
+    </b-alert>
   </b-container>
 </template>
 
@@ -83,6 +86,7 @@ export default {
       uploadPercentage: 0,
       isUploading: false,
       doneUploading: false,
+      error: null,
     }
   },
 
@@ -109,11 +113,21 @@ export default {
               if (this.uploadPercentage === 100) {
                 this.doneUploading = true
               }
-            }, 2000)
+            }, 1000)
           },
         })
         .then(response => {
-          this.$emit("input", response.data.data.url)
+          setTimeout(() => {
+            if (response.data.success) {
+              this.$emit("input", response.data.data.url)
+            } else {
+              this.handleError(response.data)
+            }
+          }, 800)
+        })
+        .catch(response => this.handleError(response))
+        .finally(() => {
+          this.isUploading = false
         })
         .finally(() => {
           this.isUploading = false
@@ -123,6 +137,9 @@ export default {
     reset() {
       this.doneUploading = false
       this.uploadPercentage = 0
+    },
+    handleError(error) {
+      this.error = error
     },
   },
 }

@@ -1,12 +1,12 @@
 <?php
 
 /*
-Template Name: Tapestry Page Template
+ Template Name: Tapestry Page Template
  */
-/**
- * Register Script with Nonce
+/*
+ * Register Script with Nonce.
  *
- * @return Object null
+ * @return object null
  */
 
 get_header();
@@ -27,8 +27,8 @@ if (current_user_can('edit_post', get_the_ID())) {
         
         <div id="tapestry-container"></div>
 
-        <?php while (have_posts()): the_post();?>
-	            <?php get_template_part('content', 'page');?>
+        <?php while (have_posts()): the_post(); ?>
+	            <?php get_template_part('content', 'page'); ?>
 	            <?php
     // If comments are open or we have at least one comment, load up the comment template
     if (comments_open() || get_comments_number()):
@@ -63,10 +63,7 @@ if (current_user_can('edit_post', get_the_ID())) {
                 document.getElementById('tapestry').addEventListener('click', function(event) {
                     var x = event.clientX + $(window).scrollLeft();
                     var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'tapestry', null, {
-                        'x': x,
-                        'y': y
-                    });
+                    recordAnalyticsEvent('user', 'click', 'tapestry', null, { x, y });
                 }, true);
             });
         </script>
@@ -89,4 +86,4 @@ if (current_user_can('edit_post', get_the_ID())) {
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer();?>
+<?php get_footer(); ?>

@@ -31,11 +31,7 @@
       <i class="fas fa-check"></i>
       Done
     </button>
-    <button
-      v-if="state === states.DONE"
-      class="my-3"
-      @click="$emit('submit', audio)"
-    >
+    <button v-if="state === states.DONE" class="my-3" @click="handleSubmit">
       <i class="fas fa-check"></i>
       Submit
     </button>
@@ -190,6 +186,9 @@ export default {
           this.startRecording()
           break
       }
+    },
+    handleSubmit() {
+      this.$emit("submit", this.audio)
     },
   },
 }

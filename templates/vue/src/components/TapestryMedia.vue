@@ -88,7 +88,7 @@ import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
-import YoutubeMedia from "./lightbox/YoutubeMedia"
+import YouTubeMedia from "./lightbox/YouTubeMedia"
 
 export default {
   name: "tapestry-media",
@@ -101,7 +101,7 @@ export default {
     WpPostMedia,
     CompletionScreen,
     QuizMedia,
-    YoutubeMedia,
+    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {
@@ -130,8 +130,8 @@ export default {
       return this.getNode(this.nodeId)
     },
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
+  beforeDestroy() {
+    this.updateNodeProgress({
       id: this.nodeId,
       progress: this.node && this.node.typeData.progress[0].value,
     })
