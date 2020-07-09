@@ -1178,7 +1178,7 @@ function getUserH5PSettingsByPostId($request)
 }
 
 /**
- * Update the user's h5p settings by post id
+ * Update the user's h5p settings by post id.
  *
  * Example endpoint: /wp-json/tapestry-tool/v1/users/h5psettings/44
  * Example body:
