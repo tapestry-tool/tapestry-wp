@@ -284,14 +284,24 @@ function tapestryTool(config){
         // 3. SET NODES/LINKS AND CREATE THE SVG OBJECTS
         //---------------------------------------------------
 
-        setNodeTypes(root);
-        setLinkTypes(root);
-        addDepthToNodes(root, 0, []);
-
         if (!isReload) {
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
         }
 
+        if (!isReload && typeof tapestry.dataset.settings.defaultDepth !== "undefined") {
+            tapestryDepth = tapestry.dataset.settings.defaultDepth
+        }
+
+        addDepthToNodes(root, 0, []);
+        setNodeTypes(root);
+        setLinkTypes(root);
+        addDepthToNodes(root, 0, []);
+
+        // add in the controls
+        if (!isReload) {
+            document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
+        }
+        
         links = createLinks();
         nodes = createNodes();
 
@@ -407,7 +417,6 @@ function tapestryTool(config){
         //--------------------------------------------------
         // Add in Depth Slider
         //--------------------------------------------------
-
         if (tapestryDepth) {
 
             // Create wrapper div 
@@ -426,7 +435,6 @@ function tapestryTool(config){
                 type:"range",
                 min:"1",
                 max:"4",
-                value:"4",
                 id:"tapestry-depth-slider"
             });
             depthSliderWrapper.appendChild(tapestryDepthSlider);
@@ -443,7 +451,7 @@ function tapestryTool(config){
                 filterTapestry();
                 updateSvgDimensions();
             };
-
+            tapestryDepthSlider.max = findMaxDepth(root) + 1;
             tapestryDepthSlider.value = tapestryDepth;
             tapestryControlsDiv.appendChild(depthSliderWrapper);
 
@@ -876,9 +884,6 @@ function tapestryTool(config){
 
         // hide the container so we can smoothly fade it in at the end of this function
         $("#"+TAPESTRY_CONTAINER_ID).hide();
-
-        // add in the controls
-        document.getElementById(TAPESTRY_CONTAINER_ID).prepend(tapestry.getControls());
 
         // actually create the SVG
         var tapestryDimensions = tapestry.getTapestryDimensions();
@@ -2410,6 +2415,7 @@ function tapestryTool(config){
     
         return maxDepth;
     }
+    this.findMaxDepth = findMaxDepth;
 
     /* Find children based on depth.
         depth = 0 returns node + children, depth = 1 returns node + children + children's children, etc. */
