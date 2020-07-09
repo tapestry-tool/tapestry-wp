@@ -324,30 +324,18 @@ export default {
       }
     },
     getRandomNumber(min, max) {
-      return Math.random() * (max - min) + min;
+      return Math.random() * (max - min) + min
     },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
-        let minX;
-        let maxX;
-        let minY;
-        let maxY;
-        this.nodes.forEach((node, index) => {
-          if (minX === undefined || node.x < minX) {
-            minX = node.x;
-          }
-          if (maxX === undefined || node.x > maxX) {
-            maxX = node.x;
-          }
-          if (minY === undefined || node.y < minY) {
-            minY = node.y;
-          }
-          if (maxY === undefined || node.y > maxY) {
-            maxY = node.y;
-          }
-        });
-        this.node.coordinates.x = this.getRandomNumber(minX, maxX) + this.getRandomNumber(sizes.NODE_RADIUS_SELECTED * -5, sizes.NODE_RADIUS_SELECTED * 5);
-        this.node.coordinates.y = this.getRandomNumber(minY, maxY) + this.getRandomNumber(sizes.NODE_RADIUS_SELECTED * -5, sizes.NODE_RADIUS_SELECTED * 5);
+        this.node.coordinates.x = this.getRandomNumber(
+          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 3,
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 3
+        )
+        this.node.coordinates.y = this.getRandomNumber(
+          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 3,
+          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 3
+        )
       }
     },
     validateNode() {
