@@ -213,6 +213,7 @@ export default {
 .depth-slider {
   border: none;
   padding: 0;
+  max-width: 350px;
 }
 
 .depth-slider-description {
