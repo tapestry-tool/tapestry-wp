@@ -77,7 +77,7 @@ function create_tapestry_node_type()
         'rest_base' => '',
         'rest_controller_class' => 'WP_REST_Posts_Controller',
         'has_archive' => false,
-        'show_in_menu' => 'edit.php?post_type=tapestry',
+        'show_in_menu' => false,
         'show_in_nav_menus' => false,
         'exclude_from_search' => false,
         'capability_type' => 'post',
