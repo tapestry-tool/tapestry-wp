@@ -403,19 +403,6 @@ button[disabled] {
   text-align: left;
 }
 
-.button-scroll-top {
-  cursor: pointer;
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  background: #262626;
-  border-radius: 50%;
-  padding: 0;
-  width: 56px;
-  height: 56px;
-  z-index: 10;
-}
-
 .accordion-row {
   background: #262626;
   border-radius: 4px;

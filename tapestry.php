@@ -206,6 +206,7 @@ function enqueue_vue_app_build()
 function tapestry_enqueue_libraries()
 {
     global $post;
+    global $TAPESTRY_VERSION_NUMBER;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
         // CSS
 

@@ -2510,7 +2510,7 @@ function tapestryTool(config){
                     node.typeData = content.typeData
                 }
 
-                if (node.mediaType !== "accordion") {
+                if (node.mediaType !== "accordion" && node.typeData.progress) {
                     //Update the dataset with new values
 
                     node.typeData.progress[0].value = amountViewed;
