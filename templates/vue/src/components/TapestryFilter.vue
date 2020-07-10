@@ -104,8 +104,15 @@ export default {
     },
   },
   watch: {
+    isActive(isActive) {
+      if (isActive) {
+        this.updateVisibleNodes(this.visibleNodes)
+      }
+    },
     visibleNodes(nodes) {
-      this.updateVisibleNodes(nodes)
+      if (this.isActive) {
+        this.updateVisibleNodes(nodes)
+      }
     },
   },
   methods: {

@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     ...mapState(["selectedNodeId", "nodes"]),
-    ...mapGetters(["getNeighbours"]),
+    ...mapGetters(["getNeighbours", "getNode"]),
     levels() {
       const levels = {}
       const queue = []
@@ -75,23 +75,20 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     setDefaultDepth() {
-      this.currentDepth = Math.ceil((this.maxDepth - 1) / 2)
+      this.currentDepth = Math.min(3, Math.ceil((this.maxDepth - 1) / 2))
     },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
-      this.nodes.forEach(node => {
-        if (node.id !== this.selectedNodeId) {
-          this.updateNode({
-            id: node.id,
-            newNode: {
-              nodeType: "child",
-            },
-          })
-        }
-      })
+      const updated = new Set()
       const nodesAtCurrentDepth = this.levels[depth]
       if (nodesAtCurrentDepth) {
-        nodesAtCurrentDepth.forEach(nodeId => {
+        const nodesToUpdate = nodesAtCurrentDepth.filter(nodeId => {
+          updated.add(parseInt(nodeId))
+          const node = this.getNode(nodeId)
+          return node.nodeType !== "grandchild"
+        })
+        console.log("grandchildren", nodesToUpdate)
+        nodesToUpdate.forEach(nodeId => {
           this.updateNode({
             id: nodeId,
             newNode: {
@@ -100,12 +97,33 @@ export default {
           })
         })
       }
-      const hiddenNodes = this.levels
-        .filter((_, level) => level > depth)
+      const children = this.levels
+        .slice(0, depth)
         .flatMap(nodes => nodes)
-      hiddenNodes.forEach(nodeId => {
+        .filter(nodeId => {
+          updated.add(parseInt(nodeId))
+          const node = this.getNode(nodeId)
+          return node.nodeType !== "child"
+        })
+      console.log("children", children)
+      children.forEach(nodeId => {
         this.updateNode({
           id: nodeId,
+          newNode: {
+            nodeType: "child",
+          },
+        })
+      })
+      const hidden = this.nodes.filter(
+        node =>
+          !updated.has(node.id) &&
+          node.id !== this.selectedNodeId &&
+          node.nodeType !== ""
+      )
+      console.log("hidden", hidden)
+      hidden.forEach(node => {
+        this.updateNode({
+          id: node.id,
           newNode: {
             nodeType: "",
           },

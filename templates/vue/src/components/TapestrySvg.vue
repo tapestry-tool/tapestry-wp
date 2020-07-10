@@ -14,6 +14,7 @@
         :node="node"
         class="node"
         :data-id="node.id"
+        :root="node.id == selectedNodeId"
         @dragend="updateViewBox"
       ></tapestry-node>
     </g>
@@ -37,7 +38,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links"]),
+    ...mapState(["nodes", "links", "selectedNodeId"]),
   },
   mounted() {
     this.updateViewBox()
@@ -52,18 +53,20 @@ export default {
       }
 
       for (const node of this.nodes) {
-        const { x, y } = node.coordinates
-        if (x < box.minX) {
-          box.minX = x
-        }
-        if (y < box.minY) {
-          box.minY = y
-        }
-        if (x > box.width) {
-          box.width = x
-        }
-        if (y > box.height) {
-          box.height = y
+        if (node.nodeType !== "") {
+          const { x, y } = node.coordinates
+          if (x < box.minX) {
+            box.minX = x
+          }
+          if (y < box.minY) {
+            box.minY = y
+          }
+          if (x > box.width) {
+            box.width = x
+          }
+          if (y > box.height) {
+            box.height = y
+          }
         }
       }
 
@@ -75,3 +78,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.opaque {
+  opacity: 0.2;
+}
+</style>

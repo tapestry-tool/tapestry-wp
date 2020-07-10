@@ -104,8 +104,7 @@ export function updateNode(state, payload) {
   Object.entries(payload.newNode).forEach(([key, value]) => {
     copy[key] = value
   })
-  state.nodes[nodeIndex] = copy
-  state.nodes = [...state.nodes]
+  state.nodes.splice(nodeIndex, 1, copy)
 }
 
 export function updateNodeProgress(state, payload) {

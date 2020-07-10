@@ -1,26 +1,26 @@
 <template>
   <g
     v-show="isVisible"
+    ref="node"
     :class="{ opaque: !visibleNodes.includes(node.id) }"
     @click="handleClick"
     @mouseover="handleMouseover"
   >
     <circle
-      ref="node"
       :cx="node.coordinates.x"
       :cy="node.coordinates.y"
       :fill="fill"
       :r="radius"
     ></circle>
     <progress-bar
-      v-show="!isGrandchild && !node.hideProgress"
+      v-show="node.nodeType !== 'grandchild' && !node.hideProgress"
       :x="node.coordinates.x"
       :y="node.coordinates.y"
       :radius="radius"
       :progress="node.progress"
       :locked="!node.accessible"
     ></progress-bar>
-    <g v-show="!isGrandchild">
+    <g v-show="node.nodeType !== 'grandchild'">
       <foreignObject
         v-if="!node.hideTitle"
         class="metaWrapper"
@@ -106,9 +106,13 @@ export default {
       type: Object,
       required: true,
     },
+    root: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
-    ...mapState(["selectedNodeId", "selection", "visibleNodes"]),
+    ...mapState(["selection", "visibleNodes"]),
     ...mapGetters(["getNode"]),
     icon() {
       switch (this.node.mediaType) {
@@ -130,16 +134,11 @@ export default {
           return "exclamation"
       }
     },
-    isGrandchild() {
-      return (
-        this.node.id != this.selectedNodeId && this.node.nodeType === "grandchild"
-      )
-    },
     isVisible() {
       return this.node.nodeType !== ""
     },
     radius() {
-      if (this.node.id == this.selectedNodeId) {
+      if (this.root) {
         return 210
       }
       if (this.node.nodeType === "grandchild") {
@@ -148,7 +147,7 @@ export default {
       return 140
     },
     fill() {
-      if (this.node.imageURL && !this.isGrandchild) {
+      if (this.node.imageURL && this.node.nodeType !== "grandchild") {
         return `url(#node-image-${this.node.id})`
       }
       if (this.selected) {
@@ -255,7 +254,7 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else {
-        this.node.id == this.selectedNodeId && this.node.hideMedia
+        this.root && this.node.hideMedia
           ? this.openNode()
           : this.updateSelectedNode(this.node.id)
       }
