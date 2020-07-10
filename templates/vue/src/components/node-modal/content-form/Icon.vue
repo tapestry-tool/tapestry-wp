@@ -42,8 +42,7 @@ export default {
   },
   computed: {
     iconSource() {
-      let lookup = new Map()
-      let icons = [
+      const lookup = {
         bold,
         italic,
         underline,
@@ -56,25 +55,8 @@ export default {
         hr,
         undo,
         redo,
-      ]
-      let iconsStrings = [
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "code",
-        "paragraph",
-        "ul",
-        "ol",
-        "quote",
-        "hr",
-        "undo",
-        "redo",
-      ]
-      for (let i in icons) {
-        lookup.set(iconsStrings[i], icons[i])
-      }
-      let usedIcon = lookup.get(this.name)
+      };
+      let usedIcon = lookup[this.name];
       return `${wpData.vue_uri}/${usedIcon.split("dist")[1]}`
     },
   },
