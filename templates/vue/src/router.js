@@ -2,6 +2,7 @@ import Vue from "vue"
 import VueRouter from "vue-router"
 import Lightbox from "./components/Lightbox"
 import NodeModal from "./components/NodeModal.vue"
+import SettingsModal from "./components/SettingsModal.vue"
 
 Vue.use(VueRouter)
 
@@ -16,6 +17,10 @@ const routes = [
     component: NodeModal,
     props: true,
     name: "node-modal",
+  },
+  {
+    path: "/settings",
+    component: SettingsModal,
   },
 ]
 

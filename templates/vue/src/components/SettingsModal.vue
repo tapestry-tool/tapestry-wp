@@ -1,5 +1,12 @@
 <template>
-  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
+  <b-modal
+    id="settings-modal"
+    v-model="showModal"
+    size="lg"
+    title="Tapestry Settings"
+    body-class="p-0"
+    @hidden="close"
+  >
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Appearance" active>
@@ -64,7 +71,7 @@
         Page will refresh when you save to apply your new settings.
       </p>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="closeModal">
+      <b-button size="sm" variant="secondary" @click="showModal = false">
         Cancel
       </b-button>
       <b-button size="sm" variant="primary" @click="updateSettings">
@@ -97,13 +104,6 @@ export default {
     DuplicateTapestryButton,
     PermissionsTable,
   },
-  props: {
-    wpCanEditTapestry: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       backgroundUrl: "",
@@ -112,10 +112,14 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      showModal: true,
     }
   },
   computed: {
     ...mapGetters(["settings", "tapestryJson"]),
+    wpCanEditTapestry() {
+      return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -123,18 +127,11 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener("open-settings-modal", this.openModal)
-  },
-  beforeDestroy() {
-    window.removeEventListener("open-settings-modal")
+    this.getSettings()
   },
   methods: {
-    openModal() {
-      this.$bvModal.show("settings-modal")
-      this.getSettings()
-    },
-    closeModal() {
-      this.$bvModal.hide("settings-modal")
+    close() {
+      this.$router.push(`/`)
     },
     getSettings() {
       const {
@@ -151,6 +148,7 @@ export default {
       this.showAccess = showAccess
     },
     async updateSettings() {
+      this.close()
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
