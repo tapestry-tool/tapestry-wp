@@ -7,8 +7,7 @@
     class="text-muted"
     scrollable
     body-class="p-0"
-    @close="$emit('close')"
-    @cancel="$emit('close')"
+    @hidden="close"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -90,7 +89,7 @@
         Delete Node
       </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="close">
+      <b-button size="sm" variant="secondary" @click="showModal = false">
         Cancel
       </b-button>
       <b-button
@@ -150,7 +149,7 @@ export default {
       type: String,
       required: true,
       validator: value => {
-        return ["", "root", "add", "edit"].includes(value)
+        return ["", "add", "edit"].includes(value)
       },
     },
   },
@@ -208,7 +207,7 @@ export default {
       )
     },
     nodeIdNumber() {
-      return this.modalType == "root" ? 0 : Number(this.nodeId)
+      return Number(this.nodeId)
     },
   },
   beforeDestroy() {
@@ -246,6 +245,7 @@ export default {
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
+      this.close()
     },
     async submit() {
       this.formErrors = this.validateNode()

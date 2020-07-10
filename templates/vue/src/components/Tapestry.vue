@@ -1,9 +1,8 @@
 <template>
   <div id="tapestry">
     <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
-    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
     <div v-if="tapestryLoaded && !tapestry.rootId">
-      <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
+      <root-node-button v-if="wpCanEditTapestry" />
       <div v-else style="margin-top: 40vh;">
         The requested tapestry is empty.
       </div>
@@ -13,7 +12,6 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex"
-import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
 import Loading from "@/components/Loading"
@@ -22,7 +20,6 @@ export default {
   name: "tapestry",
   components: {
     RootNodeButton,
-    SettingsModal,
     Loading,
   },
   data() {
@@ -48,6 +45,7 @@ export default {
     window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("tapestry-open-node", this.openNode)
+    window.addEventListener("open-settings-modal", this.openSettings)
   },
   methods: {
     ...mapMutations(["init", "setDataset", "updateSelectedNode"]),
@@ -62,10 +60,6 @@ export default {
       } else {
         this.setDataset(event.detail.dataset)
       }
-    },
-    addRootNode() {
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
     },
     addNewNode() {
       this.modalType = "add"
@@ -84,6 +78,9 @@ export default {
       thisTapestryTool.setDataset(this.tapestry)
       thisTapestryTool.setOriginalDataset(this.tapestry)
       thisTapestryTool.initialize(true)
+    },
+    openSettings() {
+      this.$router.push(`/settings`)
     },
   },
 }

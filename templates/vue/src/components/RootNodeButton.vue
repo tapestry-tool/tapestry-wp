@@ -1,6 +1,6 @@
 <template>
   <div id="root-node-button">
-    <div data-testid="root-node-button" @click="$emit('click')">
+    <div data-testid="root-node-button" @click="$router.push(`/nodes/add/0`)">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
@@ -42,9 +42,6 @@ export default {
     }
   },
   methods: {
-    showModal() {
-      this.$emit("add-root-node")
-    },
     openFileBrowser() {
       this.$refs.fileInput.click()
     },
