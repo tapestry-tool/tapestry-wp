@@ -1,6 +1,6 @@
 <?php
 /**
- * Tapestry User Roles
+ * Tapestry User Roles.
  */
 class TapestryUserRoles
 {
@@ -12,9 +12,9 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is a particular role
+     * Check if the current user is a particular role.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isRole($role)
     {
@@ -25,9 +25,9 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is an administrator
+     * Check if the current user is an administrator.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isAdministrator()
     {
@@ -35,9 +35,9 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is an editor
+     * Check if the current user is an editor.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isEditor()
     {
@@ -45,9 +45,9 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is an author
+     * Check if the current user is an author.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isAuthor()
     {
@@ -55,11 +55,11 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is an author of a post
+     * Check if the current user is an author of a post.
      *
-     * @param   Integer $postId post ID
+     * @param int $postId post ID
      *
-     * @return  Boolean
+     * @return bool
      */
     public static function isAuthorOfThePost($postId)
     {
@@ -68,9 +68,9 @@ class TapestryUserRoles
     }
 
     /**
-     * Check if the current user is a subscriber
+     * Check if the current user is a subscriber.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isSubscriber()
     {
