@@ -8,8 +8,8 @@
     @hidden="close"
   >
     <b-container fluid class="px-0">
-      <b-tabs card>
-        <b-tab title="Appearance" active>
+      <b-tabs v-model="tabIndex" card>
+        <b-tab title="Appearance">
           <b-form-group
             label="Background URL"
             description="Add a background image to the page where this tapestry
@@ -97,12 +97,21 @@ const defaultPermissions = Object.fromEntries(
   ].map(rowName => [rowName, ["read"]])
 )
 
+const tabOrdering = ["appearance", "advanced", "access"]
+
 export default {
   name: "settings-modal",
   components: {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
+  },
+  props: {
+    tab: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -113,12 +122,23 @@ export default {
       showAccess: true,
       defaultPermissions,
       showModal: true,
+      currentTab: this.tab,
     }
   },
   computed: {
     ...mapGetters(["settings", "tapestryJson"]),
     wpCanEditTapestry() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
+    tabIndex: {
+      get() {
+        const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
+        return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
+      },
+      set(newIndex) {
+        this.currentTab = tabOrdering[newIndex]
+        this.$router.push("/settings/" + this.currentTab)
+      },
     },
   },
   created() {

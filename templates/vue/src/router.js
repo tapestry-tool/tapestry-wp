@@ -19,7 +19,7 @@ const routes = [
     name: "node-modal",
   },
   {
-    path: "/settings",
+    path: "/settings/:tab?",
     component: SettingsModal,
   },
 ]
