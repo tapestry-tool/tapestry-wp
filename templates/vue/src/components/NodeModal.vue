@@ -142,7 +142,7 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
+      type: [String, Number],
       required: false,
       default: 0,
     },
@@ -172,10 +172,11 @@ export default {
       "getDirectParents",
       "getNode",
       "settings",
+      "tapestry",
     ]),
     parent() {
       if (this.modalType === "add") {
-        const parent = this.getNode(this.nodeId)
+        const parent = this.getNode(this.nodeIdNumber)
         if (parent) {
           return parent
         }
@@ -206,6 +207,9 @@ export default {
         this.videoLoaded
       )
     },
+    nodeIdNumber() {
+      return this.modalType == "root" ? 0 : Number(this.nodeId)
+    },
   },
   beforeDestroy() {
     thisTapestryTool.enableMovements()
@@ -217,7 +221,7 @@ export default {
   mounted() {
     let copy = this.createDefaultNode()
     if (this.modalType === "edit") {
-      const node = this.getNode(this.nodeId)
+      const node = this.getNode(this.nodeIdNumber)
       copy = Helpers.deepCopy(node)
     }
     copy.hasSubAccordion = this.hasSubAccordion(copy)
@@ -238,7 +242,7 @@ export default {
       return false
     },
     close() {
-      this.$emit("close")
+      this.$router.push(`/`)
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
@@ -300,9 +304,12 @@ export default {
             newNode: this.node,
           })
         }
-
-        this.$emit("submit")
       }
+
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.setOriginalDataset(this.tapestry)
+      thisTapestryTool.initialize(true)
+      this.close()
     },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {

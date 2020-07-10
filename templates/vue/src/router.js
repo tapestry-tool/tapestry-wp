@@ -1,7 +1,7 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
 import Lightbox from "./components/Lightbox"
-import NodeModalWrap from "./components/NodeModalWrap.vue"
+import NodeModal from "./components/NodeModal.vue"
 
 Vue.use(VueRouter)
 
@@ -13,7 +13,7 @@ const routes = [
   },
   {
     path: "/nodes/:modalType/:nodeId",
-    component: NodeModalWrap,
+    component: NodeModal,
     props: true,
     name: "node-modal",
   },
