@@ -17,8 +17,8 @@
       </b-alert>
     </div>
     <b-container v-if="ready" fluid class="px-0">
-      <b-tabs card>
-        <b-tab title="Content" active>
+      <b-tabs v-model="tabIndex" card>
+        <b-tab title="Content">
           <content-form
             :node="node"
             @load="videoLoaded = true"
@@ -127,6 +127,8 @@ const shouldFetch = (url, selectedNode) => {
   return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 
+const tabOrdering = ["content", "appearance", "access", "activity", "ordering"]
+
 export default {
   name: "node-modal",
   components: {
@@ -152,6 +154,11 @@ export default {
         return ["", "add", "edit"].includes(value)
       },
     },
+    tab: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -162,6 +169,7 @@ export default {
       node: null,
       videoLoaded: false,
       showModal: true,
+      currentTab: this.tab,
     }
   },
   computed: {
@@ -208,6 +216,18 @@ export default {
     },
     nodeIdNumber() {
       return Number(this.nodeId)
+    },
+    tabIndex: {
+      get() {
+        const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
+        return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
+      },
+      set(newIndex) {
+        this.currentTab = tabOrdering[newIndex]
+        this.$router.push(
+          "/nodes/" + this.modalType + "/" + this.nodeId + "/" + this.currentTab
+        )
+      },
     },
   },
   beforeDestroy() {

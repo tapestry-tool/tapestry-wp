@@ -13,7 +13,7 @@ const routes = [
     props: true,
   },
   {
-    path: "/nodes/:modalType/:nodeId",
+    path: "/nodes/:modalType/:nodeId/:tab?",
     component: NodeModal,
     props: true,
     name: "node-modal",
