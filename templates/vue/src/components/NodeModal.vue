@@ -324,12 +324,12 @@ export default {
             newNode: this.node,
           })
         }
-      }
 
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.setOriginalDataset(this.tapestry)
-      thisTapestryTool.initialize(true)
-      this.close()
+        thisTapestryTool.setDataset(this.tapestry)
+        thisTapestryTool.setOriginalDataset(this.tapestry)
+        thisTapestryTool.initialize(true)
+        this.close()
+      }
     },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
