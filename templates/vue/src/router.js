@@ -8,7 +8,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: "/nodes/view/:nodeId",
+    path: "/nodes/view/:nodeId/:row?",
     component: Lightbox,
     props: true,
   },

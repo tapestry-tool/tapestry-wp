@@ -6,7 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="this.nodeId"
+    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="close"
@@ -14,6 +14,7 @@
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
+      :target-row="accordionRow"
       @close="close"
       @complete="complete"
     />
@@ -46,6 +47,11 @@ export default {
   },
   props: {
     nodeId: {
+      type: [String, Number],
+      required: false,
+      default: 0,
+    },
+    row: {
       type: [String, Number],
       required: false,
       default: 0,
@@ -154,6 +160,9 @@ export default {
         height: videoHeight * adjustmentRatio,
       }
     },
+    accordionRow() {
+      return Number(this.row)
+    },
   },
   watch: {
     tapestryIsLoaded() {
@@ -181,7 +190,7 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      this.$router.go(-1)
+      this.$router.push("/")
     },
     handleLoad(dimensions) {
       if (dimensions) {

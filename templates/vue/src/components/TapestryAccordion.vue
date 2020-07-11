@@ -11,6 +11,11 @@ export default {
       required: false,
       default: 0,
     },
+    nodeId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -20,6 +25,17 @@ export default {
   computed: {
     hasNext() {
       return this.rows.indexOf(this.activeRow) < this.rows.length - 1
+    },
+  },
+  watch: {
+    activeRow() {
+      if (this.nodeId !== 0) {
+        const index =
+          this.rows.indexOf(this.activeRow) === -1
+            ? ""
+            : "/" + this.rows.indexOf(this.activeRow)
+        this.$router.push("/nodes/view/" + this.nodeId + index)
+      }
     },
   },
   created() {
