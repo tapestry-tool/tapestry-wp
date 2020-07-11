@@ -206,7 +206,7 @@ export default class {
   }
 
   async getAllContributors() {
-    const url = `${apiUrl}/tapestries/contributors?post_id=${this.postId}`
+    const url = `${apiUrl}/tapestries/${this.postId}/contributors`
     const response = await axios.get(url)
     return response.data
   }

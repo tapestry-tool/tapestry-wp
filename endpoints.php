@@ -279,7 +279,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_TAPESTRY_CONTRIBUTORS' => (object) [
-        'ROUTE' => '/tapestries/contributors',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/contributors',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'getTapestryContributors'
@@ -1292,7 +1292,7 @@ function updateUserFavourites($request)
 
 function getTapestryContributors($request)
 {
-    $postId = $request['post_id'];
+    $postId = $request['tapestryPostId'];
     $roles = new TapestryUserRoles();
 
     try {

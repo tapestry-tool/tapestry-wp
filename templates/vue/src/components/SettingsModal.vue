@@ -36,9 +36,11 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
-            label="Superusers Override Permissions"
-            description="When this is enabled, all WordPress superusers (Administator roles, Editor roles or the
-             Author of this Tapestry) will be able to see and edit all nodes, regardless of the node's set permissions."
+            label="Show Me All Nodes By Default"
+            description="If enabled, editors of this tapestry would be able to see and edit all nodes even 
+            for nodes with the 'read' permission off. If disabled, superusers will be able to use the filter 
+            to view such nodes, but they won't appear in the tapestry by default. Note: Editors of this 
+            tapestry include users with the Administator or Edit roles, and the author of this Tapestry."
           >
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
               {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
