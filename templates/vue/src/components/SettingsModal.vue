@@ -141,6 +141,13 @@ export default {
       },
     },
   },
+  watch: {
+    $route(to, from) {
+      if (this.currentTab !== to.params.tab && to !== from) {
+        this.currentTab = to.params.tab
+      }
+    },
+  },
   created() {
     if (this.settings.defaultPermissions) {
       this.defaultPermissions = this.settings.defaultPermissions

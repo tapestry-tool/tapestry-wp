@@ -21,6 +21,7 @@ const routes = [
   {
     path: "/settings/:tab?",
     component: SettingsModal,
+    props: true,
   },
 ]
 

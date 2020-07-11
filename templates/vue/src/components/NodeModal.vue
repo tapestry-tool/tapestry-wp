@@ -127,7 +127,7 @@ const shouldFetch = (url, selectedNode) => {
   return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 
-const tabOrdering = ["content", "appearance", "access", "activity", "ordering"]
+var tabOrdering = ["content", "appearance"]
 
 export default {
   name: "node-modal",
@@ -230,6 +230,13 @@ export default {
       },
     },
   },
+  watch: {
+    $route(to, from) {
+      if (this.currentTab !== to.params.tab && to !== from) {
+        this.currentTab = to.params.tab
+      }
+    },
+  },
   beforeDestroy() {
     thisTapestryTool.enableMovements()
     this.ready = false
@@ -245,6 +252,7 @@ export default {
     }
     copy.hasSubAccordion = this.hasSubAccordion(copy)
     this.node = copy
+    this.initializeTabArray()
     this.ready = true
     thisTapestryTool.disableMovements()
   },
@@ -393,6 +401,24 @@ export default {
         id: this.node.id,
         ord: arr,
       })
+    },
+    initializeTabArray() {
+      if (
+        this.node.mediaType === "h5p" ||
+        this.node.mediaType === "video" ||
+        this.node.mediaType === "accordion"
+      ) {
+        tabOrdering.push("behaviour")
+      }
+      if (this.viewAccess) {
+        tabOrdering.push("access")
+      }
+      if (this.node.mediaType === "h5p" || this.node.mediaType === "video") {
+        tabOrdering.push("activity")
+      }
+      if (this.node.mediaType === "accordion" || this.node.hasSubAccordion) {
+        tabOrdering.push("ordering")
+      }
     },
   },
 }
