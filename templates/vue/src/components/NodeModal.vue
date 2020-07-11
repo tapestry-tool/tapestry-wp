@@ -23,6 +23,7 @@
             :node="node"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -209,6 +210,9 @@ export default {
     },
     accessSubmit() {
       // Locks access to submit button while youtube video loads to grab duration
+      if (!this.ready) {
+        return false
+      }
       return (
         (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
         this.videoLoaded
@@ -258,7 +262,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
     hasSubAccordion(node) {
       const parents = this.getDirectParents(node.id)
       if (parents && parents[0]) {
@@ -332,7 +342,7 @@ export default {
             newNode: this.node,
           })
         }
-
+        await this.updateLockedStatus(this.node.id)
         thisTapestryTool.setDataset(this.tapestry)
         thisTapestryTool.setOriginalDataset(this.tapestry)
         thisTapestryTool.initialize(true)
@@ -419,6 +429,11 @@ export default {
       if (this.node.mediaType === "accordion" || this.node.hasSubAccordion) {
         tabOrdering.push("ordering")
       }
+    },
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
     },
   },
 }

@@ -42,6 +42,18 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
+            <b-form-input
+              v-model="defaultDepth"
+              class="depth-slider"
+              type="range"
+              min="0"
+              :max="maxDepth || 3"
+            ></b-form-input>
+            <div class="depth-slider-description">
+              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
+            </div>
+          </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
           <b-button block variant="light" @click="exportTapestry">
@@ -82,7 +94,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -123,12 +135,20 @@ export default {
       defaultPermissions,
       showModal: true,
       currentTab: this.tab,
+      defaultDepth: 3,
     }
   },
   computed: {
     ...mapGetters(["settings", "tapestryJson"]),
+    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
     wpCanEditTapestry() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
+    maxDepth() {
+      if (this.tapestryIsLoaded) {
+        return thisTapestryTool.findMaxDepth(this.rootId) + 1
+      }
+      return 0
     },
     tabIndex: {
       get() {
@@ -167,12 +187,14 @@ export default {
         nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
+        defaultDepth = 3,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
+      this.defaultDepth = defaultDepth
     },
     async updateSettings() {
       this.close()
@@ -182,6 +204,7 @@ export default {
         nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
+        defaultDepth: parseInt(this.defaultDepth),
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
@@ -208,4 +231,15 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.depth-slider {
+  border: none;
+  padding: 0;
+  max-width: 350px;
+}
+
+.depth-slider-description {
+  color: #6c757d;
+  font-size: 80%;
+}
+</style>
