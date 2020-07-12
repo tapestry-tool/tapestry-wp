@@ -136,3 +136,20 @@ export async function updateUserFavourites({ commit }, favourites) {
   await client.updateUserFavourites(JSON.stringify(favourites))
   commit("updateFavourites", { favourites })
 }
+
+export async function refetchTapestryData(_, filterUserId = null) {
+  const query = filterUserId === null ? {} : { filterUserId: filterUserId }
+  const tapestry = await client.getTapestry(query)
+  tapestry.nodes.map(n => {
+    if (tapestry.settings.autoLayout) {
+      delete n.fx
+      delete n.fy
+    } else {
+      n.fx = n.coordinates.x
+      n.fy = n.coordinates.y
+    }
+  })
+  thisTapestryTool.setDataset(tapestry)
+  thisTapestryTool.setOriginalDataset(tapestry)
+  thisTapestryTool.reinitialize()
+}

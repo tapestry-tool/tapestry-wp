@@ -101,13 +101,13 @@ class Tapestry implements ITapestry
      *
      * @return object $tapestry
      */
-    public function get()
+    public function get($filterUserId)
     {
         if (!$this->postId) {
             throw new TapestryError('INVALID_POST_ID');
         }
 
-        return $this->_getTapestry();
+        return $this->_getTapestry($filterUserId);
     }
 
     /**
@@ -323,7 +323,8 @@ class Tapestry implements ITapestry
         return array_map(
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
-                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible || 'teen' === $nodeData->userType ? $node->get() : $node->getMeta();
+                $roles = new TapestryUserRoles();
+                $data = $roles->canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
@@ -332,6 +333,18 @@ class Tapestry implements ITapestry
             },
             $nodes
         );
+    }
+
+    public function getAllContributors()
+    {
+        return array_unique(array_map(
+            function ($node) {
+                $node = new TapestryNode($this->postId, $node);
+
+                return $node->get()->author;
+            },
+            $this->nodes
+        ), SORT_REGULAR);
     }
 
     private function _setAccessibleStatus($nodes, $userId)
@@ -428,6 +441,7 @@ class Tapestry implements ITapestry
         $tapestry->settings->nodeDraggable = true;
         $tapestry->settings->showAccess = true;
         $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
+        $tapestry->settings->superuserOverridePermissions = true;
 
         return $tapestry;
     }
@@ -474,9 +488,9 @@ class Tapestry implements ITapestry
         ]);
     }
 
-    private function _getTapestry()
+    private function _getTapestry($filterUserId)
     {
-        $tapestry = $this->_filterTapestry($this->_formTapestry());
+        $tapestry = $this->_filterTapestry($this->_formTapestry(), $filterUserId);
 
         $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
         $tapestry->nodes = array_map(
@@ -507,13 +521,15 @@ class Tapestry implements ITapestry
         return $tapestry;
     }
 
-    private function _filterTapestry($tapestry)
+    private function _filterTapestry($tapestry, $filterUserId)
     {
-        if ((!TapestryUserRoles::isEditor())
-            && (!TapestryUserRoles::isAdministrator())
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
-        ) {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId);
+        $roles = new TapestryUserRoles();
+
+        if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+            return $tapestry;
+        } else {
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,
+                $tapestry->settings->superuserOverridePermissions, $filterUserId);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -536,15 +552,14 @@ class Tapestry implements ITapestry
         return $newLinks;
     }
 
-    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId)
+    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId, $superuser_override, $secondaryUserId)
     {
-        $options = TapestryNodePermissions::getNodePermissions();
-        $userId = wp_get_current_user()->ID;
-        $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
+        $currentUserId = wp_get_current_user()->ID;
 
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeMetaId) {
-            if ($this->_pathIsAllowed($nodeMetaId, $rootId)) {
+            if ($this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $currentUserId)
+                || $this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $secondaryUserId)) {
                 array_push($nodesPermitted, $nodeMetaId);
             }
         }
@@ -552,13 +567,15 @@ class Tapestry implements ITapestry
         return $nodesPermitted;
     }
 
-    private function _pathIsAllowed($from, $to, $checked = [])
+    private function _pathIsAllowed($from, $to, $checked = [], $superuser_override, $userId)
     {
         if (in_array($from, $checked)) {
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId))) {
+        if (TapestryHelpers::userIsAllowed('READ', $from, $this->postId, $superuser_override, $userId)
+            || (TapestryHelpers::userIsAllowed('ADD', $from, $this->postId, $superuser_override, $userId)
+            || TapestryHelpers::userIsAllowed('EDIT', $from, $this->postId, $superuser_override, $userId))) {
             if ($from == $to) {
                 return true;
             }
@@ -566,8 +583,8 @@ class Tapestry implements ITapestry
             $checked[] = $from;
 
             foreach ($this->links as $link) {
-                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) ||
-                    ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked))) {
+                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked, $superuser_override, $userId)) ||
+                        ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked, $superuser_override, $userId))) {
                     return true;
                 }
             }
