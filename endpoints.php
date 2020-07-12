@@ -282,7 +282,7 @@ $REST_API_ENDPOINTS = [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/contributors',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getTapestryContributors'
+            'callback' => 'getTapestryContributors',
         ],
     ],
 ];
@@ -378,6 +378,7 @@ function getTapestry($request)
     $filterUserId = $request['filter_user_id'];
     try {
         $tapestry = new Tapestry($postId);
+
         return $tapestry->get($filterUserId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -529,8 +530,7 @@ function addTapestryNode($request)
 
         if ($tapestry->isEmpty()) {
             $roles = new TapestryUserRoles();
-            if (!$roles->canEdit($postId))
-            {
+            if (!$roles->canEdit($postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
         }
@@ -1300,6 +1300,7 @@ function getTapestryContributors($request)
             throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
+
         return $tapestry->getAllContributors();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());

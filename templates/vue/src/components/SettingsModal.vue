@@ -36,11 +36,11 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
-            label="Show Me All Nodes By Default"
-            description="If enabled, editors of this tapestry would be able to see and edit all nodes even 
-            for nodes with the 'read' permission off. If disabled, superusers will be able to use the filter 
-            to view such nodes, but they won't appear in the tapestry by default. Note: Editors of this 
-            tapestry include users with the Administator or Edit roles, and the author of this Tapestry."
+            label="Show me all nodes by default"
+            description="If enabled, editors of this tapestry would be able to view all nodes even if they have 
+            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes, 
+            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with 
+            the Administator or Editor role, and the author of this Tapestry."
           >
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
               {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
@@ -234,7 +234,7 @@ export default {
           this.updateSettings()
         }
       }
-    }
+    },
   },
 }
 </script>

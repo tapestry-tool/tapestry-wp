@@ -95,9 +95,9 @@ interface ITapestry
     public function isEmpty();
 
     /**
-     * Returns all users who have authored a node within the tapestry
+     * Returns all users who have authored a node within the tapestry.
      *
-     * @return Array Wordpress users
+     * @return array Wordpress users
      */
     public function getAllContributors();
 }

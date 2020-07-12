@@ -153,11 +153,10 @@ class TapestryHelpers
      */
     public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
-
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
         $userId = $_userId;
-        if(is_null($userId)){
+        if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
         }
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
