@@ -45,6 +45,14 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
+export function favourites(state) {
+  return state.favourites || []
+}
+
+export function isFavourite(_, { favourites }) {
+  return id => favourites.findIndex(fid => fid == id) > -1
+}
+
 /* An answer is a value where its key is numeric */
 function getAnswersFromEntry(entry) {
   return Object.entries(entry)

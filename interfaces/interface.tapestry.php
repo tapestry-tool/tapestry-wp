@@ -1,97 +1,103 @@
 <?php
 
 /**
- * Tapestry Interface
- *
+ * Tapestry Interface.
  */
 interface ITapestry
 {
     /**
-     * Save the Tapestry
+     * Save the Tapestry.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
     public function save();
 
     /**
-     * Save the Tapestry automatically on publish
+     * Save the Tapestry automatically on publish.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
     public function saveOnPublish();
 
     /**
-     * Set Tapestry
+     * Set Tapestry.
      *
-     * @param   Object  $tapestry  tapestry
+     * @param object $tapestry tapestry
      *
-     * @return  NULL
+     * @return null
      */
     public function set($tapestry);
 
     /**
-     * Retrieve a Tapestry post
+     * Retrieve a Tapestry post.
      *
-     * @return  Object  $tapestry
+     * @return object $tapestry
      */
-    public function get();
+    public function get($filterUserId);
 
     /**
-     * Get node IDs
+     * Get node IDs.
      *
-     * @return  Array  $nodes  node ids
+     * @return array $nodes  node ids
      */
     public function getNodeIds();
 
     /**
-     * Add a new node
+     * Add a new node.
      *
-     * @param   Object  $node   Tapestry node
+     * @param object $node Tapestry node
      *
-     * @return  Object  $node   Tapestry node
+     * @return object $node   Tapestry node
      */
     public function addNode($node);
 
     /**
-     * Add a new link
+     * Add a new link.
      *
-     * @param  Object   $link   Tapestry link
+     * @param object $link Tapestry link
      *
-     * @return  Object  $link   Tapestry link
+     * @return object $link   Tapestry link
      */
     public function addLink($link);
 
     /**
-     * Add a new group
+     * Add a new group.
      *
-     * @param   Object  $group   Tapestry group
+     * @param object $group Tapestry group
      *
-     * @return  Object  $group   Tapestry group
+     * @return object $group   Tapestry group
      */
     public function addGroup($group);
 
     /**
-     * Get the node controller with associated node meta ID
+     * Get the node controller with associated node meta ID.
      *
-     * @param   Number  $nodeMetaId node meta ID
+     * @param Number $nodeMetaId node meta ID
      *
-     * @return  Object  $node       node controller
+     * @return object $node       node controller
      */
     public function getNode($nodeMetaId);
 
     /**
-     * Get the group controller with associated group meta ID
+     * Get the group controller with associated group meta ID.
      *
-     * @param   Number  $groupMetaId    group meta ID
+     * @param Number $groupMetaId group meta ID
      *
-     * @return  Object  $group          group controller
+     * @return object $group          group controller
      */
     public function getGroup($groupMetaId);
 
     /**
-     * Returns true if the tapestry is empty
+     * Returns true if the tapestry is empty.
      *
-     * @return  Boolean true if there is no root node, false otherwise
+     * @return bool true if there is no root node, false otherwise
      */
     public function isEmpty();
+
+    /**
+     * Returns all users who have authored a node within the tapestry.
+     *
+     * @return array Wordpress users
+     */
+    public function getAllContributors();
 }

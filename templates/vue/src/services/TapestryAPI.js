@@ -16,8 +16,11 @@ export default class {
    *
    * @return  {Object}
    */
-  async getTapestry() {
-    const url = `${apiUrl}/tapestries/${this.postId}`
+  async getTapestry(data = {}) {
+    var url = `${apiUrl}/tapestries/${this.postId}`
+    if (data.filterUserId && data.filterUserId !== undefined) {
+      url += "?filter_user_id=" + data.filterUserId
+    }
     const response = await axios.get(url)
     return response.data
   }
@@ -200,5 +203,11 @@ export default class {
       favourites: favourites,
     })
     return response
+  }
+
+  async getAllContributors() {
+    const url = `${apiUrl}/tapestries/${this.postId}/contributors`
+    const response = await axios.get(url)
+    return response.data
   }
 }
