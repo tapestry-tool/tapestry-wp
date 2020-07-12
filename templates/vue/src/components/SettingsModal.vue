@@ -35,6 +35,17 @@
               {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Show me all nodes by default"
+            description="If enabled, editors of this tapestry would be able to view all nodes even if they have 
+            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes, 
+            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with 
+            the Administator or Editor role, and the author of this Tapestry."
+          >
+            <b-form-checkbox v-model="superuserOverridePermissions" switch>
+              {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
             <b-form-input
               v-model="defaultDepth"
@@ -102,6 +113,15 @@ const defaultPermissions = Object.fromEntries(
   ].map(rowName => [rowName, ["read"]])
 )
 
+const defaultSettings = {
+  backgroundUrl: "",
+  autoLayout: false,
+  nodeDraggable: true,
+  showAccess: true,
+  superuserOverridePermissions: true,
+  defaultDepth: 3,
+}
+
 export default {
   name: "settings-modal",
   components: {
@@ -124,6 +144,7 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      superuserOverridePermissions: true,
       defaultDepth: 3,
     }
   },
@@ -152,6 +173,7 @@ export default {
     openModal() {
       this.$bvModal.show("settings-modal")
       this.getSettings()
+      this.synchronizeSettings()
     },
     closeModal() {
       this.$bvModal.hide("settings-modal")
@@ -163,6 +185,7 @@ export default {
         nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
+        superuserOverridePermissions = true,
         defaultDepth = 3,
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -170,6 +193,7 @@ export default {
       this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
+      this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
     },
     async updateSettings() {
@@ -179,6 +203,7 @@ export default {
         nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
+        superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -201,6 +226,14 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+    },
+    synchronizeSettings() {
+      const tapestrySettings = this.settings
+      for (const setting in defaultSettings) {
+        if (!tapestrySettings.hasOwnProperty(setting)) {
+          this.updateSettings()
+        }
+      }
     },
   },
 }
