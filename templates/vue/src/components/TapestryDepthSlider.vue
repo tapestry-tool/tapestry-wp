@@ -87,7 +87,6 @@ export default {
           const node = this.getNode(nodeId)
           return node.nodeType !== "grandchild"
         })
-        console.log("grandchildren", nodesToUpdate)
         nodesToUpdate.forEach(nodeId => {
           this.updateNode({
             id: nodeId,
@@ -105,7 +104,6 @@ export default {
           const node = this.getNode(nodeId)
           return node.nodeType !== "child"
         })
-      console.log("children", children)
       children.forEach(nodeId => {
         this.updateNode({
           id: nodeId,
@@ -120,7 +118,6 @@ export default {
           node.id !== this.selectedNodeId &&
           node.nodeType !== ""
       )
-      console.log("hidden", hidden)
       hidden.forEach(node => {
         this.updateNode({
           id: node.id,
@@ -129,6 +126,7 @@ export default {
           },
         })
       })
+      this.$emit("change")
     },
   },
 }
