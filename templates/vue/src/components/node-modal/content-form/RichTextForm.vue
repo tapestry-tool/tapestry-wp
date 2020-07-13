@@ -10,16 +10,17 @@
           @click="icon.click"
         >
           <icon v-if="icon.name" :name="icon.name" />
-          {{icon.text}}
+          {{ icon.text }}
         </button>
 
-        <button v-for="icon of icons_second_group"
-        class="menubar__button"
-        @click="icon.click"
-        :key="icon.name">
+        <button
+          v-for="icon of icons_second_group"
+          :key="icon.name"
+          class="menubar__button"
+          @click="icon.click"
+        >
           <icon :name="icon.name" />
         </button>
-
       </div>
     </editor-menu-bar>
     <editor-content
@@ -161,7 +162,7 @@ export default {
           click: "commands.redo",
           name: "redo",
         },
-      ]
+      ],
     }
   },
   watch: {
@@ -243,7 +244,6 @@ $color-grey: #dddddd;
 
   &__button {
     position: relative;
-    vertical-align: middle;
     width: 1.8rem;
     font-weight: bold;
     display: flex;
@@ -259,10 +259,12 @@ $color-grey: #dddddd;
 
     &:hover {
       background-color: rgba($color-black, 0.05);
+      background: rgba($color-black, 0.05);
     }
 
     &.is-active {
       background-color: rgba($color-black, 0.1);
+      background: rgba($color-black, 0.1);
     }
   }
 
