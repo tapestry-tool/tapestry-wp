@@ -194,7 +194,7 @@ function getChildIds(state, nodeId) {
 }
 
 export function initializeOrdering(state, id) {
-  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  const node = state.nodes[id]
   getChildIds(state, id)
     .filter(cid => !node.childOrdering.includes(cid))
     .forEach(id => node.childOrdering.push(id))

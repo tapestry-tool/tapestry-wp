@@ -6,25 +6,15 @@
     @click="handleClick"
     @mouseover="handleMouseover"
   >
-    <rect
-      v-if="node.imageURL && node.nodeType !== 'grandchild'"
-      :x="node.coordinates.x - radius"
-      :y="node.coordinates.y - radius"
-      :fill="fill"
-      :rx="radius"
-      :width="radius * 2"
-      :height="radius * 2"
-      style="background-size: contain;"
-    ></rect>
     <circle
-      v-else
+      ref="circle"
       :cx="node.coordinates.x"
       :cy="node.coordinates.y"
       :fill="fill"
-      :r="radius"
+      r="140"
     ></circle>
     <progress-bar
-      v-show="node.nodeType !== 'grandchild' && !node.hideProgress"
+      v-show="showProgress && node.nodeType !== 'grandchild' && !node.hideProgress"
       :x="node.coordinates.x"
       :y="node.coordinates.y"
       :radius="radius"
@@ -118,6 +108,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      showProgress: true,
+    }
+  },
   computed: {
     ...mapState(["selection", "visibleNodes"]),
     ...mapGetters(["getNode"]),
@@ -145,6 +140,9 @@ export default {
       return this.node.nodeType !== ""
     },
     radius() {
+      if (!this.isVisible) {
+        return 0
+      }
       if (this.root) {
         return 210
       }
@@ -167,6 +165,21 @@ export default {
     },
     selected() {
       return this.selection.includes(this.node.id)
+    },
+  },
+  watch: {
+    radius(newRadius) {
+      d3.select(this.$refs.circle)
+        .transition()
+        .duration(800)
+        .ease(d3.easePolyOut)
+        .on("start", () => {
+          this.showProgress = false
+        })
+        .on("end", () => {
+          this.showProgress = true
+        })
+        .attr("r", newRadius)
     },
   },
   mounted() {
