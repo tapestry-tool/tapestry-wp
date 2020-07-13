@@ -476,7 +476,8 @@ class Tapestry implements ITapestry
     {
         $roles = new TapestryUserRoles();
 
-        if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+        if (property_exists($tapestry->settings, "superuserOverridePermissions") 
+            && $tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             return $tapestry;
         } else {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,
