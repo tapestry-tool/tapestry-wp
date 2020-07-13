@@ -6,7 +6,18 @@
     @click="handleClick"
     @mouseover="handleMouseover"
   >
+    <rect
+      v-if="node.imageURL && node.nodeType !== 'grandchild'"
+      :x="node.coordinates.x - radius"
+      :y="node.coordinates.y - radius"
+      :fill="fill"
+      :rx="radius"
+      :width="radius * 2"
+      :height="radius * 2"
+      style="background-size: contain;"
+    ></rect>
     <circle
+      v-else
       :cx="node.coordinates.x"
       :cy="node.coordinates.y"
       :fill="fill"
@@ -64,13 +75,9 @@
       </foreignObject>
     </g>
     <defs v-if="node.imageURL">
-      <pattern
-        :id="`node-image-${node.id}`"
-        preserve-aspect-ratio="xMidYMid slice"
-        width="1"
-        height="1"
-      >
+      <pattern :id="`node-image-${node.id}`" width="1" height="1">
         <image
+          preserveAspectRatio="xMidYMid slice"
           :href="
             node.lockedImageURL && !node.accessible
               ? node.lockedImageURL
