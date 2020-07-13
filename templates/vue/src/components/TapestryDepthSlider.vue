@@ -114,7 +114,7 @@ export default {
           },
         })
       })
-      const hidden = this.nodes.filter(
+      const hidden = Object.values(this.nodes).filter(
         node =>
           !updated.has(node.id) &&
           node.id !== this.selectedNodeId &&

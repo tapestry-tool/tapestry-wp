@@ -18,7 +18,11 @@ import { mapActions, mapState, mapGetters } from "vuex"
 export default {
   name: "tapestry-link",
   props: {
-    link: {
+    source: {
+      type: Object,
+      required: true,
+    },
+    target: {
       type: Object,
       required: true,
     },
@@ -26,14 +30,6 @@ export default {
   computed: {
     ...mapState(["visibleNodes"]),
     ...mapGetters(["getNode"]),
-    source() {
-      const id = this.link.source
-      return this.getNode(id)
-    },
-    target() {
-      const id = this.link.target
-      return this.getNode(id)
-    },
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""
     },

@@ -39,7 +39,7 @@ const store = new Vuex.Store({
     getDirectParents: state => id => {
       return state.links.filter(link => link.target == id).map(link => link.source)
     },
-    getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
+    getNode: state => id => state.nodes[id],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
     lightbox: state => ({

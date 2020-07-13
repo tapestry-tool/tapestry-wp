@@ -100,7 +100,7 @@ export default {
             break
         }
       }
-      return this.nodes.map(node => node.id)
+      return Object.keys(this.nodes)
     },
   },
   watch: {

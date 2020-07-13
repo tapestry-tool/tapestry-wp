@@ -4,17 +4,18 @@
       <tapestry-link
         v-for="link in links"
         :key="`${link.source}-${link.target}`"
-        :link="link"
+        :source="nodes[link.source]"
+        :target="nodes[link.target]"
       ></tapestry-link>
     </g>
     <g>
       <tapestry-node
-        v-for="node in nodes"
-        :key="node.id"
+        v-for="(node, id) in nodes"
+        :key="id"
         :node="node"
         class="node"
-        :data-id="node.id"
-        :root="node.id == selectedNodeId"
+        :data-id="id"
+        :root="id == selectedNodeId"
         @dragend="updateViewBox"
       ></tapestry-node>
     </g>
@@ -52,7 +53,7 @@ export default {
         height: 3800,
       }
 
-      for (const node of this.nodes) {
+      for (const node of Object.values(this.nodes)) {
         if (node.nodeType !== "") {
           const { x, y } = node.coordinates
           if (x < box.minX) {

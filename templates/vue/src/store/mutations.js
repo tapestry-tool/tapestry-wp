@@ -1,3 +1,4 @@
+import Vue from "vue"
 import Helpers from "../utils/Helpers"
 
 export function init(state, { dataset, progress = {} }) {
@@ -5,10 +6,10 @@ export function init(state, { dataset, progress = {} }) {
   setDataset(state, datasetWithProgress)
   state.selectedNodeId = dataset.rootId
   state.tapestryIsLoaded = true
-  state.nodes
+  Object.values(state.nodes)
     .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(state, n.id))
-  state.visibleNodes = state.nodes.map(node => node.id)
+  state.visibleNodes = Object.keys(state.nodes).map(id => parseInt(id, 10))
 }
 
 function setDatasetProgress(dataset, progress) {
@@ -68,7 +69,14 @@ function setDatasetProgress(dataset, progress) {
 
 export function setDataset(state, dataset) {
   Object.entries(dataset).forEach(([key, value]) => {
-    state[key] = value
+    if (key === "nodes") {
+      state.nodes = {}
+      value.forEach(node => {
+        Vue.set(state.nodes, node.id, node)
+      })
+    } else {
+      state[key] = value
+    }
   })
 }
 
@@ -98,13 +106,12 @@ export function deleteNode(state, id) {
 }
 
 export function updateNode(state, payload) {
-  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  const thisNode = state.nodes[nodeIndex]
+  const thisNode = state.nodes[payload.id]
   const copy = { ...thisNode }
   Object.entries(payload.newNode).forEach(([key, value]) => {
     copy[key] = value
   })
-  state.nodes.splice(nodeIndex, 1, copy)
+  state.nodes[payload.id] = copy
 }
 
 export function updateNodeProgress(state, payload) {
