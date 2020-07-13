@@ -3,7 +3,7 @@
 /*
 Template Name: Tapestry Page Template
  */
-/**
+/*
  * Register Script with Nonce
  *
  * @return Object null
@@ -27,8 +27,8 @@ if (current_user_can('edit_post', get_the_ID())) {
         
         <div id="tapestry-container"></div>
 
-        <?php while (have_posts()): the_post();?>
-	            <?php get_template_part('content', 'page');?>
+        <?php while (have_posts()): the_post(); ?>
+	            <?php get_template_part('content', 'page'); ?>
 	            <?php
     // If comments are open or we have at least one comment, load up the comment template
     if (comments_open() || get_comments_number()):
@@ -89,4 +89,4 @@ if (current_user_can('edit_post', get_the_ID())) {
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer();?>
+<?php get_footer(); ?>
