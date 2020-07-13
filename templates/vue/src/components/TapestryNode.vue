@@ -1,86 +1,90 @@
 <template>
-  <g
-    v-show="isVisible"
-    ref="node"
-    :class="{ opaque: !visibleNodes.includes(node.id) }"
-    @click="handleClick"
-    @mouseover="handleMouseover"
-  >
-    <circle
-      ref="circle"
-      :cx="node.coordinates.x"
-      :cy="node.coordinates.y"
-      :fill="fill"
-      r="140"
-    ></circle>
-    <progress-bar
-      v-show="showProgress && node.nodeType !== 'grandchild' && !node.hideProgress"
-      :x="node.coordinates.x"
-      :y="node.coordinates.y"
-      :radius="radius"
-      :progress="node.progress"
-      :locked="!node.accessible"
-    ></progress-bar>
-    <g v-show="node.nodeType !== 'grandchild'">
-      <foreignObject
-        v-if="!node.hideTitle"
-        class="metaWrapper"
-        :width="(140 * 2 * 5) / 6"
-        :height="(140 * 2 * 5) / 6"
-        :x="node.coordinates.x - (140 * 5) / 6"
-        :y="node.coordinates.y - (140 * 5) / 6"
-      >
-        <div class="meta">
-          <p class="title">{{ node.title }}</p>
-          <p v-if="node.mediaDuration" class="timecode">{{ formatDuration() }}</p>
-        </div>
-      </foreignObject>
-      <foreignObject
-        v-if="!node.hideMedia"
-        class="node-button-wrapper"
-        :x="node.coordinates.x - 30"
-        :y="node.coordinates.y - radius - 30"
-      >
-        <button class="node-button" @click="openNode">
-          <tapestry-icon
-            v-if="node.mediaType !== 'text'"
-            :icon="icon"
-          ></tapestry-icon>
-          <span v-else>Aa</span>
-        </button>
-      </foreignObject>
-      <add-child-button
-        :node="node"
-        :x="node.coordinates.x - 65"
-        :y="node.coordinates.y + radius - 30"
-      ></add-child-button>
-      <foreignObject
-        class="node-button-wrapper"
-        :x="node.coordinates.x + 5"
-        :y="node.coordinates.y + radius - 30"
-      >
-        <button class="node-button" @click.stop="editNode">
-          <tapestry-icon icon="pen"></tapestry-icon>
-        </button>
-      </foreignObject>
+  <transition name="fade">
+    <g
+      v-show="isVisible"
+      ref="node"
+      :class="{ opaque: !visibleNodes.includes(node.id) }"
+      @click="handleClick"
+      @mouseover="handleMouseover"
+    >
+      <circle
+        ref="circle"
+        :cx="node.coordinates.x"
+        :cy="node.coordinates.y"
+        :fill="fill"
+        r="140"
+      ></circle>
+      <progress-bar
+        v-show="node.nodeType !== 'grandchild' && !node.hideProgress"
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius"
+        :progress="node.progress"
+        :locked="!node.accessible"
+      ></progress-bar>
+      <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
+        <foreignObject
+          v-if="!node.hideTitle"
+          class="metaWrapper"
+          :width="(140 * 2 * 5) / 6"
+          :height="(140 * 2 * 5) / 6"
+          :x="node.coordinates.x - (140 * 5) / 6"
+          :y="node.coordinates.y - (140 * 5) / 6"
+        >
+          <div class="meta">
+            <p class="title">{{ node.title }}</p>
+            <p v-if="node.mediaDuration" class="timecode">{{ formatDuration() }}</p>
+          </div>
+        </foreignObject>
+        <g v-show="!transitioning">
+          <foreignObject
+            v-if="!node.hideMedia"
+            class="node-button-wrapper"
+            :x="node.coordinates.x - 30"
+            :y="node.coordinates.y - radius - 30"
+          >
+            <button class="node-button" @click="openNode">
+              <tapestry-icon
+                v-if="node.mediaType !== 'text'"
+                :icon="icon"
+              ></tapestry-icon>
+              <span v-else>Aa</span>
+            </button>
+          </foreignObject>
+          <add-child-button
+            :node="node"
+            :x="node.coordinates.x - 65"
+            :y="node.coordinates.y + radius - 30"
+          ></add-child-button>
+          <foreignObject
+            class="node-button-wrapper"
+            :x="node.coordinates.x + 5"
+            :y="node.coordinates.y + radius - 30"
+          >
+            <button class="node-button" @click.stop="editNode">
+              <tapestry-icon icon="pen"></tapestry-icon>
+            </button>
+          </foreignObject>
+        </g>
+      </g>
+      <defs v-if="node.imageURL">
+        <pattern :id="`node-image-${node.id}`" width="1" height="1">
+          <image
+            preserveAspectRatio="xMidYMid slice"
+            :href="
+              node.lockedImageURL && !node.accessible
+                ? node.lockedImageURL
+                : node.imageURL
+            "
+            x="0"
+            y="0"
+            :width="radius * 2"
+            :height="radius * 2"
+          />
+        </pattern>
+      </defs>
     </g>
-    <defs v-if="node.imageURL">
-      <pattern :id="`node-image-${node.id}`" width="1" height="1">
-        <image
-          preserveAspectRatio="xMidYMid slice"
-          :href="
-            node.lockedImageURL && !node.accessible
-              ? node.lockedImageURL
-              : node.imageURL
-          "
-          x="0"
-          y="0"
-          :width="radius * 2"
-          :height="radius * 2"
-        />
-      </pattern>
-    </defs>
-  </g>
+  </transition>
 </template>
 
 <script>
@@ -110,7 +114,7 @@ export default {
   },
   data() {
     return {
-      showProgress: true,
+      transitioning: false,
     }
   },
   computed: {
@@ -174,10 +178,10 @@ export default {
         .duration(800)
         .ease(d3.easePolyOut)
         .on("start", () => {
-          this.showProgress = false
+          this.transitioning = true
         })
         .on("end", () => {
-          this.showProgress = true
+          this.transitioning = false
         })
         .attr("r", newRadius)
     },
@@ -286,6 +290,16 @@ export default {
 <style lang="scss" scoped>
 .opaque {
   opacity: 0.2;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
 

@@ -1,15 +1,16 @@
 <template>
   <g>
     <circle
+      ref="track"
       class="track"
       :cx="x"
       :cy="y"
-      :r="radius - width / 2"
       :stroke-width="width"
       :stroke="locked ? '#999' : 'currentColor'"
     ></circle>
     <path
-      v-if="!locked"
+      v-show="!locked && progress > 0"
+      ref="path"
       class="bar"
       :d="arc"
       :transform="`translate(${x}, ${y})`"
@@ -56,6 +57,19 @@ export default {
     width() {
       return 20
     },
+  },
+  watch: {
+    radius(radius) {
+      d3.select(this.$refs.track)
+        .transition()
+        .duration(800)
+        .ease(d3.easePolyOut)
+        .attr("r", radius)
+    },
+  },
+  mounted() {
+    const track = this.$refs.track
+    track.setAttribute("r", this.radius - this.width / 2)
   },
 }
 </script>

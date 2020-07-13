@@ -1,15 +1,18 @@
 <template>
-  <line
-    v-show="isVisible"
-    :class="{
-      opaque: !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
-    }"
-    :x1="source.coordinates.x"
-    :x2="target.coordinates.x"
-    :y1="source.coordinates.y"
-    :y2="target.coordinates.y"
-    @click="remove"
-  ></line>
+  <transition name="fade">
+    <line
+      v-show="isVisible"
+      :class="{
+        opaque:
+          !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+      }"
+      :x1="source.coordinates.x"
+      :x2="target.coordinates.x"
+      :y1="source.coordinates.y"
+      :y2="target.coordinates.y"
+      @click="remove"
+    ></line>
+  </transition>
 </template>
 
 <script>
@@ -59,6 +62,16 @@ line {
     stroke: red;
     stroke-width: 11;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .opaque {
