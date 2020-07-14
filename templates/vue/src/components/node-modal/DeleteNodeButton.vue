@@ -47,11 +47,19 @@ export default {
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),
-    ...mapMutations(["updateSelectedNode"]),
+    ...mapMutations(["updateSelectedNode", "updateNode"]),
     removeNode() {
       this.updateSelectedNode(this.rootId)
       if (this.parent) {
         this.deleteLink([this.parent.id, this.nodeId])
+        this.updateNode({
+          id: this.parent.id,
+          newNode: {
+            childOrdering: this.parent.childOrdering.filter(
+              id => id !== this.nodeId
+            ),
+          },
+        })
       }
       this.deleteNode(this.nodeId).then(() => {
         this.$emit("submit")

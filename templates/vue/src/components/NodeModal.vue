@@ -168,7 +168,7 @@ export default {
       "getDirectParents",
       "getNode",
     ]),
-    ...mapState(["rootId", "settings"]),
+    ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
       if (this.modalType === "add") {
         const parent = this.getNode(this.nodeId)
@@ -235,7 +235,12 @@ export default {
     })
   },
   methods: {
-    ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
+    ...mapMutations([
+      "updateOrdering",
+      "updateSelectedNode",
+      "updateRootNode",
+      "updateVisibleNodes",
+    ]),
     ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
     hasSubAccordion(node) {
       if (this.parent) {
@@ -293,11 +298,17 @@ export default {
               type: "",
             }
             await this.addLink(newLink)
-            this.parent.childOrdering.push(id)
+            this.updateNode({
+              id: this.parent.id,
+              newNode: {
+                childOrdering: [...this.parent.childOrdering, id],
+              },
+            })
           } else {
             this.updateRootNode(id)
             this.updateSelectedNode(id)
           }
+          this.updateVisibleNodes([...this.visibleNodes, id])
         } else {
           await this.updateNode({
             id: this.node.id,

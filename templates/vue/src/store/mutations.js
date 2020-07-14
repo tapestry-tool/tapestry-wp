@@ -51,23 +51,6 @@ function setDatasetProgress(dataset, progress) {
       }
     }
   }
-
-  for (const node of dataset.nodes) {
-    if (node.mediaType === "accordion") {
-      const rows = dataset.links
-        .filter(link => link.source == node.id)
-        .map(link => link.target)
-      const completedRows = rows
-        .map(id => dataset.nodes.find(node => node.id == id))
-        .filter(row => row.completed)
-        .map(row => row.id)
-      node.accordionProgress = completedRows
-
-      const currProgress = rows.length ? completedRows.length / rows.length : 1
-      node.progress = currProgress
-    }
-  }
-
   return dataset
 }
 
@@ -106,7 +89,7 @@ export function addNode(state, node) {
 }
 
 export function deleteNode(state, id) {
-  state.nodes[id] = undefined
+  Vue.delete(state.nodes, id)
 }
 
 export function updateNode(state, payload) {
