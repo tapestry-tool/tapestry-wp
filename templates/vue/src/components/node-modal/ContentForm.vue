@@ -110,6 +110,7 @@ export default {
       if (evt === "video" || evt === "h5p") {
         this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
       }
+      this.$emit("type-changed")
     },
   },
 }

@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Tapestry Endpoint Permissions
- *
+ * Tapestry Endpoint Permissions.
  */
 class TapestryPermissions
 {
     /**
-     * Post Tapestry Permission
+     * Post Tapestry Permission.
      *
-     * @return  Object  $permission permission
+     * @return object $permission permission
      */
     public static function postTapestry()
     {
@@ -17,15 +16,16 @@ class TapestryPermissions
         if ($TAPESTRY_USE_DEV_MODE) {
             return true;
         }
+
         return current_user_can('publish_posts');
     }
 
     /**
-     * Post Tapestry Group
+     * Post Tapestry Group.
      *
-     * @param   Object  $request    request
+     * @param object $request request
      *
-     * @return  Object  $permission permission
+     * @return object $permission permission
      */
     public static function postTapestryGroup($request)
     {
@@ -33,15 +33,16 @@ class TapestryPermissions
         if (isset($postId)) {
             return current_user_can('edit_post', $postId);
         }
+
         return false;
     }
 
     /**
-     * Post Tapestry Settings
+     * Post Tapestry Settings.
      *
-     * @param   Object  $request    request
+     * @param object $request request
      *
-     * @return  Object  $permission permission
+     * @return object $permission permission
      */
     public static function putTapestrySettings($request)
     {
@@ -49,6 +50,7 @@ class TapestryPermissions
         if (isset($postId)) {
             return current_user_can('edit_post', $postId);
         }
+
         return current_user_can('publish_posts');
     }
 }
