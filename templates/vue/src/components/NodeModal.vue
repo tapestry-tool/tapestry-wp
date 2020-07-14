@@ -332,6 +332,7 @@ export default {
         }
 
         if (this.modalType === "add") {
+          const parent = this.parent
           const id = await this.addNode({
             newNode: this.node,
             parentId: parent && parent.id,
