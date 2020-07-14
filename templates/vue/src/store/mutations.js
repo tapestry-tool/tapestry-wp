@@ -49,7 +49,11 @@ function setDatasetProgress(dataset, progress) {
           }
         })
       }
-    } else {
+    }
+  }
+
+  for (const node of dataset.nodes) {
+    if (node.mediaType === "accordion") {
       const rows = dataset.links
         .filter(link => link.source == node.id)
         .map(link => link.target)
@@ -57,13 +61,13 @@ function setDatasetProgress(dataset, progress) {
         .map(id => dataset.nodes.find(node => node.id == id))
         .filter(row => row.completed)
         .map(row => row.id)
-      completedRows.forEach(row => progress.push(row.id))
       node.accordionProgress = completedRows
 
       const currProgress = rows.length ? completedRows.length / rows.length : 1
       node.progress = currProgress
     }
   }
+
   return dataset
 }
 
@@ -98,11 +102,11 @@ export function updateRootNode(state, newNodeId) {
 
 // nodes
 export function addNode(state, node) {
-  state.nodes.push(node)
+  state.nodes[node.id] = node
 }
 
 export function deleteNode(state, id) {
-  state.nodes = state.nodes.filter(node => node.id != id)
+  state.nodes[id] = undefined
 }
 
 export function updateNode(state, payload) {

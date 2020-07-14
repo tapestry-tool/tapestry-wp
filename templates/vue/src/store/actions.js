@@ -70,7 +70,7 @@ export async function updateUserProgress() {
 
 export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
   await client.updateNodeCoordinates(id, coordinates)
-  commit("updateNode", { id, newNode: { fx: coordinates.x, fy: coordinates.y } })
+  commit("updateNode", { id, newNode: { coordinates } })
 }
 
 export async function completeNode({ commit, dispatch, getters }, nodeId) {
