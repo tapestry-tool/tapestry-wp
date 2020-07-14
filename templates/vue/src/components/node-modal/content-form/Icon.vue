@@ -55,8 +55,8 @@ export default {
         hr,
         undo,
         redo,
-      };
-      let usedIcon = lookup[this.name];
+      }
+      let usedIcon = lookup[this.name]
       return `${wpData.vue_uri}/${usedIcon.split("dist")[1]}`
     },
   },

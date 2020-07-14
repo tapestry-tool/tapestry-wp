@@ -1,3 +1,4 @@
 package-lock.json
 .DS_Store
 docker/wp-config.php
+templates/e2e
