@@ -1,9 +1,0 @@
-{
-  "env": {
-    "ENV": "TYDE",
-    "ADMIN_USERNAME": "root",
-    "ADMIN_PASSWORD": "root",
-    "SUBSCRIBER_USERNAME": "subscriber",
-    "SUBSCRIBER_PASSWORD": "subscriber"
-  }
-}
