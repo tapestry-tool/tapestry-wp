@@ -46,14 +46,18 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
     id,
     newNode: newNode,
   })
-  commit("updateNodeCoordinates", {
-    id,
-    coordinates: {
-      [getters.xOrFx]: newNode.coordinates.x,
-      [getters.yOrFy]: newNode.coordinates.y,
-    },
-  })
-  dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
+  if (newNode.coordinates) {
+    commit("updateNodeCoordinates", {
+      id,
+      coordinates: {
+        [getters.xOrFx]: newNode.coordinates.x,
+        [getters.yOrFy]: newNode.coordinates.y,
+      },
+    })
+  }
+  if (newNode.permissions) {
+    dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
+  }
   return id
 }
 

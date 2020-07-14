@@ -105,16 +105,13 @@ export function createDefaultNode({ settings }) {
     mediaDuration: 0,
     typeId: 1,
     group: 1,
+    progress: 0,
     permissions: settings.defaultPermissions || {
       public: ["read"],
       authenticated: ["read"],
     },
     typeData: {
       linkMetadata: null,
-      progress: [
-        { group: "viewed", value: 0 },
-        { group: "unviewed", value: 1 },
-      ],
       mediaURL: "",
       mediaWidth: 960, //TODO: This needs to be flexible with H5P
       mediaHeight: 600,

@@ -12,7 +12,6 @@
       v-show="!locked && progress > 0"
       ref="path"
       class="bar"
-      :d="arc"
       :transform="`translate(${x}, ${y})`"
     ></path>
   </g>
@@ -105,6 +104,16 @@ export default {
   mounted() {
     const track = this.$refs.track
     track.setAttribute("r", this.radius - this.width / 2)
+
+    this.$refs.path.setAttribute(
+      "d",
+      d3.arc()({
+        startAngle: 0,
+        endAngle: this.progress * 2 * Math.PI,
+        innerRadius: this.radius - this.width,
+        outerRadius: this.radius,
+      })
+    )
   },
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div ref="container" class="media-container">
     <h1 class="title">{{ node.title }}</h1>
-    <tapestry-accordion :rows="rows">
+    <tapestry-accordion :rows="rows.map(row => row.node.id)">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
           <div
@@ -14,9 +14,11 @@
               <button
                 class="button-row-trigger"
                 :disabled="disableRow(index)"
-                @click="toggle(row)"
+                @click="toggle(row.node.id)"
               >
-                <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
+                <i
+                  :class="isVisible(row.node.id) ? 'fas fa-minus' : 'fas fa-plus'"
+                ></i>
                 {{ row.node.title }}
               </button>
               <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
@@ -28,14 +30,14 @@
                 <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
               </a>
             </div>
-            <div v-if="isVisible(row)">
+            <div v-if="isVisible(row.node.id)">
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
-                @close="toggle(row)"
+                @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
               <p v-if="row.children.length > 0" style="color: white;">
@@ -82,7 +84,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from "vuex"
+import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryAccordion from "../TapestryAccordion"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
@@ -109,7 +111,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "getFavourites"]),
+    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -136,9 +139,6 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
   },
   mounted() {
     this.isMounted = true
@@ -158,24 +158,10 @@ export default {
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
-    async updateProgress(rowId) {
-      const { accordionProgress } = this.node
-      if (!accordionProgress.includes(rowId)) {
-        accordionProgress.push(rowId)
-
-        await this.updateNodeProgress({
-          id: this.node.id,
-          progress: accordionProgress.length / this.rows.length,
-        })
-        await this.updateNode({
-          id: this.node.id,
-          newNode: { accordionProgress },
-        })
-        await this.completeNode(rowId)
-
-        if (accordionProgress.length === this.rows.length) {
-          this.$emit("complete")
-        }
+    updateProgress(rowId) {
+      this.completeNode(rowId)
+      if (this.rows.every(row => row.node.completed)) {
+        this.$emit("complete")
       }
     },
     isFavourite(nodeId) {

@@ -1,6 +1,6 @@
 <template>
   <div ref="container">
-    <tapestry-accordion :rows="rows" :default-index="-1">
+    <tapestry-accordion :rows="rows.map(row => row.id)" :default-index="-1">
       <template v-slot="{ isVisible, toggle }">
         <div>
           <div
@@ -10,8 +10,8 @@
             class="sub-accordion-row"
           >
             <div class="button-row">
-              <button class="button-row-trigger" @click="toggle(row)">
-                <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
+              <button class="button-row-trigger" @click="toggle(row.id)">
+                <i :class="isVisible(row.id) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.title }}
               </button>
               <a @click="updateFavourites(row.id)">
@@ -24,11 +24,12 @@
               </a>
             </div>
             <tapestry-media
-              v-if="isVisible(row)"
+              v-if="isVisible(row.id)"
               :node-id="row.id"
               :dimensions="dimensions"
               :autoplay="false"
-              @close="toggle(row)"
+              @complete="completeNode(row.id)"
+              @close="toggle(row.id)"
               @load="handleLoad(index)"
             />
           </div>
@@ -41,7 +42,7 @@
 <script>
 import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
-import { mapGetters, mapActions } from "vuex"
+import { mapState, mapActions } from "vuex"
 
 export default {
   name: "sub-accordion",
@@ -61,13 +62,10 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
+    ...mapState(["favourites"]),
   },
   methods: {
-    ...mapActions(["updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateUserFavourites"]),
     handleLoad(idx) {
       this.$emit("load", this.$refs.rowRefs[idx])
     },
