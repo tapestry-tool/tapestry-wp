@@ -12,7 +12,6 @@
         :cx="node.coordinates.x"
         :cy="node.coordinates.y"
         :fill="fill"
-        r="140"
       ></circle>
       <progress-bar
         v-show="
@@ -23,7 +22,7 @@
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"
-        :progress="node.progress"
+        :progress="progress"
         :locked="!node.accessible"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
@@ -123,7 +122,7 @@ export default {
   },
   computed: {
     ...mapState(["selection", "visibleNodes"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getDirectChildren"]),
     icon() {
       switch (this.node.mediaType) {
         case "h5p":
@@ -174,6 +173,13 @@ export default {
     selected() {
       return this.selection.includes(this.node.id)
     },
+    progress() {
+      if (this.node.mediaType !== "accordion") {
+        return this.node.progress
+      }
+      const rows = this.getDirectChildren(this.node.id)
+      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+    },
   },
   watch: {
     radius(newRadius) {
@@ -191,6 +197,7 @@ export default {
     },
   },
   mounted() {
+    this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
       d3
