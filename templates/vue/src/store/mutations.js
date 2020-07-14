@@ -1,5 +1,5 @@
 import Vue from "vue"
-import Helpers from "../utils/Helpers"
+import * as getters from "./getters"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = setDatasetProgress(dataset, progress)
@@ -115,20 +115,22 @@ export function updateNode(state, payload) {
 }
 
 export function updateNodeProgress(state, payload) {
-  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  state.nodes[nodeIndex].typeData.progress[0].value = payload.progress
-  state.nodes[nodeIndex].typeData.progress[1].value = 1.0 - payload.progress
+  const node = getters.getNode(state)(payload.id)
+  state.nodes[payload.id] = {
+    ...node,
+    progress: payload.progress,
+  }
 }
 
 export function updateNodeCoordinates(state, payload) {
-  const node = state.nodes[Helpers.findNodeIndex(payload.id, state)]
+  const node = getters.getNode(state)(payload.id)
   Object.entries(payload.coordinates).forEach(([key, value]) => {
     node[key] = value
   })
 }
 
 export function fulfillNodeCondition(state, { id, condition }) {
-  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  const node = getters.getNode(state)(id)
   const toFulfill = node.conditions.find(
     cond => cond.type === condition.type && cond.value === condition.value
   )
@@ -166,13 +168,13 @@ export function deleteLink(state, linkIndex) {
 
 // quizzes
 export function completeQuestion(state, { nodeId, questionId }) {
-  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
+  const node = getters.getNode(state)(nodeId)
   const question = node.quiz.find(question => question.id === questionId)
   question.completed = true
 }
 
 export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
-  const node = state.nodes[Helpers.findNodeIndex(nodeId, state)]
+  const node = getters.getNode(state)(nodeId)
   const question = node.quiz.find(question => question.id === questionId)
   const entries = question.entries || {}
   entries[answerType] = Object.values(entry)[0]
@@ -203,8 +205,8 @@ export function initializeOrdering(state, id) {
 }
 
 export function updateOrdering(state, payload) {
-  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  state.nodes[nodeIndex].childOrdering = payload.ord
+  const node = getters.getNode(state)(payload.id)
+  node.childOrdering = payload.ord
 }
 
 export function updateVisibleNodes(state, nodes) {

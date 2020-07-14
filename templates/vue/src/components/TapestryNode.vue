@@ -15,7 +15,11 @@
         r="140"
       ></circle>
       <progress-bar
-        v-show="node.nodeType !== 'grandchild' && !node.hideProgress"
+        v-show="
+          node.nodeType !== 'grandchild' &&
+            node.nodeType !== '' &&
+            !node.hideProgress
+        "
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"

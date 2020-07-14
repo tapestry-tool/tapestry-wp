@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -119,7 +119,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings", "tapestryJson"]),
+    ...mapState(["settings"]),
+    ...mapGetters(["tapestryJson"]),
   },
   created() {
     if (this.settings.defaultPermissions) {

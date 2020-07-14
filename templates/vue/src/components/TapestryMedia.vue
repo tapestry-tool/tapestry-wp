@@ -130,10 +130,10 @@ export default {
       return this.getNode(this.nodeId)
     },
   },
-  async beforeDestroy() {
-    await this.updateNodeProgress({
+  beforeDestroy() {
+    this.updateNodeProgress({
       id: this.nodeId,
-      progress: this.node && this.node.typeData.progress[0].value,
+      progress: this.node && this.node.progress,
     })
   },
   methods: {

@@ -167,9 +167,8 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
-      "settings",
     ]),
-    ...mapState(["rootId"]),
+    ...mapState(["rootId", "settings"]),
     parent() {
       if (this.modalType === "add") {
         const parent = this.getNode(this.nodeId)
@@ -178,7 +177,6 @@ export default {
         }
       }
       const parents = this.getDirectParents(this.nodeId)
-      console.log(parents)
       return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {

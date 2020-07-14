@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapState } from "vuex"
 import ModalButton from "./ModalButton"
 
 const defaultStyles = {
@@ -66,10 +66,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getFavourites"]),
-    favourites() {
-      return this.getFavourites ? this.getFavourites : []
-    },
+    ...mapState(["favourites"]),
     isFavourite() {
       return this.favourites.find(id => id == this.nodeId)
     },

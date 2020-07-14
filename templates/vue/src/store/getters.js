@@ -1,3 +1,20 @@
+export function getDirectChildren(state) {
+  return id => {
+    const links = state.links
+    return links.filter(link => link.source == id).map(link => link.target)
+  }
+}
+
+export function getDirectParents(state) {
+  return id => {
+    return state.links.filter(link => link.target == id).map(link => link.source)
+  }
+}
+
+export function getNode(state) {
+  return id => state.nodes[id]
+}
+
 export function getParent(state) {
   return id => {
     const link = state.links.find(l => l.target == id || l.target.id == id)

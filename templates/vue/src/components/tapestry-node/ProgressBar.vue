@@ -59,12 +59,47 @@ export default {
     },
   },
   watch: {
-    radius(radius) {
+    radius(radius, oldRadius) {
       d3.select(this.$refs.track)
         .transition()
-        .duration(800)
+        .duration(750)
         .ease(d3.easePolyOut)
-        .attr("r", radius)
+        .attr("r", radius - this.width / 2)
+
+      d3.select(this.$refs.path)
+        .transition()
+        .duration(750)
+        .ease(d3.easePolyOut)
+        .attrTween("d", () => {
+          const interpolate = d3.interpolate(oldRadius, radius)
+          return t => {
+            const rad = interpolate(t)
+            return d3.arc()({
+              startAngle: 0,
+              endAngle: this.progress * 2 * Math.PI,
+              innerRadius: rad - this.width,
+              outerRadius: rad,
+            })
+          }
+        })
+    },
+    progress(progress, oldProgress) {
+      d3.select(this.$refs.path)
+        .transition()
+        .duration(750)
+        .ease(d3.easePolyOut)
+        .attrTween("d", () => {
+          const interpolate = d3.interpolate(oldProgress, progress)
+          return t => {
+            const currentProgress = interpolate(t)
+            return d3.arc()({
+              startAngle: 0,
+              endAngle: currentProgress * 2 * Math.PI,
+              innerRadius: this.radius - this.width,
+              outerRadius: this.radius,
+            })
+          }
+        })
     },
   },
   mounted() {
