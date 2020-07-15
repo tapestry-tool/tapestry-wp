@@ -3,6 +3,7 @@
     <b-form-input
       ref="input"
       v-model="inputValue"
+      :placeholder="placeholder"
       :size="size"
       :style="inputStyle"
       @blur="handleBlur"
@@ -51,6 +52,11 @@ export default {
       type: [Object, String],
       required: false,
       default: null,
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: "",
     },
     emptyMessage: {
       type: String,
