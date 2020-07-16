@@ -17,7 +17,7 @@
       </b-alert>
     </div>
     <b-container v-if="ready" fluid class="px-0">
-      <b-tabs card :value="tabIndex" @activate-tab="handleTabChange">
+      <b-tabs card :value="currentTabIndex" @activate-tab="handleTabChange">
         <b-tab title="Content">
           <content-form
             :node="node"
@@ -143,22 +143,12 @@ export default {
     PermissionsTable,
   },
   props: {
-    nodeId: {
-      type: [String, Number],
-      required: false,
-      default: 0,
-    },
     modalType: {
       type: String,
       required: true,
       validator: value => {
         return ["", "add", "edit"].includes(value)
       },
-    },
-    tab: {
-      type: String,
-      required: false,
-      default: "",
     },
   },
   data() {
@@ -170,8 +160,6 @@ export default {
       node: null,
       videoLoaded: false,
       showModal: true,
-      currentTab: this.tab,
-      currentNodeId: this.nodeId,
     }
   },
   computed: {
@@ -222,21 +210,22 @@ export default {
     nodeIdNumber() {
       return Number(this.currentNodeId)
     },
-    tabIndex() {
+    currentTabIndex() {
       const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
-      return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
+      return this.currentTab === undefined || tabIndex === -1 ? 0 : tabIndex
+    },
+    currentTab() {
+      return this.$route.params.tab
+    },
+    currentNodeId() {
+      return this.$route.params.nodeId
     },
   },
   watch: {
-    $route(to, from) {
-      if (this.currentTab !== to.params.tab && to !== from) {
-        this.currentTab = to.params.tab
-      }
-      if (this.currentNodeId !== to.params.nodeId && to !== from) {
-        this.currentNodeId = to.params.nodeId
-      }
-    },
     currentNodeId() {
+      this.initializeModal()
+    },
+    modalType() {
       this.initializeModal()
     },
   },
@@ -438,7 +427,6 @@ export default {
       thisTapestryTool.disableMovements()
     },
     handleTabChange(newTabIndex) {
-      this.currentTab = tabOrdering[newTabIndex]
       this.$router
         .push(
           "/nodes/" +
@@ -446,7 +434,7 @@ export default {
             "/" +
             this.currentNodeId +
             "/" +
-            this.currentTab
+            tabOrdering[newTabIndex]
         )
         .catch(err => {})
     },

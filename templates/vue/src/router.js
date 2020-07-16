@@ -13,15 +13,18 @@ const routes = [
     props: true,
   },
   {
-    path: "/nodes/:modalType/:nodeId/:tab?",
+    path: "/nodes/add/:nodeId/:tab?",
     component: NodeModal,
-    props: true,
-    name: "node-modal",
+    props: { modalType: "add" },
+  },
+  {
+    path: "/nodes/edit/:nodeId/:tab?",
+    component: NodeModal,
+    props: { modalType: "edit" },
   },
   {
     path: "/settings/:tab?",
     component: SettingsModal,
-    props: true,
   },
 ]
 

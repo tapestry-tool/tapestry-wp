@@ -8,7 +8,7 @@
     @hidden="close"
   >
     <b-container fluid class="px-0">
-      <b-tabs card :value="tabIndex" @input="handleTabChange">
+      <b-tabs card :value="currentTabIndex" @input="handleTabChange">
         <b-tab title="Appearance">
           <b-form-group
             label="Background URL"
@@ -138,13 +138,6 @@ export default {
     DuplicateTapestryButton,
     PermissionsTable,
   },
-  props: {
-    tab: {
-      type: String,
-      required: false,
-      default: "",
-    },
-  },
   data() {
     return {
       backgroundUrl: "",
@@ -154,7 +147,6 @@ export default {
       showAccess: true,
       defaultPermissions,
       showModal: true,
-      currentTab: this.tab,
       superuserOverridePermissions: true,
       defaultDepth: 3,
     }
@@ -171,16 +163,12 @@ export default {
       }
       return 0
     },
-    tabIndex() {
+    currentTabIndex() {
       const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
-      return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
+      return this.currentTab === undefined || tabIndex === -1 ? 0 : tabIndex
     },
-  },
-  watch: {
-    $route(to, from) {
-      if (this.currentTab !== to.params.tab && to !== from) {
-        this.currentTab = to.params.tab
-      }
+    currentTab() {
+      return this.$route.params.tab
     },
   },
   created() {
@@ -255,8 +243,7 @@ export default {
       }
     },
     handleTabChange(newTabIndex) {
-      this.currentTab = tabOrdering[newTabIndex]
-      this.$router.push("/settings/" + this.currentTab).catch(err => {})
+      this.$router.push("/settings/" + tabOrdering[newTabIndex]).catch(err => {})
     },
   },
 }
