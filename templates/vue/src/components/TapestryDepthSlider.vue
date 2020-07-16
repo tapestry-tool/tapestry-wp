@@ -17,7 +17,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selectedNodeId", "nodes"]),
+    ...mapState(["selectedNodeId", "nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
     levels() {
       if (!Object.keys(this.nodes).length) {
@@ -79,7 +79,7 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     setDefaultDepth() {
-      this.currentDepth = Math.min(3, Math.ceil((this.maxDepth - 1) / 2))
+      this.currentDepth = this.settings.defaultDepth
     },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
