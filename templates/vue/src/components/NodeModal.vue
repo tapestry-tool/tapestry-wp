@@ -128,8 +128,6 @@ const shouldFetch = (url, selectedNode) => {
   return !oldUrl.startsWith(Helpers.normalizeUrl(url))
 }
 
-var tabOrdering = ["content", "appearance"]
-
 export default {
   name: "node-modal",
   components: {
@@ -173,7 +171,7 @@ export default {
     ]),
     parent() {
       if (this.modalType === "add") {
-        const parent = this.getNode(this.nodeIdNumber)
+        const parent = this.getNode(this.currentNodeId)
         if (parent) {
           return parent
         }
@@ -207,18 +205,35 @@ export default {
         this.videoLoaded
       )
     },
-    nodeIdNumber() {
-      return Number(this.currentNodeId)
-    },
     currentTabIndex() {
-      const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
+      const tabIndex = this.tabOrdering.findIndex(t => t === this.currentTab)
       return this.currentTab === undefined || tabIndex === -1 ? 0 : tabIndex
     },
     currentTab() {
       return this.$route.params.tab
     },
     currentNodeId() {
-      return this.$route.params.nodeId
+      return Number(this.$route.params.nodeId)
+    },
+    tabOrdering() {
+      var tabs = ["content", "appearance"]
+      if (
+        this.node.mediaType === "h5p" ||
+        this.node.mediaType === "video" ||
+        this.node.mediaType === "accordion"
+      ) {
+        tabs.push("behaviour")
+      }
+      if (this.viewAccess) {
+        tabs.push("access")
+      }
+      if (this.node.mediaType === "h5p" || this.node.mediaType === "video") {
+        tabs.push("activity")
+      }
+      if (this.node.mediaType === "accordion" || this.node.hasSubAccordion) {
+        tabs.push("ordering")
+      }
+      return tabs
     },
   },
   watch: {
@@ -391,24 +406,6 @@ export default {
         ord: arr,
       })
     },
-    initializeTabArray() {
-      if (
-        this.node.mediaType === "h5p" ||
-        this.node.mediaType === "video" ||
-        this.node.mediaType === "accordion"
-      ) {
-        tabOrdering.push("behaviour")
-      }
-      if (this.viewAccess) {
-        tabOrdering.push("access")
-      }
-      if (this.node.mediaType === "h5p" || this.node.mediaType === "video") {
-        tabOrdering.push("activity")
-      }
-      if (this.node.mediaType === "accordion" || this.node.hasSubAccordion) {
-        tabOrdering.push("ordering")
-      }
-    },
     handleTypeChange() {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
@@ -417,12 +414,11 @@ export default {
     initializeModal() {
       let copy = this.createDefaultNode()
       if (this.modalType === "edit") {
-        const node = this.getNode(this.nodeIdNumber)
+        const node = this.getNode(this.currentNodeId)
         copy = Helpers.deepCopy(node)
       }
       copy.hasSubAccordion = this.hasSubAccordion(copy)
       this.node = copy
-      this.initializeTabArray()
       this.ready = true
       thisTapestryTool.disableMovements()
     },
@@ -432,9 +428,9 @@ export default {
           "/nodes/" +
             this.modalType +
             "/" +
-            this.currentNodeId +
+            String(this.currentNodeId) +
             "/" +
-            tabOrdering[newTabIndex]
+            this.tabOrdering[newTabIndex]
         )
         .catch(err => {})
     },
