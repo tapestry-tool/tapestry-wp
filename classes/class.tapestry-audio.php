@@ -16,12 +16,12 @@ class TapestryAudio implements ITapestryAudio
      *
      * @return null
      */
-    public function __construct($tapestryPostId = 0, $nodeMetaId = 0, $questionId = 0)
+    public function __construct($tapestryPostId = 0, $nodeMetaId = 0, $questionId = 0, $userId = 0)
     {
         $this->tapestryPostId = (int) $tapestryPostId;
         $this->nodeMetaId = (int) $nodeMetaId;
         $this->questionId = $questionId;
-        $this->userId = wp_get_current_user()->ID;
+        $this->userId = $userId || wp_get_current_user()->ID;
     }
 
     /**
@@ -62,7 +62,6 @@ class TapestryAudio implements ITapestryAudio
     public function get()
     {
         $filename = $this->_getFileName();
-
         $upload_dir = wp_upload_dir();
         if (false === $upload_dir['error']) {
             $audio = file_get_contents($upload_dir['basedir'].'/tapestry/'.$this->userId.'/'.$filename);

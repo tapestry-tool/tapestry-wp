@@ -31,12 +31,14 @@ class TapestryForm implements ITapestryForm
      *
      * @return object the corresponding entry
      */
-    public function getEntry($formId)
+    public function getEntry($formId, $userId = 0)
     {
         if (!$this::exists()) {
             return [];
         }
-        $userId = apply_filters('determine_current_user', false);
+        if (!$userId) {
+            $userId = apply_filters('determine_current_user', false);
+        }
         $search_criteria['field_filters'][] = [
             'key' => 'created_by',
             'value' => $userId,

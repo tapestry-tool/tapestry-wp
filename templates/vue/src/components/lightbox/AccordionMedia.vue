@@ -1,6 +1,8 @@
 <template>
   <div ref="container" class="media-container">
-    <h1 class="title">{{ node.title }}</h1>
+    <header>
+      <h1 class="title">{{ node.title }}</h1>
+    </header>
     <tapestry-accordion :rows="rows.map(row => row.node.id)">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
@@ -21,7 +23,7 @@
                 ></i>
                 {{ row.node.title }}
               </button>
-              <a v-if="!disableRow(index)" @click="updateFavourites(row.node.id)">
+              <a v-if="!disableRow(index)" @click="toggleFavourite(row.node.id)">
                 <i
                   v-if="isFavourite(row.node.id)"
                   class="fas fa-heart fa-sm"
@@ -85,17 +87,17 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
-import TapestryAccordion from "../TapestryAccordion"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
+import TapestryAccordion from "../TapestryAccordion"
 import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
   components: {
-    TapestryAccordion,
     TapestryMedia,
     TapestryModal,
+    TapestryAccordion,
     SubAccordion,
   },
   props: {
@@ -111,7 +113,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
@@ -125,8 +127,8 @@ export default {
     dimensions() {
       if (!this.isMounted) {
         return {
-          height: 0,
           width: 0,
+          height: 0,
         }
       }
       const box = this.$refs.container
@@ -145,7 +147,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateNode"]),
-    ...mapActions(["completeNode", "updateNodeProgress", "updateUserFavourites"]),
+    ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
@@ -163,20 +165,6 @@ export default {
       if (this.rows.every(row => row.node.completed)) {
         this.$emit("complete")
       }
-    },
-    isFavourite(nodeId) {
-      nodeId = nodeId.toString()
-      return this.favourites.find(id => id == nodeId)
-    },
-    updateFavourites(nodeId) {
-      let updatedFavouritesList = [...this.favourites]
-      nodeId = nodeId.toString()
-      if (this.isFavourite(nodeId)) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != nodeId)
-      } else {
-        updatedFavouritesList.push(nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
     },
   },
 }

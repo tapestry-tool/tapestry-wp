@@ -4,11 +4,29 @@
  */
 class TapestryUserRoles
 {
-    public static function canEdit($postId = 0)
+    private $user = null;
+
+    /**
+     * Constructor.
+     *
+     * @param Number $postId     post ID
+     * @param Number $nodeMetaId node meta ID
+     *
+     * @return null
+     */
+    public function __construct($_userId = null)
     {
-        return TapestryUserRoles::isEditor()
-        || TapestryUserRoles::isAdministrator()
-        || TapestryUserRoles::isAuthorOfThePost($postId);
+        $this->user = get_user_by('id', $_userId);
+        if (is_null($this->user) || !$this->user) {
+            $this->user = wp_get_current_user();
+        }
+    }
+
+    public function canEdit($postId = 0)
+    {
+        return $this->isEditor()
+        || $this->isAdministrator()
+        || $this->isAuthorOfThePost($postId);
     }
 
     /**
@@ -16,11 +34,11 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isRole($role)
+    public function isRole($role)
     {
         return in_array(
             $role,
-            wp_get_current_user()->roles
+            $this->user->roles
         );
     }
 
@@ -29,9 +47,9 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isAdministrator()
+    public function isAdministrator()
     {
-        return TapestryUserRoles::isRole('administrator');
+        return $this->isRole('administrator');
     }
 
     /**
@@ -39,9 +57,9 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isEditor()
+    public function isEditor()
     {
-        return TapestryUserRoles::isRole('editor');
+        return $this->isRole('editor');
     }
 
     /**
@@ -49,9 +67,9 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isAuthor()
+    public function isAuthor()
     {
-        return TapestryUserRoles::isRole('author');
+        return $this->isRole('author');
     }
 
     /**
@@ -61,10 +79,9 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isAuthorOfThePost($postId)
+    public function isAuthorOfThePost($postId)
     {
-        return wp_get_current_user()->ID
-            == get_post($postId)->post_author;
+        return $this->user->ID == get_post($postId)->post_author;
     }
 
     /**
@@ -72,8 +89,8 @@ class TapestryUserRoles
      *
      * @return bool
      */
-    public static function isSubscriber()
+    public function isSubscriber()
     {
-        return TapestryUserRoles::isRole('subscriber');
+        return $this->isRole('subscriber');
     }
 }

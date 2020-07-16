@@ -1,12 +1,12 @@
 <?php
 
 /*
-Template Name: Tapestry Page Template
+ Template Name: Tapestry Page Template
  */
 /*
- * Register Script with Nonce
+ * Register Script with Nonce.
  *
- * @return Object null
+ * @return object null
  */
 
 get_header();
@@ -63,17 +63,14 @@ if (current_user_can('edit_post', get_the_ID())) {
                 document.getElementById('tapestry').addEventListener('click', function(event) {
                     var x = event.clientX + $(window).scrollLeft();
                     var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'tapestry', null, {
-                        'x': x,
-                        'y': y
-                    });
+                    recordAnalyticsEvent('user', 'click', 'tapestry', null, { x, y });
                 }, true);
             });
         </script>
         
         <?php
     } else {
-        // protected, show password form?>
+        // protected, show password form ?>
         <div class="entry">
             <header class="entry-header">
                 <h1 class="entry-title">Password required to continue</h1>

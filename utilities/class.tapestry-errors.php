@@ -86,6 +86,10 @@ class TapestryError extends Error
             'MESSAGE' => 'Root node can only be deleted if there are no other nodes in the tapestry',
             'STATUS' => ['status' => 400],
         ],
+        'INVALID_PROGRESS' => [
+            'MESSAGE' => 'Progress must be a value between 0 and 1',
+            'STATUS' => ['status' => 400],
+        ],
         'FAILED_TO_CREATE_POST' => [
             'MESSAGE' => 'Unable to create new Tapestry',
             'STATUS' => ['status' => 500],

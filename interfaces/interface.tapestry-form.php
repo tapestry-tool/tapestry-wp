@@ -18,5 +18,5 @@ interface ITapestryForm
      *
      * @return object the corresponding entry
      */
-    public function getEntry($formId);
+    public function getEntry($formId, $userId = 0);
 }

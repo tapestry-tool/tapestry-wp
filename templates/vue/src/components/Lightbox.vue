@@ -6,7 +6,7 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="this.nodeId"
+    :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
     @close="close"
@@ -205,7 +205,6 @@ export default {
 
 <style lang="scss">
 body.tapestry-lightbox-open {
-  overflow: hidden;
   overflow: hidden;
 }
 </style>

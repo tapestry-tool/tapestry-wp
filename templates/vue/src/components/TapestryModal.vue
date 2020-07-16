@@ -8,11 +8,11 @@
           <modal-button
             icon="heart"
             icon-size="sm"
-            :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
-            :icon-color="isFavourite ? 'red' : ''"
-            :bg-color="isFavourite ? '#fff' : ''"
-            :bg-hover-color="isFavourite ? '#fff' : 'red'"
-            @clicked="updateFavourites"
+            :title="favourited ? 'Remove from Favourites' : 'Add to Favourites'"
+            :icon-color="favourited ? 'red' : ''"
+            :bg-color="favourited ? '#fff' : ''"
+            :bg-hover-color="favourited ? '#fff' : 'red'"
+            @clicked="toggleFavourite(nodeId)"
           />
         </div>
         <slot></slot>
@@ -59,6 +59,11 @@ export default {
       required: false,
       default: true,
     },
+    showFav: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -75,16 +80,7 @@ export default {
     this.load = true
   },
   methods: {
-    ...mapActions(["updateUserFavourites"]),
-    updateFavourites() {
-      let updatedFavouritesList = [...this.favourites]
-      if (this.isFavourite) {
-        updatedFavouritesList = updatedFavouritesList.filter(id => id != this.nodeId)
-      } else {
-        updatedFavouritesList.push(this.nodeId)
-      }
-      this.updateUserFavourites(updatedFavouritesList)
-    },
+    ...mapActions(["toggleFavourite"]),
   },
 }
 </script>
@@ -102,7 +98,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 1000;
 
   .content {
     position: absolute;
@@ -120,7 +116,7 @@ export default {
       width: 100%;
       top: -20px;
       right: -20px;
-      z-index: 100;
+      z-index: 1000;
     }
   }
 
