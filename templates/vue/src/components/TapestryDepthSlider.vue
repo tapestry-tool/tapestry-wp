@@ -1,5 +1,5 @@
 <template>
-  <div v-if="maxDepth > 1" class="depth-slider">
+  <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
     <input v-model="currentDepth" type="range" min="1" :max="maxDepth" />
     <p v-if="currentDepth < maxDepth">
       Some nodes might be hidden because you're not at max depth.
@@ -9,6 +9,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
+import { bus } from "@/utils/event-bus"
 
 export default {
   data() {
@@ -72,6 +73,12 @@ export default {
         }
       },
     },
+    maxDepth: {
+      immediate: true,
+      handler: function(maxDepth) {
+        bus.$emit("max-depth-change", maxDepth)
+      },
+    },
   },
   created() {
     this.setDefaultDepth()
@@ -79,7 +86,7 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth
+      this.currentDepth = this.settings.defaultDepth || this.maxDepth + 1
     },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
