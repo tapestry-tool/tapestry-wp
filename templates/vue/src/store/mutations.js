@@ -85,7 +85,7 @@ export function updateRootNode(state, newNodeId) {
 
 // nodes
 export function addNode(state, node) {
-  state.nodes[node.id] = node
+  Vue.set(state.nodes, node.id, node)
 }
 
 export function deleteNode(state, id) {
