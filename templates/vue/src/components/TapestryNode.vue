@@ -6,6 +6,7 @@
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       @click="handleClick"
       @mouseover="handleMouseover"
+      @mouseleave="$emit('mouseleave')"
     >
       <circle
         ref="circle"
@@ -284,6 +285,7 @@ export default {
     },
     handleMouseover() {
       bus.$emit("mouseover", this.node.id)
+      this.$emit("mouseover")
     },
     handleClick(evt) {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {

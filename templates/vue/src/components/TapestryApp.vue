@@ -28,8 +28,11 @@
             :data-id="id"
             :root="id == selectedNodeId"
             @dragend="updateViewBox"
+            @mouseover="handleMouseover(id)"
+            @mouseleave="activeNode = null"
           ></tapestry-node>
         </g>
+        <locked-tooltip v-if="activeNode" :node="nodes[activeNode]"></locked-tooltip>
       </svg>
     </main>
   </div>
@@ -44,6 +47,7 @@ import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
 import TSettingsModalButton from "@/components/TSettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
+import LockedTooltip from "@/components/LockedTooltip"
 import TapestryApi from "@/services/TapestryAPI"
 
 const client = new TapestryApi(wpPostId)
@@ -56,11 +60,13 @@ export default {
     TapestryDepthSlider,
     TSettingsModalButton,
     RootNodeButton,
+    LockedTooltip,
   },
   data() {
     return {
       loading: true,
       viewBox: "2200 2700 1600 1100",
+      activeNode: null,
     }
   },
   computed: {
@@ -139,6 +145,16 @@ export default {
       this.viewBox = `${minX - 300} ${minY - 300} ${width - minX + 600} ${height -
         minY +
         600}`
+    },
+    handleMouseover(id) {
+      const node = this.nodes[id]
+      if (
+        !node.accessible &&
+        node.nodeType !== "grandchild" &&
+        node.nodeType !== ""
+      ) {
+        this.activeNode = id
+      }
     },
   },
 }
