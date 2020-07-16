@@ -32,12 +32,20 @@
         </button>
         <button
           class="menubar__button"
+          :class="{ 'is-active': isActive.link() }"
+          @click="setUrl(commands.link)"
+        >
+          <icon name="link" />
+        </button>
+        <button
+          class="menubar__button"
           :class="{ 'is-active': isActive.code() }"
           @click="commands.code"
         >
           <icon name="code" />
         </button>
         <button
+          :style="gapLeft"
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 2 }) }"
           @click="commands.heading({ level: 2 })"
@@ -52,6 +60,7 @@
           H2
         </button>
         <button
+          :style="gapRight"
           class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 4 }) }"
           @click="commands.heading({ level: 4 })"
@@ -88,13 +97,6 @@
         <button class="menubar__button" @click="commands.redo">
           <icon name="redo" />
         </button>
-        <button
-            class="menubar__button"
-            @click="setUrl(commands.link)"
-            :class="{ 'is-active': isActive.link() }"
-          >
-            <icon name="link" />
-          </button>
       </div>
     </editor-menu-bar>
     <editor-content
@@ -108,7 +110,7 @@
 
 <script>
 import Icon from "./Icon"
-import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from "tiptap"
+import { Editor, EditorContent, EditorMenuBar } from "tiptap"
 import {
   Blockquote,
   CodeBlock,
@@ -135,7 +137,6 @@ export default {
     EditorContent,
     EditorMenuBar,
     Icon,
-    EditorMenuBubble,
   },
   props: {
     value: {
@@ -152,6 +153,12 @@ export default {
       editor: null,
       linkUrl: null,
       linkMenuIsActive: false,
+      gapLeft: {
+        marginLeft: "2em",
+      },
+      gapRight: {
+        marginRight: "2em",
+      },
     }
   },
   watch: {
@@ -204,45 +211,45 @@ export default {
     }
   },
   methods: {
-  showLinkMenu(attrs) {
-    this.linkUrl = attrs.href
-    this.linkMenuIsActive = true
-    this.$nextTick(() => {
-      this.$refs.linkInput.focus()
-    })
+    showLinkMenu(attrs) {
+      this.linkUrl = attrs.href
+      this.linkMenuIsActive = true
+      this.$nextTick(() => {
+        this.$refs.linkInput.focus()
+      })
+    },
+    hideLinkMenu() {
+      this.linkUrl = null
+      this.linkMenuIsActive = false
+    },
+    setLinkUrl(command, url) {
+      command({ href: url })
+      this.hideLinkMenu()
+    },
+    setUrl(command) {
+      const state = this.editor.state
+
+      // get marks, if any from selected area
+      const { from, to } = state.selection
+      let marks = []
+      state.doc.nodesBetween(from, to, node => {
+        marks = [...marks, ...node.marks]
+      })
+
+      const mark = marks.find(markItem => markItem.type.name === "link")
+
+      let urlSetting = ""
+
+      if (mark && mark.attrs.href) {
+        const presetURL = mark.attrs.href
+        prompt("Please update url", presetURL) // let a user see the previously set URL
+      } else {
+        urlSetting = prompt("Please add url", "") // a clean prompt, has had no anchor
+      }
+
+      command({ href: urlSetting })
+    },
   },
-  hideLinkMenu() {
-    this.linkUrl = null
-    this.linkMenuIsActive = false
-  },
-  setLinkUrl(command, url) {
-    command({ href: url })
-    this.hideLinkMenu()
-  },
-  setUrl(command) {
-    const state = this.editor.state
-
-    // get marks, if any from selected area
-    const { from, to } = state.selection
-    let marks = []
-    state.doc.nodesBetween(from, to, (node) => {
-      marks = [...marks, ...node.marks]
-    })
-
-    const mark = marks.find((markItem) => markItem.type.name === 'link')
-
-    let urlSetting = ''
-
-    if (mark && mark.attrs.href) {
-      const presetURL = mark.attrs.href
-      prompt('Please update url', presetURL) // let a user see the previously set URL
-    } else {
-      urlSetting = prompt('Please add url', '') // a clean prompt, has had no anchor
-    }
-
-    command({ href: urlSetting })
-  },
-},
 }
 </script>
 
@@ -251,6 +258,30 @@ $color-black: #000000;
 $color-white: #ffffff;
 $color-grey: #dddddd;
 
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.3em;
+}
+h4 {
+  font-size: 1.1em;
+}
+h2,
+h3,
+h4 {
+  font-weight: normal;
+  font-style: normal;
+}
+h2:after {
+  content: none !important;
+}
+h2:before {
+  content: none !important;
+}
+.ProseMirror:focus {
+  outline: none;
+}
 .editor {
   border: 1px solid #ccc;
 }
@@ -259,6 +290,7 @@ $color-grey: #dddddd;
   display: flex;
   margin-bottom: 1rem;
   transition: visibility 0.2s 0.4s, opacity 0.2s 0.4s;
+  background-color: #eee;
 
   &.is-hidden {
     visibility: hidden;
