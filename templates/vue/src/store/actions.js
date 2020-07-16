@@ -1,4 +1,5 @@
 import TapestryApi from "../services/TapestryAPI"
+import Helpers from "../utils/Helpers"
 
 const client = new TapestryApi(wpPostId)
 
@@ -73,17 +74,13 @@ export async function updateNodeProgress({ commit }, payload) {
   commit("updateNodeProgress", { id, progress })
 }
 
-export async function updateUserProgress() {
-  //const progress = await client.getUserProgress()
-  //thisTapestryTool.setDatasetProgress(progress)
-}
-
 export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
   await client.updateNodeCoordinates(id, coordinates)
   commit("updateNode", { id, newNode: { coordinates } })
 }
 
-export async function completeNode({ commit, dispatch, getters }, nodeId) {
+export async function completeNode(context, nodeId) {
+  const { commit, dispatch, getters } = context
   await client.completeNode(nodeId)
   commit("updateNode", {
     id: nodeId,
@@ -97,7 +94,32 @@ export async function completeNode({ commit, dispatch, getters }, nodeId) {
       progress: 1,
     })
   }
-  dispatch("updateUserProgress")
+  return unlockNodes(context)
+}
+
+async function unlockNodes({ commit, getters }) {
+  const progress = await client.getUserProgress()
+  for (const [id, nodeProgress] of Object.entries(progress)) {
+    const currentNode = getters.getNode(id)
+    if (
+      Helpers.isDifferent(
+        {
+          accessible: nodeProgress.accessible,
+          unlocked: nodeProgress.unlocked,
+        },
+        { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
+      )
+    ) {
+      const { accessible, unlocked, content, conditions } = nodeProgress
+      const newNode = { accessible, unlocked, conditions }
+      if (accessible) {
+        const { quiz, typeData } = content
+        newNode.quiz = quiz
+        newNode.typeData = typeData
+      }
+      commit("updateNode", { id, newNode })
+    }
+  }
 }
 
 export function updateNodePermissions(_, payload) {
