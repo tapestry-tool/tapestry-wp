@@ -1366,8 +1366,6 @@ function tapestryTool(config){
                     || yPosition - (getRadius(d) * 2) <= $(window).scrollTop()) && d.x > 0 && d.y > 0
                 return onBottom ? getRadius(d) + 27.5 + 5 : -(getRadius(d) * 3 + 27.5 + 20)
             })
-            .attr("x", d => -(tooltipWidth(d) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 20))
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
             .style("align-items", d => {
