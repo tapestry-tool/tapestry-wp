@@ -193,6 +193,7 @@ function tapestry_enqueue_vue_app()
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),
                 'roles' => $wp_roles->get_names(),
+                'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
             ]
         );
 

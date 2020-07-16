@@ -4,6 +4,7 @@
       v-show="isVisible"
       ref="node"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
+      :style="{ cursor: node.accessible || canEdit ? 'pointer' : 'not-allowed' }"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
@@ -181,6 +182,9 @@ export default {
       const rows = this.getDirectChildren(this.node.id)
       return rows.map(this.getNode).filter(row => row.completed).length / rows.length
     },
+    canEdit() {
+      return wpData.wpCanEditTapestry
+    },
   },
   watch: {
     radius(newRadius) {
@@ -229,33 +233,35 @@ export default {
         })
         .on("end", () => {
           this.$emit("dragend")
-          if (this.selection.length) {
-            this.selection.forEach(id => {
-              const node = this.getNode(id)
+          if (this.canEdit) {
+            if (this.selection.length) {
+              this.selection.forEach(id => {
+                const node = this.getNode(id)
+                this.updateNodeCoordinates({
+                  id: node.id,
+                  coordinates: {
+                    x: node.coordinates.x,
+                    y: node.coordinates.y,
+                  },
+                }).catch(() => {
+                  alert("Failed to save coordinates.")
+                  node.coordinates.x = this.coordinates[id].x
+                  node.coordinates.y = this.coordinates[id].y
+                })
+              })
+            } else {
               this.updateNodeCoordinates({
-                id: node.id,
+                id: this.node.id,
                 coordinates: {
-                  x: node.coordinates.x,
-                  y: node.coordinates.y,
+                  x: this.node.coordinates.x,
+                  y: this.node.coordinates.y,
                 },
               }).catch(() => {
                 alert("Failed to save coordinates.")
-                node.coordinates.x = this.coordinates[id].x
-                node.coordinates.y = this.coordinates[id].y
+                this.node.coordinates.x = this.originalFx
+                this.node.coordinates.y = this.originalFy
               })
-            })
-          } else {
-            this.updateNodeCoordinates({
-              id: this.node.id,
-              coordinates: {
-                x: this.node.coordinates.x,
-                y: this.node.coordinates.y,
-              },
-            }).catch(() => {
-              alert("Failed to save coordinates.")
-              this.node.coordinates.x = this.originalFx
-              this.node.coordinates.y = this.originalFy
-            })
+            }
           }
         })
     )
@@ -290,7 +296,7 @@ export default {
     handleClick(evt) {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-      } else {
+      } else if (this.node.accessible || this.canEdit) {
         this.root && this.node.hideMedia
           ? this.openNode()
           : this.updateSelectedNode(this.node.id)
