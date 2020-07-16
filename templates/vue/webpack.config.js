@@ -61,11 +61,16 @@ module.exports = {
     overlay: true,
     headers: { "Access-Control-Allow-Origin": "*" },
     hot: true,
+    port: 8080,
   },
   performance: {
     hints: false,
   },
   devtool: "#eval-source-map",
+}
+
+if (process.env.NODE_ENV === "development") {
+  module.exports.output.publicPath = "http://localhost:8080/dist/"
 }
 
 if (process.env.NODE_ENV === "production") {
