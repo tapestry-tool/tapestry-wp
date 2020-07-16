@@ -39,13 +39,6 @@
         </button>
         <button
           class="menubar__button"
-          :class="{ 'is-active': isActive.paragraph() }"
-          @click="commands.paragraph"
-        >
-          <icon name="paragraph" />
-        </button>
-        <button
-          class="menubar__button"
           :class="{ 'is-active': isActive.heading({ level: 2 }) }"
           @click="commands.heading({ level: 2 })"
         >
@@ -95,6 +88,13 @@
         <button class="menubar__button" @click="commands.redo">
           <icon name="redo" />
         </button>
+        <button
+            class="menubar__button"
+            @click="setUrl(commands.link)"
+            :class="{ 'is-active': isActive.link() }"
+          >
+            <icon name="link" />
+          </button>
       </div>
     </editor-menu-bar>
     <editor-content
@@ -108,7 +108,7 @@
 
 <script>
 import Icon from "./Icon"
-import { Editor, EditorContent, EditorMenuBar } from "tiptap"
+import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from "tiptap"
 import {
   Blockquote,
   CodeBlock,
@@ -135,6 +135,7 @@ export default {
     EditorContent,
     EditorMenuBar,
     Icon,
+    EditorMenuBubble,
   },
   props: {
     value: {
@@ -149,6 +150,8 @@ export default {
   data() {
     return {
       editor: null,
+      linkUrl: null,
+      linkMenuIsActive: false,
     }
   },
   watch: {
@@ -200,6 +203,46 @@ export default {
       this.editor.destroy()
     }
   },
+  methods: {
+  showLinkMenu(attrs) {
+    this.linkUrl = attrs.href
+    this.linkMenuIsActive = true
+    this.$nextTick(() => {
+      this.$refs.linkInput.focus()
+    })
+  },
+  hideLinkMenu() {
+    this.linkUrl = null
+    this.linkMenuIsActive = false
+  },
+  setLinkUrl(command, url) {
+    command({ href: url })
+    this.hideLinkMenu()
+  },
+  setUrl(command) {
+    const state = this.editor.state
+
+    // get marks, if any from selected area
+    const { from, to } = state.selection
+    let marks = []
+    state.doc.nodesBetween(from, to, (node) => {
+      marks = [...marks, ...node.marks]
+    })
+
+    const mark = marks.find((markItem) => markItem.type.name === 'link')
+
+    let urlSetting = ''
+
+    if (mark && mark.attrs.href) {
+      const presetURL = mark.attrs.href
+      prompt('Please update url', presetURL) // let a user see the previously set URL
+    } else {
+      urlSetting = prompt('Please add url', '') // a clean prompt, has had no anchor
+    }
+
+    command({ href: urlSetting })
+  },
+},
 }
 </script>
 

@@ -13,6 +13,7 @@ import italic from "../../../assets/icons/italic.svg"
 import underline from "../../../assets/icons/underline.svg"
 import strike from "../../../assets/icons/strike.svg"
 import paragraph from "../../../assets/icons/paragraph.svg"
+import link from "../../../assets/icons/link.svg"
 import ul from "../../../assets/icons/ul.svg"
 import ol from "../../../assets/icons/ol.svg"
 import quote from "../../../assets/icons/quote.svg"
@@ -20,6 +21,7 @@ import code from "../../../assets/icons/code.svg"
 import hr from "../../../assets/icons/hr.svg"
 import undo from "../../../assets/icons/undo.svg"
 import redo from "../../../assets/icons/redo.svg"
+import remove from "../../../assets/icons/remove.svg"
 
 export default {
   props: {
@@ -48,6 +50,7 @@ export default {
         underline,
         strike,
         code,
+        link,
         paragraph,
         ul,
         ol,
@@ -55,6 +58,7 @@ export default {
         hr,
         undo,
         redo,
+        remove,
       }
       let usedIcon = lookup[this.name]
       return `${wpData.vue_uri}/${usedIcon.split("dist")[1]}`
