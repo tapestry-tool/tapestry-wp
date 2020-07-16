@@ -20,6 +20,10 @@ export default {
     ...mapState(["selectedNodeId", "nodes"]),
     ...mapGetters(["getNeighbours", "getNode"]),
     levels() {
+      if (!Object.keys(this.nodes).length) {
+        return []
+      }
+
       const levels = {}
       const queue = []
       const visited = new Set()
