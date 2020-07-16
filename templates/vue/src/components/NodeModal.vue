@@ -235,12 +235,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations([
-      "updateOrdering",
-      "updateSelectedNode",
-      "updateRootNode",
-      "updateVisibleNodes",
-    ]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -391,10 +386,7 @@ export default {
       })
     },
     updateOrderingArray(arr) {
-      this.updateOrdering({
-        id: this.node.id,
-        ord: arr,
-      })
+      this.node.childOrdering = arr
     },
     handleTypeChange() {
       this.node.quiz = this.node.quiz.filter(q =>
