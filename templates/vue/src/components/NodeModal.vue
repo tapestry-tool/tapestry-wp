@@ -17,7 +17,7 @@
       </b-alert>
     </div>
     <b-container v-if="ready" fluid class="px-0">
-      <b-tabs v-model="tabIndex" card>
+      <b-tabs card :value="tabIndex" @activate-tab="handleTabChange">
         <b-tab title="Content">
           <content-form
             :node="node"
@@ -171,6 +171,7 @@ export default {
       videoLoaded: false,
       showModal: true,
       currentTab: this.tab,
+      currentNodeId: this.nodeId,
     }
   },
   computed: {
@@ -219,19 +220,11 @@ export default {
       )
     },
     nodeIdNumber() {
-      return Number(this.nodeId)
+      return Number(this.currentNodeId)
     },
-    tabIndex: {
-      get() {
-        const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
-        return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
-      },
-      set(newIndex) {
-        this.currentTab = tabOrdering[newIndex]
-        this.$router.push(
-          "/nodes/" + this.modalType + "/" + this.nodeId + "/" + this.currentTab
-        )
-      },
+    tabIndex() {
+      const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
+      return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
     },
   },
   watch: {
@@ -239,6 +232,12 @@ export default {
       if (this.currentTab !== to.params.tab && to !== from) {
         this.currentTab = to.params.tab
       }
+      if (this.currentNodeId !== to.params.nodeId && to !== from) {
+        this.currentNodeId = to.params.nodeId
+      }
+    },
+    currentNodeId() {
+      this.initializeModal()
     },
   },
   beforeDestroy() {
@@ -249,16 +248,7 @@ export default {
     this.node = this.createDefaultNode()
   },
   mounted() {
-    let copy = this.createDefaultNode()
-    if (this.modalType === "edit") {
-      const node = this.getNode(this.nodeIdNumber)
-      copy = Helpers.deepCopy(node)
-    }
-    copy.hasSubAccordion = this.hasSubAccordion(copy)
-    this.node = copy
-    this.initializeTabArray()
-    this.ready = true
-    thisTapestryTool.disableMovements()
+    this.initializeModal()
   },
   methods: {
     ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
@@ -434,6 +424,31 @@ export default {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
+    },
+    initializeModal() {
+      let copy = this.createDefaultNode()
+      if (this.modalType === "edit") {
+        const node = this.getNode(this.nodeIdNumber)
+        copy = Helpers.deepCopy(node)
+      }
+      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      this.node = copy
+      this.initializeTabArray()
+      this.ready = true
+      thisTapestryTool.disableMovements()
+    },
+    handleTabChange(newTabIndex) {
+      this.currentTab = tabOrdering[newTabIndex]
+      this.$router
+        .push(
+          "/nodes/" +
+            this.modalType +
+            "/" +
+            this.currentNodeId +
+            "/" +
+            this.currentTab
+        )
+        .catch(err => {})
     },
   },
 }

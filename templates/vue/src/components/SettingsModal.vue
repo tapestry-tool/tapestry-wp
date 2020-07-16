@@ -8,7 +8,7 @@
     @hidden="close"
   >
     <b-container fluid class="px-0">
-      <b-tabs v-model="tabIndex" card>
+      <b-tabs card :value="tabIndex" @input="handleTabChange">
         <b-tab title="Appearance">
           <b-form-group
             label="Background URL"
@@ -171,15 +171,9 @@ export default {
       }
       return 0
     },
-    tabIndex: {
-      get() {
-        const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
-        return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
-      },
-      set(newIndex) {
-        this.currentTab = tabOrdering[newIndex]
-        this.$router.push("/settings/" + this.currentTab)
-      },
+    tabIndex() {
+      const tabIndex = tabOrdering.findIndex(t => t === this.currentTab)
+      return this.currentTab === "" || tabIndex === -1 ? 0 : tabIndex
     },
   },
   watch: {
@@ -259,6 +253,10 @@ export default {
           this.updateSettings()
         }
       }
+    },
+    handleTabChange(newTabIndex) {
+      this.currentTab = tabOrdering[newTabIndex]
+      this.$router.push("/settings/" + this.currentTab).catch(err => {})
     },
   },
 }
