@@ -86,8 +86,7 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
-      const startTime =
-        this.node.typeData.progress[0].value * this.node.mediaDuration
+      const startTime = this.node.progress * this.node.mediaDuration
       this.player.seekTo(startTime, true)
       this.applySettings()
     },
@@ -115,7 +114,7 @@ export default {
       this.$emit("close")
     },
     getInitialEndScreenState() {
-      const progress = this.node.typeData.progress[0].value
+      const progress = this.node.progress
       if (progress >= 1) {
         return true
       }

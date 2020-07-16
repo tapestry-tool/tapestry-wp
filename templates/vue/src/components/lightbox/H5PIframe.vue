@@ -177,7 +177,7 @@ export default {
         return
       }
 
-      const mediaProgress = this.node.typeData.progress[0].value
+      const mediaProgress = this.node.progress
 
       if (h5pLibraryName === "H5P.InteractiveVideo") {
         const h5pVideo = h5pInstance.video

@@ -138,7 +138,7 @@ export default {
       this.$emit("close")
     },
     getInitialEndScreenState() {
-      const progress = this.node.typeData.progress[0].value
+      const progress = this.node.progress
       if (progress >= 1) {
         return true
       }
@@ -167,7 +167,7 @@ export default {
     seek() {
       const video = this.$refs.video
       if (video) {
-        const progress = this.node.typeData.progress[0].value
+        const progress = this.node.progress
         const viewedAmount = progress * video.duration
         video.currentTime = viewedAmount
       }
