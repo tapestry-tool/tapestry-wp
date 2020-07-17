@@ -242,9 +242,9 @@ export default {
 
       if (mark && mark.attrs.href) {
         const presetURL = mark.attrs.href
-        prompt("Please update url", presetURL) // let a user see the previously set URL
+        prompt("Please update url:", presetURL) // let a user see the previously set URL
       } else {
-        urlSetting = prompt("Please add url", "") // a clean prompt, has had no anchor
+        urlSetting = prompt("Please add url:", "") // a clean prompt, has had no anchor
       }
 
       command({ href: urlSetting })

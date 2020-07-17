@@ -71,7 +71,7 @@ export default {
 .icon {
   width: 100%;
   &.has-align-fix {
-  	top: -.1rem;
+    top: -0.1rem;
   }
 }
 
@@ -80,6 +80,4 @@ img {
   max-width: initial;
   position: initial;
 }
-
-
 </style>
