@@ -425,6 +425,8 @@ export default {
           const h5pVideo = instance.video
           const handleH5PLoad = () => {
             this.node.mediaDuration = parseInt(h5pVideo.getDuration())
+            this.loadDuration = false
+            return this.submitNode()
           }
           if (h5pVideo.getDuration() !== undefined) {
             handleH5PLoad()
