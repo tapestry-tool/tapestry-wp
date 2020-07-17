@@ -300,7 +300,8 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     async updateProgress(rowId) {
-      if (Helpers.canUserUpdateProgress(this.node) && !this.readOnly) {
+      const row = this.getNode(rowId)
+      if (Helpers.canUserUpdateProgress(row) && !this.readOnly) {
         const { accordionProgress } = this.node
         if (!accordionProgress.includes(rowId)) {
           accordionProgress.push(rowId)
