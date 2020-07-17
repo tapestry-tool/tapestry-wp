@@ -106,7 +106,7 @@ export function createDefaultNode({ settings }) {
     type: "tapestry_node",
     description: "",
     conditions: [],
-    behaviour: "embed",
+    behaviour: "new-window",
     status: "publish",
     nodeType: "",
     title: "",

@@ -300,6 +300,7 @@ export default {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
+        const parent = this.parent
         this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {

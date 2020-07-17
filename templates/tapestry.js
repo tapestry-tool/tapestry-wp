@@ -1060,7 +1060,11 @@ function tapestryTool(config){
     function initializeDragSelect() {
         new DragSelect({
             selectables: document.querySelectorAll(".node"),
-            onDragStart: () => {
+            onDragStart: (e) => {
+                let depthSliderWrapper = document.querySelector("#tapestry-controls-wrapper");
+                if (depthSliderWrapper === e.target || depthSliderWrapper.contains(e.target)) {
+                    this.break();
+                }    
                 if (!isMultiSelect) {
                     selection.clear()
                 }
