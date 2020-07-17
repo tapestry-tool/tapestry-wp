@@ -146,10 +146,10 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import FileUpload from "./FileUpload"
-import Combobox from "../components/Combobox"
-import { SlickList, SlickItem } from "vue-slicksort"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import Combobox from "../components/Combobox"
+import { SlickList, SlickItem } from "vue-slicksort"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -165,11 +165,11 @@ export default {
   name: "settings-modal",
   components: {
     FileUpload,
+    DuplicateTapestryButton,
+    PermissionsTable,
     Combobox,
     SlickList,
     SlickItem,
-    DuplicateTapestryButton,
-    PermissionsTable,
   },
   props: {
     wpCanEditTapestry: {
@@ -183,11 +183,11 @@ export default {
       backgroundUrl: "",
       autoLayout: false,
       nodeDraggable: true,
-      spaceshipBackgroundUrl: "",
-      profileActivities: [],
       userId: "",
       showAccess: true,
       defaultPermissions,
+      spaceshipBackgroundUrl: "",
+      profileActivities: [],
     }
   },
   computed: {
@@ -216,47 +216,33 @@ export default {
     closeModal() {
       this.$bvModal.hide("settings-modal")
     },
-    addActivity() {
-      this.profileActivities = [
-        ...this.profileActivities,
-        {
-          activityRef: null,
-        },
-      ]
-    },
-    deleteActivity(index) {
-      this.profileActivities.splice(index, 1)
-    },
-    updateProfileOrdering(arr) {
-      this.profileActivities = [...arr]
-    },
     getSettings() {
       const {
         backgroundUrl = "",
         autoLayout = false,
         nodeDraggable = true,
-        spaceshipBackgroundUrl = "",
-        profileActivities = [],
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
+        spaceshipBackgroundUrl = "",
+        profileActivities = [],
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
       this.nodeDraggable = nodeDraggable
-      this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
-      this.profileActivities = profileActivities
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
+      this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
+      this.profileActivities = profileActivities
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
         nodeDraggable: this.nodeDraggable,
-        spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
-        profileActivities: this.profileActivities,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
+        spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
+        profileActivities: this.profileActivities,
       })
       await this.$store.dispatch("updateSettings", settings)
       // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
@@ -278,6 +264,20 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+    },
+    addActivity() {
+      this.profileActivities = [
+        ...this.profileActivities,
+        {
+          activityRef: null,
+        },
+      ]
+    },
+    deleteActivity(index) {
+      this.profileActivities.splice(index, 1)
+    },
+    updateProfileOrdering(arr) {
+      this.profileActivities = [...arr]
     },
   },
 }

@@ -96,10 +96,10 @@ import GravityForm from "./lightbox/GravityForm"
 import WpPostMedia from "./lightbox/WpPostMedia"
 import CompletionScreen from "./lightbox/quiz-screen/CompletionScreen"
 import QuizMedia from "./lightbox/QuizMedia"
+import YouTubeMedia from "./lightbox/YoutubeMedia"
 import Helpers from "@/utils/Helpers"
-import YouTubeMedia from "./lightbox/YouTubeMedia"
 
-const SAVE_INTERVAL = 5
+const SAVE_INTERVAL = 5000
 
 export default {
   name: "tapestry-media",

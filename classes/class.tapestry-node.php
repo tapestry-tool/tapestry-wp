@@ -36,10 +36,10 @@ class TapestryNode implements ITapestryNode
     private $skippable;
     private $quiz;
     private $fullscreen;
-    private $tydeType;
-    private $showInBackpack;
     private $childOrdering;
     private $fitWindow;
+    private $tydeType;
+    private $showInBackpack;
 
     /**
      * Constructor.
@@ -77,10 +77,10 @@ class TapestryNode implements ITapestryNode
         $this->skippable = true;
         $this->quiz = [];
         $this->fullscreen = false;
-        $this->tydeType = '';
-        $this->showInBackpack = true;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->tydeType = '';
+        $this->showInBackpack = true;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -171,20 +171,17 @@ class TapestryNode implements ITapestryNode
         if (isset($node->conditions) && is_array($node->conditions)) {
             $this->conditions = $node->conditions;
         }
-        if (isset($node->tydeType) && is_string($node->tydeType)) {
-            $this->tydeType = $node->tydeType;
-        }
-        if (isset($node->showInBackpack) && is_bool($node->showInBackpack)) {
-            $this->showInBackpack = $node->showInBackpack;
-        }
-        if (isset($node->conditions) && is_array($node->conditions)) {
-            $this->conditions = $node->conditions;
-        }
         if (isset($node->childOrdering) && is_array($node->childOrdering)) {
             $this->childOrdering = $node->childOrdering;
         }
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
+        }
+        if (isset($node->tydeType) && is_string($node->tydeType)) {
+            $this->tydeType = $node->tydeType;
+        }
+        if (isset($node->showInBackpack) && is_bool($node->showInBackpack)) {
+            $this->showInBackpack = $node->showInBackpack;
         }
     }
 
@@ -200,25 +197,6 @@ class TapestryNode implements ITapestryNode
         }
 
         return $this->_formNode();
-    }
-
-    /**
-     * Returns whether this node is copilot only or not.
-     *
-     * @return bool
-     */
-    public function isCopilotOnly()
-    {
-        if (!property_exists($this->permissions, 'copilot')) {
-            return false;
-        }
-        foreach ((array) $this->permissions as $role => $permissions) {
-            if ('copilot' !== $role && count($permissions) > 0) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -423,11 +401,11 @@ class TapestryNode implements ITapestryNode
             'skippable' => $this->skippable,
             'quiz' => $this->quiz,
             'fullscreen' => $this->fullscreen,
-            'tydeType' => $this->tydeType,
-            'showInBackpack' => $this->showInBackpack,
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'tydeType' => $this->tydeType,
+            'showInBackpack' => $this->showInBackpack,
         ];
     }
 
@@ -484,5 +462,24 @@ class TapestryNode implements ITapestryNode
                 'name' => $user->display_name,
             ];
         }
+    }
+
+    /**
+     * Returns whether this node is copilot only or not.
+     *
+     * @return bool
+     */
+    public function isCopilotOnly()
+    {
+        if (!property_exists($this->permissions, 'copilot')) {
+            return false;
+        }
+        foreach ((array) $this->permissions as $role => $permissions) {
+            if ('copilot' !== $role && count($permissions) > 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -1,10 +1,10 @@
 <template>
-  <button class="button" :disabled="disabled" @click="$emit('click')">
+  <button class="answer-button" :disabled="disabled" @click="$emit('click')">
     <i class="fas fa-check-circle" :class="completed ? 'visible' : 'invisible'"></i>
-    <div v-if="isFaIcon" class="icon">
-      <i :class="`fas fa-${icon} icon-fa`"></i>
+    <div v-if="isFaIcon" class="answer-button-icon">
+      <i :class="`fas fa-${icon} answer-button-icon-fa`"></i>
     </div>
-    <img v-else :src="textIcon" class="icon" />
+    <img v-else :src="textIcon" class="answer-button-icon" />
     <div>
       <slot></slot>
     </div>
@@ -45,8 +45,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 button {
   padding: 0;
   margin: 0;
@@ -57,22 +55,17 @@ button {
   }
 }
 
-.button {
+.answer-button {
   padding: 0;
-  background-color: $tyde-orange;
+  background-color: #262626;
   color: white;
   width: 136px;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: normal;
-  font-size: 1.5em;
+  font-size: 24px;
   transition: all 0.1s ease-out;
-  margin-right: 16px;
-
-  &:last-child {
-    margin-right: 0;
-  }
 
   i {
     color: white;
@@ -83,11 +76,7 @@ button {
   }
 
   &:hover {
-    background-color: $tyde-orange-light;
-  }
-
-  > * {
-    margin-bottom: 16px;
+    background-color: #11a6d8;
   }
 
   > * {
@@ -95,7 +84,7 @@ button {
   }
 }
 
-.icon {
+.answer-button-icon {
   height: 56px;
 
   &-fa {

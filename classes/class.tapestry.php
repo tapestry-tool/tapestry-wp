@@ -129,40 +129,6 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Retrieves ids of all copilot-only nodes. Assumes the
-     * currently logged in user is a copilot.
-     */
-    public function getCopilotNodeIds()
-    {
-        $result = [];
-        foreach ($this->nodes as $nodeId) {
-            $node = $this->getNode($nodeId);
-            if ($node->isCopilotOnly()) {
-                array_push($result, $nodeId);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves ids of all teen nodes. It does this by checking
-     * whether the node id exists in the copilot nodes array.
-     */
-    public function getTeenNodeIds()
-    {
-        $result = [];
-        $copilotNodes = $this->getCopilotNodeIds();
-        foreach ($this->nodes as $nodeId) {
-            if (!in_array($nodeId, $copilotNodes)) {
-                array_push($result, $nodeId);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
@@ -336,51 +302,6 @@ class Tapestry implements ITapestry
     public function isEmpty()
     {
         return empty($this->rootId);
-    }
-
-    public function validateNode($node, $parent = null)
-    {
-        $tydeType = $node->tydeType;
-
-        if (!isset($tydeType) || !is_string($tydeType)) {
-            return true; // for backwards compatibility
-        }
-
-        if (!isset($parent)) {
-            return TydeTypes::MODULE == $tydeType || TydeTypes::REGULAR == $tydeType;
-        }
-
-        $parentType = $parent->tydeType;
-        if (!isset($parentType) || '' == $parentType) {
-            return true;
-        }
-
-        if (TydeTypes::MODULE == $parentType) {
-            return TydeTypes::STAGE == $tydeType;
-        } elseif (TydeTypes::STAGE == $parentType) {
-            return TydeTypes::QUESTION_SET == $tydeType;
-        } elseif (TydeTypes::REGULAR == $parentType) {
-            return TydeTypes::MODULE == $tydeType || TydeTypes::REGULAR == $tydeType;
-        } else {
-            // otherwise parent is a question set, so only valid if parent
-            // is an accordion
-            return 'accordion' == $parent->mediaType;
-        }
-    }
-
-    public function getNodeParent($nodeId)
-    {
-        $parent = null;
-
-        foreach ($this->links as $link) {
-            if ($link->target == $nodeId) {
-                $node = new TapestryNode($this->postId, $link->source);
-                $parent = $node->get();
-                break;
-            }
-        }
-
-        return $parent;
     }
 
     public function setUnlocked($nodeIds, $userId = 0)
@@ -643,5 +564,86 @@ class Tapestry implements ITapestry
         }
 
         return false;
+    }
+
+    // TYDE ONLY
+
+    /**
+     * Retrieves ids of all copilot-only nodes. Assumes the
+     * currently logged in user is a copilot.
+     */
+    public function getCopilotNodeIds()
+    {
+        $result = [];
+        foreach ($this->nodes as $nodeId) {
+            $node = $this->getNode($nodeId);
+            if ($node->isCopilotOnly()) {
+                array_push($result, $nodeId);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves ids of all teen nodes. It does this by checking
+     * whether the node id exists in the copilot nodes array.
+     */
+    public function getTeenNodeIds()
+    {
+        $result = [];
+        $copilotNodes = $this->getCopilotNodeIds();
+        foreach ($this->nodes as $nodeId) {
+            if (!in_array($nodeId, $copilotNodes)) {
+                array_push($result, $nodeId);
+            }
+        }
+
+        return $result;
+    }
+
+    public function validateNode($node, $parent = null)
+    {
+        $tydeType = $node->tydeType;
+
+        if (!isset($tydeType) || !is_string($tydeType)) {
+            return true; // for backwards compatibility
+        }
+
+        if (!isset($parent)) {
+            return TydeTypes::MODULE == $tydeType || TydeTypes::REGULAR == $tydeType;
+        }
+
+        $parentType = $parent->tydeType;
+        if (!isset($parentType) || '' == $parentType) {
+            return true;
+        }
+
+        if (TydeTypes::MODULE == $parentType) {
+            return TydeTypes::STAGE == $tydeType;
+        } elseif (TydeTypes::STAGE == $parentType) {
+            return TydeTypes::QUESTION_SET == $tydeType;
+        } elseif (TydeTypes::REGULAR == $parentType) {
+            return TydeTypes::MODULE == $tydeType || TydeTypes::REGULAR == $tydeType;
+        } else {
+            // otherwise parent is a question set, so only valid if parent
+            // is an accordion
+            return 'accordion' == $parent->mediaType;
+        }
+    }
+
+    public function getNodeParent($nodeId)
+    {
+        $parent = null;
+
+        foreach ($this->links as $link) {
+            if ($link->target == $nodeId) {
+                $node = new TapestryNode($this->postId, $link->source);
+                $parent = $node->get();
+                break;
+            }
+        }
+
+        return $parent;
     }
 }

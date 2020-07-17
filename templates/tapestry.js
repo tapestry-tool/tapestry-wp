@@ -123,7 +123,7 @@ function tapestryTool(config){
                     // turn off thumbnails
                     tapestry.dataset.nodes[i].imageURL = "";
                     tapestry.dataset.nodes[i].lockedImageURL = "";
-                }   
+                }
             }
         }
 
@@ -218,9 +218,9 @@ function tapestryTool(config){
                 behaviour: "embed", 
                 completed: false, 
                 quiz: [], 
+                mayUnlockNodes: [],      // ths keeps track of all nodes that may get unlocked by this node
                 showInBackpack: true,
                 tydeProgress: 0,
-                mayUnlockNodes: []      // ths keeps track of all nodes that may get unlocked by this node
             })
             updatedNode.permissions = fillEmptyFields(
                 updatedNode.permissions, 
@@ -397,12 +397,11 @@ function tapestryTool(config){
             tapestryControlsDiv.appendChild(settingsButton);
             showSettings = true;
         }
-
         
         //--------------------------------------------------
         // Add in Depth Slider
         //--------------------------------------------------
-        
+
         if (tapestryDepth) {
 
             // Create wrapper div 
@@ -494,11 +493,13 @@ function tapestryTool(config){
                 }
             }
         });
+
         document.addEventListener("keyup", () => {
             if (movementsEnabled) {
                 isMultiSelect = false;
             }
         });
+
         function createSelection() {
             const data = new Set();
             const selection = {
@@ -1390,26 +1391,26 @@ function tapestryTool(config){
         setNodeListeners(nodes);
     
         /* Add dragging and node selection functionality to the node */
-        if(config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
+        if (config.wpCanEditTapestry || tapestry.dataset.settings.nodeDraggable !== false) {
             nodes
-            .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended)
-            )
-            .on("click keydown", function (d) {
-                recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
-                if (root != d.id) { // prevent multiple clicks
-                    if (config.wpCanEditTapestry || d.userType === 'teen' || d.accessible) {
-                        if (!isMultiSelect) {
-                            selection.clear();
-                            tapestry.selectNode(d.id);
-                        } else {
-                            selection.add(d);
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended)
+                )
+                .on("click keydown", function (d) {
+                    recordAnalyticsEvent('user', 'click', 'node', d.id, { x: d3.event.x, y: d3.event.y });
+                    if (root != d.id) { // prevent multiple clicks
+                        if (config.wpCanEditTapestry || d.accessible || d.userType === 'teen') {
+                            if (!isMultiSelect) {
+                                selection.clear();
+                                tapestry.selectNode(d.id);
+                            } else {
+                                selection.add(d);
+                            }
                         }
                     }
-                }
-            });
+                });
         }
         else {
             nodes
@@ -1464,7 +1465,6 @@ function tapestryTool(config){
             })
             .attr("fill", "black")
             .style("opacity", 0)
-            
     }
 
     function setNodeListeners(nodes) {
@@ -1476,7 +1476,6 @@ function tapestryTool(config){
         nodes.on("mouseover", null).on("mouseout", null).on("mouseleave", null);
 
         nodes.on("mouseover", function (thisNode) {
-
             // Place this node at the end of the svg so that it appears on top
             $(this).insertAfter($(this).parent().children().last())
 
@@ -1904,11 +1903,9 @@ function tapestryTool(config){
                 if (d.tydeType === "Question set" && d.mediaType !== "accordion") {
                     return "visibility: hidden";
                 }
-
                 if (d.nodeType === "grandchild" || d.nodeType === "child") {
                     return "visibility: hidden";
                 }
-
                 return "visibility: visible";
             })
             .attr("class", "mediaButton addNodeButton")
@@ -1925,8 +1922,8 @@ function tapestryTool(config){
                 })
                 .on('end',function(){
                     if (typeof linkToNode != "undefined" && linkFromNode.id != linkToNode.id) {
-
                         const shouldAddLink = confirm(`Link from ${linkFromNode.title} to ${linkToNode.title}?`);
+
                         if (!shouldAddLink) {
                             return;
                         }
@@ -2169,7 +2166,7 @@ function tapestryTool(config){
             ? link.source 
             : getNodeById(link.source);
     }
-    
+
     // Set multiple attributes for an HTML element at once
     function setAttributes(elem, obj) {
         for (var prop in obj) {
@@ -2517,7 +2514,7 @@ function tapestryTool(config){
                     node.typeData = content.typeData
                 }
 
-                if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
+                if (node.mediaType !== "accordion" && node.typeData.progress) {
                     //Update the dataset with new values
 
                     node.typeData.progress[0].value = amountViewed;

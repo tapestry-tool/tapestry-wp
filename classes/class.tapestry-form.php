@@ -40,9 +40,9 @@ class TapestryForm implements ITapestryForm
             $userId = apply_filters('determine_current_user', false);
         }
         $search_criteria['field_filters'][] = [
-      'key' => 'created_by',
-      'value' => $userId,
-    ];
+            'key' => 'created_by',
+            'value' => $userId,
+        ];
 
         return GFAPI::get_entries($formId, $search_criteria);
     }

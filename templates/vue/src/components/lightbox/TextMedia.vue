@@ -1,5 +1,5 @@
 <template>
-  <article class="article">
+  <article class="text-media">
     <h1>{{ node.title }}</h1>
     <div v-html="content"></div>
   </article>
@@ -27,7 +27,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.article {
+.text-media {
   padding: 0 1em 1em;
   text-align: left;
 
@@ -43,9 +43,9 @@ export default {
 
   div {
     font-family: "Source Sans Pro", sans-serif;
-    font-size: 1em;
+    font-size: 16px;
     white-space: pre-wrap;
-    margin: 0 auto 1em;
+    margin: 0 auto;
   }
 }
 </style>

@@ -2,9 +2,9 @@
 
 // TODO Change exceptions to using an ERROR class
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-user-progress.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
 
 /**
  * Add/update/retrieve User progress.
@@ -135,10 +135,13 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return string user entries in json format
      */
-    public function getUserEntries($userId, $formId = 0)
+    public function getUserEntries($userId = 0, $formId = 0)
     {
         if (!class_exists('GFAPI')) {
             return [];
+        }
+        if (!$userId) {
+            $userId = $this->_userId;
         }
         $search_criteria['field_filters'][] = [
             'key' => 'created_by',

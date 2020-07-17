@@ -2,8 +2,8 @@ import Vue from "vue"
 import Vuex from "vuex"
 
 import * as actions from "./actions"
-import * as getters from "./getters"
 import * as mutations from "./mutations"
+import * as getters from "./getters"
 
 import Helpers from "../utils/Helpers"
 
@@ -14,7 +14,6 @@ const store = new Vuex.Store({
     groups: [],
     links: [],
     nodes: [],
-    lightbox: null,
     progress: {},
     rootId: null,
     settings: {},
@@ -25,7 +24,6 @@ const store = new Vuex.Store({
     favourites: [],
   },
   getters: {
-    ...getters,
     selectedNode: state => {
       const { selectedNodeId } = state
       const node = state.nodes[Helpers.findNodeIndex(selectedNodeId, state)]
@@ -45,6 +43,7 @@ const store = new Vuex.Store({
     getNode: state => id => state.nodes[Helpers.findNodeIndex(id, state)],
     getNodeProgress: state => id => state.progress[id],
     nodes: state => state.nodes,
+    ...getters,
   },
   mutations,
   actions,

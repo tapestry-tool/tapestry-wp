@@ -73,6 +73,45 @@ export default class Helpers {
     return `${wpData.vue_uri}/${image.split("dist")[1]}`
   }
 
+  // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
+  static decodeHTMLChars(str) {
+    return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
+  }
+
+  static getYoutubeID(url) {
+    const linkRegex = /(?:youtube\.com\/\S*(?:(?:e(?:mbed))?\/|watch\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/
+    const matchArray = url.match(linkRegex)
+    return matchArray === null ? "" : matchArray[1] // Returns '' if link is not youtube URL
+  }
+
+  /**
+   * Shallowly checks if two objects are different from one another
+   * @param {Object} src
+   * @param {Object} other
+   */
+  static isDifferent(src, other) {
+    const srcKeys = Object.keys(src)
+    const otherKeys = Object.keys(other)
+
+    // Check 1: If one object has more keys than the other
+    if (srcKeys.length !== otherKeys.length) {
+      return true
+    }
+
+    // Check 2: If they have the same keys
+    if (!srcKeys.every(key => otherKeys.includes(key))) {
+      return true
+    }
+
+    // Check 3: If the key values are equal
+    for (const key of Object.keys(src)) {
+      if (src[key] !== other[key]) {
+        return true
+      }
+    }
+    return false
+  }
+
   static base64ToBlob(b64Data, contentType) {
     const url = `data:${contentType};base64,${b64Data}`
     return new Promise(resolve => {
@@ -80,11 +119,6 @@ export default class Helpers {
         resolve(response.blob())
       })
     })
-  }
-
-  // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
-  static decodeHTMLChars(str) {
-    return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
   }
 
   // src: https://gist.github.com/beaucharman/e46b8e4d03ef30480d7f4db5a78498ca
@@ -118,40 +152,6 @@ export default class Helpers {
     return Array(end - start + 1)
       .fill()
       .map((_, idx) => start + idx)
-  }
-
-  static getYoutubeID(url) {
-    const linkRegex = /(?:youtube\.com\/\S*(?:(?:e(?:mbed))?\/|watch\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/
-    const matchArray = url.match(linkRegex)
-    return matchArray === null ? null : matchArray[1] // Returns null if link is not youtube URL
-  }
-
-  /**
-   * Shallowly checks if two objects are different from one another
-   * @param {Object} src
-   * @param {Object} other
-   */
-  static isDifferent(src, other) {
-    const srcKeys = Object.keys(src)
-    const otherKeys = Object.keys(other)
-
-    // Check 1: If one object has more keys than the other
-    if (srcKeys.length !== otherKeys.length) {
-      return true
-    }
-
-    // Check 2: If they have the same keys
-    if (!srcKeys.every(key => otherKeys.includes(key))) {
-      return true
-    }
-
-    // Check 3: If the key values are equal
-    for (const key of Object.keys(src)) {
-      if (src[key] !== other[key]) {
-        return true
-      }
-    }
-    return false
   }
 
   /**
