@@ -40,28 +40,22 @@ export default {
 .tapestry-activity {
   position: relative;
   align-items: center;
-  background: #eee;
+  background: #262626;
   border-radius: 8px;
   display: flex;
   margin-bottom: 8px;
   padding: 8px 16px 8px 38px;
   justify-content: center;
-  font-size: 1.5em;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   .icon {
-    color: #ccc;
     height: 24px;
     width: 24px;
     position: absolute;
     left: 8px;
-  }
-
-  img {
-    filter: brightness(0.8);
   }
 
   .checklist {
@@ -78,10 +72,6 @@ export default {
       &:nth-last-child(-n + 2):first-child,
       &:nth-last-child(-n + 2):first-child ~ li {
         flex-grow: 1;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
       }
 
       > .img-wrapper {

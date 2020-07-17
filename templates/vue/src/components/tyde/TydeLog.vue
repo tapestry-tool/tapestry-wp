@@ -74,8 +74,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 .log {
   position: relative;
   background: var(--tapestry-med-gray);

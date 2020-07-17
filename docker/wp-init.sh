@@ -8,4 +8,4 @@ echo 'chmod 0755 /var/www/html/wp-content/uploads' >> /usr/local/bin/docker-entr
 echo 'exec "$@"' >> /usr/local/bin/docker-entrypoint.sh
 
 # execute apache
-# exec "apache2-foreground" 
+# exec "apache2-foreground"

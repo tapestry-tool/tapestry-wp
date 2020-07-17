@@ -3,7 +3,7 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button v-if="!readOnly" class="button-nav" @click="back">
+    <button v-if="!readOnly" class="question-button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -53,7 +53,7 @@
       <div v-else>
         <div class="question-content">
           <p class="question-answer-text">I want to answer with...</p>
-          <div class="button-container">
+          <div class="buttons">
             <answer-button
               v-if="hasId('textId')"
               :completed="textFormCompleted"
@@ -87,25 +87,29 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import AnswerButton from "./AnswerButton"
-import SpeechBubble from "../../SpeechBubble"
+import AudioRecorder from "@/components/AudioRecorder"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
-import Helpers from "@/utils/Helpers"
-import AudioRecorder from "@/components/AudioRecorder"
 import TapestryActivity from "@/components/TapestryActivity"
+import SpeechBubble from "@/components/SpeechBubble"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "question",
   components: {
     AnswerButton,
-    SpeechBubble,
+    AudioRecorder,
     GravityForm,
     Loading,
-    AudioRecorder,
     TapestryActivity,
+    SpeechBubble,
   },
   props: {
     question: {
+      type: Object,
+      required: true,
+    },
+    node: {
       type: Object,
       required: true,
     },
@@ -113,10 +117,6 @@ export default {
       type: String,
       required: false,
       default: "1/1",
-    },
-    node: {
-      type: Object,
-      required: true,
     },
     readOnly: {
       type: Boolean,
@@ -281,8 +281,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 button {
   margin: auto;
 }
@@ -297,18 +295,9 @@ button {
   justify-content: space-between;
   height: 100%;
   width: 100%;
-  font-size: 0.8em;
-
-  &.question-h5p {
-    max-width: 600px;
-  }
 
   &.question-gf {
     overflow: scroll;
-
-    textarea {
-      max-height: 180px !important;
-    }
 
     .image-choices-choice-image-wrap img.image-choices-choice-image {
       max-width: 100px;
@@ -318,14 +307,12 @@ button {
   h3 {
     font-size: 2em;
   }
-}
 
-.question {
-  .button-nav {
+  .question-button-nav {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    background: $tyde-blue;
+    background: #262626;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,7 +328,7 @@ button {
     z-index: 20;
 
     &:hover {
-      opacity: 0.8;
+      background: #11a6d8;
     }
 
     &:disabled {
@@ -365,25 +352,10 @@ button {
 
   &-title {
     position: relative;
-    font-size: 0.8em;
+    font-size: 28px;
     font-weight: 600 !important;
     padding-top: 16px;
-    margin: 15px 0 36px 25px;
-
-    &-step {
-      position: absolute;
-      border: 2px solid black;
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      top: -16px;
-      left: -24px;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5em;
-    }
+    margin-bottom: 36px;
 
     &:before {
       display: none;
@@ -401,7 +373,7 @@ button {
     align-items: center;
     justify-content: center;
 
-    .button-container {
+    .buttons {
       width: 100%;
       display: flex;
       justify-content: center;
@@ -411,7 +383,7 @@ button {
   &-answer-text {
     width: 100%;
     padding: 0;
-    font-size: 1.75em;
+    font-size: 28px;
     font-style: italic;
   }
 }

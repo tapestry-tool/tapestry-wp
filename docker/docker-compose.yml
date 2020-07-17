@@ -41,4 +41,4 @@ services:
 
 volumes:
     db_data:
-    node_modules: 
+    node_modules:

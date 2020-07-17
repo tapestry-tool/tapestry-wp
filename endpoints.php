@@ -1168,7 +1168,6 @@ function completeQuestionById($request)
 function getUserH5PSettingsByPostId($request)
 {
     $postId = $request['tapestryPostId'];
-
     try {
         $userProgress = new TapestryUserProgress($postId);
 
@@ -1179,7 +1178,8 @@ function getUserH5PSettingsByPostId($request)
 }
 
 /**
- * Update the user's h5p settings by post id
+ * Update the user's h5p settings by post id.
+ *
  * Example endpoint: /wp-json/tapestry-tool/v1/users/h5psettings/44
  * Example body:
  * {
@@ -1189,7 +1189,7 @@ function getUserH5PSettingsByPostId($request)
  *  "quality": "q1",
  *  "playbackRate": 0.5,
  *  "time": 11.934346
- * }.
+ * }
  *
  * @param object $request HTTP request
  */
@@ -1197,7 +1197,6 @@ function updateUserH5PSettingsByPostId($request)
 {
     $postId = $request['tapestryPostId'];
     $h5pSettingsData = $request->get_body();
-
     try {
         $userProgress = new TapestryUserProgress($postId);
         $userProgress->updateH5PSettings($h5pSettingsData);

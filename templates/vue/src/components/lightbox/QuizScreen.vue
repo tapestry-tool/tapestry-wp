@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="close">
+      <button v-else class="quiz-screen-button-completion" @click="close">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -33,10 +33,10 @@
 
 <script>
 import Question from "./quiz-screen/Question"
-import Helpers from "@/utils/Helpers"
-import BackgroundImg from "@/assets/question-screen-bg.png"
 import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
+import Helpers from "@/utils/Helpers"
+import BackgroundImg from "@/assets/question-screen-bg.png"
 
 export default {
   name: "quiz-screen",
@@ -72,9 +72,6 @@ export default {
     activeQuestion() {
       return this.quiz[this.activeQuestionIndex]
     },
-    backgroundImage() {
-      return `url(${Helpers.getImagePath(BackgroundImg)})`
-    },
     currentQuestionText() {
       return `${this.activeQuestionIndex + 1}/${this.quiz.length}`
     },
@@ -83,6 +80,9 @@ export default {
     },
     hasPrev() {
       return this.activeQuestionIndex !== 0
+    },
+    backgroundImage() {
+      return `url(${Helpers.getImagePath(BackgroundImg)})`
     },
   },
   methods: {
@@ -115,27 +115,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/tyde-colors.scss";
-
 .quiz-screen {
   display: flex;
   background-size: cover;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 24px;
-  padding-left: 20%;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   min-height: 100%;
-  color: black;
+  background: #111;
+  color: #eee;
   z-index: 10;
-  background-color: #fff;
-  background-size: 80%;
-  background-repeat: no-repeat;
-  background-position: 0 80%;
+  padding: 24px;
 }
 
 .question-footer {
@@ -145,7 +139,7 @@ export default {
   align-items: center;
 }
 
-.button-completion {
+.quiz-screen-button-completion {
   background: none;
   padding: 0;
   margin: 0;
@@ -174,19 +168,19 @@ export default {
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  background: $tyde-blue;
+  background: #262626;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5em;
+  font-size: 40px;
   color: white;
   margin: 0;
   margin-right: 12px;
   opacity: 1;
-  transition: opacity 0.1s ease-out;
+  transition: all 0.1s ease-out;
 
   &:hover {
-    opacity: 0.8;
+    background: #11a6d8;
   }
 
   &:disabled {
@@ -204,8 +198,7 @@ export default {
   margin: 0;
   padding: 0;
   font-weight: bold;
-  font-size: 2.5em;
-  color: $tyde-blue;
+  font-size: 40px;
   margin-right: 32px;
 }
 </style>

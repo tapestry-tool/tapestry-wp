@@ -62,7 +62,7 @@ interface ITapestryUserProgress
      *
      * @return string user entries in json format
      */
-    public function getUserEntries($formId);
+    public function getUserEntries($userId = 0, $formId = 0);
 
     /**
      * Get User's favourite nodes from a tapestry post.

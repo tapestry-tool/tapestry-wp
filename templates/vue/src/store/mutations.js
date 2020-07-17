@@ -38,10 +38,6 @@ export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
-export function setLightbox(state, el) {
-  state.lightbox = el
-}
-
 // nodes
 export function addNode(state, node) {
   state.nodes.push(node)
@@ -103,6 +99,40 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
   question.entries = entries
 }
 
+// favourites
+export function updateFavourites(state, { favourites }) {
+  state.favourites = favourites
+}
+
+function getChildIds(state, nodeId) {
+  const links = state.links
+  return links
+    .filter(link =>
+      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
+    )
+    .map(link => (link.target.id == undefined ? link.target : link.target.id))
+}
+
+export function initializeOrdering(state, id) {
+  const node = state.nodes[Helpers.findNodeIndex(id, state)]
+  getChildIds(state, id)
+    .filter(cid => !node.childOrdering.includes(cid))
+    .forEach(id => node.childOrdering.push(id))
+  const children = getChildIds(state, id)
+  node.childOrdering = node.childOrdering.filter(id => children.includes(id))
+}
+
+export function updateOrdering(state, payload) {
+  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
+  state.nodes[nodeIndex].childOrdering = payload.ord
+}
+
+// TYDE ONLY
+
+export function updateSelectedModule(state, moduleId) {
+  state.selectedModuleId = moduleId
+}
+
 export function updateTydeProgress(state, { parentId, isParentModule }) {
   const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
   const childNodeIds = getChildIds(state, parentId)
@@ -138,36 +168,4 @@ function getParentIds(state, nodeId) {
       link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId
     )
     .map(link => (link.source.id == undefined ? link.source : link.source.id))
-}
-
-// favourites
-export function updateFavourites(state, { favourites }) {
-  state.favourites = favourites
-}
-
-function getChildIds(state, nodeId) {
-  const links = state.links
-  return links
-    .filter(link =>
-      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
-    )
-    .map(link => (link.target.id == undefined ? link.target : link.target.id))
-}
-
-export function initializeOrdering(state, id) {
-  const node = state.nodes[Helpers.findNodeIndex(id, state)]
-  getChildIds(state, id)
-    .filter(cid => !node.childOrdering.includes(cid))
-    .forEach(id => node.childOrdering.push(id))
-  const children = getChildIds(state, id)
-  node.childOrdering = node.childOrdering.filter(id => children.includes(id))
-}
-
-export function updateOrdering(state, payload) {
-  const nodeIndex = Helpers.findNodeIndex(payload.id, state)
-  state.nodes[nodeIndex].childOrdering = payload.ord
-}
-
-export function updateSelectedModule(state, moduleId) {
-  state.selectedModuleId = moduleId
 }

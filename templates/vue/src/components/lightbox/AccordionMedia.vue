@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="media-container">
+  <div ref="container" class="media-container accordion">
     <header class="header" :style="headerBackground">
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
@@ -118,13 +118,13 @@
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
+import SubAccordion from "./accordion/SubAccordion"
 import TapestryAccordion from "../TapestryAccordion"
 import TydeProgressBar from "../tyde/TydeProgressBar"
 import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
-import SubAccordion from "./accordion/SubAccordion"
 
 export default {
   name: "accordion-media",
@@ -132,9 +132,9 @@ export default {
     TapestryMedia,
     TapestryModal,
     TapestryAccordion,
+    SubAccordion,
     TydeIcon,
     TydeProgressBar,
-    SubAccordion,
   },
   props: {
     node: {
@@ -149,9 +149,9 @@ export default {
   },
   data() {
     return {
-      activeIndex: 0,
       showCompletion: false,
       isMounted: false,
+      activeIndex: 0,
     }
   },
   computed: {
@@ -330,29 +330,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header {
-  color: white;
-  text-align: left;
-  padding: 24px 48px;
-  background-size: cover;
-  border-radius: 8px 8px 0px 0px;
-  display: flex;
-  justify-content: space-between;
-
-  img {
-    height: 96px;
-    margin: -24px 0;
-  }
-}
-
-.title {
-  font-weight: 700;
-  margin: 0;
-}
-
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.title {
+  color: #fff;
+  margin-bottom: 1em;
 }
 
 .media-container {
@@ -360,103 +345,52 @@ button[disabled] {
   overflow: scroll;
   scrollbar-color: auto black;
   scrollbar-width: none;
-  padding: 0;
 
   ::-webkit-scrollbar-track {
     background-color: black;
   }
 }
 
-.rows {
-  padding: 32px;
-}
-
 .button-completion {
-  display: block;
-  width: 100%;
-  background: #3fa9f5;
-  padding: 16px 24px;
+  background: none;
+  padding: 0;
   margin: 0;
-  color: white;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 1.5em;
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: inherit;
+  margin-right: 2em;
 
   &:last-child {
-    margin-bottom: 0;
+    margin-right: 0;
   }
 
   &:hover {
-    opacity: 0.9;
+    color: #11a6d8;
   }
 
   p {
+    margin: 1em auto 0;
     padding: 0;
-    font-weight: 700;
+    font-weight: 600;
   }
 }
 
-.modal-progress {
-  top: 10px;
-}
-
 .button-container {
-  width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .button-row {
   display: flex;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  border-radius: 4px;
 
-  &-trigger {
-    display: flex;
-    align-items: center;
-    background: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    text-align: left;
-  }
-
-  a {
-    cursor: pointer;
-  }
-
-  &-icon {
-    background: #b29ac9;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin-right: 24px;
-  }
-
-  p {
-    display: block;
-    margin: 0;
-    padding: 0;
-    line-height: 1.1;
-    font-size: 1.2em;
-  }
-
-  &-title {
-    font-weight: bold;
-  }
-
-  &-description {
-    font-weight: 400;
-  }
-}
-
-.icon {
-  width: 48px;
-  height: 48px;
-
-  &-activity {
-    width: 52px;
-    margin-right: 10px;
+  i {
+    margin-right: 8px;
   }
 
   a {
@@ -470,44 +404,14 @@ button[disabled] {
   text-align: left;
 }
 
-.icon-container {
-  display: flex;
-  margin-right: 10px;
-  align-items: center;
-  flex: auto;
-}
-
-.button-finished {
-  background: #bbd8ee;
-  border-radius: 16px;
-  margin: 0;
-  padding: 8px 36px;
-  color: #026c93;
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-.sub-accordion-text {
-  margin-bottom: 0;
-}
-
 .accordion-row {
-  background: #643493;
-  border-radius: 16px;
-  padding: 24px;
+  background: #262626;
+  border-radius: 4px;
+  padding: 8px 16px;
   margin-bottom: 8px;
 
   &:last-child {
     margin-bottom: 0;
-  }
-
-  .content {
-    position: relative;
-    background: white;
-    border-radius: 16px;
-    margin-top: 24px;
-    margin-bottom: 16px;
-    box-shadow: 4px 8px 8px rgba(0, 0, 0, 0.16);
   }
 }
 </style>
