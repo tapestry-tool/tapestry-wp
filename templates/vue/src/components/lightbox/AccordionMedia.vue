@@ -3,7 +3,7 @@
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>
-    <tapestry-accordion :rows="rows" :default-index="targetRow" :node-id="node.id">
+    <tapestry-accordion :rows="rows" :node-id="node.id">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
           <div
@@ -102,11 +102,6 @@ export default {
     node: {
       type: Object,
       required: true,
-    },
-    targetRow: {
-      type: Number,
-      required: false,
-      default: 0,
     },
   },
   data() {

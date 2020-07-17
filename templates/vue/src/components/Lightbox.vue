@@ -14,7 +14,6 @@
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
-      :target-row="accordionRow"
       @close="close"
       @complete="complete"
     />
@@ -47,11 +46,6 @@ export default {
   },
   props: {
     nodeId: {
-      type: [String, Number],
-      required: false,
-      default: 0,
-    },
-    row: {
       type: [String, Number],
       required: false,
       default: 0,
@@ -159,9 +153,6 @@ export default {
         width: videoWidth * adjustmentRatio,
         height: videoHeight * adjustmentRatio,
       }
-    },
-    accordionRow() {
-      return Number(this.row)
     },
   },
   watch: {

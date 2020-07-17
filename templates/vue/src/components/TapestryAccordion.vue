@@ -6,61 +6,53 @@ export default {
       type: Array,
       required: true,
     },
-    defaultIndex: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
     nodeId: {
       type: Number,
       required: false,
       default: 0,
     },
   },
-  data() {
-    return {
-      activeRow: null,
-    }
-  },
   computed: {
     hasNext() {
       return this.rows.indexOf(this.activeRow) < this.rows.length - 1
     },
-  },
-  watch: {
-    activeRow() {
-      if (this.nodeId !== 0) {
-        const index =
-          this.rows.indexOf(this.activeRow) === -1
-            ? ""
-            : "/" + this.rows.indexOf(this.activeRow)
-        this.$router.push("/nodes/view/" + this.nodeId + index)
-      }
+    activeRowIndex() {
+      const rowParam =
+        this.nodeId === 0 ? this.$route.params.subrow : this.$route.params.row
+      return rowParam == undefined ? -1 : Number(rowParam)
     },
-  },
-  created() {
-    if (this.defaultIndex >= 0) {
-      const row = this.rows[this.defaultIndex]
-      if (row) {
-        this.activeRow = row
-      }
-    }
+    activeRow() {
+      return this.activeRowIndex == -1 ? null : this.rows[this.activeRowIndex]
+    },
   },
   methods: {
     isVisible(row) {
       return this.activeRow === row
     },
     toggle(row) {
-      if (this.isVisible(row)) {
-        this.activeRow = null
-      } else {
-        this.activeRow = row
+      var pathString = this.$route.path
+      if (this.activeRow !== null && this.activeRow === row){
+        pathString = this.deactivate(row)
+        this.$router.push(pathString).catch(err => {})
       }
+      if (this.activeRow !== null) {
+        pathString = this.deactivate(this.activeRow)
+      }
+      this.$router.push(pathString + "/" + this.rows.indexOf(row)).catch(err => {})
+    },
+    deactivate(row) {
+      if (this.isVisible(row) && this.nodeId !== 0) {
+        return "/nodes/view/" + this.nodeId
+      } else if (this.isVisible(row) && this.nodeId === 0) {
+        const indexLength = String(this.rows.indexOf(this.activeRow)).length + 1
+        return this.$route.path.slice(0, -indexLength)
+      }
+      return this.$route.path
     },
     next() {
       if (this.hasNext) {
         const currIndex = this.rows.indexOf(this.activeRow)
-        this.activeRow = this.rows[currIndex + 1]
+        this.toggle(this.rows[currIndex + 1])
       }
     },
   },

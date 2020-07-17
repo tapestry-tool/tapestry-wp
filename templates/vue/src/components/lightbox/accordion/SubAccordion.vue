@@ -1,6 +1,6 @@
 <template>
   <div ref="container">
-    <tapestry-accordion :rows="rows" :default-index="-1">
+    <tapestry-accordion :rows="rows">
       <template v-slot="{ isVisible, toggle }">
         <div>
           <div
