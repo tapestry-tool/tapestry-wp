@@ -70,6 +70,9 @@ export default {
 <style lang="scss" scoped>
 .icon {
   width: 100%;
+  &.has-align-fix {
+  	top: -.1rem;
+  }
 }
 
 img {
@@ -77,4 +80,6 @@ img {
   max-width: initial;
   position: initial;
 }
+
+
 </style>

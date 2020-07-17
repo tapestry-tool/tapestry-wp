@@ -89,7 +89,7 @@
           <icon name="quote" />
         </button>
         <button class="menubar__button" @click="commands.horizontal_rule">
-          <icon name="hr" />
+          —
         </button>
         <button class="menubar__button" @click="commands.undo">
           <icon name="undo" />
