@@ -1,79 +1,96 @@
 <?php
 /**
- * Tapestry User Roles
+ * Tapestry User Roles.
  */
 class TapestryUserRoles
 {
-    static function canEdit($postId = 0)
+    private $user = null;
+
+    /**
+     * Constructor.
+     *
+     * @param Number $postId     post ID
+     * @param Number $nodeMetaId node meta ID
+     *
+     * @return null
+     */
+    public function __construct($_userId = null)
     {
-        return TapestryUserRoles::isEditor()
-        || TapestryUserRoles::isAdministrator()
-        || TapestryUserRoles::isAuthorOfThePost($postId);
+        $this->user = get_user_by('id', $_userId);
+        if (is_null($this->user) || !$this->user) {
+            $this->user = wp_get_current_user();
+        }
+    }
+
+    public function canEdit($postId = 0)
+    {
+        return $this->isEditor()
+        || $this->isAdministrator()
+        || $this->isAuthorOfThePost($postId);
     }
 
     /**
-     * Check if the current user is a particular role
+     * Check if the current user is a particular role.
      *
-     * @return Boolean
+     * @return bool
      */
-    public static function isRole($role)
+    public function isRole($role)
     {
         return in_array(
             $role,
-            wp_get_current_user()->roles
+            $this->user->roles
         );
     }
 
     /**
-     * Check if the current user is an administrator
+     * Check if the current user is an administrator.
      *
-     * @return Boolean
+     * @return bool
      */
-    public static function isAdministrator()
+    public function isAdministrator()
     {
-        return TapestryUserRoles::isRole('administrator');
+        return $this->isRole('administrator');
     }
 
     /**
-     * Check if the current user is an editor
+     * Check if the current user is an editor.
      *
-     * @return Boolean
+     * @return bool
      */
-    public static function isEditor()
+    public function isEditor()
     {
-        return TapestryUserRoles::isRole('editor');
+        return $this->isRole('editor');
     }
 
     /**
-     * Check if the current user is an author
+     * Check if the current user is an author.
      *
-     * @return Boolean
+     * @return bool
      */
-    public static function isAuthor()
+    public function isAuthor()
     {
-        return TapestryUserRoles::isRole('author');
+        return $this->isRole('author');
     }
 
     /**
-     * Check if the current user is an author of a post
+     * Check if the current user is an author of a post.
      *
-     * @param   Integer $postId post ID
+     * @param int $postId post ID
      *
-     * @return  Boolean
+     * @return bool
      */
-    public static function isAuthorOfThePost($postId)
+    public function isAuthorOfThePost($postId)
     {
-        return wp_get_current_user()->ID
-            == get_post($postId)->post_author;
+        return $this->user->ID == get_post($postId)->post_author;
     }
 
     /**
-     * Check if the current user is a subscriber
+     * Check if the current user is a subscriber.
      *
-     * @return Boolean
+     * @return bool
      */
-    public static function isSubscriber()
+    public function isSubscriber()
     {
-        return TapestryUserRoles::isRole('subscriber');
+        return $this->isRole('subscriber');
     }
 }

@@ -12,31 +12,12 @@
       <b-tbody>
         <b-tr v-for="[rowName, permissionsList] in permissions" :key="rowName">
           <b-th class="text-left text-capitalize">{{ rowName }}</b-th>
-          <b-td class="text-center">
+          <b-td v-for="type in types" :key="type" class="text-center">
             <b-form-checkbox
-              :checked="permissionsList"
-              value="read"
-              :disabled="isPermissionDisabled(rowName, 'read')"
-              :data-testid="`node-permissions-${rowName}-read`"
-              @change="updatePermissions($event, rowName, 'read')"
-            ></b-form-checkbox>
-          </b-td>
-          <b-td class="text-center">
-            <b-form-checkbox
-              :checked="permissionsList"
-              value="add"
-              :disabled="isPermissionDisabled(rowName, 'add')"
-              :data-testid="`node-permissions-${rowName}-add`"
-              @change="updatePermissions($event, rowName, 'add')"
-            ></b-form-checkbox>
-          </b-td>
-          <b-td class="text-center">
-            <b-form-checkbox
-              :checked="permissionsList"
-              value="edit"
-              :disabled="isPermissionDisabled(rowName, 'edit')"
-              :data-testid="`node-permissions-${rowName}-edit`"
-              @change="updatePermissions($event, rowName, 'edit')"
+              :checked="permissionsList.includes(type)"
+              :disabled="isPermissionOverridden(rowName, type)"
+              :data-testid="`node-permissions-${rowName}-${type}`"
+              @change="updatePermissions($event, rowName, type)"
             ></b-form-checkbox>
           </b-td>
         </b-tr>
@@ -47,7 +28,7 @@
                 v-model="userId"
                 placeholder="Enter user ID"
               ></b-form-input>
-              <b-button variant="secondary" @click="addUserPermissionRow()">
+              <b-button variant="secondary" @click="addUserPermissionRow">
                 <span class="fas fa-plus mr-1"></span>
                 User
               </b-button>
@@ -81,6 +62,7 @@ export default {
   data() {
     return {
       userId: "",
+      addedByUser: new Set(),
     }
   },
   computed: {
@@ -107,65 +89,127 @@ export default {
   mounted() {
     this.$emit("input", Object.fromEntries(this.permissions))
   },
+  created() {
+    this.types = ["read", "add", "edit"]
+    for (const [rowName, permissionsList] of this.permissions) {
+      for (const type of permissionsList) {
+        this.addedByUser.add(`${rowName}-${type}`)
+      }
+    }
+  },
   methods: {
-    updatePermissions(value, rowName, type) {
-      const newPermissions = { ...this.value }
-      this.changeIndividualPermission(value, rowName, type, newPermissions)
-      if (this.shouldCascade(rowName, type)) {
+    cascade(isChecked, rowName, type, newPermissions) {
+      if (this.shouldCascade(rowName)) {
         const rowIndex = this.getPermissionRowIndex(rowName)
         const lowerPriorityPermissions = this.permissions.slice(rowIndex + 1)
         lowerPriorityPermissions.forEach(newRow => {
-          this.changeIndividualPermission(value, newRow[0], type, newPermissions)
+          const key = `${newRow[0]}-${type}`
+          isChecked ? this.addedByUser.add(key) : this.addedByUser.delete(key)
+          this.changeIndividualPermission(isChecked, newRow[0], type, newPermissions)
         })
       }
+    },
+    updatePermissions(isChecked, rowName, type) {
+      const newPermissions = Object.fromEntries(this.permissions)
+      this.changeIndividualPermission(isChecked, rowName, type, newPermissions)
+      this.cascade(isChecked, rowName, type, newPermissions)
+
+      if (type === "add" || type === "edit") {
+        const currentPermissions = newPermissions[rowName]
+        const key = `${rowName}-read`
+        if (isChecked) {
+          if (!currentPermissions.includes("read")) {
+            currentPermissions.push("read")
+            this.cascade(isChecked, rowName, "read", newPermissions)
+          }
+        } else if (
+          !this.addedByUser.has(key) &&
+          !currentPermissions.find(type => type === "add" || type === "edit")
+        ) {
+          newPermissions[rowName] = currentPermissions.filter(
+            perm => perm !== "read"
+          )
+          this.cascade(isChecked, rowName, "read", newPermissions)
+        }
+      }
+
       this.$emit("input", newPermissions)
     },
-    isPermissionDisabled(rowName, type) {
-      if (rowName == "public") {
+    isPermissionOverridden(rowName, type) {
+      const currentPermissions = this.permissions[
+        this.getPermissionRowIndex(rowName)
+      ][1]
+
+      if (
+        currentPermissions.includes("add") ||
+        currentPermissions.includes("edit")
+      ) {
+        return type === "read"
+      }
+
+      // If the row is the first in order, it should never be overridden
+      if (rowName === PERMISSIONS_ORDER[0]) {
         return false
       }
-      // keep going up until we find a non-user higher row
-      const rowIndex = this.getPermissionRowIndex(rowName)
-      const higherRow = this.permissions[rowIndex - 1][0]
-      if (higherRow.startsWith("user") || wpData.roles.hasOwnProperty(higherRow)) {
-        return this.isPermissionDisabled(higherRow, type)
+
+      const publicPermissions = this.permissions.find(
+        permList => permList[0] === "public"
+      )
+
+      if (rowName === "authenticated") {
+        return publicPermissions && publicPermissions[1].includes(type)
       }
-      const permissions = this.value[higherRow]
-      if (permissions) {
-        return permissions.includes(type)
+
+      const authenticatedPermissions = this.permissions.find(
+        permList => permList[0] === "authenticated"
+      )
+
+      if (!publicPermissions || !authenticatedPermissions) {
+        return false
       }
-      return false
+
+      return (
+        publicPermissions[1].includes(type) ||
+        authenticatedPermissions[1].includes(type)
+      )
     },
-    changeIndividualPermission(value, rowName, type, permissionsObj) {
-      let currentPermissions = permissionsObj[rowName]
-      if (!currentPermissions) {
-        currentPermissions = []
-      }
+    changeIndividualPermission(isChecked, rowName, type, permissionsObj) {
+      const currentPermissions = permissionsObj[rowName] || []
       let newPermissions = [...currentPermissions]
-      if (value) {
-        if (!currentPermissions.includes(value)) {
-          newPermissions.push(value)
+
+      const key = `${rowName}-${type}`
+      if (!isChecked) {
+        if (
+          type !== "read" ||
+          !currentPermissions.find(perm => perm === "add" || perm === "edit")
+        ) {
+          newPermissions = currentPermissions.filter(
+            permission => permission !== type
+          )
         }
-      } else {
-        newPermissions = currentPermissions.filter(permission => permission !== type)
+        this.addedByUser.delete(key)
+      } else if (!currentPermissions.includes(type)) {
+        newPermissions.push(type)
+        this.addedByUser.add(key)
       }
+
       permissionsObj[rowName] = newPermissions
     },
     addUserPermissionRow() {
       const userId = this.userId
       if (userId && Helpers.onlyContainsDigits(userId) && this.userId != "") {
-        const higherRow = this.permissions[this.permissions.length - 1][0]
-        const higherRowPermissions = this.value[higherRow]
-        const newPermissions = { ...this.value }
+        const [higherRow, higherRowPermissions] = this.permissions[
+          this.permissions.length - 1
+        ]
+        const newPermissions = Object.fromEntries(this.permissions)
         const newUserPermissions = []
-        const types = ["read", "add", "edit"]
-        types
-          .filter(type => this.shouldCascade(higherRow, type))
-          .forEach(type => {
-            if (higherRowPermissions.includes(type)) {
-              newUserPermissions.push(type)
-            }
-          })
+        this.types
+          .filter(
+            type =>
+              this.isPermissionOverridden(higherRow, type) &&
+              higherRowPermissions.includes(type)
+          )
+          .forEach(type => newUserPermissions.push(type))
         newPermissions[`user-${userId}`] = newUserPermissions
         this.userId = null
         this.$emit("input", newPermissions)
@@ -176,11 +220,8 @@ export default {
     getPermissionRowIndex(rowName) {
       return this.permissions.findIndex(thisRow => thisRow[0] === rowName)
     },
-    shouldCascade(rowName, type) {
-      if (rowName === "public" || rowName === "authenticated") {
-        return true
-      }
-      return this.isPermissionDisabled(rowName, type)
+    shouldCascade(rowName) {
+      return rowName === "public" || rowName === "authenticated"
     },
   },
 }
