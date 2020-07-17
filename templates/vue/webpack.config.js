@@ -1,6 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
-require("babel-polyfill");
+require('babel-polyfill');
 
 module.exports = {
   entry: ['babel-polyfill', './src/main.js'],
@@ -56,13 +56,18 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true,
     overlay: true,
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: { 'Access-Control-Allow-Origin': '*' },
     hot: true,
+    port: 8080
   },
   performance: {
     hints: false
   },
   devtool: '#eval-source-map'
+}
+
+if (process.env.NODE_ENV === 'development') {
+  module.exports.output.publicPath = 'http://localhost:8080/dist/'
 }
 
 if (process.env.NODE_ENV === 'production') {
