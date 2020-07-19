@@ -44,7 +44,7 @@ body {
     padding-top: 33px;
     margin: 0;
 }
-#header div, p {
+#header div {
     vertical-align: middle;
     padding-left: 50px;
     display: inline-block;
