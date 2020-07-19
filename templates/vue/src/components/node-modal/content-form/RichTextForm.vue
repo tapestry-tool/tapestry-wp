@@ -32,17 +32,17 @@
         </button>
         <button
           class="menubar__button"
-          :class="{ 'is-active': isActive.link() }"
-          @click="setUrl(commands.link)"
-        >
-          <icon name="link" />
-        </button>
-        <button
-          class="menubar__button"
           :class="{ 'is-active': isActive.code() }"
           @click="commands.code"
         >
           <icon name="code" />
+        </button>
+        <button
+          class="menubar__button"
+          :class="{ 'is-active': isActive.link() }"
+          @click="setUrl(commands.link)"
+        >
+          <icon name="link" />
         </button>
         <button
           :style="gapLeft"
@@ -91,7 +91,11 @@
         <button class="menubar__button" @click="commands.horizontal_rule">
           —
         </button>
-        <button class="menubar__button" @click="commands.undo">
+        <button
+          style="margin-left: auto;"
+          class="menubar__button"
+          @click="commands.undo"
+        >
           <icon name="undo" />
         </button>
         <button class="menubar__button" @click="commands.redo">
@@ -154,10 +158,10 @@ export default {
       linkUrl: null,
       linkMenuIsActive: false,
       gapLeft: {
-        marginLeft: "2em",
+        marginLeft: "1em",
       },
       gapRight: {
-        marginRight: "2em",
+        marginRight: "1em",
       },
     }
   },
