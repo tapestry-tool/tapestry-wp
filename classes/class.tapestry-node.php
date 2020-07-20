@@ -1,13 +1,13 @@
 <?php
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-errors.php";
-require_once dirname(__FILE__) . "/../utilities/class.tapestry-helpers.php";
-require_once dirname(__FILE__) . "/../interfaces/interface.tapestry-node.php";
-require_once dirname(__FILE__) . "/../classes/class.tapestry-user-progress.php";
-require_once dirname(__FILE__) . "/../classes/class.constants.php";
+
+require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
+require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 /**
- * Add/update/retrieve Tapestry post and its child nodes
- *
+ * Add/update/retrieve Tapestry post and its child nodes.
  */
 class TapestryNode implements ITapestryNode
 {
@@ -42,12 +42,12 @@ class TapestryNode implements ITapestryNode
     private $references;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param   Number  $tapestryPostId tapestry post ID
-     * @param   Number  $nodeMetaId node meta ID
+     * @param Number $tapestryPostId tapestry post ID
+     * @param Number $nodeMetaId     node meta ID
      *
-     * @return  NULL
+     * @return null
      */
     public function __construct($tapestryPostId = 0, $nodeMetaId = 0)
     {
@@ -75,12 +75,12 @@ class TapestryNode implements ITapestryNode
         $this->hideProgress = false;
         $this->hideMedia = false;
         $this->skippable = true;
-        $this->quiz = array();
+        $this->quiz = [];
         $this->fullscreen = false;
-        $this->childOrdering = array();
+        $this->childOrdering = [];
         $this->fitWindow = true;
-        $this->license = "";
-        $this->references = "";
+        $this->license = '';
+        $this->references = '';
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -90,9 +90,9 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
-     * Save the Tapestry node
+     * Save the Tapestry node.
      *
-     * @return  Object  $node
+     * @return object $node
      */
     public function save()
     {
@@ -100,11 +100,11 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
-     * Set Node
+     * Set Node.
      *
-     * @param   Object  $node  node
+     * @param object $node node
      *
-     * @return  NULL
+     * @return null
      */
     public function set($node)
     {
@@ -177,7 +177,7 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
         }
-        if (isset($node->license) && is_string($node->license)) {
+        if (isset($node->license) && is_object($node->license)) {
             $this->license = $node->license;
         }
         if (isset($node->references) && is_string($node->references)) {
@@ -186,22 +186,23 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
-     * Get the node
+     * Get the node.
      *
-     * @return  $node    node
+     * @return $node node
      */
     public function get()
     {
         if (!$this->nodeMetaId) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
+
         return $this->_formNode();
     }
 
     /**
-     * Delete a node
+     * Delete a node.
      *
-     * @return NULL
+     * @return null
      */
     public function deleteNode()
     {
@@ -213,11 +214,11 @@ class TapestryNode implements ITapestryNode
     }
 
     /**
-     * Update node conditions by removing conditions by nodeId
+     * Update node conditions by removing conditions by nodeId.
      *
-     * @param   String  $nodeId  nodeId
+     * @param string $nodeId nodeId
      *
-     * @return NULL
+     * @return null
      */
     public function removeConditionsById($nodeId)
     {
@@ -250,12 +251,12 @@ class TapestryNode implements ITapestryNode
                     }
                     break;
                 case ConditionTypes::DATE_NOT_PASSED:
-                    if (new DateTime() <= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                    if (new DateTime() <= new DateTime($condition->date.' '.$condition->time, new DateTimeZone($condition->timezone))) {
                         $condition->fulfilled = true;
                     }
                     break;
                 case ConditionTypes::DATE_PASSED:
-                    if (new DateTime() >= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
+                    if (new DateTime() >= new DateTime($condition->date.' '.$condition->time, new DateTimeZone($condition->timezone))) {
                         $condition->fulfilled = true;
                     }
                     break;
@@ -274,7 +275,7 @@ class TapestryNode implements ITapestryNode
         $numFulfilled = 0;
         foreach ($conditions as $condition) {
             if ($condition->fulfilled) {
-                $numFulfilled++;
+                ++$numFulfilled;
             }
         }
 
@@ -287,24 +288,25 @@ class TapestryNode implements ITapestryNode
         $node->quiz = [];
         $node->typeData = (object) [
             'progress' => [
-                0   => [
+                0 => [
                     'group' => 'viewed',
-                    'value' => 0
+                    'value' => 0,
                 ],
-                1   => [
+                1 => [
                     'group' => 'unviewed',
-                    'value' => 1
-                ]
-            ]
+                    'value' => 1,
+                ],
+            ],
         ];
+
         return $node;
     }
 
     public function getContent()
     {
         return [
-            'quiz'      => (array) $this->quiz,
-            'typeData'  => $this->typeData
+            'quiz' => (array) $this->quiz,
+            'typeData' => $this->typeData,
         ];
     }
 
@@ -341,10 +343,10 @@ class TapestryNode implements ITapestryNode
 
     private function _resetAuthor()
     {
-        wp_update_post(array(
+        wp_update_post([
             'ID' => $this->nodePostId,
             'post_author' => $this->author['id'],
-        ));
+        ]);
     }
 
     private function _loadFromDatabase()
@@ -359,6 +361,7 @@ class TapestryNode implements ITapestryNode
         $this->nodePostId = $nodePostId;
 
         $nodeData = get_post_meta($nodePostId, 'tapestry_node_data', true);
+
         return $this->_formNodeData($nodeData, $nodeMetadata);
     }
 
@@ -400,21 +403,21 @@ class TapestryNode implements ITapestryNode
             'fullscreen' => $this->fullscreen,
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
-            'fitWindow'     => $this->fitWindow,
-            'license'       => $this->license,
-            'references'    => $this->references
+            'fitWindow' => $this->fitWindow,
+            'license' => $this->license,
+            'references' => $this->references,
         ];
     }
 
     private function _makeMetadata($node, $nodePostId)
     {
-        return (object) array(
+        return (object) [
             'post_id' => $nodePostId,
             'title' => $node->title,
             'permissions' => $node->permissions,
             'coordinates' => $node->coordinates,
             'quiz' => $node->quiz,
-        );
+        ];
     }
 
     private function _formNodeData($nodeData, $nodeMetadata)
@@ -443,6 +446,7 @@ class TapestryNode implements ITapestryNode
         if (isset($nodeMetadata->meta_value->lockedImageURL)) {
             $nodeData->lockedImageURL = $nodeMetadata->meta_value->lockedImageURL;
         }
+
         return $nodeData;
     }
 
@@ -454,8 +458,8 @@ class TapestryNode implements ITapestryNode
         $user = get_user_by('id', $id);
         if ($user) {
             return [
-                "id"    => $id,
-                "name"  => $user->display_name,
+                'id' => $id,
+                'name' => $user->display_name,
             ];
         }
     }

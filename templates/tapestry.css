@@ -1,10 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
 
+:root {
+    --tapestry-gray: #404040;
+    --tapestry-light-gray: #787878;
+    --tapestry-med-gray: #535353;
+    --tapestry-light-blue: #1eade1;
+}
+
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
     font-size: 16px;
     z-index: 0;
 }
+
 * {
     box-sizing: border-box;
 }
@@ -49,7 +57,7 @@ body {
     padding-top: 33px;
     margin: 0;
 }
-#header div, p {
+#header div {
     vertical-align: middle;
     padding-left: 50px;
     display: inline-block;
@@ -264,6 +272,9 @@ body {
 .imageOverlay--no-image {
     opacity: 1;
 }
+.imageOverlay.locked {
+    opacity: 0.8;
+}
 
 .node path:first-of-type {
     fill: #11a6d8;
@@ -278,7 +289,7 @@ body {
     transform: scale(1.2);
 }
 
-.node:hover .imageOverlay {
+.node:hover .imageOverlay:not(.locked) {
     opacity: 0;
 }
 

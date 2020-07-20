@@ -3,6 +3,7 @@
     <b-form-input
       ref="input"
       v-model="inputValue"
+      :placeholder="placeholder"
       :size="size"
       :style="inputStyle"
       @blur="handleBlur"
@@ -51,6 +52,11 @@ export default {
       type: [Object, String],
       required: false,
       default: null,
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: "",
     },
     emptyMessage: {
       type: String,
@@ -174,15 +180,12 @@ export default {
 .combobox-item {
   display: flex;
   align-items: center;
+  font-weight: normal;
 
   code,
   p {
     margin: 0;
     padding: 0;
-  }
-
-  p {
-    font-weight: normal;
   }
 
   code {
