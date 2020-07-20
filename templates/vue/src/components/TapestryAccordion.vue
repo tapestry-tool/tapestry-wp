@@ -35,7 +35,7 @@ export default {
       return this.activeRow === row
     },
     toggle(row) {
-      var pathString = this.$route.path
+      let pathString = this.$route.path
       if (this.activeRow !== null && this.activeRow === row){
         pathString = this.deactivate(row)
         return this.$router.push(pathString)

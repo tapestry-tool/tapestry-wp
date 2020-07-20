@@ -216,7 +216,7 @@ export default {
       return Number(this.$route.params.nodeId)
     },
     tabOrdering() {
-      var tabs = ["content", "appearance"]
+      let tabs = ["content", "appearance"]
       if (
         this.node.mediaType === "h5p" ||
         this.node.mediaType === "video" ||
