@@ -1,52 +1,58 @@
 <?php
 
 /**
- * Tapestry Node Permissions
- *
+ * Tapestry Node Permissions.
  */
 class TapestryNodePermissions
 {
     /**
-     * Get Default Node Permissions
+     * Get Default Node Permissions.
      *
-     * @return  Array   DefaultNodePermissions
+     * @return array DefaultNodePermissions
      */
     public static function getDefaultNodePermissions($tapestryPostId)
     {
-        if ($tapestryPostId == 0) {
-            return (object) [
-                'public'        => ['read'],
-                'authenticated'    => ['read']
-            ];
+        global $wp_roles;
+        $roles = $wp_roles->get_names();
+        $permissions = [
+            'public' => ['read'],
+            'authenticated' => ['read'],
+        ];
+
+        foreach ($roles as $role) {
+            if ('Administrator' !== $role && 'Author' !== $role) {
+                $permissions[strtolower($role)] = ['read'];
+            }
+        }
+
+        if (0 == $tapestryPostId) {
+            return (object) $permissions;
         }
 
         $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
         $defaultPermissions = (isset($tapestry->settings->defaultPermissions) ? $tapestry->settings->defaultPermissions : false);
 
         if (!$defaultPermissions) {
-            return (object) [
-                'public'        => ['read'],
-                'authenticated'    => ['read']
-            ];
+            return (object) $permissions;
         }
 
         return $defaultPermissions;
     }
 
     /**
-     * Get All Node Permission Options
+     * Get All Node Permission Options.
      *
-     * @return  Array   NodePermission
+     * @return array NodePermission
      */
     public static function getNodePermissions()
     {
         return [
-            'ADD'           => 'add',
-            'READ'          => 'read',
-            'EDIT'          => 'edit',
-            'APPROVE'       => 'approve',
-            'EDIT_SUBMIT'   => 'edit_submit',
-            'ADD_SUBMIT'    => 'add_submit',
+            'ADD' => 'add',
+            'READ' => 'read',
+            'EDIT' => 'edit',
+            'APPROVE' => 'approve',
+            'EDIT_SUBMIT' => 'edit_submit',
+            'ADD_SUBMIT' => 'add_submit',
         ];
     }
 }

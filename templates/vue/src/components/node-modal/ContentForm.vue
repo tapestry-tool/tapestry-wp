@@ -11,12 +11,12 @@
       />
     </b-form-group>
     <b-form-group label="Description">
-      <b-form-textarea
+      <rich-text-form
         id="node-description"
         v-model="node.description"
         data-testid="node-description"
         placeholder="Enter description"
-      ></b-form-textarea>
+      />
     </b-form-group>
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
@@ -48,6 +48,7 @@ import AccordionForm from "./content-form/AccordionForm"
 import GravityFormForm from "./content-form/GravityFormForm"
 import H5pForm from "./content-form/H5pForm"
 import TextForm from "./content-form/TextForm"
+import RichTextForm from "./content-form/RichTextForm"
 import UrlEmbedForm from "./content-form/UrlEmbedForm"
 import VideoForm from "./content-form/VideoForm"
 import WpPostForm from "./content-form/WpPostForm"
@@ -59,6 +60,7 @@ export default {
     GravityFormForm,
     H5pForm,
     TextForm,
+    RichTextForm,
     UrlEmbedForm,
     VideoForm,
     WpPostForm,
@@ -110,6 +112,7 @@ export default {
       if (evt === "video" || evt === "h5p") {
         this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
       }
+      this.$emit("type-changed")
     },
   },
 }

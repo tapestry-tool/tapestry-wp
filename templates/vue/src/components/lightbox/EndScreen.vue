@@ -30,7 +30,7 @@ export default {
     },
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
-      return allDone ? "Retake Quiz" : "Take Quiz"
+      return allDone ? "Reanswer Question" : "Answer Question"
     },
   },
 }
