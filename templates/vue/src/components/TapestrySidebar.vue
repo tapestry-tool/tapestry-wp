@@ -48,8 +48,27 @@
         </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
-            <h4 class="content-separator">Copyright</h4>
-            <p class="content-description">{{ node.license }}</p>
+            <h4 class="content-separator">License</h4>
+            <p class="content-description" style="margin-bottom: 0.5em;">
+              <a
+                v-if="license.type === licenseTypes.CUSTOM && license.link"
+                class="license-link"
+                :href="license.link"
+                target="_blank"
+              >
+                {{ license.name }}
+              </a>
+              <span v-else class="license-link">
+                <i v-for="icon in license.icons" :key="icon" :class="icon"></i>
+                {{ license.name }}
+              </span>
+            </p>
+            <p
+              v-if="license.type === licenseTypes.CUSTOM && license.description"
+              class="content-description"
+            >
+              {{ license.description }}
+            </p>
           </section>
           <section v-if="node.references">
             <h4 class="content-separator">References</h4>
@@ -65,6 +84,7 @@
 import { mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import Helpers from "@/utils/Helpers"
+import { licenseTypes, licenses } from "@/utils/constants"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
@@ -90,6 +110,15 @@ export default {
         wpApiSettings.wpCanEditTapestry === "1" ||
         Helpers.hasPermission(this.node, "edit")
       )
+    },
+    licenseTypes() {
+      return licenseTypes
+    },
+    license() {
+      return {
+        ...this.node.license,
+        ...licenses[this.node.license.type],
+      }
     },
   },
   watch: {
@@ -341,6 +370,16 @@ export default {
   .content-description {
     display: block;
     text-align: left;
+  }
+}
+
+.license-link {
+  color: white;
+  text-transform: capitalize;
+  font-weight: 600;
+
+  i {
+    margin-right: 4px;
   }
 }
 </style>
