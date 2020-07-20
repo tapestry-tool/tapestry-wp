@@ -3,7 +3,7 @@
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>
-    <tapestry-accordion :rows="rows" :node-id="node.id">
+    <tapestry-accordion :rows="rows" :node-id="node.id" :base-url="'/nodes/view/'">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
           <div

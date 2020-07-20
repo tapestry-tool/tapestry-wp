@@ -11,6 +11,11 @@ export default {
       required: false,
       default: 0,
     },
+    baseUrl: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     hasNext() {
@@ -33,19 +38,19 @@ export default {
       var pathString = this.$route.path
       if (this.activeRow !== null && this.activeRow === row){
         pathString = this.deactivate(row)
-        this.$router.push(pathString).catch(err => {})
+        return this.$router.push(pathString)
       }
       if (this.activeRow !== null) {
         pathString = this.deactivate(this.activeRow)
       }
-      this.$router.push(pathString + "/" + this.rows.indexOf(row)).catch(err => {})
+      this.$router.push(pathString + "/" + this.rows.indexOf(row))
     },
     deactivate(row) {
-      if (this.isVisible(row) && this.nodeId !== 0) {
-        return "/nodes/view/" + this.nodeId
-      } else if (this.isVisible(row) && this.nodeId === 0) {
+      if (this.isVisible(row) && this.baseUrl !== "") {
+        return this.baseUrl + this.nodeId
+      } else if (this.isVisible(row) && this.baseUrl === "") {
         const indexLength = String(this.rows.indexOf(this.activeRow)).length + 1
-        return this.$route.path.slice(0, -indexLength)
+        return this.$route.path.slice(0, -indexLength) // Removes the index and backslash from end of URL
       }
       return this.$route.path
     },
