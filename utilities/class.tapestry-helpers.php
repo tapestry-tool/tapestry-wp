@@ -1,35 +1,35 @@
 <?php
-require_once dirname(__FILE__) . "/class.tapestry-node-permissions.php";
+
+require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
 
 /**
- * Tapestry Helper Functions
- *
+ * Tapestry Helper Functions.
  */
 class TapestryHelpers
 {
     const POST_TYPES = [
-        'TAPESTRY'      => 'tapestry',
-        'TAPESTRY_NODE' => 'tapestry_node'
+        'TAPESTRY' => 'tapestry',
+        'TAPESTRY_NODE' => 'tapestry_node',
     ];
 
     /**
-     * Check if tapestry is valid
+     * Check if tapestry is valid.
      *
-     * @param   Number  $postId postID
+     * @param Number $postId postID
      *
-     * @return  Boolean
+     * @return bool
      */
     public static function isValidTapestry($postId)
     {
-        return is_numeric($postId) && get_post_type($postId) == 'tapestry';
+        return is_numeric($postId) && 'tapestry' == get_post_type($postId);
     }
 
     /**
-     * Check if tapestry node is valid
+     * Check if tapestry node is valid.
      *
-     * @param   Number  $nodeMetaId node meta ID
+     * @param Number $nodeMetaId node meta ID
      *
-     * @return  Boolean
+     * @return bool
      */
     public static function isValidTapestryNode($nodeMetaId)
     {
@@ -39,53 +39,59 @@ class TapestryHelpers
                 && (!empty($nodeMetadata->meta_value->post_id))
             ) {
                 $nodePostId = $nodeMetadata->meta_value->post_id;
-                return get_post_type($nodePostId) == 'tapestry_node';
+
+                return 'tapestry_node' == get_post_type($nodePostId);
             }
         }
+
         return false;
     }
 
     /**
-     * Check if tapestry group is valid
+     * Check if tapestry group is valid.
      *
-     * @param   Number  $groupMetaId    group meta ID
+     * @param Number $groupMetaId group meta ID
      *
-     * @return  Boolean
+     * @return bool
      */
     public static function isValidTapestryGroup($groupMetaId)
     {
         if (is_numeric($groupMetaId)) {
             $groupMetadata = get_metadata_by_mid('post', $groupMetaId);
+
             return is_object($groupMetadata->meta_value)
-                && $groupMetadata->meta_value->type == 'tapestry_group';
+                && 'tapestry_group' == $groupMetadata->meta_value->type;
         }
+
         return false;
     }
 
     /**
-     * Check if the node is a child of a tapestry
+     * Check if the node is a child of a tapestry.
      *
-     * @param   Number  $nodeMetaId         node meta ID
-     * @param   Number  $tapestryPostId     post ID
+     * @param Number $nodeMetaId     node meta ID
+     * @param Number $tapestryPostId post ID
      *
-     * @return  Boolean
+     * @return bool
      */
     public static function isChildNodeOfTapestry($nodeMetaId, $tapestryPostId)
     {
         if (is_numeric($nodeMetaId) && self::isValidTapestry($tapestryPostId)) {
             $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
+
             return in_array($nodeMetaId, $tapestry->nodes);
         }
+
         return false;
     }
 
     /**
-     * Get all group ids of a user
+     * Get all group ids of a user.
      *
-     * @param   Number  $userId             user ID
-     * @param   Number  $tapestryPostId     post ID
+     * @param Number $userId         user ID
+     * @param Number $tapestryPostId post ID
      *
-     * @return  Array   $groupIds
+     * @return array $groupIds
      */
     public static function getGroupIdsOfUser($userId, $tapestryPostId)
     {
@@ -105,13 +111,13 @@ class TapestryHelpers
     }
 
     /**
-     * Update post
+     * Update post.
      *
-     * @param   Object  $post       post object
-     * @param   String  $postType   post type
-     * @param   Number  $postId     post ID
+     * @param object $post     post object
+     * @param string $postType post type
+     * @param Number $postId   post ID
      *
-     * @return  Number  $postId
+     * @return Number $postId
      */
     public static function updatePost($post, $postType = 'tapestry', $postId = 0)
     {
@@ -127,42 +133,43 @@ class TapestryHelpers
                 $postStatus = $post->settings->status;
                 break;
         }
-        return wp_insert_post(array(
+
+        return wp_insert_post([
             'ID' => $postId,
             'post_type' => $postType,
             'post_status' => $postStatus,
-            'post_title' => $postTitle
-        ), true);
+            'post_title' => $postTitle,
+        ], true);
     }
 
     /**
-     * Check if the current user is allowed to an action
+     * Check if the current user is allowed to an action.
      *
-     * @param   String  $action             action to be performed
-     * @param   Number  $nodeMetaId         node meta ID
-     * @param   Number  $tapestryPostId     post ID
+     * @param string $action         action to be performed
+     * @param Number $nodeMetaId     node meta ID
+     * @param Number $tapestryPostId post ID
      *
-     * @return  Boolean
+     * @return bool
      */
-    public static function currentUserIsAllowed($action, $nodeMetaId, $tapestryPostId)
+    public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
         $options = TapestryNodePermissions::getNodePermissions();
-        $userId = wp_get_current_user()->ID;
-        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
+        $userId = $_userId;
+        if (is_null($userId)) {
+            $userId = wp_get_current_user()->ID;
+        }
+        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+        $roles = new TapestryUserRoles($userId);
 
-        if ((TapestryUserRoles::isEditor())
-            || (TapestryUserRoles::isAdministrator())
-            || (TapestryUserRoles::isAuthorOfThePost($tapestryPostId))
-            || (TapestryUserRoles::isAuthorOfThePost($nodePostId))
-        ) {
+        if (($roles->canEdit($tapestryPostId) && $superuser_override) || $roles->isAuthorOfThePost($nodePostId)) {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
 
             if (
-                property_exists($nodePermissions, 'user-' . $userId) &&
-                in_array($options[$action], $nodePermissions->{'user-' . $userId})
+                property_exists($nodePermissions, 'user-'.$userId) &&
+                in_array($options[$action], $nodePermissions->{'user-'.$userId})
             ) {
                 return true;
             } elseif (
@@ -189,14 +196,15 @@ class TapestryHelpers
             } else {
                 foreach ($groupIds as $groupId) {
                     if (
-                        (property_exists($nodePermissions, 'group-' . $groupId))
-                        && (in_array($options[$action], $nodePermissions->{'group-' . $groupId}))
+                        (property_exists($nodePermissions, 'group-'.$groupId))
+                        && (in_array($options[$action], $nodePermissions->{'group-'.$groupId}))
                     ) {
                         return true;
                     }
                 }
             }
         }
+
         return false;
     }
 }

@@ -42,6 +42,8 @@
           drop-placeholder="Drop file here..."
           :disabled="isUploading"
           required
+          @dragover.prevent
+          @drop.prevent="uploadFile"
           @change="uploadFile"
         ></b-form-file>
       </b-col>
@@ -60,6 +62,9 @@
         />
       </b-col>
     </b-row>
+    <b-alert v-if="error" style="margin: 0 -15px;" show variant="danger">
+      File upload failed: {{ error.message }}
+    </b-alert>
   </b-container>
 </template>
 
@@ -89,6 +94,7 @@ export default {
       uploadPercentage: 0,
       isUploading: false,
       doneUploading: false,
+      error: null,
     }
   },
 
@@ -96,8 +102,18 @@ export default {
     uploadFile(event) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
-      formData.append("async-upload", event.target.files[0])
-      formData.append("name", event.target.files[0].name)
+      formData.append(
+        "async-upload",
+        event.dataTransfer && event.dataTransfer.files
+          ? event.dataTransfer.files[0]
+          : event.target.files[0]
+      )
+      formData.append(
+        "name",
+        event.dataTransfer && event.dataTransfer.files
+          ? event.dataTransfer.files[0]
+          : event.target.files[0].name
+      )
       formData.append("_wpnonce", wpData.file_upload_nonce)
 
       axios
@@ -114,17 +130,30 @@ export default {
               if (this.uploadPercentage === 100) {
                 this.doneUploading = true
               }
-            }, 2000)
+            }, 1000)
           },
         })
         .then(response => {
-          this.$emit("input", response.data.data.url)
+          setTimeout(() => {
+            if (response.data.success) {
+              this.$emit("input", response.data.data.url)
+            } else {
+              this.handleError(response.data)
+            }
+          }, 800)
+        })
+        .catch(response => this.handleError(response))
+        .finally(() => {
+          this.isUploading = false
         })
     },
     reset() {
       this.doneUploading = false
       this.isUploading = false
       this.uploadPercentage = 0
+    },
+    handleError(error) {
+      this.error = error
     },
   },
 }
