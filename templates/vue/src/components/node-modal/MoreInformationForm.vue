@@ -32,10 +32,10 @@
         label="License description"
         style="margin-bottom: 0;"
       >
-        <b-form-textarea
+        <rich-text-form
           v-model="node.license.description"
           placeholder="Describe your license"
-        ></b-form-textarea>
+        ></rich-text-form>
       </b-form-group>
     </b-form-group>
     <b-form-group label="References">

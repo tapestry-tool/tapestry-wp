@@ -44,7 +44,7 @@
         </header>
         <section>
           <h4 class="content-separator">About</h4>
-          <p class="content-description">{{ node.description }}</p>
+          <div class="content-description" v-html="node.description"></div>
         </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
@@ -63,16 +63,15 @@
                 {{ license.name }}
               </span>
             </p>
-            <p
+            <div
               v-if="license.type === licenseTypes.CUSTOM && license.description"
               class="content-description"
-            >
-              {{ license.description }}
-            </p>
+              v-html="license.description"
+            ></div>
           </section>
           <section v-if="node.references">
             <h4 class="content-separator">References</h4>
-            <p class="content-description">{{ node.references }}</p>
+            <div class="content-description" v-html="node.references"></div>
           </section>
         </section>
       </div>
@@ -370,6 +369,10 @@ export default {
   .content-description {
     display: block;
     text-align: left;
+
+    a {
+      color: white;
+    }
   }
 }
 
