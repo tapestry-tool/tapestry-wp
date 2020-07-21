@@ -59,7 +59,9 @@
                 {{ license.name }}
               </a>
               <span v-else class="license-link">
-                <i v-for="icon in license.icons" :key="icon" :class="icon"></i>
+                <span v-if="node.license.type !== licenseTypes.CUSTOM">
+                  <i v-for="icon in license.icons" :key="icon" :class="icon"></i>
+                </span>
                 {{ license.name }}
               </span>
             </p>

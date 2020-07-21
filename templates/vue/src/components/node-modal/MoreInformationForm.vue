@@ -76,6 +76,15 @@ export default {
       }))
     },
   },
+  mounted() {
+    if (!this.node.license) {
+      this.node.license = {
+        ...this.licenses[0],
+        link: "",
+        description: "",
+      }
+    }
+  },
 }
 </script>
 
