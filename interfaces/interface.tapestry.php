@@ -33,7 +33,7 @@ interface ITapestry
      *
      * @return object $tapestry
      */
-    public function get();
+    public function get($filterUserId);
 
     /**
      * Get node IDs.
@@ -93,4 +93,11 @@ interface ITapestry
      * @return bool true if there is no root node, false otherwise
      */
     public function isEmpty();
+
+    /**
+     * Returns all users who have authored a node within the tapestry.
+     *
+     * @return array Wordpress users
+     */
+    public function getAllContributors();
 }

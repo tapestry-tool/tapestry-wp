@@ -10,22 +10,6 @@
         @isUploading="handleUploadChange"
       />
     </b-form-group>
-    <div>
-      <video
-        v-if="node.mediaFormat === 'mp4'"
-        ref="video"
-        :src="node.typeData.mediaURL"
-        style="display: none;"
-        @loadeddata="setVideoDuration"
-      ></video>
-      <youtube
-        v-if="node.mediaFormat === 'youtube'"
-        :video-id="youtubeId"
-        :player-vars="{ autoplay: 0 }"
-        style="display: none;"
-        @ready="setYouTubeDuration"
-      ></youtube>
-    </div>
   </div>
 </template>
 

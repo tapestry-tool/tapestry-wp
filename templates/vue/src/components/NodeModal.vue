@@ -91,17 +91,34 @@
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button
-        id="submit-button"
-        size="sm"
-        variant="primary"
-        :class="accessSubmit ? '' : 'disabled'"
-        @click="submit"
-      >
+      <b-button id="submit-button" size="sm" variant="primary" :class="accessSubmit ? '' : 'disabled'" @click="handleSubmit">
         <b-spinner v-if="!accessSubmit"></b-spinner>
         <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
+    <div v-if="loadDuration">
+      <iframe
+        v-if="node.mediaType === 'h5p'"
+        ref="frame"
+        class="duration-calculator"
+        :src="node.typeData.mediaURL"
+        @load="setH5pDuration"
+      ></iframe>
+      <video
+        v-if="node.mediaFormat === 'mp4'"
+        ref="video"
+        :src="node.typeData.mediaURL"
+        style="display: none;"
+        @loadeddata="setVideoDuration"
+      ></video>
+      <youtube
+        v-if="node.mediaFormat === 'youtube'"
+        :video-id="node.typeData.youtubeID"
+        :player-vars="{ autoplay: 0 }"
+        style="display: none;"
+        @ready="setYouTubeDuration"
+      ></youtube>
+    </div>
   </b-modal>
 </template>
 
@@ -161,6 +178,7 @@ export default {
       node: null,
       videoLoaded: false,
       fileUploading: false,
+      loadDuration: false,
     }
   },
   computed: {
@@ -198,7 +216,6 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
     accessSubmit() {
-      // Locks access to submit button while youtube video loads to grab duration
       if (!this.ready || this.fileUploading) {
         return false
       }
@@ -264,67 +281,49 @@ export default {
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
     },
-    async submit() {
+    async handleSubmit() {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
         this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
-          if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
-            const url = this.node.typeData.mediaURL
-            const { data } = await getLinkMetadata(url)
-
-            if (data) {
-              this.node.typeData.linkMetadata = data
-
-              if (
-                !this.node.imageURL ||
-                confirm(
-                  "Would you like to use the link preview image as the thumbnail image?"
-                )
-              ) {
-                this.node.imageURL = data.image
-              }
-              if (
-                !this.node.lockedImageURL ||
-                confirm(
-                  "Would you like to use the link preview image as the locked thumbnail image?"
-                )
-              ) {
-                this.node.lockedImageURL = data.image
-              }
-            }
-          }
+          await this.setLinkData()
         }
 
-        if (this.modalType === "add") {
-          const id = await this.addNode(this.node)
-          this.node.id = id
-          if (this.parent) {
-            // Add link from parent node to this node
-            const newLink = {
-              source: this.parent.id,
-              target: id,
-              value: 1,
-              type: "",
-            }
-            await this.addLink(newLink)
-            this.parent.childOrdering.push(id)
-          } else {
-            this.updateRootNode(id)
-            this.updateSelectedNode(id)
-          }
+        if (this.shouldReloadDuration()) {
+          this.loadDuration = true
         } else {
-          await this.updateNode({
-            id: this.node.id,
-            newNode: this.node,
-          })
+          return this.submitNode()
         }
-
-        await this.updateLockedStatus(this.node.id)
-        this.$emit("submit")
       }
+    },
+    async submitNode() {
+      if (this.modalType === "add") {
+        const id = await this.addNode(this.node)
+        this.node.id = id
+        if (this.parent) {
+          // Add link from parent node to this node
+          const newLink = {
+            source: this.parent.id,
+            target: id,
+            value: 1,
+            type: "",
+          }
+          await this.addLink(newLink)
+          this.parent.childOrdering.push(id)
+        } else {
+          this.updateRootNode(id)
+          this.updateSelectedNode(id)
+        }
+      } else {
+        await this.updateNode({
+          id: this.node.id,
+          newNode: this.node,
+        })
+      }
+      await this.updateLockedStatus(this.node.id)
+      this.$emit("submit")
     },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
@@ -394,9 +393,93 @@ export default {
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
     },
+    async setLinkData() {
+      if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+        const url = this.node.typeData.mediaURL
+        const { data } = await getLinkMetadata(url)
+
+        if (data) {
+          this.node.typeData.linkMetadata = data
+
+          if (
+            !this.node.imageURL ||
+            confirm(
+              "Would you like to use the link preview image as the thumbnail image?"
+            )
+          ) {
+            this.node.imageURL = data.image
+          }
+          if (
+            !this.node.lockedImageURL ||
+            confirm(
+              "Would you like to use the link preview image as the locked thumbnail image?"
+            )
+          ) {
+            this.node.lockedImageURL = data.image
+          }
+        }
+      }
+    },
+    setVideoDuration() {
+      this.node.mediaDuration = parseInt(this.$refs.video.duration)
+      this.loadDuration = false
+      return this.submitNode()
+    },
+    setYouTubeDuration(evt) {
+      this.node.mediaDuration = evt.target.getDuration()
+      this.loadDuration = false
+      return this.submitNode()
+    },
+    setH5pDuration() {
+      const frame = this.$refs.frame
+      const h5p = frame.contentWindow.H5P
+      if (h5p) {
+        const instance = h5p.instances[0]
+        const libraryName = instance.libraryInfo.machineName
+        if (libraryName === "H5P.InteractiveVideo") {
+          const h5pVideo = instance.video
+          const handleH5PLoad = () => {
+            this.node.mediaDuration = parseInt(h5pVideo.getDuration())
+            this.loadDuration = false
+            return this.submitNode()
+          }
+          if (h5pVideo.getDuration() !== undefined) {
+            handleH5PLoad()
+          } else {
+            h5pVideo.on("loaded", handleH5PLoad)
+          }
+          return
+        } else {
+          this.node.mediaDuration = 0
+        }
+      }
+      this.loadDuration = false
+      return this.submitNode()
+    },
+    shouldReloadDuration() {
+      if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
+        return false
+      }
+      if (this.modalType === "add") {
+        return true
+      }
+      const oldNode = this.getNode(this.nodeId)
+      const { youtubeID, mediaURL } = oldNode.typeData
+      return this.node.mediaFormat === "youtube"
+        ? this.node.typeData.youtubeID !== youtubeID
+        : this.node.mediaURL !== mediaURL
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.duration-calculator {
+  position: fixed;
+  left: 101vw;
+  width: 1px;
+}
+</style>
 
 <style lang="scss">
 /* Use non-scoped styles to overwrite WP theme styles */
