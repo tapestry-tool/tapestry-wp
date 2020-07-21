@@ -68,11 +68,12 @@ export default {
   computed: {
     permissions() {
       const orderedPermissions = []
-      PERMISSIONS_ORDER.forEach(permission => {
+      PERMISSIONS_ORDER.forEach((permission, index) => {
         if (this.value.hasOwnProperty(permission)) {
           orderedPermissions.push([permission, this.value[permission]])
         } else {
-          orderedPermissions.push([permission, []])
+          const higherPermission = PERMISSIONS_ORDER[index - 1]
+          orderedPermissions.push([permission, this.value[higherPermission]])
         }
       })
       Object.entries(this.value)
@@ -84,6 +85,9 @@ export default {
         .forEach(entry => orderedPermissions.push(entry))
       return orderedPermissions
     },
+  },
+  mounted() {
+    this.$emit("input", Object.fromEntries(this.permissions))
   },
   created() {
     this.types = ["read", "add", "edit"]
