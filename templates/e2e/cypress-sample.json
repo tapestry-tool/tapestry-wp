@@ -5,6 +5,6 @@
     "ADMIN_PASSWORD": "admin_password",
     "SUBSCRIBER_USERNAME": "subscriber_name",
     "SUBSCRIBER_PASSWORD": "subscriber_password"
-  },
-  "baseUrl": "http://localhost:8888"
+  }
 }
+
