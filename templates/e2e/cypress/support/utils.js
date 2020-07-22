@@ -17,16 +17,16 @@ export const openRootNodeModal = () => getByTestId("root-node-button").click()
 export const openAddNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
   getAddNodeButton(id).click({ force: true })
-  return cy.get(`#node-modal-container`)
+  return cy.get(`#node-modal`)
 }
 
 export const openEditNodeModal = id => {
   cy.get(`#node-${id}`).click({ force: true })
   getEditNodeButton(id).click({ force: true })
-  return cy.get(`#node-modal-container`)
+  return cy.get(`#node-modal`)
 }
 
-export const getModal = () => cy.get("#node-modal-container")
+export const getModal = () => cy.get("#node-modal")
 
 export const submitModal = () => cy.contains("Submit").click({ force: true })
 
@@ -54,7 +54,7 @@ export const normalizeUrl = url => {
 export const applyModalChanges = newNode => {
   getModal().should("be.visible")
 
-  const { appearance, mediaType, quiz, typeData, permissions, ...rest } = newNode
+  const { appearance, mediaType, activity, typeData, permissions, ...rest } = newNode
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
   }
@@ -71,15 +71,16 @@ export const applyModalChanges = newNode => {
       }
       case "text": {
         getByTestId(`node-textContent`)
+          .find("[contenteditable=true]")
           .clear()
           .type(typeData.textContent)
         break
       }
       case "url-embed": {
-        getByTestId(`node-url-embed-url`)
+        getByTestId(`node-linkUrl`)
           .clear()
           .type(typeData.url)
-        getByTestId(`node-url-embed-behaviour-${typeData.behaviour}`).click({
+        getByTestId(`node-linkBehaviour-${typeData.behaviour}`).click({
           force: true,
         })
         break
@@ -96,9 +97,13 @@ export const applyModalChanges = newNode => {
   }
 
   Object.entries(rest).forEach(([testId, value]) => {
-    getByTestId(`node-${testId}`)
+    if (testId === "description") {
+      getByTestId(`node-description`).find("[contenteditable=true]").clear().type(value)
+    } else {
+      getByTestId(`node-${testId}`)
       .clear()
       .type(value)
+    }
   })
 
   if (appearance) {
@@ -115,17 +120,17 @@ export const applyModalChanges = newNode => {
       }
       if (prop === "thumbnail" && value) {
         const { url } = value
-        getByTestId("thumbnail-url")
+        getByTestId("node-appearance-thumbnail-url")
           .clear()
           .type(url)
       }
     })
   }
 
-  if (quiz) {
-    cy.contains(/quiz/i).click({ force: true })
+  if (activity) {
+    cy.contains(/activity/i).click({ force: true })
     getByTestId("add-question-checkbox").click({ force: true })
-    quiz.forEach((question, index) => {
+    activity.forEach((question, index) => {
       if (index > 0) {
         cy.contains(/add question/i).click({ force: true })
       }
