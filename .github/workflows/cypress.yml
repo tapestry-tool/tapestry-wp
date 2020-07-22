@@ -7,7 +7,7 @@ on:
     push:
         branches: [master]
     pull_request:
-        branches: [579-containerize-modular-cypress]
+        branches: [509-modular-cypress-tests]
 
 jobs:
     test:
@@ -19,5 +19,5 @@ jobs:
               run: docker-compose up -d
               working-directory: docker
             - name: Run tests
-              run: docker exec e2e cypress run --headless
+              run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
               working-directory: docker
