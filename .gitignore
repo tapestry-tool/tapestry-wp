@@ -1,5 +1,5 @@
 package-lock.json
+.php_cs.cache
 .DS_Store
 templates/e2e/cypress/videos
 templates/e2e/cypress/screenshots
-templates/e2e/cypress.json

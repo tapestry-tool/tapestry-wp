@@ -13,26 +13,28 @@ import {
 } from "./utils"
 import roles from "./roles"
 
-const COMMAND_DELAY = 500
+const COMMAND_DELAY = Cypress.env("DELAY") || 500
 
-for (const command of [
-  "visit",
-  "click",
-  "trigger",
-  "type",
-  "clear",
-  "reload",
-  "contains",
-]) {
-  Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-    const origVal = originalFn(...args)
-
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(origVal)
-      }, COMMAND_DELAY)
+if (COMMAND_DELAY > 0) {
+  for (const command of [
+    "visit",
+    "click",
+    "trigger",
+    "type",
+    "clear",
+    "reload",
+    "contains",
+  ]) {
+    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
+      const origVal = originalFn(...args)
+  
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(origVal)
+        }, COMMAND_DELAY)
+      })
     })
-  })
+  }
 }
 
 Cypress.Commands.add("login", role => {

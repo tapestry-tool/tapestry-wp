@@ -41,6 +41,7 @@ services:
     
   e2e:
     image: "cypress/included:4.9.0"
+    shm_size: 2GB
     depends_on: 
       - dev
       - wordpress
