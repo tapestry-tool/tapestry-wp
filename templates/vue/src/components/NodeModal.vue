@@ -263,6 +263,7 @@ export default {
   },
   beforeDestroy() {
     thisTapestryTool.enableMovements()
+    thisTapestryTool.reinitialize()
     this.ready = false
   },
   created() {
