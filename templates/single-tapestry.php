@@ -70,7 +70,7 @@ if (current_user_can('edit_post', get_the_ID())) {
         
         <?php
     } else {
-        // protected, show password form ?>
+        // protected, show password form?>
         <div class="entry">
             <header class="entry-header">
                 <h1 class="entry-title">Password required to continue</h1>
