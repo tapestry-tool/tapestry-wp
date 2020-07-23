@@ -151,18 +151,18 @@ class TapestryHelpers
      *
      * @return bool
      */
-    public static function currentUserIsAllowed($action, $nodeMetaId, $tapestryPostId)
+    public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
         $options = TapestryNodePermissions::getNodePermissions();
-        $userId = wp_get_current_user()->ID;
-        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
+        $userId = $_userId;
+        if (is_null($userId)) {
+            $userId = wp_get_current_user()->ID;
+        }
+        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+        $roles = new TapestryUserRoles($userId);
 
-        if ((TapestryUserRoles::isEditor())
-            || (TapestryUserRoles::isAdministrator())
-            || (TapestryUserRoles::isAuthorOfThePost($tapestryPostId))
-            || (TapestryUserRoles::isAuthorOfThePost($nodePostId))
-        ) {
+        if (($roles->canEdit($tapestryPostId) && $superuser_override) || $roles->isAuthorOfThePost($nodePostId)) {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
