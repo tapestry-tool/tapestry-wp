@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { mapActions, mapGetters, mapMutations } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
@@ -179,7 +179,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
     ...mapGetters([
       "createDefaultNode",
       "getDirectChildren",
@@ -324,21 +323,21 @@ export default {
             this.parent.coordinates.x +
               sizes.NODE_RADIUS_SELECTED +
               sizes.NODE_RADIUS,
-            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 3
+            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
           )
         } else {
           this.node.coordinates.x = this.getRandomNumber(
             this.parent.coordinates.x -
               sizes.NODE_RADIUS_SELECTED -
               sizes.NODE_RADIUS,
-            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 3
+            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
           )
         }
         this.calculateY(true)
       } else {
         this.node.coordinates.x = this.getRandomNumber(
-          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 3,
-          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 3
+          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
         )
       }
     },
@@ -349,21 +348,21 @@ export default {
             this.parent.coordinates.y +
               sizes.NODE_RADIUS_SELECTED +
               sizes.NODE_RADIUS,
-            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 3
+            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
           )
         } else {
           this.node.coordinates.y = this.getRandomNumber(
             this.parent.coordinates.y -
               sizes.NODE_RADIUS_SELECTED -
               sizes.NODE_RADIUS,
-            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 3
+            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
           )
         }
         this.calculateX(true)
       } else {
         this.node.coordinates.y = this.getRandomNumber(
-          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 3,
-          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 3
+          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
         )
       }
     },
