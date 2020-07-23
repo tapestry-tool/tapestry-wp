@@ -419,6 +419,31 @@ class Tapestry implements ITapestry
         return $tapestry;
     }
 
+    private function _getDefaultTapestry()
+    {
+        $post = get_post($this->postId);
+        $tapestry = new stdClass();
+
+        $tapestry->nodes = [];
+        $tapestry->links = [];
+        $tapestry->groups = [];
+        $tapestry->rootId = 0;
+        $tapestry->settings = new stdClass();
+
+        $tapestry->settings->tapestrySlug = $post->post_name;
+        $tapestry->settings->title = $post->post_title;
+        $tapestry->settings->status = $post->post_status;
+        $tapestry->settings->backgroundUrl = '';
+        $tapestry->settings->autoLayout = false;
+        $tapestry->settings->nodeDraggable = true;
+        $tapestry->settings->showAccess = true;
+        $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
+        $tapestry->settings->superuserOverridePermissions = true;
+        $tapestry->settings->permalink = get_permalink($this->postId);
+
+        return $tapestry;
+    }
+
     private function _getAuthor()
     {
         if ($this->postId) {

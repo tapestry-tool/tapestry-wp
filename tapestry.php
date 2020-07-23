@@ -271,40 +271,58 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
-/**
- * Set Up Tapestry Post Upon Insertion.
- *
- * @param int    $postId Post ID
- * @param object $post   Post Object
- * @param bool   $update Post Object
- *
- * @return object Null
- */
-function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
+function create_new_tapestry()
 {
-    if (!isset($postId) || !isset($post) || 'tapestry' != get_post_type($postId)) {
-        return;
-    }
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');
 
-    $tapestry = new Tapestry($postId);
-    $tapestryData = $tapestry->get();
-
-    if ($update && !empty($tapestryData->settings)) {
-        $tapestryData->settings->tapestrySlug = $post->post_name;
-        $tapestryData->settings->title = $post->post_title;
-        $tapestryData->settings->status = $post->post_status;
-    } else {
-        $tapestryData->settings = (object) [
-            'tapestrySlug' => $post->post_name,
-            'title' => $post->post_title,
-            'status' => $post->post_status,
-        ];
-    }
-
-    $tapestry->set((object) ['settings' => $tapestryData->settings]);
-    $tapestry->saveOnPublish();
+    return "
+        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
+        <button id='new_tapestry_button'>
+            Add Tapestry
+        </button>
+        <script type='text/javascript'>
+        var apiUrl = '{$prefix}';
+            $('#new_tapestry_button').click(function() {
+                let name = prompt(`Enter a name`);
+                let payload = {};
+                payload[`nodes`] = [];
+                payload[`groups`] = [];
+                payload[`links`] = [];
+                payload[`title`] = name;
+                return new Promise((fulfill, reject) => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', apiUrl + '/tapestries');
+                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            fulfill(xhr.response);
+                        } else {
+                            reject({
+                                status: xhr.status,
+                                statusText: xhr.statusText
+                            });
+                        }
+                    };
+                    xhr.onerror = () => {
+                        reject({
+                            status: xhr.status,
+                            statusText: xhr.statusText
+                        });
+                    };
+                    xhr.send(JSON.stringify(payload));
+                }).then(data => {
+                    let res = JSON.parse(data);
+                    window.location.href = res.settings.permalink;
+                }).catch(err => {
+                    console.log(err);
+                    alert(`Error occured while creating tapestry, please try again`);
+                })
+            })
+        </script>
+    ";
 }
-add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
+
+add_shortcode('new_tapestry_button', 'create_new_tapestry');
 
 // Gravity Forms Pluggin
 
