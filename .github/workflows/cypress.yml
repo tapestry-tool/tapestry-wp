@@ -18,6 +18,12 @@ jobs:
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
+            - name: Install wordpress
+              run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret
+            - name: Activate plugins
+              run: docker exec wp wp plugin activate tapestry h5p --allow-root
+            - name: Add users
+              run: docker exec wp wp user create subscriber sub@foo.com --role=subscriber --user_pass=subscriber
             - name: Run tests
               run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
               working-directory: docker
