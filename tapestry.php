@@ -264,42 +264,6 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
-/**
- * Set Up Tapestry Post Upon Insertion
- *
- * @param   Integer $postId Post ID
- * @param   Object  $post   Post Object
- * @param   Boolean $update Post Object
- *
- * @return  Object  Null
- */
-function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
-{
-    if (!isset($postId) || !isset($post) || get_post_type($postId) != 'tapestry') {
-        return;
-    }
-
-    $tapestry = new Tapestry($postId);
-    $tapestryData = $tapestry->get();
-
-    if ($update && !empty($tapestryData->settings)) {
-        $tapestryData->settings->tapestrySlug = $post->post_name;
-        $tapestryData->settings->title = $post->post_title;
-        $tapestryData->settings->status = $post->post_status;
-    } else {
-        $tapestryData->settings = (object) array(
-            'tapestrySlug' => $post->post_name,
-            'title' => $post->post_title,
-            'status' => $post->post_status,
-            'permalink' => get_permalink($postId),
-        );
-    }
-
-    $tapestry->set((object) ['settings' => $tapestryData->settings]);
-    $tapestry->saveOnPublish();
-}
-add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
-
 function create_new_tapestry() {
     $prefix = get_rest_url(null, 'tapestry-tool/v1');   
     return "

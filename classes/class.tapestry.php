@@ -408,6 +408,7 @@ class Tapestry implements ITapestry
         $tapestry->settings->showAccess = true;
         $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $tapestry->settings->superuserOverridePermissions = true;
+        $tapestry->settings->permalink = get_permalink($this->postId);
 
         return $tapestry;
     }
