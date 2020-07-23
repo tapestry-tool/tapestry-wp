@@ -91,7 +91,13 @@
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" :class="accessSubmit ? '' : 'disabled'" @click="handleSubmit">
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :class="accessSubmit ? '' : 'disabled'"
+        @click="handleSubmit"
+      >
         <b-spinner v-if="!accessSubmit"></b-spinner>
         <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
@@ -219,10 +225,7 @@ export default {
       if (!this.ready || this.fileUploading) {
         return false
       }
-      return (
-        (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
-        this.videoLoaded
-      )
+      return this.node.mediaType === "video" || this.node.mediaType === "h5p"
     },
   },
   created() {
