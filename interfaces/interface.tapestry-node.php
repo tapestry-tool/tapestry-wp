@@ -1,31 +1,30 @@
 <?php
 
 /**
- * Tapestry Node Interface
- *
+ * Tapestry Node Interface.
  */
 interface ITapestryNode
 {
     /**
-     * Save the Tapestry node
+     * Save the Tapestry node.
      *
-     * @return  Object  $node
+     * @return object $node
      */
     public function save();
 
     /**
-     * Set Node
+     * Set Node.
      *
-     * @param   Object  $node  node
+     * @param object $node node
      *
-     * @return  NULL
+     * @return null
      */
     public function set($node);
 
     /**
-     * Get the node
+     * Get the node.
      *
-     * @return  $node    node
+     * @return $node node
      */
     public function get();
 }
