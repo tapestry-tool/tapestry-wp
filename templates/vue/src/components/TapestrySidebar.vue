@@ -42,7 +42,7 @@
             </b-button>
           </div>
         </header>
-        <section>
+        <section v-if="node.description">
           <h4 class="content-separator">About</h4>
           <div class="content-description" v-html="node.description"></div>
         </section>
