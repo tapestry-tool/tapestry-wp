@@ -201,10 +201,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
       })
       await this.$store.dispatch("updateSettings", settings)
-      // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
-      // this.$emit("settings-updated", settings);
-      // this.closeModal();
-      location.reload()
+      this.closeModal()
     },
     exportTapestry() {
       const tapestry = this.tapestryJson

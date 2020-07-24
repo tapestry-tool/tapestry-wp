@@ -9,7 +9,7 @@
       <t-settings-modal-button></t-settings-modal-button>
       <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
     </div>
-    <main ref="app">
+    <main ref="app" :style="background">
       <svg id="vue-svg" :viewBox="viewBox">
         <g>
           <tapestry-link
@@ -77,9 +77,22 @@ export default {
       "tapestryIsLoaded",
       "rootId",
       "selection",
+      "settings",
     ]),
+    background() {
+      return this.settings.backgroundUrl
+    },
     canEdit() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
+  },
+  watch: {
+    background: {
+      immediate: true,
+      handler(background) {
+        const app = this.$root.$el
+        app.style.backgroundImage = background ? `url(${background})` : ""
+      },
     },
   },
   mounted() {
@@ -163,5 +176,11 @@ export default {
 <style lang="scss" scoped>
 main {
   position: relative;
+}
+</style>
+
+<style lang="scss">
+#app {
+  background-size: cover;
 }
 </style>
