@@ -98,8 +98,10 @@ export default {
   },
   watch: {
     node(newNode, oldNode) {
-      this.handlePause(oldNode)
-      this.handleLoad()
+      if (newNode.id !== oldNode.id) {
+        this.handlePause(oldNode)
+        this.handleLoad()
+      }
     },
   },
   beforeDestroy() {
