@@ -80,7 +80,7 @@
     </b-container>
     <template slot="modal-footer">
       <delete-node-button
-        v-show="modalType === 'edit'"
+        v-if="modalType === 'edit'"
         :node-id="nodeId"
         @submit="close"
       ></delete-node-button>
