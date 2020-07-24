@@ -1,13 +1,16 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else>
-    <root-node-button
-      v-if="!rootId && canEdit"
-      @click="addRootNode"
-    ></root-node-button>
     <div class="toolbar">
       <t-settings-modal-button></t-settings-modal-button>
       <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+    </div>
+    <root-node-button
+      v-if="empty && canEdit"
+      @click="addRootNode"
+    ></root-node-button>
+    <div v-if="empty && !canEdit">
+      The requested Tapestry is empty.
     </div>
     <main ref="app" :style="background">
       <svg id="vue-svg" :viewBox="viewBox">
@@ -75,7 +78,6 @@ export default {
       "links",
       "selectedNodeId",
       "tapestryIsLoaded",
-      "rootId",
       "selection",
       "settings",
     ]),
@@ -84,6 +86,9 @@ export default {
     },
     canEdit() {
       return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+    },
+    empty() {
+      return Object.keys(this.nodes).length === 0
     },
   },
   watch: {
