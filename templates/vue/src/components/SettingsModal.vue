@@ -31,16 +31,6 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
-            label="Auto-Layout"
-            description="With auto-layout enabled, nodes will place themselves in
-              the best position possible. If this is disabled, you will need to manually place the nodes where
-              you want them to appear."
-          >
-            <b-form-checkbox v-model="autoLayout" switch>
-              {{ autoLayout ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group
             label="Show me all nodes by default"
             description="If enabled, editors of this tapestry would be able to view all nodes even if they have 
             the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes, 
@@ -121,7 +111,6 @@ const defaultPermissions = Object.fromEntries(
 
 const defaultSettings = {
   backgroundUrl: "",
-  autoLayout: false,
   nodeDraggable: true,
   showAccess: true,
   superuserOverridePermissions: true,
@@ -144,7 +133,6 @@ export default {
   data() {
     return {
       backgroundUrl: "",
-      autoLayout: false,
       nodeDraggable: true,
       userId: "",
       showAccess: true,
