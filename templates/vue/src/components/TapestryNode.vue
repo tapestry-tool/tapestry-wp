@@ -4,7 +4,9 @@
       v-show="isVisible"
       ref="node"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
-      :style="{ cursor: node.accessible || canEdit ? 'pointer' : 'not-allowed' }"
+      :style="{
+        cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
+      }"
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
@@ -57,11 +59,13 @@
             </button>
           </foreignObject>
           <add-child-button
+            v-if="hasPermission('add')"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
           ></add-child-button>
           <foreignObject
+            v-if="hasPermission('edit')"
             class="node-button-wrapper"
             :x="node.coordinates.x + 5"
             :y="node.coordinates.y + radius - 30"
@@ -182,9 +186,6 @@ export default {
       const rows = this.getDirectChildren(this.node.id)
       return rows.map(this.getNode).filter(row => row.completed).length / rows.length
     },
-    canEdit() {
-      return wpData.wpCanEditTapestry
-    },
   },
   watch: {
     radius(newRadius) {
@@ -233,7 +234,7 @@ export default {
         })
         .on("end", () => {
           this.$emit("dragend")
-          if (this.canEdit) {
+          if (this.hasPermission("edit")) {
             if (this.selection.length) {
               this.selection.forEach(id => {
                 const node = this.getNode(id)
@@ -296,11 +297,57 @@ export default {
     handleClick(evt) {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
-      } else if (this.node.accessible || this.canEdit) {
+      } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
           ? this.openNode()
           : this.updateSelectedNode(this.node.id)
       }
+    },
+    hasPermission(action) {
+      // Check 1: Has edit permissions for Tapestry
+      if (wpData.wpCanEditTapestry === "1") {
+        return true
+      }
+
+      // Check 2: User is the author of the node
+      if (wpData.currentUser.ID == this.node.author.id) {
+        return true
+      }
+
+      // Check 3: User has a role with general edit permissions
+      const { ID, roles } = wpData.currentUser
+      const allowedRoles = ["administrator", "editor", "author"]
+      if (allowedRoles.some(role => roles.includes(role))) {
+        return true
+      }
+
+      const { public: publicPermissions, authenticated } = this.node.permissions
+      // Check 4: Node has public permissions
+      if (publicPermissions.includes(action)) {
+        return true
+      }
+
+      // Check 5: Node has authenticated permissions
+      if (wpData.currentUser.ID && authenticated.includes(action)) {
+        return true
+      }
+
+      // Check 6: User has a role that is allowed in the node
+      const isRoleAllowed = roles.some(role => {
+        const permissions = this.node.permissions[role]
+        return permissions.includes(action)
+      })
+      if (isRoleAllowed) {
+        return true
+      }
+
+      // Check 7: User has a permission associated with its ID
+      const userPermissions = this.node.permissions[`user-${ID}`]
+      if (userPermissions) {
+        return userPermissions.includes(action)
+      }
+
+      return false
     },
   },
 }
