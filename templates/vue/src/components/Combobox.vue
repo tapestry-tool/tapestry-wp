@@ -49,7 +49,7 @@ export default {
       required: true,
     },
     value: {
-      type: [Object, String],
+      type: [Object, String, Number],
       required: false,
       default: null,
     },

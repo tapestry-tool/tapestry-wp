@@ -8,10 +8,8 @@
       :options="wpPosts"
     >
       <template v-slot="slotProps">
-        <p>
-          <code>{{ slotProps.option.id }}</code>
-          {{ slotProps.option.title }}
-        </p>
+        <code>{{ slotProps.option.id }}</code>
+        <p v-html="slotProps.option.title"></p>
       </template>
     </combobox>
   </b-form-group>
