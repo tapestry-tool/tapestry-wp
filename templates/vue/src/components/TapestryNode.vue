@@ -291,6 +291,10 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleMouseover() {
+      // Move node to end of svg document so it appears on top
+      const node = this.$refs.node
+      node.parentNode.appendChild(node)
+
       bus.$emit("mouseover", this.node.id)
       this.$emit("mouseover")
     },
