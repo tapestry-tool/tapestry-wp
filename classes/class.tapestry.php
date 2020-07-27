@@ -368,17 +368,15 @@ class Tapestry implements ITapestry
         $node->accessible = $node->unlocked;
         if ($node->accessible) {
             $neighbourIds = $this->_getNeighbours($node);
+            $neighbours = [];
 
-            $neighbours = array_map(
-                function ($nodeId) use ($nodeList) {
-                    foreach ($nodeList as $otherNode) {
-                        if ($otherNode->id === $nodeId) {
-                            return $otherNode;
-                        }
+            foreach ($neighbourIds as $nodeId) {
+                foreach ($nodeList as $otherNode) {
+                    if ($otherNode->id === $nodeId) {
+                        array_push($neighbours, $otherNode);
                     }
-                },
-                $neighbourIds
-            );
+                }
+            }
 
             foreach ($neighbours as $neighbour) {
                 if (!in_array($neighbour, $visited)) {
@@ -547,8 +545,7 @@ class Tapestry implements ITapestry
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId)))
-        {
+        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId))) {
             if ($from == $to) {
                 return true;
             }
