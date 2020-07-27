@@ -69,7 +69,7 @@ Cypress.Commands.add("deleteTapestry", () => {
 
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
-  cy.contains(/loading/i).should("not.exist")
+  cy.contains(/loading/i, { timeout: 60000 }).should("not.exist")
 })
 
 Cypress.Commands.add("getNodeByIndex", idx => getStore().its(`state.nodes.${idx}`))
