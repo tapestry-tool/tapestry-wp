@@ -416,6 +416,10 @@ export default {
       let copy = this.createDefaultNode()
       if (this.modalType === "edit") {
         const node = this.getNode(this.currentNodeId)
+        if (node === undefined) {
+          this.close()
+          return
+        }
         copy = Helpers.deepCopy(node)
       }
       copy.hasSubAccordion = this.hasSubAccordion(copy)
