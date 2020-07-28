@@ -821,6 +821,7 @@ function tapestryTool(config){
                 .from(selection.data)
                 .map(node => ({ id: node.id, x: node.x, y: node.y }));
 
+            renderTooltips()
             recordAnalyticsEvent('user', 'drag-start', 'node', d.id, {'x': d.x, 'y': d.y});
         }
     }
@@ -873,6 +874,7 @@ function tapestryTool(config){
         }
 
         updateSvgDimensions();
+        renderTooltips();
         recordAnalyticsEvent('user', 'drag-end', 'node', d.id, {'x': d.x, 'y': d.y});
     }
 
@@ -1355,10 +1357,23 @@ function tapestryTool(config){
             .style("position", "relative")
             .attr("width", tooltipWidth)
             .attr("height", d => getRadius(d) * 2)
-            .attr("x", d => -(tooltipWidth(d) / 2))
-            .attr("y", d => -(getRadius(d) * 3 + 27.5 + 20))
+            .attr("x", d => -(Math.min(getRadius(d) * 2 + 48, 400) / 2))
+            .attr("y", d => {
+                const tooltipHeight = getRadius(d) * 2.5
+                const yPosition = d.y - tapestry.getTapestryDimensions().startY
+                const onBottom = (d.y - tapestry.getTapestryDimensions().startY < tooltipHeight 
+                    || yPosition - (getRadius(d) * 2) <= $(window).scrollTop()) && d.x > 0 && d.y > 0
+                return onBottom ? getRadius(d) + 27.5 + 5 : -(getRadius(d) * 3 + 27.5 + 20)
+            })
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip")
+            .style("align-items", d => {
+                const tooltipHeight = getRadius(d) * 2.5
+                const yPosition = d.y - tapestry.getTapestryDimensions().startY
+                const onBottom = (yPosition < tooltipHeight 
+                    || yPosition - (getRadius(d) * 2) <= $(window).scrollTop()) && d.x > 0 && d.y > 0
+                return onBottom ? "flex-start" : "flex-end"
+            })
             .append("xhtml:div")
             .attr("class", "tapestry-tooltip-content")
             .html(getTooltipHtml)
@@ -1372,13 +1387,18 @@ function tapestryTool(config){
                 goToNode(this.dataset.node)
             })
 
+        nodes.selectAll(".tooltip-pointer").remove();
         nodes
             .filter(d => !d.accessible)
             .append("polygon")
             .attr("class", "tooltip-pointer")
             .attr("points", function(d) {
-                const yOffset = getRadius(d) * 3 + 27.5 + 20 - getRadius(d) * 2
-                const points = [[-16, -16 - yOffset], [16, -16 - yOffset], [0, 16 - yOffset]]
+                const tooltipHeight = getRadius(d) * 2.5
+                const yPosition = d.y - tapestry.getTapestryDimensions().startY
+                const onBottom = (yPosition < tooltipHeight 
+                    || yPosition - (getRadius(d) * 2) <= $(window).scrollTop()) && d.x > 0 && d.y > 0
+                const yOffset = onBottom ? -(getRadius(d) * 3 + 27.5 + 5 - getRadius(d) * 2) : getRadius(d) * 3 + 27.5 + 20 - getRadius(d) * 2
+                const points = onBottom ? [[-16, 16 - yOffset], [16, 16 - yOffset], [0, -16 - yOffset]] : [[-16, -16 - yOffset], [16, -16 - yOffset], [0, 16 - yOffset]]
                 return points.map(point => point.join(",")).join(" ")
             })
             .attr("fill", "black")
@@ -1881,9 +1901,10 @@ function tapestryTool(config){
     }
 
     function getVideoDuration(seconds) {
+        seconds = Math.floor(seconds);
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds - (hours * 3600)) / 60);
-        var sec = seconds - (hours * 3600) - (minutes * 60);
+        var sec = Math.floor(seconds - (hours * 3600) - (minutes * 60));
 
         if (sec < 10)
             sec = "0" + sec;
