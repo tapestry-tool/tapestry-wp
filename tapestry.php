@@ -264,10 +264,12 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
-function create_new_tapestry() {
-    $prefix = get_rest_url(null, 'tapestry-tool/v1');   
+function create_new_tapestry()
+{
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');
+
     return "
-        <script src='". plugin_dir_url(__FILE__) ."templates/libs/jquery.min.js' type='application/javascript'></script>
+        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
         <button id='new_tapestry_button'>
             Add Tapestry
         </button>
@@ -312,8 +314,6 @@ function create_new_tapestry() {
         </script>
     ";
 }
-
-
 
 add_shortcode('new_tapestry_button', 'create_new_tapestry');
 
