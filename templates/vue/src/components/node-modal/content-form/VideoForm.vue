@@ -44,14 +44,6 @@ export default {
     },
   },
   methods: {
-    setYouTubeDuration(evt) {
-      this.node.mediaDuration = evt.target.getDuration()
-      this.$emit("load")
-    },
-    setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video.duration
-      this.$emit("load")
-    },
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },

@@ -140,9 +140,6 @@ export default {
         .catch(response => this.handleError(response))
         .finally(() => {
           this.isUploading = false
-        })
-        .finally(() => {
-          this.isUploading = false
           this.$emit("isUploading", this.isUploading)
         })
     },
