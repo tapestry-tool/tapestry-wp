@@ -165,7 +165,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["updateNodeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
