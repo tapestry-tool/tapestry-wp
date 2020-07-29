@@ -677,38 +677,24 @@ function tapestryTool(config){
         AUTHOR: "author"
     }
 
-    this.updateVisibleNodes = (to, from) => {
+    this.updateVisibleNodes = (opt, val) => {
         // Only update if we're moving from or to a filter route. This prevents
         // unnecessary rerenders when opening lightboxes.
-        if (isFilterActive(to) || isFilterActive(from)) {
-            const route = window.location.href.split(`#\/`)[1]
-            let newVisibleNodes = tapestry.dataset.nodes
-            if (route.startsWith("filter")) {
-                const query = new URLSearchParams(route.split("filter")[1])
-                const attr = query.get("by")
-                const val = query.get("q")
-                if (attr && val) {
-                    switch (attr) {
-                        case filterOptions.AUTHOR:
-                            newVisibleNodes = 
-                                tapestry.dataset.nodes.filter(n => n.author.id == val)
-                            break
-                        default:
-                            break
-                    }
-                }
+        let newVisibleNodes = tapestry.dataset.nodes
+        if (opt && val) {
+            switch (opt) {
+                case filterOptions.AUTHOR:
+                    newVisibleNodes = 
+                        tapestry.dataset.nodes.filter(n => n.author.id == val)
+                    break
+                default:
+                    break
             }
-            visibleNodes = new Set(newVisibleNodes.map(n => n.id))
-            resizeNodes(root)
-        }   
-    }
-
-    function isFilterActive(url = window.location.href) {
-        if (url.includes("#")) {
-            url = url.split(`#\/`)[1]
         }
-        return url.includes("filter")
-    }
+        visibleNodes = new Set(newVisibleNodes.map(n => n.id))
+        console.log(visibleNodes)
+        resizeNodes(root)
+    }   
     
     /****************************************************
      * D3 RELATED FUNCTIONS

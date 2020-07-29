@@ -90,8 +90,9 @@ export default {
     },
   },
   watch: {
-    filterValue(next) {
-      this.refetchTapestryData(Number(next))
+    async filterValue(next) {
+      await this.refetchTapestryData(Number(next))
+      thisTapestryTool.updateVisibleNodes(this.filterOption, this.filterValue)
     },
   },
   async created() {
