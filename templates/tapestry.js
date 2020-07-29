@@ -692,7 +692,6 @@ function tapestryTool(config){
             }
         }
         visibleNodes = new Set(newVisibleNodes.map(n => n.id))
-        console.log(visibleNodes)
         resizeNodes(root)
     }   
     
