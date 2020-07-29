@@ -453,7 +453,7 @@ function tapestryTool(config){
 
             const messageWrapper = document.createElement("p");
             messageWrapper.id = "depth-warning-message";
-            messageWrapper.textContent = `Some filter results might be hidden because you're not at max depth.`;
+            messageWrapper.textContent = `Some nodes might be hidden because you're not at max depth.`;
             messageWrapper.style.opacity = shouldShowMessage() ? "1" : "0";
 
             tapestryControlsDiv.appendChild(messageWrapper);
@@ -477,7 +477,7 @@ function tapestryTool(config){
     }
 
     function shouldShowMessage() {
-        return tapestryDepthSlider.value !== tapestryDepthSlider.max && isFilterActive()
+        return tapestryDepthSlider.value !== tapestryDepthSlider.max
     }
     
     /****************************************************
