@@ -37,9 +37,11 @@ export default {
     }
   },
   mounted() {
+    this.wpPosts = WordpressApi.loadCachedPosts()
     WordpressApi.getPosts().then(posts => {
       this.wpPosts = posts
     })
+
   },
 }
 </script>
