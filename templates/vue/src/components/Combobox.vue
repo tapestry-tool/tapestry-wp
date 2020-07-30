@@ -16,7 +16,7 @@
         @mousedown.prevent="handleClick(option)"
       >
         <div class="combobox-item">
-          <slot :option="option">{{ option.toString() }}</slot>
+          <slot :option="option"></slot>
         </div>
       </button>
     </div>
@@ -119,11 +119,11 @@ export default {
   },
   watch: {
     text(newText) {
-      this.inputValue = newText
+      this.inputValue = this.decodeHtmlEntity(newText)
     },
   },
   created() {
-    this.inputValue = this.text
+    this.inputValue = this.decodeHtmlEntity(this.text)
   },
   methods: {
     handleBlur() {
@@ -133,13 +133,14 @@ export default {
         if (this.inputValue.length === 0) {
           this.$emit("input", null)
         } else if (this.inputValue !== this.text && !this.selected) {
-          this.inputValue = this.text
+          this.inputValue = this.decodeHtmlEntity(this.text)
         }
       })
     },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
       this.inputValue = this.itemText ? option[this.itemText] : option
+      this.inputValue = this.decodeHtmlEntity(this.inputValue)
       this.selected = true
       this.$refs.input.blur()
     },
@@ -150,6 +151,11 @@ export default {
     },
     getValue(option) {
       return typeof option === "string" ? option : option[this.itemValue]
+    },
+    decodeHtmlEntity(str) {
+      return str.replace(/&#(\d+);/g, function(match, dec) {
+        return String.fromCharCode(dec)
+      })
     },
   },
 }
