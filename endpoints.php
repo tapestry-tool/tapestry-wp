@@ -377,12 +377,9 @@ function getTapestry($request)
     $postId = $request['tapestryPostId'];
     $filterUserId = $request['filter_user_id'];
     try {
-        $start_time = microtime(true);
         $tapestry = new Tapestry($postId);
-        error_log("Getting Tapestry");
         $data = $tapestry->get($filterUserId);
-        $end_time = microtime(true);
-        error_log(print_r($end_time - $start_time, true));
+
         return $data;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
