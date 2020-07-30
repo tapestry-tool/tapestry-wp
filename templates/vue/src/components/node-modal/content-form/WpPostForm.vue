@@ -41,7 +41,6 @@ export default {
     WordpressApi.getPosts().then(posts => {
       this.wpPosts = posts
     })
-
   },
 }
 </script>

@@ -6,22 +6,22 @@ let wp_posts_cache = []
 
 function loadCachedPosts() {
   if (wp_posts_cache.length > 0) {
-    return wp_posts_cache;
+    return wp_posts_cache
   } else {
-    return [];
+    return []
   }
 }
 
 async function getPosts() {
   let posts = []
   const res = await axios.get(`${API_URL}/posts?per_page=1`)
-  let totalPages = Math.ceil(res.headers["x-wp-total"] / 100);
+  let totalPages = Math.ceil(res.headers["x-wp-total"] / 100)
   let arr = []
   for (let i = 1; i <= totalPages; i++) {
-    arr[i-1] = i;
+    arr[i - 1] = i
   }
   await Promise.all(
-    arr.map(async (page) => {
+    arr.map(async page => {
       const res = await axios.get(`${API_URL}/posts?page=${page}&per_page=100`)
       posts = posts.concat(res.data)
     })
