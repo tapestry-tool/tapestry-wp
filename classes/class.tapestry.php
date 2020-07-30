@@ -457,8 +457,10 @@ class Tapestry implements ITapestry
 
     private function _getTapestry($filterUserId)
     {
+        error_log("Filtering Tapestry");
         $tapestry = $this->_filterTapestry($this->_formTapestry(), $filterUserId);
 
+        error_log("Setting unlocked status");
         $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
 
         $tapestry->groups = array_map(
@@ -481,11 +483,15 @@ class Tapestry implements ITapestry
             $tapestry->settings->superuserOverridePermissions = true;
         }
 
+        error_log(print_r($tapestry, true));
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             return $tapestry;
         } else {
+            error_log("Filter nodes");
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,
                 $tapestry->settings->superuserOverridePermissions, $filterUserId);
+            
+            error_log("Filter links");
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -525,6 +531,7 @@ class Tapestry implements ITapestry
 
     private function _pathIsAllowed($from, $to, $checked = [], $superuser_override, $userId)
     {
+        error_log("path is allowed called");
         if (in_array($from, $checked)) {
             return false;
         }
