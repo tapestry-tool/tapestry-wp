@@ -14,25 +14,32 @@ function loadCachedPosts() {
 
 async function getPosts() {
   let posts = []
-  const res = await axios.get(`${API_URL}/posts?per_page=1`)
+  const res = await axios.get(`${API_URL}/posts?per_page=1&_fields=id`)
   let totalPages = Math.ceil(res.headers["x-wp-total"] / 100)
   let arr = []
   for (let i = 1; i <= totalPages; i++) {
     arr[i - 1] = i
   }
+  console.time()
   await Promise.all(
     arr.map(async page => {
-      const res = await axios.get(`${API_URL}/posts?page=${page}&per_page=100`)
+      const res = await axios.get(
+        `${API_URL}/posts?page=${page}&per_page=100&_fields=id,title`
+      )
       posts = posts.concat(res.data)
     })
   )
-  wp_posts_cache = posts.map(parsePost)
-  return posts.map(parsePost)
+  console.timeEnd()
+  wp_posts_cache = posts.map(post => ({
+    ...post,
+    title: post.title.rendered,
+  }))
+  return wp_posts_cache
 }
 
 async function getPostById(id) {
   return axios
-    .get(`${API_URL}/posts/${id}`)
+    .get(`${API_URL}/posts/${id}&_fields=id,title,content`)
     .then(res => res.data)
     .then(parsePost)
 }
