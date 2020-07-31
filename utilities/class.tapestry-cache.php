@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
-
 /**
  * Tapestry Cache Functions.
  */
