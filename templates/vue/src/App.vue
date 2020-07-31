@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <tapestry />
-    <tapestry-filter v-if="tapestryIsLoaded" />
     <tapestry-app />
     <router-view v-if="tapestryIsLoaded"></router-view>
   </div>
@@ -11,14 +10,12 @@
 import { mapState } from "vuex"
 import Tapestry from "./components/Tapestry"
 import TapestryApp from "./components/TapestryApp"
-import TapestryFilter from "./components/TapestryFilter"
 
 export default {
   name: "app",
   components: {
     Tapestry,
     TapestryApp,
-    TapestryFilter,
   },
   computed: {
     ...mapState(["tapestryIsLoaded"]),

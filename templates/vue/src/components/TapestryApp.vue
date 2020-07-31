@@ -2,8 +2,11 @@
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else>
     <div class="toolbar">
-      <t-settings-modal-button></t-settings-modal-button>
-      <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+      <tapestry-filter />
+      <div class="slider-wrapper">
+        <t-settings-modal-button></t-settings-modal-button>
+        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+      </div>
     </div>
     <root-node-button
       v-if="empty && canEdit"
@@ -52,6 +55,7 @@ import TSettingsModalButton from "@/components/TSettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryApi from "@/services/TapestryAPI"
+import TapestryFilter from "@/components/TapestryFilter"
 
 const client = new TapestryApi(wpPostId)
 
@@ -61,6 +65,7 @@ export default {
     TapestryNode,
     TapestryLink,
     TapestryDepthSlider,
+    TapestryFilter,
     TSettingsModalButton,
     RootNodeButton,
     LockedTooltip,
@@ -180,6 +185,21 @@ export default {
 
 <style lang="scss" scoped>
 main {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.slider-wrapper {
+  background: #fbfbfb;
+  box-shadow: 0 0 7px 0 #ddd;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 8px 0 8px 12px;
   position: relative;
 }
 </style>

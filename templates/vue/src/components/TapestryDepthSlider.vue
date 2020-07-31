@@ -1,7 +1,13 @@
 <template>
   <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
-    <input v-model="currentDepth" type="range" min="1" :max="maxDepth" />
-    <p v-if="currentDepth < maxDepth">
+    <input
+      v-model="currentDepth"
+      class="slider"
+      type="range"
+      min="1"
+      :max="maxDepth"
+    />
+    <p v-if="currentDepth < maxDepth" class="warning-text">
       Some nodes might be hidden because you're not at max depth.
     </p>
   </div>
@@ -145,8 +151,6 @@ export default {
 
 <style lang="scss" scoped>
 .depth-slider {
-  border-left: 1px solid #a1a1a1;
-  padding-left: 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -154,5 +158,76 @@ export default {
   p {
     display: block;
   }
+}
+
+.slider {
+  -webkit-appearance: none;
+  outline: none;
+  background: #d3d3d3;
+  height: 10px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  position: relative;
+  margin: 0 32px;
+  align-items: center;
+
+  &:before,
+  &:after {
+    position: absolute;
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-size: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid #dfdfdf;
+    border-radius: 50%;
+    left: -30px;
+    bottom: -9px;
+  }
+
+  &:after {
+    left: initial;
+    right: -30px;
+  }
+
+  /* webkit support */
+  &::-webkit-slider-thumb {
+    border: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ed7565;
+    cursor: pointer;
+  }
+
+  /* mozilla support */
+  &::-moz-range-thumb {
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ed7565;
+  }
+
+  /* internet explorer support */
+  &::-ms-thumb {
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ed7565;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.warning-text {
+  position: absolute;
+  width: 100%;
+  top: calc(100% + 12px);
 }
 </style>
