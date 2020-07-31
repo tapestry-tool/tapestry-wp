@@ -18,20 +18,12 @@ jobs:
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
-            - name: Print docker
-              run: docker ps -a
-            - name: Docker DB logs
-              run: docker logs db 
-            - name: Update Apt
-              run: docker exec wp apt update
-            - name: Install ping
-              run: docker exec wp apt install iputils-ping -y
-            - name: Ping DB
-              run: docker exec wp ping -c 5 db
             - name: Install wordpress
               run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
+            - name: Install H5P
+              run: docker exec wp wp plugin install h5p --allow-root
             - name: Activate plugins
-              run: docker exec wp wp plugin activate tapestry h5p --allow-root
+              run: docker exec wp wp plugin activate tapestry-wp h5p --allow-root
             - name: Add users
               run: docker exec wp wp user create subscriber sub@foo.com --role=subscriber --user_pass=subscriber
             - name: Run tests
