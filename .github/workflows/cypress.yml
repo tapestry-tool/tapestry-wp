@@ -29,7 +29,7 @@ jobs:
             - name: Ping DB
               run: docker exec wp ping -c 5 db
             - name: Install wordpress
-              run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --debug
+              run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
             - name: Activate plugins
               run: docker exec wp wp plugin activate tapestry h5p --allow-root
             - name: Add users
