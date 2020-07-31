@@ -27,7 +27,7 @@ jobs:
             - name: Install ping
               run: docker exec wp apt install iputils-ping -y
             - name: Ping DB
-              run: docker exec wp apt ping -c 5 db
+              run: docker exec wp ping -c 5 db
             - name: Install wordpress
               run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --debug
             - name: Activate plugins
