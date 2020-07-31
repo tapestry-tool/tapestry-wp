@@ -20,7 +20,6 @@ async function getPosts() {
   for (let i = 1; i <= totalPages; i++) {
     arr[i - 1] = i
   }
-  console.time()
   await Promise.all(
     arr.map(async page => {
       const res = await axios.get(
@@ -29,7 +28,6 @@ async function getPosts() {
       posts = posts.concat(res.data)
     })
   )
-  console.timeEnd()
   wp_posts_cache = posts.map(post => ({
     ...post,
     title: post.title.rendered,
