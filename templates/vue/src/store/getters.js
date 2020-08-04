@@ -62,6 +62,30 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
+export function hasPath(_, { getNeighbours }) {
+  return (from, to) => {
+    const stack = []
+    const visited = new Set()
+
+    stack.push(from)
+    visited.add(from)
+    while (stack.length > 0) {
+      const node = stack.pop()
+      const neighbours = getNeighbours(node)
+      for (const neighbour of neighbours) {
+        if (!visited.has(neighbour)) {
+          if (neighbour === to) {
+            return true
+          }
+          visited.add(neighbour)
+          stack.push(neighbour)
+        }
+      }
+    }
+    return false
+  }
+}
+
 export function favourites(state) {
   return state.favourites || []
 }

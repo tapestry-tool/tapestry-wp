@@ -4,7 +4,7 @@
     <div class="toolbar">
       <tapestry-filter />
       <div class="slider-wrapper">
-        <t-settings-modal-button></t-settings-modal-button>
+        <settings-modal-button></settings-modal-button>
         <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
       </div>
     </div>
@@ -51,7 +51,7 @@ import Loading from "@/components/Loading"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
-import TSettingsModalButton from "@/components/TSettingsModalButton"
+import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryApi from "@/services/TapestryAPI"
@@ -66,7 +66,7 @@ export default {
     TapestryLink,
     TapestryDepthSlider,
     TapestryFilter,
-    TSettingsModalButton,
+    SettingsModalButton,
     RootNodeButton,
     LockedTooltip,
   },
