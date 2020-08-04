@@ -28,7 +28,7 @@ jobs:
 #             - name: Ping DB
 #               run: docker exec wp ping -c 5 db
             - name: Check WP CLI
-              run: wp --info
+              run: docker exec wp wp --info
             - name: Install wordpress
               run: docker exec wp wp core install --allow-root --path=/var/www/html/ --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
             - name: Install H5P
