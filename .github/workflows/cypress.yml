@@ -15,21 +15,21 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+            - run: docker-compose pull
+            - uses: satackey/action-docker-layer-caching@v0.0.4
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
-#             - name: Print docker
-#               run: docker ps -a
-#             - name: Docker DB logs
-#               run: docker logs db 
             - name: Update Apt
               run: docker exec wp apt update
-            - name: Install ping
-              run: docker exec wp apt install iputils-ping -y
-            - name: Ping DB
-              run: docker exec wp ping -c 5 db
+#             - name: Install ping
+#               run: docker exec wp apt install iputils-ping -y
+#             - name: Ping DB
+#               run: docker exec wp ping -c 5 db
+            - name: Check WP CLI
+              run: wp --info
             - name: Install wordpress
-              run: docker exec wp wp core install --allow-root --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
+              run: docker exec wp wp core install --allow-root --path=/var/www/html/ --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
             - name: Install H5P
               run: docker exec wp wp plugin install h5p --allow-root
             - name: Activate plugins
