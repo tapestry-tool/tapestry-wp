@@ -37,6 +37,8 @@ jobs:
               run: docker exec wp wp plugin activate tapestry-wp h5p --allow-root
             - name: Add users
               run: docker exec wp wp user create subscriber --allow-root sub@foo.com --role=subscriber --user_pass=subscriber
+            - name: Set Permalink Structure
+              run: docker exec wp wp rewrite structure %postname% --allow-root
             - name: Run tests
               run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
               working-directory: docker
