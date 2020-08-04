@@ -16,6 +16,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - run: docker-compose pull
+              working-directory: docker
             - uses: satackey/action-docker-layer-caching@v0.0.4
             - name: Launch containers
               run: docker-compose up -d
