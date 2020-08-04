@@ -160,37 +160,36 @@ function tapestryTool(config){
             //---------------------------------------------------
             // GET PROGRESS FROM DATABASE OR COOKIE (IF ENABLED)
             //---------------------------------------------------
-            
-            if (config.wpUserId) { // Get from database if user is logged in
+            $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
+                    let progress = retrievedUserProgress;
 
-                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
-
-                    if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        setDatasetProgress(retrievedUserProgress);
+                    if (!wpUserId) {
+                        const localProgress = localStorage.getItem("tapestry-progress");
+                        if (localProgress) {
+                            const userProgress = JSON.parse(localProgress);
+                            Object.keys(progress)
+                                .filter(nodeId => userProgress.hasOwnProperty(nodeId))
+                                .forEach(nodeId => {
+                                    const nodeProgress = userProgress[nodeId]
+                                    const newProgress = progress[nodeId]
+                                    newProgress.completed = nodeProgress.completed
+                                    newProgress.unlocked = nodeProgress.unlocked
+                                    newProgress.accessible = nodeProgress.accessible
+                                    newProgress.progress = nodeProgress.progress
+                                })
+                        }
                     }
-
-                }).fail(function(e) {
-                    console.error("Error with retrieving node progress");
-                    console.error(e);
-                })
-                .complete(function(){
-                    tapestry.init();
-                });
-            }
-            else {  // Get from cookie if user is NOT logged in
-                
-                var cookieProgress = Cookies.get("progress-data-"+tapestrySlug);
-
-                if (cookieProgress) {
-                    cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
+                    setDatasetProgress(progress);
                 }
-
+            })
+            .fail(function(e) {
+                console.error("Error with retrieving node progress");
+                console.error(e);
+            })
+            .complete(function(){
                 tapestry.init();
-            }
-        }
-        else {
-            tapestry.init();
+            });
         }
     }).fail(function(e) {
         console.error("Error with loading tapestries");
@@ -1463,6 +1462,13 @@ function tapestryTool(config){
     }
 
     function getTooltipHtml(node) {
+        if (!wpUserId) {
+            const completeCondition = node.conditions.find(cond => cond.type === conditionTypes.NODE_COMPLETED)
+            if (completeCondition) {
+                return "Please login to unlock this node."
+            }
+        }
+
         const str = "This node will be unlocked: <br />";
         const wrapper = document.createElement("ul");
 
@@ -2316,6 +2322,10 @@ function tapestryTool(config){
         if (progressObj.length < 1) {
             return false;
         }
+
+        if (!wpUserId) {
+            localStorage.setItem("tapestry-progress", JSON.stringify(progressObj));
+        }
         
         for (var id in progressObj) {
             var amountViewed = progressObj[id].progress;
@@ -2337,11 +2347,15 @@ function tapestryTool(config){
                 
                 node.unlocked = progressObj[id].unlocked;
                 node.accessible = progressObj[id].accessible;
-                node.conditions = progressObj[id].conditions;
-                const content = progressObj[id].content
-                if (content) {
-                    node.quiz = content.quiz
-                    node.typeData = content.typeData
+
+                if (wpUserId) {
+                    node.conditions = progressObj[id].conditions;
+            
+                    const content = progressObj[id].content
+                    if (content) {
+                        node.quiz = content.quiz
+                        node.typeData = content.typeData
+                    }
                 }
 
                 if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {
