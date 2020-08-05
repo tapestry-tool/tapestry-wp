@@ -5,6 +5,7 @@
       "ADMIN_PASSWORD": "secret",
       "SUBSCRIBER_USERNAME": "subscriber",
       "SUBSCRIBER_PASSWORD": "subscriber"
-    }
+    },
+    "chromeWebSecurity": false
 }
   
