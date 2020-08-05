@@ -49,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getParent"]),
   },
   mounted() {
     bus.$on("mouseover", id => {
@@ -75,9 +75,45 @@ export default {
             const shouldAddLink = confirm(
               `Link from ${this.node.title} to ${target.title}?`
             )
-            if (shouldAddLink) {
-              await this.addLink({ source: this.node.id, target: this.target })
+
+            if (!shouldAddLink) {
+              return
             }
+
+            const isAccordion = node => {
+              if (node.mediaType === "accordion") {
+                return true
+              }
+              const parent = this.getParent(node)
+              return parent ? parent.mediaType === "accordion" : false
+            }
+
+            const getLinkState = link => {
+              if (isAccordion(link.source) && isAccordion(link.target)) {
+                return { state: "NORMAL", data: link }
+              }
+              if (isAccordion(link.source) || isAccordion(link.target)) {
+                return {
+                  state: "ADD-ROW",
+                  data: {
+                    source: isAccordion(link.source) ? link.source : link.target,
+                    target: isAccordion(link.source) ? link.target : link.source,
+                  },
+                }
+              }
+              return { state: "NORMAL", data: link }
+            }
+
+            const { state, data } = getLinkState({ source: this.node, target })
+            if (state === "ADD-ROW") {
+              const shouldAddRow = confirm(
+                `Add ${data.target.title} as a row of ${data.source.title}?`
+              )
+              if (shouldAddRow) {
+                data.source.childOrdering.push(target.id)
+              }
+            }
+            await this.addLink({ source: data.source.id, target: data.target.id })
           }
           this.linkDragging = false
           this.linkX = 0

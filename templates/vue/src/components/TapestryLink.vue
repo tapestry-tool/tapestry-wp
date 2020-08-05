@@ -31,7 +31,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["visibleNodes", "selectedNodeId"]),
+    ...mapState(["visibleNodes", "rootId"]),
     ...mapGetters(["hasPath"]),
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""
@@ -41,8 +41,8 @@ export default {
     ...mapActions(["deleteLink"]),
     canDelete() {
       return (
-        this.hasPath(this.selectedNodeId, this.source.id) &&
-        this.hasPath(this.selectedNodeId, this.target.id)
+        this.hasPath(this.rootId, this.source.id) &&
+        this.hasPath(this.rootId, this.target.id)
       )
     },
     remove() {
