@@ -93,7 +93,7 @@ describe("User", () => {
   describe("Quiz", () => {
     beforeEach(() => {
       cy.findNode(node => node.mediaFormat === "mp4" && node.quiz).openLightbox()
-      cy.contains(/quiz/i).click({ force: true })
+      cy.contains(/question/i).click({ force: true })
     })
 
     it("Should be able to complete a gravity form quiz", () => {
