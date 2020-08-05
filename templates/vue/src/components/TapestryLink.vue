@@ -5,7 +5,6 @@
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
-        disabled,
       }"
       :x1="source.coordinates.x"
       :x2="target.coordinates.x"

@@ -56,6 +56,7 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryApi from "@/services/TapestryAPI"
 import TapestryFilter from "@/components/TapestryFilter"
+import Helpers from "@/utils/Helpers"
 
 const client = new TapestryApi(wpPostId)
 
@@ -139,35 +140,43 @@ export default {
       })
     },
     updateViewBox() {
-      const box = {
-        minX: 2200,
-        minY: 3000,
-        width: 3800,
-        height: 3800,
-      }
+      const MAX_RADIUS = 240
+      if (this.$refs.app) {
+        const { width, height } = this.$refs.app.getBoundingClientRect()
+        const { x0, y0, x, y } = this.getNodeDimensions()
 
-      for (const node of Object.values(this.nodes)) {
-        if (node.nodeType !== "") {
-          const { x, y } = node.coordinates
-          if (x < box.minX) {
-            box.minX = x
-          }
-          if (y < box.minY) {
-            box.minY = y
-          }
-          if (x > box.width) {
-            box.width = x
-          }
-          if (y > box.height) {
-            box.height = y
-          }
+        const tapestryDimensions = {
+          startX: 0,
+          startY: 0,
+          width,
+          height,
         }
-      }
+        if (x > width || y > height) {
+          tapestryDimensions.startX = x0 - MAX_RADIUS * 1.25
+          tapestryDimensions.startY = y0 - MAX_RADIUS * 1.25
+          tapestryDimensions.width = x
+          tapestryDimensions.height = y
+        }
+        const windowWidth = Helpers.getBrowserWidth()
+        // Center the nodes if there is not enough of them to fill the width of the screen
+        if (
+          tapestryDimensions.width - tapestryDimensions.startX - MAX_RADIUS * 1.25 <
+          windowWidth
+        ) {
+          tapestryDimensions.startX -=
+            (windowWidth - tapestryDimensions.width + tapestryDimensions.startX) /
+              2 +
+            MAX_RADIUS
+        }
+        tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
+        tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
 
-      const { minX, minY, width, height } = box
-      this.viewBox = `${minX - 300} ${minY - 300} ${width - minX + 600} ${height -
-        minY +
-        600}`
+        this.viewBox = `${tapestryDimensions.startX} ${
+          tapestryDimensions.startY
+        } ${tapestryDimensions.width -
+          tapestryDimensions.startX} ${tapestryDimensions.height -
+          tapestryDimensions.startY}`
+      }
     },
     handleMouseover(id) {
       const node = this.nodes[id]
@@ -178,6 +187,34 @@ export default {
       ) {
         this.activeNode = id
       }
+    },
+    getNodeDimensions() {
+      const box = {
+        x0: 30000,
+        y0: 30000,
+        x: 0,
+        y: 0,
+      }
+
+      for (const node of Object.values(this.nodes)) {
+        if (node.nodeType !== "") {
+          const { x, y } = node.coordinates
+          if (x < box.x0) {
+            box.x0 = x
+          }
+          if (y < box.y0) {
+            box.y0 = y
+          }
+          if (x > box.x) {
+            box.x = x
+          }
+          if (y > box.y) {
+            box.y = y
+          }
+        }
+      }
+
+      return box
     },
   },
 }
