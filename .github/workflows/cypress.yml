@@ -20,13 +20,16 @@ jobs:
             - name: Setup WP config
               working-directory: docker
               run: |
-                apt update
-                apt install curl -y
-                cp wp-config-sample-nokey.php wp-config.php
-                curl https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
+                sudo apt update
+                sudo apt install curl -y
+                sudo cp wp-config-sample-nokey.php wp-config.php
+                sudo curl https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
             - name: Setup config.js 
               working-directory: templates/vue
-              run: cat config-sample.js > config.js
+              run: cp config-sample.js config.js
+            - name: Setup cypress.json
+              working-directory: templates/e2e
+              run: cp cypress-gha.json cypress.json
             - uses: satackey/action-docker-layer-caching@v0.0.4
             - name: Launch containers
               run: docker-compose up -d
