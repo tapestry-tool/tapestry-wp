@@ -222,10 +222,10 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
     accessSubmit() {
-      if (!this.ready || this.fileUploading) {
+      if (this.fileUploading) {
         return false
       }
-      return this.node.mediaType === "video" || this.node.mediaType === "h5p"
+      return true
     },
   },
   created() {
