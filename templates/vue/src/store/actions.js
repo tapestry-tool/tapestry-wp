@@ -1,6 +1,8 @@
 import TapestryApi from "../services/TapestryAPI"
 import Helpers from "../utils/Helpers"
 
+const LOCAL_PROGRESS_ID = "tapestry-progress"
+
 const client = new TapestryApi(wpPostId)
 
 export async function updateSettings({ commit }, newSettings) {
@@ -70,7 +72,16 @@ export async function updateLockedStatus({ commit }, id) {
 
 export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
-  await client.updateUserProgress(id, progress)
+
+  if (!wpData.wpUserId) {
+    const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+    const nodeProgress = progressObj[id] || {}
+    nodeProgress.progress = progress
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+  } else {
+    await client.updateUserProgress(id, progress)
+  }
+
   commit("updateNodeProgress", { id, progress })
 }
 
@@ -81,7 +92,16 @@ export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
 
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
-  await client.completeNode(nodeId)
+
+  if (!wpData.wpUserId) {
+    const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+    const nodeProgress = progressObj[nodeId] || {}
+    nodeProgress.completed = true
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+  } else {
+    await client.completeNode(nodeId)
+  }
+
   commit("updateNode", {
     id: nodeId,
     newNode: { completed: true },
