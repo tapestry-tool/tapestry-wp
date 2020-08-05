@@ -20,10 +20,8 @@ jobs:
             - name: Setup WP config
               working-directory: docker
               run: |
-                sudo apt update
-                sudo apt install curl -y
-                sudo cp wp-config-sample-nokey.php wp-config.php
-                sudo curl https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
+                cp wp-config-sample-nokey.php wp-config.php
+                curl https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
             - name: Setup config.js 
               working-directory: templates/vue
               run: cp config-sample.js config.js
@@ -36,8 +34,6 @@ jobs:
               working-directory: docker
             - name: Ping DB
               run: docker exec wp bash -c "apt update; apt install iputils-ping -y; ping -c 5 db"
-            - name: Check WP CLI
-              run: docker exec wp wp --info
             - name: Install wordpress
               run: docker exec wp wp core install --allow-root --path=/var/www/html/ --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
             - name: Install H5P
