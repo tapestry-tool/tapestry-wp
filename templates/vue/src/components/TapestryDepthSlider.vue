@@ -74,9 +74,6 @@ export default {
       immediate: true,
       handler: function() {
         this.updateNodeTypes()
-        if (this.currentDepth > this.maxDepth) {
-          this.setDefaultDepth()
-        }
       },
     },
     maxDepth: {
