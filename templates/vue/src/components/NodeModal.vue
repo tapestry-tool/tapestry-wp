@@ -328,10 +328,65 @@ export default {
       await this.updateLockedStatus(this.node.id)
       this.$emit("submit")
     },
+    getRandomNumber(min, max) {
+      return Math.random() * (max - min) + min
+    },
+    coinToss() {
+      return Math.floor(Math.random() * 2) == 0
+    },
+    calculateX(yIsCalculated) {
+      if (!yIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateY(true)
+      } else {
+        this.node.coordinates.x = this.getRandomNumber(
+          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+        )
+      }
+    },
+    calculateY(xIsCalculated) {
+      if (!xIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateX(true)
+      } else {
+        this.node.coordinates.y = this.getRandomNumber(
+          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+        )
+      }
+    },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
-        this.node.coordinates.x = this.parent.x + sizes.NODE_RADIUS_SELECTED * 2 + 50
-        this.node.coordinates.y = this.parent.y
+        this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
     validateNode() {
