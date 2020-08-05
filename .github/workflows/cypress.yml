@@ -17,16 +17,22 @@ jobs:
             - uses: actions/checkout@v2
             - run: docker-compose pull
               working-directory: docker
+            - name: Setup WP config
+              working-directory: docker
+              run: |
+                apt update
+                apt install curl -y
+                cp wp-config-sample-nokey.php wp-config.php
+                curl https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
+            - name: Setup config.js 
+              working-directory: templates/vue
+              run: cat config-sample.js > config.js
             - uses: satackey/action-docker-layer-caching@v0.0.4
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
-            - name: Update Apt
-              run: docker exec wp apt update
-            - name: Install ping
-              run: docker exec wp apt install iputils-ping -y
             - name: Ping DB
-              run: docker exec wp ping -c 5 db
+              run: docker exec wp bash -c "apt update; apt install iputils-ping -y; ping -c 5 db"
             - name: Check WP CLI
               run: docker exec wp wp --info
             - name: Install wordpress
@@ -39,8 +45,6 @@ jobs:
               run: docker exec wp wp user create subscriber --allow-root sub@foo.com --role=subscriber --user_pass=subscriber
             - name: Set Permalink Structure
               run: docker exec wp wp rewrite structure %postname% --allow-root
-            - name: Create config file
-              run: docker exec app bash -c "cd app; cat config-sample.js > config.js; cat config.js"
             - name: Run tests
               run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
               working-directory: docker
