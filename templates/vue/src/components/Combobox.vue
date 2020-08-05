@@ -119,11 +119,11 @@ export default {
   },
   watch: {
     text(newText) {
-      this.inputValue = this.decodeHtmlEntity(newText)
+      this.inputValue = newText
     },
   },
   created() {
-    this.inputValue = this.decodeHtmlEntity(this.text)
+    this.inputValue = this.text
   },
   methods: {
     handleBlur() {
@@ -133,14 +133,13 @@ export default {
         if (this.inputValue.length === 0) {
           this.$emit("input", null)
         } else if (this.inputValue !== this.text && !this.selected) {
-          this.inputValue = this.decodeHtmlEntity(this.text)
+          this.inputValue = this.text
         }
       })
     },
     handleClick(option) {
       this.$emit("input", this.getValue(option))
       this.inputValue = this.itemText ? option[this.itemText] : option
-      this.inputValue = this.decodeHtmlEntity(this.inputValue)
       this.selected = true
       this.$refs.input.blur()
     },
@@ -151,11 +150,6 @@ export default {
     },
     getValue(option) {
       return typeof option === "string" ? option : option[this.itemValue]
-    },
-    decodeHtmlEntity(str) {
-      return str.replace(/&#(\d+);/g, function(match, dec) {
-        return String.fromCharCode(dec)
-      })
     },
   },
 }
