@@ -115,7 +115,6 @@ export default {
                 data.source.childOrdering.push(data.target.id)
               }
             }
-            console.log(data.source.title, data.target.title)
             await this.addLink({ source: data.source.id, target: data.target.id })
           }
           this.linkDragging = false
