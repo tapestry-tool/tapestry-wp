@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
-    ...mapGetters(["hasPath"]),
+    ...mapGetters(["hasPath", "isAccordion"]),
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""
     },
@@ -45,14 +45,21 @@ export default {
         this.hasPath(this.rootId, this.target.id)
       )
     },
-    remove() {
+    async remove() {
       const userConfirmDelete = confirm(
         `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
       )
       if (userConfirmDelete) {
-        this.canDelete()
-          ? this.deleteLink([this.source.id, this.target.id])
-          : alert("You cannot delete this link")
+        if (this.canDelete()) {
+          await this.deleteLink([this.source.id, this.target.id])
+          if (this.isAccordion(this.source.id)) {
+            this.source.childOrdering = this.source.childOrdering.filter(
+              id => id !== this.target.id
+            )
+          }
+        } else {
+          alert("You cannot delete this link")
+        }
       }
     },
   },

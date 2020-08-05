@@ -22,6 +22,17 @@ export function getParent(state) {
   }
 }
 
+export function isAccordion(_, { getNode, getParent }) {
+  return id => {
+    const node = getNode(id)
+    if (node.mediaType === "accordion") {
+      return true
+    }
+    const parent = getParent(node)
+    return parent ? parent.mediaType === "accordion" : false
+  }
+}
+
 export function getActivities(state) {
   return (options = {}) => {
     const { exclude = [] } = options
@@ -71,12 +82,13 @@ export function hasPath(_, { getNeighbours }) {
     visited.add(from)
     while (stack.length > 0) {
       const node = stack.pop()
+      if (node === to) {
+        return true
+      }
+
       const neighbours = getNeighbours(node)
       for (const neighbour of neighbours) {
         if (!visited.has(neighbour)) {
-          if (neighbour === to) {
-            return true
-          }
           visited.add(neighbour)
           stack.push(neighbour)
         }

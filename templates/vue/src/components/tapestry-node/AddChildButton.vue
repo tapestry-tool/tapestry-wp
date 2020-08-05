@@ -49,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getParent"]),
+    ...mapGetters(["getNode", "isAccordion"]),
   },
   mounted() {
     bus.$on("mouseover", id => {
@@ -80,24 +80,26 @@ export default {
               return
             }
 
-            const isAccordion = node => {
-              if (node.mediaType === "accordion") {
-                return true
-              }
-              const parent = this.getParent(node)
-              return parent ? parent.mediaType === "accordion" : false
-            }
-
             const getLinkState = link => {
-              if (isAccordion(link.source) && isAccordion(link.target)) {
+              if (
+                this.isAccordion(link.source.id) &&
+                this.isAccordion(link.target.id)
+              ) {
                 return { state: "NORMAL", data: link }
               }
-              if (isAccordion(link.source) || isAccordion(link.target)) {
+              if (
+                this.isAccordion(link.source.id) ||
+                this.isAccordion(link.target.id)
+              ) {
                 return {
                   state: "ADD-ROW",
                   data: {
-                    source: isAccordion(link.source) ? link.source : link.target,
-                    target: isAccordion(link.source) ? link.target : link.source,
+                    source: this.isAccordion(link.source.id)
+                      ? link.source
+                      : link.target,
+                    target: this.isAccordion(link.source.id)
+                      ? link.target
+                      : link.source,
                   },
                 }
               }
@@ -110,9 +112,10 @@ export default {
                 `Add ${data.target.title} as a row of ${data.source.title}?`
               )
               if (shouldAddRow) {
-                data.source.childOrdering.push(target.id)
+                data.source.childOrdering.push(data.target.id)
               }
             }
+            console.log(data.source.title, data.target.title)
             await this.addLink({ source: data.source.id, target: data.target.id })
           }
           this.linkDragging = false
