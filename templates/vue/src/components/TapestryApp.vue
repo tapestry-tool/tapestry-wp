@@ -1,8 +1,8 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
-  <div v-else>
+  <div v-else class="app-container">
     <div class="toolbar">
-      <tapestry-filter />
+      <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
         <settings-modal-button></settings-modal-button>
         <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
@@ -229,8 +229,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.app-container {
+  z-index: 0;
+}
+
 main {
   position: relative;
+  z-index: 0;
 }
 
 .toolbar {

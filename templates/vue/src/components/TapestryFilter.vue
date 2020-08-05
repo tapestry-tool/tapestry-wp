@@ -101,7 +101,7 @@ export default {
       if (this.isActive && this.activeFilterOption && this.activeFilterValue) {
         switch (this.activeFilterOption) {
           case filterOptions.AUTHOR: {
-            return this.nodes
+            return Object.values(this.nodes)
               .filter(node => node.author.id == this.activeFilterValue)
               .map(node => node.id)
           }
@@ -116,6 +116,8 @@ export default {
     isActive(isActive) {
       if (isActive) {
         this.updateVisibleNodes(this.visibleNodes)
+      } else {
+        this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
       }
     },
     visibleNodes(nodes) {
