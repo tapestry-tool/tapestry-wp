@@ -32,7 +32,7 @@ jobs:
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
-            - name: Ping DB
+            - name: Ping DB # Shouldn't be required but the next line doesn't succeed without this 
               run: docker exec wp bash -c "apt update; apt install iputils-ping -y; ping -c 5 db"
             - name: Install wordpress
               run: docker exec wp wp core install --allow-root --path=/var/www/html/ --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
@@ -42,7 +42,7 @@ jobs:
               run: docker exec wp wp plugin activate tapestry-wp h5p --allow-root
             - name: Add users
               run: docker exec wp wp user create subscriber --allow-root sub@foo.com --role=subscriber --user_pass=subscriber
-            - name: Set Permalink Structure
+            - name: Set permalink structure
               run: docker exec wp wp rewrite structure %postname% --allow-root
             - name: Run tests
               run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
