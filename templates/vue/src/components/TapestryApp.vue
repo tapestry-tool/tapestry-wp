@@ -141,6 +141,7 @@ export default {
     },
     updateViewBox() {
       const MAX_RADIUS = 240
+      const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
       if (this.$refs.app) {
         const { width, height } = this.$refs.app.getBoundingClientRect()
         const { x0, y0, x, y } = this.getNodeDimensions()
@@ -171,11 +172,18 @@ export default {
         tapestryDimensions.width = tapestryDimensions.width + MAX_RADIUS * 1.25
         tapestryDimensions.height = tapestryDimensions.height + MAX_RADIUS * 1.25
 
+        const MIN_WIDTH = Helpers.getBrowserWidth() * MIN_TAPESTRY_WIDTH_FACTOR
+        const MIN_HEIGHT = Helpers.getBrowserHeight() * MIN_TAPESTRY_WIDTH_FACTOR
+
         this.viewBox = `${tapestryDimensions.startX} ${
           tapestryDimensions.startY
-        } ${tapestryDimensions.width -
-          tapestryDimensions.startX} ${tapestryDimensions.height -
-          tapestryDimensions.startY}`
+        } ${Math.max(
+          tapestryDimensions.width - tapestryDimensions.startX,
+          MIN_WIDTH
+        )} ${Math.max(
+          tapestryDimensions.height - tapestryDimensions.startY,
+          MIN_HEIGHT
+        )}`
       }
     },
     handleMouseover(id) {
