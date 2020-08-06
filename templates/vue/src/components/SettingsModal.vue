@@ -113,15 +113,6 @@ const defaultPermissions = Object.fromEntries(
   ].map(rowName => [rowName, ["read"]])
 )
 
-const defaultSettings = {
-  backgroundUrl: "",
-  autoLayout: false,
-  nodeDraggable: true,
-  showAccess: true,
-  superuserOverridePermissions: true,
-  defaultDepth: 3,
-}
-
 export default {
   name: "settings-modal",
   components: {
@@ -173,7 +164,6 @@ export default {
     openModal() {
       this.$bvModal.show("settings-modal")
       this.getSettings()
-      this.synchronizeSettings()
     },
     closeModal() {
       this.$bvModal.hide("settings-modal")
@@ -226,14 +216,6 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
-    },
-    synchronizeSettings() {
-      const tapestrySettings = this.settings
-      for (const setting in defaultSettings) {
-        if (!tapestrySettings.hasOwnProperty(setting)) {
-          this.updateSettings()
-        }
-      }
     },
   },
 }
