@@ -37,9 +37,9 @@
           </b-form-group>
           <b-form-group
             label="Show me all nodes by default"
-            description="If enabled, editors of this tapestry would be able to view all nodes even if they have 
-            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes, 
-            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with 
+            description="If enabled, editors of this tapestry would be able to view all nodes even if they have
+            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes,
+            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with
             the Administator or Editor role, and the author of this Tapestry."
           >
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
@@ -60,8 +60,17 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button block variant="light" @click="exportTapestry">
-            Export Tapestry
+          <b-button
+            id="export-button"
+            block
+            variant="light"
+            :class="isExporting ? 'disabled' : ''"
+            @click="exportTapestry"
+          >
+            <b-spinner v-if="isExporting"></b-spinner>
+            <div :style="isExporting ? 'opacity: 50%;' : ''">
+              Export Tapestry
+            </div>
           </b-button>
           <duplicate-tapestry-button style="margin-top: 12px;" />
         </b-tab>
@@ -71,7 +80,7 @@
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
-              and can change the permissions for each node that they add. Hiding the Access tab 
+              and can change the permissions for each node that they add. Hiding the Access tab
               will hide it from all users except you, editors of this tapestry, and admins."
           >
             <b-form-checkbox v-model="showAccess" switch>
@@ -146,6 +155,7 @@ export default {
       defaultPermissions,
       superuserOverridePermissions: true,
       defaultDepth: 3,
+      isExporting: false,
     }
   },
   computed: {
@@ -213,6 +223,7 @@ export default {
       location.reload()
     },
     exportTapestry() {
+      this.isExporting = true
       const tapestry = this.tapestryJson
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
@@ -226,6 +237,7 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+      this.isExporting = false
     },
     synchronizeSettings() {
       const tapestrySettings = this.settings
@@ -249,5 +261,28 @@ export default {
 .depth-slider-description {
   color: #6c757d;
   font-size: 80%;
+}
+
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#export-button {
+  position: relative;
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 </style>
