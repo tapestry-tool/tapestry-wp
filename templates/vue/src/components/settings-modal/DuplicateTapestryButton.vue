@@ -37,7 +37,7 @@ export default {
       client
         .addTapestry({ title: this.settings.title, ...tapestry })
         .then(res => {
-          const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
+          const href = res.settings.permalink
           this.link = href
           this.showConfirmation = true
         })
