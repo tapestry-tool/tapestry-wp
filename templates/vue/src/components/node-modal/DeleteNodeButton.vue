@@ -31,7 +31,7 @@ export default {
     },
     isDisabled() {
       if (this.isRoot) {
-        return this.nodes.length > 1
+        return Object.keys(this.nodes).length > 1
       } else {
         return this.getNeighbours(this.nodeId).length > 1
       }
