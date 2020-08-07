@@ -122,6 +122,7 @@ async function unlockNodes({ commit, getters }) {
   for (const [id, nodeProgress] of Object.entries(progress)) {
     const currentNode = getters.getNode(id)
     if (
+      currentNode &&
       Helpers.isDifferent(
         {
           accessible: nodeProgress.accessible,

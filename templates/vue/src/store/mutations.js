@@ -2,7 +2,10 @@ import Vue from "vue"
 import * as getters from "./getters"
 
 export function init(state, { dataset, progress = {} }) {
-  const datasetWithProgress = setDatasetProgress(parseDataset(dataset), progress)
+  const datasetWithProgress = setDatasetProgress(
+    parseDataset(dataset),
+    applyLocalProgress(progress)
+  )
   setDataset(state, datasetWithProgress)
   state.selectedNodeId = dataset.rootId
   Object.values(state.nodes)
@@ -10,6 +13,26 @@ export function init(state, { dataset, progress = {} }) {
     .forEach(n => initializeOrdering(state, n.id))
   state.visibleNodes = Object.keys(state.nodes).map(id => parseInt(id, 10))
   state.tapestryIsLoaded = true
+}
+
+function applyLocalProgress(progress) {
+  if (!wpData.wpUserId) {
+    const localProgress = localStorage.getItem("tapestry-progress")
+    if (localProgress) {
+      const userProgress = JSON.parse(localProgress)
+      Object.keys(progress)
+        .filter(nodeId => userProgress.hasOwnProperty(nodeId))
+        .forEach(nodeId => {
+          const nodeProgress = userProgress[nodeId]
+          const newProgress = progress[nodeId]
+          newProgress.completed = nodeProgress.completed
+          newProgress.unlocked = nodeProgress.unlocked
+          newProgress.accessible = nodeProgress.accessible
+          newProgress.progress = nodeProgress.progress
+        })
+    }
+  }
+  return progress
 }
 
 function parseDataset(dataset) {
@@ -30,41 +53,48 @@ function parseDataset(dataset) {
 }
 
 function setDatasetProgress(dataset, progress) {
+  if (!wpData.wpUserId) {
+    localStorage.setItem("tapestry-progress", JSON.stringify(progress))
+  }
   for (const [id, nodeProgress] of Object.entries(progress)) {
     const node = dataset.nodes.find(node => node.id == id)
-    const willLock = node.unlocked && !nodeProgress.unlocked
-    if (willLock && !wpData.wpCanEditTapestry) {
-      node.quiz = []
-      node.typeData = {}
-    }
+    if (node) {
+      const willLock = node.unlocked && !nodeProgress.unlocked
+      if (willLock && !wpData.wpCanEditTapestry) {
+        node.quiz = []
+        node.typeData = {}
+      }
 
-    node.unlocked = nodeProgress.unlocked
-    node.accessible = nodeProgress.accessible
-    node.conditions = nodeProgress.conditions
-    node.completed = nodeProgress.completed
+      node.unlocked = nodeProgress.unlocked
+      node.accessible = nodeProgress.accessible
+      node.conditions = nodeProgress.conditions
+      node.completed = nodeProgress.completed
 
-    const { content } = nodeProgress
-    if (content) {
-      node.quiz = content.quiz
-      node.typeData = content.typeData
-    }
+      const { content } = nodeProgress
+      if (content) {
+        node.quiz = content.quiz
+        node.typeData = content.typeData
+      }
 
-    if (node.mediaType !== "accordion") {
-      node.progress = nodeProgress.progress
-      const questions = node.quiz
-      if (nodeProgress.quiz) {
-        Object.entries(nodeProgress.quiz).forEach(([questionId, completionInfo]) => {
-          const question = questions.find(question => question.id === questionId)
-          if (question) {
-            question.completed = completionInfo.completed
-            question.entries = {}
-            Object.entries(completionInfo).forEach(([key, value]) => {
-              if (key !== "completed") {
-                question.entries[key] = value
+      if (node.mediaType !== "accordion") {
+        node.progress = nodeProgress.progress
+        const questions = node.quiz
+        if (nodeProgress.quiz) {
+          Object.entries(nodeProgress.quiz).forEach(
+            ([questionId, completionInfo]) => {
+              const question = questions.find(question => question.id === questionId)
+              if (question) {
+                question.completed = completionInfo.completed
+                question.entries = {}
+                Object.entries(completionInfo).forEach(([key, value]) => {
+                  if (key !== "completed") {
+                    question.entries[key] = value
+                  }
+                })
               }
-            })
-          }
-        })
+            }
+          )
+        }
       }
     }
   }
