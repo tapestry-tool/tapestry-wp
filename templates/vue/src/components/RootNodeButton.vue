@@ -6,7 +6,11 @@
     </div>
     <p>Or</p>
     <b-button class="import-button" @click="openFileBrowser">
-      Import a Tapestry
+      <b-spinner v-if="isImporting"></b-spinner>
+
+      <div v-else>
+        Import a Tapestry
+      </div>
     </b-button>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
@@ -39,6 +43,7 @@ export default {
     return {
       error: null,
       isDragover: false,
+      isImporting: false,
     }
   },
   methods: {
@@ -75,11 +80,15 @@ export default {
       this.importTapestry(file)
     },
     importTapestry(file) {
+      this.isImporting = true
       const reader = new FileReader()
       reader.onload = e => {
         client
           .importTapestry(JSON.parse(e.target.result))
-          .then(() => location.reload()) // TODO: Change this so a refresh isn't required
+          .then(() => {
+            this.isImporting = false
+            location.reload()
+          }) // TODO: Change this so a refresh isn't required
           .catch(err => (this.error = err))
       }
       reader.readAsText(file)
@@ -149,5 +158,12 @@ export default {
   &.drag-over {
     opacity: 1;
   }
+}
+
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
