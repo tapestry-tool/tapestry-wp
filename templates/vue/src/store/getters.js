@@ -73,8 +73,19 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
-export function hasPath(_, { getNeighbours }) {
-  return (from, to) => {
+export function hasPath(state) {
+  return (from, to, options = {}) => {
+    const { exclude = [] } = options
+    const allowedLinks = state.links.filter(link => {
+      return (
+        exclude.find(
+          blacklistedLink =>
+            blacklistedLink.source === link.source &&
+            blacklistedLink.target === link.target
+        ) !== undefined
+      )
+    })
+
     const stack = []
     const visited = new Set()
 
@@ -86,7 +97,9 @@ export function hasPath(_, { getNeighbours }) {
         return true
       }
 
-      const neighbours = getNeighbours(node)
+      const neighbours = allowedLinks
+        .filter(link => link.source == node || link.target == node)
+        .map(link => (link.source == node ? link.target : link.source))
       for (const neighbour of neighbours) {
         if (!visited.has(neighbour)) {
           visited.add(neighbour)

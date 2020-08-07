@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
-    ...mapGetters(["hasPath", "isAccordion"]),
+    ...mapGetters(["getNeighbours", "isAccordion"]),
     isVisible() {
       return this.source.nodeType !== "" && this.target.nodeType !== ""
     },
@@ -40,10 +40,13 @@ export default {
   methods: {
     ...mapActions(["deleteLink"]),
     canDelete() {
-      return (
-        this.hasPath(this.rootId, this.source.id) &&
-        this.hasPath(this.rootId, this.target.id)
+      const sourceNeighbours = this.getNeighbours(this.source.id).filter(
+        id => id !== this.target.id
       )
+      const targetNeighbours = this.getNeighbours(this.target.id).filter(
+        id => id !== this.source.id
+      )
+      return sourceNeighbours.length > 0 && targetNeighbours.length > 0
     },
     async remove() {
       const userConfirmDelete = confirm(
