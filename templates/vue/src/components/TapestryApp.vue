@@ -38,7 +38,11 @@
             @mouseleave="activeNode = null"
           ></tapestry-node>
         </g>
-        <locked-tooltip v-if="activeNode" :node="nodes[activeNode]"></locked-tooltip>
+        <locked-tooltip
+          v-if="activeNode"
+          :node="nodes[activeNode]"
+          :viewBox="viewBox"
+        ></locked-tooltip>
       </svg>
     </main>
   </div>
