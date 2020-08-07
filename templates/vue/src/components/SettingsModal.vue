@@ -40,8 +40,12 @@
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
               {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
           </b-form-group>
-          <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
+          <b-form-group v-if="tapestryIsLoaded" label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
@@ -49,6 +53,10 @@
               min="0"
               :max="maxDepth || 3"
             ></b-form-input>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
             <div class="depth-slider-description">
               Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
             </div>
@@ -77,11 +85,6 @@
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
-      <p class="mb-0 p-0 text-muted small">
-        <strong>Note:</strong>
-        Page will refresh when you save to apply your new settings.
-      </p>
-      <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
