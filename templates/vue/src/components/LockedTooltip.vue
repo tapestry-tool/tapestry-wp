@@ -1,7 +1,7 @@
 <template>
   <g :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`">
     <foreignObject :width="width" :height="height" :x="x" :y="y">
-      <div class="tapestry-tooltip">
+      <div class="tapestry-tooltip" :style="flexPosition">
         <div class="tapestry-tooltip-content">
           This node will be unlocked:
           <br />
@@ -45,6 +45,10 @@ export default {
       type: Object,
       required: true,
     },
+    viewBox: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapGetters(["getDirectParents", "getNode"]),
@@ -71,15 +75,23 @@ export default {
       return -this.width / 2
     },
     y() {
-      return -(this.radius * 3 + 27.5 + 20)
+      return this.onBottom ? this.radius + 27.5 + 10 : -(this.radius * 3 + 27.5 + 20)
     },
     points() {
-      const yOffset = -this.y - this.height
-      const points = [
-        [-16, -16 - yOffset],
-        [16, -16 - yOffset],
-        [0, 16 - yOffset],
-      ]
+      const yOffset = this.onBottom
+        ? this.y - this.height - 75
+        : -this.y - this.height
+      const points = this.onBottom
+        ? [
+            [-16, 16 - yOffset],
+            [16, 16 - yOffset],
+            [0, -16 - yOffset],
+          ]
+        : [
+            [-16, -16 - yOffset],
+            [16, -16 - yOffset],
+            [0, 16 - yOffset],
+          ]
       return points.map(point => point.join(",")).join(" ")
     },
     parent() {
@@ -98,6 +110,18 @@ export default {
     },
     conditionTypes() {
       return conditionTypes
+    },
+    startY() {
+      return this.viewBox.split(" ")[1]
+    },
+    onBottom() {
+      return (
+        this.node.coordinates.y - this.startY < this.height ||
+        this.node.coordinates.y - this.startY - this.height <= $(window).scrollTop()
+      )
+    },
+    flexPosition() {
+      return this.onBottom ? "align-items: flex-start;" : "align-items: flex-end;"
     },
   },
   methods: {
