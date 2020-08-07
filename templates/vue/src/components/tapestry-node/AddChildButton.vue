@@ -19,7 +19,7 @@
 
 <script>
 import * as d3 from "d3"
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 
@@ -49,6 +49,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["links"]),
     ...mapGetters(["getNode", "isAccordion"]),
   },
   mounted() {
@@ -70,52 +71,54 @@ export default {
           this.linkY += d3.event.dy
         })
         .on("end", async () => {
-          if (this.target !== this.node.id) {
+          const linkExists = this.links.find(link => {
+            if (link.source === this.node.id && link.target === this.target) {
+              return true
+            }
+            return link.target === this.node.id && link.source === this.target
+          })
+          if (!linkExists && this.target !== this.node.id) {
             const target = this.getNode(this.target)
             const shouldAddLink = confirm(
               `Link from ${this.node.title} to ${target.title}?`
             )
 
-            if (!shouldAddLink) {
-              return
-            }
-
-            const getLinkState = link => {
-              if (
-                this.isAccordion(link.source.id) &&
-                this.isAccordion(link.target.id)
-              ) {
+            if (shouldAddLink) {
+              const getLinkState = link => {
+                if (
+                  this.isAccordion(link.source.id) &&
+                  this.isAccordion(link.target.id)
+                ) {
+                  return { state: "NORMAL", data: link }
+                }
+                if (
+                  this.isAccordion(link.source.id) ||
+                  this.isAccordion(link.target.id)
+                ) {
+                  return {
+                    state: "ADD-ROW",
+                    data: {
+                      source: this.isAccordion(link.source.id)
+                        ? link.source
+                        : link.target,
+                      target: this.isAccordion(link.source.id)
+                        ? link.target
+                        : link.source,
+                    },
+                  }
+                }
                 return { state: "NORMAL", data: link }
               }
-              if (
-                this.isAccordion(link.source.id) ||
-                this.isAccordion(link.target.id)
-              ) {
-                return {
-                  state: "ADD-ROW",
-                  data: {
-                    source: this.isAccordion(link.source.id)
-                      ? link.source
-                      : link.target,
-                    target: this.isAccordion(link.source.id)
-                      ? link.target
-                      : link.source,
-                  },
-                }
-              }
-              return { state: "NORMAL", data: link }
-            }
 
-            const { state, data } = getLinkState({ source: this.node, target })
-            if (state === "ADD-ROW") {
-              const shouldAddRow = confirm(
-                `Add ${data.target.title} as a row of ${data.source.title}?`
-              )
-              if (shouldAddRow) {
+              const { state, data } = getLinkState({ source: this.node, target })
+              if (state === "ADD-ROW") {
+                alert(
+                  `${data.target.title} will be added as a row of ${data.source.title}`
+                )
                 data.source.childOrdering.push(data.target.id)
               }
+              await this.addLink({ source: data.source.id, target: data.target.id })
             }
-            await this.addLink({ source: data.source.id, target: data.target.id })
           }
           this.linkDragging = false
           this.linkX = 0
