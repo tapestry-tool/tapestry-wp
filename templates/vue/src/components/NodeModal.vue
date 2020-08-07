@@ -95,11 +95,11 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :class="accessSubmit ? '' : 'disabled'"
+        :class="canSubmit ? '' : 'disabled'"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!accessSubmit"></b-spinner>
-        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -221,11 +221,8 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    accessSubmit() {
-      if (this.fileUploading) {
-        return false
-      }
-      return true
+    canSubmit() {
+      return !this.fileUploading
     },
   },
   created() {
