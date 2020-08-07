@@ -2,14 +2,31 @@ import Vue from "vue"
 import * as getters from "./getters"
 
 export function init(state, { dataset, progress = {} }) {
-  const datasetWithProgress = setDatasetProgress(dataset, progress)
+  const datasetWithProgress = setDatasetProgress(parseDataset(dataset), progress)
   setDataset(state, datasetWithProgress)
   state.selectedNodeId = dataset.rootId
-  state.tapestryIsLoaded = true
   Object.values(state.nodes)
     .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(state, n.id))
   state.visibleNodes = Object.keys(state.nodes).map(id => parseInt(id, 10))
+  state.tapestryIsLoaded = true
+}
+
+function parseDataset(dataset) {
+  for (const node of dataset.nodes) {
+    const { imageURL, lockedImageURL } = node
+    const { mediaURL } = node.typeData
+    if (imageURL) {
+      node.imageURL = imageURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+    if (lockedImageURL) {
+      node.lockedImageURL = lockedImageURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+    if (mediaURL && typeof mediaURL === "string") {
+      node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+  }
+  return dataset
 }
 
 function setDatasetProgress(dataset, progress) {
