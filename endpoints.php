@@ -411,8 +411,9 @@ function getTapestry($request)
     $postId = $request['tapestryPostId'];
     try {
         $tapestry = new Tapestry($postId);
+        $data = $tapestry->get($filterUserId);
 
-        return $tapestry->get();
+        return $data;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
