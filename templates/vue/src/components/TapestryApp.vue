@@ -4,7 +4,7 @@
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <settings-modal-button></settings-modal-button>
+        <settings-modal-button v-if="canEdit"></settings-modal-button>
         <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
       </div>
     </div>
