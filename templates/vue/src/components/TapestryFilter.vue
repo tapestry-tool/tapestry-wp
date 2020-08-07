@@ -89,7 +89,10 @@ export default {
             ? Object.values(this.allContributors)
             : [
                 ...new Map(
-                  this.nodes.map(node => [node.author.id, node.author])
+                  Object.values(this.nodes).map(node => [
+                    node.author.id,
+                    node.author,
+                  ])
                 ).values(),
               ]
         }

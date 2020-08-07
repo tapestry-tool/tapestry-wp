@@ -216,7 +216,7 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     activities() {
-      const questions = this.nodes
+      const questions = Object.values(this.nodes)
         .filter(node => Boolean(node.quiz))
         .flatMap(node => node.quiz)
       this.questions.forEach(q => {
