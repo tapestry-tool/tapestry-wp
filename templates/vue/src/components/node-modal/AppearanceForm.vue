@@ -14,6 +14,7 @@
         v-model="node.imageURL"
         data-testid="node-imageUrl"
         placeholder="Enter the URL for the thumbnail"
+        @isUploading="handleUploadChange"
       />
     </b-form-group>
     <b-form-group v-if="addThumbnail">
@@ -29,6 +30,7 @@
         v-model="node.lockedImageURL"
         data-testid="node-lockedImageURL"
         placeholder="Enter the URL for the thumbnail"
+        @isUploading="handleUploadChange"
       />
     </b-form-group>
     <b-form-group>
@@ -103,6 +105,11 @@ export default {
   created() {
     this.addThumbnail = this.node.imageURL.length > 0
     this.addLockedThumbnail = this.node.lockedImageURL.length > 0
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
+    },
   },
 }
 </script>
