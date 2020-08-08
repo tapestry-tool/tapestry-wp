@@ -108,11 +108,11 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :class="accessSubmit ? '' : 'disabled'"
-        @click="submit"
+        :disabled="!canSubmit"
+        @click="handleSubmit"
       >
-        <b-spinner v-if="!accessSubmit"></b-spinner>
-        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -182,6 +182,8 @@ export default {
       tydeTypes: tydeTypes,
       node: null,
       videoLoaded: false,
+      fileUploading: false,
+      loadDuration: false,
     }
   },
   computed: {
@@ -228,18 +230,17 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    accessSubmit() {
-      // Locks access to submit button while youtube video loads to grab duration
-      return (
-        (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
-        this.videoLoaded
-      )
+    canSubmit() {
+      return !this.fileUploading
     },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
@@ -654,15 +655,17 @@ table {
 
 #submit-button {
   position: relative;
+
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
   }
 }
 </style>

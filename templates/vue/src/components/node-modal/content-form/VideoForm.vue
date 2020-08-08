@@ -7,6 +7,7 @@
         data-testid="node-videoUrl"
         placeholder="Enter URL for MP4 or YouTube video"
         required
+        @isUploading="handleUploadChange"
       />
       <b-form-text v-if="showVideoDescription">
         This video should not include any screenshots of the stage layout.
@@ -76,13 +77,8 @@ export default {
     },
   },
   methods: {
-    setYouTubeDuration(evt) {
-      this.node.mediaDuration = evt.target.getDuration()
-      this.$emit("load")
-    },
-    setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video.duration
-      this.$emit("load")
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }
