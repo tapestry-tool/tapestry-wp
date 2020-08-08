@@ -246,7 +246,7 @@ class TapestryNode implements ITapestryNode
         foreach ($conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
-                    if ($userProgress->isCompleted($condition->nodeId, $userId)) {
+                    if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
                         $condition->fulfilled = true;
                     } else {
                         // If user is a co-pilot, also check the completion of node by teen
