@@ -25,6 +25,7 @@
       <h1 class="question-title">
         {{ question.text }}
       </h1>
+      <p v-if="!isLoggedIn">Please login to have your answers saved.</p>
       <gravity-form
         v-if="formOpened"
         :id="formId"
@@ -106,6 +107,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntry", "getQuestion"]),
+    isLoggedIn() {
+      return Boolean(wpData.wpUserId)
+    },
     lastQuestion() {
       if (this.question.previousEntry) {
         return this.getQuestion(this.question.previousEntry)
@@ -167,6 +171,9 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       this.loading = true
       await this.completeQuestion({
         nodeId: this.node.id,
@@ -179,6 +186,9 @@ export default {
     },
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       this.loading = true
       await this.completeQuestion({
         nodeId: this.node.id,
