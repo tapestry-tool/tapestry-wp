@@ -5,12 +5,11 @@
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
       <combobox
+        v-model="filterOption"
         class="filter-combobox"
         :options="comboboxFilterOptions"
-        :value="activeFilterOption"
         :input-style="inputStyles"
         size="sm"
-        @input="updateFilterOption"
       >
         <template v-slot="slotProps">
           <p class="filter-value">
@@ -19,14 +18,13 @@
         </template>
       </combobox>
       <combobox
+        v-model="filterValue"
         class="filter-combobox"
         item-text="name"
         item-value="id"
         :options="comboboxValueOptions"
-        :value="activeFilterValue"
         :input-style="inputStyles"
         size="sm"
-        @input="updateFilterValue"
       >
         <template v-slot="slotProps">
           <p class="filter-value">
@@ -52,6 +50,14 @@ export default {
   components: {
     Combobox,
   },
+  data() {
+    return {
+      allContributors: null,
+      isActive: false,
+      filterOption: "",
+      filterValue: "",
+    }
+  },
   computed: {
     ...mapState(["nodes"]),
     inputStyles() {
@@ -60,24 +66,14 @@ export default {
         width: "60%",
       }
     },
-    isActive() {
-      return this.$route.path.includes("filter")
-    },
     isFilterSelected() {
-      return this.activeFilterOption !== null
-    },
-    activeFilterOption() {
-      const query = this.$route.query
-      return query.by || null
+      return this.filterOption !== ""
     },
     comboboxFilterOptions() {
       return Object.values(filterOptions)
     },
-    activeFilterValue() {
-      return this.$route.query.q || null
-    },
     comboboxValueOptions() {
-      switch (this.activeFilterOption) {
+      switch (this.filterOption) {
         case filterOptions.AUTHOR: {
           const authors = new Map(
             this.nodes.map(node => [node.author.id, node.author])
@@ -90,30 +86,18 @@ export default {
     },
   },
   watch: {
-    $route(to, from) {
-      thisTapestryTool.updateVisibleNodes(
-        to.fullPath.slice(1),
-        from.fullPath.slice(1)
-      )
+    async filterValue(next) {
+      await this.refetchTapestryData(Number(next))
+      thisTapestryTool.updateVisibleNodes(this.filterOption, this.filterValue)
     },
   },
   methods: {
     toggleFilter() {
-      this.isActive
-        ? this.$router.push(`/`)
-        : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
-    },
-    updateFilterOption(opt) {
-      this.$router.push({
-        query: { by: opt !== null ? opt : this.comboboxFilterOptions[0] },
-      })
-    },
-    updateFilterValue(val) {
-      const newQuery =
-        val !== null
-          ? { ...this.$route.query, q: val }
-          : { by: this.$route.query.by }
-      this.$router.push({ query: newQuery })
+      if (this.isActive) {
+        this.filterOption = ""
+        this.filterValue = ""
+      }
+      this.isActive = !this.isActive
     },
   },
 }
