@@ -4,7 +4,7 @@
       v-model="node.typeData.mediaURL"
       item-text="title"
       item-value="id"
-      empty-message="There are no Wordpress posts yet. Please add one in your WP dashboard."
+      :empty-message="emptyMessage"
       :options="wpPosts"
     >
       <template v-slot="slotProps">
@@ -34,12 +34,21 @@ export default {
   data() {
     return {
       wpPosts: [],
+      emptyMessage: "Wordpress posts are loading...",
     }
   },
   mounted() {
-    WordpressApi.getPosts().then(posts => {
-      this.wpPosts = posts
-    })
+    this.wpPosts = WordpressApi.loadCachedPosts()
+    WordpressApi.getPosts()
+      .then(posts => {
+        this.wpPosts = posts
+      })
+      .then(() => {
+        if (this.wpPosts.length < 1) {
+          this.emptyMessage =
+            "There are no Wordpress posts yet. Please add one in your WP dashboard."
+        }
+      })
   },
 }
 </script>
