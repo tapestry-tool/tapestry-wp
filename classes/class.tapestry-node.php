@@ -246,12 +246,16 @@ class TapestryNode implements ITapestryNode
         foreach ($conditions as $condition) {
             switch ($condition->type) {
                 case ConditionTypes::NODE_COMPLETED:
-                    $user = get_userdata($userId);
-                    if ($user) {
-                        $isCopilot = in_array('copilot', $user->roles);
-                        $workingUserId = $isCopilot ? get_the_author_meta('teen_id', $userId) : $userId;
-                        if ($userProgress->isCompleted($condition->nodeId, $workingUserId)) {
-                            $condition->fulfilled = true;
+                    if ($userProgress->isCompleted($condition->nodeId, $userId)) {
+                        $condition->fulfilled = true;
+                    } else {
+                        // If user is a co-pilot, also check the completion of node by teen
+                        $user = get_userdata($userId);
+                        if (in_array('copilot', $user->roles)) {
+                            $teenUserId = get_the_author_meta('teen_id', $userId);
+                            if ($teenUserId && $userProgress->isCompleted($condition->nodeId, $teenUserId)) {
+                                $condition->fulfilled = true;
+                            }
                         }
                     }
                     break;
