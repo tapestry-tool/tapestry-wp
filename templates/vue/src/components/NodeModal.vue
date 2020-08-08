@@ -105,8 +105,15 @@
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" @click="handleSubmit">
-        Submit
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :disabled="!canSubmit"
+        @click="handleSubmit"
+      >
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -198,6 +205,8 @@ export default {
       maxDescriptionLength: 250,
       tydeTypes: tydeTypes,
       node: null,
+      videoLoaded: false,
+      fileUploading: false,
       loadDuration: false,
     }
   },
@@ -245,11 +254,17 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+    canSubmit() {
+      return !this.fileUploading
+    },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
@@ -646,6 +661,11 @@ table {
       width: 1.5em;
       left: 33%;
     }
+
+    &:disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+    }
   }
 
   .slick-list-item {
@@ -664,62 +684,16 @@ table {
     > span:last-of-type {
       margin-left: auto;
     }
-  }
-}
 
-.slick-list-item {
-  display: flex;
-  height: 25px;
-  border: lightgray solid 1.5px;
-  margin: 10px 25px;
-  border-radius: 5px;
-  padding: 15px;
-  align-items: center;
-  > span {
-    margin-right: 25px;
-  }
-  > span:last-of-type {
-    margin-left: auto;
-  }
-}
-
-.slick-list-item {
-  display: flex;
-  height: 25px;
-  border: lightgray solid 1.5px;
-  margin: 10px 25px;
-  border-radius: 5px;
-  padding: 15px;
-  align-items: center;
-  > span {
-    margin-right: 25px;
-  }
-  > span:last-of-type {
-    margin-left: auto;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
+    &.disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+    }
   }
 }
 
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
-}
-
-#submit-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-    left: 33%;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
 }
 </style>

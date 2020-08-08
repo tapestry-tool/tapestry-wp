@@ -7,6 +7,7 @@
         data-testid="node-videoUrl"
         placeholder="Enter URL for MP4 or YouTube video"
         required
+        @isUploading="handleUploadChange"
       />
       <b-form-text v-if="showVideoDescription">
         This video should not include any screenshots of the stage layout.
@@ -57,6 +58,11 @@ export default {
         this.node.mediaFormat = "mp4"
         this.node.typeData.youtubeID = undefined
       }
+    },
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }

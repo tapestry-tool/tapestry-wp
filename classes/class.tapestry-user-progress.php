@@ -355,7 +355,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function updateFavourites($favourites)
     {
         $this->_checkPostId();
-        update_user_meta($this->_userId, 'tapestry_favourites_' . $this->postId, $favourites);
+        update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
     }
 
     /* Helpers */
