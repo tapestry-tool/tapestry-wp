@@ -95,7 +95,7 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :class="canSubmit ? '' : 'disabled'"
+        :disabled="!canSubmit"
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit"></b-spinner>
@@ -638,16 +638,16 @@ table {
 #submit-button {
   position: relative;
 
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
   }
 }
 

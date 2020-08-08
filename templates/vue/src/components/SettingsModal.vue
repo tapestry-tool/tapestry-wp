@@ -85,7 +85,7 @@
     <template slot="modal-footer">
       <p class="mb-0 p-0 text-muted small">
         <strong>Note:</strong>
-        Page will refresh when you save to apply your new settings.
+        Page will refresh when you submit to apply your new settings.
       </p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="closeModal">
@@ -99,7 +99,7 @@
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
-        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Save</div>
+        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -176,7 +176,7 @@ export default {
     window.addEventListener("open-settings-modal", this.openModal)
   },
   beforeDestroy() {
-    window.removeEventListener("open-settings-modal")
+    window.removeEventListener("open-settings-modal", this.openModal)
   },
   methods: {
     openModal() {
@@ -273,16 +273,16 @@ export default {
 #save-button {
   position: relative;
 
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
   }
 }
 </style>

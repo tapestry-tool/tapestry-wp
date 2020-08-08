@@ -1,39 +1,26 @@
 <template>
-  <b-container fluid>
-    <div v-if="isUploading" class="upload-container">
-      <b-row>
-        <b-col cols="auto" class="upload-label mr-auto text-muted">
-          <p v-if="doneUploading">
-            Upload complete. Press the "Submit" button to save your changes
-          </p>
-          <p v-else>Upload in progress ...</p>
-        </b-col>
-        <b-col cols="auto">
-          <b-button
-            v-if="doneUploading"
-            size="sm"
-            variant="secondary"
-            @click="reset"
-          >
-            OK
-          </b-button>
-          <b-button v-else size="sm" variant="secondary" @click="reset">
-            Cancel
-          </b-button>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col class="progress-wrapper">
-          <b-progress
-            :value="uploadPercentage"
-            :max="100"
-            :animated="uploadPercentage < 100"
-          ></b-progress>
-        </b-col>
-      </b-row>
-    </div>
-    <b-row v-else>
-      <b-col class="px-0">
+  <b-container fluid class="upload-container px-0">
+    <b-row v-if="isUploading">
+      <b-col cols="auto" class="upload-label mr-auto text-muted">
+        <p>Upload in progress ...</p>
+      </b-col>
+      <b-col cols="auto">
+        <b-button size="sm" variant="light" @click="cancelUpload">
+          Cancel Upload
+        </b-button>
+      </b-col>
+    </b-row>
+    <b-row v-if="isUploading">
+      <b-col class="progress-wrapper">
+        <b-progress
+          :value="uploadPercentage"
+          :max="100"
+          :animated="uploadPercentage < 100"
+        ></b-progress>
+      </b-col>
+    </b-row>
+    <b-row v-if="!isUploading">
+      <b-col class="pr-0">
         <b-form-file
           ref="file"
           name="async-upload"
@@ -50,7 +37,7 @@
       <b-col sm="1" class="divider">
         <h6 class="text-muted">OR</h6>
       </b-col>
-      <b-col class="px-0">
+      <b-col class="pl-0">
         <b-form-input
           name="text-input"
           :placeholder="placeholder"
@@ -61,8 +48,21 @@
         />
       </b-col>
     </b-row>
-    <b-alert v-if="error" style="margin: 0 -15px;" show variant="danger">
-      File upload failed: {{ error.message }}
+    <b-alert v-if="error" show variant="danger">
+      File upload failed: {{ error.message || error.data.message }}
+    </b-alert>
+    <b-alert v-else-if="!confirmedUpload" show variant="success">
+      <b-row>
+        <b-col cols="auto" class="upload-label mr-auto text-muted">
+          Upload completed successfully. Press the "Submit" button to save your
+          changes.
+        </b-col>
+        <b-col cols="auto">
+          <b-button size="sm" variant="secondary" @click="confirmUpload">
+            OK
+          </b-button>
+        </b-col>
+      </b-row>
     </b-alert>
   </b-container>
 </template>
@@ -82,16 +82,16 @@ export default {
       required: false,
     },
   },
-
   data() {
     return {
       uploadPercentage: 0,
+      uploadBarInterval: null,
+      uploadSource: null,
       isUploading: false,
-      doneUploading: false,
+      confirmedUpload: true,
       error: null,
     }
   },
-
   methods: {
     uploadFile(event) {
       const formData = new FormData()
@@ -110,20 +110,31 @@ export default {
       )
       formData.append("_wpnonce", wpData.file_upload_nonce)
 
+      this.error = null
+      this.confirmedUpload = true
+
+      let CancelToken = axios.CancelToken
+      this.uploadSource = CancelToken.source()
+
       axios
         .post(wpData.upload_url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          cancelToken: this.uploadSource.token,
           onUploadProgress: progressEvent => {
             this.isUploading = true
             this.$emit("isUploading", this.isUploading)
             setTimeout(() => {
               this.uploadPercentage = parseInt(
-                Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                Math.round((progressEvent.loaded / progressEvent.total) * 95)
               )
-              if (this.uploadPercentage === 100) {
-                this.doneUploading = true
+              if (this.uploadPercentage == 95) {
+                this.uploadBarInterval = setInterval(() => {
+                  if (this.uploadPercentage < 99) {
+                    this.uploadPercentage++
+                  }
+                }, 500)
               }
             }, 1000)
           },
@@ -139,16 +150,32 @@ export default {
         })
         .catch(response => this.handleError(response))
         .finally(() => {
-          this.isUploading = false
-          this.$emit("isUploading", this.isUploading)
+          if (this.isUploading) {
+            this.isUploading = false
+            this.confirmedUpload = false
+            this.$emit("isUploading", this.isUploading)
+          }
+          clearInterval(this.uploadBarInterval)
         })
     },
-    reset() {
-      this.doneUploading = false
+    cancelUpload() {
       this.uploadPercentage = 0
+      this.isUploading = false
+      this.$emit("isUploading", false)
+      if (this.uploadSource) {
+        this.uploadSource.cancel()
+        this.confirmedUpload = true
+      }
+    },
+    confirmUpload() {
+      this.confirmedUpload = true
     },
     handleError(error) {
-      this.error = error
+      if (axios.isCancel(error)) {
+        console.log("Request canceled", error.message)
+      } else {
+        this.error = error
+      }
     },
   },
 }
@@ -163,10 +190,6 @@ export default {
   text-align: center;
   vertical-align: center;
   padding: 10px;
-}
-
-.upload-container {
-  padding-left: 9px;
 }
 
 .upload-label {
