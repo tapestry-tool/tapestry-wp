@@ -453,7 +453,7 @@ function tapestryTool(config){
 
             const messageWrapper = document.createElement("p");
             messageWrapper.id = "depth-warning-message";
-            messageWrapper.textContent = `Some filter results might be hidden because you're not at max depth.`;
+            messageWrapper.textContent = `Some nodes might be hidden because you're not at max depth.`;
             messageWrapper.style.opacity = shouldShowMessage() ? "1" : "0";
 
             tapestryControlsDiv.appendChild(messageWrapper);
@@ -477,7 +477,7 @@ function tapestryTool(config){
     }
 
     function shouldShowMessage() {
-        return tapestryDepthSlider.value !== tapestryDepthSlider.max && isFilterActive()
+        return tapestryDepthSlider.value !== tapestryDepthSlider.max
     }
     
     /****************************************************
@@ -677,38 +677,23 @@ function tapestryTool(config){
         AUTHOR: "author"
     }
 
-    this.updateVisibleNodes = (to, from) => {
+    this.updateVisibleNodes = (opt, val) => {
         // Only update if we're moving from or to a filter route. This prevents
         // unnecessary rerenders when opening lightboxes.
-        if (isFilterActive(to) || isFilterActive(from)) {
-            const route = window.location.href.split(`#\/`)[1]
-            let newVisibleNodes = tapestry.dataset.nodes
-            if (route.startsWith("filter")) {
-                const query = new URLSearchParams(route.split("filter")[1])
-                const attr = query.get("by")
-                const val = query.get("q")
-                if (attr && val) {
-                    switch (attr) {
-                        case filterOptions.AUTHOR:
-                            newVisibleNodes = 
-                                tapestry.dataset.nodes.filter(n => n.author.id == val)
-                            break
-                        default:
-                            break
-                    }
-                }
+        let newVisibleNodes = tapestry.dataset.nodes
+        if (opt && val) {
+            switch (opt) {
+                case filterOptions.AUTHOR:
+                    newVisibleNodes = 
+                        tapestry.dataset.nodes.filter(n => n.author.id == val)
+                    break
+                default:
+                    break
             }
-            visibleNodes = new Set(newVisibleNodes.map(n => n.id))
-            resizeNodes(root)
-        }   
-    }
-
-    function isFilterActive(url = window.location.href) {
-        if (url.includes("#")) {
-            url = url.split(`#\/`)[1]
         }
-        return url.includes("filter")
-    }
+        visibleNodes = new Set(newVisibleNodes.map(n => n.id))
+        resizeNodes(root)
+    }   
     
     /****************************************************
      * D3 RELATED FUNCTIONS
