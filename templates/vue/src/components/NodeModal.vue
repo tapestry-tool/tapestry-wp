@@ -94,8 +94,15 @@
       <b-button size="sm" variant="secondary" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" @click="handleSubmit">
-        Submit
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :disabled="!canSubmit"
+        @click="handleSubmit"
+      >
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -180,6 +187,8 @@ export default {
       formErrors: [],
       maxDescriptionLength: 250,
       node: null,
+      videoLoaded: false,
+      fileUploading: false,
       loadDuration: false,
     }
   },
@@ -217,11 +226,17 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+    canSubmit() {
+      return !this.fileUploading
+    },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
@@ -628,16 +643,16 @@ table {
 #submit-button {
   position: relative;
 
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
   }
 }
 
