@@ -141,7 +141,7 @@ function tapestry_enqueue_tapestry_js()
 			$(document).ready(function() {
 				thisTapestryTool = new tapestryTool({
 					'containerId': 'tapestry',
-					'apiUrl': '".get_rest_url(null, 'tapestry-tool/v1')."',
+                    'apiUrl': '".get_rest_url(null, 'tapestry-tool/v1')."',
 					'wpUserId': '".apply_filters('determine_current_user', false)."',
 					'wpPostId': '".get_the_ID()."',
 					'wpCanEditTapestry': '".current_user_can('edit_post', get_the_ID())."',
