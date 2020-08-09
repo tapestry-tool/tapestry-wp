@@ -37,7 +37,7 @@ async function getPosts() {
 
 async function getPostById(id) {
   return axios
-    .get(`${API_URL}/posts/${id}&_fields=id,title,content`)
+    .get(`${API_URL}/posts/${id}?_fields=id,title,content`)
     .then(res => res.data)
     .then(parsePost)
 }
