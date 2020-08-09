@@ -482,6 +482,11 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+            // set author as current user, and reset permissions to default
+
+            $node->author = $node->_getAuthorInfo(wp_get_current_user()->ID);
+            $node->permissions = TapestryNodePermissions::getDefaultNodePermissions($postID);
+
             $tapestryNode->set($node);
             $tapestryNode->save();
         }
