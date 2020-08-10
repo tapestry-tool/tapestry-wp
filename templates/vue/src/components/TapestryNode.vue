@@ -25,9 +25,10 @@
         "
         :x="node.coordinates.x"
         :y="node.coordinates.y"
-        :radius="radius"
+        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
+        :draft="node.status === 'draft'"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject

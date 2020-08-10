@@ -6,10 +6,11 @@
       :cx="x"
       :cy="y"
       :stroke-width="width"
-      :stroke="locked ? '#999' : 'currentColor'"
+      :stroke="locked || draft ? '#999' : 'currentColor'"
+      :stroke-dasharray="draft ? dasharraySize : 0"
     ></circle>
     <path
-      v-show="!locked && progress > 0"
+      v-show="!locked && progress > 0 && !draft"
       ref="path"
       class="bar"
       :transform="`translate(${x}, ${y})`"
@@ -43,6 +44,11 @@ export default {
       type: Number,
       required: true,
     },
+    draft: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     arc() {
@@ -54,7 +60,10 @@ export default {
       })
     },
     width() {
-      return 20
+      return this.draft ? 5 : 20
+    },
+    dasharraySize() {
+      return this.radius / 10
     },
   },
   watch: {
