@@ -187,7 +187,9 @@ export default {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
-      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+        .map(this.getNode)
+        .filter(n => n.status !== "draft")
+      return rows.filter(row => row.completed).length / rows.length
     },
     isAuthenticated() {
       return wpData.currentUser.ID !== 0
