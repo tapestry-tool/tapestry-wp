@@ -484,6 +484,7 @@ class Tapestry implements ITapestry
         $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
 
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             return $tapestry;
         } else {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,

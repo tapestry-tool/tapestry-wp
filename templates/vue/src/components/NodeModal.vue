@@ -89,12 +89,13 @@
         Cancel
       </b-button>
       <b-button
+        v-if="parent !== null"
         id="draft-button"
         size="sm"
         variant="secondary"
         @click="handleDraftSubmit"
       >
-        Save As Private Node
+        Save as Private Draft
       </b-button>
       <b-button
         id="submit-button"
@@ -103,10 +104,14 @@
         :disabled="!hasPermission"
         @click="handleSubmit"
       >
-        Submit
+        Publish
       </b-button>
-      <b-form-invalid-feedback :state="hasPermission" style="text-align: right;">
-        You do not have "{{ modalType }}" permission for this node
+      <b-form-invalid-feedback
+        v-if="parent !== null"
+        :state="hasPermission"
+        style="text-align: right;"
+      >
+        You do not have Publish (add or edit) permission for this node
       </b-form-invalid-feedback>
     </template>
     <div v-if="loadDuration">
@@ -230,12 +235,12 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
     hasPermission() {
-      if (!this.ready) return
+      if (!this.ready) return false
 
       let node = null
       if (this.modalType === "add") {
         node = this.parent
-        if (node.status === "draft") return false
+        if (node !== null && node.status === "draft") return false
       } else {
         node = this.node
       }
@@ -369,12 +374,14 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.updateNode({
-            id: this.parent.id,
-            newNode: {
-              childOrdering: [...this.parent.childOrdering, id],
-            },
-          })
+          if (this.node.status !== "draft") {
+            this.updateNode({
+              id: this.parent.id,
+              newNode: {
+                childOrdering: [...this.parent.childOrdering, id],
+              },
+            })
+          }
         } else {
           this.updateRootNode(id)
           this.updateSelectedNode(id)

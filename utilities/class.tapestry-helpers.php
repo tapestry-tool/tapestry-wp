@@ -207,4 +207,18 @@ class TapestryHelpers
 
         return false;
     }
+
+    /**
+     * Check if node is a draft node
+     *
+     * @param Number $nodeMetaId     node meta ID
+     * @param Number $tapestryPostId post ID
+     *
+     * @return bool
+     */
+    public static function nodeIsDraft($nodeMetaId, $tapestryPostId)
+    {
+        $node = new TapestryNode($tapestryPostId, $nodeMetaId);
+        return $node->getMeta()->status == "draft";
+    }
 }

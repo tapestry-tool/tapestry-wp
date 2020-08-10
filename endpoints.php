@@ -590,6 +590,11 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+            || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
+            $tapestry = new Tapestry($postId);
+            return $tapestry->addLink($link);
+        }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
