@@ -59,7 +59,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add')"
+            v-if="hasPermission('add') || isAuthenticated"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
@@ -185,6 +185,9 @@ export default {
       }
       const rows = this.getDirectChildren(this.node.id)
       return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+    },
+    isAuthenticated() {
+      return wpData.currentUser.ID !== 0
     },
   },
   watch: {

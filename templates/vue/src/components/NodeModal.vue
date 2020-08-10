@@ -85,12 +85,29 @@
         @submit="close"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="danger" @click="$emit('cancel')">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" @click="handleSubmit">
+      <b-button
+        id="draft-button"
+        size="sm"
+        variant="secondary"
+        @click="handleDraftSubmit"
+      >
+        Save As Private Node
+      </b-button>
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :disabled="!hasPermission"
+        @click="handleSubmit"
+      >
         Submit
       </b-button>
+      <b-form-invalid-feedback :state="hasPermission" style="text-align: right;">
+        You do not have "{{ modalType }}" permission for this node
+      </b-form-invalid-feedback>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -212,6 +229,62 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+    hasPermission() {
+      if (!this.ready) return
+
+      let node = null
+      if (this.modalType === "add") {
+        node = this.parent
+        if (node.status === "draft") return false
+      } else {
+        node = this.node
+      }
+
+      // Check 1: Has edit permissions for Tapestry
+      if (wpData.wpCanEditTapestry === "1") {
+        return true
+      }
+
+      // Check 2: User is the author of the node
+      if (wpData.currentUser.ID == node.author.id) {
+        return true
+      }
+
+      // Check 3: User has a role with general edit permissions
+      const { ID, roles } = wpData.currentUser
+      const allowedRoles = ["administrator", "editor", "author"]
+      if (allowedRoles.some(role => roles.includes(role))) {
+        return true
+      }
+
+      const { public: publicPermissions, authenticated } = node.permissions
+      // Check 4: Node has public permissions
+      if (publicPermissions.includes(this.modalType)) {
+        return true
+      }
+
+      // Check 5: Node has authenticated permissions
+      if (wpData.currentUser.ID && authenticated.includes(this.modalType)) {
+        return true
+      }
+
+      // Check 6: User has a role that is allowed in the node
+      const isRoleAllowed = roles.some(role => {
+        const permissions = node.permissions[role]
+        return permissions.includes(this.modalType)
+      })
+      if (isRoleAllowed) {
+        return true
+      }
+
+      // Check 7: User has a permission associated with its ID
+      const userPermissions = node.permissions[`user-${ID}`]
+      if (userPermissions) {
+        return userPermissions.includes(this.modalType)
+      }
+
+      return false
+    },
   },
   created() {
     this.node = this.createDefaultNode()
@@ -274,6 +347,13 @@ export default {
         } else {
           return this.submitNode()
         }
+      }
+    },
+    async handleDraftSubmit() {
+      this.formErrors = this.validateNode()
+      if (!this.formErrors.length) {
+        this.node.status = "draft"
+        this.handleSubmit()
       }
     },
     async submitNode() {
@@ -625,5 +705,9 @@ table {
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 </style>
