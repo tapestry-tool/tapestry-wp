@@ -89,29 +89,25 @@
         Cancel
       </b-button>
       <b-button
-        v-if="rootId !== null && authoredNode"
+        v-if="rootId !== 0"
         id="draft-button"
         size="sm"
         variant="secondary"
-        :disabled="nodeId !== null && getNeighbours(nodeId).length > 1"
+        :disabled="!canMakeDraft"
         @click="handleDraftSubmit"
       >
         Save as Private Draft
       </b-button>
       <b-button
+        v-if="canPublish"
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="!hasPermission"
         @click="handleSubmit"
       >
         Publish
       </b-button>
-      <b-form-invalid-feedback
-        v-if="parent !== null"
-        :state="hasPermission"
-        style="text-align: right;"
-      >
+      <b-form-invalid-feedback :state="canMakeDraft">
         {{ warningText }}
       </b-form-invalid-feedback>
     </template>
@@ -198,7 +194,7 @@ export default {
       maxDescriptionLength: 250,
       node: null,
       loadDuration: false,
-      warningText: "You do not have Publish (add or edit) permission for this node",
+      warningText: "",
     }
   },
   computed: {
@@ -237,15 +233,42 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    publishPermission() {
+    canPublish() {
       if (!this.ready) return false
-      return this.hasPermission(this.modalType, this.node)
+      if (this.modalType === "add") {
+        return this.hasPermission(this.modalType, this.parent)
+      } else if (this.node.status === "draft" && this.modalType === "edit") {
+        return this.hasPermission("add", this.parent)
+      } else {
+        return this.hasPermission(this.modalType, this.node)
+      }
     },
     authoredNode() {
       const { ID } = wpData.currentUser
       if (this.node.author) {
-        return this.node.author.id === ID
+        return parseInt(this.node.author.id) === ID
       }
+      return true
+    },
+    canMakeDraft() {
+      const { ID } = wpData.currentUser
+      if (ID === 0) {
+        this.warningText = "You must be authenticated to create a draft node"
+        return false
+      }
+
+      if (this.modalType === "edit") {
+        if (!this.authoredNode) {
+          this.warningText = "You cannot make nodes you did not author into drafts"
+          return false
+        }
+
+        if (this.getNeighbours(this.nodeId).length > 1) {
+          this.warningText = "" // Handled by DeleteButton component
+          return false
+        }
+      }
+
       return true
     },
   },
@@ -569,13 +592,8 @@ export default {
         : this.node.mediaURL !== mediaURL
     },
     hasPermission(action, node) {
-      if (node === null) {
+      if (!node || node === null || !node.author) {
         return wpData.wpCanEditTapestry === "1"
-      }
-
-      if (node.status === "draft") {
-        const parents = this.getDirectParents(this.nodeId)
-        return this.hasPermission(action, this.getNode(parents[0]))
       }
 
       // Check 1: Has edit permissions for Tapestry
@@ -584,7 +602,7 @@ export default {
       }
 
       // Check 2: User is the author of the node
-      if (wpData.currentUser.ID == node.author.id) {
+      if (wpData.currentUser.ID == parseInt(node.author.id)) {
         return true
       }
 
@@ -617,8 +635,8 @@ export default {
 
       // Check 7: User has a permission associated with its ID
       const userPermissions = node.permissions[`user-${ID}`]
-      if (userPermissions) {
-        return userPermissions.includes(action)
+      if (userPermissions && userPermissions.includes(action)) {
+        return true
       }
 
       return false

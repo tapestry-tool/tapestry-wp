@@ -60,7 +60,9 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add') || isAuthenticated"
+            v-if="
+              (hasPermission('add') || isAuthenticated) && node.status !== 'draft'
+            "
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
