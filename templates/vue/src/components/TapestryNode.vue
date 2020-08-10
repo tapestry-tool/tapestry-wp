@@ -50,7 +50,11 @@
             :x="node.coordinates.x - 30"
             :y="node.coordinates.y - radius - 30"
           >
-            <button class="node-button" @click="openNode">
+            <button
+              class="node-button"
+              :disabled="!node.accessible && !hasPermission('edit')"
+              @click="handleRequestOpen"
+            >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
                 :icon="icon"
@@ -130,6 +134,9 @@ export default {
     ...mapState(["selection", "visibleNodes"]),
     ...mapGetters(["getNode", "getDirectChildren"]),
     icon() {
+      if (!this.node.accessible) {
+        return "lock"
+      }
       switch (this.node.mediaType) {
         case "h5p":
         case "video":
@@ -289,6 +296,11 @@ export default {
       if (hours === 0) return minutes + ":" + sec
 
       return hours + ":" + minutes + ":" + sec
+    },
+    handleRequestOpen() {
+      if (this.node.accessible || this.hasPermission("edit")) {
+        this.openNode()
+      }
     },
     handleMouseover() {
       // Move node to end of svg document so it appears on top
