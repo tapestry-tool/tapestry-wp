@@ -160,37 +160,36 @@ function tapestryTool(config){
             //---------------------------------------------------
             // GET PROGRESS FROM DATABASE OR COOKIE (IF ENABLED)
             //---------------------------------------------------
-            
-            if (config.wpUserId) { // Get from database if user is logged in
+            $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
+                if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
+                    let progress = retrievedUserProgress;
 
-                $.get(USER_NODE_PROGRESS_URL, { "post_id": config.wpPostId }, function(retrievedUserProgress) {
-
-                    if (retrievedUserProgress && !isEmptyObject(retrievedUserProgress)) {
-                        setDatasetProgress(retrievedUserProgress);
+                    if (!wpUserId) {
+                        const localProgress = localStorage.getItem("tapestry-progress");
+                        if (localProgress) {
+                            const userProgress = JSON.parse(localProgress);
+                            Object.keys(progress)
+                                .filter(nodeId => userProgress.hasOwnProperty(nodeId))
+                                .forEach(nodeId => {
+                                    const nodeProgress = userProgress[nodeId]
+                                    const newProgress = progress[nodeId]
+                                    newProgress.completed = nodeProgress.completed
+                                    newProgress.unlocked = nodeProgress.unlocked
+                                    newProgress.accessible = nodeProgress.accessible
+                                    newProgress.progress = nodeProgress.progress
+                                })
+                        }
                     }
-
-                }).fail(function(e) {
-                    console.error("Error with retrieving node progress");
-                    console.error(e);
-                })
-                .complete(function(){
-                    tapestry.init();
-                });
-            }
-            else {  // Get from cookie if user is NOT logged in
-                
-                var cookieProgress = Cookies.get("progress-data-"+tapestrySlug);
-
-                if (cookieProgress) {
-                    cookieProgress = JSON.parse( cookieProgress );
-                    setDatasetProgress(cookieProgress);	
+                    setDatasetProgress(progress);
                 }
-
+            })
+            .fail(function(e) {
+                console.error("Error with retrieving node progress");
+                console.error(e);
+            })
+            .complete(function(){
                 tapestry.init();
-            }
-        }
-        else {
-            tapestry.init();
+            });
         }
     }).fail(function(e) {
         console.error("Error with loading tapestries");
@@ -454,7 +453,7 @@ function tapestryTool(config){
 
             const messageWrapper = document.createElement("p");
             messageWrapper.id = "depth-warning-message";
-            messageWrapper.textContent = `Some filter results might be hidden because you're not at max depth.`;
+            messageWrapper.textContent = `Some nodes might be hidden because you're not at max depth.`;
             messageWrapper.style.opacity = shouldShowMessage() ? "1" : "0";
 
             tapestryControlsDiv.appendChild(messageWrapper);
@@ -478,7 +477,7 @@ function tapestryTool(config){
     }
 
     function shouldShowMessage() {
-        return tapestryDepthSlider.value !== tapestryDepthSlider.max && isFilterActive()
+        return tapestryDepthSlider.value !== tapestryDepthSlider.max
     }
     
     /****************************************************
@@ -678,38 +677,23 @@ function tapestryTool(config){
         AUTHOR: "author"
     }
 
-    this.updateVisibleNodes = (to, from) => {
+    this.updateVisibleNodes = (opt, val) => {
         // Only update if we're moving from or to a filter route. This prevents
         // unnecessary rerenders when opening lightboxes.
-        if (isFilterActive(to) || isFilterActive(from)) {
-            const route = window.location.href.split(`#\/`)[1]
-            let newVisibleNodes = tapestry.dataset.nodes
-            if (route.startsWith("filter")) {
-                const query = new URLSearchParams(route.split("filter")[1])
-                const attr = query.get("by")
-                const val = query.get("q")
-                if (attr && val) {
-                    switch (attr) {
-                        case filterOptions.AUTHOR:
-                            newVisibleNodes = 
-                                tapestry.dataset.nodes.filter(n => n.author.id == val)
-                            break
-                        default:
-                            break
-                    }
-                }
+        let newVisibleNodes = tapestry.dataset.nodes
+        if (opt && val) {
+            switch (opt) {
+                case filterOptions.AUTHOR:
+                    newVisibleNodes = 
+                        tapestry.dataset.nodes.filter(n => n.author.id == val)
+                    break
+                default:
+                    break
             }
-            visibleNodes = new Set(newVisibleNodes.map(n => n.id))
-            resizeNodes(root)
-        }   
-    }
-
-    function isFilterActive(url = window.location.href) {
-        if (url.includes("#")) {
-            url = url.split(`#\/`)[1]
         }
-        return url.includes("filter")
-    }
+        visibleNodes = new Set(newVisibleNodes.map(n => n.id))
+        resizeNodes(root)
+    }   
     
     /****************************************************
      * D3 RELATED FUNCTIONS
@@ -1463,6 +1447,13 @@ function tapestryTool(config){
     }
 
     function getTooltipHtml(node) {
+        if (!wpUserId) {
+            const completeCondition = node.conditions.find(cond => cond.type === conditionTypes.NODE_COMPLETED)
+            if (completeCondition) {
+                return "Please login to unlock this node."
+            }
+        }
+
         const str = "This node will be unlocked: <br />";
         const wrapper = document.createElement("ul");
 
@@ -2316,6 +2307,10 @@ function tapestryTool(config){
         if (progressObj.length < 1) {
             return false;
         }
+
+        if (!wpUserId) {
+            localStorage.setItem("tapestry-progress", JSON.stringify(progressObj));
+        }
         
         for (var id in progressObj) {
             var amountViewed = progressObj[id].progress;
@@ -2337,11 +2332,15 @@ function tapestryTool(config){
                 
                 node.unlocked = progressObj[id].unlocked;
                 node.accessible = progressObj[id].accessible;
-                node.conditions = progressObj[id].conditions;
-                const content = progressObj[id].content
-                if (content) {
-                    node.quiz = content.quiz
-                    node.typeData = content.typeData
+
+                if (wpUserId) {
+                    node.conditions = progressObj[id].conditions;
+            
+                    const content = progressObj[id].content
+                    if (content) {
+                        node.quiz = content.quiz
+                        node.typeData = content.typeData
+                    }
                 }
 
                 if (node.mediaType !== "accordion" && tapestry.dataset.nodes[index].typeData.progress) {

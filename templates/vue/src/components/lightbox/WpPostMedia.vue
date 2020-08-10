@@ -1,7 +1,7 @@
 <template>
   <loading v-if="loading" />
   <div v-else class="article">
-    <h1 class="article-title">{{ title }}</h1>
+    <h1 class="article-title" v-html="title"></h1>
     <article v-html="content"></article>
   </div>
 </template>
