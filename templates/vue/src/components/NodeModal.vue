@@ -89,10 +89,11 @@
         Cancel
       </b-button>
       <b-button
-        v-if="parent !== null"
+        v-if="rootId !== null && authoredNode"
         id="draft-button"
         size="sm"
         variant="secondary"
+        :disabled="nodeId !== null && getNeighbours(nodeId).length > 1"
         @click="handleDraftSubmit"
       >
         Save as Private Draft
@@ -111,7 +112,7 @@
         :state="hasPermission"
         style="text-align: right;"
       >
-        You do not have Publish (add or edit) permission for this node
+        {{ warningText }}
       </b-form-invalid-feedback>
     </template>
     <div v-if="loadDuration">
@@ -197,6 +198,7 @@ export default {
       maxDescriptionLength: 250,
       node: null,
       loadDuration: false,
+      warningText: "You do not have Publish (add or edit) permission for this node",
     }
   },
   computed: {
@@ -205,6 +207,7 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
+      "getNeighbours",
     ]),
     ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
@@ -234,61 +237,16 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    hasPermission() {
+    publishPermission() {
       if (!this.ready) return false
-
-      let node = null
-      if (this.modalType === "add") {
-        node = this.parent
-        if (node !== null && node.status === "draft") return false
-      } else {
-        node = this.node
+      return this.hasPermission(this.modalType, this.node)
+    },
+    authoredNode() {
+      const { ID } = wpData.currentUser
+      if (this.node.author) {
+        return this.node.author.id === ID
       }
-
-      // Check 1: Has edit permissions for Tapestry
-      if (wpData.wpCanEditTapestry === "1") {
-        return true
-      }
-
-      // Check 2: User is the author of the node
-      if (wpData.currentUser.ID == node.author.id) {
-        return true
-      }
-
-      // Check 3: User has a role with general edit permissions
-      const { ID, roles } = wpData.currentUser
-      const allowedRoles = ["administrator", "editor", "author"]
-      if (allowedRoles.some(role => roles.includes(role))) {
-        return true
-      }
-
-      const { public: publicPermissions, authenticated } = node.permissions
-      // Check 4: Node has public permissions
-      if (publicPermissions.includes(this.modalType)) {
-        return true
-      }
-
-      // Check 5: Node has authenticated permissions
-      if (wpData.currentUser.ID && authenticated.includes(this.modalType)) {
-        return true
-      }
-
-      // Check 6: User has a role that is allowed in the node
-      const isRoleAllowed = roles.some(role => {
-        const permissions = node.permissions[role]
-        return permissions.includes(this.modalType)
-      })
-      if (isRoleAllowed) {
-        return true
-      }
-
-      // Check 7: User has a permission associated with its ID
-      const userPermissions = node.permissions[`user-${ID}`]
-      if (userPermissions) {
-        return userPermissions.includes(this.modalType)
-      }
-
-      return false
+      return true
     },
   },
   created() {
@@ -340,6 +298,7 @@ export default {
     async handleSubmit() {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
+        this.node.status = "publish"
         this.updateNodeCoordinates()
         this.ready = false
 
@@ -358,7 +317,18 @@ export default {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.node.status = "draft"
-        this.handleSubmit()
+        this.updateNodeCoordinates()
+        this.ready = false
+
+        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+          await this.setLinkData()
+        }
+
+        if (this.shouldReloadDuration()) {
+          this.loadDuration = true
+        } else {
+          return this.submitNode()
+        }
       }
     },
     async submitNode() {
@@ -597,6 +567,61 @@ export default {
       return this.node.mediaFormat === "youtube"
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL
+    },
+    hasPermission(action, node) {
+      if (node === null) {
+        return wpData.wpCanEditTapestry === "1"
+      }
+
+      if (node.status === "draft") {
+        const parents = this.getDirectParents(this.nodeId)
+        return this.hasPermission(action, this.getNode(parents[0]))
+      }
+
+      // Check 1: Has edit permissions for Tapestry
+      if (wpData.wpCanEditTapestry === "1") {
+        return true
+      }
+
+      // Check 2: User is the author of the node
+      if (wpData.currentUser.ID == node.author.id) {
+        return true
+      }
+
+      // Check 3: User has a role with general edit permissions
+      const { ID, roles } = wpData.currentUser
+      const allowedRoles = ["administrator", "editor", "author"]
+      if (allowedRoles.some(role => roles.includes(role))) {
+        return true
+      }
+
+      const { public: publicPermissions, authenticated } = node.permissions
+      // Check 4: Node has public permissions
+      if (publicPermissions.includes(action)) {
+        return true
+      }
+
+      // Check 5: Node has authenticated permissions
+      if (wpData.currentUser.ID && authenticated.includes(action)) {
+        return true
+      }
+
+      // Check 6: User has a role that is allowed in the node
+      const isRoleAllowed = roles.some(role => {
+        const permissions = node.permissions[role]
+        return permissions.includes(action)
+      })
+      if (isRoleAllowed) {
+        return true
+      }
+
+      // Check 7: User has a permission associated with its ID
+      const userPermissions = node.permissions[`user-${ID}`]
+      if (userPermissions) {
+        return userPermissions.includes(action)
+      }
+
+      return false
     },
   },
 }
