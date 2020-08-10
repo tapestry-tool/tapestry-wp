@@ -481,6 +481,8 @@ class Tapestry implements ITapestry
             $tapestry->settings->superuserOverridePermissions = true;
         }
 
+        $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
+
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             return $tapestry;
         } else {
@@ -518,6 +520,22 @@ class Tapestry implements ITapestry
                 || $this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $secondaryUserId)) {
                 array_push($nodesPermitted, $nodeMetaId);
             }
+        }
+
+        return $nodesPermitted;
+    }
+
+    private function _filterNodesMetaIdsByStatus($nodeMetaIds)
+    {
+        $currentUserId = wp_get_current_user()->ID;
+        $nodesPermitted = [];
+        foreach ($nodeMetaIds as $nodeId) {
+            $node = new TapestryNode($this->postId, $nodeId);
+            $nodeMeta = $node->getMeta();
+            if($nodeMeta->status == "draft" && $nodeMeta->author["id"] != $currentUserId){
+                continue;
+            }
+            array_push($nodesPermitted, $nodeId);
         }
 
         return $nodesPermitted;
