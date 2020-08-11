@@ -56,6 +56,8 @@ export default class {
         node["permissionsOrder"] = node["permissionsOrder"].filter(role =>
           wp_roles.has(role)
         )
+        node["author"]["original_author_name"] = node["author"]["name"]
+        node["author"]["original_author_email"] = node["author"]["email"]
       }
       alert(
         "As the import was from a different site, roles and users have been changed to suit the current site."
