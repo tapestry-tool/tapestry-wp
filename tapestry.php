@@ -179,6 +179,7 @@ function tapestry_enqueue_vue_app()
                 'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
+                'wpUrl' => get_bloginfo('url'),
                 'app_path' => $post->post_name, // page where the custom page template is loaded.
                 'post_categories' => get_terms([
                     'taxonomy' => 'category', // default post categories.

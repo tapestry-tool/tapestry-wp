@@ -448,6 +448,7 @@ class TapestryNode implements ITapestryNode
             return [
                 'id' => $id,
                 'name' => $user->display_name,
+                'email' => $user->user_email,
             ];
         }
     }
