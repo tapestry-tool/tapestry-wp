@@ -225,7 +225,7 @@ export default {
     exportTapestry() {
       this.isExporting = true
       const tapestry = this.tapestryJson
-      tapestry["site-url"] = wpUrl
+      tapestry["site-url"] = wpData.wpUrl
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
       })
