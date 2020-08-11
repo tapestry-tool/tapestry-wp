@@ -1094,7 +1094,7 @@ function tapestryTool(config){
         nodes.append("rect")
             .attr("class", function (d) {
                 var classes = "imageContainer"
-                if (d.nodeType === "grandchild") classes += "grandchild"
+                if (d.nodeType === "grandchild") classes += " grandchild"
                 return classes;
             })
             .attr("rx", function (d) {
