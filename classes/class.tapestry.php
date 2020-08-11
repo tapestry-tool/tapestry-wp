@@ -521,7 +521,7 @@ class Tapestry implements ITapestry
             }
 
             foreach ($this->_getNeighbours((object) ['id' => $node]) as $neighbour) {
-                if (!array_key_exists($neighbour, $visited)) {
+                if (!array_key_exists($neighbour, $visited) && in_array($neighbour, $nodeMetaIds)) {
                     $queue->enqueue($neighbour);
                 }
             }
