@@ -508,42 +508,32 @@ class Tapestry implements ITapestry
         $currentUserId = wp_get_current_user()->ID;
 
         $nodesPermitted = [];
-        foreach ($nodeMetaIds as $nodeMetaId) {
-            if ($this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $currentUserId)
-                || $this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $secondaryUserId)) {
-                array_push($nodesPermitted, $nodeMetaId);
+
+        $queue = new SplQueue();
+        $queue->enqueue($rootId);
+        $visited = [];
+        while (!$queue->isEmpty()) {
+            $node = $queue->dequeue();
+            $visited[$node] = true;
+
+            if ($this->_isAllowed($node, $superuser_override, $currentUserId) || $this->_isAllowed($node, $superuser_override, $secondaryUserId)) {
+                array_push($nodesPermitted, $node);
+            }
+
+            foreach ($this->_getNeighbours((object) ['id' => $node]) as $neighbour) {
+                if (!array_key_exists($neighbour, $visited)) {
+                    $queue->enqueue($neighbour);
+                }
             }
         }
 
         return $nodesPermitted;
     }
 
-    private function _pathIsAllowed($from, $to, $checked = [], $superuser_override, $userId)
+    private function _isAllowed($node, $superuser_override, $userId)
     {
-        if (TapestryCache::exists(__METHOD__, [$from, $to, $superuser_override, $userId])) {
-            return TapestryCache::get(__METHOD__, [$from, $to, $superuser_override, $userId]);
-        }
-
-        $pathIsAllowed = false;
-        if (!in_array($from, $checked) && (
-            TapestryHelpers::userIsAllowed('READ', $from, $this->postId, $superuser_override, $userId)
-            || (TapestryHelpers::userIsAllowed('ADD', $from, $this->postId, $superuser_override, $userId)
-            || TapestryHelpers::userIsAllowed('EDIT', $from, $this->postId, $superuser_override, $userId))
-        )) {
-            if ($from == $to) {
-                $pathIsAllowed = true;
-            } else {
-                $checked[] = $from;
-                foreach ($this->links as $link) {
-                    if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked, $superuser_override, $userId)) ||
-                            ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked, $superuser_override, $userId))) {
-                        $pathIsAllowed = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return TapestryCache::set(__METHOD__, [$from, $to, $superuser_override, $userId], $pathIsAllowed);
+        return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
+        || (TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
+        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId));
     }
 }
