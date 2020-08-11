@@ -285,6 +285,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
+    'GET_ALL_ROLES' => (object) [
+        'ROUTE' => '/all_roles',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'get_all_user_roles',
+        ],
+    ],
 ];
 
 /*
@@ -302,6 +309,15 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
         }
     );
 }
+
+function get_all_user_roles($request) {
+    global $wp_roles;
+	
+	$roles = $wp_roles->roles;
+	
+	return $roles;
+}
+  
 
 function login($request)
 {
