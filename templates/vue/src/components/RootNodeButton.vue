@@ -87,7 +87,7 @@ export default {
           .importTapestry(JSON.parse(e.target.result))
           .then(() => {
             this.isImporting = false
-            location.reload()
+            // location.reload()
           }) // TODO: Change this so a refresh isn't required
           .catch(err => (this.error = err))
       }
