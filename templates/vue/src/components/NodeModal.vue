@@ -252,24 +252,7 @@ export default {
     },
     canMakeDraft() {
       const { ID } = wpData.currentUser
-      if (ID === 0) {
-        this.warningText = "You must be authenticated to create a draft node"
-        return false
-      }
-
-      if (this.modalType === "edit") {
-        if (!this.authoredNode) {
-          this.warningText = "You cannot make nodes you did not author into drafts"
-          return false
-        }
-
-        if (this.getNeighbours(this.nodeId).length > 1) {
-          this.warningText = "" // Handled by DeleteButton component
-          return false
-        }
-      }
-
-      return true
+      return this.hasDraftPermission(ID)
     },
   },
   created() {
@@ -640,6 +623,26 @@ export default {
       }
 
       return false
+    },
+    hasDraftPermission(ID) {
+      if (ID === 0) {
+        this.warningText = "You must be authenticated to create a draft node"
+        return false
+      }
+
+      if (this.modalType === "edit") {
+        if (!this.authoredNode) {
+          this.warningText = "You cannot make nodes you did not author into drafts"
+          return false
+        }
+
+        if (this.getNeighbours(this.nodeId).length > 1) {
+          this.warningText = "" // Handled by DeleteButton component
+          return false
+        }
+      }
+
+      return true
     },
   },
 }
