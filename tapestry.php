@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.28.0-beta
+ * Version: 2.30.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.28.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.30.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -45,6 +45,9 @@ function create_tapestry_type()
         'show_in_nav_menus' => true,
         'exclude_from_search' => false,
         'capability_type' => 'post',
+        'capabilities' => [
+            'create_posts' => 'administrator',
+        ],
         'map_meta_cap' => true,
         'hierarchical' => false,
         'rewrite' => ['with_front' => true],
@@ -264,6 +267,59 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
+function create_new_tapestry()
+{
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');
+
+    return "
+        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
+        <button id='new_tapestry_button'>
+            Add Tapestry
+        </button>
+        <script type='text/javascript'>
+        var apiUrl = '{$prefix}';
+            $('#new_tapestry_button').click(function() {
+                let name = prompt(`Enter a name`);
+                let payload = {};
+                payload[`nodes`] = [];
+                payload[`groups`] = [];
+                payload[`links`] = [];
+                payload[`title`] = name;
+                return new Promise((fulfill, reject) => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', apiUrl + '/tapestries');
+                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            fulfill(xhr.response);
+                        } else {
+                            reject({
+                                status: xhr.status,
+                                statusText: xhr.statusText
+                            });
+                        }
+                    };
+                    xhr.onerror = () => {
+                        reject({
+                            status: xhr.status,
+                            statusText: xhr.statusText
+                        });
+                    };
+                    xhr.send(JSON.stringify(payload));
+                }).then(data => {
+                    let res = JSON.parse(data);
+                    window.location.href = res.settings.permalink;
+                }).catch(err => {
+                    console.log(err);
+                    alert(`Error occured while creating tapestry, please try again`);
+                })
+            })
+        </script>
+    ";
+}
+
+add_shortcode('new_tapestry_button', 'create_new_tapestry');
+
 // Gravity Forms Pluggin
 
 // Hook up the AJAX ajctions
@@ -316,3 +372,22 @@ function gf_button_ajax_get_form()
     die();
 }
 // End of Gravity Forms Pluggin
+
+function replace_special_apostrophe($str)
+{
+    return str_replace('’', "'", $str);
+}
+
+$quote_style = 'ENT_QUOTES';
+add_filter('rest_prepare_post', 'prefix_title_entity_decode');
+function prefix_title_entity_decode($response)
+{
+    $data = $response->get_data();
+    $data['title']['rendered'] = wp_specialchars_decode(html_entity_decode($data['title']['rendered']), $quote_style);
+    $data['title']['rendered'] = replace_special_apostrophe($data['title']['rendered']);
+    $data['content']['rendered'] = wp_specialchars_decode(html_entity_decode($data['content']['rendered']), $quote_style);
+    $data['content']['rendered'] = replace_special_apostrophe($data['content']['rendered']);
+    $response->set_data($data);
+
+    return $response;
+}

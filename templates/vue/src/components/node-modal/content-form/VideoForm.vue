@@ -7,24 +7,9 @@
         data-testid="node-videoUrl"
         placeholder="Enter URL for MP4 or YouTube video"
         required
+        @isUploading="handleUploadChange"
       />
     </b-form-group>
-    <div>
-      <video
-        v-if="node.mediaFormat === 'mp4'"
-        ref="video"
-        :src="node.typeData.mediaURL"
-        style="display: none;"
-        @loadeddata="setVideoDuration"
-      ></video>
-      <youtube
-        v-if="node.mediaFormat === 'youtube'"
-        :video-id="youtubeId"
-        :player-vars="{ autoplay: 0 }"
-        style="display: none;"
-        @ready="setYouTubeDuration"
-      ></youtube>
-    </div>
   </div>
 </template>
 
@@ -59,13 +44,8 @@ export default {
     },
   },
   methods: {
-    setYouTubeDuration(evt) {
-      this.node.mediaDuration = evt.target.getDuration()
-      this.$emit("load")
-    },
-    setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video.duration
-      this.$emit("load")
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }
