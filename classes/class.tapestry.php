@@ -438,11 +438,6 @@ class Tapestry implements ITapestry
     {
         $tapestry = $this->_formTapestry();
 
-        if ($this->updateTapestryPost) {
-            $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry', $this->postId);
-            $this->_resetAuthor();
-        }
-
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $tapestry;
