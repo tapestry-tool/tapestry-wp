@@ -38,6 +38,7 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
+    private $comments;
 
     /**
      * Constructor.
@@ -77,6 +78,7 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->comments = [];
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -172,6 +174,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
+        }
+        if (isset($node->comments) && is_array($node->comments)) {
+            $this->comments = $node->comments;
         }
     }
 
@@ -394,6 +399,7 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'comments' => $this->comments,
         ];
     }
 
