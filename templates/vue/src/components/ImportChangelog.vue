@@ -1,0 +1,10 @@
+<template>
+  <b-modal
+    id="node-modal"
+    :title="title"
+    size="lg"
+    class="text-muted"
+    scrollable
+    body-class="p-0"
+  ></b-modal>
+</template>

@@ -454,4 +454,14 @@ class TapestryNode implements ITapestryNode
             ];
         }
     }
+
+    public function update_original_author($node) {
+        // update original author if needed
+        if ($node->author->original_author_name  == '') {
+            $this->author->original_author_name = $this->author->name;
+            $this->author->original_author_email = $this->author->email;
+        }
+        $this->author->original_author_name = 'okso';
+
+    }
 }

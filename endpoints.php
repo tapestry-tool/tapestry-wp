@@ -477,8 +477,12 @@ function importTapestry($postId, $tapestryData)
 
         // Construct ID map and add nodes to new Tapestry
         foreach ($tapestryData->nodes as $node) {
+            
+        // $node->permissions = TapestryNodePermissions::getDefaultNodePermissions($postID);
+
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
+            $newNode->update_original_author($node);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
         }
@@ -498,10 +502,6 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
-            // set author as current user, and reset permissions to default
-
-            $node->author = $node->_getAuthorInfo(wp_get_current_user()->ID);
-            $node->permissions = TapestryNodePermissions::getDefaultNodePermissions($postID);
 
             $tapestryNode->set($node);
             $tapestryNode->save();
@@ -520,6 +520,13 @@ function importTapestry($postId, $tapestryData)
 
     return $tapestry->save();
 }
+
+function console_log( $data ){
+    echo '<script>';
+    echo 'console.log('. json_encode( $data ) .')';
+    echo '</script>';
+  }
+  
 
 function deleteTapestry($request)
 {
