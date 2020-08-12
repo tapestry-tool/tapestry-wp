@@ -6,11 +6,11 @@
       :cx="x"
       :cy="y"
       :stroke-width="width"
-      :stroke="locked || draft ? '#999' : 'currentColor'"
-      :stroke-dasharray="draft ? dasharraySize : 0"
+      :stroke="locked ? '#999' : strokeColor"
+      :stroke-dasharray="status === 'publish' ? 0 : dasharraySize"
     ></circle>
     <path
-      v-show="!locked && progress > 0 && !draft"
+      v-show="!locked && progress > 0 && status === 'publish'"
       ref="path"
       class="bar"
       :transform="`translate(${x}, ${y})`"
@@ -44,10 +44,10 @@ export default {
       type: Number,
       required: true,
     },
-    draft: {
-      type: Boolean,
+    status: {
+      type: String,
       required: false,
-      default: false,
+      default: "publish",
     },
   },
   computed: {
@@ -60,10 +60,24 @@ export default {
       })
     },
     width() {
-      return this.draft ? 5 : 20
+      return this.status === "publish" ? 20 : 5
     },
     dasharraySize() {
       return this.radius / 10
+    },
+    strokeColor() {
+      switch (this.status) {
+        case "publish":
+          return "currentColor"
+        case "draft":
+          return "#999"
+        case "submitted":
+          return "blue"
+        case "reject":
+          return "red"
+        default:
+          return "currentColor"
+      }
     },
   },
   watch: {

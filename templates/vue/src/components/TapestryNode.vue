@@ -25,10 +25,10 @@
         "
         :x="node.coordinates.x"
         :y="node.coordinates.y"
-        :radius="node.status === 'draft' ? radius + 15 : radius"
+        :radius="node.status === 'publish' ? radius : radius + 15"
         :progress="progress"
         :locked="!node.accessible"
-        :draft="node.status === 'draft'"
+        :status="node.status"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
@@ -60,9 +60,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="
-              (hasPermission('add') || isAuthenticated) && node.status !== 'draft'
-            "
+            v-if="isAuthenticated && node.status === 'publish'"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
