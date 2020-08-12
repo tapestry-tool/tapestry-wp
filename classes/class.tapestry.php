@@ -532,12 +532,16 @@ class Tapestry implements ITapestry
 
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)
     {
+        $currentUserRoles = new TapestryUserRoles();
         $currentUserId = wp_get_current_user()->ID;
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
             $nodeMeta = $node->getMeta();
-            if($nodeMeta->status == "draft" && $nodeMeta->author["id"] != $currentUserId){
+            if(($nodeMeta->status == "draft" || $nodeMeta->status == "reject") && $nodeMeta->author["id"] != $currentUserId){
+                continue;
+            }
+            if($nodeMeta->status == "submitted" && !$currentUserRoles->canEdit($this->postId) && $nodeMeta->author["id"] != $currentUserId){
                 continue;
             }
             array_push($nodesPermitted, $nodeId);
