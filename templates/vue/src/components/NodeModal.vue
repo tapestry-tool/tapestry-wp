@@ -79,37 +79,58 @@
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
     <template slot="modal-footer">
-      <delete-node-button
-        v-if="modalType === 'edit'"
-        :node-id="nodeId"
-        @submit="close"
-      ></delete-node-button>
-      <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="danger" @click="$emit('cancel')">
-        Cancel
-      </b-button>
-      <b-button
-        v-if="rootId !== 0"
-        id="draft-button"
-        size="sm"
-        variant="secondary"
-        :disabled="!canMakeDraft"
-        @click="handleDraftSubmit"
+      <review-form
+        v-if="tapestryEditor && node.status === 'submitted'"
+        :node="node"
+        @submit="handleSubmit"
+      ></review-form>
+      <div
+        v-else
+        style="display: flex; justify-content: space-between; width: 100%;"
       >
-        Save as Private Draft
-      </b-button>
-      <b-button
-        v-if="canPublish"
-        id="submit-button"
-        size="sm"
-        variant="primary"
-        @click="handleSubmit"
-      >
-        Publish
-      </b-button>
-      <b-form-invalid-feedback :state="canMakeDraft">
-        {{ warningText }}
-      </b-form-invalid-feedback>
+        <delete-node-button
+          v-if="modalType === 'edit'"
+          :node-id="nodeId"
+          @submit="close"
+        ></delete-node-button>
+        <span style="flex-grow:4;"></span>
+        <div>
+          <b-button size="sm" variant="danger" @click="$emit('cancel')">
+            Cancel
+          </b-button>
+          <b-button
+            v-if="rootId !== 0"
+            id="draft-button"
+            size="sm"
+            variant="secondary"
+            :disabled="!canMakeDraft"
+            @click="handleDraftSubmit"
+          >
+            Save as Private Draft
+          </b-button>
+          <b-button
+            v-if="canPublish"
+            id="submit-button"
+            size="sm"
+            variant="primary"
+            @click="handleSubmit"
+          >
+            Publish
+          </b-button>
+          <b-button
+            v-else
+            size="sm"
+            variant="primary"
+            @click="handleSubmitForReview"
+          >
+            {{ node.status !== "publish" ? "Re-submit" : "Submit" }} to
+            Administrators for Review
+          </b-button>
+          <b-form-invalid-feedback :state="canMakeDraft">
+            {{ warningText }}
+          </b-form-invalid-feedback>
+        </div>
+      </div>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -150,6 +171,7 @@ import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
+import ReviewForm from "./node-modal/ReviewForm"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -171,6 +193,7 @@ export default {
     SlickList,
     PermissionsTable,
     DeleteNodeButton,
+    ReviewForm,
   },
   props: {
     nodeId: {
@@ -237,7 +260,7 @@ export default {
       if (!this.ready) return false
       if (this.modalType === "add") {
         return this.hasPermission(this.modalType, this.parent)
-      } else if (this.node.status === "draft" && this.modalType === "edit") {
+      } else if (this.node.status !== "publish" && this.modalType === "edit") {
         return this.hasPermission("add", this.parent)
       } else {
         return this.hasPermission(this.modalType, this.node)
@@ -253,6 +276,9 @@ export default {
     canMakeDraft() {
       const { ID } = wpData.currentUser
       return this.hasDraftPermission(ID)
+    },
+    tapestryEditor() {
+      return wpData.wpCanEditTapestry == 1
     },
   },
   created() {
@@ -304,7 +330,6 @@ export default {
     async handleSubmit() {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
-        this.node.status = "publish"
         this.updateNodeCoordinates()
         this.ready = false
 
@@ -319,23 +344,17 @@ export default {
         }
       }
     },
+    async handlePublish() {
+      this.node.status = "publish"
+      this.handleSubmit()
+    },
     async handleDraftSubmit() {
-      this.formErrors = this.validateNode()
-      if (!this.formErrors.length) {
-        this.node.status = "draft"
-        this.updateNodeCoordinates()
-        this.ready = false
-
-        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
-          await this.setLinkData()
-        }
-
-        if (this.shouldReloadDuration()) {
-          this.loadDuration = true
-        } else {
-          return this.submitNode()
-        }
-      }
+      this.node.status = "draft"
+      this.handleSubmit()
+    },
+    async handleSubmitForReview() {
+      this.node.status = "submitted"
+      this.handleSubmit()
     },
     async submitNode() {
       if (this.modalType === "add") {
@@ -350,7 +369,7 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          if (this.node.status !== "draft") {
+          if (this.node.status !== "draft" && this.node.status !== "submitted") {
             this.updateNode({
               id: this.parent.id,
               newNode: {
@@ -632,7 +651,7 @@ export default {
 
       if (this.modalType === "edit") {
         if (!this.authoredNode) {
-          this.warningText = "You cannot make nodes you did not author into drafts"
+          this.warningText = "You can only make nodes you authored into drafts"
           return false
         }
 
