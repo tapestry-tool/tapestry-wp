@@ -1,5 +1,6 @@
 <template>
   <div id="root-node-button">
+    <import-changelog />
     <div data-testid="root-node-button" @click="$emit('click')">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
@@ -34,11 +35,15 @@
 
 <script>
 import TapestryApi from "@/services/TapestryAPI"
+import ImportChangelog from "./ImportChangelog"
 
 const client = new TapestryApi(wpPostId)
 
 export default {
   name: "root-node-button",
+  components: {
+    ImportChangelog,
+  },
   data() {
     return {
       error: null,
@@ -87,7 +92,7 @@ export default {
           .importTapestry(JSON.parse(e.target.result))
           .then(() => {
             this.isImporting = false
-            location.reload()
+            this.$bvModal.show("import-changelog")
           }) // TODO: Change this so a refresh isn't required
           .catch(err => (this.error = err))
       }
