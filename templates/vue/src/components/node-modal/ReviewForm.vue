@@ -39,12 +39,18 @@ export default {
   },
   mounted() {
     moment.tz.setDefault("America/Vancouver")
-    console.log(wpData.currentUser)
   },
   methods: {
     handleReject() {
-      const { data } = wpData.currentUser
       this.node.status = "reject"
+      this.handleSubmit()
+    },
+    handleAccept() {
+      this.node.status = "publish"
+      this.handleSubmit()
+    },
+    handleSubmit() {
+      const { data } = wpData.currentUser
       this.node.comments.push({
         timestamp: moment().toISOString(),
         comment: this.comment,
@@ -52,17 +58,7 @@ export default {
         author_email: data.user_email,
       })
       this.$emit("submit")
-    },
-    handleAccept() {
-      const { author } = wpData.currentUser
-      this.node.status = "publish"
-      this.node.comments.push({
-        timestamp: moment().toISOString(),
-        comment: this.comment,
-        author: author,
-      })
-      this.$emit("submit")
-    },
+    }
   },
 }
 </script>
