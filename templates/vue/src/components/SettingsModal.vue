@@ -45,16 +45,6 @@
               You will need to refresh the page to see this change applied.
             </p>
           </b-form-group>
-          <b-form-group
-            label="Users must submit nodes for review"
-            description="If enabled, all non-editor users will only be able to submit nodes to be reviewed before
-            being added to the Tapestry. If disabled, all users with the appropriote 'add' permissions can publish 
-            nodes directly to the Tapestry"
-          >
-            <b-form-checkbox v-model="reviewRequired" switch>
-              {{ reviewRequired ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
           <b-form-group v-if="tapestryIsLoaded" label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
@@ -145,7 +135,6 @@ export default {
       superuserOverridePermissions: true,
       defaultDepth: 3,
       maxDepth: 0,
-      reviewRequired: true,
     }
   },
   computed: {
@@ -159,7 +148,6 @@ export default {
   },
   mounted() {
     this.getSettings()
-    this.synchronizeSettings()
     bus.$on("max-depth-change", depth => (this.maxDepth = depth))
   },
   methods: {
@@ -175,7 +163,6 @@ export default {
         showAccess = true,
         superuserOverridePermissions = true,
         defaultDepth = 3,
-        reviewRequired = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -184,7 +171,6 @@ export default {
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
-      this.reviewRequired = reviewRequired
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -195,7 +181,6 @@ export default {
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
-        reviewRequired: this.reviewRequired,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()

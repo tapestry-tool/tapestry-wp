@@ -414,7 +414,6 @@ class Tapestry implements ITapestry
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
-        $settings->reviewRequired = true;
         return $settings;
     }
 
