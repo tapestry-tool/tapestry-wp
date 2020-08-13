@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import TapestryApi from "@/services/TapestryAPI"
 
 const client = new TapestryApi(wpPostId)
@@ -28,7 +28,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings", "tapestryJson"]),
+    ...mapGetters(["tapestryJson"]),
+    ...mapState(["settings"]),
   },
   methods: {
     duplicateTapestry() {
@@ -43,6 +44,9 @@ export default {
         })
         .finally(() => {
           this.loading = false
+        })
+        .catch(err => {
+          console.log(err)
         })
     },
   },

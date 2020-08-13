@@ -1,6 +1,6 @@
 <template>
   <div id="root-node-button">
-    <import-changelog />
+    <import-changelog :changes="changes" />
     <div data-testid="root-node-button" @click="$emit('click')">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
@@ -49,6 +49,10 @@ export default {
       error: null,
       isDragover: false,
       isImporting: false,
+      changes: {
+        noChange: true,
+        permissions: [],
+      },
     }
   },
   methods: {
@@ -87,16 +91,49 @@ export default {
     importTapestry(file) {
       this.isImporting = true
       const reader = new FileReader()
-      reader.onload = e => {
+      reader.onload = async e => {
+        let upload = JSON.parse(e.target.result)
+        if (!(upload["site-url"] == wpData.wpUrl)) {
+          await this.prepareImport(upload)
+        }
         client
-          .importTapestry(JSON.parse(e.target.result))
+          .importTapestry(upload)
           .then(() => {
             this.isImporting = false
             this.$bvModal.show("import-changelog")
           }) // TODO: Change this so a refresh isn't required
-          .catch(err => (this.error = err))
+          .catch(err => {
+            this.error = err
+          })
       }
       reader.readAsText(file)
+    },
+    async prepareImport(data) {
+      let wp_roles = await client.getAllRoles()
+      for (let node of data.nodes) {
+        const originalPerms = node["permissions"]
+        node["permissions"] = Object.keys(node["permissions"])
+          .filter(key => wp_roles.has(key))
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: node["permissions"][key],
+            }
+          }, {})
+        const keys = Object.keys(node["permissions"])
+        for (let key in originalPerms) {
+          if (!keys.includes(key)) {
+            this.changes.permissions.push(key)
+          }
+        }
+        if (this.changes.permissions.length > 0) {
+          this.changes.noChange = false
+        }
+
+        node["permissionsOrder"] = node["permissionsOrder"].filter(role =>
+          wp_roles.has(role)
+        )
+      }
     },
   },
 }

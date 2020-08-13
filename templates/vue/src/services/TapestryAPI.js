@@ -31,42 +31,56 @@ export default class {
     return response.data
   }
 
-  async importTapestry(data) {
-    if (!(data["site-url"] == wpData.wpUrl)) {
-      const usersRequest = await axios.get(`${apiUrl}/all_roles`)
-      const users = usersRequest.data
-      let wp_roles = new Set()
-      //defaults
-      wp_roles.add("public")
-      wp_roles.add("authenticated")
-      for (let role of Object.keys(users)) {
-        wp_roles.add(role)
-      }
-      wp_roles.delete("administrator")
-      for (let node of data.nodes) {
-        node["permissions"] = Object.keys(node["permissions"])
-          .filter(key => wp_roles.has(key))
-          .reduce((obj, key) => {
-            return {
-              ...obj,
-              [key]: node["permissions"][key],
-            }
-          }, {})
-
-        node["permissionsOrder"] = node["permissionsOrder"].filter(role =>
-          wp_roles.has(role)
-        )
-        // node["author"]["original_author_name"] = node["author"]["name"]
-        // node["author"]["original_author_email"] = node["author"]["email"]
-      }
-      alert(
-        "As the import was from a different site, roles and users have been changed to suit the current site."
-      )
+  async getAllRoles() {
+    const usersRequest = await axios.get(`${apiUrl}/all_roles`)
+    const users = usersRequest.data
+    let wp_roles = new Set()
+    //defaults
+    wp_roles.add("public")
+    wp_roles.add("authenticated")
+    for (let role of Object.keys(users)) {
+      wp_roles.add(role)
     }
+    wp_roles.delete("administrator")
+    return wp_roles
+  }
+
+  async importTapestry(data) {
+    // if (!(data["site-url"] == wpData.wpUrl)) {
+    //   const usersRequest = await axios.get(`${apiUrl}/all_roles`)
+    //   const users = usersRequest.data
+    //   let wp_roles = new Set()
+    //   //defaults
+    //   wp_roles.add("public")
+    //   wp_roles.add("authenticated")
+    //   for (let role of Object.keys(users)) {
+    //     wp_roles.add(role)
+    //   }
+    //   wp_roles.delete("administrator")
+
+    //   for (let node of data.nodes) {
+    //     node["permissions"] = Object.keys(node["permissions"])
+    //       .filter(key => wp_roles.has(key))
+    //       .reduce((obj, key) => {
+    //         return {
+    //           ...obj,
+    //           [key]: node["permissions"][key],
+    //         }
+    //       }, {})
+
+    //     node["permissionsOrder"] = node["permissionsOrder"].filter(role =>
+    //       wp_roles.has(role)
+    //     )
+    //   }
+    // }
     // do this regardless
     const url = `${apiUrl}/tapestries/${this.postId}`
-    const response = await axios.put(url, data)
-    return response.data
+    try {
+      const response = await axios.put(url, data)
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   async getNode(id) {

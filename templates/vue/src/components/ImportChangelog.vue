@@ -6,17 +6,32 @@
     class="text-muted"
     body-class="p-0"
   >
-    <div>{{ changes }}</div>
+    <div v-if="changes.noChange">No changes were made in import</div>
+    <div v-else>
+      All authors have been set to the current user.
+      <br />
+      The following permissions for user groups were on the old site, but do not
+      exist on this site and were removed.
+      <br />
+      These also include user-specific permissions, which were all removed by
+      default.
+      <li v-for="perm in changes.permissions" :key="perm">
+        {{ perm }}
+      </li>
+    </div>
+    <div>Pressing confirm will reload your page</div>
+    <b-button @click="confirmReload">Confirm</b-button>
   </b-modal>
 </template>
 
 <script>
 export default {
   name: "import-changelog",
-  data() {
-    return {
-      changes: "changes here",
-    }
+  props: ["changes"],
+  methods: {
+    confirmReload() {
+      location.reload()
+    },
   },
 }
 </script>
