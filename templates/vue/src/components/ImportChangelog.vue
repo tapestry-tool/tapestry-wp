@@ -5,22 +5,31 @@
     size="lg"
     class="text-muted"
     body-class="p-0"
+    no-close-on-esc
+    no-close-on-backdrop
+    hide-header-close
   >
-    <div v-if="changes.noChange">No changes were made in import</div>
-    <div v-else>
-      All authors have been set to the current user.
-      <br />
-      The following permissions for user groups were on the old site, but do not
-      exist on this site and were removed.
-      <br />
-      These also include user-specific permissions, which were all removed by
-      default.
-      <li v-for="perm in changes.permissions" :key="perm">
-        {{ perm }}
-      </li>
+    <b-container fluid class="px-0">
+      <b-card>
+        <div v-if="changes.noChange">No changes were made in import</div>
+        <div v-else>
+          All authors have been set to the current user.
+          <br />
+          The following permissions for user groups were on the old site, but do not
+          exist on this site and were removed.
+          <br />
+          These also include user-specific permissions, which were all removed by
+          default.
+          <li v-for="perm in changes.permissions" :key="perm">
+            {{ perm }}
+          </li>
+          <div>Pressing confirm will reload your page</div>
+        </div>
+      </b-card>
+    </b-container>
+    <div slot="modal-footer">
+      <b-button @click="confirmReload">Confirm</b-button>
     </div>
-    <div>Pressing confirm will reload your page</div>
-    <b-button @click="confirmReload">Confirm</b-button>
   </b-modal>
 </template>
 
