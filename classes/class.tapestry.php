@@ -133,6 +133,7 @@ class Tapestry implements ITapestry
     public function addNode($node)
     {
         $tapestryNode = new TapestryNode($this->postId);
+        // $tapestryNode->update_original_author($node);
         $tapestryNode->set($node);
 
         $node = $tapestryNode->save($node);
@@ -147,6 +148,7 @@ class Tapestry implements ITapestry
 
         return $node;
     }
+
 
     /**
      * Delete a node.

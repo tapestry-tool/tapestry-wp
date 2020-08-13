@@ -173,6 +173,22 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
         }
+        // if (isset($node->author) && is_array($node->author)) {
+        //     $this->update_original_author($node);
+        //     $this->author = $node->author;
+        // }
+        error_log(print_r($node->author,true) . "first error");
+        // error_log(print_r($this->author,true));
+
+    }
+
+    // doesn't actually work ?
+    public function update_original_author($node) {
+        // update original author if needed
+        if ($node->author["original_author_name"]  == '') {
+            $this->author["original_author_name"] = $node->author["name"];
+            $this->author["original_author_email"] = $node->author["email"];
+        }
     }
 
     /**
@@ -455,13 +471,4 @@ class TapestryNode implements ITapestryNode
         }
     }
 
-    public function update_original_author($node) {
-        // update original author if needed
-        if ($node->author->original_author_name  == '') {
-            $this->author->original_author_name = $this->author->name;
-            $this->author->original_author_email = $this->author->email;
-        }
-        $this->author->original_author_name = 'okso';
-
-    }
 }

@@ -482,7 +482,6 @@ function importTapestry($postId, $tapestryData)
 
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
-            $newNode->update_original_author($node);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
         }
