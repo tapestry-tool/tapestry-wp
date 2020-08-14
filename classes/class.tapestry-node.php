@@ -177,9 +177,6 @@ class TapestryNode implements ITapestryNode
         //     $this->update_original_author($node);
         //     $this->author = $node->author;
         // }
-        error_log(print_r($node->author,true) . "first error");
-        // error_log(print_r($this->author,true));
-
     }
 
     // doesn't actually work ?
