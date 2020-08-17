@@ -73,6 +73,9 @@
             </slick-list>
           </div>
         </b-tab>
+        <b-tab title="More Information">
+          <more-information-form :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <b-container v-else class="spinner">
@@ -136,6 +139,7 @@ import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
+import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
@@ -157,6 +161,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    MoreInformationForm,
     SlickItem,
     SlickList,
     PermissionsTable,
