@@ -52,11 +52,13 @@
             <p class="content-description" style="margin-bottom: 0.5em;">
               <a
                 v-if="license.type === licenseTypes.CUSTOM && license.link"
-                class="license-link"
                 :href="license.link"
                 target="_blank"
               >
-                {{ license.name }}
+                <span style="margin-right: 4px;" class="license-link">
+                  {{ license.name }}
+                </span>
+                <tapestry-icon icon="external-link-alt" />
               </a>
               <span v-else class="license-link">
                 <span v-if="node.license.type !== licenseTypes.CUSTOM">
