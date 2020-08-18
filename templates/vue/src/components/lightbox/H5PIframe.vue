@@ -6,7 +6,7 @@
     :height="frameHeight"
     :src="node.typeData && node.typeData.mediaURL"
     :width="frameWidth"
-    :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
+    :scrolling="library === 'H5P.InteractiveVideo'"
     @load="handleLoad"
   ></iframe>
 </template>
@@ -44,6 +44,7 @@ export default {
       frameHeight: 0,
       frameWidth: "100%",
       played: false,
+      library: null,
     }
   },
   watch: {
@@ -171,10 +172,9 @@ export default {
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
 
-      const h5pLibraryName = h5pInstance.libraryInfo.machineName
-      this.type = h5pLibraryName
+      this.library = h5pInstance.libraryInfo.machineName
 
-      if (h5pLibraryName !== "H5P.InteractiveVideo") {
+      if (this.library !== "H5P.InteractiveVideo") {
         this.frameHeight = this.dimensions.height
       }
 
@@ -189,88 +189,101 @@ export default {
 
       const mediaProgress = this.node.typeData.progress[0].value
 
-      if (h5pLibraryName === "H5P.InteractiveVideo") {
-        const h5pVideo = h5pInstance.video
-        const h5pIframeComponent = this
+      switch (this.library) {
+        case "H5P.InteractiveVideo": {
+          const h5pVideo = h5pInstance.video
+          const h5pIframeComponent = this
 
-        const handleH5pAfterLoad = () => {
-          this.instance = h5pVideo
-          this.setFrameHeight()
-          h5pIframeComponent.$emit("load", { el: h5pVideo })
+          const handleH5pAfterLoad = () => {
+            this.instance = h5pVideo
+            this.setFrameHeight()
+            h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-          let currentPlayedTime
+            let currentPlayedTime
 
-          const videoDuration = h5pVideo.getDuration()
-          h5pVideo.seek(mediaProgress * videoDuration)
+            const videoDuration = h5pVideo.getDuration()
+            h5pVideo.seek(mediaProgress * videoDuration)
 
-          const viewedAmount = mediaProgress * videoDuration
-          if (viewedAmount === videoDuration) {
-            h5pIframeComponent.$emit("show-end-screen")
-          }
-
-          h5pIframeComponent.applySettings(h5pVideo)
-
-          h5pVideo.on("stateChange", event => {
-            switch (event.data) {
-              case h5pObj.Video.PLAYING: {
-                const updateVideoInterval = setInterval(() => {
-                  if (
-                    currentPlayedTime !== h5pVideo.getCurrentTime() &&
-                    h5pVideo.getCurrentTime() > 0
-                  ) {
-                    currentPlayedTime = h5pVideo.getCurrentTime()
-                    const amountViewed = currentPlayedTime / videoDuration
-
-                    h5pIframeComponent.$emit("timeupdate", amountViewed)
-                    thisTapestryTool.updateProgressBars()
-
-                    h5pIframeComponent.updateSettings(h5pVideo)
-
-                    if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-                      h5pIframeComponent.$emit("complete")
-                    }
-
-                    if (amountViewed >= 1) {
-                      h5pIframeComponent.$emit("show-end-screen")
-                    }
-                  } else {
-                    clearInterval(updateVideoInterval)
-                  }
-                }, 1000)
-                h5pIframeComponent.handlePlay(h5pIframeComponent.node)
-                break
-              }
-
-              case h5pObj.Video.PAUSED: {
-                h5pIframeComponent.handlePause(h5pIframeComponent.node)
-                break
-              }
-
-              case h5pObj.Video.BUFFERING: {
-                const { id, mediaType } = h5pIframeComponent.node
-                thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
-                break
-              }
+            const viewedAmount = mediaProgress * videoDuration
+            if (viewedAmount === videoDuration) {
+              h5pIframeComponent.$emit("show-end-screen")
             }
-          })
-          if (h5pIframeComponent.autoplay) {
-            setTimeout(() => {
-              h5pVideo.play()
-              thisTapestryTool.recordAnalyticsEvent(
-                "app",
-                "auto-play",
-                "h5p-video",
-                h5pIframeComponent.node.id
-              )
-            }, 1000)
+
+            h5pIframeComponent.applySettings(h5pVideo)
+
+            h5pVideo.on("stateChange", event => {
+              switch (event.data) {
+                case h5pObj.Video.PLAYING: {
+                  const updateVideoInterval = setInterval(() => {
+                    if (
+                      currentPlayedTime !== h5pVideo.getCurrentTime() &&
+                      h5pVideo.getCurrentTime() > 0
+                    ) {
+                      currentPlayedTime = h5pVideo.getCurrentTime()
+                      const amountViewed = currentPlayedTime / videoDuration
+
+                      h5pIframeComponent.$emit("timeupdate", amountViewed)
+                      thisTapestryTool.updateProgressBars()
+
+                      h5pIframeComponent.updateSettings(h5pVideo)
+
+                      if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+                        h5pIframeComponent.$emit("complete")
+                      }
+
+                      if (amountViewed >= 1) {
+                        h5pIframeComponent.$emit("show-end-screen")
+                      }
+                    } else {
+                      clearInterval(updateVideoInterval)
+                    }
+                  }, 1000)
+                  h5pIframeComponent.handlePlay(h5pIframeComponent.node)
+                  break
+                }
+
+                case h5pObj.Video.PAUSED: {
+                  h5pIframeComponent.handlePause(h5pIframeComponent.node)
+                  break
+                }
+
+                case h5pObj.Video.BUFFERING: {
+                  const { id, mediaType } = h5pIframeComponent.node
+                  thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
+                  break
+                }
+              }
+            })
+            if (h5pIframeComponent.autoplay) {
+              setTimeout(() => {
+                h5pVideo.play()
+                thisTapestryTool.recordAnalyticsEvent(
+                  "app",
+                  "auto-play",
+                  "h5p-video",
+                  h5pIframeComponent.node.id
+                )
+              }, 1000)
+            }
+          }
+
+          if (h5pVideo.getDuration() !== undefined) {
+            handleH5pAfterLoad()
+          } else {
+            h5pVideo.on("loaded", handleH5pAfterLoad)
           }
         }
-
-        if (h5pVideo.getDuration() !== undefined) {
-          handleH5pAfterLoad()
-        } else {
-          h5pVideo.on("loaded", handleH5pAfterLoad)
+        break
+        case "H5P.ThreeImage": {
+          let threeSixtyLoadInterval = setInterval(()=>{
+            if (typeof h5pInstance.reDraw !== "undefined") {
+              clearInterval(threeSixtyLoadInterval)
+              h5pInstance.currentScene = h5pThreeSixtyScene
+              h5pInstance.reDraw()
+            }
+          }, 500)
         }
+        break
       }
       this.$emit("is-loaded")
     },
