@@ -462,18 +462,21 @@ function save_copilot_teen_field($user_id)
 add_action('personal_options_update', 'save_copilot_teen_field');
 add_action('edit_user_profile_update', 'save_copilot_teen_field');
 
-function replace_special_apostrophe($str) {
-  return str_replace("’", "'", $str);
+function replace_special_apostrophe($str)
+{
+    return str_replace('’', "'", $str);
 }
 
-$quote_style = "ENT_QUOTES";
-add_filter( "rest_prepare_post", 'prefix_title_entity_decode'); 
-function prefix_title_entity_decode($response){
+$quote_style = 'ENT_QUOTES';
+add_filter('rest_prepare_post', 'prefix_title_entity_decode');
+function prefix_title_entity_decode($response)
+{
     $data = $response->get_data();
-    $data['title']['rendered'] = wp_specialchars_decode(html_entity_decode( $data['title']['rendered']), $quote_style);
-    $data['title']['rendered'] = replace_special_apostrophe( $data['title']['rendered']);
-    $data['content']['rendered'] = wp_specialchars_decode(html_entity_decode( $data['content']['rendered']), $quote_style);
-    $data['content']['rendered'] = replace_special_apostrophe( $data['content']['rendered']);
+    $data['title']['rendered'] = wp_specialchars_decode(html_entity_decode($data['title']['rendered']), $quote_style);
+    $data['title']['rendered'] = replace_special_apostrophe($data['title']['rendered']);
+    $data['content']['rendered'] = wp_specialchars_decode(html_entity_decode($data['content']['rendered']), $quote_style);
+    $data['content']['rendered'] = replace_special_apostrophe($data['content']['rendered']);
     $response->set_data($data);
+
     return $response;
 }

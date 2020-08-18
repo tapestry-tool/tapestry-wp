@@ -105,7 +105,7 @@
         children.
       </p>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button
@@ -222,6 +222,7 @@ export default {
       "getDirectParents",
       "getNode",
       "settings",
+      "tapestry",
     ]),
     parent() {
       return this.getNode(this.parentId)
@@ -328,6 +329,7 @@ export default {
     },
     close() {
       this.$bvModal.hide("node-modal")
+      this.$emit("cancel")
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
@@ -374,6 +376,12 @@ export default {
         })
       }
       await this.updateLockedStatus(this.node.id)
+
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.setOriginalDataset(this.tapestry)
+      thisTapestryTool.initialize(true)
+
+      this.close()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {

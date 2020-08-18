@@ -1057,6 +1057,7 @@ function tapestryTool(config){
 
     function initializeDragSelect() {
         new DragSelect({
+            area: document.getElementById('tapestry-container'),
             selectables: document.querySelectorAll(".node"),
             onDragStart: (e) => {
                 let depthSliderWrapper = document.querySelector("#tapestry-controls-wrapper");

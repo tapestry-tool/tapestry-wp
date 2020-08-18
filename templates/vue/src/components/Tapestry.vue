@@ -1,26 +1,20 @@
 <template>
-  <div id="tapestry">
-    <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
-    <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
-    <div v-if="tapestryLoaded && !tapestry.rootId">
-      <root-node-button v-if="wpCanEditTapestry" @click="addRootNode" />
-      <div v-else style="margin-top: 40vh;">
-        The requested tapestry is empty.
+  <div id="tapestry-container">
+    <div id="tapestry">
+      <loading v-if="!tapestryLoaded" style="padding: 30vh 0;" label="Loading" />
+      <settings-modal :wp-can-edit-tapestry="wpCanEditTapestry" />
+      <div v-if="tapestryLoaded && !tapestry.rootId">
+        <root-node-button v-if="wpCanEditTapestry" @click="$emit('add-root')" />
+        <div v-else style="margin-top: 40vh;">
+          The requested tapestry is empty.
+        </div>
       </div>
     </div>
-    <node-modal
-      :parent-id="parentId"
-      :node-id="nodeId"
-      :modal-type="modalType"
-      @cancel="closeModal"
-      @submit="handleSubmit"
-    />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex"
-import NodeModal from "./NodeModal"
 import SettingsModal from "./SettingsModal"
 import RootNodeButton from "./RootNodeButton"
 import TapestryApi from "../services/TapestryAPI"
@@ -30,7 +24,6 @@ import Loading from "@/components/Loading"
 export default {
   name: "tapestry",
   components: {
-    NodeModal,
     RootNodeButton,
     SettingsModal,
     Loading,
@@ -38,9 +31,6 @@ export default {
   data() {
     return {
       tapestryLoaded: false,
-      modalType: "",
-      parentId: null,
-      nodeId: null,
     }
   },
   computed: {
@@ -60,8 +50,6 @@ export default {
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
-    window.addEventListener("add-new-node", this.addNewNode)
-    window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("tapestry-open-node", this.openNode)
   },
@@ -88,36 +76,8 @@ export default {
         this.updateTydeProgress({ parentId: n.id, isParentModule: false })
       )
     },
-    addRootNode() {
-      this.parentNode = null
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
-    },
-    addNewNode() {
-      this.parentId = this.selectedNode.id
-      this.modalType = "add"
-      this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
-    },
-    editNode() {
-      this.parentId = this.getDirectParents(this.selectedNode.id)[0]
-      this.modalType = "edit"
-      this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
-    },
-    closeModal() {
-      this.modalType = ""
-      this.parent = null
-      this.$bvModal.hide("node-modal")
-    },
     changeSelectedNode(event) {
       this.updateSelectedNode(event.detail)
-    },
-    handleSubmit() {
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.setOriginalDataset(this.tapestry)
-      thisTapestryTool.initialize(true)
-      this.closeModal()
     },
   },
 }

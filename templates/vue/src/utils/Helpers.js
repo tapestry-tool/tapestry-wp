@@ -178,4 +178,44 @@ export default class Helpers {
 
     return outObject
   }
+
+  static hasPermission(node, permissionType) {
+    if (wpData.wpCanEditTapestry) {
+      return true
+    }
+    if (node.author == wpData.wpUserId) {
+      return true
+    }
+
+    if (node.nodeType !== "root") {
+      return false
+    }
+    if (
+      node.permissions.public &&
+      node.permissions.public.includes(permissionType)
+    ) {
+      return true
+    }
+
+    if (wpData.wpUserId && wpData.wpUserId !== "") {
+      if (
+        node.permissions.authenticated &&
+        node.permissions.authenticated.includes(permissionType)
+      ) {
+        return true
+      }
+
+      var userIndex = "user-" + wpData.wpUserId
+      if (
+        node.permissions[userIndex] &&
+        node.permissions[userIndex].includes(permissionType)
+      ) {
+        return true
+      }
+    }
+
+    // // TODO Check user's group id
+
+    return false
+  }
 }
