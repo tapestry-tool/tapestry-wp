@@ -94,8 +94,15 @@
       <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
-      <b-button id="submit-button" size="sm" variant="primary" @click="handleSubmit">
-        Submit
+      <b-button
+        id="submit-button"
+        size="sm"
+        variant="primary"
+        :disabled="!canSubmit"
+        @click="handleSubmit"
+      >
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -180,6 +187,8 @@ export default {
       formErrors: [],
       maxDescriptionLength: 250,
       node: null,
+      videoLoaded: false,
+      fileUploading: false,
       loadDuration: false,
     }
   },
@@ -218,11 +227,17 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+    canSubmit() {
+      return !this.fileUploading
+    },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
@@ -323,10 +338,65 @@ export default {
       this.close()
       this.$emit("submit")
     },
+    getRandomNumber(min, max) {
+      return Math.random() * (max - min) + min
+    },
+    coinToss() {
+      return Math.floor(Math.random() * 2) == 0
+    },
+    calculateX(yIsCalculated) {
+      if (!yIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateY(true)
+      } else {
+        this.node.coordinates.x = this.getRandomNumber(
+          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+        )
+      }
+    },
+    calculateY(xIsCalculated) {
+      if (!xIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateX(true)
+      } else {
+        this.node.coordinates.y = this.getRandomNumber(
+          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+        )
+      }
+    },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
-        this.node.coordinates.x = this.parent.x + sizes.NODE_RADIUS_SELECTED * 2 + 50
-        this.node.coordinates.y = this.parent.y
+        this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
     validateNode() {
@@ -581,16 +651,16 @@ table {
 #submit-button {
   position: relative;
 
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
   }
 }
 

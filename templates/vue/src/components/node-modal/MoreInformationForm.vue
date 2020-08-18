@@ -24,7 +24,7 @@
       >
         <b-form-input
           v-model="node.license.link"
-          placeholder="Paste a link to your license"
+          placeholder="Paste a link to your license starting with http:// or https://"
         ></b-form-input>
       </b-form-group>
       <b-form-group

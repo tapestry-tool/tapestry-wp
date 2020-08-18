@@ -137,7 +137,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["updateNodeProgress", "updateH5pSettings"]),
+    ...mapActions(["updateNodeProgress"]),
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -145,7 +145,7 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    async updateProgress(amountViewed) {
+    updateProgress(amountViewed) {
       this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
     complete() {
