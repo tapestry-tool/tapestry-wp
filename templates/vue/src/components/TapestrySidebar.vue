@@ -15,10 +15,11 @@
         <tapestry-icon icon="copyright" />
       </button>
       <button
-        :class="['close-button', { closed: isClosed }]"
-        @click.stop="isClosed = true"
+        :class="['toggle-button', { closed: isClosed }]"
+        @click.stop="isClosed = !isClosed"
       >
-        <tapestry-icon icon="chevron-right" />
+        <tapestry-icon v-if="isClosed" icon="chevron-left" />
+        <tapestry-icon v-else icon="chevron-right" />
       </button>
       <button
         :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
@@ -28,28 +29,28 @@
       </button>
     </div>
     <aside ref="content" :class="['sidebar', { closed: isClosed }]">
+      <header class="sidebar-header">
+        <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
+        <div class="button-container">
+          <b-button v-if="node.accessible || canEdit" @click="viewNode">
+            <tapestry-icon icon="eye" />
+            View
+          </b-button>
+          <b-button v-if="canEdit" @click="$emit('edit')">
+            <tapestry-icon icon="pencil-alt" />
+            Edit
+          </b-button>
+        </div>
+      </header>
       <div class="sidebar-content">
-        <header class="sidebar-header">
-          <h3 ref="info" data-name="info" class="content-title">{{ node.title }}</h3>
-          <div class="button-container">
-            <b-button v-if="node.accessible || canEdit" @click="viewNode">
-              <tapestry-icon icon="eye" />
-              View
-            </b-button>
-            <b-button v-if="canEdit" @click="$emit('edit')">
-              <tapestry-icon icon="pencil-alt" />
-              Edit
-            </b-button>
-          </div>
-        </header>
         <section v-if="node.description">
-          <h4 class="content-separator">About</h4>
-          <div class="content-description" v-html="node.description"></div>
+          <h2 class="content-header">About</h2>
+          <div class="content-body" v-html="node.description"></div>
         </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
-            <h4 class="content-separator">License</h4>
-            <p class="content-description" style="margin-bottom: 0.5em;">
+            <h2 class="content-header">License</h2>
+            <p class="content-body" style="margin-bottom: 0.5em;">
               <a
                 v-if="license.type === licenseTypes.CUSTOM && license.link"
                 :href="license.link"
@@ -69,13 +70,13 @@
             </p>
             <div
               v-if="license.type === licenseTypes.CUSTOM && license.description"
-              class="content-description"
+              class="content-body"
               v-html="license.description"
             ></div>
           </section>
           <section v-if="node.references">
-            <h4 class="content-separator">References</h4>
-            <div class="content-description" v-html="node.references"></div>
+            <h2 class="content-header">References</h2>
+            <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
       </div>
@@ -202,191 +203,190 @@ export default {
       transform: translateX(calc(100% - 2.5em));
     }
   }
-}
 
-.anchor-button {
-  padding: 0;
-  background: 0;
-  height: 100%;
-  width: 2.5em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8em;
-  opacity: 0.6;
-
-  &:hover,
-  &.active {
-    background: none;
-    opacity: 1;
-  }
-
-  @media screen and (min-width: 500px) {
-    width: 100%;
-    height: 2em;
-  }
-}
-
-.close-button {
-  display: none;
-
-  @media screen and (min-width: 500px) {
-    padding: 0;
+  .sidebar-preview {
     background: var(--gray);
-    position: absolute;
-    width: 2.5em;
-    height: 2.5em;
-    bottom: auto;
-    right: 1em;
-    top: 50%;
-    transform: translateY(-50%);
     display: flex;
-    align-items: center;
     justify-content: center;
-    border-radius: 50%;
-
-    &.closed {
-      display: none;
-    }
-
-    &:hover {
-      background: var(--gray);
-    }
+    padding: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 4em;
+    z-index: 10;
+    pointer-events: all;
 
     i {
-      margin-bottom: 0;
+      display: block;
+      text-align: left;
+    }
+
+    @media screen and (min-width: 500px) {
+      position: relative;
+      padding: 32px 0;
+      height: 100vh;
+      width: 2.5em;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .anchor-button {
+      padding: 0;
+      background: 0;
+      height: 100%;
+      width: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8em;
+      opacity: 0.6;
+
+      &:hover,
+      &.active {
+        background: none;
+        opacity: 1;
+      }
+
+      @media screen and (min-width: 500px) {
+        width: 100%;
+        height: 2em;
+      }
+    }
+
+    .toggle-button {
+      display: none;
+
+      @media screen and (min-width: 500px) {
+        padding: 0;
+        background: var(--gray);
+        position: absolute;
+        width: 2.5em;
+        height: 2.5em;
+        bottom: auto;
+        right: 1em;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+
+        &:hover {
+          background: var(--gray);
+        }
+
+        i {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .close-button-mobile {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+
+      &.closed {
+        display: none;
+      }
+
+      @media screen and (min-width: 500px) {
+        display: none;
+      }
     }
   }
-}
 
-.close-button-mobile {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-
-  &.closed {
-    display: none;
-  }
-
-  @media screen and (min-width: 500px) {
-    display: none;
-  }
-}
-
-.sidebar {
-  background: #5d656c;
-  color: white;
-  height: 100vh;
-  padding-bottom: 4em;
-  transform: translateY(0);
-  transition: all 0.2s ease-out;
-  width: 100vw;
-  font-size: 14px;
-  z-index: 0;
-  overflow-y: scroll;
-
-  &.closed {
-    cursor: pointer;
-    transform: translateY(100%);
-  }
-
-  @media screen and (min-width: 500px) {
-    min-width: 300px;
-    width: 25vw;
-    max-width: 400px;
-    grid-column: 2;
-    padding-bottom: 0;
+  .sidebar {
+    background: #5d656c;
+    color: white;
+    height: 100vh;
+    padding: 2.2rem 1rem;
+    transform: translateY(0);
+    transition: all 0.2s ease-out;
+    width: 100vw;
+    font-size: 14px;
+    z-index: 0;
+    overflow-y: scroll;
 
     &.closed {
-      transform: translateY(0);
+      cursor: pointer;
+      transform: translateY(100%);
     }
-  }
 
-  @media screen and (min-width: 960px) {
-    font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
-  }
+    @media screen and (min-width: 500px) {
+      min-width: 300px;
+      width: 25vw;
+      max-width: 400px;
+      grid-column: 2;
+      padding-bottom: 0;
 
-  @media screen and (min-width: 1280px) {
-    font-size: 16px;
-  }
-}
-
-.button-container {
-  i {
-    margin-right: 4px;
-  }
-}
-
-.sidebar-header {
-  margin-bottom: 1.5em;
-  text-align: left;
-
-  .content-title {
-    margin-bottom: 0.8em;
-  }
-}
-
-.sidebar-preview {
-  background: var(--gray);
-  display: flex;
-  justify-content: center;
-  padding: 0;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: 4em;
-  z-index: 10;
-  pointer-events: all;
-
-  i {
-    display: block;
-    text-align: left;
-  }
-
-  @media screen and (min-width: 500px) {
-    position: relative;
-    padding: 32px 0;
-    height: 100vh;
-    width: 2.5em;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-}
-
-.sidebar-content {
-  padding: 3rem 2rem;
-
-  section {
-    margin-bottom: 2em;
-    &:last-child {
-      margin-bottom: 3rem;
+      &.closed {
+        transform: translateY(0);
+      }
     }
-  }
 
-  .content-separator {
-    margin-bottom: 0.8em;
-    position: relative;
-    text-align: left;
-  }
-
-  .content-description {
-    display: block;
-    text-align: left;
-
-    a {
-      color: white;
+    @media screen and (min-width: 960px) {
+      font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
     }
-  }
-}
 
-.license-link {
-  color: white;
-  text-transform: capitalize;
-  font-weight: 600;
+    @media screen and (min-width: 1280px) {
+      font-size: 16px;
+    }
 
-  i {
-    margin-right: 4px;
+    .sidebar-header {
+      margin-bottom: 1.5em;
+      text-align: left;
+
+      .content-title {
+        margin-bottom: 0.2em;
+      }
+
+      .button-container {
+        button {
+          font-size: 1em;
+          i {
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+
+    .sidebar-content {
+      section {
+        margin-bottom: 2em;
+        &:last-child {
+          margin-bottom: 3rem;
+        }
+
+        .content-header {
+          margin: 1em 0 0.2em;
+          position: relative;
+          text-align: left;
+          border-bottom: solid 2px #6b747d;
+          padding: 0.2em 0;
+        }
+
+        .content-body {
+          display: block;
+          text-align: left;
+          color: #becddc;
+
+          a {
+            color: #becddc;
+          }
+
+          .license-link {
+            color: white;
+            text-transform: capitalize;
+            font-weight: 600;
+            i {
+              margin-right: 4px;
+            }
+          }
+        }
+      }
+    }
   }
 }
 </style>

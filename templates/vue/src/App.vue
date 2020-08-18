@@ -75,8 +75,14 @@ html {
     color: #2c3e50;
     margin-top: 60px;
 
-    h1:before {
-      content: none;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      &::before {
+        display: none;
+      }
     }
 
     p {
