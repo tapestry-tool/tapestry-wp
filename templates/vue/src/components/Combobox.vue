@@ -180,15 +180,12 @@ export default {
 .combobox-item {
   display: flex;
   align-items: center;
+  font-weight: normal;
 
   code,
   p {
     margin: 0;
     padding: 0;
-  }
-
-  p {
-    font-weight: normal;
   }
 
   code {
