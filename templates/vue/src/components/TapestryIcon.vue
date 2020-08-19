@@ -1,8 +1,5 @@
 <template>
-  <i
-    v-if="icon === 'audio' || icon === 'checklist'"
-    :class="`fas fa-${iconSrc} icon-fa`"
-  ></i>
+  <i v-if="icon !== 'text'" :class="`fas fa-${iconSrc} icon-fa`"></i>
   <img v-else :src="iconSrc" />
 </template>
 
@@ -16,7 +13,6 @@ export default {
     icon: {
       type: String,
       required: true,
-      validator: prop => ["audio", "checklist", "text"].includes(prop),
     },
   },
   computed: {
@@ -26,7 +22,7 @@ export default {
         checklist: "tasks",
         text: Helpers.getImagePath(TextIcon),
       }
-      return icons[this.icon]
+      return icons[this.icon] || this.icon
     },
   },
 }
