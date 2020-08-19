@@ -22,8 +22,6 @@ export default {
   data() {
     return {
       tapestryLoaded: false,
-      modalType: "",
-      nodeId: null,
     }
   },
   computed: {
@@ -38,8 +36,6 @@ export default {
   },
   mounted() {
     window.addEventListener("change-selected-node", this.changeSelectedNode)
-    window.addEventListener("add-new-node", this.addNewNode)
-    window.addEventListener("edit-node", this.editNode)
     window.addEventListener("tapestry-updated", this.tapestryUpdated)
     window.addEventListener("tapestry-open-node", this.openNode)
 
@@ -68,24 +64,6 @@ export default {
       } else {
         this.setDataset(event.detail.dataset)
       }
-    },
-    addRootNode() {
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
-    },
-    addNewNode() {
-      this.modalType = "add"
-      this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
-    },
-    editNode() {
-      this.modalType = "edit"
-      this.nodeId = this.selectedNode.id
-      this.$bvModal.show("node-modal")
-    },
-    closeModal() {
-      this.modalType = ""
-      this.$bvModal.hide("node-modal")
     },
     changeSelectedNode(event) {
       this.updateSelectedNode(event.detail)
