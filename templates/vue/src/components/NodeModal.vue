@@ -73,6 +73,9 @@
             </slick-list>
           </div>
         </b-tab>
+        <b-tab title="More Information">
+          <more-information-form :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <b-container v-else class="spinner">
@@ -88,7 +91,7 @@
         Delete Node
       </b-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button
@@ -136,6 +139,7 @@ import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
+import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
@@ -157,6 +161,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    MoreInformationForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -194,6 +199,7 @@ export default {
       "getDirectParents",
       "getNode",
       "settings",
+      "tapestry",
     ]),
     parent() {
       if (this.modalType === "add") {
@@ -277,6 +283,7 @@ export default {
     },
     close() {
       this.$bvModal.hide("node-modal")
+      this.$emit("cancel")
     },
     deleteNode() {
       thisTapestryTool.deleteNodeFromTapestry()
@@ -323,6 +330,12 @@ export default {
         })
       }
       await this.updateLockedStatus(this.node.id)
+
+      thisTapestryTool.setDataset(this.tapestry)
+      thisTapestryTool.setOriginalDataset(this.tapestry)
+      thisTapestryTool.initialize(true)
+
+      this.close()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {
