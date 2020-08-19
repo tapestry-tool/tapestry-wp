@@ -115,6 +115,9 @@ class TapestryNode implements ITapestryNode
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
         }
+        if (isset($node->author) && is_object($node->author)) {
+            $this->author = $node->author;
+        }
         if (isset($node->size) && is_string($node->size)) {
             $this->size = $node->size;
         }
@@ -341,7 +344,7 @@ class TapestryNode implements ITapestryNode
             $nodePostId = $nodeMetadata->meta_value->post_id;
         }
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId);
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId, $node->author->id);
 
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
@@ -365,7 +368,7 @@ class TapestryNode implements ITapestryNode
     {
         wp_update_post([
             'ID' => $this->nodePostId,
-            'post_author' => $this->author['id'],
+            'post_author' => $this->author->id,
         ]);
     }
 
@@ -479,7 +482,7 @@ class TapestryNode implements ITapestryNode
         }
         $user = get_user_by('id', $id);
         if ($user) {
-            return [
+            return (object) [
                 'id' => $id,
                 'name' => $user->display_name,
             ];
