@@ -36,7 +36,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$emit('edit')">
+          <b-button v-if="canEdit" @click="$root.$emit('edit-node', selectedNodeId)">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
