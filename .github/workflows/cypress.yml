@@ -47,6 +47,8 @@ jobs:
               env: 
                 GF_KEY: ${{ secrets.GRAVITY_FORMS_API_KEY }}
               run: docker exec wp wp gf install --key=$GF_KEY --allow-root
+            - name: Ping DB # Shouldn't be required but the next line doesn't succeed without this 
+              run: docker exec wp bash -c "apt update; apt install iputils-ping -y; ping -c 5 db"
             - name: Add Test Gravity Form
               run: docker exec wp wp gf form import /var/www/html/wp-content/plugins/tapestry-wp/templates/e2e/test-gf-form.csv --allow-root
             - name: Add users
