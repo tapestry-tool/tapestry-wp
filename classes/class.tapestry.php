@@ -342,15 +342,17 @@ class Tapestry implements ITapestry
         $node->accessible = $node->unlocked;
         if ($node->accessible) {
             $neighbourIds = $this->_getNeighbours($node);
-            $neighbours = [];
 
-            foreach ($neighbourIds as $nodeId) {
-                foreach ($nodeList as $otherNode) {
-                    if ($otherNode->id === $nodeId) {
-                        array_push($neighbours, $otherNode);
+            $neighbours = array_map(
+                function ($nodeId) use ($nodeList) {
+                    foreach ($nodeList as $otherNode) {
+                        if ($otherNode->id === $nodeId) {
+                            return $otherNode;
+                        }
                     }
-                }
-            }
+                },
+                $neighbourIds
+            );
 
             foreach ($neighbours as $neighbour) {
                 if (!in_array($neighbour, $visited)) {
