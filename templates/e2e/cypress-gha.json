@@ -6,6 +6,7 @@
       "SUBSCRIBER_USERNAME": "subscriber",
       "SUBSCRIBER_PASSWORD": "subscriber"
     },
-    "chromeWebSecurity": false
+    "chromeWebSecurity": false,
+    "video": false
 }
   
