@@ -29,7 +29,6 @@ jobs:
             - name: Setup cypress.json
               working-directory: templates/e2e
               run: cp cypress-gha.json cypress.json
-            - uses: satackey/action-docker-layer-caching@v0.0.4
             - name: Launch containers
               run: docker-compose up -d
               working-directory: docker
