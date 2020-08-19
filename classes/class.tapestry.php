@@ -511,17 +511,17 @@ class Tapestry implements ITapestry
 
         $queue = new SplQueue();
         $queue->enqueue($rootId);
-        $visited = [];
+        $visited = [$rootId];
         while (!$queue->isEmpty()) {
             $node = $queue->dequeue();
-            $visited[$node] = true;
 
             if ($this->_isAllowed($node, $superuser_override, $currentUserId) || $this->_isAllowed($node, $superuser_override, $secondaryUserId)) {
                 array_push($nodesPermitted, $node);
             }
 
             foreach ($this->_getNeighbours((object) ['id' => $node]) as $neighbour) {
-                if (!array_key_exists($neighbour, $visited) && in_array($neighbour, $nodeMetaIds)) {
+                if (!in_array($neighbour, $visited) && in_array($neighbour, $nodeMetaIds)) {
+                    $visited[] = $neighbour;
                     $queue->enqueue($neighbour);
                 }
             }
