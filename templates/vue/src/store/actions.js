@@ -68,17 +68,19 @@ export async function updateLockedStatus({ commit, getters }) {
   const userProgress = await client.getUserProgress()
   for (const [nodeId, progress] of Object.entries(userProgress)) {
     const node = getters.getNode(nodeId)
-    const { accessible, unlocked } = progress
-    if (
-      Helpers.isDifferent(
-        {
-          accessible: node.accessible,
-          unlocked: node.unlocked,
-        },
-        { accessible, unlocked }
-      )
-    ) {
-      commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
+    if (node) {
+      const { accessible, unlocked } = progress
+      if (
+        Helpers.isDifferent(
+          {
+            accessible: node.accessible,
+            unlocked: node.unlocked,
+          },
+          { accessible, unlocked }
+        )
+      ) {
+        commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
+      }
     }
   }
 }
