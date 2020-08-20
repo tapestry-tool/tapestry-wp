@@ -350,8 +350,4 @@ h2:before {
   height: 0;
   font-style: italic;
 }
-
-.editor p {
-  margin-bottom: 0rem;
-}
 </style>
