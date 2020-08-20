@@ -157,7 +157,6 @@ export default {
   },
   mounted() {
     this.getSettings()
-    this.synchronizeSettings()
     bus.$on("max-depth-change", depth => (this.maxDepth = depth))
   },
   methods: {

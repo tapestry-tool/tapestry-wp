@@ -12,7 +12,7 @@
 get_header();
 
 if (current_user_can('edit_post', get_the_ID())) {
-    $additionalClasses = 'is-editor"';
+    $additionalClasses = 'is-editor';
 }
 
 ?>
@@ -60,7 +60,7 @@ if (current_user_can('edit_post', get_the_ID())) {
                     });
                 }, true);
 
-                document.getElementById('tapestry').addEventListener('click', function(event) {
+                document.getElementById('main').addEventListener('click', function(event) {
                     var x = event.clientX + $(window).scrollLeft();
                     var y = event.clientY + $(window).scrollTop();
                     recordAnalyticsEvent('user', 'click', 'tapestry', null, { x, y });
