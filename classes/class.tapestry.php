@@ -38,7 +38,7 @@ class Tapestry implements ITapestry
         $this->links = [];
         $this->groups = [];
         $this->rootId = 0;
-        $this->settings = (object) [];
+        $this->settings = $this->_getDefaultSettings();
 
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
@@ -391,27 +391,31 @@ class Tapestry implements ITapestry
 
     private function _getDefaultTapestry()
     {
-        $post = get_post($this->postId);
         $tapestry = new stdClass();
-
         $tapestry->nodes = [];
         $tapestry->links = [];
         $tapestry->groups = [];
         $tapestry->rootId = 0;
-        $tapestry->settings = new stdClass();
-
-        $tapestry->settings->tapestrySlug = $post->post_name;
-        $tapestry->settings->title = $post->post_title;
-        $tapestry->settings->status = $post->post_status;
-        $tapestry->settings->backgroundUrl = '';
-        $tapestry->settings->autoLayout = false;
-        $tapestry->settings->nodeDraggable = true;
-        $tapestry->settings->showAccess = true;
-        $tapestry->settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
-        $tapestry->settings->superuserOverridePermissions = true;
-        $tapestry->settings->permalink = get_permalink($this->postId);
+        $tapestry->settings = $this->_getDefaultSettings();
 
         return $tapestry;
+    }
+    
+    private function _getDefaultSettings()
+    {
+        $post = get_post($this->postId);
+        $settings = new stdClass();
+        $settings->tapestrySlug = $post->post_name;
+        $settings->title = $post->post_title;
+        $settings->status = $post->post_status;
+        $settings->backgroundUrl = '';
+        $settings->autoLayout = false;
+        $settings->nodeDraggable = true;
+        $settings->showAccess = true;
+        $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
+        $settings->superuserOverridePermissions = true;
+        $settings->permalink = get_permalink($this->postId);
+        return $settings;
     }
 
     private function _getAuthor()
