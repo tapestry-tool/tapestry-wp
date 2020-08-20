@@ -48,24 +48,6 @@ if (current_user_can('edit_post', get_the_ID())) {
             var wpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
-
-            // Capture click events anywhere inside or outside tapestry
-            $(document).ready(function() {
-                document.body.addEventListener('click', function(event) {
-                    var x = event.clientX + $(window).scrollLeft();
-                    var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'screen', null, {
-                        'x': x,
-                        'y': y
-                    });
-                }, true);
-
-                document.getElementById('main').addEventListener('click', function(event) {
-                    var x = event.clientX + $(window).scrollLeft();
-                    var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'tapestry', null, { x, y });
-                }, true);
-            });
         </script>
         
         <?php

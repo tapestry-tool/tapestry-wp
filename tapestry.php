@@ -112,7 +112,7 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
  */
 
 add_action('wp_enqueue_scripts', 'tapestry_enqueue_libraries');
-add_action('wp_enqueue_scripts', 'tapestry_enqueue_tapestry_js');
+// add_action('wp_enqueue_scripts', 'tapestry_enqueue_tapestry_js');
 add_action('wp_enqueue_scripts', 'tapestry_enqueue_vue_app');
 add_filter('style_loader_tag', 'tapestry_add_style_attributes', 10, 2);
 

@@ -129,7 +129,7 @@ export default {
     },
   },
   async created() {
-    if (wpApiSettings && wpApiSettings.wpCanEditTapestry === "1") {
+    if (wpData.wpCanEditTapestry === "1") {
       const tapestryApi = new TapestryApi(wpPostId)
       this.allContributors = await tapestryApi.getAllContributors()
     }

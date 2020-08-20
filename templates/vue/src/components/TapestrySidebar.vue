@@ -111,8 +111,7 @@ export default {
     },
     canEdit() {
       return (
-        wpApiSettings.wpCanEditTapestry === "1" ||
-        Helpers.hasPermission(this.node, "edit")
+        wpData.wpCanEditTapestry === "1" || Helpers.hasPermission(this.node, "edit")
       )
     },
     licenseTypes() {

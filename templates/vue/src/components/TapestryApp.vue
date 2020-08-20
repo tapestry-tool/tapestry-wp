@@ -95,7 +95,7 @@ export default {
       return this.settings.backgroundUrl
     },
     canEdit() {
-      return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+      return wpData.wpCanEditTapestry === "1"
     },
     empty() {
       return Object.keys(this.nodes).length === 0
@@ -111,6 +111,8 @@ export default {
     },
   },
   mounted() {
+    window.addEventListener("click", this.recordAnalytics)
+
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
@@ -118,8 +120,19 @@ export default {
       this.$nextTick(this.initializeDragSelect)
     })
   },
+  beforeDestroy() {
+    window.removeEventListener("click", this.recordAnalytics)
+  },
   methods: {
     ...mapMutations(["init", "select", "unselect", "clearSelection"]),
+    recordAnalytics(evt) {
+      const x = evt.clientX + window.scrollLeft
+      const y = evt.clientY + window.scrollTop
+      client.recordAnalyticsEvent("user", "click", "screen", null, {
+        x: x,
+        y: y,
+      })
+    },
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
