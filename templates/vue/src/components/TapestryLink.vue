@@ -54,7 +54,7 @@ export default {
       )
       if (userConfirmDelete) {
         if (this.canDelete()) {
-          await this.deleteLink([this.source.id, this.target.id])
+          await this.deleteLink({ source: this.source.id, target: this.target.id })
           if (this.isAccordion(this.source.id)) {
             this.source.childOrdering = this.source.childOrdering.filter(
               id => id !== this.target.id
