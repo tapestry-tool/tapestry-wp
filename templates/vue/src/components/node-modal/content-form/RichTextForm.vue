@@ -290,10 +290,15 @@ h2:before {
   border: 1px solid #ccc;
 }
 
+.editor:not(:focus-within) .menubar {
+  background: #fff;
+  opacity: 0.5;
+}
+
 .menubar {
   display: flex;
-  margin-bottom: 1rem;
-  transition: visibility 0.2s 0.4s, opacity 0.2s 0.4s;
+  margin-bottom: 0.7rem;
+  transition: all 0.3s;
   background-color: #eee;
 
   &.is-hidden {

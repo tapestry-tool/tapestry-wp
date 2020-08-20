@@ -8,3 +8,23 @@ export const sizes = {
   NODE_RADIUS: 140,
   NODE_RADIUS_SELECTED: 210,
 }
+
+export const licenseTypes = {
+  CREATIVE_COMMONS: "cc",
+  CUSTOM: "custom",
+}
+
+export const licenses = {
+  [licenseTypes.CREATIVE_COMMONS]: {
+    name: "CC-BY-SA",
+    icons: [
+      "fab fa-creative-commons",
+      "fab fa-creative-commons-by",
+      "fab fa-creative-commons-sa",
+    ],
+  },
+  [licenseTypes.CUSTOM]: {
+    name: "Custom license",
+    icons: ["fas fa-plus"],
+  },
+}

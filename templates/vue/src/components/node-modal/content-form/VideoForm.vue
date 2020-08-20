@@ -7,6 +7,7 @@
         input-test-id="node-videoUrl"
         placeholder="Enter URL for MP4 or YouTube video"
         required
+        @isUploading="handleUploadChange"
       />
     </b-form-group>
   </div>
@@ -40,6 +41,11 @@ export default {
         this.node.mediaFormat = "mp4"
         this.node.typeData.youtubeID = undefined
       }
+    },
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }
