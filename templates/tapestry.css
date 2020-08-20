@@ -21,6 +21,19 @@ li p {
     margin-bottom: 0;
 }
 
+#tapestry {
+    transform: scale(1);
+    transform-origin: top left;
+    transition: all 0.2s ease-out;
+}
+
+@media screen and (min-width: 500px) {
+    #tapestry.sidebar-open {
+        transform: scale(0.7);
+    }
+}
+
+
 #header {
     position: fixed;
     top: 1em;

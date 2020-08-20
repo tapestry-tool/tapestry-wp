@@ -19,6 +19,7 @@
               v-model="backgroundUrl"
               placeholder="Enter background URL"
               autofocus
+              @isUploading="isUploading"
             />
           </b-form-group>
           <b-form-group
@@ -32,9 +33,9 @@
           </b-form-group>
           <b-form-group
             label="Show me all nodes by default"
-            description="If enabled, editors of this tapestry would be able to view all nodes even if they have 
-            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes, 
-            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with 
+            description="If enabled, editors of this tapestry would be able to view all nodes even if they have
+            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes,
+            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with
             the Administator or Editor role, and the author of this Tapestry."
           >
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
@@ -74,7 +75,7 @@
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
-              and can change the permissions for each node that they add. Hiding the Access tab 
+              and can change the permissions for each node that they add. Hiding the Access tab
               will hide it from all users except you, editors of this tapestry, and admins."
           >
             <b-form-checkbox v-model="showAccess" switch>
@@ -88,8 +89,15 @@
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings">
-        Save
+      <b-button
+        id="save-button"
+        size="sm"
+        variant="primary"
+        :disabled="fileUploading"
+        @click="updateSettings"
+      >
+        <b-spinner v-if="fileUploading"></b-spinner>
+        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -112,14 +120,6 @@ const defaultPermissions = Object.fromEntries(
   ].map(rowName => [rowName, ["read"]])
 )
 
-const defaultSettings = {
-  backgroundUrl: "",
-  nodeDraggable: true,
-  showAccess: true,
-  superuserOverridePermissions: true,
-  defaultDepth: 3,
-}
-
 export default {
   name: "settings-modal",
   components: {
@@ -140,6 +140,7 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
       maxDepth: 0,
@@ -194,6 +195,9 @@ export default {
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
     },
+    isUploading(status) {
+      this.fileUploading = status
+    },
     exportTapestry() {
       const tapestry = this.tapestryJson
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
@@ -209,14 +213,6 @@ export default {
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
     },
-    synchronizeSettings() {
-      const tapestrySettings = this.settings
-      for (const setting in defaultSettings) {
-        if (!tapestrySettings.hasOwnProperty(setting)) {
-          this.updateSettings()
-        }
-      }
-    },
   },
 }
 </script>
@@ -231,5 +227,28 @@ export default {
 .depth-slider-description {
   color: #6c757d;
   font-size: 80%;
+}
+
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#save-button {
+  position: relative;
+
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
+  }
 }
 </style>

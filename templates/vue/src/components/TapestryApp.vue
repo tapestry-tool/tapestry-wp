@@ -15,7 +15,7 @@
     <div v-if="empty && !canEdit">
       The requested Tapestry is empty.
     </div>
-    <main ref="app" :style="background">
+    <main id="tapestry" ref="app" :style="background">
       <svg id="vue-svg" :viewBox="viewBox">
         <g>
           <tapestry-link
