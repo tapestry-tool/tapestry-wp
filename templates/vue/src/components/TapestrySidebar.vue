@@ -128,7 +128,7 @@ export default {
     isClosed: {
       immediate: true,
       handler(isClosed) {
-        const tapestryContainer = document.getElementById("app")
+        const tapestryContainer = document.getElementById("app-container")
         if (isClosed) {
           tapestryContainer.classList.remove("sidebar-open")
           this.active = null

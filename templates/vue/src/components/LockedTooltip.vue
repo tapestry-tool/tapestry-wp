@@ -114,7 +114,7 @@ export default {
     onBottom() {
       return (
         this.node.coordinates.y - this.startY < this.height ||
-        this.node.coordinates.y - this.startY - this.height <= $(window).scrollTop()
+        this.node.coordinates.y - this.startY - this.height <= window.scrollTop
       )
     },
     flexPosition() {

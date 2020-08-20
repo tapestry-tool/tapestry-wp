@@ -1,6 +1,6 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
-  <div v-else class="app-container">
+  <div v-else id="app-container">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
@@ -246,8 +246,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+#app-container {
+  transform: scale(1);
+  transform-origin: top left;
+  transition: all 0.2s ease-out;
   z-index: 0;
+
+  @media screen and (min-width: 500px) {
+    &.sidebar-open {
+      transform: scale(0.7);
+    }
+  }
 }
 
 main {
