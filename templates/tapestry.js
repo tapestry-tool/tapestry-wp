@@ -2226,6 +2226,7 @@ function tapestryTool(config){
                     maxDepth = tapestry.dataset.nodes[findNodeIndex(id)].depth;
                 }
         });
+
         return maxDepth;
     }
     this.findMaxDepth = findMaxDepth;
