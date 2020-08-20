@@ -278,9 +278,18 @@ function tapestryTool(config){
         // 3. SET NODES/LINKS AND CREATE THE SVG OBJECTS
         //---------------------------------------------------
 
+        if (!isReload) {
+            svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
+        }
+
+        if (!isReload && typeof tapestry.dataset.settings.defaultDepth !== "undefined") {
+            tapestryDepth = tapestry.dataset.settings.defaultDepth
+        }
+
+        addDepthToNodes(root);
         setNodeTypes(root);
         setLinkTypes(root);
-        addDepthToNodes(root, 0, []);
+        addDepthToNodes(root);
 
         if (!isReload) {
             svg = createSvgContainer(TAPESTRY_CONTAINER_ID);
@@ -331,7 +340,7 @@ function tapestryTool(config){
         root = id
         tapestry.resetNodeCache();
         resizeNodes(id);
-        addDepthToNodes(id, 0, []);
+        addDepthToNodes(id);
 
         dispatchEvent(new CustomEvent('change-selected-node', { detail: id }));
 
@@ -2368,28 +2377,33 @@ function tapestryTool(config){
 
     /* Add 'depth' parameter to each node recursively. 
         The depth is determined by the number of levels from the root each node is. */
-    function addDepthToNodes(id, depth, visited) {
+    function addDepthToNodes(id) {
 
         if (!tapestryDepth) {
             return;
         }
 
-        visited.push(id);
-
-        const node = tapestry.dataset.nodes[findNodeIndex(id)];
-        if (node) {
-            node.depth = depth;
+        for (let node of tapestry.dataset.nodes) {
+            node.depth = Number.POSITIVE_INFINITY;
         }
+        tapestry.dataset.nodes[findNodeIndex(id)].depth = 0;
 
-        const children = getChildren(id, 0);
-        children.forEach(child => {
-            if (visited.includes(child)) {
-                const childNode = tapestry.dataset.nodes[findNodeIndex(child)];
-                childNode.depth = Math.min(childNode.depth, depth);
-            } else {
-                addDepthToNodes(child, depth + 1, visited);
+        for (let i = 0; i < tapestry.dataset.nodes.length - 1; i++) {
+            let changed = false;
+            for (let link of tapestry.dataset.links) {
+                if (link.source.depth > link.target.depth + 1) {
+                    link.source.depth = link.target.depth + 1;
+                    changed = true;
+                }
+                if (link.target.depth > link.source.depth + 1) {
+                    link.target.depth = link.source.depth + 1;
+                    changed = true;
+                }
             }
-        })
+            if (!changed) {
+                break;
+            }
+        }
     }
     
     /* Return the distance between a node and its farthest descendant node */
@@ -2414,7 +2428,7 @@ function tapestryTool(config){
                     maxDepth = tapestry.dataset.nodes[findNodeIndex(id)].depth;
                 }
         });
-    
+
         return maxDepth;
     }
 
