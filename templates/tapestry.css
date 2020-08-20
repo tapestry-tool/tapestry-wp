@@ -16,6 +16,11 @@ body {
     z-index: 0;
 }
 
+body.admin-bar .modal[role="dialog"] {
+    top: 3em;
+    height: calc(100vh - 3em);
+}
+
 * {
     box-sizing: border-box;
 }
