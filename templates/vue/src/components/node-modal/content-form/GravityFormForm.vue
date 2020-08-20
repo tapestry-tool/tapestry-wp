@@ -2,7 +2,7 @@
   <b-form-group label="Gravity Form">
     <combobox
       v-model="node.typeData.mediaURL"
-      data-testid="combobox-gravity-form"
+      data-testid="node-gravity-form-id"
       item-text="title"
       item-value="id"
       empty-message="There are no Gravity Forms available. You need to first create a Gravity Form to use here."
