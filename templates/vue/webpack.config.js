@@ -37,7 +37,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: "babel-loader",
-        exclude: /node_modules(?!\/audio-recorder-polyfill)/,
+        exclude: /node_modules\/(?!(audio-recorder-polyfill|tiptap|tiptap-extensions|tiptap-commands|tiptap-utils|highlight.js)\/).*/,
       },
       {
         test: /\.(png|jpg|gif|svg|wav)$/,
