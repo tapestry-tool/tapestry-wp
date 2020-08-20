@@ -4,6 +4,8 @@ npm-debug.log
 yarn-error.log
 config.js
 cypress.json
+cypress/screenshots/
+cypress/videos/
 
 # Editor directories and files
 .DS_Store

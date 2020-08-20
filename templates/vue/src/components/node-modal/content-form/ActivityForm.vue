@@ -79,6 +79,7 @@
                 <b-col cols="12" md="4">
                   <b-form-checkbox
                     :checked="question.answers.audioId.length > 0"
+                    :data-testid="`question-answer-audio-${index}`"
                     switch
                     @input="question.answers.audioId = $event ? '1' : ''"
                   >
@@ -88,7 +89,7 @@
                 <b-col cols="12" md="4">
                   <b-form-group label="Textbox Gravity Form" class="mb-0">
                     <b-form-input
-                      v-if="!gavityFormExists"
+                      v-if="!gravityFormExists"
                       :disabled="true"
                       title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
                       value="Not Available"
@@ -96,7 +97,7 @@
                     <combobox
                       v-else
                       v-model="question.answers.textId"
-                      :data-testid="`question-answer-textbox-${index}`"
+                      :data-testid="`question-answer-text-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"
@@ -115,7 +116,7 @@
                 <b-col cols="12" md="4">
                   <b-form-group label="Checklist Gravity Form" class="mb-0">
                     <b-form-input
-                      v-if="!gavityFormExists"
+                      v-if="!gravityFormExists"
                       :disabled="true"
                       title="Gravity Forms plugin is not installed. You need to install Gravity Forms before being able to use it here."
                       value="Not Available"
@@ -123,6 +124,7 @@
                     <combobox
                       v-else
                       v-model="question.answers.checklistId"
+                      :data-testid="`question-answer-checklist-${index}`"
                       :options="formOptions"
                       item-text="title"
                       item-value="id"
@@ -204,7 +206,7 @@ export default {
   data() {
     return {
       canAddQuestion: Boolean(this.node.quiz && this.node.quiz.length),
-      gavityFormExists: false,
+      gravityFormExists: false,
       formOptions: [],
       h5pOptions: [],
       questions: this.node.quiz,
@@ -240,7 +242,7 @@ export default {
     },
   },
   async mounted() {
-    this.gavityFormExists = await GravityFormsApi.exists()
+    this.gravityFormExists = await GravityFormsApi.exists()
     this.formOptions = await GravityFormsApi.getAllForms()
   },
   methods: {
