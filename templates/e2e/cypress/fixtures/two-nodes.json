@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": 2244,
+      "author": {
+        "id": "1",
+        "name": "admin"
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "node",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "qwe",
+      "behaviour": "embed",
+      "typeData": {
+        "linkMetadata": null,
+        "progress": [
+          {
+            "group": "viewed",
+            "value": 0,
+            "extra": {
+              "nodeType": "root",
+              "unlocked": true
+            }
+          },
+          {
+            "group": "unviewed",
+            "value": 1,
+            "extra": {
+              "nodeType": "root",
+              "unlocked": true
+            }
+          }
+        ],
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "qwe"
+      },
+      "coordinates": {
+        "x": 2939.49951171875,
+        "y": 3116.346923828125
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ],
+        "copilot": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "fx": 2939.49951171875,
+      "fy": 3116.346923828125,
+      "completed": false,
+      "accordionProgress": [],
+      "mayUnlockNodes": [],
+      "permissionsOrder": [
+        "public",
+        "authenticated",
+        "contributor",
+        "subscriber",
+        "copilot"
+      ],
+      "index": 0,
+      "x": 2939.49951171875,
+      "y": 3116.346923828125,
+      "vy": 0,
+      "vx": 0,
+      "nodeType": "root",
+      "unlocked": true,
+      "depth": 0,
+      "accessible": true
+    },
+    {
+      "id": 2246,
+      "author": {
+        "id": "1",
+        "name": "admin"
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "qwe",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "qwe",
+      "behaviour": "embed",
+      "typeData": {
+        "linkMetadata": null,
+        "progress": [
+          {
+            "group": "viewed",
+            "value": 0,
+            "extra": {
+              "nodeType": "child",
+              "unlocked": true
+            }
+          },
+          {
+            "group": "unviewed",
+            "value": 1,
+            "extra": {
+              "nodeType": "child",
+              "unlocked": true
+            }
+          }
+        ],
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "qwe"
+      },
+      "coordinates": {
+        "x": 3500.967041015625,
+        "y": 3275.8583984375
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ],
+        "copilot": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "fx": 3500.967041015625,
+      "fy": 3275.8583984375,
+      "completed": false,
+      "accordionProgress": [],
+      "mayUnlockNodes": [],
+      "permissionsOrder": [
+        "public",
+        "authenticated",
+        "contributor",
+        "subscriber",
+        "copilot"
+      ],
+      "index": 1,
+      "x": 3500.967041015625,
+      "y": 3275.8583984375,
+      "vy": 0,
+      "vx": 0,
+      "nodeType": "child",
+      "unlocked": true,
+      "depth": 1,
+      "accessible": true
+    }
+  ],
+  "links": [
+    {
+      "source": 2244,
+      "target": 2246,
+      "value": 1,
+      "type": "",
+      "appearsAt": 0,
+      "index": 0
+    }
+  ],
+  "groups": []
+}
