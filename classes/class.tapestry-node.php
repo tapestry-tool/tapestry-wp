@@ -248,8 +248,18 @@ class TapestryNode implements ITapestryNode
                 case ConditionTypes::NODE_COMPLETED:
                     if ($userId && $userProgress->isCompleted($condition->nodeId, $userId)) {
                         $condition->fulfilled = true;
+                    } else {
+                        // If user is a co-pilot, also check the completion of node by teen
+                        $user = get_userdata($userId);
+                        if (in_array('copilot', $user->roles)) {
+                            $teenUserId = get_the_author_meta('teen_id', $userId);
+                            if ($teenUserId && $userProgress->isCompleted($condition->nodeId, $teenUserId)) {
+                                $condition->fulfilled = true;
+                            }
+                        }
                     }
                     break;
+
                 case ConditionTypes::DATE_NOT_PASSED:
                     if (new DateTime() <= new DateTime($condition->date.' '.$condition->time, new DateTimeZone($condition->timezone))) {
                         $condition->fulfilled = true;
