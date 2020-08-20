@@ -166,7 +166,6 @@ export default {
         return
       }
       this.applyDimensions()
-      thisTapestryTool.selectNode(Number(this.nodeId))
     },
   },
   mounted() {
@@ -176,13 +175,10 @@ export default {
     }
     this.isLoaded = true
     this.applyDimensions()
-    thisTapestryTool.selectNode(Number(this.nodeId))
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-    thisTapestryTool.disableMovements()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    thisTapestryTool.enableMovements()
   },
   methods: {
     ...mapActions(["completeNode"]),
@@ -190,7 +186,6 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      thisTapestryTool.enableMovements()
       this.$router.push("/")
     },
     handleLoad(dimensions) {
