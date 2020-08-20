@@ -19,6 +19,7 @@
               v-model="backgroundUrl"
               placeholder="Enter background URL"
               autofocus
+              @isUploading="isUploading"
             />
           </b-form-group>
           <b-form-group
@@ -97,8 +98,15 @@
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
-      <b-button size="sm" variant="primary" @click="updateSettings">
-        Save
+      <b-button
+        id="save-button"
+        size="sm"
+        variant="primary"
+        :disabled="fileUploading"
+        @click="updateSettings"
+      >
+        <b-spinner v-if="fileUploading"></b-spinner>
+        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
   </b-modal>
@@ -149,6 +157,7 @@ export default {
       userId: "",
       showAccess: true,
       defaultPermissions,
+      fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
       maxDepth: 0,
@@ -204,6 +213,9 @@ export default {
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
     },
+    isUploading(status) {
+      this.fileUploading = status
+    },
     exportTapestry() {
       this.isExporting = true
       const tapestry = this.tapestryJson
@@ -255,17 +267,31 @@ export default {
 
 #export-button {
   position: relative;
-
   > span {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
     left: 33%;
   }
-
   &.disabled {
     pointer-events: none;
     cursor: not-allowed;
+  }
+}
+
+#save-button {
+  position: relative;
+
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
   }
 }
 </style>

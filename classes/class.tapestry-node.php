@@ -38,6 +38,8 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
+    private $license;
+    private $references;
 
     /**
      * Constructor.
@@ -77,6 +79,8 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->license = '';
+        $this->references = '';
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -106,6 +110,9 @@ class TapestryNode implements ITapestryNode
     {
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
+        }
+        if (isset($node->author) && is_object($node->author)) {
+            $this->author = $node->author;
         }
         if (isset($node->size) && is_string($node->size)) {
             $this->size = $node->size;
@@ -173,18 +180,11 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
         }
-        // if (isset($node->author) && is_array($node->author)) {
-        //     $this->update_original_author($node);
-        //     $this->author = $node->author;
-        // }
-    }
-
-    // doesn't actually work ?
-    public function update_original_author($node) {
-        // update original author if needed
-        if ($node->author["original_author_name"]  == '') {
-            $this->author["original_author_name"] = $node->author["name"];
-            $this->author["original_author_email"] = $node->author["email"];
+        if (isset($node->license) && is_object($node->license)) {
+            $this->license = $node->license;
+        }
+        if (isset($node->references) && is_string($node->references)) {
+            $this->references = $node->references;
         }
     }
 
@@ -324,7 +324,7 @@ class TapestryNode implements ITapestryNode
             $nodePostId = $nodeMetadata->meta_value->post_id;
         }
 
-        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId);
+        $nodePostId = TapestryHelpers::updatePost($node, 'tapestry_node', $nodePostId, $node->author->id);
 
         $nodeMetadata = $this->_makeMetadata($node, $nodePostId);
 
@@ -348,7 +348,7 @@ class TapestryNode implements ITapestryNode
     {
         wp_update_post([
             'ID' => $this->nodePostId,
-            'post_author' => $this->author['id'],
+            'post_author' => $this->author->id,
         ]);
     }
 
@@ -407,6 +407,8 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'license' => $this->license,
+            'references' => $this->references,
         ];
     }
 
@@ -458,7 +460,7 @@ class TapestryNode implements ITapestryNode
         }
         $user = get_user_by('id', $id);
         if ($user) {
-            return [
+            return (object) [
                 'id' => $id,
                 'name' => $user->display_name,
                 'email' => $user->user_email,
