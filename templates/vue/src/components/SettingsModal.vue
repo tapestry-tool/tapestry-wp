@@ -4,6 +4,7 @@
     v-model="show"
     size="lg"
     title="Tapestry Settings"
+    scrollable
     body-class="p-0"
   >
     <b-container fluid class="px-0">
