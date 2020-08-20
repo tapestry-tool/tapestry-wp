@@ -125,17 +125,14 @@ export default {
     },
   },
   watch: {
-    isClosed: {
-      immediate: true,
-      handler(isClosed) {
-        const tapestryContainer = document.getElementById("app-container")
-        if (isClosed) {
-          tapestryContainer.classList.remove("sidebar-open")
-          this.active = null
-        } else {
-          tapestryContainer.classList.add("sidebar-open")
-        }
-      },
+    isClosed(isClosed) {
+      const tapestryContainer = document.getElementById("app-container")
+      if (isClosed) {
+        tapestryContainer.classList.remove("sidebar-open")
+        this.active = null
+      } else {
+        tapestryContainer.classList.add("sidebar-open")
+      }
     },
     selectedNodeId() {
       if (!this.isClosed) {
