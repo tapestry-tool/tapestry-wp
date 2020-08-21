@@ -211,6 +211,16 @@ function tapestryTool(config){
             return obj;
         }
 
+        const getUserType = node => {
+                const { permissions } = node
+                for (const [role, rolePermissions] of Object.entries(permissions)) {
+                    if (role !== 'copilot' && rolePermissions.length > 0) {
+                        return 'teen'
+                    }
+                }
+                return permissions.copilot.length > 0 ? 'copilot' : 'teen'
+        }
+
         this.dataset.nodes = this.dataset.nodes.map(node => {
             var updatedNode = fillEmptyFields(node, { 
                 accordionProgress: [], 
@@ -228,6 +238,9 @@ function tapestryTool(config){
             );
             updatedNode.permissionsOrder = reorderPermissions(updatedNode.permissions);
             updatedNode.tydeType = updatedNode.tydeType || "Regular";
+            if (wpData.wpTeenId) {
+                updatedNode.userType = getUserType(updatedNode) 
+            }
 
             const getDirectChildren = id => this.dataset.links
                 .filter(link => link.source == id)
