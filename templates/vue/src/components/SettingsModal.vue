@@ -1,5 +1,11 @@
 <template>
-  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
+  <b-modal
+    id="settings-modal"
+    size="lg"
+    title="Tapestry Settings"
+    scrollable
+    body-class="p-0"
+  >
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Appearance" active>
