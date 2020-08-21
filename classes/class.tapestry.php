@@ -400,7 +400,7 @@ class Tapestry implements ITapestry
 
         return $tapestry;
     }
-    
+
     private function _getDefaultSettings()
     {
         $post = get_post($this->postId);
@@ -415,6 +415,7 @@ class Tapestry implements ITapestry
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
+
         return $settings;
     }
 

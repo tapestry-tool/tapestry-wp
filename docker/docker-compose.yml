@@ -23,36 +23,6 @@ services:
     volumes:
      - ../../:/var/www/html/wp-content/plugins
     container_name: wp
-    
-  dev:
-    depends_on:
-      - db
-    build:
-      context: ../templates/vue
-      target: 'develop-stage'
-    restart: always
-    ports:
-      - '8080:8080'
-    volumes: 
-      - ../templates/vue:/app
-      - node_modules:/app/node_modules
-    command: npm run dev:container
-    container_name: app
-    
-  e2e:
-    image: "cypress/included:4.9.0"
-    shm_size: 2GB
-    depends_on: 
-      - dev
-      - wordpress
-    environment:
-      - CYPRESS_baseUrl=http://localhost:8000
-    network_mode: host
-    volumes: 
-      - ../templates/e2e:/e2e
-    working_dir: /e2e
-    container_name: e2e
-    entrypoint: tail -f /dev/null
 
 volumes:
     db_data:
