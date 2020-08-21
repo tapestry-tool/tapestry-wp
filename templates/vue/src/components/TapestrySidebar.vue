@@ -14,16 +14,13 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button
-        :class="['toggle-button', { closed: isClosed }]"
-        @click.stop="isClosed = !isClosed"
-      >
+      <button :class="['toggle-button', { closed: isClosed }]" @click.stop="toggle">
         <tapestry-icon v-if="isClosed" icon="chevron-left" />
         <tapestry-icon v-else icon="chevron-right" />
       </button>
       <button
         :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
-        @click.stop="isClosed = true"
+        @click.stop="toggle"
       >
         <tapestry-icon icon="times" />
       </button>
@@ -36,7 +33,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$root.$emit('edit-node', selectedNodeId)">
+          <b-button v-if="canEdit" @click="$root.$emit('edit-node', nodeId)">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -85,7 +82,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
@@ -99,15 +96,19 @@ export default {
   },
   data() {
     return {
-      isClosed: true,
       active: null,
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
-    ...mapState(["selectedNodeId"]),
+    isClosed() {
+      return !this.$route.matched.find(route => route.path === "/nodes/:nodeId/info")
+    },
+    nodeId() {
+      return parseInt(this.$route.params.nodeId, 10)
+    },
     node() {
-      return this.getNode(this.selectedNodeId)
+      return this.getNode(this.nodeId)
     },
     canEdit() {
       return (
@@ -134,7 +135,7 @@ export default {
         tapestryContainer.classList.add("sidebar-open")
       }
     },
-    selectedNodeId() {
+    nodeId() {
       if (!this.isClosed) {
         this.active = "info"
       }
@@ -161,7 +162,7 @@ export default {
     },
     scrollToRef(refName) {
       if (this.isClosed) {
-        this.isClosed = false
+        this.toggle()
       }
       this.$nextTick(() => {
         const el = this.$refs[refName]
@@ -170,7 +171,14 @@ export default {
       })
     },
     viewNode() {
-      this.$router.push(`/nodes/${this.selectedNodeId}`)
+      this.$router.push(`/nodes/${this.nodeId}/view`)
+    },
+    toggle() {
+      if (this.isClosed) {
+        this.$router.push(`${this.$route.path}/info`)
+      } else {
+        this.$router.go(-1)
+      }
     },
   },
 }

@@ -32,12 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["tapestryIsLoaded", "selectedNodeId"]),
-  },
-  watch: {
-    tapestryIsLoaded() {
-      this.$router.start()
-    },
+    ...mapState(["tapestryIsLoaded"]),
   },
   mounted() {
     this.$root.$on("add-node", to => {

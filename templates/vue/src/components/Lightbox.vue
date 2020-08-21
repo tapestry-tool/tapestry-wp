@@ -186,7 +186,7 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      this.$router.push("/")
+      this.$router.push(`/nodes/${this.nodeId}`)
     },
     handleLoad(dimensions) {
       if (dimensions) {

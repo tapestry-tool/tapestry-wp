@@ -278,7 +278,7 @@ export default {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push(`/nodes/${this.node.id}/view`)
     },
     editNode() {
       this.$root.$emit("edit-node", this.node.id)

@@ -32,7 +32,7 @@
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == selectedNodeId"
+            :root="id == root"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -90,6 +90,7 @@ export default {
       "tapestryIsLoaded",
       "selection",
       "settings",
+      "rootId",
     ]),
     background() {
       return this.settings.backgroundUrl
@@ -100,6 +101,9 @@ export default {
     empty() {
       return Object.keys(this.nodes).length === 0
     },
+    root() {
+      return this.$route.params.nodeId
+    },
   },
   watch: {
     background: {
@@ -108,6 +112,9 @@ export default {
         const app = this.$root.$el
         app.style.backgroundImage = background ? `url(${background})` : ""
       },
+    },
+    selectedNodeId(nodeId) {
+      this.$router.push(`/nodes/${nodeId}`)
     },
   },
   mounted() {
@@ -118,6 +125,14 @@ export default {
       this.init({ dataset, progress })
       this.loading = false
       this.$nextTick(this.initializeDragSelect)
+    })
+
+    this.$router.beforeEach((to, _, next) => {
+      if (to.matched.length === 0) {
+        next({ path: `/nodes/${this.rootId}`, replace: true })
+      } else {
+        next()
+      }
     })
   },
   beforeDestroy() {
