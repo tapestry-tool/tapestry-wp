@@ -42,6 +42,7 @@
           name="text-input"
           :placeholder="placeholder"
           :value="value"
+          :data-testid="inputTestId"
           :disabled="isUploading"
           required
           @input="$emit('input', $event)"
@@ -80,6 +81,11 @@ export default {
     value: {
       type: String,
       required: false,
+    },
+    inputTestId: {
+      type: String,
+      required: false,
+      default: "node-uploadInput",
     },
   },
   data() {
