@@ -69,6 +69,14 @@
             Export Tapestry
           </b-button>
           <duplicate-tapestry-button style="margin-top: 12px;" />
+          <b-form-group
+            label="Render images"
+            description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
+          >
+            <b-form-checkbox v-model="renderImages" switch>
+              {{ renderImages ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab title="Access">
           <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
@@ -145,6 +153,7 @@ export default {
       superuserOverridePermissions: true,
       defaultDepth: 3,
       maxDepth: 0,
+      renderImages: true,
     }
   },
   computed: {
@@ -173,6 +182,7 @@ export default {
         showAccess = true,
         superuserOverridePermissions = true,
         defaultDepth = 3,
+        renderImages = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -181,6 +191,7 @@ export default {
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
+      this.renderImages = renderImages
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -191,6 +202,7 @@ export default {
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
+        renderImages: this.renderImages,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()

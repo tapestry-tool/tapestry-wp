@@ -131,7 +131,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "visibleNodes"]),
+    ...mapState(["selection", "settings", "visibleNodes"]),
     ...mapGetters(["getNode", "getDirectChildren"]),
     icon() {
       if (!this.node.accessible) {
@@ -172,7 +172,10 @@ export default {
       return 140
     },
     fill() {
-      if (this.node.imageURL && this.node.nodeType !== "grandchild") {
+      const showImages = this.settings.hasOwnProperty("renderImages")
+        ? this.settings.renderImages
+        : true
+      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
         return `url(#node-image-${this.node.id})`
       }
       if (this.selected) {
