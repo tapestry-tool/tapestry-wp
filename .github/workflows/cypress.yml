@@ -27,7 +27,7 @@ jobs:
                 LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
               run: echo 'export const LINK_PREVIEW_API_KEY = "'$LINK_KEY'"' > config.js
             - name: Setup cypress.json
-              working-directory: templates/e2e
+              working-directory: templates/vue
               run: cp cypress-gha.json cypress.json
             - name: Launch containers
               run: docker-compose up -d
@@ -50,6 +50,10 @@ jobs:
               run: docker exec wp wp user create subscriber --allow-root sub@foo.com --role=subscriber --user_pass=subscriber
             - name: Set permalink structure
               run: docker exec wp wp rewrite structure %postname% --allow-root
-            - name: Run tests
-              run: docker exec e2e cypress run -b chrome --headless -s "cypress/integration/authoring/*"
-              working-directory: docker
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                start: npm start
+                # quote the url to be safe against YML parsing surprises
+                wait-on: 'http://localhost:8080'
+              working-directory: templates/vue
