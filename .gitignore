@@ -1,7 +1,6 @@
-package-lock.json
 .php_cs.cache
 .DS_Store
-docker/wp-config.php
+
 cypress/videos
 cypress/screenshots
 cypress.json

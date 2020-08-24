@@ -1,0 +1,11 @@
+{
+  "env": {
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "secret",
+    "SUBSCRIBER_USERNAME": "subscriber",
+    "SUBSCRIBER_PASSWORD": "subscriber"
+  },
+  "baseUrl": "http://localhost:8000",
+  "video": false
+}
+

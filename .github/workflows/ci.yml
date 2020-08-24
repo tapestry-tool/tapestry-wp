@@ -1,0 +1,36 @@
+name: Cypress
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Launch containers
+        run: docker-compose up -d
+      - name: Wait for containers to be ready
+        uses: jakejarvis/wait-action@master
+        with:
+          time: "10s"
+      - name: Setup WP
+        run: sh ./bin/install.sh
+      - name: Setup link preview config
+        working-directory: templates/vue
+        env:
+          LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
+        run: echo 'export const LINK_PREVIEW_API_KEY = "'$LINK_KEY'"' > config.js
+      - name: Setup cypress.json
+        working-directory: templates/vue
+        run: cp cypress.gha.json cypress.json
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          start: npm start
+          # quote the url to be safe against YML parsing surprises
+          wait-on: "http://localhost:8080"
+          working-directory: templates/vue
