@@ -1,0 +1,25 @@
+name: Cypress
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Launch containers
+        run: docker-compose up -d
+        working-directory: docker
+      - name: Setup WP
+        run: sh ./bin/install.sh
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          start: npm start
+          # quote the url to be safe against YML parsing surprises
+          wait-on: "http://localhost:8080"
+          working-directory: tapestry-plugin/templates/vue
