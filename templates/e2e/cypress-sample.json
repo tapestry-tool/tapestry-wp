@@ -1,6 +1,5 @@
 {
   "env": {
-    "ENV": "TYDE",
     "ADMIN_USERNAME": "admin_name",
     "ADMIN_PASSWORD": "admin_password",
     "SUBSCRIBER_USERNAME": "subscriber_name",

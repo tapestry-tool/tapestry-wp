@@ -16,7 +16,7 @@
         @mousedown.prevent="handleClick(option)"
       >
         <div class="combobox-item">
-          <slot :option="option">{{ option.toString() }}</slot>
+          <slot :option="option"></slot>
         </div>
       </button>
     </div>
@@ -49,7 +49,7 @@ export default {
       required: true,
     },
     value: {
-      type: [Object, String],
+      type: [Object, String, Number],
       required: false,
       default: null,
     },
@@ -180,15 +180,12 @@ export default {
 .combobox-item {
   display: flex;
   align-items: center;
+  font-weight: normal;
 
   code,
   p {
     margin: 0;
     padding: 0;
-  }
-
-  p {
-    font-weight: normal;
   }
 
   code {
