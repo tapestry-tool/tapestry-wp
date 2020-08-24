@@ -13,6 +13,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: Launch containers
         run: docker-compose up -d
+      - name: Wait for containers to be ready
+        uses: jakejarvis/wait-action@master
+        with:
+          time: "20s"
       - name: Setup WP
         run: sh ./bin/install.sh
       - name: Cypress run
