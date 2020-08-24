@@ -12,6 +12,6 @@ echo "- You can skip the pre-commit hook altogether by adding "
 echo "  the the --no-verify flag"
 echo "*******************************************************\n"
 
-php-cs-fixer fix . --rules=@Symfony
+php-cs-fixer fix ./tapestry-plugin --rules=@Symfony
 
 cd tapestry-plugin/templates/vue && node lint.js

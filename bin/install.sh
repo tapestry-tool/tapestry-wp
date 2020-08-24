@@ -8,6 +8,6 @@ wp plugin activate tapestry-wp h5p
 
 wp user create subscriber sub@foo.com --role=subscriber --user_pass=subscriber
 
-wp rewrite structure %postname%
+wp rewrite structure '/%postname%/'
 
 wp theme install twentynineteen --activate
