@@ -16,7 +16,7 @@ jobs:
       - name: Wait for containers to be ready
         uses: jakejarvis/wait-action@master
         with:
-          time: "20s"
+          time: "10s"
       - name: Setup WP
         run: sh ./bin/install.sh
       - name: Cypress run
