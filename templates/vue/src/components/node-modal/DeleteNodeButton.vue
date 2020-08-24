@@ -51,7 +51,7 @@ export default {
     removeNode() {
       this.updateSelectedNode(this.rootId)
       if (this.parent) {
-        this.deleteLink([this.parent.id, this.nodeId])
+        this.deleteLink({ source: this.parent.id, target: this.nodeId })
         this.updateNode({
           id: this.parent.id,
           newNode: {

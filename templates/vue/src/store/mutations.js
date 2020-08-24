@@ -111,6 +111,18 @@ export function setDataset(state, dataset) {
   })
 }
 
+export function updateDataset(state, { nodes, links }) {
+  nodes.additions.forEach(node => addNode(state, node))
+  nodes.deletions.forEach(node => {
+    if (node.id == state.selectedNodeId) {
+      state.selectedNodeId = state.rootId
+    }
+    deleteNode(state, node.id)
+  })
+  links.additions.forEach(link => addLink(state, link))
+  links.deletions.forEach(link => deleteLink(state, link))
+}
+
 export function updateSettings(state, newSettings) {
   state.settings = newSettings
 }
@@ -193,7 +205,10 @@ export function addLink(state, link) {
   state.links.push(link)
 }
 
-export function deleteLink(state, linkIndex) {
+export function deleteLink(state, { source, target }) {
+  const linkIndex = state.links.findIndex(
+    link => link.source === source && link.target === target
+  )
   state.links = state.links.filter((_, i) => i !== linkIndex)
 }
 
