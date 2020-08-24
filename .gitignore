@@ -5,3 +5,5 @@ docker/wp-config.php
 cypress/videos
 cypress/screenshots
 cypress.json
+
+data/
