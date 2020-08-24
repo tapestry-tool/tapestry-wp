@@ -14,4 +14,4 @@ echo "*******************************************************\n"
 
 php-cs-fixer fix . --rules=@Symfony
 
-cd templates/vue && node lint.js
+cd tapestry-plugin/templates/vue && node lint.js
