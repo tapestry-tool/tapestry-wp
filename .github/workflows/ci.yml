@@ -19,6 +19,9 @@ jobs:
           time: "10s"
       - name: Setup WP
         run: sh ./bin/install.sh
+      - name: Setup cypress.json
+        working-directory: tapestry-plugin/templates/vue
+        run: cp cypress.gha.json cypress.json
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:

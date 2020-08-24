@@ -1,0 +1,9 @@
+{
+  "baseUrl": "http://localhost:8000",
+  "env": {
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "secret",
+    "SUBSCRIBER_USERNAME": "subscriber",
+    "SUBSCRIBER_PASSWORD": "subscriber"
+  }
+}
