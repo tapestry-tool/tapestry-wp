@@ -141,6 +141,11 @@ export default {
         if (evt.key === "Escape") {
           this.clearSelection()
         }
+
+        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+          evt.preventDefault()
+          Object.values(this.nodes).forEach(node => this.select(node.id))
+        }
       })
 
       new DragSelect({
