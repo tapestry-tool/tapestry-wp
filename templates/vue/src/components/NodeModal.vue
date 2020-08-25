@@ -369,7 +369,7 @@ export default {
           newNode: this.node,
         })
       }
-      await this.updateLockedStatus(this.node.id)
+      await this.updateLockedStatus()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {

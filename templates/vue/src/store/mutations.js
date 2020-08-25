@@ -25,9 +25,6 @@ function applyLocalProgress(progress) {
         .forEach(nodeId => {
           const nodeProgress = userProgress[nodeId]
           const newProgress = progress[nodeId]
-          newProgress.completed = nodeProgress.completed
-          newProgress.unlocked = nodeProgress.unlocked
-          newProgress.accessible = nodeProgress.accessible
           newProgress.progress = nodeProgress.progress
         })
     }
