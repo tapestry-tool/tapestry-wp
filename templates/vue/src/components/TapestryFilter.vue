@@ -5,12 +5,11 @@
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
       <combobox
+        v-model="filterOption"
         class="filter-combobox"
         :options="comboboxFilterOptions"
-        :value="activeFilterOption"
         :input-style="inputStyles"
         size="sm"
-        @input="updateFilterOption"
       >
         <template v-slot="slotProps">
           <p class="filter-value">
@@ -19,14 +18,13 @@
         </template>
       </combobox>
       <combobox
+        v-model="filterValue"
         class="filter-combobox"
         item-text="name"
         item-value="id"
         :options="comboboxValueOptions"
-        :value="activeFilterValue"
         :input-style="inputStyles"
         size="sm"
-        @input="updateFilterValue"
       >
         <template v-slot="slotProps">
           <p class="filter-value">
@@ -56,6 +54,9 @@ export default {
   data() {
     return {
       allContributors: null,
+      isActive: false,
+      filterOption: "",
+      filterValue: "",
     }
   },
   computed: {
@@ -66,24 +67,14 @@ export default {
         width: "60%",
       }
     },
-    isActive() {
-      return this.$route.path.includes("filter")
-    },
     isFilterSelected() {
-      return this.activeFilterOption !== null
-    },
-    activeFilterOption() {
-      const query = this.$route.query
-      return query.by || null
+      return this.filterOption !== ""
     },
     comboboxFilterOptions() {
       return Object.values(filterOptions)
     },
-    activeFilterValue() {
-      return this.$route.query.q || null
-    },
     comboboxValueOptions() {
-      switch (this.activeFilterOption) {
+      switch (this.filterOption) {
         case filterOptions.AUTHOR: {
           return this.allContributors !== null
             ? Object.values(this.allContributors)
@@ -100,45 +91,22 @@ export default {
           return []
       }
     },
-    visibleNodes() {
-      if (this.isActive && this.activeFilterOption && this.activeFilterValue) {
-        switch (this.activeFilterOption) {
-          case filterOptions.AUTHOR: {
-            return Object.values(this.nodes)
-              .filter(node => node.author.id == this.activeFilterValue)
-              .map(node => node.id)
-          }
-          default:
-            break
-        }
-      }
-      return Object.keys(this.nodes)
-    },
   },
   watch: {
+    async filterValue(next) {
+      await this.refetchTapestryData(Number(next))
+      this.updateVisibleNodes(this.getVisibleNodes())
+    },
     isActive(isActive) {
       if (isActive) {
-        this.updateVisibleNodes(this.visibleNodes)
+        this.updateVisibleNodes([])
       } else {
         this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
       }
     },
-    visibleNodes(nodes) {
-      if (this.isActive) {
-        this.updateVisibleNodes(nodes)
-      }
-    },
-    async $route(to, from) {
-      if (from.query && from.query.q && from.query.q !== undefined) {
-        this.refetchTapestryData()
-      }
-      if (to.query && to.query.q && to.query.q !== undefined) {
-        this.refetchTapestryData(to.query.q)
-      }
-    },
   },
   async created() {
-    if (wpApiSettings && wpApiSettings.wpCanEditTapestry === "1") {
+    if (wpData.wpCanEditTapestry === "1") {
       const tapestryApi = new TapestryApi(wpPostId)
       this.allContributors = await tapestryApi.getAllContributors()
     }
@@ -147,21 +115,25 @@ export default {
     ...mapMutations(["updateVisibleNodes"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
-      this.isActive
-        ? this.$router.push(`/`)
-        : this.$router.push(`/filter?by=${this.comboboxFilterOptions[0]}`)
+      if (this.isActive) {
+        this.filterOption = ""
+        this.filterValue = ""
+      }
+      this.isActive = !this.isActive
     },
-    updateFilterOption(opt) {
-      this.$router.push({
-        query: { by: opt !== null ? opt : this.comboboxFilterOptions[0] },
-      })
-    },
-    updateFilterValue(val) {
-      const newQuery =
-        val !== null
-          ? { ...this.$route.query, q: val }
-          : { by: this.$route.query.by }
-      this.$router.push({ query: newQuery })
+    getVisibleNodes() {
+      if (this.isActive && this.filterOption && this.filterValue) {
+        switch (this.filterOption) {
+          case filterOptions.AUTHOR: {
+            return Object.values(this.nodes)
+              .filter(node => node.author.id == this.filterValue)
+              .map(node => node.id)
+          }
+          default:
+            break
+        }
+      }
+      return Object.keys(this.nodes).map(id => parseInt(id, 10))
     },
   },
 }

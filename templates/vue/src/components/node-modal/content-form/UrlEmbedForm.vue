@@ -3,8 +3,9 @@
     <b-form-group label="External Link">
       <file-upload
         v-model="node.typeData.mediaURL"
-        data-testid="node-linkUrl"
+        input-test-id="node-linkUrl"
         placeholder="Enter embed link (starting with http)"
+        @isUploading="handleUploadChange"
       />
     </b-form-group>
     <b-form-group label="Behaviour">
@@ -34,6 +35,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }
