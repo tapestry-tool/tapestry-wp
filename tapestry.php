@@ -112,7 +112,7 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
  */
 
 add_action('wp_enqueue_scripts', 'tapestry_enqueue_libraries');
-add_action('wp_enqueue_scripts', 'tapestry_enqueue_tapestry_js');
+// add_action('wp_enqueue_scripts', 'tapestry_enqueue_tapestry_js');
 add_action('wp_enqueue_scripts', 'tapestry_enqueue_vue_app');
 add_filter('style_loader_tag', 'tapestry_add_style_attributes', 10, 2);
 
@@ -196,6 +196,8 @@ function tapestry_enqueue_vue_app()
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),
                 'roles' => $wp_roles->get_names(),
+                'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
+                'currentUser' => wp_get_current_user(),
             ]
         );
 

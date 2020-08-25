@@ -22,19 +22,6 @@ body.admin-bar .modal[role="dialog"] {
     box-sizing: border-box;
 }
 
-#tapestry {
-    transform: scale(1);
-    transform-origin: top left;
-    transition: all 0.2s ease-out;
-}
-
-@media screen and (min-width: 500px) {
-    #tapestry.sidebar-open {
-        transform: scale(0.7);
-    }
-}
-
-
 #header {
     position: fixed;
     top: 1em;
@@ -296,10 +283,6 @@ body.admin-bar .modal[role="dialog"] {
 
 .node:hover .imageOverlay:not(.locked) {
     opacity: 0;
-}
-
-.node:hover text {
-    display: none;
 }
 
 .links line {
