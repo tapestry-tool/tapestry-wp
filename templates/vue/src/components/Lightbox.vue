@@ -161,19 +161,15 @@ export default {
     },
     nodeId() {
       this.applyDimensions()
-      thisTapestryTool.selectNode(Number(this.nodeId))
     },
   },
   mounted() {
     this.isLoaded = true
     this.applyDimensions()
-    thisTapestryTool.selectNode(Number(this.nodeId))
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-    thisTapestryTool.disableMovements()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    thisTapestryTool.enableMovements()
   },
   methods: {
     ...mapActions(["completeNode"]),

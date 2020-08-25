@@ -1,31 +1,28 @@
 <template>
   <div id="app">
-    <tapestry @add-root="addRootNode" />
+    <tapestry-app />
     <router-view v-if="tapestryIsLoaded"></router-view>
-    <tapestry-filter v-if="tapestryIsLoaded" />
+    <tapestry-sidebar v-if="tapestryIsLoaded" />
     <node-modal
-      v-if="tapestryIsLoaded"
       :node-id="nodeId"
       :modal-type="modalType"
       @cancel="closeModal"
+      @submit="closeModal"
     />
-    <tapestry-sidebar v-if="tapestryIsLoaded" @edit="editNode" />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import Tapestry from "./components/Tapestry"
-import TapestryFilter from "./components/TapestryFilter"
-import NodeModal from "@/components/NodeModal"
-import TapestrySidebar from "@/components/TapestrySidebar"
+import NodeModal from "./components/NodeModal"
+import TapestryApp from "./components/TapestryApp"
+import TapestrySidebar from "./components/TapestrySidebar"
 
 export default {
   name: "app",
   components: {
     NodeModal,
-    Tapestry,
-    TapestryFilter,
+    TapestryApp,
     TapestrySidebar,
   },
   data() {
@@ -38,25 +35,21 @@ export default {
     ...mapState(["tapestryIsLoaded", "selectedNodeId"]),
   },
   mounted() {
-    window.addEventListener("add-new-node", this.addNewNode)
-    window.addEventListener("edit-node", this.editNode)
+    this.$root.$on("add-node", to => {
+      this.modalType = "add"
+      this.nodeId = to
+      this.$bvModal.show("node-modal")
+    })
+
+    this.$root.$on("edit-node", nodeId => {
+      this.modalType = "edit"
+      this.nodeId = nodeId
+      this.$bvModal.show("node-modal")
+    })
   },
   methods: {
-    addRootNode() {
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
-    },
-    addNewNode() {
-      this.modalType = "add"
-      this.nodeId = this.selectedNodeId
-      this.$bvModal.show("node-modal")
-    },
-    editNode() {
-      this.modalType = "edit"
-      this.nodeId = this.selectedNodeId
-      this.$bvModal.show("node-modal")
-    },
     closeModal() {
+      this.$bvModal.hide("node-modal")
       this.modalType = ""
     },
   },
