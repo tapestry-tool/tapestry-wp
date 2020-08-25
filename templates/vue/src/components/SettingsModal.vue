@@ -47,7 +47,7 @@
               You will need to refresh the page to see this change applied.
             </p>
           </b-form-group>
-          <b-form-group v-if="tapestryIsLoaded" label="Default Depth" class="mb-0">
+          <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
@@ -175,7 +175,7 @@ export default {
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
+    ...mapState(["settings", "rootId"]),
   },
   created() {
     if (this.settings.defaultPermissions) {

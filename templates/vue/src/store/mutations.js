@@ -12,7 +12,6 @@ export function init(state, { dataset, progress = {} }) {
     .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(state, n.id))
   state.visibleNodes = Object.keys(state.nodes).map(id => parseInt(id, 10))
-  state.tapestryIsLoaded = true
 }
 
 function applyLocalProgress(progress) {
