@@ -406,8 +406,13 @@ export default {
     transform: translate(-50%, -50%);
   }
 
+  > .fas.fa-play {
+    left: 55%;
+  }
+
   span {
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bolder;
   }
 
   &-wrapper {

@@ -7,8 +7,8 @@
       min="1"
       :max="maxDepth"
     />
-    <p v-if="currentDepth < maxDepth" class="warning-text">
-      Some nodes might be hidden because you're not at max depth.
+    <p v-if="currentDepth < maxDepth" class="warning-text alert p-2 small">
+      Some nodes might be hidden because you're not at maximum depth.
     </p>
   </div>
 </template>
@@ -225,6 +225,10 @@ export default {
 .warning-text {
   position: absolute;
   width: 100%;
-  top: calc(100% + 12px);
+  top: calc(100% - 1px);
+  box-shadow: 0 7px 7px 0 #ddd;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  background-color: #fbfbfb;
 }
 </style>

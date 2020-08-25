@@ -65,12 +65,25 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button block variant="light" @click="exportTapestry">
-            Export Tapestry
-          </b-button>
-          <duplicate-tapestry-button style="margin-top: 12px;" />
           <b-form-group
-            label="Render images"
+            label="Export/Duplicate"
+            description="Export your tapestry to a file and then you can import it on another site. 
+              Duplicating will create a copy of this tapestry on this site."
+          >
+            <b-row class="mb-2">
+              <b-col>
+                <b-button block variant="light" @click="exportTapestry">
+                  Export Tapestry
+                </b-button>
+              </b-col>
+              <b-col>
+                <duplicate-tapestry-button />
+              </b-col>
+            </b-row>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
           >
             <b-form-checkbox v-model="renderImages" switch>
@@ -79,8 +92,12 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Access">
-          <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
-          <permissions-table v-model="defaultPermissions" />
+          <b-form-group
+            label="Default Permissions For New Nodes"
+            description="Newly created nodes in this tapestry will have these permissions by default."
+          >
+            <permissions-table v-model="defaultPermissions" />
+          </b-form-group>
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
