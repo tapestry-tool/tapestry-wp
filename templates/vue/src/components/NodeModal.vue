@@ -416,9 +416,6 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
