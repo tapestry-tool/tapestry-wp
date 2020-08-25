@@ -58,11 +58,9 @@ import TapestryDepthSlider from "@/components/TapestryDepthSlider"
 import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
-import TapestryApi from "@/services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
-
-const client = new TapestryApi(wpPostId)
 
 export default {
   components: {
