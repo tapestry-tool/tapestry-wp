@@ -119,7 +119,7 @@ class TapestryHelpers
      *
      * @return Number $postId
      */
-    public static function updatePost($post, $postType = 'tapestry', $postId = 0)
+    public static function updatePost($post, $postType = 'tapestry', $postId = 0, $author = 0)
     {
         switch ($postType) {
             case self::POST_TYPES['TAPESTRY_NODE']:
@@ -134,8 +134,13 @@ class TapestryHelpers
                 break;
         }
 
+        if (!$author) {
+            $author = wp_get_current_user()->ID;
+        }
+
         return wp_insert_post([
             'ID' => $postId,
+            'post_author' => $author,
             'post_type' => $postType,
             'post_status' => $postStatus,
             'post_title' => $postTitle,
