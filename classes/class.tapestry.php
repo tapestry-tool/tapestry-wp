@@ -335,6 +335,9 @@ class Tapestry implements ITapestry
 
     private function _recursivelySetAccessible($node, $visited, $nodeList)
     {
+        if (!isset($node)) {
+            return;
+        }
         if (!in_array($node, $visited)) {
             array_push($visited, $node);
         }
