@@ -45,7 +45,28 @@ function parseDataset(dataset) {
       node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
     }
   }
+
+  for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
+    const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
+    accordionRowIds.forEach(accordionRowId => {
+      const accordionRow = getNode(dataset, accordionRowId)
+      accordionRow.presentationStyle = "accordion-row"
+      const subRows = getChildIds({ links: dataset.links }, accordionRowId)
+      if (subRows.length) {
+        accordionRow.isSubAccordion = true
+      }
+      subRows.forEach(id => {
+        const subRow = getNode(dataset, id)
+        subRow.presentationStyle = "accordion-row"
+      })
+    })
+  }
+
   return dataset
+}
+
+function getNode(dataset, nodeId) {
+  return dataset.nodes.find(node => node.id == nodeId)
 }
 
 function setDatasetProgress(dataset, progress) {
