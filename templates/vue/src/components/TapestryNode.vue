@@ -51,7 +51,11 @@
             :x="node.coordinates.x - 30"
             :y="node.coordinates.y - radius - 30"
           >
-            <button class="node-button" @click="openNode">
+            <button
+              class="node-button"
+              :disabled="!node.accessible && !hasPermission('edit')"
+              @click="handleRequestOpen"
+            >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
                 :icon="icon"
@@ -128,9 +132,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "visibleNodes"]),
+    ...mapState(["selection", "settings", "visibleNodes"]),
     ...mapGetters(["getNode", "getDirectChildren"]),
     icon() {
+      if (!this.node.accessible) {
+        return "lock"
+      }
       switch (this.node.mediaType) {
         case "h5p":
         case "video":
@@ -166,7 +173,10 @@ export default {
       return 140
     },
     fill() {
-      if (this.node.imageURL && this.node.nodeType !== "grandchild") {
+      const showImages = this.settings.hasOwnProperty("renderImages")
+        ? this.settings.renderImages
+        : true
+      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
         return `url(#node-image-${this.node.id})`
       }
       if (this.selected) {
@@ -296,6 +306,11 @@ export default {
 
       return hours + ":" + minutes + ":" + sec
     },
+    handleRequestOpen() {
+      if (this.node.accessible || this.hasPermission("edit")) {
+        this.openNode()
+      }
+    },
     handleMouseover() {
       // Move node to end of svg document so it appears on top
       const node = this.$refs.node
@@ -397,8 +412,13 @@ export default {
     transform: translate(-50%, -50%);
   }
 
+  > .fas.fa-play {
+    left: 55%;
+  }
+
   span {
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bolder;
   }
 
   &-wrapper {

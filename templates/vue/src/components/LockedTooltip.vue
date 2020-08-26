@@ -3,30 +3,27 @@
     <foreignObject :width="width" :height="height" :x="x" :y="y">
       <div class="tapestry-tooltip" :style="flexPosition">
         <div class="tapestry-tooltip-content">
-          This node will be unlocked:
-          <br />
-          <ul>
-            <li
-              v-if="
-                (node.conditions.length === 0 ||
-                  node.conditions.every(cond => cond.fulfilled)) &&
-                  parent
-              "
-            >
-              When {{ parent.title }} is unlocked.
-            </li>
-            <li v-for="(cond, index) in conditions" :key="index">
-              <span v-if="cond.type === conditionTypes.NODE_COMPLETED">
-                When {{ cond.node.title }} is completed.
-              </span>
-              <span v-if="cond.type === conditionTypes.DATE_PASSED">
-                After {{ formatDate(cond) }}.
-              </span>
-              <span v-if="cond.type === conditionTypes.DATE_NOT_PASSED">
-                Until {{ formatDate(cond) }}.
-              </span>
-            </li>
-          </ul>
+          <span v-if="isLoggedIn || !hasCompleteCondition">
+            This node will be unlocked:
+            <br />
+            <ul>
+              <li v-if="isParentLocked">When {{ parent.title }} is unlocked.</li>
+              <li v-for="(cond, index) in conditions" :key="index">
+                <span v-if="cond.type === conditionTypes.NODE_COMPLETED">
+                  When {{ cond.node.title }} is completed.
+                </span>
+                <span v-if="cond.type === conditionTypes.DATE_PASSED">
+                  After {{ formatDate(cond) }}.
+                </span>
+                <span v-if="cond.type === conditionTypes.DATE_NOT_PASSED">
+                  Until {{ formatDate(cond) }}.
+                </span>
+              </li>
+            </ul>
+          </span>
+          <span v-else>
+            Please login to unlock this node.
+          </span>
         </div>
       </div>
     </foreignObject>
@@ -117,11 +114,26 @@ export default {
     onBottom() {
       return (
         this.node.coordinates.y - this.startY < this.height ||
-        this.node.coordinates.y - this.startY - this.height <= $(window).scrollTop()
+        this.node.coordinates.y - this.startY - this.height <= window.scrollTop
       )
     },
     flexPosition() {
       return this.onBottom ? "align-items: flex-start;" : "align-items: flex-end;"
+    },
+    hasCompleteCondition() {
+      return this.conditions.find(
+        cond => cond.type === conditionTypes.NODE_COMPLETED
+      )
+    },
+    isParentLocked() {
+      return (
+        (this.node.conditions.length === 0 ||
+          this.node.conditions.every(cond => cond.fulfilled)) &&
+        this.parent
+      )
+    },
+    isLoggedIn() {
+      return Boolean(wpData.wpUserId)
     },
   },
   methods: {

@@ -58,7 +58,7 @@ export default {
         author_email: data.user_email,
       })
       this.$emit("submit")
-    }
+    },
   },
 }
 </script>

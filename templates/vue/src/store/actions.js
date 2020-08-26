@@ -64,10 +64,25 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
   return id
 }
 
-export async function updateLockedStatus({ commit }, id) {
-  const nodeProgress = await client.getNodeProgress(id)
-  const { accessible, unlocked } = nodeProgress
-  commit("updateNode", { id, newNode: { accessible, unlocked } })
+export async function updateLockedStatus({ commit, getters }) {
+  const userProgress = await client.getUserProgress()
+  for (const [nodeId, progress] of Object.entries(userProgress)) {
+    const node = getters.getNode(nodeId)
+    if (node) {
+      const { accessible, unlocked } = progress
+      if (
+        Helpers.isDifferent(
+          {
+            accessible: node.accessible,
+            unlocked: node.unlocked,
+          },
+          { accessible, unlocked }
+        )
+      ) {
+        commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
+      }
+    }
+  }
 }
 
 export async function updateNodeProgress({ commit }, payload) {
@@ -180,12 +195,12 @@ export async function addLink({ commit }, newLink) {
   commit("addLink", newLink)
 }
 
-export async function deleteLink({ state, commit }, [source, target]) {
+export async function deleteLink({ state, commit }, { source, target }) {
   const linkIndex = state.links.findIndex(
     link => link.source === source && link.target === target
   )
   await client.deleteLink(linkIndex)
-  commit("deleteLink", linkIndex)
+  commit("deleteLink", { source, target })
 }
 
 // favourites
@@ -202,19 +217,27 @@ export async function updateUserFavourites({ commit }, favourites) {
   commit("updateFavourites", { favourites })
 }
 
-export async function refetchTapestryData(_, filterUserId = null) {
+export async function refetchTapestryData({ commit, state }, filterUserId = null) {
   const query = filterUserId === null ? {} : { filterUserId: filterUserId }
   const tapestry = await client.getTapestry(query)
-  tapestry.nodes.map(n => {
-    if (tapestry.settings.autoLayout) {
-      delete n.fx
-      delete n.fy
-    } else {
-      n.fx = n.coordinates.x
-      n.fy = n.coordinates.y
-    }
-  })
-  thisTapestryTool.setDataset(tapestry)
-  thisTapestryTool.setOriginalDataset(tapestry)
-  thisTapestryTool.reinitialize()
+  const { nodes, links } = state
+
+  const nodeIds = new Set(Object.values(nodes).map(node => node.id))
+  const newNodeIds = new Set(tapestry.nodes.map(node => node.id))
+
+  const nodeDiff = {
+    additions: tapestry.nodes.filter(node => !nodeIds.has(node.id)),
+    deletions: Object.values(nodes).filter(node => !newNodeIds.has(node.id)),
+  }
+
+  const getLinkId = link => `${link.source}-${link.target}`
+  const currentLinks = new Set(links.map(getLinkId))
+  const newLinks = new Set(tapestry.links.map(getLinkId))
+
+  const linkDiff = {
+    additions: tapestry.links.filter(link => !currentLinks.has(getLinkId(link))),
+    deletions: links.filter(link => !newLinks.has(getLinkId(link))),
+  }
+
+  commit("updateDataset", { nodes: nodeDiff, links: linkDiff })
 }

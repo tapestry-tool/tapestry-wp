@@ -73,6 +73,9 @@
             </slick-list>
           </div>
         </b-tab>
+        <b-tab title="More Information">
+          <more-information-form :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <b-container v-else class="spinner">
@@ -103,10 +106,13 @@
             id="draft-button"
             size="sm"
             variant="secondary"
-            :disabled="!canMakeDraft"
+            :disabled="!canMakeDraft || !canSubmit"
             @click="handleDraftSubmit"
           >
-            Save as Private Draft
+            <b-spinner v-if="!canSubmit"></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">
+              Save as Private Draft
+            </div>
           </b-button>
           <b-button
             v-if="canPublish"
@@ -115,16 +121,21 @@
             variant="primary"
             @click="handleSubmit"
           >
-            Publish
+            <b-spinner v-if="!canSubmit"></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
           </b-button>
           <b-button
             v-else
             size="sm"
             variant="primary"
+            :disabled="!canMakeDraft || !canSubmit"
             @click="handleSubmitForReview"
           >
-            {{ node.status !== "publish" ? "Re-submit" : "Submit" }} to
-            Administrators for Review
+            <b-spinner v-if="!canSubmit"></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">
+              {{ node.status !== "publish" ? "Re-submit" : "Submit" }} to
+              Administrators for Review
+            </div>
           </b-button>
           <b-form-invalid-feedback :state="canMakeDraft">
             {{ warningText }}
@@ -166,6 +177,7 @@ import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
+import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
@@ -189,6 +201,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    MoreInformationForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -216,6 +229,8 @@ export default {
       formErrors: [],
       maxDescriptionLength: 250,
       node: null,
+      videoLoaded: false,
+      fileUploading: false,
       loadDuration: false,
       warningText: "",
     }
@@ -280,11 +295,17 @@ export default {
     tapestryEditor() {
       return wpData.wpCanEditTapestry == 1
     },
+    canSubmit() {
+      return !this.fileUploading
+    },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
@@ -326,6 +347,7 @@ export default {
     },
     close() {
       this.$bvModal.hide("node-modal")
+      this.$emit("cancel")
     },
     async handleSubmit() {
       this.formErrors = this.validateNode()
@@ -388,7 +410,7 @@ export default {
           newNode: this.node,
         })
       }
-      await this.updateLockedStatus(this.node.id)
+      await this.updateLockedStatus()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {

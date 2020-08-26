@@ -36,13 +36,8 @@ module.exports = {
   },
   globals: {
     adminAjaxUrl: "readonly",
-    wpApiSettings: "readonly",
     wpData: "readonly",
     wpPostId: "readonly",
     apiUrl: "readonly",
-    thisTapestryTool: "readonly",
-  },
-  env: {
-    jquery: true,
   },
 }
