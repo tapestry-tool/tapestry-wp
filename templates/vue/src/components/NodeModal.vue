@@ -100,7 +100,7 @@
         :disabled="!canSubmit"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit"></b-spinner>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
         <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
@@ -413,9 +413,6 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
-        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
-        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
@@ -612,6 +609,16 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#submit-button {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div {
+    margin-right: 4px;
+  }
 }
 
 #node-modal-container {

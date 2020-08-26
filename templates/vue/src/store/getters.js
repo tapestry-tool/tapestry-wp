@@ -1,3 +1,5 @@
+import Helpers from "@/utils/Helpers"
+
 export function getDirectChildren(state) {
   return id => {
     const links = state.links
@@ -28,8 +30,32 @@ export function isAccordion(_, { getNode, getParent }) {
     if (node.mediaType === "accordion") {
       return true
     }
-    const parent = getParent(node)
-    return parent ? parent.mediaType === "accordion" : false
+    const parent = getParent(node.id)
+    if (parent) {
+      const parentNode = getNode(parent)
+      return parentNode.mediaType === "accordion"
+    }
+    return false
+  }
+}
+
+export function isAccordionRow(_, { getParent, isAccordion }) {
+  return id => {
+    const parent = getParent(id)
+    return parent ? isAccordion(parent) : false
+  }
+}
+
+export function isVisible(_, { getNode, isAccordionRow }) {
+  return id => {
+    const node = getNode(id)
+    if (node.nodeType === "") {
+      return false
+    }
+    if (!Helpers.hasPermission(node, "edit")) {
+      return !isAccordionRow(node.id)
+    }
+    return true
   }
 }
 

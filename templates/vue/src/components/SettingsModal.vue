@@ -47,7 +47,7 @@
               You will need to refresh the page to see this change applied.
             </p>
           </b-form-group>
-          <b-form-group v-if="tapestryIsLoaded" label="Default Depth" class="mb-0">
+          <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
@@ -65,14 +65,39 @@
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button block variant="light" @click="exportTapestry">
-            Export Tapestry
-          </b-button>
-          <duplicate-tapestry-button style="margin-top: 12px;" />
+          <b-form-group
+            label="Export/Duplicate"
+            description="Export your tapestry to a file and then you can import it on another site. 
+              Duplicating will create a copy of this tapestry on this site."
+          >
+            <b-row class="mb-2">
+              <b-col>
+                <b-button block variant="light" @click="exportTapestry">
+                  Export Tapestry
+                </b-button>
+              </b-col>
+              <b-col>
+                <duplicate-tapestry-button />
+              </b-col>
+            </b-row>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Show thumbnails"
+            description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
+          >
+            <b-form-checkbox v-model="renderImages" switch>
+              {{ renderImages ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab title="Access">
-          <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
-          <permissions-table v-model="defaultPermissions" />
+          <b-form-group
+            label="Default Permissions For New Nodes"
+            description="Newly created nodes in this tapestry will have these permissions by default."
+          >
+            <permissions-table v-model="defaultPermissions" />
+          </b-form-group>
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
@@ -145,11 +170,12 @@ export default {
       superuserOverridePermissions: true,
       defaultDepth: 3,
       maxDepth: 0,
+      renderImages: true,
     }
   },
   computed: {
-    ...mapGetters(["settings", "tapestryJson"]),
-    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
+    ...mapGetters(["tapestryJson"]),
+    ...mapState(["settings", "rootId"]),
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -173,6 +199,7 @@ export default {
         showAccess = true,
         superuserOverridePermissions = true,
         defaultDepth = 3,
+        renderImages = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -181,6 +208,7 @@ export default {
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
+      this.renderImages = renderImages
     },
     async updateSettings() {
       this.close()
@@ -192,6 +220,7 @@ export default {
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
+        renderImages: this.renderImages,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()

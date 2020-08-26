@@ -1,6 +1,5 @@
 <template>
   <tapestry-modal
-    v-if="tapestryIsLoaded && node !== undefined"
     id="lightbox"
     :class="{
       'full-screen': node.fullscreen,
@@ -63,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "tapestryIsLoaded"]),
+    ...mapState(["h5pSettings"]),
     ...mapGetters(["getNode"]),
     node() {
       const node = this.getNode(this.nodeId)
@@ -157,9 +156,6 @@ export default {
     },
   },
   watch: {
-    tapestryIsLoaded() {
-      this.applyDimensions()
-    },
     nodeId() {
       if (this.node === undefined) {
         this.close()

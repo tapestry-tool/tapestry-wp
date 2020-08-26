@@ -29,9 +29,7 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
-
-const client = new TapestryApi(wpPostId)
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "root-node-button",
