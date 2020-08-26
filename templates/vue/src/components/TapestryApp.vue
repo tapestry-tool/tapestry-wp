@@ -100,7 +100,8 @@ export default {
       },
     },
     selectedNodeId(nodeId) {
-      this.$router.push(`/nodes/${nodeId}`)
+      const trail = this.$route.path.split(this.$route.params.nodeId)[1] || ""
+      this.$router.push(`/nodes/${nodeId}${trail}`)
     },
   },
   mounted() {

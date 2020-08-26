@@ -177,7 +177,8 @@ export default {
       if (this.isClosed) {
         this.$router.push(`${this.$route.path}/info`)
       } else {
-        this.$router.go(-1)
+        const path = this.$route.path.split("/info")[0]
+        this.$router.push(path)
       }
     },
   },
