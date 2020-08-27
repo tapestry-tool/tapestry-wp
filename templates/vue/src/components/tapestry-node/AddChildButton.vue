@@ -129,7 +129,10 @@ export default {
   methods: {
     ...mapActions(["addLink"]),
     addNode() {
-      this.$root.$emit("add-node", this.node.id)
+      this.$router.push({
+        name: "modal",
+        params: { nodeId: this.node.id, type: "add", tab: "content" },
+      })
     },
   },
 }

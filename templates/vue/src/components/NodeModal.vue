@@ -1,13 +1,12 @@
 <template>
   <b-modal
     id="node-modal"
-    v-model="showModal"
+    :visible="show"
     :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
-    @hidden="close"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -17,8 +16,12 @@
       </b-alert>
     </div>
     <b-container v-if="ready" fluid class="px-0">
-      <b-tabs card :value="currentTabIndex" @activate-tab="handleTabChange">
-        <b-tab title="Content">
+      <b-tabs card>
+        <b-tab
+          title="Content"
+          :active="tab === 'content'"
+          @click="changeTab('content')"
+        >
           <content-form
             :node="node"
             @load="videoLoaded = true"
@@ -26,7 +29,11 @@
             @type-changed="handleTypeChange"
           />
         </b-tab>
-        <b-tab title="Appearance">
+        <b-tab
+          title="Appearance"
+          :active="tab === 'appearance'"
+          @click="changeTab('appearance')"
+        >
           <appearance-form :node="node" />
         </b-tab>
         <b-tab
@@ -35,11 +42,18 @@
               node.mediaType === 'video' ||
               node.mediaType === 'accordion'
           "
+          :active="tab === 'behaviour'"
           title="Behaviour"
+          @click="changeTab('behaviour')"
         >
           <behaviour-form :node="node" />
         </b-tab>
-        <b-tab v-if="viewAccess" title="Access">
+        <b-tab
+          v-if="viewAccess"
+          title="Access"
+          :active="tab === 'access'"
+          @click="changeTab('access')"
+        >
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
           <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
@@ -48,12 +62,16 @@
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Activity"
+          :active="tab === 'activity'"
+          @click="changeTab('activity')"
         >
           <activity-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
           title="Ordering"
+          :active="tab === 'ordering'"
+          @click="changeTab('ordering')"
         >
           <div>
             <slick-list
@@ -75,7 +93,11 @@
             </slick-list>
           </div>
         </b-tab>
-        <b-tab title="More Information">
+        <b-tab
+          title="More Information"
+          :active="tab === 'more-information'"
+          @click="changeTab('more-information')"
+        >
           <more-information-form :node="node" />
         </b-tab>
       </b-tabs>
@@ -85,7 +107,7 @@
     </b-container>
     <template slot="modal-footer">
       <delete-node-button
-        v-if="modalType === 'edit'"
+        v-if="type === 'edit'"
         :node-id="nodeId"
         @submit="close"
       ></delete-node-button>
@@ -97,11 +119,11 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="!canSubmit"
+        :disabled="fileUploading"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
+        <b-spinner v-if="fileUploading" small></b-spinner>
+        <div :style="fileUploading ? 'opacity: 50%;' : ''">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -168,12 +190,27 @@ export default {
     DeleteNodeButton,
   },
   props: {
-    modalType: {
-      type: String,
+    show: {
+      type: Boolean,
       required: true,
+    },
+    type: {
+      type: String,
+      required: false,
+      default: "",
       validator: value => {
         return ["", "add", "edit"].includes(value)
       },
+    },
+    nodeId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    tab: {
+      type: String,
+      required: false,
+      default: "",
     },
   },
   data() {
@@ -197,8 +234,8 @@ export default {
     ]),
     ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
-      if (this.modalType === "add") {
-        const parent = this.getNode(this.currentNodeId)
+      if (this.type === "add") {
+        const parent = this.getNode(this.nodeId)
         if (parent) {
           return parent
         }
@@ -207,11 +244,11 @@ export default {
       return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return this.parent
           ? `Add new sub-topic to ${this.parent.title}`
           : "Add root node"
-      } else if (this.modalType === "edit") {
+      } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
       return ""
@@ -227,34 +264,50 @@ export default {
       return !this.fileUploading
     },
   },
-  created() {
-    this.node = this.createDefaultNode()
+  watch: {
+    nodeId: {
+      immediate: true,
+      handler(nodeId) {
+        if (this.show) {
+          let copy = this.createDefaultNode()
+          if (this.type === "edit") {
+            const node = this.getNode(nodeId)
+            copy = Helpers.deepCopy(node)
+          }
+          copy.hasSubAccordion = this.hasSubAccordion(copy)
+          this.node = copy
+          this.ready = true
+        }
+      },
+    },
+    show: {
+      immediate: true,
+      handler(show) {
+        if (show) {
+          this.formErrors = ""
+        } else {
+          this.ready = false
+        }
+      },
+    },
+    tab: {
+      immediate: true,
+      handler(tab) {
+        if (this.show) {
+          const isTabValid = this.validateTab(tab)
+          if (!isTabValid) {
+            this.$router.replace({
+              name: "modal",
+              params: { nodeId: this.nodeId, type: this.type, tab: "content" },
+            })
+          }
+        }
+      },
+    },
   },
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
-    })
-    this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-      if (modalId == "node-modal") {
-        this.formErrors = ""
-      }
-    })
-    this.$root.$on("bv::modal::shown", (_, modalId) => {
-      if (modalId == "node-modal") {
-        let copy = this.createDefaultNode()
-        if (this.modalType === "edit") {
-          const node = this.getNode(this.nodeId)
-          copy = Helpers.deepCopy(node)
-        }
-        copy.hasSubAccordion = this.hasSubAccordion(copy)
-        this.node = copy
-        this.ready = true
-      }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId == "node-modal") {
-        this.ready = false
-      }
     })
   },
   methods: {
@@ -266,6 +319,36 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    validateTab(requestedTab) {
+      // Tabs that are valid for ALL node types and modal types
+      const okTabs = ["content", "appearance", "more-information"]
+      if (okTabs.includes(requestedTab)) {
+        return true
+      }
+
+      // If requested tab is access, check if the user can access it
+      if (requestedTab === "access") {
+        return this.viewAccess
+      }
+
+      switch (requestedTab) {
+        case "activity": {
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+        }
+        case "behaviour": {
+          return (
+            this.node.mediaType === "h5p" ||
+            this.node.mediaType === "video" ||
+            this.node.mediaType === "accordion"
+          )
+        }
+        case "ordering": {
+          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+        }
+      }
+
+      return false
+    },
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
@@ -273,9 +356,14 @@ export default {
       }
       return false
     },
+    changeTab(tab) {
+      this.$router.push({
+        name: "modal",
+        params: { nodeId: this.nodeId, type: this.type, tab },
+      })
+    },
     close() {
-      this.$bvModal.hide("node-modal")
-      this.$emit("cancel")
+      this.$router.push({ name: "app", params: { nodeId: this.nodeId } })
     },
     async handleSubmit() {
       this.formErrors = this.validateNode()
@@ -295,7 +383,7 @@ export default {
       }
     },
     async submitNode() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
@@ -325,7 +413,7 @@ export default {
         })
       }
       await this.updateLockedStatus()
-      this.$emit("submit")
+      this.close()
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
@@ -384,7 +472,7 @@ export default {
       }
     },
     updateNodeCoordinates() {
-      if (this.modalType === "add" && this.parent) {
+      if (this.type === "add" && this.parent) {
         this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
@@ -450,26 +538,12 @@ export default {
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
     },
-    initializeModal() {
-      let copy = this.createDefaultNode()
-      if (this.modalType === "edit") {
-        const node = this.getNode(this.currentNodeId)
-        if (node === undefined) {
-          this.close()
-          return
-        }
-        copy = Helpers.deepCopy(node)
-      }
-      copy.hasSubAccordion = this.hasSubAccordion(copy)
-      this.node = copy
-      this.ready = true
-    },
     handleTabChange(newTabIndex) {
       this.$router.push(
         "/nodes/" +
-          this.modalType +
+          this.type +
           "/" +
-          String(this.currentNodeId) +
+          String(this.nodeId) +
           "/" +
           this.tabOrdering[newTabIndex]
       )
@@ -541,7 +615,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return true
       }
       const oldNode = this.getNode(this.nodeId)

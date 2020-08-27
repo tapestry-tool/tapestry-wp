@@ -71,7 +71,7 @@ export default {
   },
   props: {
     selectedId: {
-      type: String,
+      type: Number,
       required: true,
     },
   },

@@ -295,18 +295,17 @@ export default {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
     updateRootNode() {
-      if (this.$route.path.endsWith("info")) {
-        this.$router.push(`/nodes/${this.node.id}/info`)
-      } else {
-        this.$router.push(`/nodes/${this.node.id}`)
-      }
+      this.$router.push({ name: "app", params: { nodeId: this.node.id } })
       this.updateSelectedNode(this.node.id)
     },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}/view`)
+      this.$router.push({ name: "lightbox", params: { nodeId: this.node.id } })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: "modal",
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration

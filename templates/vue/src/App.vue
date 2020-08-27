@@ -3,19 +3,13 @@
   <div v-else id="app">
     <router-view></router-view>
     <router-view name="lightbox"></router-view>
-    <node-modal
-      :node-id="nodeId"
-      :modal-type="modalType"
-      @cancel="closeModal"
-      @submit="closeModal"
-    />
+    <router-view name="modal"></router-view>
     <tapestry-sidebar />
   </div>
 </template>
 
 <script>
 import { mapMutations } from "vuex"
-import NodeModal from "./components/NodeModal"
 import Loading from "./components/Loading"
 import TapestrySidebar from "./components/TapestrySidebar"
 import client from "./services/TapestryAPI"
@@ -24,13 +18,10 @@ export default {
   name: "app",
   components: {
     Loading,
-    NodeModal,
     TapestrySidebar,
   },
   data() {
     return {
-      modalType: "",
-      nodeId: null,
       loading: true,
     }
   },
@@ -53,28 +44,12 @@ export default {
         }
       })
     })
-
-    this.$root.$on("add-node", to => {
-      this.modalType = "add"
-      this.nodeId = to
-      this.$bvModal.show("node-modal")
-    })
-
-    this.$root.$on("edit-node", nodeId => {
-      this.modalType = "edit"
-      this.nodeId = nodeId
-      this.$bvModal.show("node-modal")
-    })
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
     ...mapMutations(["init"]),
-    closeModal() {
-      this.$bvModal.hide("node-modal")
-      this.modalType = ""
-    },
     recordAnalytics(evt) {
       const x = evt.clientX + window.scrollLeft
       const y = evt.clientY + window.scrollTop
