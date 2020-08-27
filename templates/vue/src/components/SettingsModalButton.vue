@@ -3,7 +3,9 @@
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
+      :tab="tab"
       @close="settingsModalOpen = false"
+      @change:tab="changeTab"
     ></settings-modal>
   </button>
 </template>
@@ -11,16 +13,55 @@
 <script>
 import SettingsModal from "@/components/SettingsModal"
 import TapestryIcon from "@/components/TapestryIcon"
+import routes from "@/config/routes"
 
 export default {
   components: {
     SettingsModal,
     TapestryIcon,
   },
-  data() {
-    return {
-      settingsModalOpen: false,
-    }
+  computed: {
+    settingsModalOpen: {
+      get() {
+        const { settings: settingsRoute } = routes
+        return Boolean(
+          this.$route.matched.find(route => route.path === settingsRoute.path)
+        )
+      },
+      set(open) {
+        this.$router.push({
+          name: open ? "settings" : "app",
+          params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+        })
+      },
+    },
+    tab() {
+      return this.$route.params.tab
+    },
+  },
+  watch: {
+    tab: {
+      immediate: true,
+      handler(requestedTab) {
+        if (this.settingsModalOpen) {
+          const acceptedTabs = ["appearance", "advanced", "access"]
+          if (!acceptedTabs.includes(requestedTab)) {
+            this.$router.replace({
+              name: "settings",
+              params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+            })
+          }
+        }
+      },
+    },
+  },
+  methods: {
+    changeTab(tab) {
+      this.$router.push({
+        name: "settings",
+        params: { nodeId: this.$route.params.nodeId, tab },
+      })
+    },
   },
 }
 </script>

@@ -7,6 +7,7 @@
     class="text-muted"
     scrollable
     body-class="p-0"
+    @hidden="close"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>

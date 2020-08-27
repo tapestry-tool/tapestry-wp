@@ -30,6 +30,19 @@ const lightbox = {
   },
 }
 
+const settings = {
+  path: "/nodes/:nodeId/settings/:tab",
+  name: "settings",
+  components: {
+    default: TapestryApp,
+    modal: NodeModal,
+  },
+  props: {
+    default: route => ({ selectedId: Number(route.params.nodeId) }),
+    modal: { show: false },
+  },
+}
+
 const modal = {
   path: "/nodes/:nodeId/:type/:tab",
   name: "modal",
@@ -47,4 +60,19 @@ const modal = {
   },
 }
 
-export default { app, lightbox, modal }
+const redirects = [
+  {
+    path: "/nodes/:nodeId/settings",
+    redirect: "/nodes/:nodeId/settings/appearance",
+  },
+  {
+    path: "/nodes/:nodeId/add",
+    redirect: "/nodes/:nodeId/add/content",
+  },
+  {
+    path: "/nodes/:nodeId/edit",
+    redirect: "/nodes/:nodeId/edit/content",
+  },
+]
+
+export default { app, lightbox, modal, settings, redirects }
