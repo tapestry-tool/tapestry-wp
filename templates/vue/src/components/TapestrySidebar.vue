@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrapper" :class="['sidebar-container', { closed: isClosed }]">
+  <div ref="wrapper" :class="['sidebar-container', { closed: closed }]">
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
@@ -14,18 +14,17 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button :class="['toggle-button', { closed: isClosed }]" @click.stop="toggle">
-        <tapestry-icon v-if="isClosed" icon="chevron-left" />
-        <tapestry-icon v-else icon="chevron-right" />
+      <button :class="['toggle-button', { closed: closed }]" @click.stop="toggle">
+        <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
-        :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
+        :class="['anchor-button', 'close-button-mobile', { closed: closed }]"
         @click.stop="toggle"
       >
         <tapestry-icon icon="times" />
       </button>
     </div>
-    <aside ref="content" :class="['sidebar', { closed: isClosed }]">
+    <aside ref="content" :class="['sidebar', { closed: closed }]">
       <header class="sidebar-header">
         <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
         <div class="button-container">
@@ -94,6 +93,12 @@ export default {
   components: {
     TapestryIcon,
   },
+  props: {
+    closed: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       active: null,
@@ -101,9 +106,6 @@ export default {
   },
   computed: {
     ...mapGetters(["getNode"]),
-    isClosed() {
-      return !this.$route.matched.find(route => route.path === "/nodes/:nodeId/info")
-    },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },
@@ -126,9 +128,9 @@ export default {
     },
   },
   watch: {
-    isClosed(isClosed) {
+    closed(closed) {
       const tapestryContainer = document.getElementById("app-container")
-      if (isClosed) {
+      if (closed) {
         tapestryContainer.classList.remove("sidebar-open")
         this.active = null
       } else {
@@ -136,7 +138,7 @@ export default {
       }
     },
     nodeId() {
-      if (!this.isClosed) {
+      if (!this.closed) {
         this.active = "info"
       }
     },
@@ -149,7 +151,7 @@ export default {
   },
   methods: {
     handleObserve(entries) {
-      if (this.isClosed) {
+      if (this.closed) {
         return
       }
 
@@ -161,7 +163,7 @@ export default {
       }
     },
     scrollToRef(refName) {
-      if (this.isClosed) {
+      if (this.closed) {
         this.toggle()
       }
       this.$nextTick(() => {
@@ -174,7 +176,7 @@ export default {
       this.$router.push(`/nodes/${this.nodeId}/view`)
     },
     toggle() {
-      if (this.isClosed) {
+      if (this.closed) {
         this.$router.push(`${this.$route.path}/info`)
       } else {
         const path = this.$route.path.split("/info")[0]

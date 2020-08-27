@@ -1,9 +1,8 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <tapestry-app />
     <router-view></router-view>
-    <tapestry-sidebar />
+    <router-view name="sidebar"></router-view>
     <node-modal
       :node-id="nodeId"
       :modal-type="modalType"
@@ -16,8 +15,6 @@
 <script>
 import { mapMutations } from "vuex"
 import NodeModal from "./components/NodeModal"
-import TapestryApp from "./components/TapestryApp"
-import TapestrySidebar from "./components/TapestrySidebar"
 import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 
@@ -26,8 +23,6 @@ export default {
   components: {
     Loading,
     NodeModal,
-    TapestryApp,
-    TapestrySidebar,
   },
   data() {
     return {
@@ -42,6 +37,18 @@ export default {
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
       this.loading = false
+
+      if (!this.$route.params.nodeId) {
+        this.$router.replace(`/nodes/${dataset.rootId}`)
+      }
+
+      this.$router.beforeEach((to, _, next) => {
+        if (!to.matched.length) {
+          next(`/nodes/${dataset.rootId}`)
+        } else {
+          next()
+        }
+      })
     })
 
     this.$root.$on("add-node", to => {

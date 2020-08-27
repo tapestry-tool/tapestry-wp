@@ -294,6 +294,14 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    updateRootNode() {
+      if (this.$route.path.endsWith("info")) {
+        this.$router.push(`/nodes/${this.node.id}/info`)
+      } else {
+        this.$router.push(`/nodes/${this.node.id}`)
+      }
+      this.updateSelectedNode(this.node.id)
+    },
     openNode() {
       this.$router.push(`/nodes/${this.node.id}/view`)
     },
@@ -331,9 +339,7 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia
-          ? this.openNode()
-          : this.updateSelectedNode(this.node.id)
+        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
       }
     },
     hasPermission(action) {

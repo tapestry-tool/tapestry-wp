@@ -31,7 +31,7 @@
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == root"
+            :root="id == selectedId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -69,6 +69,12 @@ export default {
     RootNodeButton,
     LockedTooltip,
   },
+  props: {
+    selectedId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       loading: true,
@@ -77,7 +83,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -87,9 +93,6 @@ export default {
     empty() {
       return Object.keys(this.nodes).length === 0
     },
-    root() {
-      return this.$route.params.nodeId
-    },
   },
   watch: {
     background: {
@@ -98,10 +101,6 @@ export default {
         const app = this.$root.$el
         app.style.backgroundImage = background ? `url(${background})` : ""
       },
-    },
-    selectedNodeId(nodeId) {
-      const trail = this.$route.path.split(this.$route.params.nodeId)[1] || ""
-      this.$router.push(`/nodes/${nodeId}${trail}`)
     },
   },
   mounted() {
