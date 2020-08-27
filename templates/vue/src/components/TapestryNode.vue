@@ -53,7 +53,7 @@
             <button
               class="node-button"
               :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
+              @click.stop="handleRequestOpen"
             >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"

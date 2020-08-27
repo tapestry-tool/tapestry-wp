@@ -3,6 +3,7 @@
   <div v-else id="app">
     <router-view></router-view>
     <router-view name="sidebar"></router-view>
+    <router-view name="lightbox"></router-view>
     <node-modal
       :node-id="nodeId"
       :modal-type="modalType"

@@ -20,8 +20,16 @@ const routes = [
   },
   {
     path: "/nodes/:nodeId/view",
-    component: Lightbox,
-    props: true,
+    components: {
+      default: TapestryApp,
+      sidebar: TapestrySidebar,
+      lightbox: Lightbox,
+    },
+    props: {
+      default: route => ({ selectedId: route.params.nodeId }),
+      sidebar: { closed: true },
+      lightbox: true,
+    },
   },
   {
     path: "/nodes/:nodeId/info",
