@@ -9,11 +9,24 @@
  * @return object null
  */
 
-$browser = $_SERVER['HTTP_USER_AGENT'];
+// str is evaluated to detect support of ES6
+echo "<script type='text/javascript'>
+    var str = 'class ಠ_ಠ extends Array {constructor(j = \"a\", ...c) {const q = (({u: e}) => {return { [`s${c}`]: Symbol(j) };})({});super(j, q, ...c);}}' + 
+    'new Promise((f) => {const a = function* (){return \"\u{20BB7}\".match(/./u)[0].length === 2 || true;};for (let vre of a()) {' +
+    'const [uw, as, he, re] = [new Set(), new WeakSet(), new Map(), new WeakMap()];break;}f(new Proxy({}, {get: (han, h) => h in han ? han[h] ' + 
+    ': \"42\".repeat(0o10)}));}).then(bi => new ಠ_ಠ(bi.rd));';
 
-if(is_int(strpos($browser, "MSIE")) || is_int(strpos($browser, "Trident/7.0"))) {
-    echo "<html><div>To use the Tapestry Tool, please use a browser other than Internet Explorer.</div></html>";
-}
+    try {
+        eval(str);
+    } catch(e) {
+        var div = document.createElement(\"div\")
+        var message = document.createTextNode(\"To use the Tapestry Tool, please use a browser that supports ES6.\")
+        div.appendChild(message)
+        var body = document.createElement(\"body\")
+        document.body = body
+        document.body.appendChild(div)
+    }
+</script>";
 
 get_header();
 
