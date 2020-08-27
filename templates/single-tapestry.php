@@ -12,7 +12,7 @@
 $browser = $_SERVER['HTTP_USER_AGENT'];
 
 if(is_int(strpos($browser, "MSIE")) || is_int(strpos($browser, "Trident/7.0"))) {
-    echo "<html><div>To use the Tapestry Tool, please use a browser other than Internet Explorer.</div></html>";
+    echo "<div>To use the Tapestry Tool, please use a browser other than Internet Explorer.</div>";
 }
 
 get_header();
