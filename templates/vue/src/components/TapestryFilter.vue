@@ -44,6 +44,7 @@ import TapestryApi from "../services/TapestryAPI"
 
 const filterOptions = {
   AUTHOR: "author",
+  STATUS: "status",
 }
 
 export default {
@@ -87,6 +88,10 @@ export default {
                 ).values(),
               ]
         }
+        case filterOptions.STATUS: {
+
+          return [{"id":"1","name":"accepted"}, {"id":"2","name":"submitted"}, {"id":"3","name":"rejected"}]
+        }
         default:
           return []
       }
@@ -128,6 +133,9 @@ export default {
             return Object.values(this.nodes)
               .filter(node => node.author.id == this.filterValue)
               .map(node => node.id)
+          }
+          case filterOptions.STATUS: {
+
           }
           default:
             break
