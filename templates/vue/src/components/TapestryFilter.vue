@@ -28,7 +28,6 @@
       >
         <template v-slot="slotProps">
           <p class="filter-value">
-            <code>{{ slotProps.option.id }}</code>
             {{ slotProps.option.name }}
           </p>
         </template>
@@ -58,6 +57,7 @@ export default {
       isActive: false,
       filterOption: "",
       filterValue: "",
+      allStatuses: null,
     }
   },
   computed: {
@@ -89,8 +89,16 @@ export default {
               ]
         }
         case filterOptions.STATUS: {
-
-          return [{"id":"1","name":"accepted"}, {"id":"2","name":"submitted"}, {"id":"3","name":"rejected"}]
+          let res = []
+          let fakeKey = 0;
+          for (let status of this.allStatuses) {
+            let obj = {}
+            obj["name"] = status;
+            obj["id"] = fakeKey.toString();
+            fakeKey++
+            res.push(obj)
+          }
+          return res
         }
         default:
           return []
@@ -114,6 +122,10 @@ export default {
     if (wpData.wpCanEditTapestry === "1") {
       const tapestryApi = new TapestryApi(wpPostId)
       this.allContributors = await tapestryApi.getAllContributors()
+    }
+    this.allStatuses = new Set();
+    for (let node of Object.values(this.nodes)) {
+      this.allStatuses.add(node.status)
     }
   },
   methods: {
