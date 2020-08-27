@@ -2,7 +2,6 @@
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <router-view></router-view>
-    <router-view name="sidebar"></router-view>
     <router-view name="lightbox"></router-view>
     <node-modal
       :node-id="nodeId"
@@ -10,6 +9,7 @@
       @cancel="closeModal"
       @submit="closeModal"
     />
+    <tapestry-sidebar />
   </div>
 </template>
 
@@ -17,6 +17,7 @@
 import { mapMutations } from "vuex"
 import NodeModal from "./components/NodeModal"
 import Loading from "./components/Loading"
+import TapestrySidebar from "./components/TapestrySidebar"
 import client from "./services/TapestryAPI"
 
 export default {
@@ -24,6 +25,7 @@ export default {
   components: {
     Loading,
     NodeModal,
+    TapestrySidebar,
   },
   data() {
     return {

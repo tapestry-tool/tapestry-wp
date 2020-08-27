@@ -93,15 +93,10 @@ export default {
   components: {
     TapestryIcon,
   },
-  props: {
-    closed: {
-      type: Boolean,
-      required: true,
-    },
-  },
   data() {
     return {
       active: null,
+      closed: true,
     }
   },
   computed: {
@@ -113,9 +108,7 @@ export default {
       return this.getNode(this.nodeId)
     },
     canEdit() {
-      return (
-        wpData.wpCanEditTapestry === "1" || Helpers.hasPermission(this.node, "edit")
-      )
+      return Helpers.hasPermission(this.node, "edit")
     },
     licenseTypes() {
       return licenseTypes
@@ -176,12 +169,7 @@ export default {
       this.$router.push(`/nodes/${this.nodeId}/view`)
     },
     toggle() {
-      if (this.closed) {
-        this.$router.push(`${this.$route.path}/info`)
-      } else {
-        const path = this.$route.path.split("/info")[0]
-        this.$router.push(path)
-      }
+      this.closed = !this.closed
     },
   },
 }
