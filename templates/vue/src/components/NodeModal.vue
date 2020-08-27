@@ -364,7 +364,9 @@ export default {
       })
     },
     close() {
-      this.$router.push({ name: "app", params: { nodeId: this.nodeId } })
+      if (this.show) {
+        this.$router.push({ name: "app", params: { nodeId: this.nodeId } })
+      }
     },
     async handleSubmit() {
       this.formErrors = this.validateNode()
