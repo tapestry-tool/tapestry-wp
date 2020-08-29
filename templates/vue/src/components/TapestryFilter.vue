@@ -90,12 +90,10 @@ export default {
         }
         case filterOptions.STATUS: {
           let res = []
-          let fakeKey = 0;
           for (let status of this.allStatuses) {
             let obj = {}
-            obj["name"] = status;
-            obj["id"] = fakeKey.toString();
-            fakeKey++
+            obj["name"] = status
+            obj["id"] = status
             res.push(obj)
           }
           return res
@@ -123,7 +121,7 @@ export default {
       const tapestryApi = new TapestryApi(wpPostId)
       this.allContributors = await tapestryApi.getAllContributors()
     }
-    this.allStatuses = new Set();
+    this.allStatuses = new Set()
     for (let node of Object.values(this.nodes)) {
       this.allStatuses.add(node.status)
     }
@@ -147,7 +145,9 @@ export default {
               .map(node => node.id)
           }
           case filterOptions.STATUS: {
-
+            return Object.values(this.nodes)
+              .filter(node => node.status == this.filterValue)
+              .map(node => node.id)
           }
           default:
             break
