@@ -192,30 +192,6 @@ export default {
     PermissionsTable,
     DeleteNodeButton,
   },
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    type: {
-      type: String,
-      required: false,
-      default: "",
-      validator: value => {
-        return ["", "add", "edit"].includes(value)
-      },
-    },
-    nodeId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    tab: {
-      type: String,
-      required: false,
-      default: "",
-    },
-  },
   data() {
     return {
       loading: false,
@@ -265,6 +241,19 @@ export default {
     },
     canSubmit() {
       return !this.fileUploading
+    },
+    nodeId() {
+      const nodeId = this.$route.params.nodeId
+      return nodeId || Number(nodeId)
+    },
+    show() {
+      return this.$route.name === names.MODAL
+    },
+    tab() {
+      return this.$route.params.tab || ""
+    },
+    type() {
+      return this.$route.params.type || ""
     },
   },
   watch: {

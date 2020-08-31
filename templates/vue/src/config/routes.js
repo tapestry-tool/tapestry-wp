@@ -1,5 +1,4 @@
 import Lightbox from "@/components/Lightbox"
-import NodeModal from "@/components/NodeModal"
 
 const ROOT_PATH = `/nodes/:nodeId`
 
@@ -15,12 +14,6 @@ const parseParams = route => {
 const app = {
   path: ROOT_PATH,
   name: "app",
-  components: {
-    modal: NodeModal,
-  },
-  props: {
-    modal: { show: false },
-  },
 }
 
 const lightbox = {
@@ -28,11 +21,9 @@ const lightbox = {
   name: "lightbox",
   components: {
     lightbox: Lightbox,
-    modal: NodeModal,
   },
   props: {
     lightbox: parseParams,
-    modal: { show: false },
   },
 }
 
@@ -40,11 +31,9 @@ const accordion = {
   path: `${ROOT_PATH}/view/:rowId`,
   name: "accordion",
   components: {
-    modal: NodeModal,
     lightbox: Lightbox,
   },
   props: {
-    modal: { show: false },
     lightbox: parseParams,
   },
 }
@@ -53,11 +42,9 @@ const subAccordion = {
   path: `${ROOT_PATH}/view/:rowId/row/:subRowId`,
   name: "subaccordion",
   components: {
-    modal: NodeModal,
     lightbox: Lightbox,
   },
   props: {
-    modal: { show: false },
     lightbox: parseParams,
   },
 }
@@ -65,27 +52,11 @@ const subAccordion = {
 const settings = {
   path: `${ROOT_PATH}/settings/:tab`,
   name: "settings",
-  components: {
-    modal: NodeModal,
-  },
-  props: {
-    modal: { show: false },
-  },
 }
 
 const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
   name: "modal",
-  components: {
-    modal: NodeModal,
-  },
-  props: {
-    modal: route => ({
-      ...route.params,
-      show: true,
-      nodeId: Number(route.params.nodeId),
-    }),
-  },
 }
 
 const redirects = [
