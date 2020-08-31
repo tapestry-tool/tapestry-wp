@@ -13,7 +13,7 @@
 <script>
 import SettingsModal from "@/components/SettingsModal"
 import TapestryIcon from "@/components/TapestryIcon"
-import routes from "@/config/routes"
+import { names } from "@/config/routes"
 
 export default {
   components: {
@@ -23,14 +23,11 @@ export default {
   computed: {
     settingsModalOpen: {
       get() {
-        const { settings: settingsRoute } = routes
-        return Boolean(
-          this.$route.matched.find(route => route.path === settingsRoute.path)
-        )
+        return this.$route.name === names.SETTINGS
       },
       set(open) {
         this.$router.push({
-          name: open ? "settings" : "app",
+          name: open ? names.SETTINGS : names.APP,
           params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
         })
       },
@@ -47,7 +44,7 @@ export default {
           const acceptedTabs = ["appearance", "advanced", "access"]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
-              name: "settings",
+              name: names.SETTINGS,
               params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
             })
           }
@@ -58,7 +55,7 @@ export default {
   methods: {
     changeTab(tab) {
       this.$router.push({
-        name: "settings",
+        name: names.SETTINGS,
         params: { nodeId: this.$route.params.nodeId, tab },
       })
     },

@@ -216,7 +216,7 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      this.$router.push(`/nodes/${this.nodeId}`)
+      this.$router.push({ name: names.APP, params: { nodeId: this.nodeId } })
     },
     handleLoad(dimensions) {
       if (dimensions) {

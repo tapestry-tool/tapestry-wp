@@ -83,6 +83,7 @@
 <script>
 import { mapGetters } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
 
@@ -166,7 +167,7 @@ export default {
       })
     },
     viewNode() {
-      this.$router.push(`/nodes/${this.nodeId}/view`)
+      this.$router.push({ name: names.LIGHTBOX, params: { nodeId: this.nodeId } })
     },
     toggle() {
       this.closed = !this.closed

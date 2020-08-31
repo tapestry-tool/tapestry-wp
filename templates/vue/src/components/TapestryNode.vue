@@ -104,6 +104,7 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import AddChildButton from "./tapestry-node/AddChildButton"
@@ -295,15 +296,15 @@ export default {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
     updateRootNode() {
-      this.$router.push({ name: "app", params: { nodeId: this.node.id } })
+      this.$router.push({ name: names.APP, params: { nodeId: this.node.id } })
       this.updateSelectedNode(this.node.id)
     },
     openNode() {
-      this.$router.push({ name: "lightbox", params: { nodeId: this.node.id } })
+      this.$router.push({ name: names.LIGHTBOX, params: { nodeId: this.node.id } })
     },
     editNode() {
       this.$router.push({
-        name: "modal",
+        name: names.MODAL,
         params: { nodeId: this.node.id, type: "edit", tab: "content" },
       })
     },

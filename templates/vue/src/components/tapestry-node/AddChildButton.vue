@@ -21,6 +21,7 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 
 export default {
@@ -130,7 +131,7 @@ export default {
     ...mapActions(["addLink"]),
     addNode() {
       this.$router.push({
-        name: "modal",
+        name: names.MODAL,
         params: { nodeId: this.node.id, type: "add", tab: "content" },
       })
     },

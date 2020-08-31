@@ -275,7 +275,7 @@ export default {
           const isTabValid = this.validateTab(tab)
           if (!isTabValid) {
             this.$router.replace({
-              name: "modal",
+              name: names.MODAL,
               params: { nodeId: this.nodeId, type: this.type, tab: "content" },
             })
           }
@@ -343,7 +343,7 @@ export default {
       // Prevent multiple clicks
       if (tab !== this.tab) {
         this.$router.push({
-          name: "modal",
+          name: names.MODAL,
           params: { nodeId: this.nodeId, type: this.type, tab },
         })
       }
@@ -536,16 +536,6 @@ export default {
     handleTypeChange() {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
-      )
-    },
-    handleTabChange(newTabIndex) {
-      this.$router.push(
-        "/nodes/" +
-          this.type +
-          "/" +
-          String(this.nodeId) +
-          "/" +
-          this.tabOrdering[newTabIndex]
       )
     },
     async setLinkData() {
