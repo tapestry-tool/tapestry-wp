@@ -41,11 +41,7 @@
           <appearance-form :node="node" />
         </b-tab>
         <b-tab
-          v-if="
-            node.mediaType === 'h5p' ||
-              node.mediaType === 'video' ||
-              node.mediaType === 'accordion'
-          "
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           :active="tab === 'behaviour'"
           title="Behaviour"
           @click="changeTab('behaviour')"
@@ -327,11 +323,7 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "behaviour": {
-          return (
-            this.node.mediaType === "h5p" ||
-            this.node.mediaType === "video" ||
-            this.node.mediaType === "accordion"
-          )
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
           return this.node.mediaType === "accordion" || this.node.hasSubAccordion
