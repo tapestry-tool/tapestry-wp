@@ -35,7 +35,7 @@ export default {
     ...mapState(["nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
     selectedNodeId() {
-      return this.$route.params.nodeId
+      return Number(this.$route.params.nodeId)
     },
     levels() {
       if (!Object.keys(this.nodes).length) {
