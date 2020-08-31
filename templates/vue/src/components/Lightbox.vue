@@ -29,12 +29,13 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex"
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
-import { mapActions, mapGetters, mapState } from "vuex"
 
 export default {
   name: "lightbox",
@@ -45,25 +46,32 @@ export default {
   },
   props: {
     nodeId: {
-      type: [String, Number],
+      type: Number,
+      required: true,
+    },
+    rowId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    subRowId: {
+      type: Number,
       required: false,
       default: 0,
     },
   },
   data() {
     return {
-      isLoaded: false,
       dimensions: {
         top: 100,
         left: 50,
       },
-      timeSinceLastSaved: new Date(),
       showCompletionScreen: false,
     }
   },
   computed: {
-    ...mapState(["h5pSettings"]),
-    ...mapGetters(["getNode"]),
+    ...mapState(["h5pSettings", "rootId"]),
+    ...mapGetters(["getNode", "isAccordion", "isAccordionRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -156,25 +164,51 @@ export default {
     },
   },
   watch: {
-    nodeId() {
-      if (this.node === undefined) {
-        this.close()
-        return
-      }
-      this.applyDimensions()
+    nodeId: {
+      immediate: true,
+      handler() {
+        if (!this.node) {
+          this.$router.replace({ name: names.APP, params: { nodeId: this.rootId } })
+        } else {
+          this.applyDimensions()
+        }
+      },
+    },
+    rowId: {
+      immediate: true,
+      handler(rowId) {
+        if (rowId) {
+          if (
+            !this.isAccordion(this.nodeId) ||
+            !this.isAccordionRow(rowId, this.nodeId)
+          ) {
+            this.$router.replace({
+              name: names.LIGHTBOX,
+              params: { nodeId: this.nodeId },
+            })
+          }
+        }
+      },
+    },
+    subRowId: {
+      immediate: true,
+      handler(subRowId) {
+        if (subRowId) {
+          if (!this.isAccordionRow(subRowId, this.rowId)) {
+            this.$router.replace({
+              name: names.ACCORDION,
+              params: { nodeId: this.nodeId, rowId: this.rowId },
+            })
+          }
+        }
+      },
     },
   },
   mounted() {
-    if (this.node === undefined) {
-      this.close()
-      return
-    }
-    this.isLoaded = true
-    this.applyDimensions()
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-  },
-  beforeDestroy() {
-    document.querySelector("body").classList.remove("tapestry-lightbox-open")
+    this.$once("hook:destroyed", () => {
+      document.querySelector("body").classList.remove("tapestry-lightbox-open")
+    })
   },
   methods: {
     ...mapActions(["completeNode"]),
