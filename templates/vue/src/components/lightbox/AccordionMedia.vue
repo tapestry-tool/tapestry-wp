@@ -3,7 +3,11 @@
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>
-    <tapestry-accordion :rows="rows.map(row => row.node.id)">
+    <tapestry-accordion
+      :rows="rows.map(row => row.node.id)"
+      :value="rowId"
+      @input="changeRow"
+    >
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div>
           <div
@@ -49,6 +53,7 @@
                 v-if="row.children.length > 0"
                 :dimensions="dimensions"
                 :rows="row.children"
+                :row-id="subRowId"
                 @load="handleLoad"
               ></sub-accordion>
             </div>
@@ -91,6 +96,7 @@ import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import TapestryAccordion from "../TapestryAccordion"
 import SubAccordion from "./accordion/SubAccordion"
+import { names } from "@/config/routes"
 
 export default {
   name: "accordion-media",
@@ -104,6 +110,15 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    rowId: {
+      type: Number,
+      required: true,
+    },
+    subRowId: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -164,6 +179,19 @@ export default {
       this.completeNode(rowId)
       if (this.rows.every(row => row.node.completed)) {
         this.$emit("complete")
+      }
+    },
+    changeRow(rowId) {
+      if (rowId) {
+        this.$router.push({
+          name: names.ACCORDION,
+          params: { nodeId: this.node.id, rowId },
+        })
+      } else {
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: this.node.id },
+        })
       }
     },
   },

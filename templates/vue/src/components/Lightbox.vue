@@ -13,6 +13,8 @@
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
+      :row-id="rowId"
+      :sub-row-id="subRowId"
       @close="close"
       @complete="complete"
     />
@@ -168,6 +170,7 @@ export default {
       immediate: true,
       handler() {
         if (!this.node) {
+          // Node ID doesn't exist, so reroute to default selected node
           this.$router.replace({ name: names.APP, params: { nodeId: this.rootId } })
         } else {
           this.applyDimensions()

@@ -40,7 +40,7 @@ const accordion = {
 
 const subAccordion = {
   path: `${ROOT_PATH}/view/:rowId/row/:subRowId`,
-  name: "subaccordion",
+  name: "sub_accordion",
   components: {
     lightbox: Lightbox,
   },

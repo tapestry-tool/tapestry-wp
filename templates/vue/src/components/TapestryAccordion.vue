@@ -6,57 +6,26 @@ export default {
       type: Array,
       required: true,
     },
-    nodeId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    baseUrl: {
-      type: String,
-      required: false,
-      default: "",
+    value: {
+      type: null,
+      required: true,
     },
   },
   computed: {
     hasNext() {
-      return this.rows.indexOf(this.activeRow) < this.rows.length - 1
-    },
-    activeRowIndex() {
-      const rowParam =
-        this.nodeId === 0 ? this.$route.params.subrow : this.$route.params.row
-      return rowParam == undefined ? -1 : Number(rowParam)
-    },
-    activeRow() {
-      return this.activeRowIndex == -1 ? null : this.rows[this.activeRowIndex]
+      return this.rows.indexOf(this.value) < this.rows.length - 1
     },
   },
   methods: {
     isVisible(row) {
-      return this.activeRow === row
+      return this.value === row
     },
     toggle(row) {
-      let pathString = this.$route.path
-      if (this.activeRow !== null && this.activeRow === row) {
-        pathString = this.deactivate(row)
-        return this.$router.push(pathString)
-      }
-      if (this.activeRow !== null) {
-        pathString = this.deactivate(this.activeRow)
-      }
-      this.$router.push(pathString + "/" + this.rows.indexOf(row))
-    },
-    deactivate(row) {
-      if (this.isVisible(row) && this.baseUrl !== "") {
-        return this.baseUrl + this.nodeId
-      } else if (this.isVisible(row) && this.baseUrl === "") {
-        const indexLength = String(this.rows.indexOf(this.activeRow)).length + 1
-        return this.$route.path.slice(0, -indexLength) // Removes the index and backslash from end of URL
-      }
-      return this.$route.path
+      this.$emit("input", this.isVisible(row) ? null : row)
     },
     next() {
       if (this.hasNext) {
-        const currIndex = this.rows.indexOf(this.activeRow)
+        const currIndex = this.rows.indexOf(this.value)
         this.toggle(this.rows[currIndex + 1])
       }
     },
