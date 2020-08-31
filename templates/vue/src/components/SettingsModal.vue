@@ -229,7 +229,6 @@ export default {
       this.renderImages = renderImages
     },
     async updateSettings() {
-      this.close()
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,

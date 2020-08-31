@@ -259,16 +259,8 @@ export default {
   watch: {
     nodeId: {
       immediate: true,
-      handler(nodeId) {
-        if (this.show) {
-          let copy = this.createDefaultNode()
-          if (this.type === "edit") {
-            const node = this.getNode(nodeId)
-            copy = Helpers.deepCopy(node)
-          }
-          copy.hasSubAccordion = this.hasSubAccordion(copy)
-          this.node = copy
-        }
+      handler() {
+        this.initialize()
       },
     },
     show: {
@@ -276,6 +268,7 @@ export default {
       handler(show) {
         if (show) {
           this.formErrors = ""
+          this.initialize()
         }
       },
     },
@@ -308,6 +301,15 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    initialize() {
+      let copy = this.createDefaultNode()
+      if (this.type === "edit") {
+        const node = this.getNode(this.nodeId)
+        copy = Helpers.deepCopy(node)
+      }
+      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      this.node = copy
+    },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
       const okTabs = ["content", "appearance", "more-information"]
@@ -346,10 +348,13 @@ export default {
       return false
     },
     changeTab(tab) {
-      this.$router.push({
-        name: "modal",
-        params: { nodeId: this.nodeId, type: this.type, tab },
-      })
+      // Prevent multiple clicks
+      if (tab !== this.tab) {
+        this.$router.push({
+          name: "modal",
+          params: { nodeId: this.nodeId, type: this.type, tab },
+        })
+      }
     },
     close() {
       if (this.show) {
