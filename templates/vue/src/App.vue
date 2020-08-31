@@ -4,12 +4,12 @@
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
-    <tapestry-sidebar></tapestry-sidebar>
+    <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
   </div>
 </template>
 
 <script>
-import { mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import Loading from "./components/Loading"
 import NodeModal from "./components/NodeModal"
 import TapestryApp from "./components/TapestryApp"
@@ -28,6 +28,12 @@ export default {
     return {
       loading: true,
     }
+  },
+  computed: {
+    ...mapState(["nodes"]),
+    isEmpty() {
+      return Object.keys(this.nodes).length === 0
+    },
   },
   mounted() {
     window.addEventListener("click", this.recordAnalytics)
