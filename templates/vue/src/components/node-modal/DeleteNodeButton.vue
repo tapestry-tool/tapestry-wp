@@ -61,8 +61,9 @@ export default {
           },
         })
       }
+      this.$emit("submit")
       this.deleteNode(this.nodeId).then(() => {
-        this.$emit("submit")
+        this.$emit("done")
       })
     },
   },

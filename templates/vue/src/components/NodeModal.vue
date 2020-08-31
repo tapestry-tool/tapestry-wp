@@ -16,7 +16,10 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="ready" fluid class="px-0">
+    <b-container v-if="loading" class="spinner">
+      <b-spinner variant="secondary"></b-spinner>
+    </b-container>
+    <b-container v-else fluid class="px-0">
       <b-tabs card>
         <b-tab
           title="Content"
@@ -103,14 +106,12 @@
         </b-tab>
       </b-tabs>
     </b-container>
-    <b-container v-else class="spinner">
-      <b-spinner variant="secondary"></b-spinner>
-    </b-container>
     <template slot="modal-footer">
       <delete-node-button
         v-if="type === 'edit'"
         :node-id="nodeId"
-        @submit="close"
+        @submit="loading = true"
+        @done="handleDelete"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="close">
@@ -164,6 +165,7 @@ import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -216,7 +218,7 @@ export default {
   },
   data() {
     return {
-      ready: false,
+      loading: false,
       userId: null,
       formErrors: [],
       maxDescriptionLength: 250,
@@ -233,7 +235,7 @@ export default {
       "getDirectParents",
       "getNode",
     ]),
-    ...mapState(["rootId", "settings", "visibleNodes"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
     parent() {
       if (this.type === "add") {
         const parent = this.getNode(this.nodeId)
@@ -277,7 +279,6 @@ export default {
           }
           copy.hasSubAccordion = this.hasSubAccordion(copy)
           this.node = copy
-          this.ready = true
         }
       },
     },
@@ -286,8 +287,6 @@ export default {
       handler(show) {
         if (show) {
           this.formErrors = ""
-        } else {
-          this.ready = false
         }
       },
     },
@@ -365,14 +364,25 @@ export default {
     },
     close() {
       if (this.show) {
-        this.$router.push({ name: "app", params: { nodeId: this.nodeId } })
+        if (Object.keys(this.nodes).length === 0) {
+          this.$router.push("/")
+        } else if (this.rootId && !this.nodeId) {
+          // We just added a root node
+          this.$router.push({ name: names.APP, params: { nodeId: this.rootId } })
+        } else {
+          this.$router.push({ name: names.APP, params: { nodeId: this.nodeId } })
+        }
       }
     },
+    handleDelete() {
+      this.loading = false
+      this.close()
+    },
     async handleSubmit() {
+      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
-        this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -417,6 +427,7 @@ export default {
       }
       await this.updateLockedStatus()
       this.close()
+      this.loading = false
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min

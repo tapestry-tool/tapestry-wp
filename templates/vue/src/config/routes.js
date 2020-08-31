@@ -1,5 +1,4 @@
 import Lightbox from "@/components/Lightbox"
-import TapestryApp from "@/components/TapestryApp"
 import NodeModal from "@/components/NodeModal"
 
 const ROOT_PATH = `/nodes/:nodeId`
@@ -17,11 +16,9 @@ const app = {
   path: ROOT_PATH,
   name: "app",
   components: {
-    default: TapestryApp,
     modal: NodeModal,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     modal: { show: false },
   },
 }
@@ -30,12 +27,10 @@ const lightbox = {
   path: `${ROOT_PATH}/view`,
   name: "lightbox",
   components: {
-    default: TapestryApp,
     lightbox: Lightbox,
     modal: NodeModal,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     lightbox: parseParams,
     modal: { show: false },
   },
@@ -45,12 +40,10 @@ const accordion = {
   path: `${ROOT_PATH}/view/:rowId`,
   name: "accordion",
   components: {
-    default: TapestryApp,
     modal: NodeModal,
     lightbox: Lightbox,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     modal: { show: false },
     lightbox: parseParams,
   },
@@ -58,14 +51,12 @@ const accordion = {
 
 const subAccordion = {
   path: `${ROOT_PATH}/view/:rowId/row/:subRowId`,
-  name: "sub-accordion",
+  name: "subaccordion",
   components: {
-    default: TapestryApp,
     modal: NodeModal,
     lightbox: Lightbox,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     modal: { show: false },
     lightbox: parseParams,
   },
@@ -75,11 +66,9 @@ const settings = {
   path: `${ROOT_PATH}/settings/:tab`,
   name: "settings",
   components: {
-    default: TapestryApp,
     modal: NodeModal,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     modal: { show: false },
   },
 }
@@ -88,11 +77,9 @@ const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
   name: "modal",
   components: {
-    default: TapestryApp,
     modal: NodeModal,
   },
   props: {
-    default: route => ({ selectedId: Number(route.params.nodeId) }),
     modal: route => ({
       ...route.params,
       show: true,
@@ -116,7 +103,15 @@ const redirects = [
   },
 ]
 
-const routes = { app, accordion, lightbox, modal, settings, subAccordion, redirects }
+const routes = {
+  app,
+  accordion,
+  lightbox,
+  modal,
+  settings,
+  subAccordion,
+  redirects,
+}
 
 export const names = Object.fromEntries(
   Object.entries(routes).map(([name, route]) => [name.toUpperCase(), route.name])

@@ -69,12 +69,6 @@ export default {
     RootNodeButton,
     LockedTooltip,
   },
-  props: {
-    selectedId: {
-      type: Number,
-      required: true,
-    },
-  },
   data() {
     return {
       loading: true,
@@ -92,6 +86,9 @@ export default {
     },
     empty() {
       return Object.keys(this.nodes).length === 0
+    },
+    selectedId() {
+      return Number(this.$route.params.nodeId)
     },
   },
   watch: {
