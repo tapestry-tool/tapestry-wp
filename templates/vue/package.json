@@ -7,8 +7,8 @@
   "private": true,
   "scripts": {
     "start": "npm run dev",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot",
-    "dev:container": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --hot --port 8080",
+    "dev": "webpack-dev-server --hot",
+    "debug": "webpack --mode='development'",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
@@ -16,9 +16,9 @@
     "test": "cypress run"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "audio-recorder-polyfill": "^0.3.4",
     "axios": "^0.19.0",
-    "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.13.1",
     "d3": "^5.16.0",
@@ -39,28 +39,32 @@
     "not ie <= 8"
   ],
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-json-strings": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-syntax-import-meta": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
     "babel-eslint": "^10.0.3",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-3": "^6.24.1",
+    "babel-loader": "^8.0.0",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
     "cypress": "4.9.0",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.4.0",
-    "eslint-loader": "^3.0.2",
+    "eslint-loader": "^4.0.2",
     "eslint-plugin-cypress": "^2.8.1",
     "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-vue": "^5.2.3",
+    "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^1.1.4",
     "node-sass": "^4.13.0",
     "prettier": "^1.18.2",
     "sass-loader": "7.3.1",
     "style-loader": "^1.0.0",
-    "vue-loader": "^13.0.5",
+    "vue-loader": "^15.9.3",
     "vue-template-compiler": "^2.4.4",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }

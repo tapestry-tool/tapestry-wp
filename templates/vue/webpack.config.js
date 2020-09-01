@@ -1,9 +1,9 @@
-var path = require('path')
-var webpack = require('webpack')
-require('babel-polyfill');
+const path = require('path')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
-  entry: ['babel-polyfill', './src/main.js'],
+  entry: ['@babel/polyfill', './src/main.js'],
+  mode: 'development',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -12,8 +12,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.s[a|c]ss$/,
-        loader: 'style!css!sass'
+        test: /\.vue$/,
+        loader: 'vue-loader',
       },
       {
         test: /\.css$/,
@@ -21,15 +21,15 @@ module.exports = {
           'vue-style-loader',
           'css-loader'
         ],
+        exclude: /node_modules\/(?!(bootstrap-vue|bootstrap)\/).*/
       },
       {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-          }
-          // other vue-loader options go here
-        }
+        test: /\.scss$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          'sass-loader'
+        ]
       },
       {
         test: /\.js$/,
@@ -53,40 +53,15 @@ module.exports = {
     extensions: ['*', '.js', '.vue', '.json']
   },
   devServer: {
-    historyApiFallback: true,
-    noInfo: true,
-    overlay: true,
-    headers: { 'Access-Control-Allow-Origin': '*' },
-    hot: true,
+    contentBase: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist/',
     port: 8080
   },
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map'
-}
-
-if (process.env.NODE_ENV === 'development') {
-  module.exports.output.publicPath = 'http://localhost:8080/dist/'
-}
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
+  devtool: 'inline-source-map',
+  plugins: [
+    new VueLoaderPlugin()
+  ]
 }
