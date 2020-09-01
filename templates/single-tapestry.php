@@ -10,6 +10,7 @@
  */
 
 // str is evaluated to detect support of ES6
+// originally by user DaBs: https://gist.github.com/DaBs/89ccc2ffd1d435efdacff05248514f38
 echo "<script type='text/javascript'>
     var str = 'class ಠ_ಠ extends Array {constructor(j = \"a\", ...c) {const q = (({u: e}) => {return { [`s${c}`]: Symbol(j) };})({});super(j, q, ...c);}}' + 
     'new Promise((f) => {const a = function* (){return \"\u{20BB7}\".match(/./u)[0].length === 2 || true;};for (let vre of a()) {' +
