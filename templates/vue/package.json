@@ -21,7 +21,6 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.13.1",
     "d3": "^5.16.0",
-    "dragselect": "^1.13.1",
     "moment": "^2.25.3",
     "moment-timezone": "^0.5.28",
     "tiptap": "^1.29.1",

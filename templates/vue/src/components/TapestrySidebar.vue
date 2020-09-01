@@ -78,6 +78,10 @@
             <h2 class="content-header">References</h2>
             <div class="content-body" v-html="node.references"></div>
           </section>
+          <section>
+            <h2 class="content-header">Review</h2>
+            <div class="content-body" v-html="node.references"></div>
+          </section>
         </section>
       </div>
     </aside>

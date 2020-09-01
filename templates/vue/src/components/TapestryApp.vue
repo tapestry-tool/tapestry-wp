@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import DragSelect from "dragselect"
+// import DragSelect from "dragselect"
 import { mapMutations, mapState } from "vuex"
 import Loading from "@/components/Loading"
 import TapestryNode from "@/components/TapestryNode"
@@ -117,7 +117,7 @@ export default {
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
       this.loading = false
-      this.$nextTick(this.initializeDragSelect)
+      // this.$nextTick(this.initializeDragSelect)
     })
   },
   beforeDestroy() {
@@ -136,26 +136,26 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    initializeDragSelect() {
-      document.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
-      })
+    // initializeDragSelect() {
+    //   document.addEventListener("keydown", evt => {
+    //     if (evt.key === "Escape") {
+    //       this.clearSelection()
+    //     }
+    //   })
 
-      new DragSelect({
-        selectables: document.querySelectorAll(".node"),
-        area: this.$refs.app,
-        onDragStart: evt => {
-          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-            return
-          }
-          this.clearSelection()
-        },
-        onElementSelect: el => this.select(el.dataset.id),
-        onElementUnselect: el => this.unselect(el.dataset.id),
-      })
-    },
+    //   new DragSelect({
+    //     selectables: document.querySelectorAll(".node"),
+    //     area: this.$refs.app,
+    //     onDragStart: evt => {
+    //       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+    //         return
+    //       }
+    //       this.clearSelection()
+    //     },
+    //     onElementSelect: el => this.select(el.dataset.id),
+    //     onElementUnselect: el => this.unselect(el.dataset.id),
+    //   })
+    // },
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5

@@ -6,7 +6,7 @@
       :cx="x"
       :cy="y"
       :stroke-width="width"
-      :stroke="locked ? '#999' : strokeColor"
+      :stroke="strokeColor"
       :stroke-dasharray="status === 'publish' ? 0 : dasharraySize"
     ></circle>
     <path
@@ -72,9 +72,11 @@ export default {
         case "draft":
           return "#999"
         case "submitted":
-          return "blue"
+          return "orange"
+        case "accept":
+          return "green"
         case "reject":
-          return "red"
+          return "#CC444B"
         default:
           return "currentColor"
       }

@@ -46,7 +46,7 @@ export default {
       this.handleSubmit()
     },
     handleAccept() {
-      this.node.status = "publish"
+      this.node.status = "accept"
       this.handleSubmit()
     },
     handleSubmit() {
