@@ -14,9 +14,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryApi from "@/services/TapestryAPI"
-
-const client = new TapestryApi(wpPostId)
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "duplicate-tapestry-button",

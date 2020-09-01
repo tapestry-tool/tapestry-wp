@@ -13,6 +13,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -152,9 +153,17 @@ export default {
     },
     handlePlay() {
       this.$emit("show-play-screen", false)
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
+        time: progress * mediaDuration,
+      })
     },
     handlePause() {
       this.$emit("show-play-screen", true)
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+        time: progress * mediaDuration,
+      })
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -239,6 +248,12 @@ export default {
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
               h5pVideo.play()
+              client.recordAnalyticsEvent(
+                "app",
+                "auto-play",
+                "h5p-video",
+                h5pIframeComponent.node.id
+              )
             }, 1000)
           }
         }

@@ -40,7 +40,7 @@
 <script>
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
-import TapestryApi from "../services/TapestryAPI"
+import client from "../services/TapestryAPI"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -107,8 +107,7 @@ export default {
   },
   async created() {
     if (wpData.wpCanEditTapestry === "1") {
-      const tapestryApi = new TapestryApi(wpPostId)
-      this.allContributors = await tapestryApi.getAllContributors()
+      this.allContributors = await client.getAllContributors()
     }
   },
   methods: {

@@ -1,7 +1,7 @@
 import axios from "axios"
 import Helpers from "../utils/Helpers"
 
-export default class {
+class TapestryApi {
   /**
    *
    * @param {Number} postId
@@ -252,3 +252,5 @@ export default class {
     await axios.post(analyticsAJAXUrl, data)
   }
 }
+
+export default new TapestryApi(wpPostId)

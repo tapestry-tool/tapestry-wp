@@ -113,12 +113,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isAccordion"]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
-        const children = node.isSubAccordion
+        const children = this.isAccordion(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
