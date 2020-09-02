@@ -14,7 +14,6 @@ init:
 	# Change 15 to a higher number if it fails to install
 	@sleep 15
 	make install
-	make start
 
 install:
 	sh ./bin/install.sh
