@@ -79,6 +79,9 @@ export default {
       showQuizScreen: false,
     }
   },
+  beforeDestroy() {
+    thisTapestryTool.init(true)
+  },
   computed: {
     ...mapState(["h5pSettings"]),
   },
