@@ -215,6 +215,9 @@ export default {
     }
   },
   methods: {
+    clear() {
+      this.editor.clearContent()
+    },
     showLinkMenu(attrs) {
       this.linkUrl = attrs.href
       this.linkMenuIsActive = true

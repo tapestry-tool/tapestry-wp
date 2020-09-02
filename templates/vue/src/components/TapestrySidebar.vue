@@ -74,12 +74,21 @@
               v-html="license.description"
             ></div>
           </section>
+          <section v-if="showReview">
+            <h2 class="content-header">Review</h2>
+            <div class="content-body">Status: {{ node.status }}</div>
+            <h2 class="content-header">Comments</h2>
+            <div class="content-body">
+              <comment
+                v-for="comment in node.comments"
+                :key="comment"
+                :comment="comment"
+              />
+            </div>
+            <comment-form :node="node" @submit="handleSubmit"></comment-form>
+          </section>
           <section v-if="node.references">
             <h2 class="content-header">References</h2>
-            <div class="content-body" v-html="node.references"></div>
-          </section>
-          <section>
-            <h2 class="content-header">Review</h2>
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
@@ -89,10 +98,12 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState, mapActions } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
+import CommentForm from "./node-modal/CommentForm"
+import Comment from "./Comment"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
@@ -100,6 +111,8 @@ const PADDING_OFFSET = 48
 export default {
   components: {
     TapestryIcon,
+    CommentForm,
+    Comment,
   },
   data() {
     return {
@@ -117,6 +130,9 @@ export default {
       return (
         wpData.wpCanEditTapestry === "1" || Helpers.hasPermission(this.node, "edit")
       )
+    },
+    showReview() {
+      return ["submitted", "accept", "reject"].indexOf(this.node.status) > -1
     },
     licenseTypes() {
       return licenseTypes
@@ -151,6 +167,7 @@ export default {
     observer.observe(this.$refs.info)
   },
   methods: {
+    ...mapActions(["updateNode"]),
     handleObserve(entries) {
       if (this.isClosed) {
         return
@@ -175,6 +192,12 @@ export default {
     },
     viewNode() {
       this.$router.push(`/nodes/${this.selectedNodeId}`)
+    },
+    async handleSubmit() {
+      await this.updateNode({
+        id: this.node.id,
+        newNode: this.node,
+      })
     },
   },
 }
