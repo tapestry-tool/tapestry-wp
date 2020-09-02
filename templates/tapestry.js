@@ -150,6 +150,16 @@ function tapestryTool(config){
 		// Delete links that connect to a non-existing node due to possibly corrupted data
 		tapestry.dataset.links = tapestry.dataset.links.filter(
             thisLink => nodeIds.includes(thisLink.source) && nodeIds.includes(thisLink.target));
+		
+		var nodeIdsInLinks = [];
+        for (var i=0; i < tapestry.dataset.links.length; i++) {
+			nodeIdsInLinks.push(tapestry.dataset.links[i].source);
+			nodeIdsInLinks.push(tapestry.dataset.links[i].target);
+		}
+		
+		// Delete nodes that do not connect to any link
+		tapestry.dataset.nodes = tapestry.dataset.nodes.filter(
+            thisNode => nodeIdsInLinks.includes(thisNode.id) );
 
         tapestry.originalDataset = tapestry.dataset;
         
