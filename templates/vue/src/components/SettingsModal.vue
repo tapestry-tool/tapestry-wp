@@ -69,6 +69,7 @@
             block
             variant="light"
             :class="isExporting ? 'disabled' : ''"
+            :disabled="isExporting"
             @click="exportTapestry"
           >
             <b-spinner v-if="isExporting"></b-spinner>
