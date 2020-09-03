@@ -80,7 +80,7 @@
                   :disabled="isExporting"
                   @click="exportTapestry"
                 >
-                  <b-spinner v-if="isExporting"></b-spinner>
+                  <b-spinner v-if="isExporting" small></b-spinner>
                   <div :style="isExporting ? 'opacity: 50%;' : ''">
                     Export Tapestry
                   </div>

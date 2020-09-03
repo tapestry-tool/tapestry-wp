@@ -49,7 +49,7 @@ export default {
       isImporting: false,
       changes: {
         noChange: true,
-        permissions: [],
+        permissions: new Set(),
       },
     }
   },
@@ -121,15 +121,17 @@ export default {
         const keys = Object.keys(node.permissions)
         for (let key in originalPerms) {
           if (!keys.includes(key)) {
-            this.changes.permissions.push(key)
+            this.changes.permissions.add(key)
           }
         }
-        if (this.changes.permissions.length > 0) {
+        if (node.permissionsOrder) {
+          node.permissionsOrder = node.permissionsOrder.filter(role =>
+            wp_roles.has(role)
+          )
+        }
+        if (this.changes.permissions.size > 0) {
           this.changes.noChange = false
         }
-        node.permissionsOrder = node.permissionsOrder.filter(role =>
-          wp_roles.has(role)
-        )
       }
     },
   },
