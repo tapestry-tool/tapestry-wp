@@ -98,7 +98,7 @@
         :disabled="!canSubmit"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit"></b-spinner>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
         <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
@@ -588,6 +588,16 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#submit-button {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div {
+    margin-right: 4px;
+  }
 }
 
 #node-modal-container {
