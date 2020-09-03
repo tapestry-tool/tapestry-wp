@@ -11,6 +11,7 @@
   >
     <b-container fluid class="px-0">
       <b-card>
+        <h2>Import Successful!</h2>
         <div v-if="changes.noChange">No changes were made in import</div>
         <div v-else>
           All authors have been set to the current user.
