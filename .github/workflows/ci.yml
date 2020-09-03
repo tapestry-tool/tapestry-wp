@@ -32,5 +32,5 @@ jobs:
         with:
           start: npm start
           # quote the url to be safe against YML parsing surprises
-          wait-on: "http://localhost:8080/dist"
+          wait-on: "http://localhost:8080/dist/build.js"
           working-directory: templates/vue
