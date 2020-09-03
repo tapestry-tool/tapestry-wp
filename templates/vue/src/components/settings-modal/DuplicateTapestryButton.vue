@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-button block variant="light" @click="duplicateTapestry">
-      <b-spinner v-if="loading"></b-spinner>
+      <b-spinner v-if="loading" small></b-spinner>
       <div v-else>Duplicate Tapestry</div>
     </b-button>
     <b-alert :show="showConfirmation" variant="success" style="margin-top: 1em;">

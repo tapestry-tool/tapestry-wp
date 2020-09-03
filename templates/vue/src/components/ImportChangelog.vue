@@ -24,7 +24,7 @@
           <li v-for="perm in changes.permissions" :key="perm">
             {{ perm }}
           </li>
-          <div>Pressing confirm will reload your page</div>
+          <div>Pressing confirm will reload your page.</div>
         </div>
       </b-card>
     </b-container>
