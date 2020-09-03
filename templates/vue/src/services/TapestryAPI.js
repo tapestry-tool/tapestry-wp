@@ -32,7 +32,7 @@ export default class {
   }
 
   async getAllRoles() {
-    const usersRequest = await axios.get(`${apiUrl}/all_roles`)
+    const usersRequest = await axios.get(`${apiUrl}/roles`)
     const users = usersRequest.data
     let wp_roles = new Set()
     //defaults

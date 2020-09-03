@@ -111,16 +111,16 @@ export default {
     async prepareImport(data) {
       let wp_roles = await client.getAllRoles()
       for (let node of data.nodes) {
-        const originalPerms = node["permissions"]
-        node["permissions"] = Object.keys(node["permissions"])
+        const originalPerms = node.permissions
+        node.permissions = Object.keys(node.permissions)
           .filter(key => wp_roles.has(key))
           .reduce((obj, key) => {
             return {
               ...obj,
-              [key]: node["permissions"][key],
+              [key]: node.permissions[key],
             }
           }, {})
-        const keys = Object.keys(node["permissions"])
+        const keys = Object.keys(node.permissions)
         for (let key in originalPerms) {
           if (!keys.includes(key)) {
             this.changes.permissions.push(key)
@@ -129,8 +129,7 @@ export default {
         if (this.changes.permissions.length > 0) {
           this.changes.noChange = false
         }
-
-        node["permissionsOrder"] = node["permissionsOrder"].filter(role =>
+        node.permissionsOrder = node.permissionsOrder.filter(role =>
           wp_roles.has(role)
         )
       }

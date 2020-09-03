@@ -286,7 +286,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'GET_ALL_ROLES' => (object) [
-        'ROUTE' => '/all_roles',
+        'ROUTE' => '/roles',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'get_all_user_roles',
