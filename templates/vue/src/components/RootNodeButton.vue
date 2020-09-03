@@ -34,10 +34,8 @@
 </template>
 
 <script>
-import TapestryApi from "@/services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 import ImportChangelog from "./ImportChangelog"
-
-const client = new TapestryApi(wpPostId)
 
 export default {
   name: "root-node-button",

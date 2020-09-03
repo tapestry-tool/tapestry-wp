@@ -1,6 +1,5 @@
 <template>
-  <loading v-if="loading" style="height: 75vh;"></loading>
-  <div v-else class="app-container">
+  <div id="app-container">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
@@ -51,22 +50,17 @@
 <script>
 import DragSelect from "dragselect"
 import { mapMutations, mapState } from "vuex"
-import Loading from "@/components/Loading"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
 import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
-import TapestryApi from "@/services/TapestryAPI"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
 
-const client = new TapestryApi(wpPostId)
-
 export default {
   components: {
-    Loading,
     TapestryNode,
     TapestryLink,
     TapestryDepthSlider,
@@ -83,19 +77,12 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "nodes",
-      "links",
-      "selectedNodeId",
-      "tapestryIsLoaded",
-      "selection",
-      "settings",
-    ]),
+    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
     background() {
       return this.settings.backgroundUrl
     },
     canEdit() {
-      return wpApiSettings && wpApiSettings.wpCanEditTapestry === "1"
+      return wpData.wpCanEditTapestry === "1"
     },
     empty() {
       return Object.keys(this.nodes).length === 0
@@ -111,15 +98,10 @@ export default {
     },
   },
   mounted() {
-    const data = [client.getTapestry(), client.getUserProgress()]
-    Promise.all(data).then(([dataset, progress]) => {
-      this.init({ dataset, progress })
-      this.loading = false
-      this.$nextTick(this.initializeDragSelect)
-    })
+    this.initializeDragSelect()
   },
   methods: {
-    ...mapMutations(["init", "select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
@@ -127,6 +109,11 @@ export default {
       document.addEventListener("keydown", evt => {
         if (evt.key === "Escape") {
           this.clearSelection()
+        }
+
+        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+          evt.preventDefault()
+          Object.values(this.nodes).forEach(node => this.select(node.id))
         }
       })
 
@@ -233,8 +220,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+#app-container {
+  transform: scale(1);
+  transform-origin: top left;
+  transition: all 0.2s ease-out;
   z-index: 0;
+
+  @media screen and (min-width: 500px) {
+    &.sidebar-open {
+      transform: scale(0.7);
+    }
+  }
 }
 
 main {
@@ -245,6 +241,7 @@ main {
 .toolbar {
   display: flex;
   justify-content: space-between;
+  padding: 0 5vw;
 }
 
 .slider-wrapper {
@@ -253,6 +250,8 @@ main {
   display: flex;
   align-items: center;
   border-radius: 4px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
   padding: 8px 0 8px 12px;
   position: relative;
 }

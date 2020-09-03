@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <line
-      v-show="isVisible"
+      v-show="show"
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
@@ -32,9 +32,9 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
-    ...mapGetters(["getNeighbours", "isAccordion"]),
-    isVisible() {
-      return this.source.nodeType !== "" && this.target.nodeType !== ""
+    ...mapGetters(["getNeighbours", "isAccordion", "isVisible"]),
+    show() {
+      return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
   },
   methods: {
@@ -54,7 +54,7 @@ export default {
       )
       if (userConfirmDelete) {
         if (this.canDelete()) {
-          await this.deleteLink([this.source.id, this.target.id])
+          await this.deleteLink({ source: this.source.id, target: this.target.id })
           if (this.isAccordion(this.source.id)) {
             this.source.childOrdering = this.source.childOrdering.filter(
               id => id !== this.target.id

@@ -40,7 +40,7 @@
 <script>
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
-import TapestryApi from "../services/TapestryAPI"
+import client from "../services/TapestryAPI"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -91,47 +91,23 @@ export default {
           return []
       }
     },
-    visibleNodes() {
-      if (this.isActive && this.activeFilterOption && this.activeFilterValue) {
-        switch (this.activeFilterOption) {
-          case filterOptions.AUTHOR: {
-            return Object.values(this.nodes)
-              .filter(node => node.author.id == this.activeFilterValue)
-              .map(node => node.id)
-          }
-          default:
-            break
-        }
-      }
-      return Object.keys(this.nodes)
-    },
   },
   watch: {
+    async filterValue(next) {
+      await this.refetchTapestryData(Number(next))
+      this.updateVisibleNodes(this.getVisibleNodes())
+    },
     isActive(isActive) {
       if (isActive) {
-        this.updateVisibleNodes(this.visibleNodes)
+        this.updateVisibleNodes([])
       } else {
         this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
       }
     },
-    visibleNodes(nodes) {
-      if (this.isActive) {
-        this.updateVisibleNodes(nodes)
-      }
-    },
-    async $route(to, from) {
-      if (from.query && from.query.q && from.query.q !== undefined) {
-        this.refetchTapestryData()
-      }
-      if (to.query && to.query.q && to.query.q !== undefined) {
-        this.refetchTapestryData(to.query.q)
-      }
-    },
   },
   async created() {
-    if (wpApiSettings && wpApiSettings.wpCanEditTapestry === "1") {
-      const tapestryApi = new TapestryApi(wpPostId)
-      this.allContributors = await tapestryApi.getAllContributors()
+    if (wpData.wpCanEditTapestry === "1") {
+      this.allContributors = await client.getAllContributors()
     }
   },
   methods: {
@@ -143,6 +119,20 @@ export default {
         this.filterValue = ""
       }
       this.isActive = !this.isActive
+    },
+    getVisibleNodes() {
+      if (this.isActive && this.filterOption && this.filterValue) {
+        switch (this.filterOption) {
+          case filterOptions.AUTHOR: {
+            return Object.values(this.nodes)
+              .filter(node => node.author.id == this.filterValue)
+              .map(node => node.id)
+          }
+          default:
+            break
+        }
+      }
+      return Object.keys(this.nodes).map(id => parseInt(id, 10))
     },
   },
 }

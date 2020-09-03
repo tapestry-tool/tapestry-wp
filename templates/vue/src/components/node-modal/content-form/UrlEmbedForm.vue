@@ -3,7 +3,7 @@
     <b-form-group label="External Link">
       <file-upload
         v-model="node.typeData.mediaURL"
-        data-testid="node-linkUrl"
+        input-test-id="node-linkUrl"
         placeholder="Enter embed link (starting with http)"
         @isUploading="handleUploadChange"
       />

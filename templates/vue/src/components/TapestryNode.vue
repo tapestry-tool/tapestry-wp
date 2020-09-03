@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <g
-      v-show="isVisible"
+      v-show="show"
       ref="node"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
@@ -63,7 +63,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add')"
+            v-if="hasPermission('add') && !isSubAccordionRow"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
@@ -105,6 +105,7 @@ import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
+import Helpers from "@/utils/Helpers"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 
@@ -131,8 +132,21 @@ export default {
     }
   },
   computed: {
-    ...mapState(["selection", "visibleNodes"]),
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapState(["selection", "settings", "visibleNodes"]),
+    ...mapGetters([
+      "getNode",
+      "getDirectChildren",
+      "isVisible",
+      "getParent",
+      "isAccordionRow",
+    ]),
+    isSubAccordionRow() {
+      const parent = this.getParent(this.node.id)
+      if (parent) {
+        return this.isAccordionRow(parent)
+      }
+      return false
+    },
     icon() {
       if (!this.node.accessible) {
         return "lock"
@@ -156,11 +170,11 @@ export default {
           return "exclamation"
       }
     },
-    isVisible() {
-      return this.node.nodeType !== ""
+    show() {
+      return this.isVisible(this.node.id)
     },
     radius() {
-      if (!this.isVisible) {
+      if (!this.show) {
         return 0
       }
       if (this.root) {
@@ -172,7 +186,10 @@ export default {
       return 140
     },
     fill() {
-      if (this.node.imageURL && this.node.nodeType !== "grandchild") {
+      const showImages = this.settings.hasOwnProperty("renderImages")
+        ? this.settings.renderImages
+        : true
+      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
         return `url(#node-image-${this.node.id})`
       }
       if (this.selected) {
@@ -320,50 +337,7 @@ export default {
       }
     },
     hasPermission(action) {
-      // Check 1: Has edit permissions for Tapestry
-      if (wpData.wpCanEditTapestry === "1") {
-        return true
-      }
-
-      // Check 2: User is the author of the node
-      if (wpData.currentUser.ID == this.node.author.id) {
-        return true
-      }
-
-      // Check 3: User has a role with general edit permissions
-      const { ID, roles } = wpData.currentUser
-      const allowedRoles = ["administrator", "editor", "author"]
-      if (allowedRoles.some(role => roles.includes(role))) {
-        return true
-      }
-
-      const { public: publicPermissions, authenticated } = this.node.permissions
-      // Check 4: Node has public permissions
-      if (publicPermissions.includes(action)) {
-        return true
-      }
-
-      // Check 5: Node has authenticated permissions
-      if (wpData.currentUser.ID && authenticated.includes(action)) {
-        return true
-      }
-
-      // Check 6: User has a role that is allowed in the node
-      const isRoleAllowed = roles.some(role => {
-        const permissions = this.node.permissions[role]
-        return permissions.includes(action)
-      })
-      if (isRoleAllowed) {
-        return true
-      }
-
-      // Check 7: User has a permission associated with its ID
-      const userPermissions = this.node.permissions[`user-${ID}`]
-      if (userPermissions) {
-        return userPermissions.includes(action)
-      }
-
-      return false
+      return Helpers.hasPermission(this.node, action)
     },
   },
 }
@@ -403,8 +377,13 @@ export default {
     transform: translate(-50%, -50%);
   }
 
+  > .fas.fa-play {
+    left: 55%;
+  }
+
   span {
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bolder;
   }
 
   &-wrapper {
