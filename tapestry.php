@@ -231,6 +231,7 @@ function tapestry_enqueue_libraries()
             wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
         }
 
+        wp_enqueue_script('es2015-test', plugin_dir_url(__FILE__).'es2015-test.js');
         wp_enqueue_script('jquery-min', plugin_dir_url(__FILE__).'templates/libs/jquery.min.js');
         wp_enqueue_script('jquery-ui', plugin_dir_url(__FILE__).'templates/libs/jquery-ui.min.js', ['jquery-min']);
         wp_enqueue_script('jscookie', plugin_dir_url(__FILE__).'templates/libs/jscookie.js', ['jquery']);
