@@ -1,4 +1,5 @@
 import Lightbox from "@/components/Lightbox"
+import store from "@/store"
 
 const ROOT_PATH = `/nodes/:nodeId`
 
@@ -57,6 +58,14 @@ const settings = {
 const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
   name: "modal",
+  beforeEnter: (to, _, next) => {
+    const { nodeId } = to.params
+    if (store.state.nodes.hasOwnProperty(nodeId)) {
+      next()
+    } else {
+      next({ name: app.name, params: { nodeId: store.state.rootId } })
+    }
+  },
 }
 
 const redirects = [
