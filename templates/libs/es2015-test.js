@@ -9,19 +9,34 @@ var str =
 try {
   eval(str);
 } catch (e) {
+
   var div = document.createElement("div");
-  var message = document.createTextNode(
-    "To use the Tapestry Tool, please update your browser. One of the following browsers would work:"
+  div.id = "old-browser";
+
+  var heading = document.createElement("h2");
+  var headingText = document.createTextNode(
+    "Your browser is outdated!"
   );
+  heading.appendChild(headingText);
+  div.appendChild(heading);
+
+  var message = document.createElement("p");
+  var messageText = document.createTextNode(
+    "Please update your browser to use the Tapestry Tool. These are some free and secure browsers:"
+  );
+  message.appendChild(messageText);
   div.appendChild(message);
 
+  var css = document.createElement("style");
+  css.innerText = "#old-browser { margin: 25vh auto; padding: 4em; border-radius: 1em; max-width: 900px; box-shadow: 5px 5px 40px -15px; } #old-browser h2 { margin: 0.5em; } #old-browser p { margin: 2em 0; } #old-browser ul { display: inline-flex; } #old-browser ul li { margin: 0 2em; list-style-type: none; }"
+  div.appendChild(css);
+
+  var list = document.createElement("ul");
   var browsers = [
-    ["Firefox", "https://www.mozilla.org/en-CA/firefox/new/"],
+    ["Mozilla Firefox", "https://www.mozilla.org/en-CA/firefox/new/"],
     ["Google Chrome", "https://www.google.ca/chrome/"],
     ["Microsoft Edge", "https://www.microsoft.com/en-us/edge"],
   ];
-
-  var list = document.createElement("ul");
   for (let i = 0; i < browsers.length; i++) {
     var browserData = browsers[i];
     var name = browserData[0];
@@ -34,9 +49,16 @@ try {
     listItem.appendChild(anchor);
     list.appendChild(listItem);
   }
+  div.appendChild(list);
 
-  var body = document.createElement("body");
-  body.appendChild(div);
-  body.appendChild(list);
-  document.body = body;
+  window.addEventListener('DOMContentLoaded', (event) => {  
+    var body = document.getElementById("app");
+    if (!body) {
+      body = document.createElement("body");
+      document.body = body;
+    }
+    body.innerHTML = '';
+    body.appendChild(div);
+  });
+
 }
