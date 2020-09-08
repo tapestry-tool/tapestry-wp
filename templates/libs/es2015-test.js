@@ -15,20 +15,20 @@ try {
 
   var heading = document.createElement("h2");
   var headingText = document.createTextNode(
-    "Your browser is outdated!"
+    "Your browser is not supported."
   );
   heading.appendChild(headingText);
   div.appendChild(heading);
 
   var message = document.createElement("p");
   var messageText = document.createTextNode(
-    "Please update your browser to use the Tapestry Tool. These are some free and secure browsers:"
+    "Tapestry uses modern web technologies that require newer browsers. Please update your browser to use the Tapestry Tool. These are some free and secure web browsers you may download now:"
   );
   message.appendChild(messageText);
   div.appendChild(message);
 
   var css = document.createElement("style");
-  css.innerText = "#old-browser { margin: 25vh auto; padding: 4em; border-radius: 1em; max-width: 900px; box-shadow: 5px 5px 40px -15px; } #old-browser h2 { margin: 0.5em; } #old-browser p { margin: 2em 0; } #old-browser ul { display: inline-flex; } #old-browser ul li { margin: 0 2em; list-style-type: none; }"
+  css.innerText = "#old-browser { margin: 25vh auto; padding: 4em; border-radius: 1em; max-width: 900px; box-shadow: 5px 5px 40px -15px; text-align: center; } #old-browser h2 { margin: 0.5em; } #old-browser p { margin: 2em 0; } #old-browser ul { display: inline-flex; } #old-browser ul li { margin: 0 2em; list-style-type: none; }"
   div.appendChild(css);
 
   var list = document.createElement("ul");
@@ -45,6 +45,7 @@ try {
     var listItem = document.createElement("li");
     var anchor = document.createElement("a");
     anchor.href = link;
+    anchor.target = "_blank";
     anchor.appendChild(document.createTextNode(name));
     listItem.appendChild(anchor);
     list.appendChild(listItem);
@@ -52,7 +53,7 @@ try {
   div.appendChild(list);
 
   window.addEventListener('DOMContentLoaded', (event) => {  
-    var body = document.getElementById("app");
+    var body = document.getElementById("content");
     if (!body) {
       body = document.createElement("body");
       document.body = body;
