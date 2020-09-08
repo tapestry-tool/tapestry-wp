@@ -69,9 +69,6 @@ export default {
       showPlayScreen: !this.autoplay,
     }
   },
-  beforeDestroy() {
-    thisTapestryTool.init(true)
-  },
   computed: {
     ...mapState(["h5pSettings"]),
   },
