@@ -61,10 +61,10 @@ export default {
       const videoHeight = box.height
       if (videoHeight > this.dimensions.height && this.node.fitWindow) {
         const scaleFactor = this.dimensions.height / videoHeight
-        this.frameHeight = this.dimensions.height
+        this.frameHeight = 100 * scaleFactor + "%"
         this.frameWidth = 100 * scaleFactor + "%"
       } else {
-        this.frameHeight = videoHeight
+        this.frameHeight = "100%"
       }
       this.$emit("change:dimensions", {
         width: this.frameWidth,
