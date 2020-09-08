@@ -106,7 +106,7 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     nodeOptions() {
-      return this.nodes
+      return Object.values(this.nodes)
         .filter(node => node.id !== this.node.id)
         .map(node => ({
           value: node.id,

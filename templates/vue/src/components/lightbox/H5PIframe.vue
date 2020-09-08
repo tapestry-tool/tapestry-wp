@@ -13,6 +13,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -44,6 +45,7 @@ export default {
       frameHeight: 0,
       frameWidth: "100%",
       played: false,
+      type: null,
     }
   },
   watch: {
@@ -150,20 +152,18 @@ export default {
         h5pVideo.setCaptionsTrack(settings.caption)
       }
     },
-    handlePlay(node) {
+    handlePlay() {
       this.$emit("show-play-screen", false)
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
-      thisTapestryTool.recordAnalyticsEvent("user", "play", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
+        time: progress * mediaDuration,
       })
     },
-    handlePause(node) {
+    handlePause() {
       this.$emit("show-play-screen", true)
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
-      thisTapestryTool.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-        time: node.typeData.progress[0].value * node.mediaDuration,
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+        time: progress * mediaDuration,
       })
     },
     handleLoad() {
@@ -187,7 +187,7 @@ export default {
         return
       }
 
-      const mediaProgress = this.node.typeData.progress[0].value
+      const mediaProgress = this.node.progress
 
       if (h5pLibraryName === "H5P.InteractiveVideo") {
         const h5pVideo = h5pInstance.video
@@ -222,7 +222,6 @@ export default {
                     const amountViewed = currentPlayedTime / videoDuration
 
                     h5pIframeComponent.$emit("timeupdate", amountViewed)
-                    thisTapestryTool.updateProgressBars()
 
                     h5pIframeComponent.updateSettings(h5pVideo)
 
@@ -245,18 +244,12 @@ export default {
                 h5pIframeComponent.handlePause(h5pIframeComponent.node)
                 break
               }
-
-              case h5pObj.Video.BUFFERING: {
-                const { id, mediaType } = h5pIframeComponent.node
-                thisTapestryTool.updateMediaIcon(id, mediaType, "loading")
-                break
-              }
             }
           })
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
               h5pVideo.play()
-              thisTapestryTool.recordAnalyticsEvent(
+              client.recordAnalyticsEvent(
                 "app",
                 "auto-play",
                 "h5p-video",

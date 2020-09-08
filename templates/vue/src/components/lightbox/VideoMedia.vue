@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
 import PlayScreen from "./PlayScreen"
@@ -98,8 +99,10 @@ export default {
   },
   watch: {
     node(newNode, oldNode) {
-      this.handlePause(oldNode)
-      this.handleLoad()
+      if (newNode.id !== oldNode.id) {
+        this.handlePause(oldNode)
+        this.handleLoad()
+      }
     },
   },
   beforeDestroy() {
@@ -138,7 +141,7 @@ export default {
       this.$emit("close")
     },
     getInitialEndScreenState() {
-      const progress = this.node.typeData.progress[0].value
+      const progress = this.node.progress
       if (progress >= 1) {
         return true
       }
@@ -148,25 +151,21 @@ export default {
       }
       return false
     },
-    handlePlay(node) {
+    handlePlay() {
       this.showPlayScreen = false
       this.showEndScreen = false
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "pause")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "play", "html5-video", id, {
+        client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
           time: video.currentTime,
         })
       }
     },
-    handlePause(node) {
+    handlePause() {
       this.showPlayScreen = true
-      const { id, mediaType } = node
-      thisTapestryTool.updateMediaIcon(id, mediaType, "play")
       const video = this.$refs.video
       if (video) {
-        thisTapestryTool.recordAnalyticsEvent("user", "pause", "html5-video", id, {
+        client.recordAnalyticsEvent("user", "pause", "html5-video", this.node.id, {
           time: video.currentTime,
         })
       }
@@ -183,7 +182,7 @@ export default {
     seek() {
       const video = this.$refs.video
       if (video) {
-        const progress = this.node.typeData.progress[0].value
+        const progress = this.node.progress
         const viewedAmount = progress * video.duration
         video.currentTime = viewedAmount
       }
