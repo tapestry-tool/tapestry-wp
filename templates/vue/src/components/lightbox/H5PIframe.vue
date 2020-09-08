@@ -45,6 +45,7 @@ export default {
       frameHeight: 0,
       frameWidth: "100%",
       played: false,
+      type: null,
     }
   },
   watch: {

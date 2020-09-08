@@ -103,7 +103,7 @@ export default {
   },
   mounted() {
     const track = this.$refs.track
-    track.setAttribute("r", this.radius - this.width / 2)
+    track.setAttribute("r", Math.max(this.radius - this.width / 2, 0))
 
     this.$refs.path.setAttribute(
       "d",
