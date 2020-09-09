@@ -182,7 +182,7 @@ import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
-import { getLinkMetadata } from "@/services/LinkPreviewApi"
+// import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import ReviewForm from "./node-modal/ReviewForm"
 
 const shouldFetch = (url, selectedNode) => {

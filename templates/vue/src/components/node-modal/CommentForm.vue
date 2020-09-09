@@ -1,9 +1,9 @@
 <template>
   <div class="comment-form">
     <b-form-group label="Comment Thread">
-      <rich-text-form
+      <rich-text-form-simple
         id="node-description"
-        ref="richTextForm"
+        ref="richTextFormSimple"
         v-model="comment"
         placeholder="Enter a comment"
       />
@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import RichTextForm from "./content-form/RichTextForm"
+import RichTextFormSimple from "./content-form/RichTextFormSimple"
 import moment from "moment-timezone"
 
 export default {
   components: {
-    RichTextForm,
+    RichTextFormSimple,
   },
   props: {
     node: {
@@ -48,7 +48,7 @@ export default {
         author_email: data.user_email,
       })
       this.$emit("submit")
-      this.$refs.richTextForm.clear()
+      this.$refs.richTextFormSimple.clear()
     },
   },
 }

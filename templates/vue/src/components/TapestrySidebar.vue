@@ -74,7 +74,7 @@
               v-html="license.description"
             ></div>
           </section>
-          <section v-if="showReview">
+          <section>
             <h2 class="content-header">Review</h2>
             <div class="content-body">Status: {{ node.status }}</div>
             <h2 class="content-header">Comments</h2>

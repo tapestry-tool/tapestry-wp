@@ -13,3 +13,15 @@ export default {
   props: ["comment"],
 }
 </script>
+
+<style scoped>
+* {
+  color: black;
+}
+
+.card {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+</style>
