@@ -4,7 +4,7 @@
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
     </header>
-    <tapestry-accordion :rows="rows">
+    <tapestry-accordion :rows="rows.map(row => row.node.id)">
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div class="rows">
           <div
@@ -17,7 +17,7 @@
               <button
                 class="button-row-trigger"
                 :disabled="disableRow(index)"
-                @click="toggle(row)"
+                @click="toggle(row.node.id)"
               >
                 <div class="button-row-icon">
                   <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
@@ -57,7 +57,7 @@
                 </a>
               </div>
             </div>
-            <div v-if="isVisible(row)" class="content">
+            <div v-if="isVisible(row.node.id)" class="content">
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
@@ -65,7 +65,7 @@
                 :read-only="readOnly"
                 style="margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
-                @close="toggle(row)"
+                @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
               <p v-if="row.children.length > 0" class="sub-accordion-text">
@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations, mapState } from "vuex"
+import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import SubAccordion from "./accordion/SubAccordion"
@@ -125,6 +125,7 @@ import TydeIcon from "../tyde/TydeIcon"
 import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "accordion-media",
@@ -155,8 +156,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite"]),
-    ...mapState(["selectedModuleId"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isAccordion"]),
+    ...mapState(["selectedModuleId", "favourites"]),
     confirmationStyles() {
       return {
         backgroundColor: "white",
@@ -186,7 +187,7 @@ export default {
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
-        const children = node.isSubAccordion
+        const children = this.isAccordion(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
@@ -222,12 +223,12 @@ export default {
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
-          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
             to: 0,
           })
           this.$refs.container.scrollTop = 0
         } else {
-          globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
             to: el.offsetTop - 12,
           })
           this.$refs.container.scrollTop = el.offsetTop - 12
@@ -237,7 +238,7 @@ export default {
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
-        globals.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+        client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
           to: 0,
         })
         el.scrollTop = 0
@@ -247,26 +248,26 @@ export default {
       if (this.activeIndex === index) {
         const activeRowId = this.rows[this.activeIndex].node.id
         this.activeIndex = -1
-        globals.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
+        client.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
           accordion: this.node.id,
         })
       } else {
         this.activeIndex = index
         const activeRowId = this.rows[this.activeIndex].node.id
-        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+        client.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
           accordion: this.node.id,
         })
       }
     },
     next(evt) {
-      globals.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
+      client.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })
       if (this.hasNext) {
         this.activeIndex++
         const activeRowId = this.rows[this.activeIndex].node.id
-        globals.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
+        client.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
           accordion: this.node.id,
         })
       } else {
@@ -274,14 +275,14 @@ export default {
       }
     },
     handleClose(evt) {
-      globals.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
+      client.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })
       this.$emit("close")
     },
     handleCancel(evt) {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "close",
         "accordion-completion-screen",
@@ -306,10 +307,6 @@ export default {
         if (!accordionProgress.includes(rowId)) {
           accordionProgress.push(rowId)
 
-          await this.updateNodeProgress({
-            id: this.node.id,
-            progress: accordionProgress.length / this.rows.length,
-          })
           await this.updateNode({
             id: this.node.id,
             newNode: { accordionProgress },

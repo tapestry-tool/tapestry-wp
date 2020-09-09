@@ -91,15 +91,12 @@
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
     <template slot="modal-footer">
-      <b-button
-        v-show="modalType === 'edit'"
-        size="sm"
-        variant="danger"
+      <delete-node-button
+        v-if="modalType === 'edit'"
+        :node-id="nodeId"
         :disabled="disableDeleteButton"
-        @click="deleteNode"
-      >
-        Delete Node
-      </b-button>
+        @submit="close"
+      ></delete-node-button>
       <p v-if="disableDeleteButton" class="disable-message text-muted">
         You cannot delete this node because this {{ node.tydeType }} node still has
         children.
@@ -115,7 +112,7 @@
         :disabled="!canSubmit"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit"></b-spinner>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
         <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
@@ -146,7 +143,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import { tydeTypes } from "../utils/constants"
@@ -157,6 +154,7 @@ import ContentForm from "./node-modal/ContentForm"
 import SpaceshipPartForm from "./node-modal/SpaceshipPartForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -182,6 +180,7 @@ export default {
     SlickList,
     PermissionsTable,
     SpaceshipPartForm,
+    DeleteNodeButton,
   },
   props: {
     nodeId: {
@@ -221,9 +220,8 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
-      "settings",
-      "tapestry",
     ]),
+    ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
       return this.getNode(this.parentId)
     },
@@ -274,7 +272,6 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
-        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
@@ -292,13 +289,12 @@ export default {
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId == "node-modal") {
-        thisTapestryTool.enableMovements()
         this.ready = false
       }
     })
   },
   methods: {
-    ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -319,20 +315,15 @@ export default {
       }
     },
     hasSubAccordion(node) {
-      const parents = this.getDirectParents(node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
+      if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return parent.mediaType === "accordion" && children.length > 0
+        return this.parent.mediaType === "accordion" && children.length > 0
       }
       return false
     },
     close() {
       this.$bvModal.hide("node-modal")
       this.$emit("cancel")
-    },
-    deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry()
     },
     async handleSubmit() {
       this.formErrors = this.validateNode()
@@ -367,24 +358,24 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.parent.childOrdering.push(id)
+          this.updateNode({
+            id: this.parent.id,
+            newNode: {
+              childOrdering: [...this.parent.childOrdering, id],
+            },
+          })
         } else {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
         }
+        this.updateVisibleNodes([...this.visibleNodes, id])
       } else {
         await this.updateNode({
           id: this.node.id,
           newNode: this.node,
         })
       }
-      await this.updateLockedStatus(this.node.id)
-
-      thisTapestryTool.setDataset(this.tapestry)
-      thisTapestryTool.setOriginalDataset(this.tapestry)
-      thisTapestryTool.initialize(true)
-
-      this.close()
+      await this.updateLockedStatus()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {
@@ -477,6 +468,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          errMsgs.push("Please enter numeric value for H5P Video Duration")
+        }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
@@ -500,10 +494,7 @@ export default {
       })
     },
     updateOrderingArray(arr) {
-      this.updateOrdering({
-        id: this.node.id,
-        ord: arr,
-      })
+      this.node.childOrdering = arr
     },
     handleTypeChange() {
       this.node.quiz = this.node.quiz.filter(q =>
@@ -645,6 +636,16 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#submit-button {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div {
+    margin-right: 4px;
+  }
 }
 
 #node-modal-container {

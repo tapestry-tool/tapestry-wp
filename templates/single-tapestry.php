@@ -12,7 +12,7 @@
 get_header();
 
 if (current_user_can('edit_post', get_the_ID())) {
-    $additionalClasses = 'is-editor"';
+    $additionalClasses = 'is-editor';
 }
 
 ?>
@@ -49,71 +49,6 @@ if (current_user_can('edit_post', get_the_ID())) {
             var wpUserId = "<?php echo apply_filters('determine_current_user', false); ?>";
             var apiUrl = "<?php echo get_rest_url(null, 'tapestry-tool/v1'); ?>";
             var adminAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
-
-            var globals = { recordAnalyticsEvent }
-            /****************************************************
-             * ANALYTICS FUNCTIONS
-             ****************************************************/
-
-            function recordAnalyticsEvent(actor, action, object, objectID, details) {
-
-                if (wpUserId && wpUserId !== "") {
-                    var userUUID = wpUserId;
-                } else {
-                    var userUUID = Cookies.get("user-uuid");
-                    if (userUUID === undefined) {
-                        userUUID = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                            return v.toString(16);
-                        });
-                        Cookies.set("user-uuid", userUUID);
-                    }
-                }
-
-                if (details === undefined) {
-                    details = {};
-                }
-
-                details['user-ip'] = $('#user-ip').text();
-
-                var data = {
-                    'actor': actor,
-                    'action': action,
-                    'object': object,
-                    'user_guid': userUUID,
-                    'object_id': objectID,
-                    'details': JSON.stringify(details),
-                };
-
-                // Send the event to an AJAX URL to be saved
-                jQuery.ajax({
-                    url: apiUrl + '/analytics',
-                    method: 'POST',
-                    data: JSON.stringify(data),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                });
-            }
-
-            recordAnalyticsEvent('user', 'request', 'tapestry', wpPostId);
-
-            // Capture click events anywhere inside or outside tapestry
-            $(document).ready(function() {
-                document.body.addEventListener('click', function(event) {
-                    var x = event.clientX + $(window).scrollLeft();
-                    var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'screen', null, { x, y });
-                }, true);
-
-                document.getElementById('tapestry').addEventListener('click', function(event) {
-                    var x = event.clientX + $(window).scrollLeft();
-                    var y = event.clientY + $(window).scrollTop();
-                    recordAnalyticsEvent('user', 'click', 'tapestry', null, {
-                        'x': x,
-                        'y': y
-                    });
-                }, true);
-            });
         </script>
 		
 		<?php

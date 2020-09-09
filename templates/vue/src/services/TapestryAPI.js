@@ -1,7 +1,7 @@
 import axios from "axios"
 import Helpers from "../utils/Helpers"
 
-export default class {
+class TapestryApi {
   /**
    *
    * @param {Number} postId
@@ -62,6 +62,11 @@ export default class {
     return response
   }
 
+  async deleteNode(id) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}`
+    return await axios.delete(url)
+  }
+
   /**
    * Add link
    *
@@ -73,6 +78,11 @@ export default class {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
     const response = await axios.post(url, link)
     return response
+  }
+
+  async deleteLink(linkIndex) {
+    const url = `${apiUrl}/tapestries/${this.postId}/links`
+    return await axios.delete(url, { data: linkIndex })
   }
 
   /**
@@ -101,6 +111,11 @@ export default class {
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
     const response = await axios.put(url, node)
     return response
+  }
+
+  async updateNodeCoordinates(id, coordinates) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/coordinates`
+    return await axios.put(url, coordinates)
   }
 
   async getUserProgress() {
@@ -212,4 +227,32 @@ export default class {
     const response = await axios.get(url)
     return response.data
   }
+
+  async recordAnalyticsEvent(actor, action, object, objectID, details = {}) {
+    const analyticsAJAXUrl = "" // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
+    const analyticsAJAXAction = "tapestry_tool_log_event" // Analytics
+
+    if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length) {
+      return false
+    }
+
+    // TODO: Also need to save the tapestry slug or ID in the events
+
+    details["user-ip"] = document.getElementById("user-ip").innerText
+
+    const data = {
+      action: analyticsAJAXAction,
+      actor: actor,
+      action2: action,
+      object: object,
+      user_guid: Helpers.createUUID(),
+      object_id: objectID,
+      details: JSON.stringify(details),
+    }
+
+    // Send the event to an AJAX URL to be saved
+    await axios.post(analyticsAJAXUrl, data)
+  }
 }
+
+export default new TapestryApi(wpPostId)

@@ -38,9 +38,9 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
-import TapestryApi from "../services/TapestryAPI"
+import client from "../services/TapestryAPI"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -80,7 +80,10 @@ export default {
             ? Object.values(this.allContributors)
             : [
                 ...new Map(
-                  this.nodes.map(node => [node.author.id, node.author])
+                  Object.values(this.nodes).map(node => [
+                    node.author.id,
+                    node.author,
+                  ])
                 ).values(),
               ]
         }
@@ -92,16 +95,23 @@ export default {
   watch: {
     async filterValue(next) {
       await this.refetchTapestryData(Number(next))
-      thisTapestryTool.updateVisibleNodes(this.filterOption, this.filterValue)
+      this.updateVisibleNodes(this.getVisibleNodes())
+    },
+    isActive(isActive) {
+      if (isActive) {
+        this.updateVisibleNodes([])
+      } else {
+        this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
+      }
     },
   },
   async created() {
-    if (wpApiSettings && wpApiSettings.wpCanEditTapestry === "1") {
-      const tapestryApi = new TapestryApi(wpPostId)
-      this.allContributors = await tapestryApi.getAllContributors()
+    if (wpData.wpCanEditTapestry === "1") {
+      this.allContributors = await client.getAllContributors()
     }
   },
   methods: {
+    ...mapMutations(["updateVisibleNodes"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
@@ -110,6 +120,20 @@ export default {
       }
       this.isActive = !this.isActive
     },
+    getVisibleNodes() {
+      if (this.isActive && this.filterOption && this.filterValue) {
+        switch (this.filterOption) {
+          case filterOptions.AUTHOR: {
+            return Object.values(this.nodes)
+              .filter(node => node.author.id == this.filterValue)
+              .map(node => node.id)
+          }
+          default:
+            break
+        }
+      }
+      return Object.keys(this.nodes).map(id => parseInt(id, 10))
+    },
   },
 }
 </script>
@@ -117,9 +141,6 @@ export default {
 <style lang="scss" scoped>
 .filter {
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 10vw;
   height: 32px;
 
   button {

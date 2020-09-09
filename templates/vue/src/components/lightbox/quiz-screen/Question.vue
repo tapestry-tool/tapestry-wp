@@ -97,6 +97,7 @@ import Loading from "../../Loading"
 import TapestryActivity from "@/components/TapestryActivity"
 import SpeechBubble from "@/components/SpeechBubble"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "question",
@@ -195,7 +196,7 @@ export default {
         .filter(Boolean)
     },
     back() {
-      globals.recordAnalyticsEvent("user", "back", "question", this.question.id)
+      client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       const wasOpened = this.formOpened || this.recorderOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
@@ -204,7 +205,7 @@ export default {
       this.recorderOpened = false
     },
     openRecorder() {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "click",
         "answer-button",
@@ -216,7 +217,7 @@ export default {
       this.recorderOpened = true
     },
     openForm(id, answerType) {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "click",
         "answer-button",
@@ -244,13 +245,10 @@ export default {
           questionId: this.question.id,
         })
         this.loading = false
-        globals.recordAnalyticsEvent(
-          "user",
-          "submit",
-          "question",
-          this.question.id,
-          { type: this.formType, id: this.formId }
-        )
+        client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+          type: this.formType,
+          id: this.formId,
+        })
         this.$emit("submit")
       }
     },
@@ -272,7 +270,7 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
-      globals.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: "audio",
       })
       this.$emit("submit")

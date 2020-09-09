@@ -1,32 +1,33 @@
 <template>
-  <div id="app">
-    <tyde @add-root="addRootNode" />
-    <router-view v-if="tapestryIsLoaded"></router-view>
-    <tapestry-filter v-if="tapestryIsLoaded && enableFilter" />
+  <loading v-if="loading" style="height: 75vh;"></loading>
+  <div v-else id="app">
+    <tyde />
+    <router-view></router-view>
+    <tapestry-sidebar />
     <node-modal
-      v-if="tapestryIsLoaded"
       :node-id="nodeId"
       :parent-id="parentId"
       :modal-type="modalType"
       @cancel="closeModal"
+      @submit="closeModal"
     />
-    <tapestry-sidebar v-if="tapestryIsLoaded" @edit="editNode" />
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
 import Tyde from "./components/Tyde"
-import TapestryFilter from "./components/TapestryFilter"
 import NodeModal from "@/components/NodeModal"
 import TapestrySidebar from "@/components/TapestrySidebar"
+import Loading from "./components/Loading"
+import client from "./services/TapestryAPI"
 
 export default {
   name: "app",
   components: {
     Tyde,
     NodeModal,
-    TapestryFilter,
+    Loading,
     TapestrySidebar,
   },
   data() {
@@ -35,37 +36,52 @@ export default {
       nodeId: null,
       parentId: null,
       enableFilter: false,
+      loading: true,
     }
   },
   computed: {
     ...mapGetters(["getParent"]),
-    ...mapState(["tapestryIsLoaded", "selectedNodeId", "getDirectParents"]),
   },
   mounted() {
-    window.addEventListener("add-new-node", this.addNewNode)
-    window.addEventListener("edit-node", this.editNode)
+    window.addEventListener("click", this.recordAnalytics)
+    const data = [client.getTapestry(), client.getUserProgress()]
+    Promise.all(data).then(([dataset, progress]) => {
+      this.init({ dataset, progress })
+      this.loading = false
+    })
+
+    this.$root.$on("add-node", to => {
+      this.modalType = "add"
+      this.parentId = to
+      this.nodeId = to
+      this.$bvModal.show("node-modal")
+    })
+
+    this.$root.$on("edit-node", nodeId => {
+      this.modalType = "edit"
+      const parent = this.getParent(nodeId)
+      this.parentId = parent && parent.id
+      this.nodeId = nodeId
+      this.$bvModal.show("node-modal")
+    })
+  },
+  beforeDestroy() {
+    window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    addRootNode() {
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
-    },
-    addNewNode() {
-      this.modalType = "add"
-      this.nodeId = this.selectedNodeId
-      this.parentId = this.selectedNodeId
-      this.$bvModal.show("node-modal")
-    },
-    editNode() {
-      this.modalType = "edit"
-      this.nodeId = this.selectedNodeId
-      const parent = this.getParent(this.selectedNodeId)
-      this.parentId = parent && parent.id
-      this.$bvModal.show("node-modal")
-    },
+    ...mapMutations(["init"]),
     closeModal() {
       this.parentId = null
+      this.$bvModal.hide("node-modal")
       this.modalType = ""
+    },
+    recordAnalytics(evt) {
+      const x = evt.clientX + window.scrollLeft
+      const y = evt.clientY + window.scrollTop
+      client.recordAnalyticsEvent("user", "click", "screen", null, {
+        x: x,
+        y: y,
+      })
     },
   },
 }

@@ -51,6 +51,7 @@
 <script>
 import AudioRecoder from "audio-recorder-polyfill"
 import { mapGetters } from "vuex"
+import client from "@/services/TapestryAPI"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {
@@ -171,30 +172,30 @@ export default {
       clearInterval(this.durationInterval)
     },
     startRecording() {
-      globals.recordAnalyticsEvent("user", "start", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "start", "audio-recorder", this.id)
       this.recorder.start()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     pauseRecording() {
-      globals.recordAnalyticsEvent("user", "pause", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "pause", "audio-recorder", this.id)
       this.recorder.pause()
       this.stopDurationCount()
       this.state = this.states.PAUSED
     },
     resumeRecording() {
-      globals.recordAnalyticsEvent("user", "resume", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "resume", "audio-recorder", this.id)
       this.recorder.resume()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     stopRecording() {
-      globals.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
     },
     resetRecording() {
-      globals.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
     },
@@ -212,7 +213,7 @@ export default {
       }
     },
     handleSubmit() {
-      globals.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
+      client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
       this.$emit("submit", this.audio)
     },
   },

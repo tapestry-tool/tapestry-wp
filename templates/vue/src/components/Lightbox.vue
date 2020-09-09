@@ -1,6 +1,5 @@
 <template>
   <tapestry-modal
-    v-if="tapestryIsLoaded"
     id="lightbox"
     :class="{
       'full-screen': node.fullscreen,
@@ -36,6 +35,7 @@ import TapestryMedia from "./TapestryMedia"
 import Helpers from "@/utils/Helpers"
 import { sizes, tydeTypes } from "@/utils/constants"
 import { mapActions, mapMutations, mapGetters, mapState } from "vuex"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "lightbox",
@@ -63,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "tapestryIsLoaded"]),
+    ...mapState(["h5pSettings"]),
     ...mapGetters(["getNode", "getDirectParents"]),
     node() {
       return this.getNode(this.nodeId)
@@ -156,24 +156,17 @@ export default {
     },
   },
   watch: {
-    tapestryIsLoaded() {
-      this.applyDimensions()
-    },
     nodeId() {
       this.applyDimensions()
-      thisTapestryTool.selectNode(Number(this.nodeId))
     },
   },
   mounted() {
     this.isLoaded = true
     this.applyDimensions()
-    thisTapestryTool.selectNode(Number(this.nodeId))
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-    thisTapestryTool.disableMovements()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    thisTapestryTool.enableMovements()
   },
   methods: {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
@@ -190,11 +183,11 @@ export default {
       }
     },
     handleUserClose() {
-      globals.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
+      client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
       this.close()
     },
     handleAutoClose() {
-      globals.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
+      client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
       this.close()
     },
     close() {

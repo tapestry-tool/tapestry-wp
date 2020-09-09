@@ -1,21 +1,22 @@
 <template>
   <div id="tyde">
-    <tapestry @add-root="$emit('add-root')" />
+    <tapestry-app />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="closeModule" />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>
 </template>
 
 <script>
-import Tapestry from "./Tapestry"
+import TapestryApp from "./components/TapestryApp"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
+import client from "@/services/TapestryAPI"
 import "../tyde.scss"
 
 export default {
   name: "tyde",
   components: {
-    Tapestry,
+    TapestryApp,
     TydeModule,
     TydeSpaceship,
   },
@@ -34,7 +35,7 @@ export default {
   },
   methods: {
     closeModule() {
-      globals.recordAnalyticsEvent("app", "close", "module", this.moduleId)
+      client.recordAnalyticsEvent("app", "close", "module", this.moduleId)
       this.showModule = false
     },
   },

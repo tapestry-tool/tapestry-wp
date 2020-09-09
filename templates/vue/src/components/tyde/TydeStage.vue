@@ -51,6 +51,7 @@ import ActiveStar from "@/assets/star-active.png"
 import InactiveStar from "@/assets/star-inactive.png"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "tyde-stage",
@@ -143,18 +144,18 @@ export default {
       return {}
     },
     openTopic(evt, id) {
-      globals.recordAnalyticsEvent("user", "click", "topic", id, {
+      client.recordAnalyticsEvent("user", "click", "topic", id, {
         x: evt.clientX,
         y: evt.clientY,
       })
       this.openLightbox(id)
     },
     openLightbox(id) {
-      globals.recordAnalyticsEvent("user", "open", "topic", id)
+      client.recordAnalyticsEvent("user", "open", "topic", id)
       this.$router.push(`/nodes/${id}`)
     },
     handleClick(evt, type) {
-      globals.recordAnalyticsEvent("user", "click", `stage-${type}-button`, null, {
+      client.recordAnalyticsEvent("user", "click", `stage-${type}-button`, null, {
         x: evt.clientX,
         y: evt.clientY,
       })
