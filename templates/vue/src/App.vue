@@ -1,63 +1,80 @@
 <template>
-  <div id="app">
-    <tapestry @add-root="addRootNode" />
-    <router-view v-if="tapestryIsLoaded"></router-view>
-    <tapestry-filter v-if="tapestryIsLoaded" />
+  <loading v-if="loading" style="height: 75vh;"></loading>
+  <div v-else id="app">
+    <tapestry-app />
+    <router-view></router-view>
+    <tapestry-sidebar />
     <node-modal
-      v-if="tapestryIsLoaded"
       :node-id="nodeId"
       :modal-type="modalType"
       @cancel="closeModal"
+      @submit="closeModal"
     />
-    <tapestry-sidebar v-if="tapestryIsLoaded" @edit="editNode" />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
-import Tapestry from "./components/Tapestry"
-import TapestryFilter from "./components/TapestryFilter"
-import NodeModal from "@/components/NodeModal"
-import TapestrySidebar from "@/components/TapestrySidebar"
+import { mapState, mapMutations } from "vuex"
+import NodeModal from "./components/NodeModal"
+import TapestryApp from "./components/TapestryApp"
+import TapestrySidebar from "./components/TapestrySidebar"
+import Loading from "./components/Loading"
+import client from "./services/TapestryAPI"
 
 export default {
   name: "app",
   components: {
+    Loading,
     NodeModal,
-    Tapestry,
-    TapestryFilter,
+    TapestryApp,
     TapestrySidebar,
   },
   data() {
     return {
       modalType: "",
       nodeId: null,
+      loading: true,
     }
   },
   computed: {
-    ...mapState(["tapestryIsLoaded", "selectedNodeId"]),
+    ...mapState(["selectedNodeId"]),
   },
   mounted() {
-    window.addEventListener("add-new-node", this.addNewNode)
-    window.addEventListener("edit-node", this.editNode)
+    window.addEventListener("click", this.recordAnalytics)
+    const data = [client.getTapestry(), client.getUserProgress()]
+    Promise.all(data).then(([dataset, progress]) => {
+      this.init({ dataset, progress })
+      this.loading = false
+    })
+
+    this.$root.$on("add-node", to => {
+      this.modalType = "add"
+      this.nodeId = to
+      this.$bvModal.show("node-modal")
+    })
+
+    this.$root.$on("edit-node", nodeId => {
+      this.modalType = "edit"
+      this.nodeId = nodeId
+      this.$bvModal.show("node-modal")
+    })
+  },
+  beforeDestroy() {
+    window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    addRootNode() {
-      this.modalType = "add"
-      this.$bvModal.show("node-modal")
-    },
-    addNewNode() {
-      this.modalType = "add"
-      this.nodeId = this.selectedNodeId
-      this.$bvModal.show("node-modal")
-    },
-    editNode() {
-      this.modalType = "edit"
-      this.nodeId = this.selectedNodeId
-      this.$bvModal.show("node-modal")
-    },
+    ...mapMutations(["init"]),
     closeModal() {
+      this.$bvModal.hide("node-modal")
       this.modalType = ""
+    },
+    recordAnalytics(evt) {
+      const x = evt.clientX + window.scrollLeft
+      const y = evt.clientY + window.scrollTop
+      client.recordAnalyticsEvent("user", "click", "screen", null, {
+        x: x,
+        y: y,
+      })
     },
   },
 }

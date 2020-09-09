@@ -20,5 +20,10 @@ export default {
       required: true,
     },
   },
+  created() {
+    if (!this.node.typeData.textContent) {
+      this.node.typeData.textContent = ""
+    }
+  },
 }
 </script>

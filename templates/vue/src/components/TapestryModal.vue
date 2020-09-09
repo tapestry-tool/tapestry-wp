@@ -8,10 +8,10 @@
           <modal-button
             icon="heart"
             icon-size="sm"
-            :title="favourited ? 'Remove from Favourites' : 'Add to Favourites'"
-            :icon-color="favourited ? 'red' : ''"
-            :bg-color="favourited ? '#fff' : ''"
-            :bg-hover-color="favourited ? '#fff' : 'red'"
+            :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
+            :icon-color="isFavourite ? 'red' : ''"
+            :bg-color="isFavourite ? '#fff' : ''"
+            :bg-hover-color="isFavourite ? '#fff' : 'red'"
             @clicked="toggleFavourite(nodeId)"
           />
         </div>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapState } from "vuex"
 import ModalButton from "./ModalButton"
 
 const defaultStyles = {
@@ -71,9 +71,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isFavourite"]),
-    favourited() {
-      return this.isFavourite(this.nodeId)
+    ...mapState(["favourites"]),
+    isFavourite() {
+      return this.favourites.find(id => id == this.nodeId)
     },
   },
   mounted() {
