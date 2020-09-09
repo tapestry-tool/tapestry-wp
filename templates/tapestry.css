@@ -22,6 +22,10 @@ body.admin-bar .modal[role="dialog"] {
     box-sizing: border-box;
 }
 
+li p {
+    margin-bottom: 0;
+}
+
 #header {
     position: fixed;
     top: 1em;

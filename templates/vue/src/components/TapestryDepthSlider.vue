@@ -1,12 +1,16 @@
 <template>
   <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
-    <input
-      v-model="currentDepth"
-      class="slider"
-      type="range"
-      min="1"
-      :max="maxDepth"
-    />
+    <div>
+      <tapestry-icon icon="zoom-in"></tapestry-icon>
+      <input
+        v-model="currentDepth"
+        class="slider"
+        type="range"
+        min="1"
+        :max="maxDepth"
+      />
+      <tapestry-icon icon="zoom-out"></tapestry-icon>
+    </div>
     <p v-if="currentDepth < maxDepth" class="warning-text alert p-2 small">
       Some nodes might be hidden because you're not at maximum depth.
     </p>
@@ -15,9 +19,13 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
+import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 
 export default {
+  components: {
+    TapestryIcon,
+  },
   data() {
     return {
       currentDepth: 1,
@@ -152,6 +160,21 @@ export default {
   flex-direction: column;
   align-items: flex-end;
 
+  div {
+    img {
+      width: 20px;
+      margin-top: -5px;
+
+      &:first-child {
+        margin-left: 15px;
+        margin-right: -1px;
+      }
+      &:last-child {
+        margin-right: 15px;
+      }
+    }
+  }
+
   p {
     display: block;
   }
@@ -165,7 +188,6 @@ export default {
   opacity: 0.8;
   transition: opacity 0.2s;
   position: relative;
-  margin: 0 32px;
   align-items: center;
 
   &:before,
@@ -219,6 +241,11 @@ export default {
 
   &:hover {
     opacity: 1;
+  }
+
+  &:focus {
+    border-color: transparent !important;
+    outline: none !important;
   }
 }
 

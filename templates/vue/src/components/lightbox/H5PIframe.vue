@@ -13,6 +13,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -44,6 +45,7 @@ export default {
       frameHeight: 0,
       frameWidth: "100%",
       played: false,
+      type: null,
     }
   },
   watch: {
@@ -60,10 +62,10 @@ export default {
       const videoHeight = box.height
       if (videoHeight > this.dimensions.height && this.node.fitWindow) {
         const scaleFactor = this.dimensions.height / videoHeight
-        this.frameHeight = this.dimensions.height
+        this.frameHeight = 100 * scaleFactor + "%"
         this.frameWidth = 100 * scaleFactor + "%"
       } else {
-        this.frameHeight = videoHeight
+        this.frameHeight = "100%"
       }
       this.$emit("change:dimensions", {
         width: this.frameWidth,
@@ -152,9 +154,17 @@ export default {
     },
     handlePlay() {
       this.$emit("show-play-screen", false)
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
+        time: progress * mediaDuration,
+      })
     },
     handlePause() {
       this.$emit("show-play-screen", true)
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+        time: progress * mediaDuration,
+      })
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -239,6 +249,12 @@ export default {
           if (h5pIframeComponent.autoplay) {
             setTimeout(() => {
               h5pVideo.play()
+              client.recordAnalyticsEvent(
+                "app",
+                "auto-play",
+                "h5p-video",
+                h5pIframeComponent.node.id
+              )
             }, 1000)
           }
         }
