@@ -3,7 +3,7 @@
   <div v-else id="app">
     <tapestry-app />
     <router-view></router-view>
-    <tapestry-sidebar v-if="nodeId" />
+    <tapestry-sidebar />
     <node-modal
       :node-id="nodeId"
       :modal-type="modalType"
