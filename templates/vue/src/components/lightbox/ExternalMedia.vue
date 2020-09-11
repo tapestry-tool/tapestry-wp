@@ -132,5 +132,6 @@ export default {
 #external {
   width: 100%;
   min-height: 400px;
+  height: 100%;
 }
 </style>

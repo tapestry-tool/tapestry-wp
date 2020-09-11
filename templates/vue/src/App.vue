@@ -1,24 +1,19 @@
 <template>
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <tapestry-app />
-    <router-view></router-view>
-    <tapestry-sidebar />
-    <node-modal
-      :node-id="nodeId"
-      :modal-type="modalType"
-      @cancel="closeModal"
-      @submit="closeModal"
-    />
+    <tapestry-app></tapestry-app>
+    <router-view name="lightbox"></router-view>
+    <node-modal></node-modal>
+    <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex"
+import { mapMutations, mapState } from "vuex"
+import Loading from "./components/Loading"
 import NodeModal from "./components/NodeModal"
 import TapestryApp from "./components/TapestryApp"
 import TapestrySidebar from "./components/TapestrySidebar"
-import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 
 export default {
@@ -31,13 +26,14 @@ export default {
   },
   data() {
     return {
-      modalType: "",
-      nodeId: null,
       loading: true,
     }
   },
   computed: {
-    ...mapState(["selectedNodeId"]),
+    ...mapState(["nodes"]),
+    isEmpty() {
+      return Object.keys(this.nodes).length === 0
+    },
   },
   mounted() {
     window.addEventListener("click", this.recordAnalytics)
@@ -45,18 +41,10 @@ export default {
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
       this.loading = false
-    })
 
-    this.$root.$on("add-node", to => {
-      this.modalType = "add"
-      this.nodeId = to
-      this.$bvModal.show("node-modal")
-    })
-
-    this.$root.$on("edit-node", nodeId => {
-      this.modalType = "edit"
-      this.nodeId = nodeId
-      this.$bvModal.show("node-modal")
+      if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
+        this.$router.replace(`/nodes/${dataset.rootId}`)
+      }
     })
   },
   beforeDestroy() {
@@ -64,10 +52,6 @@ export default {
   },
   methods: {
     ...mapMutations(["init"]),
-    closeModal() {
-      this.$bvModal.hide("node-modal")
-      this.modalType = ""
-    },
     recordAnalytics(evt) {
       const x = evt.clientX + window.scrollLeft
       const y = evt.clientY + window.scrollTop

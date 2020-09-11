@@ -53,7 +53,7 @@
             <button
               class="node-button"
               :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
+              @click.stop="handleRequestOpen"
             >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
@@ -104,6 +104,7 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import AddChildButton from "./tapestry-node/AddChildButton"
@@ -294,11 +295,18 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    updateRootNode() {
+      this.$router.push({ name: names.APP, params: { nodeId: this.node.id } })
+      this.updateSelectedNode(this.node.id)
+    },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push({ name: names.LIGHTBOX, params: { nodeId: this.node.id } })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -331,9 +339,7 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia
-          ? this.openNode()
-          : this.updateSelectedNode(this.node.id)
+        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
       }
     },
     hasPermission(action) {

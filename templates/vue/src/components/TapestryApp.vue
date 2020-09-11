@@ -31,7 +31,7 @@
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == selectedNodeId"
+            :root="id == selectedId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -77,7 +77,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -86,6 +86,9 @@ export default {
     },
     empty() {
       return Object.keys(this.nodes).length === 0
+    },
+    selectedId() {
+      return Number(this.$route.params.nodeId)
     },
   },
   watch: {

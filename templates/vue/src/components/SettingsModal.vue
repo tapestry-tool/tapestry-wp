@@ -1,15 +1,20 @@
 <template>
   <b-modal
     id="settings-modal"
-    v-model="show"
+    :visible="show"
     size="lg"
     title="Tapestry Settings"
     scrollable
     body-class="p-0"
+    @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
       <b-tabs card>
-        <b-tab title="Appearance" active>
+        <b-tab
+          title="Appearance"
+          :active="tab === 'appearance'"
+          @click="$emit('change:tab', 'appearance')"
+        >
           <b-form-group
             label="Background URL"
             description="Add a background image to the page where this tapestry
@@ -64,7 +69,11 @@
             </div>
           </b-form-group>
         </b-tab>
-        <b-tab title="Advanced">
+        <b-tab
+          title="Advanced"
+          :active="tab === 'advanced'"
+          @click="$emit('change:tab', 'advanced')"
+        >
           <b-form-group
             label="Export/Duplicate"
             description="Export your tapestry to a file and then you can import it on another site. 
@@ -91,7 +100,11 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
-        <b-tab title="Access">
+        <b-tab
+          title="Access"
+          :active="tab === 'access'"
+          @click="$emit('change:tab', 'access')"
+        >
           <b-form-group
             label="Default Permissions For New Nodes"
             description="Newly created nodes in this tapestry will have these permissions by default."
@@ -157,6 +170,11 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    tab: {
+      type: String,
+      required: false,
+      default: "",
     },
   },
   data() {

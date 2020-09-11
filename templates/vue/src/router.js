@@ -1,17 +1,30 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
-import Lightbox from "./components/Lightbox"
+
+import routes, { names } from "./config/routes"
+import store from "./store"
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
-    path: "/nodes/:nodeId",
-    component: Lightbox,
-    props: true,
-  },
-]
+const router = new VueRouter({
+  routes: [
+    routes.app,
+    routes.lightbox,
+    routes.accordion,
+    routes.subAccordion,
+    routes.settings,
+    ...routes.redirects,
+    routes.modal,
+  ],
+})
 
-const router = new VueRouter({ routes })
+router.beforeEach((to, _, next) => {
+  const nodes = Object.keys(store.state.nodes)
+  if (to.matched.length === 0 && nodes.length > 0) {
+    next({ name: names.APP, params: { nodeId: store.state.rootId } })
+  } else {
+    next()
+  }
+})
 
 export default router

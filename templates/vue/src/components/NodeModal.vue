@@ -1,11 +1,13 @@
 <template>
   <b-modal
     id="node-modal"
+    :visible="show"
     :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
+    @hidden="close"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -14,9 +16,16 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="ready" fluid class="px-0">
+    <b-container v-if="loading" class="spinner">
+      <b-spinner variant="secondary"></b-spinner>
+    </b-container>
+    <b-container v-else fluid class="px-0">
       <b-tabs card>
-        <b-tab title="Content" active>
+        <b-tab
+          title="Content"
+          :active="tab === 'content'"
+          @click="changeTab('content')"
+        >
           <content-form
             :node="node"
             @load="videoLoaded = true"
@@ -24,20 +33,27 @@
             @type-changed="handleTypeChange"
           />
         </b-tab>
-        <b-tab title="Appearance">
+        <b-tab
+          title="Appearance"
+          :active="tab === 'appearance'"
+          @click="changeTab('appearance')"
+        >
           <appearance-form :node="node" />
         </b-tab>
         <b-tab
-          v-if="
-            node.mediaType === 'h5p' ||
-              node.mediaType === 'video' ||
-              node.mediaType === 'accordion'
-          "
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          :active="tab === 'behaviour'"
           title="Behaviour"
+          @click="changeTab('behaviour')"
         >
           <behaviour-form :node="node" />
         </b-tab>
-        <b-tab v-if="viewAccess" title="Access">
+        <b-tab
+          v-if="viewAccess"
+          title="Access"
+          :active="tab === 'access'"
+          @click="changeTab('access')"
+        >
           <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
           <permissions-table v-model="node.permissions" />
           <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
@@ -46,12 +62,16 @@
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Activity"
+          :active="tab === 'activity'"
+          @click="changeTab('activity')"
         >
           <activity-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
           title="Ordering"
+          :active="tab === 'ordering'"
+          @click="changeTab('ordering')"
         >
           <div>
             <slick-list
@@ -73,19 +93,21 @@
             </slick-list>
           </div>
         </b-tab>
-        <b-tab title="More Information">
+        <b-tab
+          title="More Information"
+          :active="tab === 'more-information'"
+          @click="changeTab('more-information')"
+        >
           <more-information-form :node="node" />
         </b-tab>
       </b-tabs>
     </b-container>
-    <b-container v-else class="spinner">
-      <b-spinner variant="secondary"></b-spinner>
-    </b-container>
     <template slot="modal-footer">
       <delete-node-button
-        v-if="modalType === 'edit'"
+        v-if="type === 'edit'"
         :node-id="nodeId"
-        @submit="close"
+        @submit="loading = true"
+        @done="handleDelete"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="close">
@@ -95,11 +117,11 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="!canSubmit"
+        :disabled="fileUploading"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
+        <b-spinner v-if="fileUploading" small></b-spinner>
+        <div :style="fileUploading ? 'opacity: 50%;' : ''">Submit</div>
       </b-button>
     </template>
     <div v-if="loadDuration">
@@ -139,6 +161,7 @@ import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -165,23 +188,9 @@ export default {
     PermissionsTable,
     DeleteNodeButton,
   },
-  props: {
-    nodeId: {
-      type: Number,
-      required: false,
-      default: null,
-    },
-    modalType: {
-      type: String,
-      required: true,
-      validator: value => {
-        return ["", "add", "edit"].includes(value)
-      },
-    },
-  },
   data() {
     return {
-      ready: false,
+      loading: false,
       userId: null,
       formErrors: [],
       maxDescriptionLength: 250,
@@ -198,9 +207,9 @@ export default {
       "getDirectParents",
       "getNode",
     ]),
-    ...mapState(["rootId", "settings", "visibleNodes"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
     parent() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         const parent = this.getNode(this.nodeId)
         if (parent) {
           return parent
@@ -210,11 +219,11 @@ export default {
       return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return this.parent
           ? `Add new sub-topic to ${this.parent.title}`
           : "Add root node"
-      } else if (this.modalType === "edit") {
+      } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
       return ""
@@ -229,35 +238,54 @@ export default {
     canSubmit() {
       return !this.fileUploading
     },
+    nodeId() {
+      const nodeId = this.$route.params.nodeId
+      return nodeId || Number(nodeId)
+    },
+    show() {
+      return this.$route.name === names.MODAL
+    },
+    tab() {
+      return this.$route.params.tab || ""
+    },
+    type() {
+      return this.$route.params.type || ""
+    },
   },
-  created() {
-    this.node = this.createDefaultNode()
+  watch: {
+    nodeId: {
+      immediate: true,
+      handler() {
+        this.initialize()
+      },
+    },
+    show: {
+      immediate: true,
+      handler(show) {
+        if (show) {
+          this.formErrors = ""
+          this.initialize()
+        }
+      },
+    },
+    tab: {
+      immediate: true,
+      handler(tab) {
+        if (this.show) {
+          const isTabValid = this.validateTab(tab)
+          if (!isTabValid) {
+            this.$router.replace({
+              name: names.MODAL,
+              params: { nodeId: this.nodeId, type: this.type, tab: "content" },
+            })
+          }
+        }
+      },
+    },
   },
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
-    })
-    this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-      if (modalId == "node-modal") {
-        this.formErrors = ""
-      }
-    })
-    this.$root.$on("bv::modal::shown", (_, modalId) => {
-      if (modalId == "node-modal") {
-        let copy = this.createDefaultNode()
-        if (this.modalType === "edit") {
-          const node = this.getNode(this.nodeId)
-          copy = Helpers.deepCopy(node)
-        }
-        copy.hasSubAccordion = this.hasSubAccordion(copy)
-        this.node = copy
-        this.ready = true
-      }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId == "node-modal") {
-        this.ready = false
-      }
     })
   },
   methods: {
@@ -269,6 +297,41 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    initialize() {
+      let copy = this.createDefaultNode()
+      if (this.type === "edit") {
+        const node = this.getNode(this.nodeId)
+        copy = Helpers.deepCopy(node)
+      }
+      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      this.node = copy
+    },
+    validateTab(requestedTab) {
+      // Tabs that are valid for ALL node types and modal types
+      const okTabs = ["content", "appearance", "more-information"]
+      if (okTabs.includes(requestedTab)) {
+        return true
+      }
+
+      // If requested tab is access, check if the user can access it
+      if (requestedTab === "access") {
+        return this.viewAccess
+      }
+
+      switch (requestedTab) {
+        case "activity": {
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+        }
+        case "behaviour": {
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+        }
+        case "ordering": {
+          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+        }
+      }
+
+      return false
+    },
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
@@ -276,15 +339,36 @@ export default {
       }
       return false
     },
+    changeTab(tab) {
+      // Prevent multiple clicks
+      if (tab !== this.tab) {
+        this.$router.push({
+          name: names.MODAL,
+          params: { nodeId: this.nodeId, type: this.type, tab },
+        })
+      }
+    },
     close() {
-      this.$bvModal.hide("node-modal")
-      this.$emit("cancel")
+      if (this.show) {
+        if (Object.keys(this.nodes).length === 0) {
+          this.$router.push("/")
+        } else if (this.rootId && !this.nodeId) {
+          // We just added a root node
+          this.$router.push({ name: names.APP, params: { nodeId: this.rootId } })
+        } else {
+          this.$router.push({ name: names.APP, params: { nodeId: this.nodeId } })
+        }
+      }
+    },
+    handleDelete() {
+      this.loading = false
+      this.close()
     },
     async handleSubmit() {
+      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
-        this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -298,7 +382,7 @@ export default {
       }
     },
     async submitNode() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
@@ -328,7 +412,8 @@ export default {
         })
       }
       await this.updateLockedStatus()
-      this.$emit("submit")
+      this.close()
+      this.loading = false
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
@@ -387,7 +472,7 @@ export default {
       }
     },
     updateNodeCoordinates() {
-      if (this.modalType === "add" && this.parent) {
+      if (this.type === "add" && this.parent) {
         this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
@@ -520,7 +605,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return true
       }
       const oldNode = this.getNode(this.nodeId)
