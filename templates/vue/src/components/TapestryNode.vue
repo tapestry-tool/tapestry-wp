@@ -18,12 +18,12 @@
         :fill="fill"
       ></circle>
       <circle
-        v-if="selected"
+        v-if="selected || !node.accessible"
         :cx="node.coordinates.x"
         :cy="node.coordinates.y"
         :r="radius"
-        fill="#11a6d8"
-        class="select-highlight"
+        :fill="overlayFill"
+        class="node-overlay"
       ></circle>
       <progress-bar
         v-show="
@@ -200,11 +200,15 @@ export default {
       if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
         return `url(#node-image-${this.node.id})`
       }
-
-      if (!this.node.accessible) {
+      return "#8396a1"
+    },
+    overlayFill() {
+      if (this.selected) {
+        return "#11a6d8"
+      } else if (!this.node.accessible) {
         return "#8a8a8c"
       }
-      return "#8396a1"
+      return "transparent"
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -398,7 +402,7 @@ export default {
   }
 }
 
-.select-highlight {
-  opacity: 0.5;
+.node-overlay {
+  opacity: 0.75;
 }
 </style>
