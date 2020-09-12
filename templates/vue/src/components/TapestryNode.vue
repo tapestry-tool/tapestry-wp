@@ -12,7 +12,20 @@
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
     >
-      <circle ref="circle" :fill="fill"></circle>
+      <circle
+        ref="circle"
+        :cx="node.coordinates.x"
+        :cy="node.coordinates.y"
+        :fill="fill"
+      ></circle>
+      <circle
+        v-if="selected || !node.accessible"
+        :cx="node.coordinates.x"
+        :cy="node.coordinates.y"
+        :r="radius"
+        :fill="overlayFill"
+        class="node-overlay"
+      ></circle>
       <progress-bar
         v-show="
           node.nodeType !== 'grandchild' &&
@@ -239,13 +252,15 @@ export default {
       ) {
         return `url(#node-image-${this.node.id})`
       }
+      return "#8396a1"
+    },
+    overlayFill() {
       if (this.selected) {
         return "#11a6d8"
-      }
-      if (!this.node.accessible) {
+      } else if (!this.node.accessible) {
         return "#8a8a8c"
       }
-      return "#8396a1"
+      return "transparent"
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -453,5 +468,9 @@ export default {
     width: 65px;
     height: 65px;
   }
+}
+
+.node-overlay {
+  opacity: 0.75;
 }
 </style>
