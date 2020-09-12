@@ -163,6 +163,21 @@ export default {
   flex-direction: column;
   align-items: flex-end;
 
+  div {
+    img {
+      width: 20px;
+      margin-top: -5px;
+
+      &:first-child {
+        margin-left: 15px;
+        margin-right: -1px;
+      }
+      &:last-child {
+        margin-right: 15px;
+      }
+    }
+  }
+
   p {
     display: block;
   }
@@ -229,6 +244,11 @@ export default {
 
   &:hover {
     opacity: 1;
+  }
+
+  &:focus {
+    border-color: transparent !important;
+    outline: none !important;
   }
 }
 

@@ -268,5 +268,6 @@ body.tapestry-lightbox-open {
       right: 50px;
     }
   }
+  height: 100%;
 }
 </style>
