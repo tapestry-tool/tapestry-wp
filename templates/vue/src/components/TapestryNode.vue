@@ -17,6 +17,14 @@
         :cy="node.coordinates.y"
         :fill="fill"
       ></circle>
+      <circle
+        v-if="selected"
+        :cx="node.coordinates.x"
+        :cy="node.coordinates.y"
+        :r="radius"
+        fill="#11a6d8"
+        class="select-highlight"
+      ></circle>
       <progress-bar
         v-show="
           node.nodeType !== 'grandchild' &&
@@ -186,9 +194,6 @@ export default {
       return 140
     },
     fill() {
-            if (this.selected) {
-        return "#11a6d8"
-      }
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
@@ -391,5 +396,9 @@ export default {
     width: 65px;
     height: 65px;
   }
+}
+
+.select-highlight {
+  opacity: 0.5;
 }
 </style>
