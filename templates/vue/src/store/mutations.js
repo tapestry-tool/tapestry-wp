@@ -62,6 +62,14 @@ function parseDataset(dataset) {
     })
   }
 
+  dataset.links = dataset.links.filter(link => {
+    const { source, target } = link
+    return (
+      getNode(dataset, source) !== undefined &&
+      getNode(dataset, target) !== undefined
+    )
+  })
+
   return dataset
 }
 
