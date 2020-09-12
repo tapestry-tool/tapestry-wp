@@ -186,15 +186,16 @@ export default {
       return 140
     },
     fill() {
+            if (this.selected) {
+        return "#11a6d8"
+      }
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
       if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
         return `url(#node-image-${this.node.id})`
       }
-      if (this.selected) {
-        return "#11a6d8"
-      }
+
       if (!this.node.accessible) {
         return "#8a8a8c"
       }
