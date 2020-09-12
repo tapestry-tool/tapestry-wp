@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.30.0-tyde-beta
+ * Version: 2.32.0-tyde-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.30.0-tyde-beta';
+$TAPESTRY_VERSION_NUMBER = '2.32.0-tyde-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -170,7 +170,6 @@ function tapestry_enqueue_libraries()
     global $post;
     global $TAPESTRY_VERSION_NUMBER;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
-
         $LIBS_FOLDER_URL = plugin_dir_url(__FILE__).'templates/libs/';
 
         // CSS
