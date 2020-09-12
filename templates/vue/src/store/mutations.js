@@ -129,8 +129,6 @@ export function setDataset(state, dataset) {
       state[key] = value
     }
   })
-  links.additions.forEach(link => addLink(state, link))
-  links.deletions.forEach(link => deleteLink(state, link))
 }
 
 export function updateDataset(state, { nodes, links }) {
