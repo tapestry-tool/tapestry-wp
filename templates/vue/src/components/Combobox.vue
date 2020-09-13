@@ -16,7 +16,7 @@
         @mousedown.prevent="handleClick(option)"
       >
         <div class="combobox-item">
-          <slot :option="option"></slot>
+          <slot :option="option"> </slot>
         </div>
       </button>
     </div>

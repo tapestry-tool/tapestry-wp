@@ -26,9 +26,9 @@
         :input-style="inputStyles"
         size="sm"
       >
-        <template v-slot="slotProps">
+        <template v-slot="slotProps" >
           <p class="filter-value">
-             <code>{{ slotProps.option.id }}</code>
+             <code >{{ slotProps.option.id }}</code>
             {{ slotProps.option.name }}
           </p>
         </template>
@@ -41,6 +41,7 @@
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
 import client from "../services/TapestryAPI"
+import {nodeStatuses} from "@/utils/constants.js"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -96,8 +97,8 @@ export default {
           let res = []
           for (let status of this.allStatuses) {
             let obj = {}
-            obj["name"] = status
-            obj["id"] = status
+            obj["name"] = status[0]
+            obj["id"] = status[1]
             res.push(obj)
           }
           return res
@@ -124,9 +125,12 @@ export default {
     if (wpData.wpCanEditTapestry === "1") {
       this.allContributors = await client.getAllContributors()
     }
-    this.allStatuses = new Set()
+    this.allStatuses = new Map()
+    for (let status of nodeStatuses) {
+      this.allStatuses.set(status, 0);
+    }
     for (let node of Object.values(this.nodes)) {
-      this.allStatuses.add(node.status)
+      this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
     }
   },
   methods: {
