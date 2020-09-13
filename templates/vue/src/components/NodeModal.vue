@@ -367,12 +367,12 @@ export default {
           }
           await this.addLink(newLink)
           if (this.node.status !== "draft") {
-            this.updateNode({
-              id: this.parent.id,
-              newNode: {
-                childOrdering: [...this.parent.childOrdering, id],
-              },
-            })
+          this.$store.commit("updateNode", {
+            id: this.parent.id,
+            newNode: {
+              childOrdering: [...this.parent.childOrdering, id],
+            },
+          })
           }
         } else {
           this.updateRootNode(id)
