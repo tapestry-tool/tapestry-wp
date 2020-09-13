@@ -181,10 +181,12 @@ export default {
     if (this.settings.defaultPermissions) {
       this.defaultPermissions = this.settings.defaultPermissions
     }
+    bus.$on("max-depth-change", depth => {
+      this.maxDepth = depth
+    })
   },
   mounted() {
-    this.getSettings()
-    bus.$on("max-depth-change", depth => (this.maxDepth = depth))
+    this.getSettings()   
   },
   methods: {
     closeModal() {
@@ -198,7 +200,7 @@ export default {
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
         superuserOverridePermissions = true,
-        defaultDepth = 3,
+        defaultDepth = Math.max(this.maxDepth, 3),
         renderImages = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -218,7 +220,7 @@ export default {
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
-        defaultDepth: parseInt(this.defaultDepth),
+        defaultDepth: Math.max(this.maxDepth, parseInt(this.defaultDepth)),
         renderImages: this.renderImages,
       })
       await this.$store.dispatch("updateSettings", settings)
