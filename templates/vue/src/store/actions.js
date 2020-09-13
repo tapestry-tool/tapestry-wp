@@ -1,9 +1,7 @@
-import TapestryApi from "../services/TapestryAPI"
+import client from "../services/TapestryAPI"
 import Helpers from "../utils/Helpers"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
-
-const client = new TapestryApi(wpPostId)
 
 export async function updateSettings({ commit }, newSettings) {
   await client.updateSettings(JSON.stringify(newSettings))

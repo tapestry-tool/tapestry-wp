@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
 import EndScreen from "./EndScreen"
 import QuizScreen from "./QuizScreen"
 import PlayScreen from "./PlayScreen"
@@ -153,9 +154,21 @@ export default {
     handlePlay() {
       this.showPlayScreen = false
       this.showEndScreen = false
+      const video = this.$refs.video
+      if (video) {
+        client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
+          time: video.currentTime,
+        })
+      }
     },
     handlePause() {
       this.showPlayScreen = true
+      const video = this.$refs.video
+      if (video) {
+        client.recordAnalyticsEvent("user", "pause", "html5-video", this.node.id, {
+          time: video.currentTime,
+        })
+      }
     },
     handleLoad() {
       const video = this.$refs.video

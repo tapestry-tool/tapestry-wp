@@ -86,7 +86,7 @@ export default {
         .transition()
         .duration(750)
         .ease(d3.easePolyOut)
-        .attr("r", radius - this.width / 2)
+        .attr("r", Math.max(radius - this.width / 2, 0))
 
       d3.select(this.$refs.path)
         .transition()
@@ -99,7 +99,7 @@ export default {
             return d3.arc()({
               startAngle: 0,
               endAngle: this.progress * 2 * Math.PI,
-              innerRadius: rad - this.width,
+              innerRadius: Math.max(rad - this.width, 0),
               outerRadius: rad,
             })
           }
@@ -126,7 +126,7 @@ export default {
   },
   mounted() {
     const track = this.$refs.track
-    track.setAttribute("r", this.radius - this.width / 2)
+    track.setAttribute("r", Math.max(this.radius - this.width / 2, 0))
 
     this.$refs.path.setAttribute(
       "d",
