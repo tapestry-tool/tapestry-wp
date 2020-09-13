@@ -3,7 +3,11 @@
     <g
       v-show="show"
       ref="node"
-      :class="{ opaque: !visibleNodes.includes(node.id) }"
+      :class="{
+        opaque: !visibleNodes.includes(node.id),
+        'has-thumbnail': node.accessible ? node.imageURL : node.lockedImageURL,
+        'has-title': !node.hideTitle,
+      }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
       }"
@@ -18,12 +22,12 @@
         :fill="fill"
       ></circle>
       <circle
-        v-if="selected || !node.accessible"
         :cx="node.coordinates.x"
         :cy="node.coordinates.y"
         :r="radius"
         :fill="overlayFill"
         class="node-overlay"
+        :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
       ></circle>
       <progress-bar
         v-show="
@@ -208,7 +212,7 @@ export default {
       } else if (!this.node.accessible) {
         return "#8a8a8c"
       }
-      return "transparent"
+      return this.node.imageURL ? "#333" : "transparent"
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -402,7 +406,23 @@ export default {
   }
 }
 
+.meta {
+  transition: opacity 0.2s;
+  .title {
+    text-shadow: 0 0 5px #000;
+    font-weight: bold;
+  }
+}
 .node-overlay {
   opacity: 0.75;
+  transition: opacity 0.2s;
+  &.normal {
+    opacity: 0.5;
+  }
+}
+.node:hover .node-overlay.normal,
+.node:not(.has-title) .node-overlay.normal,
+.node.has-thumbnail:hover .meta {
+  opacity: 0;
 }
 </style>
