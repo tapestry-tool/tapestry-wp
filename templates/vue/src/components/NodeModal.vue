@@ -213,6 +213,7 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
+      "getNeighbours",
     ]),
     ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
