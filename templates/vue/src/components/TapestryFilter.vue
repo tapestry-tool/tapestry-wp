@@ -28,6 +28,7 @@
       >
         <template v-slot="slotProps">
           <p class="filter-value">
+             <code>{{ slotProps.option.id }}</code>
             {{ slotProps.option.name }}
           </p>
         </template>
