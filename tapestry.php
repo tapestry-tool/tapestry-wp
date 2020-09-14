@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.30.0-beta
+ * Version: 2.32.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.30.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.32.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -172,6 +172,9 @@ function tapestry_enqueue_libraries()
     global $post;
     global $TAPESTRY_VERSION_NUMBER;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
+
+        $LIBS_FOLDER_URL = plugin_dir_url(__FILE__).'templates/libs/';
+
         // CSS
 
         wp_enqueue_style('font-awesome-5', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', [], null);
@@ -182,7 +185,7 @@ function tapestry_enqueue_libraries()
         }
         if (class_exists('GFImageChoices')) {
             $GF_Image_Choices_Object = new GFImageChoices();
-            wp_enqueue_style('gf-img-choices', plugin_dir_url(__FILE__).'templates/libs/gf-image-ui.css', [], $TAPESTRY_VERSION_NUMBER);
+            wp_enqueue_style('gf-img-choices', $LIBS_FOLDER_URL.'gf-image-ui.css', [], $TAPESTRY_VERSION_NUMBER);
             wp_enqueue_style('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/css/gf_image_choices.css', [], $TAPESTRY_VERSION_NUMBER);
         }
 
@@ -192,6 +195,8 @@ function tapestry_enqueue_libraries()
             $GF_Image_Choices_Object = new GFImageChoices();
             wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
         }
+      
+        wp_enqueue_script('es2015-test', $LIBS_FOLDER_URL.'es2015-test.js');
     }
 }
 
