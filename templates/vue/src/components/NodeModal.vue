@@ -82,16 +82,13 @@
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
     <template slot="modal-footer">
-      <b-button
-        v-show="modalType === 'edit'"
-        size="sm"
-        variant="danger"
-        @click="deleteNode"
-      >
-        Delete Node
-      </b-button>
+      <delete-node-button
+        v-if="modalType === 'edit'"
+        :node-id="nodeId"
+        @submit="close"
+      ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button
@@ -101,7 +98,7 @@
         :disabled="!canSubmit"
         @click="handleSubmit"
       >
-        <b-spinner v-if="!canSubmit"></b-spinner>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
         <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
@@ -132,7 +129,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
@@ -141,6 +138,7 @@ import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -165,6 +163,7 @@ export default {
     SlickItem,
     SlickList,
     PermissionsTable,
+    DeleteNodeButton,
   },
   props: {
     nodeId: {
@@ -198,8 +197,8 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
-      "settings",
     ]),
+    ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
       if (this.modalType === "add") {
         const parent = this.getNode(this.nodeId)
@@ -207,7 +206,8 @@ export default {
           return parent
         }
       }
-      return null
+      const parents = this.getDirectParents(this.nodeId)
+      return parents && parents[0] ? this.getNode(parents[0]) : null
     },
     title() {
       if (this.modalType === "add") {
@@ -240,7 +240,6 @@ export default {
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
-        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
@@ -257,13 +256,12 @@ export default {
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId == "node-modal") {
-        thisTapestryTool.enableMovements()
         this.ready = false
       }
     })
   },
   methods: {
-    ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -272,19 +270,15 @@ export default {
       "updateLockedStatus",
     ]),
     hasSubAccordion(node) {
-      const parents = this.getDirectParents(node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
+      if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return parent.mediaType === "accordion" && children.length > 0
+        return this.parent.mediaType === "accordion" && children.length > 0
       }
       return false
     },
     close() {
       this.$bvModal.hide("node-modal")
-    },
-    deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry()
+      this.$emit("cancel")
     },
     async handleSubmit() {
       this.formErrors = this.validateNode()
@@ -316,18 +310,24 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.parent.childOrdering.push(id)
+          this.$store.commit("updateNode", {
+            id: this.parent.id,
+            newNode: {
+              childOrdering: [...this.parent.childOrdering, id],
+            },
+          })
         } else {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
         }
+        this.updateVisibleNodes([...this.visibleNodes, id])
       } else {
         await this.updateNode({
           id: this.node.id,
           newNode: this.node,
         })
       }
-      await this.updateLockedStatus(this.node.id)
+      await this.updateLockedStatus()
       this.$emit("submit")
     },
     getRandomNumber(min, max) {
@@ -420,6 +420,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          errMsgs.push("Please enter numeric value for H5P Video Duration")
+        }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
@@ -443,10 +446,7 @@ export default {
       })
     },
     updateOrderingArray(arr) {
-      this.updateOrdering({
-        id: this.node.id,
-        ord: arr,
-      })
+      this.node.childOrdering = arr
     },
     handleTypeChange() {
       this.node.quiz = this.node.quiz.filter(q =>
@@ -590,6 +590,16 @@ table {
   justify-content: center;
 }
 
+#submit-button {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div {
+    margin-right: 4px;
+  }
+}
+
 #node-modal-container {
   * {
     outline: none;
@@ -637,22 +647,6 @@ table {
   }
   > span:last-of-type {
     margin-left: auto;
-  }
-}
-
-#submit-button {
-  position: relative;
-
-  &:disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-    left: 33%;
   }
 }
 

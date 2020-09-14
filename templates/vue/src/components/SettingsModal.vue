@@ -1,5 +1,12 @@
 <template>
-  <b-modal id="settings-modal" size="lg" title="Tapestry Settings" body-class="p-0">
+  <b-modal
+    id="settings-modal"
+    v-model="show"
+    size="lg"
+    title="Tapestry Settings"
+    scrollable
+    body-class="p-0"
+  >
     <b-container fluid class="px-0">
       <b-tabs card>
         <b-tab title="Appearance" active>
@@ -17,23 +24,12 @@
             />
           </b-form-group>
           <b-form-group
-            v-show="wpCanEditTapestry"
             label="Users can move nodes"
             description="If enabled, you allow users to move nodes to different positions on the screen.
               However, changes made by the users won't be saved."
           >
             <b-form-checkbox v-model="nodeDraggable" switch>
               {{ nodeDraggable ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group
-            label="Auto-Layout"
-            description="With auto-layout enabled, nodes will place themselves in
-              the best position possible. If this is disabled, you will need to manually place the nodes where
-              you want them to appear."
-          >
-            <b-form-checkbox v-model="autoLayout" switch>
-              {{ autoLayout ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
@@ -46,8 +42,12 @@
             <b-form-checkbox v-model="superuserOverridePermissions" switch>
               {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
           </b-form-group>
-          <b-form-group v-if="tapestryIsLoaded" label="Default Depth">
+          <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
               class="depth-slider"
@@ -55,20 +55,49 @@
               min="0"
               :max="maxDepth || 3"
             ></b-form-input>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
             <div class="depth-slider-description">
               Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
             </div>
           </b-form-group>
         </b-tab>
         <b-tab title="Advanced">
-          <b-button block variant="light" @click="exportTapestry">
-            Export Tapestry
-          </b-button>
-          <duplicate-tapestry-button style="margin-top: 12px;" />
+          <b-form-group
+            label="Export/Duplicate"
+            description="Export your tapestry to a file and then you can import it on another site. 
+              Duplicating will create a copy of this tapestry on this site."
+          >
+            <b-row class="mb-2">
+              <b-col>
+                <b-button block variant="light" @click="exportTapestry">
+                  Export Tapestry
+                </b-button>
+              </b-col>
+              <b-col>
+                <duplicate-tapestry-button />
+              </b-col>
+            </b-row>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Show thumbnails"
+            description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
+          >
+            <b-form-checkbox v-model="renderImages" switch>
+              {{ renderImages ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab title="Access">
-          <h6 class="mb-3 text-muted">Default Permissions For New Nodes</h6>
-          <permissions-table v-model="defaultPermissions" />
+          <b-form-group
+            label="Default Permissions For New Nodes"
+            description="Newly created nodes in this tapestry will have these permissions by default."
+          >
+            <permissions-table v-model="defaultPermissions" />
+          </b-form-group>
           <b-form-group
             label="Show Access Tab"
             description="When shown, users will see the Access tab when adding or editing a node
@@ -83,11 +112,6 @@
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
-      <p class="mb-0 p-0 text-muted small">
-        <strong>Note:</strong>
-        Page will refresh when you submit to apply your new settings.
-      </p>
-      <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
@@ -107,6 +131,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
+import { bus } from "@/utils/event-bus"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -121,15 +146,6 @@ const defaultPermissions = Object.fromEntries(
   ].map(rowName => [rowName, ["read"]])
 )
 
-const defaultSettings = {
-  backgroundUrl: "",
-  autoLayout: false,
-  nodeDraggable: true,
-  showAccess: true,
-  superuserOverridePermissions: true,
-  defaultDepth: 3,
-}
-
 export default {
   name: "settings-modal",
   components: {
@@ -138,16 +154,14 @@ export default {
     PermissionsTable,
   },
   props: {
-    wpCanEditTapestry: {
+    show: {
       type: Boolean,
-      required: false,
-      default: false,
+      required: true,
     },
   },
   data() {
     return {
       backgroundUrl: "",
-      autoLayout: false,
       nodeDraggable: true,
       userId: "",
       showAccess: true,
@@ -155,17 +169,13 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
+      maxDepth: 0,
+      renderImages: true,
     }
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId", "tapestryIsLoaded"]),
-    maxDepth() {
-      if (this.tapestryIsLoaded) {
-        return thisTapestryTool.findMaxDepth(this.rootId) + 1
-      }
-      return 0
-    },
+    ...mapState(["settings", "rootId"]),
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -173,19 +183,12 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener("open-settings-modal", this.openModal)
-  },
-  beforeDestroy() {
-    window.removeEventListener("open-settings-modal", this.openModal)
+    this.getSettings()
+    bus.$on("max-depth-change", depth => (this.maxDepth = depth))
   },
   methods: {
-    openModal() {
-      this.$bvModal.show("settings-modal")
-      this.getSettings()
-      this.synchronizeSettings()
-    },
     closeModal() {
-      this.$bvModal.hide("settings-modal")
+      this.$emit("close")
     },
     getSettings() {
       const {
@@ -196,6 +199,7 @@ export default {
         showAccess = true,
         superuserOverridePermissions = true,
         defaultDepth = 3,
+        renderImages = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -204,6 +208,7 @@ export default {
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
+      this.renderImages = renderImages
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -214,12 +219,10 @@ export default {
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
+        renderImages: this.renderImages,
       })
       await this.$store.dispatch("updateSettings", settings)
-      // TODO: Improve behavior so refresh is not required (currently auto-layout and setting the background image only happen initially)
-      // this.$emit("settings-updated", settings);
-      // this.closeModal();
-      location.reload()
+      this.closeModal()
     },
     isUploading(status) {
       this.fileUploading = status
@@ -238,14 +241,6 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
-    },
-    synchronizeSettings() {
-      const tapestrySettings = this.settings
-      for (const setting in defaultSettings) {
-        if (!tapestrySettings.hasOwnProperty(setting)) {
-          this.updateSettings()
-        }
-      }
     },
   },
 }

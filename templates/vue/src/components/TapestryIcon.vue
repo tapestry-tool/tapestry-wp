@@ -1,14 +1,19 @@
 <template>
-  <i
-    v-if="icon === 'audio' || icon === 'checklist'"
-    :class="`fas fa-${iconSrc} icon-fa`"
-  ></i>
-  <img v-else :src="iconSrc" />
+  <img v-if="isImage" :src="imageSource" />
+  <i v-else :class="iconClass"></i>
 </template>
 
 <script>
 import TextIcon from "@/assets/Aa.svg"
+import ZoomIn from "@/assets/zoom-in.png"
+import ZoomOut from "@/assets/zoom-out.png"
 import Helpers from "@/utils/Helpers"
+
+const images = {
+  text: TextIcon,
+  "zoom-in": ZoomIn,
+  "zoom-out": ZoomOut,
+}
 
 export default {
   name: "tapestry-icon",
@@ -16,17 +21,24 @@ export default {
     icon: {
       type: String,
       required: true,
-      validator: prop => ["audio", "checklist", "text"].includes(prop),
     },
   },
   computed: {
-    iconSrc() {
+    isImage() {
+      return images.hasOwnProperty(this.icon)
+    },
+    iconClass() {
+      if (this.icon === "post") {
+        return "fab fa-wordpress-simple"
+      }
       const icons = {
         audio: "microphone",
         checklist: "tasks",
-        text: Helpers.getImagePath(TextIcon),
       }
-      return icons[this.icon]
+      return `fas fa-${icons[this.icon] || this.icon} icon-fa`
+    },
+    imageSource() {
+      return Helpers.getImagePath(images[this.icon])
     },
   },
 }
