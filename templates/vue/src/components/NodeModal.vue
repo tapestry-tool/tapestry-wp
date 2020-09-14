@@ -133,7 +133,7 @@
           >
             <b-spinner v-if="!canSubmit"></b-spinner>
             <div :style="canSubmit ? '' : 'opacity: 50%;'">
-              {{ node.status !== "publish" ? "Re-submit" : "Submit" }} to
+              {{ node.status !== "publish" && node.status !== "draft" ? "Re-submit" : "Submit" }} to
               Administrators for Review
             </div>
           </b-button>
@@ -391,13 +391,13 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          if (this.node.status !== "draft" && this.node.status !== "submitted") {
-            this.updateNode({
-              id: this.parent.id,
-              newNode: {
-                childOrdering: [...this.parent.childOrdering, id],
-              },
-            })
+          if (this.node.status !== "draft" && this.node.status !== "submitted"){
+          this.$store.commit("updateNode", {
+            id: this.parent.id,
+            newNode: {
+              childOrdering: [...this.parent.childOrdering, id],
+            },
+          })
           }
         } else {
           this.updateRootNode(id)

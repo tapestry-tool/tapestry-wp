@@ -98,38 +98,36 @@ export default {
     },
   },
   mounted() {
-    // this.initializeDragSelect()
+    this.initializeDragSelect()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    // initializeDragSelect() {
-    //   document.addEventListener("keydown", evt => {
-    //     if (evt.key === "Escape") {
-    //       this.clearSelection()
-    //     }
-
-    //     if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-    //       evt.preventDefault()
-    //       Object.values(this.nodes).forEach(node => this.select(node.id))
-    //     }
-    //   })
-
-    //   new DragSelect({
-    //     selectables: document.querySelectorAll(".node"),
-    //     area: this.$refs.app,
-    //     onDragStart: evt => {
-    //       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-    //         return
-    //       }
-    //       this.clearSelection()
-    //     },
-    //     onElementSelect: el => this.select(el.dataset.id),
-    //     onElementUnselect: el => this.unselect(el.dataset.id),
-    //   })
-    // },
+    initializeDragSelect() {
+      document.addEventListener("keydown", evt => {
+        if (evt.key === "Escape") {
+          this.clearSelection()
+        }
+        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+          evt.preventDefault()
+          Object.values(this.nodes).forEach(node => this.select(node.id))
+        }
+      })
+      new DragSelect({
+        selectables: document.querySelectorAll(".node"),
+        area: this.$refs.app,
+        onDragStart: evt => {
+          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+            return
+          }
+          this.clearSelection()
+        },
+        onElementSelect: el => this.select(el.dataset.id),
+        onElementUnselect: el => this.unselect(el.dataset.id),
+      })
+    },
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
