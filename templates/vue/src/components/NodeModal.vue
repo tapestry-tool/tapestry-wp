@@ -394,7 +394,7 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.updateNode({
+          this.$store.commit("updateNode", {
             id: this.parent.id,
             newNode: {
               childOrdering: [...this.parent.childOrdering, id],

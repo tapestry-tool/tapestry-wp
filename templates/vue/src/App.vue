@@ -9,11 +9,11 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex"
-import Loading from "./components/Loading"
+import { mapState, mapMutations } from "vuex"
 import NodeModal from "./components/NodeModal"
 import TapestryApp from "./components/TapestryApp"
 import TapestrySidebar from "./components/TapestrySidebar"
+import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 
 export default {
@@ -41,7 +41,6 @@ export default {
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
       this.loading = false
-
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
         this.$router.replace(`/nodes/${dataset.rootId}`)
       }
@@ -52,6 +51,14 @@ export default {
   },
   methods: {
     ...mapMutations(["init"]),
+    recordAnalytics(evt) {
+      const x = evt.clientX + window.scrollLeft
+      const y = evt.clientY + window.scrollTop
+      client.recordAnalyticsEvent("user", "click", "screen", null, {
+        x: x,
+        y: y,
+      })
+    },
     recordAnalytics(evt) {
       const x = evt.clientX + window.scrollLeft
       const y = evt.clientY + window.scrollTop

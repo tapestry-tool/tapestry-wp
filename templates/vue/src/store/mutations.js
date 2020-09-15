@@ -62,6 +62,14 @@ function parseDataset(dataset) {
     })
   }
 
+  dataset.links = dataset.links.filter(link => {
+    const { source, target } = link
+    return (
+      getNode(dataset, source) !== undefined &&
+      getNode(dataset, target) !== undefined
+    )
+  })
+
   return dataset
 }
 
@@ -129,6 +137,18 @@ export function setDataset(state, dataset) {
       state[key] = value
     }
   })
+}
+
+export function updateDataset(state, { nodes, links }) {
+  nodes.additions.forEach(node => addNode(state, node))
+  nodes.deletions.forEach(node => {
+    if (node.id == state.selectedNodeId) {
+      state.selectedNodeId = state.rootId
+    }
+    deleteNode(state, node.id)
+  })
+  links.additions.forEach(link => addLink(state, link))
+  links.deletions.forEach(link => deleteLink(state, link))
 }
 
 export function updateDataset(state, { nodes, links }) {
