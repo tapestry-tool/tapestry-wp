@@ -71,7 +71,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add') && !isSubAccordionRow"
+            v-if="isLoggedIn() && hasPermission('add') && !isSubAccordionRow"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
@@ -114,6 +114,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 
@@ -349,6 +350,7 @@ export default {
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action)
     },
+    isLoggedIn,
   },
 }
 </script>
