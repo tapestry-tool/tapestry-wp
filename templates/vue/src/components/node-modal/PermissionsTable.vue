@@ -140,6 +140,11 @@ export default {
         this.getPermissionRowIndex(rowName)
       ][1]
 
+      // We don't support node additions for public users
+      if (rowName === "public" && type === "add") {
+        return true
+      }
+
       if (
         currentPermissions.includes("add") ||
         currentPermissions.includes("edit")

@@ -44,6 +44,11 @@ function parseDataset(dataset) {
     if (mediaURL && typeof mediaURL === "string") {
       node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
     }
+
+    const publicPermissions = node.permissions.public
+    if (publicPermissions.includes("add")) {
+      node.permissions.public = publicPermissions.filter(perm => perm !== "add")
+    }
   }
 
   for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
