@@ -71,7 +71,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="isLoggedIn() && hasPermission('add') && !isSubAccordionRow"
+            v-if="isLoggedIn && hasPermission('add') && !isSubAccordionRow"
             :node="node"
             :x="node.coordinates.x - 65"
             :y="node.coordinates.y + radius - 30"
@@ -149,6 +149,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    isLoggedIn() {
+      return isLoggedIn
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -350,7 +353,6 @@ export default {
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action)
     },
-    isLoggedIn,
   },
 }
 </script>
