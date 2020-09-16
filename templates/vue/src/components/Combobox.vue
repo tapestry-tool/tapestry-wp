@@ -14,6 +14,8 @@
         v-for="option in visibleOptions"
         :key="option[itemValue]"
         @mousedown.prevent="handleClick(option)"
+        :class="optionClass(option)"
+        :disabled="optionDisabled(option)"
       >
         <div class="combobox-item">
           <slot :option="option"> </slot>
@@ -138,6 +140,8 @@ export default {
       })
     },
     handleClick(option) {
+    console.log(this.visibleOptions)
+
       this.$emit("input", this.getValue(option))
       this.inputValue = this.itemText ? option[this.itemText] : option
       this.selected = true
@@ -151,6 +155,24 @@ export default {
     getValue(option) {
       return typeof option === "string" ? option : option[this.itemValue]
     },
+    optionClass(option) {
+      if (option.hasOwnProperty("disable")) {
+        return option.disable ? "combobox-disabled" : ""
+      } else {
+        return ""
+      }
+    },
+    optionDisabled(option) {
+      console.log("hello")
+if (option.hasOwnProperty("disable")) {
+  console.log("has disable")
+        return option.disable
+      } else {
+          console.log("no has disable")
+
+        return false
+      }
+    }
   },
 }
 </script>
@@ -173,6 +195,13 @@ export default {
       background: #cce5ff;
     }
   }
+
+.combobox-disabled {
+     cursor: not-allowed ;
+  pointer-events: none;
+
+  opacity: 50%
+}
 }
 </style>
 
@@ -199,4 +228,5 @@ export default {
   padding: 4px 0;
   color: #6c757d;
 }
+
 </style>

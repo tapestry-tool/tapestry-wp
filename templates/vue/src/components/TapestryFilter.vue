@@ -28,7 +28,8 @@
       >
         <template v-slot="slotProps" >
           <p class="filter-value">
-             <code >{{ slotProps.option.id }}</code>
+            <code v-if="shouldRenderCount(slotProps.option)">{{ slotProps.option.count }}</code>
+
             {{ slotProps.option.name }}
           </p>
         </template>
@@ -73,6 +74,7 @@ export default {
         width: "60%",
       }
     },
+
     isFilterSelected() {
       return this.filterOption !== ""
     },
@@ -89,16 +91,23 @@ export default {
                   Object.values(this.nodes).map(node => [
                     node.author.id,
                     node.author,
+                    
                   ])
                 ).values(),
-              ]
+              ].forEach((el)=>{el.disable = false;})
         }
         case filterOptions.STATUS: {
           let res = []
           for (let status of this.allStatuses) {
             let obj = {}
+            obj["count"] = status[1]
             obj["name"] = status[0]
-            obj["id"] = status[1]
+            obj["id"] = status[0]
+            if (status[1] == 0) {
+              obj["disable"] = true
+            } else {
+              obj["disable"] = false
+            }
             res.push(obj)
           }
           return res
@@ -142,6 +151,9 @@ export default {
         this.filterValue = ""
       }
       this.isActive = !this.isActive
+    },
+        shouldRenderCount(option) {
+      return typeof option.count == "number"
     },
     getVisibleNodes() {
       if (this.isActive && this.filterOption && this.filterValue) {
