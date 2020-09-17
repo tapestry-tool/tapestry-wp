@@ -50,6 +50,7 @@
 <script>
 import DragSelect from "dragselect"
 import { mapMutations, mapState } from "vuex"
+import { bus } from "@/utils/event-bus"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
@@ -99,6 +100,13 @@ export default {
   },
   mounted() {
     this.initializeDragSelect()
+    bus.$on("modal-displayed", (data) => {
+      if (data) {
+        this.removeDragSelectListener()
+      } else {
+        this.addDragSelectListener()
+      }   
+    })
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -106,16 +114,7 @@ export default {
       this.$root.$emit("add-node", null)
     },
     initializeDragSelect() {
-      document.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
-
-        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-          evt.preventDefault()
-          Object.values(this.nodes).forEach(node => this.select(node.id))
-        }
-      })
+      this.addDragSelectListener();
 
       new DragSelect({
         selectables: document.querySelectorAll(".node"),
@@ -129,6 +128,22 @@ export default {
         onElementSelect: el => this.select(el.dataset.id),
         onElementUnselect: el => this.unselect(el.dataset.id),
       })
+    },
+    dragSelectListener(evt) {
+        if (evt.key === "Escape") {
+          this.clearSelection()
+        }
+
+        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+          evt.preventDefault()
+          Object.values(this.nodes).forEach(node => this.select(node.id))
+        }
+    },
+    addDragSelectListener() {
+      document.addEventListener("keydown", this.dragSelectListener)
+    },
+    removeDragSelectListener() {
+      document.removeEventListener("keydown", this.dragSelectListener)
     },
     updateViewBox() {
       const MAX_RADIUS = 240
