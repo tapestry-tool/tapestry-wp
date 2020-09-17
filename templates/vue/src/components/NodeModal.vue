@@ -263,10 +263,12 @@ export default {
       immediate: true,
       handler(show) {
         if (show) {
-          this.formErrors = ""
           this.initialize()
         }
       },
+    },
+    type() {
+      this.initialize()
     },
     tab: {
       immediate: true,
@@ -298,6 +300,7 @@ export default {
       "updateLockedStatus",
     ]),
     initialize() {
+      this.formErrors = ""
       let copy = this.createDefaultNode()
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)

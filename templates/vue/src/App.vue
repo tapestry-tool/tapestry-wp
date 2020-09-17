@@ -59,14 +59,6 @@ export default {
         y: y,
       })
     },
-    recordAnalytics(evt) {
-      const x = evt.clientX + window.scrollLeft
-      const y = evt.clientY + window.scrollTop
-      client.recordAnalyticsEvent("user", "click", "screen", null, {
-        x: x,
-        y: y,
-      })
-    },
   },
 }
 </script>

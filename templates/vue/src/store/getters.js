@@ -39,7 +39,7 @@ export function isAccordion(_, { getNode, getParent }) {
       const parentNode = getNode(parent)
       return parentNode.mediaType === "accordion"
     }
-    
+
     return false
   }
 }
