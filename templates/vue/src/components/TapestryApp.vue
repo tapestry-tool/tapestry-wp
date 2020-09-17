@@ -58,6 +58,8 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
+import { bus } from "@/utils/event-bus"
+
 
 export default {
   components: {
@@ -74,6 +76,7 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      dragSelect: null,
     }
   },
   computed: {
@@ -98,6 +101,9 @@ export default {
     },
   },
   mounted() {
+    bus.$on("tapestry node mounted", data => {
+      this.dragSelect.addSelectables(document.querySelectorAll(".node"))
+    })
     this.initializeDragSelect()
   },
   methods: {
@@ -117,7 +123,7 @@ export default {
         }
       })
 
-      new DragSelect({
+      this.dragSelect = new DragSelect({
         selectables: document.querySelectorAll(".node"),
         area: this.$refs.app,
         onDragStart: evt => {

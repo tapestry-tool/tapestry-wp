@@ -237,6 +237,7 @@ export default {
     },
   },
   mounted() {
+    bus.$emit("tapestry node mounted", true)
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
