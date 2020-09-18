@@ -492,12 +492,13 @@ class Tapestry implements ITapestry
     private function _getTapestry($filterUserId)
     {
         $tapestry = $this->_filterTapestry($this->_formTapestry(), $filterUserId);
+        $roles = new TapestryUserRoles();
 
         $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
         $tapestry->nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
-                if (TapestryUserRoles::isRole('copilot')) {
+                if ($roles->isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';
                     } else {

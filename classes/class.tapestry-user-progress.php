@@ -42,8 +42,9 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
+        $roles = new TapestryUserRoles();
 
-        if (!TapestryUserRoles::isRole('copilot')) {
+        if (!$roles->isRole('copilot')) {
             return $this->_getUserProgress($nodeIds, $this->_userId);
         }
 
