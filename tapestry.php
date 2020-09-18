@@ -230,51 +230,57 @@ add_filter('single_template', 'load_tapestry_template');
 
 function create_new_tapestry()
 {
+    if (!current_user_can('edit_posts')) {
+        return "";
+    }
+
     $prefix = get_rest_url(null, 'tapestry-tool/v1');
 
     return "
-        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
-        <button id='new_tapestry_button'>
+        <button onclick='promptAddNewTapestry()'>
             Add Tapestry
         </button>
         <script type='text/javascript'>
-        var apiUrl = '{$prefix}';
-            $('#new_tapestry_button').click(function() {
+            function promptAddNewTapestry() {
                 let name = prompt(`Enter a name`);
-                let payload = {};
-                payload[`nodes`] = [];
-                payload[`groups`] = [];
-                payload[`links`] = [];
-                payload[`title`] = name;
-                return new Promise((fulfill, reject) => {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', apiUrl + '/tapestries');
-                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
-                    xhr.onload = () => {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            fulfill(xhr.response);
-                        } else {
+                if (name !== null) {
+                    var apiUrl = '{$prefix}';
+                    let payload = {};
+                    payload[`nodes`] = [];
+                    payload[`groups`] = [];
+                    payload[`links`] = [];
+                    payload[`title`] = name;
+                    return new Promise((fulfill, reject) => {
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', apiUrl + '/tapestries');
+                        xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                        xhr.setRequestHeader(`X-WP-Nonce`, `".wp_create_nonce('wp_rest')."`);
+                        xhr.onload = () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                fulfill(xhr.response);
+                            } else {
+                                reject({
+                                    status: xhr.status,
+                                    statusText: xhr.statusText
+                                });
+                            }
+                        };
+                        xhr.onerror = () => {
                             reject({
                                 status: xhr.status,
                                 statusText: xhr.statusText
                             });
-                        }
-                    };
-                    xhr.onerror = () => {
-                        reject({
-                            status: xhr.status,
-                            statusText: xhr.statusText
-                        });
-                    };
-                    xhr.send(JSON.stringify(payload));
-                }).then(data => {
-                    let res = JSON.parse(data);
-                    window.location.href = res.settings.permalink;
-                }).catch(err => {
-                    console.log(err);
-                    alert(`Error occured while creating tapestry, please try again`);
-                })
-            })
+                        };
+                        xhr.send(JSON.stringify(payload));
+                    }).then(data => {
+                        let res = JSON.parse(data);
+                        window.location.href = res.settings.permalink;
+                    }).catch(err => {
+                        console.log(err);
+                        alert(`Error occured while creating tapestry, please try again`);
+                    })
+                }
+            }
         </script>
     ";
 }
