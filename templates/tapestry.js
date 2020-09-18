@@ -157,9 +157,11 @@ function tapestryTool(config){
 			nodeIdsInLinks.push(tapestry.dataset.links[i].target);
 		}
 		
-		// Delete nodes that do not connect to any link
-		tapestry.dataset.nodes = tapestry.dataset.nodes.filter(
-            thisNode => nodeIdsInLinks.includes(thisNode.id) );
+        // Delete nodes that do not connect to any link
+        if (tapestry.dataset.links.length > 0) {
+            tapestry.dataset.nodes = tapestry.dataset.nodes.filter(
+                thisNode => nodeIdsInLinks.includes(thisNode.id) );
+        }
 
         tapestry.originalDataset = tapestry.dataset;
         
