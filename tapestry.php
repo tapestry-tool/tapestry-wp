@@ -252,7 +252,6 @@ function create_new_tapestry()
                         let xhr = new XMLHttpRequest();
                         xhr.open('POST', apiUrl + '/tapestries');
                         xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
-                        xhr.setRequestHeader(`X-WP-Nonce`, `".wp_create_nonce('wp_rest')."`);
                         xhr.onload = () => {
                             if (xhr.status >= 200 && xhr.status < 300) {
                                 fulfill(xhr.response);
