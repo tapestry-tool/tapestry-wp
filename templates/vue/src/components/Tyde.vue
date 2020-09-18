@@ -1,6 +1,6 @@
 <template>
   <div id="tyde">
-    <tapestry />
+    <tapestry @add-root="$emit('add-root')" />
     <tyde-module v-if="showModule" :node-id="moduleId" @done="closeModule" />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>

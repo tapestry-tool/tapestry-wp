@@ -1,11 +1,12 @@
 <template>
   <div id="app">
-    <tyde />
+    <tyde @add-root="addRootNode" />
     <router-view v-if="tapestryIsLoaded"></router-view>
     <tapestry-filter v-if="tapestryIsLoaded && enableFilter" />
     <node-modal
       v-if="tapestryIsLoaded"
       :node-id="nodeId"
+      :parent-id="parentId"
       :modal-type="modalType"
       @cancel="closeModal"
     />
@@ -32,11 +33,12 @@ export default {
     return {
       modalType: "",
       nodeId: null,
+      parentId: null,
       enableFilter: false,
     }
   },
   computed: {
-    ...mapState(["tapestryIsLoaded", "selectedNodeId"]),
+    ...mapState(["tapestryIsLoaded", "selectedNodeId", "getDirectParents"]),
   },
   mounted() {
     window.addEventListener("add-new-node", this.addNewNode)
@@ -50,6 +52,7 @@ export default {
     addNewNode() {
       this.modalType = "add"
       this.nodeId = this.selectedNodeId
+      this.parentId = this.getDirectParents(this.selectedNodeId)[0]
       this.$bvModal.show("node-modal")
     },
     editNode() {
@@ -58,6 +61,7 @@ export default {
       this.$bvModal.show("node-modal")
     },
     closeModal() {
+      this.parentId = null
       this.modalType = ""
     },
   },
