@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import Tyde from "./components/Tyde"
 import TapestryFilter from "./components/TapestryFilter"
 import NodeModal from "@/components/NodeModal"
@@ -38,6 +38,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getParent"]),
     ...mapState(["tapestryIsLoaded", "selectedNodeId", "getDirectParents"]),
   },
   mounted() {
@@ -52,12 +53,14 @@ export default {
     addNewNode() {
       this.modalType = "add"
       this.nodeId = this.selectedNodeId
-      this.parentId = this.getDirectParents(this.selectedNodeId)[0]
+      this.parentId = this.selectedNodeId
       this.$bvModal.show("node-modal")
     },
     editNode() {
       this.modalType = "edit"
       this.nodeId = this.selectedNodeId
+      const parent = this.getParent(this.selectedNodeId)
+      this.parentId = parent && parent.id
       this.$bvModal.show("node-modal")
     },
     closeModal() {
