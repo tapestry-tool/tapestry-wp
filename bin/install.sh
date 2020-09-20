@@ -1,4 +1,4 @@
-alias wp="docker-compose run --rm wpcli"
+alias wp="docker-compose run --rm wpcli --path=/var/www/html"
 
 # Install wordpress
 wp core install --url=localhost:8000 --admin_user=admin --admin_email=foo@bar.com --admin_password=secret --title=tapestry --debug
