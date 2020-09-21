@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import TapestryApp from "./components/TapestryApp"
+import TapestryApp from "./TapestryApp"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
 import client from "@/services/TapestryAPI"
