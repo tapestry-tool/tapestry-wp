@@ -1,9 +1,9 @@
 <template>
-  <button class="settings-button" @click="settingsModalOpen = true">
+  <button class="settings-button" @click="this.showModal">
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
-      @close="settingsModalOpen = false"
+      @close="this.closeModal"
     ></settings-modal>
   </button>
 </template>
@@ -22,6 +22,16 @@ export default {
       settingsModalOpen: false,
     }
   },
+  methods: {
+    showModal() {
+      console.log("settings wshow plz")
+      this.settingsModalOpen = true;
+    },
+    closeModal() {
+      console.log("settings close plz")
+      this.settingsModalOpen = false;
+    }
+  }
 }
 </script>
 
