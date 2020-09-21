@@ -1,14 +1,25 @@
 <template>
-  <iframe
-    id="h5p"
-    ref="h5p"
-    frameborder="0"
-    :height="frameHeight"
-    :src="node.typeData && node.typeData.mediaURL"
-    :width="frameWidth"
-    :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
-    @load="handleLoad"
-  ></iframe>
+  <div
+    class="h5p-iframe-container"
+    :class="{
+      'fill-window': !node.fitWindow,
+      'context-accordion': context === 'accordion',
+    }"
+    :style="
+      'height:' + (frameHeight ? frameHeight : 'auto') + ';width:' + frameWidth
+    "
+  >
+    <iframe
+      id="h5p"
+      ref="h5p"
+      height="100%"
+      width="100%"
+      frameborder="0"
+      :src="node.typeData && node.typeData.mediaURL"
+      :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
+      @load="handleLoad"
+    ></iframe>
+  </div>
 </template>
 
 <script>
@@ -26,6 +37,10 @@ export default {
     },
     dimensions: {
       type: Object,
+      required: true,
+    },
+    context: {
+      type: String,
       required: true,
     },
     settings: {
@@ -58,15 +73,28 @@ export default {
   },
   methods: {
     setFrameHeight() {
-      const box = this.instance.parent.$container[0].getBoundingClientRect()
-      const videoHeight = box.height
-      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
-        const scaleFactor = this.dimensions.height / videoHeight
-        this.frameHeight = 100 * scaleFactor + "%"
-        this.frameWidth = 100 * scaleFactor + "%"
-      } else {
-        this.frameHeight = "100%"
+      const h5pContainer = this.instance.parent.$container[0].getBoundingClientRect()
+
+      // default
+      this.frameHeight = h5pContainer.height + "px"
+      this.frameWidth = "100%"
+
+      if (this.node.fitWindow) {
+        // H5P should fit within the smaller of the viewport or the container it's in
+        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
+
+        // We need to resize IF the height or width is bigger than the viewport/container
+        if (h5pContainer.height > fitHeight + 5) {
+          // Count for the accordion header
+          if (this.context === "accordion") {
+            fitHeight -= 100
+          }
+          const scaleFactor = fitHeight / h5pContainer.height
+          this.frameHeight = h5pContainer.height * scaleFactor + "px"
+          this.frameWidth = h5pContainer.width * scaleFactor + "px"
+        }
       }
+
       this.$emit("change:dimensions", {
         width: this.frameWidth,
         height: this.frameHeight,
@@ -196,6 +224,8 @@ export default {
         const handleH5pAfterLoad = () => {
           this.instance = h5pVideo
           this.setFrameHeight()
+          window.addEventListener("resize", this.setFrameHeight)
+
           h5pIframeComponent.$emit("load", { el: h5pVideo })
 
           let currentPlayedTime
@@ -275,3 +305,21 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.h5p-iframe-container {
+  margin: auto;
+  overflow: hidden;
+  &:not(.context-accordion) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+  iframe {
+    margin: -1px !important;
+    min-width: calc(100% + 4px);
+  }
+}
+</style>
