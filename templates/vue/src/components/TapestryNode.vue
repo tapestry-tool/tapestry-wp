@@ -80,15 +80,11 @@
           </foreignObject>
         </g>
       </g>
-      <defs v-if="node.imageURL">
+      <defs v-if="imageUrl && imageUrl.length > 0">
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
-            :href="
-              node.lockedImageURL && !node.accessible
-                ? node.lockedImageURL
-                : node.imageURL
-            "
+            :href="imageUrl"
             x="0"
             y="0"
             :width="radius * 2"
@@ -106,6 +102,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import { tydeTypes } from "@/utils/constants"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 
@@ -146,6 +143,9 @@ export default {
         return this.isAccordionRow(parent)
       }
       return false
+    },
+    isModule() {
+      return this.node.tydeType === tydeTypes.MODULE
     },
     icon() {
       if (!this.node.accessible) {
@@ -189,7 +189,12 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
+      if (
+        this.imageUrl &&
+        this.imageUrl.length > 0 &&
+        this.node.nodeType !== "grandchild" &&
+        showImages
+      ) {
         return `url(#node-image-${this.node.id})`
       }
       if (this.selected) {
@@ -209,6 +214,20 @@ export default {
       }
       const rows = this.getDirectChildren(this.node.id)
       return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+    },
+    imageUrl() {
+      const node = this.node
+
+      if (this.isModule) {
+        const { typeData } = node
+        return this.node.completed
+          ? typeData.planetViewEarnedIconUrl
+          : typeData.planetViewNotEarnedIconUrl
+      }
+
+      return node.lockedImageURL && !node.accessible
+        ? node.lockedImageURL
+        : node.imageURL
     },
   },
   watch: {
@@ -293,7 +312,12 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
-    ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    ...mapMutations([
+      "select",
+      "unselect",
+      "updateSelectedNode",
+      "updateSelectedModule",
+    ]),
     openNode() {
       this.$router.push(`/nodes/${this.node.id}`)
     },
@@ -316,7 +340,7 @@ export default {
     },
     handleRequestOpen() {
       if (this.node.accessible || this.hasPermission("edit")) {
-        this.openNode()
+        this.isModule ? this.updateSelectedModule(this.node.id) : this.openNode()
       }
     },
     handleMouseover() {
@@ -332,7 +356,7 @@ export default {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
-          ? this.openNode()
+          ? this.handleRequestOpen()
           : this.updateSelectedNode(this.node.id)
       }
     },

@@ -1,12 +1,17 @@
 <template>
   <div id="tyde">
     <tapestry-app />
-    <tyde-module v-if="showModule" :node-id="moduleId" @done="closeModule" />
+    <tyde-module
+      v-if="selectedModuleId"
+      :node-id="selectedModuleId"
+      @done="closeModule"
+    />
     <tyde-spaceship @return-to-map="showModule = false" />
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex"
 import TapestryApp from "./TapestryApp"
 import TydeModule from "./tyde/TydeModule"
 import TydeSpaceship from "./tyde/TydeSpaceship"
@@ -20,23 +25,14 @@ export default {
     TydeModule,
     TydeSpaceship,
   },
-  data() {
-    return {
-      showModule: false,
-      moduleId: null,
-    }
-  },
-  mounted() {
-    window.addEventListener("start-module", evt => {
-      this.showModule = !this.showModule
-      this.moduleId = evt.detail
-      this.$store.commit("updateSelectedModule", this.moduleId)
-    })
+  computed: {
+    ...mapState(["selectedModuleId"]),
   },
   methods: {
+    ...mapMutations(["updateSelectedModule"]),
     closeModule() {
       client.recordAnalyticsEvent("app", "close", "module", this.moduleId)
-      this.showModule = false
+      this.updateSelectedModule(null)
     },
   },
 }
