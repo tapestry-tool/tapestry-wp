@@ -6,7 +6,6 @@
     <tapestry-sidebar />
     <node-modal
       :node-id="nodeId"
-      :parent-id="parentId"
       :modal-type="modalType"
       @cancel="closeModal"
       @submit="closeModal"
@@ -34,7 +33,6 @@ export default {
     return {
       modalType: "",
       nodeId: null,
-      parentId: null,
       enableFilter: false,
       loading: true,
     }
@@ -52,15 +50,12 @@ export default {
 
     this.$root.$on("add-node", to => {
       this.modalType = "add"
-      this.parentId = to
       this.nodeId = to
       this.$bvModal.show("node-modal")
     })
 
     this.$root.$on("edit-node", nodeId => {
       this.modalType = "edit"
-      const parent = this.getParent(nodeId)
-      this.parentId = parent && parent.id
       this.nodeId = nodeId
       this.$bvModal.show("node-modal")
     })

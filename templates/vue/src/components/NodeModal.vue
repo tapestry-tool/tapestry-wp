@@ -188,11 +188,6 @@ export default {
       required: false,
       default: null,
     },
-    parentId: {
-      type: Number,
-      required: false,
-      default: null,
-    },
     modalType: {
       type: String,
       required: true,
@@ -220,13 +215,16 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
+      "getParent",
     ]),
     ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
-      return this.getNode(this.parentId)
+      return this.getNode(
+        this.modalType === "add" ? this.nodeId : this.getParent(this.nodeId)
+      )
     },
     hasChildren() {
-      if (this.modalType === "edit-node") {
+      if (this.modalType === "edit") {
         return this.getDirectChildren(this.node.id).length > 0
       } else {
         return false
@@ -283,7 +281,7 @@ export default {
         }
         copy.hasSubAccordion = this.hasSubAccordion(copy)
         this.node = copy
-        this.setInitialTydeType()
+        this.node.tydeType = this.getInitialTydeType(this.parent)
         this.ready = true
       }
     })
@@ -302,17 +300,13 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
-    setInitialTydeType() {
-      // only set node types if adding a new node
-      if (this.parent && this.modalType === "add") {
-        const parentType = this.parent.tydeType
-        this.node.tydeType =
-          parentType === tydeTypes.MODULE
-            ? tydeTypes.STAGE
-            : parentType === tydeTypes.STAGE
-            ? tydeTypes.QUESTION_SET
-            : tydeTypes.REGULAR
-      }
+    getInitialTydeType(parent) {
+      const parentType = parent.tydeType
+      return parentType === tydeTypes.MODULE
+        ? tydeTypes.STAGE
+        : parentType === tydeTypes.STAGE
+        ? tydeTypes.QUESTION_SET
+        : tydeTypes.REGULAR
     },
     hasSubAccordion(node) {
       if (this.parent) {
