@@ -24,11 +24,9 @@ export default {
   },
   methods: {
     showModal() {
-      console.log("settings wshow plz")
       this.settingsModalOpen = true;
     },
     closeModal() {
-      console.log("settings close plz")
       this.settingsModalOpen = false;
     }
   }
