@@ -1,5 +1,7 @@
 <template>
-  <div class="video-container">
+  <div class="video-container" :style="
+      'height:' + (frameHeight ? frameHeight : 'auto') + ';width:' + frameWidth
+    ">
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -69,6 +71,8 @@ export default {
       showQuizScreen: false,
       videoDimensions: null,
       player: null,
+      frameHeight: 0,
+      frameWidth: "100%",
     }
   },
   computed: {
@@ -85,6 +89,8 @@ export default {
   methods: {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
+      console.log("is ready")
+      this.setFrameHeight()
       this.player = event.target
       const startTime =
         this.node.typeData.progress[0].value * this.node.mediaDuration
@@ -167,6 +173,34 @@ export default {
         this.updateH5pSettings(newSettings)
       }
     },
+    setFrameHeight() {
+      const h5pContainer = this.instance.parent.$container[0].getBoundingClientRect()
+      console.log(h5pContainer)
+      // default
+      this.frameHeight = h5pContainer.height + "px"
+      this.frameWidth = "100%"
+
+      if (this.node.fitWindow) {
+        // H5P should fit within the smaller of the viewport or the container it's in
+        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
+
+        // We need to resize IF the height or width is bigger than the viewport/container
+        if (h5pContainer.height > fitHeight + 5) {
+          // Count for the accordion header
+          if (this.context === "accordion") {
+            fitHeight -= 100
+          }
+          const scaleFactor = fitHeight / h5pContainer.height
+          this.frameHeight = h5pContainer.height * scaleFactor + "px"
+          this.frameWidth = h5pContainer.width * scaleFactor + "px"
+        }
+      }
+
+      this.$emit("change:dimensions", {
+        width: this.frameWidth,
+        height: this.frameHeight,
+      })
+    },
   },
 }
 </script>
@@ -177,7 +211,7 @@ export default {
   left: 15px;
   top: 15px;
   width: 100%;
-  height: 100%;
+  height: auto;
   max-width: 100vw;
 
   > div {
