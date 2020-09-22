@@ -110,8 +110,8 @@ export default {
     },
   },
   created() {
-    ;(this.addThumbnail = this.node.imageURL.length > 0),
-      (this.addLockedThumbnail = this.node.lockedImageURL.length > 0)
+    this.addThumbnail = this.node.imageURL.length > 0,
+    this.addLockedThumbnail = this.node.lockedImageURL.length > 0
   },
   methods: {
     handleUploadChange(state) {
