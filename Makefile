@@ -14,10 +14,14 @@ init:
 	# Change 30 to a higher number if it fails to install
 	@sleep 30
 	make install
+	make env
 
 install:
 	sh ./bin/install.sh
 	cd templates/vue && npm i
+
+env:
+	bash ./bin/setup-env.sh
 
 clear-db:
 	docker volume rm tapestry-wp_db_data
