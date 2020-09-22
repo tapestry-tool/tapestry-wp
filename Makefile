@@ -10,9 +10,6 @@ start-app:
 
 init:
 	make start-wp
-	@echo "Waiting for 30s for containers to be ready..."
-	# Change 30 to a higher number if it fails to install
-	@sleep 30
 	make install
 	make env
 
