@@ -25,6 +25,7 @@ clear-db:
 uninstall:
 	make stop
 	make clear-db
+	cd templates/vue && rm -r node_modules
 
 stop:
 	make stop-app
