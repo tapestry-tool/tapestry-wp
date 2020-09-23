@@ -35,6 +35,7 @@ import TapestryMedia from "./TapestryMedia"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { mapActions, mapGetters, mapState } from "vuex"
+import { bus } from "@/utils/event-bus"
 
 export default {
   name: "lightbox",
@@ -160,12 +161,16 @@ export default {
     },
   },
   mounted() {
+    console.log("lightbox up")
     this.isLoaded = true
     this.applyDimensions()
     document.querySelector("body").classList.add("tapestry-lightbox-open")
+    bus.$emit("modal-displayed", true)
   },
   beforeDestroy() {
+        console.log("lightbox down")
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
+    bus.$emit("modal-displayed", false)
   },
   methods: {
     ...mapActions(["completeNode"]),
