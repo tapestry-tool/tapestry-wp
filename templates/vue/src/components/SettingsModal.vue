@@ -200,7 +200,7 @@ export default {
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
         superuserOverridePermissions = true,
-        defaultDepth = Math.max(this.maxDepth, 3),
+        defaultDepth = 3,
         renderImages = true,
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -220,7 +220,7 @@ export default {
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
-        defaultDepth: Math.max(this.maxDepth, parseInt(this.defaultDepth)),
+        defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
       })
       await this.$store.dispatch("updateSettings", settings)
