@@ -164,11 +164,11 @@ export default {
     this.isLoaded = true
     this.applyDimensions()
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-    bus.$emit("modal-displayed", true)
+    bus.$emit("drag-select-override", true)
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    bus.$emit("modal-displayed", false)
+    bus.$emit("drag-select-override", false)
   },
   methods: {
     ...mapActions(["completeNode"]),

@@ -100,7 +100,7 @@ export default {
   },
   mounted() {
     this.initializeDragSelect()
-    bus.$on("modal-displayed", data => {
+    bus.$on("drag-select-override", data => {
       if (data) {
         this.removeDragSelectListener()
       } else {

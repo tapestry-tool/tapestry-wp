@@ -184,7 +184,11 @@ export default {
   },
   mounted() {
     this.getSettings()
+    bus.$emit("drag-select-override", true)
     bus.$on("max-depth-change", depth => (this.maxDepth = depth))
+  },
+  beforeDestroy() {
+    bus.$emit("drag-select-override", false)
   },
   methods: {
     closeModal() {

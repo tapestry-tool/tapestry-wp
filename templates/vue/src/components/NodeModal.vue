@@ -244,7 +244,7 @@ export default {
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
-      bus.$emit("modal-displayed", true)
+      bus.$emit("drag-select-override", true)
 
       if (modalId == "node-modal") {
         let copy = this.createDefaultNode()
@@ -258,7 +258,7 @@ export default {
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
-      bus.$emit("modal-displayed", false)
+      bus.$emit("drag-select-override", false)
 
       if (modalId == "node-modal") {
         this.ready = false
