@@ -6,6 +6,7 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
+      :style="'min-height:' + this.dimensions.height + 'px'"
       @load="$emit('load')"
     ></iframe>
     <div v-else class="preview" :style="previewStyles">
