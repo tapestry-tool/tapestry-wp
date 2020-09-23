@@ -84,11 +84,13 @@ export default {
         this.$router.push({
           name: names.SUBACCORDION,
           params: { nodeId, rowId, subRowId },
+          query: this.$route.query,
         })
       } else {
         this.$router.push({
           name: names.ACCORDION,
           params: { nodeId, rowId },
+          query: this.$route.query,
         })
       }
     },

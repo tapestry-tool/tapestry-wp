@@ -26,14 +26,26 @@ export default {
   components: {
     TapestryIcon,
   },
-  data() {
-    return {
-      currentDepth: 1,
-    }
-  },
   computed: {
     ...mapState(["nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
+    currentDepth: {
+      get() {
+        const { depth } = this.$route.query
+        if (depth) {
+          return Number(depth)
+        }
+        return this.settings.defaultDepth || 3
+      },
+      set(depth) {
+        if (depth !== this.currentDepth) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, depth },
+          })
+        }
+      },
+    },
     selectedNodeId() {
       return Number(this.$route.params.nodeId)
     },
@@ -94,14 +106,8 @@ export default {
       },
     },
   },
-  created() {
-    this.setDefaultDepth()
-  },
   methods: {
     ...mapMutations(["updateNode"]),
-    setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth || this.maxDepth + 1
-    },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
       const updated = new Set()

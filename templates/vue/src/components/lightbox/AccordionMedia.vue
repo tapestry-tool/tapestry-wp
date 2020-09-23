@@ -186,11 +186,13 @@ export default {
         this.$router.push({
           name: names.ACCORDION,
           params: { nodeId: this.node.id, rowId },
+          query: this.$route.query,
         })
       } else {
         this.$router.push({
           name: names.LIGHTBOX,
           params: { nodeId: this.node.id },
+          query: this.$route.query,
         })
       }
     },

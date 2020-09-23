@@ -279,6 +279,7 @@ export default {
             this.$router.replace({
               name: names.MODAL,
               params: { nodeId: this.nodeId, type: this.type, tab: "content" },
+              query: this.$route.query,
             })
           }
         }
@@ -348,18 +349,27 @@ export default {
         this.$router.push({
           name: names.MODAL,
           params: { nodeId: this.nodeId, type: this.type, tab },
+          query: this.$route.query,
         })
       }
     },
     close() {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
-          this.$router.push("/")
+          this.$router.push({ path: "/", query: this.$route.query })
         } else if (this.rootId && !this.nodeId) {
           // We just added a root node
-          this.$router.push({ name: names.APP, params: { nodeId: this.rootId } })
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.rootId },
+            query: this.$route.query,
+          })
         } else {
-          this.$router.push({ name: names.APP, params: { nodeId: this.nodeId } })
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.nodeId },
+            query: this.$route.query,
+          })
         }
       }
     },

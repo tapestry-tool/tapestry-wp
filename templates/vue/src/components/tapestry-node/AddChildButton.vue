@@ -133,6 +133,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "add", tab: "content" },
+        query: this.$route.query,
       })
     },
   },

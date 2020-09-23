@@ -1,5 +1,5 @@
 <template>
-  <button class="settings-button" @click="this.showModal">
+  <button class="settings-button" @click="showModal">
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
@@ -29,6 +29,7 @@ export default {
         this.$router.push({
           name: open ? names.SETTINGS : names.APP,
           params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+          query: this.$route.query,
         })
       },
     },
@@ -46,6 +47,7 @@ export default {
             this.$router.replace({
               name: names.SETTINGS,
               params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+              query: this.$route.query,
             })
           }
         }
@@ -57,17 +59,16 @@ export default {
       this.$router.push({
         name: names.SETTINGS,
         params: { nodeId: this.$route.params.nodeId, tab },
+        query: this.$route.query,
       })
     },
-  },
-  methods: {
     showModal() {
-      this.settingsModalOpen = true;
+      this.settingsModalOpen = true
     },
     closeModal() {
-      this.settingsModalOpen = false;
-    }
-  }
+      this.settingsModalOpen = false
+    },
+  },
 }
 </script>
 

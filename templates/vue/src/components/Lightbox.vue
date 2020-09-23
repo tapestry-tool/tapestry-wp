@@ -171,7 +171,11 @@ export default {
       handler() {
         if (!this.node) {
           // Node ID doesn't exist, so reroute to default selected node
-          this.$router.replace({ name: names.APP, params: { nodeId: this.rootId } })
+          this.$router.replace({
+            name: names.APP,
+            params: { nodeId: this.rootId },
+            query: this.$route.query,
+          })
         } else {
           this.applyDimensions()
         }
@@ -188,6 +192,7 @@ export default {
             this.$router.replace({
               name: names.LIGHTBOX,
               params: { nodeId: this.nodeId },
+              query: this.$route.query,
             })
           }
         }
@@ -201,6 +206,7 @@ export default {
             this.$router.replace({
               name: names.ACCORDION,
               params: { nodeId: this.nodeId, rowId: this.rowId },
+              query: this.$route.query,
             })
           }
         }
@@ -219,7 +225,11 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      this.$router.push({ name: names.APP, params: { nodeId: this.nodeId } })
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId: this.nodeId },
+        query: this.$route.query,
+      })
     },
     handleLoad(dimensions) {
       if (dimensions) {

@@ -18,7 +18,7 @@ const router = new VueRouter({
   ],
 })
 
-router.beforeEach((to, _, next) => {
+router.beforeEach((to, from, next) => {
   const nodes = Object.keys(store.state.nodes)
   if (to.matched.length === 0 && nodes.length > 0) {
     next({ name: names.APP, params: { nodeId: store.state.rootId } })

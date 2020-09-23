@@ -42,7 +42,10 @@ export default {
       this.init({ dataset, progress })
       this.loading = false
       if (!this.$route.params.nodeId && dataset.nodes.length > 0) {
-        this.$router.replace(`/nodes/${dataset.rootId}`)
+        this.$router.replace({
+          path: `/nodes/${dataset.rootId}`,
+          query: this.$route.query,
+        })
       }
     })
   },

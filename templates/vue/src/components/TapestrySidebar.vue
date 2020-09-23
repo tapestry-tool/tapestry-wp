@@ -167,7 +167,11 @@ export default {
       })
     },
     viewNode() {
-      this.$router.push({ name: names.LIGHTBOX, params: { nodeId: this.nodeId } })
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.nodeId },
+        query: this.$route.query,
+      })
     },
     toggle() {
       this.closed = !this.closed

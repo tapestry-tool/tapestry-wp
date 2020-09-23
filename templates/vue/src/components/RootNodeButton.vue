@@ -49,6 +49,7 @@ export default {
           type: "add",
           tab: "content",
         },
+        query: this.$route.query,
       })
     },
     openFileBrowser() {
