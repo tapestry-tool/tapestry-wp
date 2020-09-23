@@ -1,7 +1,7 @@
 <template>
   <b-modal
     id="settings-modal"
-    v-model="show"
+    :visible="show"
     size="lg"
     title="Tapestry Settings"
     scrollable
@@ -186,7 +186,10 @@ export default {
     })
   },
   mounted() {
-    this.getSettings()   
+    this.getSettings()
+    this.$root.$on("bv::modal::hide", () => {
+      this.$emit("close")
+    })
   },
   methods: {
     closeModal() {
