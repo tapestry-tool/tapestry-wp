@@ -77,7 +77,7 @@
             :y="node.coordinates.y + radius - 30"
           ></add-child-button>
           <foreignObject
-            v-if="hasPermission('edit')"
+            v-if="isLoggedIn && hasPermission('edit')"
             class="node-button-wrapper"
             :x="node.coordinates.x + 5"
             :y="node.coordinates.y + radius - 30"
