@@ -203,6 +203,9 @@ export default {
   mounted() {
     this.getSettings()
     bus.$on("max-depth-change", depth => (this.maxDepth = depth))
+    this.$root.$on("bv::modal::hide", () => {
+      this.$emit("close")
+    })
   },
   methods: {
     closeModal() {
