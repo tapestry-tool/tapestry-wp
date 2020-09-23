@@ -100,12 +100,12 @@ export default {
   },
   mounted() {
     this.initializeDragSelect()
-    bus.$on("modal-displayed", (data) => {
+    bus.$on("modal-displayed", data => {
       if (data) {
         this.removeDragSelectListener()
       } else {
         this.addDragSelectListener()
-      }   
+      }
     })
   },
   methods: {
@@ -114,7 +114,7 @@ export default {
       this.$root.$emit("add-node", null)
     },
     initializeDragSelect() {
-      this.addDragSelectListener();
+      this.addDragSelectListener()
 
       new DragSelect({
         selectables: document.querySelectorAll(".node"),
@@ -130,14 +130,14 @@ export default {
       })
     },
     dragSelectListener(evt) {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
+      if (evt.key === "Escape") {
+        this.clearSelection()
+      }
 
-        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-          evt.preventDefault()
-          Object.values(this.nodes).forEach(node => this.select(node.id))
-        }
+      if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+        evt.preventDefault()
+        Object.values(this.nodes).forEach(node => this.select(node.id))
+      }
     },
     addDragSelectListener() {
       document.addEventListener("keydown", this.dragSelectListener)

@@ -144,7 +144,6 @@ import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import { bus } from "@/utils/event-bus"
 
-
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
     return true
@@ -236,18 +235,16 @@ export default {
     this.node = this.createDefaultNode()
   },
   mounted() {
-
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-
       if (modalId == "node-modal") {
         this.formErrors = ""
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
-              bus.$emit("modal-displayed", true)
+      bus.$emit("modal-displayed", true)
 
       if (modalId == "node-modal") {
         let copy = this.createDefaultNode()
@@ -261,12 +258,11 @@ export default {
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
-        bus.$emit("modal-displayed", false)
+      bus.$emit("modal-displayed", false)
 
       if (modalId == "node-modal") {
         this.ready = false
       }
-
     })
   },
   methods: {
