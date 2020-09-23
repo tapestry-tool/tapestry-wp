@@ -59,8 +59,12 @@ const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
   name: "modal",
   beforeEnter: (to, _, next) => {
-    const { nodeId } = to.params
-    if (store.state.nodes.hasOwnProperty(nodeId)) {
+    const { nodes } = store.state
+    const { nodeId, type } = to.params
+
+    if (Object.keys(nodes).length === 0 && type === "add") {
+      next()
+    } else if (nodes.hasOwnProperty(nodeId)) {
       next()
     } else {
       next({ name: app.name, params: { nodeId: store.state.rootId } })
