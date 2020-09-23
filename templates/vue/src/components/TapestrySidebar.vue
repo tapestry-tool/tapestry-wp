@@ -97,11 +97,21 @@ export default {
   data() {
     return {
       active: null,
-      closed: true,
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
+    closed: {
+      get() {
+        return !this.$route.query.sidebar
+      },
+      set(closed) {
+        // eslint-disable-next-line no-unused-vars
+        const { sidebar: _, ...rest } = this.$route.query
+        const newQuery = closed ? rest : { ...this.$route.query, sidebar: true }
+        this.$router.push({ ...this.$route, query: newQuery })
+      },
+    },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },
