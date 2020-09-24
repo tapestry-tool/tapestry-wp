@@ -1,7 +1,5 @@
 <template>
-  <div class="video-container" :style="
-      'height:' + (frameHeight ? frameHeight : 'auto') + ';width:' + frameWidth
-    ">
+  <div class="video-container">
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -89,7 +87,6 @@ export default {
   methods: {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
-      console.log("is ready")
       this.setFrameHeight()
       this.player = event.target
       const startTime =
@@ -174,32 +171,25 @@ export default {
       }
     },
     setFrameHeight() {
-      const h5pContainer = this.instance.parent.$container[0].getBoundingClientRect()
-      console.log(h5pContainer)
-      // default
-      this.frameHeight = h5pContainer.height + "px"
-      this.frameWidth = "100%"
-
-      if (this.node.fitWindow) {
-        // H5P should fit within the smaller of the viewport or the container it's in
-        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
-
-        // We need to resize IF the height or width is bigger than the viewport/container
-        if (h5pContainer.height > fitHeight + 5) {
-          // Count for the accordion header
-          if (this.context === "accordion") {
-            fitHeight -= 100
-          }
-          const scaleFactor = fitHeight / h5pContainer.height
-          this.frameHeight = h5pContainer.height * scaleFactor + "px"
-          this.frameWidth = h5pContainer.width * scaleFactor + "px"
-        }
-      }
-
-      this.$emit("change:dimensions", {
-        width: this.frameWidth,
-        height: this.frameHeight,
+      const videoContainer = document.getElementsByClassName("video-container")[0].getBoundingClientRect()
+      const mediaContainer = document.getElementsByClassName("media-container")[0].getBoundingClientRect()
+      console.log(videoContainer)
+      console.log(mediaContainer)
+      if (videoContainer.bottom > mediaContainer.bottom) {
+        let scaleFactor = (mediaContainer.bottom - videoContainer.top)/videoContainer.height
+        console.log(scaleFactor)
+        document.getElementsByClassName("video-container")[0].style.height = videoContainer.height * scaleFactor + "px"
+        document.getElementsByClassName("video-container")[0].style.width = (videoContainer.width * scaleFactor) + "px"
+        console.log(document.getElementsByTagName("iframe"))
+        let iframe = document.getElementsByTagName("iframe")[0]
+        iframe.style.height = document.getElementsByClassName("video-container")[0].style.height
+        iframe.style.width = document.getElementsByClassName("video-container")[0].style.width 
+        this.$emit("change:dimensions", {
+        width: document.getElementsByClassName("video-container")[0].style.width,
+        height: document.getElementsByClassName("video-container")[0].style.height
       })
+      
+      }
     },
   },
 }
@@ -207,12 +197,12 @@ export default {
 
 <style lang="scss" scoped>
 .video-container {
-  position: absolute;
+  position: relative;
   left: 15px;
   top: 15px;
-  width: 100%;
-  height: auto;
-  max-width: 100vw;
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
 
   > div {
     padding-right: 30px;
