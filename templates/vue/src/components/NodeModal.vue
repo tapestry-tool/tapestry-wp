@@ -255,8 +255,13 @@ export default {
   watch: {
     nodeId: {
       immediate: true,
-      handler() {
-        this.initialize()
+      handler(nodeId) {
+        const isNodeValid = this.validateNodeRoute(nodeId)
+        if (!isNodeValid) {
+          this.$router.replace({ name: names.APP, params: { nodeId: this.rootId } })
+        } else {
+          this.initialize()
+        }
       },
     },
     show: {
@@ -300,6 +305,12 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    validateNodeRoute(nodeId) {
+      if (Object.keys(this.nodes).length === 0 && this.type === "add") {
+        return true
+      }
+      return this.nodes.hasOwnProperty(nodeId)
+    },
     initialize() {
       this.formErrors = ""
       let copy = this.createDefaultNode()
