@@ -375,7 +375,15 @@ export default {
     },
     handleDelete() {
       this.loading = false
-      this.close()
+      if (this.parent) {
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.parent.id },
+          query: this.$route.query,
+        })
+      } else {
+        this.$router.push({ path: "/", query: this.$route.query })
+      }
     },
     async handleSubmit() {
       this.loading = true
