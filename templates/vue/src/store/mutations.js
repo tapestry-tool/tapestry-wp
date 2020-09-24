@@ -1,6 +1,7 @@
 import { tydeTypes } from "../utils/constants"
 import Vue from "vue"
 import * as getters from "./getters"
+import { DEFAULT_DEPTH } from "@/utils/constants"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = setDatasetProgress(
@@ -76,6 +77,11 @@ function parseDataset(dataset) {
       getNode(dataset, target) !== undefined
     )
   })
+
+  const { defaultDepth } = dataset.settings
+  if (defaultDepth === undefined) {
+    dataset.settings.defaultDepth = DEFAULT_DEPTH
+  }
 
   return dataset
 }
