@@ -69,8 +69,6 @@ export default {
       showQuizScreen: false,
       videoDimensions: null,
       player: null,
-      frameHeight: 0,
-      frameWidth: "100%",
     }
   },
   computed: {
@@ -171,16 +169,24 @@ export default {
       }
     },
     setFrameDimensions() {
-      const videoContainer = document.getElementsByClassName("video-container")[0].getBoundingClientRect()
-      const mediaContainer = document.getElementsByClassName("media-container")[0].getBoundingClientRect()
+      const videoContainer = document
+        .getElementsByClassName("video-container")[0]
+        .getBoundingClientRect()
+      const mediaContainer = document
+        .getElementsByClassName("media-container")[0]
+        .getBoundingClientRect()
       if (videoContainer.bottom > mediaContainer.bottom) {
-        let scaleFactor = (mediaContainer.bottom - videoContainer.top)/videoContainer.height
-        let videoConatinerElement = document.getElementsByClassName("video-container")[0]
-        videoConatinerElement.style.height = videoContainer.height * scaleFactor + "px"
-        videoConatinerElement.style.width = (videoContainer.width * scaleFactor) + "px"
+        let scaleFactor =
+          (mediaContainer.bottom - videoContainer.top) / videoContainer.height
+        let videoConatinerElement = document.getElementsByClassName(
+          "video-container"
+        )[0]
+        videoConatinerElement.style.height =
+          videoContainer.height * scaleFactor + "px"
+        videoConatinerElement.style.width = videoContainer.width * scaleFactor + "px"
         let iframe = document.getElementsByTagName("iframe")[0]
         iframe.style.height = videoConatinerElement.style.height
-        iframe.style.width = videoConatinerElement.style.width 
+        iframe.style.width = videoConatinerElement.style.width
       }
     },
   },
