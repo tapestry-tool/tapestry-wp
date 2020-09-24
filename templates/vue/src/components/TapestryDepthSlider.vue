@@ -35,7 +35,7 @@ export default {
         if (depth) {
           return Number(depth)
         }
-        return this.settings.defaultDepth || 3
+        return this.settings.defaultDepth
       },
       set(depth) {
         if (depth !== this.currentDepth) {

@@ -28,3 +28,5 @@ export const licenses = {
     icons: ["fas fa-plus"],
   },
 }
+
+export const DEFAULT_DEPTH = 3
