@@ -97,7 +97,7 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth || 3
+      this.currentDepth = this.settings.defaultDepth
     },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
