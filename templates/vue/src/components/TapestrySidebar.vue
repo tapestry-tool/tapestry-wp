@@ -133,12 +133,8 @@ export default {
   },
   watch: {
     closed(closed) {
-      const tapestryContainer = document.getElementById("app-container")
       if (closed) {
-        tapestryContainer.classList.remove("sidebar-open")
         this.active = null
-      } else {
-        tapestryContainer.classList.add("sidebar-open")
       }
     },
     nodeId() {

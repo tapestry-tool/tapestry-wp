@@ -1,5 +1,5 @@
 <template>
-  <div id="app-container">
+  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
@@ -90,6 +90,9 @@ export default {
     },
     selectedId() {
       return Number(this.$route.params.nodeId)
+    },
+    isSidebarOpen() {
+      return Boolean(this.$route.query.sidebar)
     },
   },
   watch: {
