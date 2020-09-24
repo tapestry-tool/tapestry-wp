@@ -89,8 +89,15 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function() {
-        this.updateNodeTypes()
+      handler: function(depth) {
+        if (depth > this.maxDepth) {
+          this.$router.replace({
+            ...this.$route,
+            query: { ...this.$route.query, depth: this.maxDepth },
+          })
+        } else {
+          this.updateNodeTypes()
+        }
       },
     },
     levels: {
