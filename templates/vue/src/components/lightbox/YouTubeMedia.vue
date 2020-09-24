@@ -87,7 +87,7 @@ export default {
   methods: {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
-      this.setFrameHeight()
+      this.setFrameDimensions()
       this.player = event.target
       const startTime =
         this.node.typeData.progress[0].value * this.node.mediaDuration
@@ -170,25 +170,17 @@ export default {
         this.updateH5pSettings(newSettings)
       }
     },
-    setFrameHeight() {
+    setFrameDimensions() {
       const videoContainer = document.getElementsByClassName("video-container")[0].getBoundingClientRect()
       const mediaContainer = document.getElementsByClassName("media-container")[0].getBoundingClientRect()
-      console.log(videoContainer)
-      console.log(mediaContainer)
       if (videoContainer.bottom > mediaContainer.bottom) {
         let scaleFactor = (mediaContainer.bottom - videoContainer.top)/videoContainer.height
-        console.log(scaleFactor)
-        document.getElementsByClassName("video-container")[0].style.height = videoContainer.height * scaleFactor + "px"
-        document.getElementsByClassName("video-container")[0].style.width = (videoContainer.width * scaleFactor) + "px"
-        console.log(document.getElementsByTagName("iframe"))
+        let videoConatinerElement = document.getElementsByClassName("video-container")[0]
+        videoConatinerElement.style.height = videoContainer.height * scaleFactor + "px"
+        videoConatinerElement.style.width = (videoContainer.width * scaleFactor) + "px"
         let iframe = document.getElementsByTagName("iframe")[0]
-        iframe.style.height = document.getElementsByClassName("video-container")[0].style.height
-        iframe.style.width = document.getElementsByClassName("video-container")[0].style.width 
-        this.$emit("change:dimensions", {
-        width: document.getElementsByClassName("video-container")[0].style.width,
-        height: document.getElementsByClassName("video-container")[0].style.height
-      })
-      
+        iframe.style.height = videoConatinerElement.style.height
+        iframe.style.width = videoConatinerElement.style.width 
       }
     },
   },
