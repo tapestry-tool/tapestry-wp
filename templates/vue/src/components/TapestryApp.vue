@@ -58,6 +58,7 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
+import { names } from "@/config/routes"
 
 export default {
   components: {
@@ -77,7 +78,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -97,6 +98,22 @@ export default {
       handler(background) {
         const app = this.$root.$el
         app.style.backgroundImage = background ? `url(${background})` : ""
+      },
+    },
+    selectedId: {
+      immediate: true,
+      handler(nodeId) {
+        if (!this.nodes.hasOwnProperty(nodeId)) {
+          this.$router.replace(
+            Object.keys(this.nodes).length === 0
+              ? { path: "/", query: this.$route.query }
+              : {
+                  name: names.APP,
+                  params: { nodeId: this.rootId },
+                  query: this.$route.query,
+                }
+          )
+        }
       },
     },
   },
