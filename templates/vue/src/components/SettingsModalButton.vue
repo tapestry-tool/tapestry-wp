@@ -24,12 +24,12 @@ export default {
   },
   methods: {
     showModal() {
-      this.settingsModalOpen = true;
+      this.settingsModalOpen = true
     },
     closeModal() {
-      this.settingsModalOpen = false;
-    }
-  }
+      this.settingsModalOpen = false
+    },
+  },
 }
 </script>
 

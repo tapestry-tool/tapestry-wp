@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import DragSelect from "dragselect"
+import DragSelectModular from "@/utils/dragSelectModular"
 import { mapMutations, mapState } from "vuex"
 import { bus } from "@/utils/event-bus"
 import TapestryNode from "@/components/TapestryNode"
@@ -99,7 +99,7 @@ export default {
     },
   },
   mounted() {
-    this.initializeDragSelect()
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     bus.$on("drag-select-override", data => {
       if (data) {
         this.removeDragSelectListener()
@@ -113,22 +113,22 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    initializeDragSelect() {
-      this.addDragSelectListener()
+    // initializeDragSelect() {
+    //   this.addDragSelectListener()
 
-      new DragSelect({
-        selectables: document.querySelectorAll(".node"),
-        area: this.$refs.app,
-        onDragStart: evt => {
-          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-            return
-          }
-          this.clearSelection()
-        },
-        onElementSelect: el => this.select(el.dataset.id),
-        onElementUnselect: el => this.unselect(el.dataset.id),
-      })
-    },
+    //   new DragSelect({
+    //     selectables: document.querySelectorAll(".node"),
+    //     area: this.$refs.app,
+    //     onDragStart: evt => {
+    //       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+    //         return
+    //       }
+    //       this.clearSelection()
+    //     },
+    //     onElementSelect: el => this.select(el.dataset.id),
+    //     onElementUnselect: el => this.unselect(el.dataset.id),
+    //   })
+    // },
     dragSelectListener(evt) {
       if (evt.key === "Escape") {
         this.clearSelection()
