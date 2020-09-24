@@ -101,6 +101,7 @@ export default {
     },
   },
   mounted() {
+    this.updateViewBox()
     this.initializeDragSelect()
   },
   methods: {
