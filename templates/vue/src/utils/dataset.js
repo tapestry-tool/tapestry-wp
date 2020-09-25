@@ -1,3 +1,5 @@
+import { DEFAULT_DEPTH } from "./constants"
+
 export function parse(dataset) {
   const store = {
     ...dataset,
@@ -31,6 +33,11 @@ export function parse(dataset) {
         subRow.presentationStyle = "accordion-row"
       })
     })
+  }
+
+  const { defaultDepth } = dataset.settings
+  if (defaultDepth === undefined) {
+    store.settings.defaultDepth = DEFAULT_DEPTH
   }
 
   dataset.nodes
