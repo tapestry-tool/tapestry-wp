@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container">
+  <div class="embed-responsive embed-responsive-16by9">
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -14,6 +14,7 @@
       @close="close"
     />
     <youtube
+      class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width - 15"
       :player-height="dimensions.height - 40"
@@ -73,6 +74,14 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
+    progress() {
+      if (this.node.progress) {
+        return this.node.progress
+      } else if (this.node.typeData.progress) {
+        return this.node.typeData.progress[0].value
+      }
+      return 0
+    },
   },
   beforeDestroy() {
     if (this.player) {
@@ -85,11 +94,8 @@ export default {
   methods: {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
-      this.setFrameDimensions()
       this.player = event.target
-      const startTime =
-        this.node.typeData.progress[0].value * this.node.mediaDuration
-      this.player.seekTo(startTime, true)
+      this.player.seekTo(this.progress * this.node.mediaDuration, true)
       this.applySettings()
     },
     openQuiz() {
@@ -116,12 +122,11 @@ export default {
       this.$emit("close")
     },
     getInitialEndScreenState() {
-      const progress = this.node.typeData.progress[0].value
-      if (progress >= 1) {
+      if (this.progress >= 1) {
         return true
       }
       if (this.player) {
-        const viewedAmount = progress * this.player.getDuration()
+        const viewedAmount = this.progress * this.player.getDuration()
         return this.player.getDuration() <= viewedAmount
       }
       return false
@@ -168,47 +173,13 @@ export default {
         this.updateH5pSettings(newSettings)
       }
     },
-    setFrameDimensions() {
-      const videoContainer = document
-        .getElementsByClassName("video-container")[0]
-        .getBoundingClientRect()
-      const mediaContainer = document
-        .getElementsByClassName("media-container")[0]
-        .getBoundingClientRect()
-      if (videoContainer.bottom > mediaContainer.bottom) {
-        let scaleFactor =
-          (mediaContainer.bottom - videoContainer.top) / videoContainer.height
-        let videoConatinerElement = document.getElementsByClassName(
-          "video-container"
-        )[0]
-        videoConatinerElement.style.height =
-          videoContainer.height * scaleFactor + "px"
-        videoConatinerElement.style.width = videoContainer.width * scaleFactor + "px"
-        let iframe = document.getElementsByTagName("iframe")[0]
-        iframe.style.height = videoConatinerElement.style.height
-        iframe.style.width = videoConatinerElement.style.width
-      }
-    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.video-container {
-  position: relative;
-  left: 15px;
-  top: 15px;
-  width: auto;
+.embed-responsive {
+  max-height: calc(100vh - 120px);
   height: 100%;
-  margin: 0 auto;
-
-  > div {
-    padding-right: 30px;
-
-    > iframe {
-      margin: 0;
-      padding: 0;
-    }
-  }
 }
 </style>
