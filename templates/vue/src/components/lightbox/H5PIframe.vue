@@ -6,8 +6,8 @@
       'context-accordion': context === 'accordion',
     }"
     :style="{
-      height: this.frameHeight ? this.frameHeight + 'px' : 'auto',
-      width: this.frameWidth ? this.frameWidth + 'px' : '100%',
+      height: this.frameHeight ? this.frameHeight.toFixed(2) + 'px' : 'auto',
+      width: this.frameWidth ? this.frameWidth.toFixed(2) + 'px' : '100%',
       opacity: this.loading ? 0 : 1,
     }"
   >
