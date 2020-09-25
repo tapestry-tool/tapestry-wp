@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import DragSelect from "dragselect"
+import DragSelectModular from "@/utils/dragSelectModular"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
@@ -58,8 +58,6 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
-import { bus } from "@/utils/event-bus"
-
 
 export default {
   components: {
@@ -101,40 +99,12 @@ export default {
     },
   },
   mounted() {
-    bus.$on("tapestry node mounted", data => {
-      this.dragSelect.addSelectables(document.querySelectorAll(".node"))
-    })
-    this.initializeDragSelect()
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
-    },
-    initializeDragSelect() {
-      document.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
-
-        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-          evt.preventDefault()
-          Object.values(this.nodes).forEach(node => this.select(node.id))
-        }
-      })
-
-      this.dragSelect = new DragSelect({
-        selectables: document.querySelectorAll(".node"),
-        area: this.$refs.app,
-        onDragStart: evt => {
-          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-            return
-          }
-          this.clearSelection()
-        },
-        onElementSelect: el => this.select(el.dataset.id),
-        onElementUnselect: el => this.unselect(el.dataset.id),
-      })
     },
     updateViewBox() {
       const MAX_RADIUS = 240
