@@ -1,6 +1,9 @@
 import axios from "axios"
+import { data } from "./wp"
 
-const BASE_URL = typeof apiUrl === "undefined" ? "gf" : `${apiUrl}/gf`
+const { apiUrl, adminAjaxUrl } = data
+
+const BASE_URL = `${apiUrl}/gf`
 
 async function exists() {
   const url = `${BASE_URL}/exists`

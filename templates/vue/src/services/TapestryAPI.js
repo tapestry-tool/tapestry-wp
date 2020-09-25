@@ -1,5 +1,8 @@
 import axios from "axios"
 import Helpers from "../utils/Helpers"
+import { data } from "./wp"
+
+const { apiUrl, nonce, postId } = data
 
 class TapestryApi {
   /**
@@ -7,7 +10,7 @@ class TapestryApi {
    * @param {Number} postId
    */
   constructor(postId) {
-    //axios.defaults.headers.common["X-WP-Nonce"] = wpData.nonce
+    axios.defaults.headers.common["X-WP-Nonce"] = nonce
     this.postId = postId
   }
 
@@ -253,4 +256,4 @@ class TapestryApi {
   }
 }
 
-export default new TapestryApi(0)
+export default new TapestryApi(postId)

@@ -1,6 +1,7 @@
 import axios from "axios"
+import { data } from "./wp"
 
-const API_URL = typeof wpData !== "undefined" ? `${wpData.rest_url}/wp/v2` : "wp"
+const API_URL = `${data.rest_url}/wp/v2`
 
 let wp_posts_cache = []
 
