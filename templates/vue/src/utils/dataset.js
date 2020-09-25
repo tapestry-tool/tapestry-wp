@@ -35,7 +35,8 @@ export function parse(dataset) {
     })
   }
 
-  const { defaultDepth } = dataset.settings
+  store.settings = dataset.settings || {}
+  const { defaultDepth } = store.settings
   if (defaultDepth === undefined) {
     store.settings.defaultDepth = DEFAULT_DEPTH
   }
