@@ -26,7 +26,7 @@
         enablejsapi: 1,
       }"
       @ready="ready"
-      @paused="handlePause(player.getCurrentTime())"
+      @paused="handlePause()"
       @ended="handleEnd"
     />
   </div>
@@ -85,9 +85,8 @@ export default {
   },
   beforeDestroy() {
     if (this.player) {
-      const time = this.player.getCurrentTime()
       this.player.stopVideo()
-      this.updateVideoProgress(time)
+      this.updateVideoProgress()
       this.updateSettings()
     }
   },
@@ -95,7 +94,7 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
-      this.player.seekTo(this.progress * this.node.mediaDuration, true)
+      this.player.seekTo(this.progress * this.player.getDuration(), true)
       this.applySettings()
     },
     openQuiz() {
@@ -131,10 +130,14 @@ export default {
       }
       return false
     },
-    updateVideoProgress(time) {
+    updateVideoProgress(ended = false) {
       if (this.player) {
-        const currentTime = time || this.player.getCurrentTime()
-        const amountViewed = currentTime / this.player.getDuration()
+        let amountViewed
+        if (ended) {
+          amountViewed = 1
+        } else {
+          amountViewed = this.player.getCurrentTime() / this.player.getDuration()
+        }
         this.$emit("timeupdate", amountViewed)
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
@@ -145,12 +148,13 @@ export default {
         }
       }
     },
-    handlePause(time) {
-      this.updateVideoProgress(time)
+    handlePause() {
+      this.updateVideoProgress()
       this.updateSettings()
     },
     handleEnd() {
-      this.updateVideoProgress(this.node.mediaDuration) // Pass update with video duration because video may be a few milliseconds short
+      // Video current time may be a few milliseconds short and so won't mark it as complete
+      this.updateVideoProgress(true)
       this.updateSettings()
       this.showEndScreen = true
     },
