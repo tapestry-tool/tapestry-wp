@@ -5,9 +5,11 @@
       'fill-window': !node.fitWindow,
       'context-accordion': context === 'accordion',
     }"
-    :style="
-      'height:' + (frameHeight ? frameHeight : 'auto') + ';width:' + frameWidth
-    "
+    :style="{
+      height: this.frameHeight ? this.frameHeight + 'px' : 'auto',
+      width: this.frameWidth ? this.frameWidth + 'px' : '100%',
+      opacity: this.loading ? 0 : 1,
+    }"
   >
     <iframe
       id="h5p"
@@ -59,8 +61,9 @@ export default {
       instance: null,
       frameHeight: 0,
       frameWidth: "100%",
-      played: false,
       type: null,
+      loading: true,
+      requiresRefresh: false,
     }
   },
   watch: {
@@ -70,28 +73,47 @@ export default {
   },
   beforeDestroy() {
     this.handlePause(this.node)
+    window.removeEventListener("resize", this.setFrameHeight)
+    document.removeEventListener("fullscreenchange", this.setFrameHeight)
+    document.removeEventListener("webkitfullscreenchange", this.setFrameHeight)
+    document.removeEventListener("mozfullscreenchange", this.setFrameHeight)
   },
   methods: {
     setFrameHeight() {
-      const h5pContainer = this.instance.parent.$container[0].getBoundingClientRect()
+      const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
 
       // default
-      this.frameHeight = h5pContainer.height + "px"
-      this.frameWidth = "100%"
+      this.frameHeight = h5pDimensions.height
+      this.frameWidth = 0
 
       if (this.node.fitWindow) {
-        // H5P should fit within the smaller of the viewport or the container it's in
+        // Video should fit within the smaller of the viewport or the container it's in
         let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
 
-        // We need to resize IF the height or width is bigger than the viewport/container
-        if (h5pContainer.height > fitHeight + 5) {
+        if (this.context === "accordion") {
           // Count for the accordion header
-          if (this.context === "accordion") {
-            fitHeight -= 100
-          }
-          const scaleFactor = fitHeight / h5pContainer.height
-          this.frameHeight = h5pContainer.height * scaleFactor + "px"
-          this.frameWidth = h5pContainer.width * scaleFactor + "px"
+          // TODO: Find a better way of doing this without hardcoding the heigh value
+          fitHeight -= 100
+        }
+
+        // Proportionally make the frame smaller
+        const scaleFactor = fitHeight / h5pDimensions.height
+        this.frameHeight = h5pDimensions.height * scaleFactor
+        this.frameWidth = h5pDimensions.width * scaleFactor
+      }
+
+      if (this.loading) {
+        // Fix for unknown issue where H5P height is just a bit short
+        this.frameHeight += 8
+        if (this.requiresRefresh) {
+          this.$refs.h5p.contentWindow.location.reload()
+          setTimeout(() => {
+            this.loading = false
+            this.$emit("is-loaded")
+          }, 2000)
+        } else {
+          this.loading = false
+          this.$emit("is-loaded")
         }
       }
 
@@ -222,9 +244,22 @@ export default {
         const h5pIframeComponent = this
 
         const handleH5pAfterLoad = () => {
-          this.instance = h5pVideo
-          this.setFrameHeight()
-          window.addEventListener("resize", this.setFrameHeight)
+          h5pIframeComponent.instance = h5pVideo
+
+          h5pIframeComponent.setFrameHeight()
+          window.addEventListener("resize", h5pIframeComponent.setFrameHeight)
+          document.addEventListener(
+            "fullscreenchange",
+            h5pIframeComponent.setFrameHeight
+          )
+          document.addEventListener(
+            "webkitfullscreenchange",
+            h5pIframeComponent.setFrameHeight
+          )
+          document.addEventListener(
+            "mozfullscreenchange",
+            h5pIframeComponent.setFrameHeight
+          )
 
           h5pIframeComponent.$emit("load", { el: h5pVideo })
 
@@ -290,12 +325,15 @@ export default {
         }
 
         if (h5pVideo.getDuration() !== undefined) {
+          this.requiresRefresh = this.context === "accordion"
           handleH5pAfterLoad()
         } else {
           h5pVideo.on("loaded", handleH5pAfterLoad)
         }
+      } else {
+        this.loading = false
+        this.$emit("is-loaded")
       }
-      this.$emit("is-loaded")
     },
     toggleMuteIcon() {
       const body = this.$refs.h5p.contentWindow.H5P.$body[0]
@@ -309,6 +347,7 @@ export default {
 .h5p-iframe-container {
   margin: auto;
   overflow: hidden;
+  border-radius: 15px;
   &:not(.context-accordion) {
     position: absolute;
     top: 0;
