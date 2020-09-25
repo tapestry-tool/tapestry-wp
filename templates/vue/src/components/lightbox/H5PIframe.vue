@@ -74,13 +74,13 @@ export default {
   },
   beforeDestroy() {
     this.handlePause(this.node)
-    window.removeEventListener("resize", this.setFrameHeight)
-    document.removeEventListener("fullscreenchange", this.setFrameHeight)
-    document.removeEventListener("webkitfullscreenchange", this.setFrameHeight)
-    document.removeEventListener("mozfullscreenchange", this.setFrameHeight)
+    window.removeEventListener("resize", this.setFrameDimensions)
+    document.removeEventListener("fullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("webkitfullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("mozfullscreenchange", this.setFrameDimensions)
   },
   methods: {
-    setFrameHeight() {
+    setFrameDimensions() {
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
       let widthScaled = false
 
@@ -258,19 +258,19 @@ export default {
         const handleH5pAfterLoad = () => {
           h5pIframeComponent.instance = h5pVideo
 
-          h5pIframeComponent.setFrameHeight()
-          window.addEventListener("resize", h5pIframeComponent.setFrameHeight)
+          h5pIframeComponent.setFrameDimensions()
+          window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
           document.addEventListener(
             "fullscreenchange",
-            h5pIframeComponent.setFrameHeight
+            h5pIframeComponent.setFrameDimensions
           )
           document.addEventListener(
             "webkitfullscreenchange",
-            h5pIframeComponent.setFrameHeight
+            h5pIframeComponent.setFrameDimensions
           )
           document.addEventListener(
             "mozfullscreenchange",
-            h5pIframeComponent.setFrameHeight
+            h5pIframeComponent.setFrameDimensions
           )
 
           h5pIframeComponent.$emit("load", { el: h5pVideo })
