@@ -142,7 +142,7 @@ import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
-import { bus } from "@/utils/event-bus"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -244,7 +244,7 @@ export default {
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
-      bus.$emit("drag-select-override", true)
+      DragSelectModular.removeDragSelectListener()
 
       if (modalId == "node-modal") {
         let copy = this.createDefaultNode()
@@ -258,7 +258,7 @@ export default {
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
-      bus.$emit("drag-select-override", false)
+      DragSelectModular.addDragSelectListener()
 
       if (modalId == "node-modal") {
         this.ready = false
