@@ -74,7 +74,6 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
-      dragSelect: null,
     }
   },
   computed: {
@@ -98,7 +97,7 @@ export default {
       },
     },
   },
-  mounted() {
+  created() {
     DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
   },
   methods: {
