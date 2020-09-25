@@ -1,5 +1,5 @@
 <template>
-  <button class="settings-button" @click="showModal">
+  <button class="settings-button" @click="settingsModalOpen = true">
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
@@ -61,12 +61,6 @@ export default {
         params: { nodeId: this.$route.params.nodeId, tab },
         query: this.$route.query,
       })
-    },
-    showModal() {
-      this.settingsModalOpen = true
-    },
-    closeModal() {
-      this.settingsModalOpen = false
     },
   },
 }
