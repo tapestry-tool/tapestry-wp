@@ -3,6 +3,7 @@
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
+      :max-depth="maxDepth"
       @close="this.closeModal"
     ></settings-modal>
   </button>
@@ -16,6 +17,12 @@ export default {
   components: {
     SettingsModal,
     TapestryIcon,
+  },
+  props: {
+    maxDepth: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {

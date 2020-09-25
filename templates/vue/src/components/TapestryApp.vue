@@ -3,8 +3,14 @@
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <settings-modal-button v-if="canEdit"></settings-modal-button>
-        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
       </div>
     </div>
     <root-node-button
@@ -74,6 +80,7 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      maxDepth: 0,
     }
   },
   computed: {
