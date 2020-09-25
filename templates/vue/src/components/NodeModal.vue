@@ -309,7 +309,18 @@ export default {
       if (Object.keys(this.nodes).length === 0 && this.type === "add") {
         return true
       }
-      return this.nodes.hasOwnProperty(nodeId)
+      if (!this.nodes.hasOwnProperty(nodeId)) {
+        return false
+      }
+      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const messages = {
+        edit: `You don't have permission to edit this node`,
+        add: `You don't have permission to add to this node`,
+      }
+      if (!isAllowed && this.type in messages) {
+        alert(messages[this.type])
+      }
+      return isAllowed
     },
     initialize() {
       this.formErrors = ""
