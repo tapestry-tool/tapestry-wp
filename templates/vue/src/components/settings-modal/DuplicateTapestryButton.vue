@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import client from "@/services/TapestryAPI"
 
 export default {
@@ -26,7 +26,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["settings", "tapestryJson"]),
+    ...mapState(["settings"]),
+    ...mapGetters(["tapestryJson"]),
   },
   methods: {
     duplicateTapestry() {

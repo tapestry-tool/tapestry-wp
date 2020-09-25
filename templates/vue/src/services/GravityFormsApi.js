@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const BASE_URL = `${apiUrl}/gf`
+const BASE_URL = typeof apiUrl === "undefined" ? "gf" : `${apiUrl}/gf`
 
 async function exists() {
   const url = `${BASE_URL}/exists`
