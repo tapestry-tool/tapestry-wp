@@ -1,13 +1,14 @@
 <template>
   <div
+    ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
       'fill-window': !node.fitWindow,
       'context-accordion': context === 'accordion',
     }"
     :style="{
-      height: this.frameHeight ? this.frameHeight.toFixed(2) + 'px' : 'auto',
-      width: this.frameWidth ? this.frameWidth.toFixed(2) + 'px' : '100%',
+      height: this.frameHeight ? this.frameHeight + 'px' : 'auto',
+      width: this.frameWidth ? this.frameWidth + 'px' : '100%',
       opacity: this.loading ? 0 : 1,
     }"
   >
@@ -81,6 +82,7 @@ export default {
   methods: {
     setFrameHeight() {
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
+      let widthScaled = false
 
       // default
       this.frameHeight = h5pDimensions.height
@@ -89,22 +91,32 @@ export default {
       if (this.node.fitWindow) {
         // Video should fit within the smaller of the viewport or the container it's in
         let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
-
         if (this.context === "accordion") {
           // Count for the accordion header
           // TODO: Find a better way of doing this without hardcoding the heigh value
           fitHeight -= 100
         }
-
         // Proportionally make the frame smaller
-        const scaleFactor = fitHeight / h5pDimensions.height
+        let scaleFactor = fitHeight / h5pDimensions.height
         this.frameHeight = h5pDimensions.height * scaleFactor
         this.frameWidth = h5pDimensions.width * scaleFactor
+
+        // if the width is bigger than the available space, we need to scale based on the width
+        let fitWidth = this.$refs.h5pIframeContainer.clientWidth
+        if (this.frameWidth > fitWidth) {
+          scaleFactor = fitWidth / h5pDimensions.width
+          this.frameWidth = h5pDimensions.width * scaleFactor
+          this.frameHeight = h5pDimensions.height * scaleFactor
+        } else {
+          widthScaled = true
+        }
       }
 
       if (this.loading) {
         // Fix for unknown issue where H5P height is just a bit short
-        this.frameHeight += 8
+        if (widthScaled && this.frameHeight) {
+          this.frameHeight += 8
+        }
         if (this.requiresRefresh) {
           this.$refs.h5p.contentWindow.location.reload()
           setTimeout(() => {
