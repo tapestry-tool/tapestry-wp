@@ -106,11 +106,17 @@ export default {
     addThumbnail(addThumbnail) {
       if (!addThumbnail) {
         this.node.imageURL = ""
+        this.node.lockedImageURL = ""
       }
     },
+    addLockedThumbnail(addLockedThumbnail) {
+      if (!addLockedThumbnail) {
+        this.node.lockedImageURL = ""
+      }
+    }
   },
   created() {
-    this.addThumbnail = this.node.imageURL.length > 0,
+    this.addThumbnail = this.node.imageURL.length > 0
     this.addLockedThumbnail = this.node.lockedImageURL.length > 0
   },
   methods: {
