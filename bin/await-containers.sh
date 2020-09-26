@@ -1,5 +1,5 @@
 # check for an configuration file
-if [[ -f "./bin/config.sh" ]]; then
+if [ -f "./bin/config.sh" ]; then
     source "./bin/config.sh"
 else
     DOCKER_WP_INSTALL_DELAY=30

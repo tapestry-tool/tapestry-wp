@@ -13,10 +13,17 @@ init:
 	sh ./bin/await-containers.sh
 	make install
 	make env
+	@echo "All done!"
 
 install:
+	make install-wp
+	make install-app
+
+install-wp:
 	sh ./bin/install.sh
-	cd templates/vue && npm i
+
+install-app:
+	sh ./bin/node-install.sh
 
 env:
 	bash ./bin/setup-env.sh
