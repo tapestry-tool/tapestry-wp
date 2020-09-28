@@ -153,6 +153,7 @@ import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -252,6 +253,8 @@ export default {
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
+      DragSelectModular.removeDragSelectListener()
+
       if (modalId == "node-modal") {
         let copy = this.createDefaultNode()
         if (this.modalType === "edit") {
@@ -266,6 +269,8 @@ export default {
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
+      DragSelectModular.addDragSelectListener()
+
       if (modalId == "node-modal") {
         this.ready = false
       }
