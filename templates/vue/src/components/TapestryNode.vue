@@ -119,6 +119,7 @@ import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "tapestry-node",
@@ -245,6 +246,7 @@ export default {
     },
   },
   mounted() {
+    DragSelectModular.updateSelectableNodes()
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
