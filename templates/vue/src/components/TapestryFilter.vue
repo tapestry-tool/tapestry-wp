@@ -111,6 +111,7 @@ export default {
             } else {
               obj["disable"] = false
             }
+            console.log(obj)
             res.push(obj)
           }
           return res

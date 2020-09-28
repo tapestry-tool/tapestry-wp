@@ -29,4 +29,4 @@ export const licenses = {
   },
 }
 
-export const nodeStatuses = ["publish", "draft", "submitted"]
+export const nodeStatuses = ["publish", "draft", "submitted", "reject"]
