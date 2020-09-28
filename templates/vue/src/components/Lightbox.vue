@@ -36,6 +36,7 @@ import TapestryMedia from "./TapestryMedia"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { mapActions, mapGetters, mapState } from "vuex"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "lightbox",
@@ -164,9 +165,11 @@ export default {
     this.isLoaded = true
     this.applyDimensions()
     document.querySelector("body").classList.add("tapestry-lightbox-open")
+    DragSelectModular.removeDragSelectListener()
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
+    DragSelectModular.addDragSelectListener()
   },
   methods: {
     ...mapActions(["completeNode"]),
