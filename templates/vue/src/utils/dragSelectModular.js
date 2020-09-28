@@ -3,12 +3,13 @@ import DragSelect from "dragselect"
 export default class DragSelectModular {
   app
   nodes
+  dragSelect
 
   static initializeDragSelect(area, app, nodes) {
     this.addDragSelectListener()
     this.app = app
     this.nodes = nodes
-    new DragSelect({
+    this.dragSelect = new DragSelect({
       selectables: document.querySelectorAll(".node"),
       area: area,
       onDragStart: evt => {
@@ -41,5 +42,9 @@ export default class DragSelectModular {
 
   static removeDragSelectListener() {
     document.removeEventListener("keydown", this.dragSelectListener)
+  }
+
+  static updateSelectableNodes() {
+    DragSelectModular.dragSelect.addSelectables(document.querySelectorAll(".node"))
   }
 }
