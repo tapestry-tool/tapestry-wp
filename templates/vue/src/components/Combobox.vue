@@ -13,12 +13,12 @@
       <button
         v-for="option in visibleOptions"
         :key="option[itemValue]"
-        @mousedown.prevent="handleClick(option)"
         :class="optionClass(option)"
         :disabled="optionDisabled(option)"
+        @mousedown.prevent="handleClick(option)"
       >
         <div class="combobox-item">
-          <slot :option="option"> </slot>
+          <slot :option="option"></slot>
         </div>
       </button>
     </div>
@@ -140,8 +140,6 @@ export default {
       })
     },
     handleClick(option) {
-    console.log(this.visibleOptions)
-
       this.$emit("input", this.getValue(option))
       this.inputValue = this.itemText ? option[this.itemText] : option
       this.selected = true
@@ -163,16 +161,12 @@ export default {
       }
     },
     optionDisabled(option) {
-      console.log("hello")
-if (option.hasOwnProperty("disable")) {
-  console.log("has disable")
+      if (option.hasOwnProperty("disable")) {
         return option.disable
       } else {
-          console.log("no has disable")
-
         return false
       }
-    }
+    },
   },
 }
 </script>
@@ -196,12 +190,12 @@ if (option.hasOwnProperty("disable")) {
     }
   }
 
-.combobox-disabled {
-     cursor: not-allowed ;
-  pointer-events: none;
+  .combobox-disabled {
+    cursor: not-allowed;
+    pointer-events: none;
 
-  opacity: 50%
-}
+    opacity: 50%;
+  }
 }
 </style>
 
@@ -228,5 +222,4 @@ if (option.hasOwnProperty("disable")) {
   padding: 4px 0;
   color: #6c757d;
 }
-
 </style>

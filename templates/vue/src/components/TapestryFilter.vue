@@ -26,9 +26,11 @@
         :input-style="inputStyles"
         size="sm"
       >
-        <template v-slot="slotProps" >
+        <template v-slot="slotProps">
           <p class="filter-value">
-            <code v-if="shouldRenderCount(slotProps.option)">{{ slotProps.option.count }}</code>
+            <code v-if="shouldRenderCount(slotProps.option)">
+              {{ slotProps.option.count }}
+            </code>
 
             {{ slotProps.option.name }}
           </p>
@@ -42,7 +44,7 @@
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
 import client from "../services/TapestryAPI"
-import {nodeStatuses} from "@/utils/constants.js"
+import { nodeStatuses } from "@/utils/constants.js"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -91,10 +93,11 @@ export default {
                   Object.values(this.nodes).map(node => [
                     node.author.id,
                     node.author,
-                    
                   ])
                 ).values(),
-              ].forEach((el)=>{el.disable = false;})
+              ].forEach(el => {
+                el.disable = false
+              })
         }
         case filterOptions.STATUS: {
           let res = []
@@ -136,7 +139,7 @@ export default {
     }
     this.allStatuses = new Map()
     for (let status of nodeStatuses) {
-      this.allStatuses.set(status, 0);
+      this.allStatuses.set(status, 0)
     }
     for (let node of Object.values(this.nodes)) {
       this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
@@ -152,7 +155,7 @@ export default {
       }
       this.isActive = !this.isActive
     },
-        shouldRenderCount(option) {
+    shouldRenderCount(option) {
       return typeof option.count == "number"
     },
     getVisibleNodes() {
