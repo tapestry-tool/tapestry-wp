@@ -144,10 +144,25 @@ export default {
     for (let node of Object.values(this.nodes)) {
       this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
     }
+    this.$store.subscribe(mutation => {
+      if (mutation.type == "updateNode") {
+        this.reinitialize()
+        this.getVisibleNodes()
+      }
+    })
   },
   methods: {
-    ...mapMutations(["updateVisibleNodes"]),
+    ...mapMutations(["updateVisibleNodes", "updateNode"]),
     ...mapActions(["refetchTapestryData"]),
+    reinitialize() {
+      this.allStatuses = new Map()
+      for (let status of nodeStatuses) {
+        this.allStatuses.set(status, 0)
+      }
+      for (let node of Object.values(this.nodes)) {
+        this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
+      }
+    },
     toggleFilter() {
       if (this.isActive) {
         this.filterOption = ""
