@@ -97,7 +97,7 @@ export default {
       },
     },
   },
-  mounted() {
+  created() {
     DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
   },
   methods: {
