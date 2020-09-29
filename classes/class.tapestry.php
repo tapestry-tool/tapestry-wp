@@ -531,8 +531,8 @@ class Tapestry implements ITapestry
         $queue->enqueue($from);
         while (!$queue->isEmpty()) {
             $node = $queue->dequeue();
-            if (TapestryCache::exists(__METHOD__, [$node, $to, $superuser_override, $userId])) {
-                return TapestryCache::get(__METHOD__, [$node, $to, $superuser_override, $userId]);
+            if (TapestryCache::get(__METHOD__, [$node, $to, $superuser_override, $userId])) {
+                return true;
             }
             if (TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
                 || (TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
