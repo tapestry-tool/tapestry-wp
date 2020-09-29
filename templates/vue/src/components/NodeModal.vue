@@ -87,7 +87,7 @@
         :node="node"
         @submit="handleSubmit"
       ></review-form>
-      <div v-else style="display: flex; width: 100%;">
+      <div v-else style="display: flex; width: 100%;" class="buttons-container">
         <delete-node-button
           v-if="modalType === 'edit'"
           :node-id="nodeId"
@@ -812,5 +812,9 @@ table {
 
 button:disabled {
   cursor: not-allowed;
+}
+
+.buttons-container > * {
+  margin: 0.25rem !important;
 }
 </style>
