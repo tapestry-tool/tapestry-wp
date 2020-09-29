@@ -148,6 +148,7 @@ import { bus } from "@/utils/event-bus"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -202,12 +203,17 @@ export default {
   },
   mounted() {
     this.getSettings()
+    DragSelectModular.removeDragSelectListener()
+
     bus.$on("max-depth-change", depth => (this.maxDepth = depth))
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
         this.$emit("close")
       }
     })
+  },
+  beforeDestroy() {
+    DragSelectModular.addDragSelectListener()
   },
   methods: {
     closeModal() {

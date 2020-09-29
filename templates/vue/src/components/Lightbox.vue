@@ -38,6 +38,7 @@ import TapestryMedia from "./TapestryMedia"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "lightbox",
@@ -215,9 +216,11 @@ export default {
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
-    this.$once("hook:destroyed", () => {
-      document.querySelector("body").classList.remove("tapestry-lightbox-open")
-    })
+    DragSelectModular.removeDragSelectListener()
+  },
+  beforeDestroy() {
+    document.querySelector("body").classList.remove("tapestry-lightbox-open")
+    DragSelectModular.addDragSelectListener()
   },
   methods: {
     ...mapActions(["completeNode"]),

@@ -164,6 +164,7 @@ import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -263,8 +264,11 @@ export default {
       immediate: true,
       handler(show) {
         if (show) {
+          DragSelectModular.removeDragSelectListener()
           this.loading = false
           this.initialize()
+        } else {
+          DragSelectModular.addDragSelectListener()
         }
       },
     },
