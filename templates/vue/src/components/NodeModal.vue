@@ -136,10 +136,13 @@
             to Administrators for Review
           </div>
         </b-button>
-        <b-form-invalid-feedback :state="canMakeDraft">
-          {{ warningText }}
-        </b-form-invalid-feedback>
       </div>
+      <b-form-invalid-feedback
+        v-if="!(tapestryEditor && node.status === 'submitted')"
+        :state="canMakeDraft"
+      >
+        {{ warningText }}
+      </b-form-invalid-feedback>
       <review-form v-else :node="node" @submit="handleSubmit"></review-form>
     </template>
     <template v-else slot="modal-footer">
