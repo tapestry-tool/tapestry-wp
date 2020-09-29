@@ -107,7 +107,6 @@
         v-if="type === 'edit'"
         :node-id="nodeId"
         @submit="loading = true"
-        @done="handleDelete"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="close">
@@ -204,19 +203,15 @@ export default {
     ...mapGetters([
       "createDefaultNode",
       "getDirectChildren",
-      "getDirectParents",
+      "getParent",
       "getNode",
     ]),
     ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
     parent() {
-      if (this.type === "add") {
-        const parent = this.getNode(this.nodeId)
-        if (parent) {
-          return parent
-        }
-      }
-      const parents = this.getDirectParents(this.nodeId)
-      return parents && parents[0] ? this.getNode(parents[0]) : null
+      const parent = this.getNode(
+        this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
+      )
+      return parent ? parent : null
     },
     title() {
       if (this.type === "add") {
@@ -268,6 +263,7 @@ export default {
       immediate: true,
       handler(show) {
         if (show) {
+          this.loading = false
           this.initialize()
         }
       },
@@ -393,18 +389,6 @@ export default {
             query: this.$route.query,
           })
         }
-      }
-    },
-    handleDelete() {
-      this.loading = false
-      if (this.parent) {
-        this.$router.push({
-          name: names.APP,
-          params: { nodeId: this.parent.id },
-          query: this.$route.query,
-        })
-      } else {
-        this.$router.push({ path: "/", query: this.$route.query })
       }
     },
     async handleSubmit() {
