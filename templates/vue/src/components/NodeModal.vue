@@ -81,13 +81,12 @@
     <b-container v-else class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
-    <template slot="modal-footer">
-      <review-form
-        v-if="tapestryEditor && node.status === 'submitted'"
-        :node="node"
-        @submit="handleSubmit"
-      ></review-form>
-      <div v-else style="display: flex; width: 100%;" class="buttons-container">
+    <template v-if="ready" slot="modal-footer">
+      <div
+        v-if="!(tapestryEditor && node.status === 'submitted')"
+        style="display: flex; width: 100%;"
+        class="buttons-container"
+      >
         <delete-node-button
           v-if="modalType === 'edit'"
           :node-id="nodeId"
@@ -141,6 +140,10 @@
           {{ warningText }}
         </b-form-invalid-feedback>
       </div>
+      <review-form v-else :node="node" @submit="handleSubmit"></review-form>
+    </template>
+    <template v-else slot="modal-footer">
+      <b-spinner variant="secondary"></b-spinner>
     </template>
     <div v-if="loadDuration">
       <iframe
