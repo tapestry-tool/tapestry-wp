@@ -92,7 +92,7 @@
         :width="radius * 1.3"
         :height="radius / 7"
         :x="showPlanet ? -radius * 0.8 : -((radius * 1.3) / 2)"
-        :y="radius - 50"
+        :y="-radius - 50"
       >
         <div class="progress">
           <div class="progress-bar" :style="{ width: `${progress * 100}%` }"></div>
@@ -264,14 +264,6 @@ export default {
     },
     imageUrl() {
       const node = this.node
-
-      if (this.isModule) {
-        const { typeData } = node
-        return this.node.completed
-          ? typeData.planetViewEarnedIconUrl
-          : typeData.planetViewNotEarnedIconUrl
-      }
-
       return node.lockedImageURL && !node.accessible
         ? node.lockedImageURL
         : node.imageURL
