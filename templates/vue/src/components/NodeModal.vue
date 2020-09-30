@@ -301,12 +301,15 @@ export default {
       "updateLockedStatus",
     ]),
     getInitialTydeType(parent) {
-      const parentType = parent.tydeType
-      return parentType === tydeTypes.MODULE
-        ? tydeTypes.STAGE
-        : parentType === tydeTypes.STAGE
-        ? tydeTypes.QUESTION_SET
-        : tydeTypes.REGULAR
+      if (this.parent) {
+        const parentType = parent.tydeType
+        return parentType === tydeTypes.MODULE
+          ? tydeTypes.STAGE
+          : parentType === tydeTypes.STAGE
+          ? tydeTypes.QUESTION_SET
+          : tydeTypes.REGULAR
+      }
+      return null
     },
     hasSubAccordion(node) {
       if (this.parent) {
