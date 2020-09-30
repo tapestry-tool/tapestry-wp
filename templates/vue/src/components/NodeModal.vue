@@ -278,10 +278,11 @@ export default {
         if (this.modalType === "edit") {
           const node = this.getNode(this.nodeId)
           copy = Helpers.deepCopy(node)
+        } else if (this.modalType === "add") {
+          this.node.tydeType = this.getInitialTydeType(this.parent)
         }
         copy.hasSubAccordion = this.hasSubAccordion(copy)
         this.node = copy
-        this.node.tydeType = this.getInitialTydeType(this.parent)
         this.ready = true
       }
     })

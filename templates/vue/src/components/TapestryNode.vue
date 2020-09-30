@@ -87,13 +87,15 @@
         </pattern>
       </defs>
       <foreignObject
-        v-if="show && isModule"
+        v-if="show && showPlanet && isModule"
         class="tyde-module-planet-icon"
         :width="radius / 2"
         :height="radius / 2"
         :x="radius * 0.7"
         :y="-radius * 1.2 - 45"
-      ></foreignObject>
+      >
+        <img :src="planetUrl" alt="Planet View Icon" />
+      </foreignObject>
     </g>
   </transition>
 </template>
@@ -148,6 +150,20 @@ export default {
     },
     isModule() {
       return this.node.tydeType === tydeTypes.MODULE
+    },
+    showPlanet() {
+      if (this.planetUrl) {
+        return this.planetUrl.length > 0
+      }
+      return false
+    },
+    planetUrl() {
+      if (this.isModule) {
+        return this.progress < 1
+          ? this.node.typeData.planetViewNotEarnedIconUrl
+          : this.node.typeData.planetViewEarnedIconUrl
+      }
+      return ""
     },
     icon() {
       if (!this.node.accessible) {
