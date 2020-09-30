@@ -251,9 +251,11 @@ export default {
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId"]),
+    ...mapState(["nodes", "settings", "rootId"]),
     activities() {
-      return this.nodes.filter(node => Boolean(node.quiz)).flatMap(node => node.quiz)
+      return Object.values(this.nodes)
+        .filter(node => Boolean(node.quiz))
+        .flatMap(node => node.quiz)
     },
   },
   created() {

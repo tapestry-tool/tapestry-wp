@@ -166,7 +166,7 @@ function formatEntry(answers, answerType) {
 
 export function tapestryJson(state) {
   const exportedTapestry = {
-    nodes: state.nodes.map(node => {
+    nodes: Object.values(state.nodes).map(node => {
       const newNode = { ...node }
       if (newNode.quiz) {
         newNode.quiz = newNode.quiz.map(question => {
@@ -336,7 +336,7 @@ function getCompletedActivities(node) {
 
 export function getProfileActivities({ nodes, settings }) {
   let activities = []
-  let nodesWithQuestions = nodes.filter(
+  let nodesWithQuestions = Object.values(nodes).filter(
     node =>
       node.quiz &&
       node.quiz.some(

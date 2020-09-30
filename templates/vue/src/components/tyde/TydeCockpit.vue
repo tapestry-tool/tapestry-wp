@@ -27,7 +27,7 @@ export default {
       }
     },
     modules() {
-      return this.nodes.filter(this.isNodeModuleType)
+      return Object.values(this.nodes).filter(this.isNodeModuleType)
     },
   },
   methods: {
