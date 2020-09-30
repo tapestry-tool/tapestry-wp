@@ -339,6 +339,12 @@ h2:before {
       background-color: rgba($color-black, 0.1);
       background: rgba($color-black, 0.1);
     }
+
+    &:focus {
+      background-color: rgba($color-black, 0.2);
+      background: rgba($color-black, 0.2);
+      outline: unset;
+    }
   }
 
   span#{&}__button {

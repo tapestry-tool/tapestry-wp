@@ -60,7 +60,6 @@
         >
           <icon name="ol" />
         </button>
-        
       </div>
     </editor-menu-bar>
     <editor-content
