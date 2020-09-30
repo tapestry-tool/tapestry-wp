@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
@@ -11,20 +12,13 @@
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
     >
-      <circle
-        ref="circle"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
-        :fill="fill"
-      ></circle>
+      <circle ref="circle" :fill="fill"></circle>
       <progress-bar
         v-show="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
         :radius="radius"
         :progress="progress"
         :locked="!node.accessible"
@@ -35,8 +29,8 @@
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"
-          :x="node.coordinates.x - (140 * 5) / 6"
-          :y="node.coordinates.y - (140 * 5) / 6"
+          :x="-(140 * 5) / 6"
+          :y="-(140 * 5) / 6"
         >
           <div class="meta">
             <p class="title">{{ node.title }}</p>
@@ -47,8 +41,8 @@
           <foreignObject
             v-if="!node.hideMedia"
             class="node-button-wrapper"
-            :x="node.coordinates.x - 30"
-            :y="node.coordinates.y - radius - 30"
+            :x="-30"
+            :y="-radius - 30"
           >
             <button
               class="node-button"
@@ -65,14 +59,14 @@
           <add-child-button
             v-if="hasPermission('add') && !isSubAccordionRow"
             :node="node"
-            :x="node.coordinates.x - 65"
-            :y="node.coordinates.y + radius - 30"
+            :x="-65"
+            :y="radius - 30"
           ></add-child-button>
           <foreignObject
             v-if="hasPermission('edit')"
             class="node-button-wrapper"
-            :x="node.coordinates.x + 5"
-            :y="node.coordinates.y + radius - 30"
+            :x="5"
+            :y="radius - 30"
           >
             <button class="node-button" @click.stop="editNode">
               <tapestry-icon icon="pen"></tapestry-icon>
@@ -92,6 +86,14 @@
           />
         </pattern>
       </defs>
+      <foreignObject
+        v-if="show && isModule"
+        class="tyde-module-planet-icon"
+        :width="radius / 2"
+        :height="radius / 2"
+        :x="radius * 0.7"
+        :y="-radius * 1.2 - 45"
+      ></foreignObject>
     </g>
   </transition>
 </template>
