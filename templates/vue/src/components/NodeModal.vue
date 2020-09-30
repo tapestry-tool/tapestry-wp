@@ -344,7 +344,7 @@ export default {
       if (this.modalType === "add") {
         const id = await this.addNode({
           newNode: this.node,
-          parentId: this.parentId,
+          parentId: this.parent && this.parent.id,
         })
         this.node.id = id
         if (this.parent) {
