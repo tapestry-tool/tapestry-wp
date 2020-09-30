@@ -40,12 +40,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren"]),
+    ...mapGetters(["getNode", "getDirectChildren", "getTydeProgress"]),
     node() {
       return this.getNode(this.nodeId)
     },
     progress() {
-      return this.node.tydeProgress
+      return this.getTydeProgress(this.nodeId)
     },
     stages() {
       return this.getDirectChildren(this.nodeId)
@@ -53,7 +53,7 @@ export default {
         .filter(n => n.tydeType === tydeTypes.STAGE)
     },
     numIncompleteStages() {
-      return this.stages.filter(n => n.tydeProgress < 1).length
+      return this.stages.filter(n => this.getTydeProgress(n.id) < 1).length
     },
     outerCSS() {
       return {

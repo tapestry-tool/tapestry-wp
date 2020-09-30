@@ -1,4 +1,3 @@
-import Helpers from "../utils/Helpers"
 import { tydeTypes } from "../utils/constants"
 import Vue from "vue"
 import * as getters from "./getters"
@@ -291,41 +290,4 @@ export function updateVisibleNodes(state, nodes) {
 
 export function updateSelectedModule(state, moduleId) {
   state.selectedModuleId = moduleId
-}
-
-export function updateTydeProgress(state, { parentId, isParentModule }) {
-  const parentNode = state.nodes[Helpers.findNodeIndex(parentId, state)]
-  const childNodeIds = getChildIds(state, parentId)
-  const childNodes = childNodeIds.map(
-    id => state.nodes[Helpers.findNodeIndex(id, state)]
-  )
-  var childProgress, reducer
-  if (isParentModule) {
-    // parentNode is a module, and all children are stages
-    childProgress = childNodes.map(stage => stage.tydeProgress)
-    reducer = (accumulator, progress) => accumulator + progress
-  } else {
-    // parentNode is a stage, and all children are nodes (topics)
-    childProgress = childNodes.map(topic => topic.completed)
-    reducer = (accumulator, completed) => accumulator + (completed === true ? 1 : 0)
-  }
-  parentNode.tydeProgress =
-    childNodes.length === 0
-      ? 1
-      : childProgress.reduce(reducer, 0) / childNodes.length
-  if (!isParentModule) {
-    // If node is stage, parent module must be updated as well
-    getParentIds(state, parentId).map(id =>
-      updateTydeProgress(state, { parentId: id, isParentModule: true })
-    )
-  }
-}
-
-function getParentIds(state, nodeId) {
-  const links = state.links
-  return links
-    .filter(link =>
-      link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId
-    )
-    .map(link => (link.source.id == undefined ? link.source : link.source.id))
 }

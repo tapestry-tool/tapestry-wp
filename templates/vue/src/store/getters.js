@@ -1,3 +1,4 @@
+import { tydeTypes } from "@/utils/constants"
 import Helpers from "@/utils/Helpers"
 
 export function getDirectChildren(state) {
@@ -376,5 +377,29 @@ export function getNeighbours(state) {
     return state.links
       .filter(link => link.source == id || link.target == id)
       .map(link => (link.source == id ? link.target : link.source))
+  }
+}
+
+export function getTydeProgress(_, { getNode, getDirectChildren }) {
+  return id => {
+    const node = getNode(id)
+    if (node.tydeType !== tydeTypes.MODULE && node.tydeType !== tydeTypes.STAGE) {
+      return 0
+    }
+
+    let topics = []
+    if (node.tydeType === tydeTypes.MODULE) {
+      const stages = getDirectChildren(id)
+      topics = stages.flatMap(getDirectChildren).map(getNode)
+    } else {
+      topics = getDirectChildren(id).map(getNode)
+    }
+
+    if (!topics.length) {
+      return 1
+    }
+
+    const completedTopics = topics.filter(topic => topic.completed)
+    return completedTopics.length / topics.length
   }
 }

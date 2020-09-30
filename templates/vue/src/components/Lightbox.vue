@@ -33,8 +33,8 @@ import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
 import Helpers from "@/utils/Helpers"
-import { sizes, tydeTypes } from "@/utils/constants"
-import { mapActions, mapMutations, mapGetters, mapState } from "vuex"
+import { sizes } from "@/utils/constants"
+import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 
 export default {
@@ -170,16 +170,9 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode", "updateMayUnlockNodes"]),
-    ...mapMutations(["updateTydeProgress"]),
     complete() {
       if (Helpers.canUserUpdateProgress(this.node)) {
         this.completeNode(this.nodeId)
-        const stages = this.getDirectParents(this.nodeId).filter(
-          id => this.getNode(id).tydeType === tydeTypes.STAGE
-        )
-        stages.map(sid =>
-          this.updateTydeProgress({ parentId: sid, isParentModule: false })
-        )
       }
     },
     handleUserClose() {

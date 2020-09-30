@@ -41,7 +41,7 @@
           <foreignObject
             v-if="!node.hideMedia"
             class="node-button-wrapper"
-            :x="-30"
+            x="-30"
             :y="-radius - 30"
           >
             <button
@@ -59,13 +59,13 @@
           <add-child-button
             v-if="hasPermission('add') && !isSubAccordionRow"
             :node="node"
-            :x="-65"
+            x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
             v-if="hasPermission('edit')"
             class="node-button-wrapper"
-            :x="5"
+            x="5"
             :y="radius - 30"
           >
             <button class="node-button" @click.stop="editNode">
@@ -87,7 +87,19 @@
         </pattern>
       </defs>
       <foreignObject
-        v-if="show && showPlanet && isModule"
+        v-if="showProgress && isModule"
+        class="tyde-module-progress"
+        :width="radius * 1.3"
+        :height="radius / 7"
+        :x="showPlanet ? -radius * 0.8 : -((radius * 1.3) / 2)"
+        :y="radius - 50"
+      >
+        <div class="progress">
+          <div class="progress-bar" :style="{ width: `${progress * 100}%` }"></div>
+        </div>
+      </foreignObject>
+      <foreignObject
+        v-if="showPlanet && isModule"
         class="tyde-module-planet-icon"
         :width="radius / 2"
         :height="radius / 2"
@@ -95,6 +107,14 @@
         :y="-radius * 1.2 - 45"
       >
         <img :src="planetUrl" alt="Planet View Icon" />
+      </foreignObject>
+      <foreignObject
+        v-if="isModule && progress >= 1"
+        class="tyde-module-complete-check"
+        :x="radius - 45"
+        :y="radius - 45"
+      >
+        <i class="fas fa-check"></i>
       </foreignObject>
     </g>
   </transition>
@@ -140,6 +160,7 @@ export default {
       "isVisible",
       "getParent",
       "isAccordionRow",
+      "getTydeProgress",
     ]),
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
@@ -164,6 +185,9 @@ export default {
           : this.node.typeData.planetViewEarnedIconUrl
       }
       return ""
+    },
+    showProgress() {
+      return this.progress > 0 && this.progress < 1
     },
     icon() {
       if (!this.node.accessible) {
@@ -227,11 +251,16 @@ export default {
       return this.selection.includes(this.node.id)
     },
     progress() {
-      if (this.node.mediaType !== "accordion") {
-        return this.node.progress
+      if (this.isModule || this.node.tydeType === tydeTypes.STAGE) {
+        return this.getTydeProgress(this.node.id)
       }
-      const rows = this.getDirectChildren(this.node.id)
-      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+      if (this.node.mediaType === "accordion") {
+        const rows = this.getDirectChildren(this.node.id)
+        return (
+          rows.map(this.getNode).filter(row => row.completed).length / rows.length
+        )
+      }
+      return this.node.progress
     },
     imageUrl() {
       const node = this.node

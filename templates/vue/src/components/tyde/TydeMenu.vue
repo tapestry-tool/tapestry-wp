@@ -107,7 +107,7 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "favourites"]),
-    ...mapGetters(["getNode"]),
+    ...mapGetters(["getNode", "getTydeProgress"]),
   },
   watch: {
     settings(newSettings, prevSettings) {
@@ -122,7 +122,7 @@ export default {
     },
     openSummary(nodeId) {
       const node = this.getNode(nodeId)
-      if (node.tydeProgress === 1 || node.userType === "teen") {
+      if (this.getTydeProgress(nodeId) === 1 || node.userType === "teen") {
         this.showSummary = true
         this.moduleId = nodeId
       }

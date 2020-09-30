@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
+
 export default {
   name: "tyde-spaceship-part",
   props: {
@@ -23,8 +25,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getTydeProgress"]),
+    tydeProgress() {
+      return this.getTydeProgress(this.node.id)
+    },
     img() {
-      if (this.node.tydeProgress === 1 || this.isCopilot) {
+      if (this.tydeProgress === 1 || this.isCopilot) {
         switch (this.state) {
           case "hover":
             return this.node.typeData.spaceshipPartHoverIconUrl
@@ -45,8 +51,7 @@ export default {
         left: this.node.typeData.spaceshipPartX + "%",
         height: this.node.typeData.spaceshipPartHeight + "%",
         width: this.node.typeData.spaceshipPartWidth + "%",
-        cursor:
-          this.node.tydeProgress === 1 || this.isCopilot ? "pointer" : "default",
+        cursor: this.tydeProgress === 1 || this.isCopilot ? "pointer" : "default",
       }
     },
   },
