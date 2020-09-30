@@ -94,13 +94,8 @@
       <delete-node-button
         v-if="modalType === 'edit'"
         :node-id="nodeId"
-        :disabled="disableDeleteButton"
         @submit="close"
       ></delete-node-button>
-      <p v-if="disableDeleteButton" class="disable-message text-muted">
-        You cannot delete this node because this {{ node.tydeType }} node still has
-        children.
-      </p>
       <span style="flex-grow:1;"></span>
       <b-button size="sm" variant="secondary" @click="close">
         Cancel
@@ -222,22 +217,6 @@ export default {
       return this.getNode(
         this.modalType === "add" ? this.nodeId : this.getParent(this.nodeId)
       )
-    },
-    hasChildren() {
-      if (this.modalType === "edit") {
-        return this.getDirectChildren(this.node.id).length > 0
-      } else {
-        return false
-      }
-    },
-    disableDeleteButton() {
-      if (
-        this.node.tydeType === tydeTypes.MODULE ||
-        this.node.tydeType === tydeTypes.STAGE
-      ) {
-        return this.hasChildren
-      }
-      return false
     },
     title() {
       if (this.modalType === "add") {

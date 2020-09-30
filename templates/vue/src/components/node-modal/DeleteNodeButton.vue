@@ -11,6 +11,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { tydeTypes } from "@/utils/constants"
 
 export default {
   props: {
@@ -20,16 +21,19 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDirectParents", "getNode", "getNeighbours"]),
+    ...mapGetters(["getParent", "getDirectChildren", "getNode", "getNeighbours"]),
     ...mapState(["nodes", "rootId"]),
     parent() {
-      const parents = this.getDirectParents(this.nodeId)
-      return parents && parents[0] ? this.getNode(parents[0]) : null
+      return this.getNode(this.getParent(this.nodeId)) || null
     },
     isRoot() {
       return this.parent === null
     },
     isDisabled() {
+      const node = this.getNode(this.nodeId).tydeType
+      if (node.tydeType === tydeTypes.MODULE || node.tydeType === tydeTypes.STAGE) {
+        return this.getDirectChildren(this.nodeId).length > 0
+      }
       if (this.isRoot) {
         return Object.keys(this.nodes).length > 1
       } else {
@@ -37,7 +41,14 @@ export default {
       }
     },
     disabledMessage() {
+      const node = this.getNode(this.nodeId)
       if (this.isDisabled) {
+        if (
+          node.tydeType === tydeTypes.MODULE ||
+          node.tydeType === tydeTypes.STAGE
+        ) {
+          return `You cannot delete this node because this ${node.tydeType} node still has children.`
+        }
         return this.isRoot
           ? "Root node can only be deleted if there are no other nodes in the tapestry."
           : "Only nodes with a single connection can be deleted."
