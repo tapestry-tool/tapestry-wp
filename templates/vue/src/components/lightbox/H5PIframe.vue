@@ -129,10 +129,11 @@ export default {
         }
       }
 
-      this.$emit("change:dimensions", {
-        width: this.frameWidth,
-        height: this.frameHeight,
-      })
+      let updatedDimensions = { height: this.frameHeight }
+      if (this.frameWidth) {
+        updatedDimensions.width = this.frameWidth
+      }
+      this.$emit("change:dimensions", updatedDimensions)
     },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
