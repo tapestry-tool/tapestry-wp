@@ -88,7 +88,7 @@
         @submit="close"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="danger" @click="$emit('cancel')">
+      <b-button size="sm" variant="light" @click="$emit('cancel')">
         Cancel
       </b-button>
       <b-button
@@ -373,12 +373,12 @@ export default {
           }
           await this.addLink(newLink)
           if (this.node.status !== "draft") {
-          this.$store.commit("updateNode", {
-            id: this.parent.id,
-            newNode: {
-              childOrdering: [...this.parent.childOrdering, id],
-            },
-          })
+            this.$store.commit("updateNode", {
+              id: this.parent.id,
+              newNode: {
+                childOrdering: [...this.parent.childOrdering, id],
+              },
+            })
           }
         } else {
           this.updateRootNode(id)

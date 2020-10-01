@@ -488,6 +488,7 @@ class Tapestry implements ITapestry
 
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+
             return $tapestry;
         } else {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,
@@ -537,7 +538,7 @@ class Tapestry implements ITapestry
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
             $nodeMeta = $node->getMeta();
-            if($nodeMeta->status == "draft" && $nodeMeta->author->id != $currentUserId){
+            if ('draft' == $nodeMeta->status && $nodeMeta->author->id != $currentUserId) {
                 continue;
             }
             array_push($nodesPermitted, $nodeId);

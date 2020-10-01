@@ -73,7 +73,9 @@
           </foreignObject>
           <add-child-button
             v-if="
-              (hasPermission('add') || isAuthenticated) && node.status !== 'draft' && !isSubAccordionRow
+              (hasPermission('add') || isAuthenticated) &&
+                node.status !== 'draft' &&
+                !isSubAccordionRow
             "
             :node="node"
             :x="node.coordinates.x - 65"
