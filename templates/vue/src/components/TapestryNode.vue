@@ -60,7 +60,7 @@
             <button
               class="node-button"
               :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
+              @click.stop="handleRequestOpen"
             >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
@@ -137,6 +137,7 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
@@ -374,11 +375,29 @@ export default {
       "updateSelectedNode",
       "updateSelectedModule",
     ]),
+    updateRootNode() {
+      if (!this.root) {
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
+        this.updateSelectedNode(this.node.id)
+      }
+    },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration

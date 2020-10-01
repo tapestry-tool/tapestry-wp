@@ -4,7 +4,11 @@
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
     </header>
-    <tapestry-accordion :rows="rows.map(row => row.node.id)">
+    <tapestry-accordion
+      :rows="rows.map(row => row.node.id)"
+      :value="rowId"
+      @input="changeRow"
+    >
       <template v-slot="{ isVisible, hasNext, next, toggle }">
         <div class="rows">
           <div
@@ -75,6 +79,7 @@
                 v-if="row.children.length > 0"
                 :rows="row.children"
                 :read-only="readOnly"
+                :row-id="subRowId"
                 @load="handleLoad"
               ></sub-accordion>
             </div>
@@ -126,6 +131,7 @@ import Helpers from "../../utils/Helpers"
 import AccordionHeader from "../../assets/accordion-header.png"
 import AccordionConfirmation from "../../assets/accordion-confirmation.png"
 import client from "@/services/TapestryAPI"
+import { names } from "@/config/routes"
 
 export default {
   name: "accordion-media",
@@ -146,6 +152,15 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    rowId: {
+      type: Number,
+      required: true,
+    },
+    subRowId: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -321,6 +336,21 @@ export default {
     },
     showActivityIcon(mediaType) {
       return mediaType === "gravity-form" || mediaType === "activity"
+    },
+    changeRow(rowId) {
+      if (rowId) {
+        this.$router.push({
+          name: names.ACCORDION,
+          params: { nodeId: this.node.id, rowId },
+          query: this.$route.query,
+        })
+      } else {
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
+      }
     },
   },
 }
