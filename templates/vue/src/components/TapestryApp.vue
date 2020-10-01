@@ -3,8 +3,14 @@
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <settings-modal-button v-if="canEdit"></settings-modal-button>
-        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
       </div>
     </div>
     <root-node-button
@@ -48,7 +54,7 @@
 </template>
 
 <script>
-import DragSelect from "dragselect"
+import DragSelectModular from "@/utils/dragSelectModular"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
@@ -74,6 +80,7 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      maxDepth: 0,
     }
   },
   computed: {
@@ -97,38 +104,13 @@ export default {
       },
     },
   },
-  mounted() {
-    this.initializeDragSelect()
+  created() {
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
-    },
-    initializeDragSelect() {
-      document.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
-
-        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-          evt.preventDefault()
-          Object.values(this.nodes).forEach(node => this.select(node.id))
-        }
-      })
-
-      new DragSelect({
-        selectables: document.querySelectorAll(".node"),
-        area: this.$refs.app,
-        onDragStart: evt => {
-          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-            return
-          }
-          this.clearSelection()
-        },
-        onElementSelect: el => this.select(el.dataset.id),
-        onElementUnselect: el => this.unselect(el.dataset.id),
-      })
     },
     updateViewBox() {
       const MAX_RADIUS = 240
