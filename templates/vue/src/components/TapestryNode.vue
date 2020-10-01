@@ -12,16 +12,9 @@
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
     >
-      <circle
-        ref="circle"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
-        :fill="fill"
-      ></circle>
+      <circle ref="circle" :fill="fill"></circle>
       <circle
         v-if="selected || !node.accessible"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
         :r="radius"
         :fill="overlayFill"
         class="node-overlay"
