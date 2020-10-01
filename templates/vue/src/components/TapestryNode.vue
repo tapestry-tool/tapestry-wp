@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :data-qa="`node-${node.id}`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
@@ -60,6 +61,7 @@
           >
             <button
               class="node-button"
+              :data-qa="`open-node-${node.id}`"
               :disabled="!node.accessible && !hasPermission('edit')"
               @click="handleRequestOpen"
             >
@@ -82,7 +84,11 @@
             :x="node.coordinates.x + 5"
             :y="node.coordinates.y + radius - 30"
           >
-            <button class="node-button" @click.stop="editNode">
+            <button
+              :data-qa="`edit-node-${node.id}`"
+              class="node-button"
+              @click.stop="editNode"
+            >
               <tapestry-icon icon="pen"></tapestry-icon>
             </button>
           </foreignObject>

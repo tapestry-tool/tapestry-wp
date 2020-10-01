@@ -1,7 +1,12 @@
 <template>
   <g>
     <foreignObject class="node-button-wrapper" :x="x" :y="y">
-      <button ref="addButton" class="node-button" @click.stop="addNode">
+      <button
+        ref="addButton"
+        :data-qa="`add-node-${node.id}`"
+        class="node-button"
+        @click.stop="addNode"
+      >
         <tapestry-icon icon="plus"></tapestry-icon>
       </button>
     </foreignObject>

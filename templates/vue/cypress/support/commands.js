@@ -8,7 +8,6 @@ import {
   openRootNodeModal,
   openEditNodeModal,
   TEST_TAPESTRY_NAME,
-  findNode,
   applyModalChanges,
 } from "./utils"
 import roles from "./roles"
@@ -27,7 +26,7 @@ if (COMMAND_DELAY > 0) {
   ]) {
     Cypress.Commands.overwrite(command, (originalFn, ...args) => {
       const origVal = originalFn(...args)
-  
+
       return new Promise(resolve => {
         setTimeout(() => {
           resolve(origVal)
@@ -47,7 +46,7 @@ Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
   cy.scrollTo(0, 0)
   const nodeId = id || node.id
-  getMediaButton(nodeId).click({ force: true })
+  cy.getByTestId(`open-node-${nodeId}`).click({ force: true })
   return cy.get("#lightbox")
 })
 
@@ -74,6 +73,14 @@ Cypress.Commands.add("visitTapestry", () => {
 
 Cypress.Commands.add("getNodeByIndex", idx => getStore().its(`state.nodes.${idx}`))
 
+Cypress.Commands.add("getNodeByTitle", title =>
+  cy.findNode(node => node.title === title)
+)
+
+Cypress.Commands.add("getSelectedNode", () =>
+  cy.store().then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
+)
+
 Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) => {
   if (!newNode) {
     return parent ? openAddNodeModal(parent.id) : openRootNodeModal()
@@ -93,7 +100,7 @@ Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) =
   return cy
     .wait("@postNode")
     .its("response.body.id")
-    .then(id => findNode(node => node.id === id))
+    .then(id => cy.findNode(node => node.id === id))
 })
 
 Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
@@ -113,7 +120,7 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
 
   cy.wait("@editPermissions")
   cy.wait("@editNode")
-  return findNode(nd => nd.id === node.id)
+  return cy.findNode(nd => nd.id === node.id)
 })
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
@@ -140,7 +147,9 @@ Cypress.Commands.add("findNode", pred => {
   return cy
     .store()
     .its("nodes")
-    .then(nodes => nodes.find(pred))
+    .then(nodes => Object.values(nodes).find(pred))
 })
 
 Cypress.Commands.add("store", () => getStore().its("state"))
+
+Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))

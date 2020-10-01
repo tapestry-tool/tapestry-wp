@@ -15,14 +15,12 @@ export const visitTapestry = (name = "empty") => {
 export const openRootNodeModal = () => getByTestId("root-node-button").click()
 
 export const openAddNodeModal = id => {
-  cy.get(`#node-${id}`).click({ force: true })
-  getAddNodeButton(id).click({ force: true })
+  cy.getByTestId(`add-node-${id}`).click({ force: true })
   return cy.get(`#node-modal`)
 }
 
 export const openEditNodeModal = id => {
-  cy.get(`#node-${id}`).click({ force: true })
-  getEditNodeButton(id).click({ force: true })
+  cy.getByTestId(`edit-node-${id}`).click({ force: true })
   return cy.get(`#node-modal`)
 }
 
@@ -41,11 +39,6 @@ export const getByTestId = id => cy.get(`[data-testid=${id}]`)
 export const getNode = id => cy.get(`#node-${id}`)
 
 export const getLightbox = () => cy.get("#lightbox")
-
-export const findNode = pred =>
-  getStore()
-    .its("state.nodes")
-    .then(nodes => nodes.find(pred))
 
 export const normalizeUrl = url => {
   return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
@@ -98,11 +91,14 @@ export const applyModalChanges = newNode => {
 
   Object.entries(rest).forEach(([testId, value]) => {
     if (testId === "description") {
-      getByTestId(`node-description`).find("[contenteditable=true]").clear().type(value)
+      getByTestId(`node-description`)
+        .find("[contenteditable=true]")
+        .clear()
+        .type(value)
     } else {
       getByTestId(`node-${testId}`)
-      .clear()
-      .type(value)
+        .clear()
+        .type(value)
     }
   })
 
