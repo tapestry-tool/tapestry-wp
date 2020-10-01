@@ -20,7 +20,6 @@
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
-import { bus } from "@/utils/event-bus"
 
 export default {
   components: {
@@ -87,7 +86,7 @@ export default {
     maxDepth: {
       immediate: true,
       handler: function(maxDepth) {
-        bus.$emit("max-depth-change", maxDepth)
+        this.$emit("change:max-depth", maxDepth)
       },
     },
   },
@@ -97,7 +96,7 @@ export default {
   methods: {
     ...mapMutations(["updateNode"]),
     setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth || this.maxDepth + 1
+      this.currentDepth = this.settings.defaultDepth
     },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
