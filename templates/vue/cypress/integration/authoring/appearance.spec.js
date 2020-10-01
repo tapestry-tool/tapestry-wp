@@ -3,11 +3,17 @@ import { setup, cleanup } from "../../support/utils"
 describe("Node appearance", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    cy.fixture("two-nodes.json").as("twoNodes")
     setup("@oneNode")
   })
 
   afterEach(cleanup)
+
+  const setupThenTest = (newNode, assertions) => {
+    cy.getSelectedNode().then(node => {
+      cy.wrap(node).editNode(newNode)
+      cy.getByTestId(`node-${node.id}`).within(() => assertions(node))
+    })
+  }
 
   it("Should show a thumbnail if a thumbnail url is passed", () => {
     const newNode = {
@@ -18,9 +24,7 @@ describe("Node appearance", () => {
         },
       },
     }
-
-    cy.getNodeByIndex(0).editNode(newNode)
-    cy.getDOMNodeByIndex(0).within(() => {
+    setupThenTest(newNode, () => {
       cy.get("image").should("have.attr", "href", newNode.appearance.thumbnail.url)
     })
   })
@@ -31,9 +35,8 @@ describe("Node appearance", () => {
         hideTitle: true,
       },
     }
-    cy.getNodeByIndex(0).editNode(newNode)
-    cy.getDOMNodeByIndex(0).within(() => {
-      cy.get(".meta").should("not.exist")
+    setupThenTest(newNode, node => {
+      cy.getByTestId(`node-title-${node.id}`).should("not.exist")
     })
   })
 
@@ -43,9 +46,8 @@ describe("Node appearance", () => {
         hideProgress: true,
       },
     }
-    cy.getNodeByIndex(0).editNode(newNode)
-    cy.getDOMNodeByIndex(0).within(() => {
-      cy.get("path").should("not.exist")
+    setupThenTest(newNode, node => {
+      cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
     })
   })
 
@@ -55,9 +57,8 @@ describe("Node appearance", () => {
         hideMedia: true,
       },
     }
-    cy.getNodeByIndex(0).editNode(newNode)
-    cy.getDOMNodeByIndex(0).within(() => {
-      cy.get(".mediaButton").should("be.hidden")
+    setupThenTest(newNode, node => {
+      cy.getByTestId(`open-node-${node.id}`).should("not.exist")
     })
   })
 
@@ -67,8 +68,10 @@ describe("Node appearance", () => {
         hideMedia: true,
       },
     }
-    cy.getNodeByIndex(0).editNode(newNode)
-    cy.getDOMNodeByIndex(0).click()
+    cy.getSelectedNode().then(node => {
+      cy.wrap(node).editNode(newNode)
+      cy.getByTestId(`node-${node.id}`).click()
+    })
     cy.get("#lightbox").should("exist")
   })
 })

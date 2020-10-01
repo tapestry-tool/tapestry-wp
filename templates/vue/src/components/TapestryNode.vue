@@ -27,11 +27,12 @@
         class="node-overlay"
       ></circle>
       <progress-bar
-        v-show="
+        v-if="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
+        :data-qa="`node-progress-${node.id}`"
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"
@@ -41,6 +42,7 @@
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
+          :data-qa="`node-title-${node.id}`"
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"

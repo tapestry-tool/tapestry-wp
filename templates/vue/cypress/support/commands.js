@@ -1,5 +1,4 @@
 import {
-  getMediaButton,
   API_URL,
   getStore,
   openAddNodeModal,
@@ -87,7 +86,7 @@ Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) =
   }
 
   cy.server()
-  cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+  cy.route("POST", `**/nodes`).as("postNode")
 
   if (parent) {
     openAddNodeModal(parent.id)
@@ -109,10 +108,8 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   }
 
   cy.server()
-  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**`).as("editNode")
-  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`).as(
-    "editPermissions"
-  )
+  cy.route("PUT", `**/nodes/**`).as("editNode")
+  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   openEditNodeModal(node.id)
   applyModalChanges(newNode)
@@ -125,13 +122,11 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
   cy.server()
-  cy.route("DELETE", `${API_URL}/tapestries/**/nodes/**`).as("deleteNode")
-  cy.route("GET", `${API_URL}/tapestries/**`).as("getTapestry")
+  cy.route("DELETE", `**/nodes/**`).as("deleteNode")
 
   openEditNodeModal(node.id)
   cy.contains(/delete/i).click({ force: true })
   cy.wait("@deleteNode")
-  cy.wait("@getTapestry")
 
   return cy.wrap(node.id)
 })
