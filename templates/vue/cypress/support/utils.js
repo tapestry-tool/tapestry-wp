@@ -1,48 +1,9 @@
 // TODO: Add node generator
 // TODO: Add link generator
 
-export const API_URL = `/wp-json/tapestry-tool/v1`
+const getModal = () => cy.get("#node-modal")
 
-export const TEST_TAPESTRY_NAME = `cypress`
-
-export const getStore = () => cy.window().its("app.$store")
-
-export const visitTapestry = (name = "empty") => {
-  cy.visit(`/tapestry/${name}`)
-  cy.get("#content")
-}
-
-export const openRootNodeModal = () => getByTestId("root-node-button").click()
-
-export const openAddNodeModal = id => {
-  cy.getByTestId(`add-node-${id}`).click({ force: true })
-  return cy.get(`#node-modal`)
-}
-
-export const openEditNodeModal = id => {
-  cy.getByTestId(`edit-node-${id}`).click({ force: true })
-  return cy.get(`#node-modal`)
-}
-
-export const getModal = () => cy.get("#node-modal")
-
-export const submitModal = () => cy.contains("Submit").click({ force: true })
-
-export const getMediaButton = id => cy.get(`#mediaButton${id} > i`)
-
-export const getAddNodeButton = id => cy.get(`#addNodeIcon${id}`)
-
-export const getEditNodeButton = id => cy.get(`#editNodeIcon${id}`)
-
-export const getByTestId = id => cy.get(`[data-testid=${id}]`)
-
-export const getNode = id => cy.get(`#node-${id}`)
-
-export const getLightbox = () => cy.get("#lightbox")
-
-export const normalizeUrl = url => {
-  return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
-}
+const getByTestId = id => cy.get(`[data-testid=${id}]`)
 
 export const applyModalChanges = newNode => {
   getModal().should("be.visible")
