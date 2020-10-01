@@ -69,7 +69,10 @@ Cypress.Commands.add("getNodeByTitle", title =>
 )
 
 Cypress.Commands.add("getSelectedNode", () =>
-  cy.store().then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
+  cy
+    .store()
+    .its("state")
+    .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
 )
 
 Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) => {
@@ -104,7 +107,9 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   return cy.findNode(nd => nd.id === node.id)
 })
 
-Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {})
+Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {
+  cy.store().then(store => store.commit("updateNode", { id: node.id, newNode }))
+})
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
   cy.server()
@@ -120,10 +125,10 @@ Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
 Cypress.Commands.add("findNode", pred => {
   return cy
     .store()
-    .its("nodes")
+    .its("state.nodes")
     .then(nodes => Object.values(nodes).find(pred))
 })
 
-Cypress.Commands.add("store", () => cy.window().its("app.$store.state"))
+Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 
 Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))

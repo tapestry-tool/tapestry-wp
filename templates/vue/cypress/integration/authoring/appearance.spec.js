@@ -10,30 +10,24 @@ describe("Node appearance", () => {
 
   const setupThenTest = (newNode, assertions) => {
     cy.getSelectedNode().then(node => {
-      cy.wrap(node).editNode(newNode)
+      cy.wrap(node).editNodeInStore(newNode)
       cy.getByTestId(`node-${node.id}`).within(() => assertions(node))
     })
   }
 
   it("Should show a thumbnail if a thumbnail url is passed", () => {
     const newNode = {
-      appearance: {
-        thumbnail: {
-          url:
-            "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg",
-        },
-      },
+      imageURL:
+        "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg",
     }
     setupThenTest(newNode, () => {
-      cy.get("image").should("have.attr", "href", newNode.appearance.thumbnail.url)
+      cy.get("image").should("have.attr", "href", newNode.imageURL)
     })
   })
 
   it("Should hide node title", () => {
     const newNode = {
-      appearance: {
-        hideTitle: true,
-      },
+      hideTitle: true,
     }
     setupThenTest(newNode, node => {
       cy.getByTestId(`node-title-${node.id}`).should("not.exist")
@@ -41,21 +35,14 @@ describe("Node appearance", () => {
   })
 
   it("Should hide progress bar", () => {
-    const newNode = {
-      appearance: {
-        hideProgress: true,
-      },
-    }
-    setupThenTest(newNode, node => {
+    setupThenTest({ hideProgress: true }, node => {
       cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
     })
   })
 
   it("Should hide media button", () => {
     const newNode = {
-      appearance: {
-        hideMedia: true,
-      },
+      hideMedia: true,
     }
     setupThenTest(newNode, node => {
       cy.getByTestId(`open-node-${node.id}`).should("not.exist")
@@ -64,12 +51,10 @@ describe("Node appearance", () => {
 
   it("Should be able to open lightbox by clicking on center of node if media button is hidden", () => {
     const newNode = {
-      appearance: {
-        hideMedia: true,
-      },
+      hideMedia: true,
     }
     cy.getSelectedNode().then(node => {
-      cy.wrap(node).editNode(newNode)
+      cy.wrap(node).editNodeInStore(newNode)
       cy.getByTestId(`node-${node.id}`).click()
     })
     cy.get("#lightbox").should("exist")
