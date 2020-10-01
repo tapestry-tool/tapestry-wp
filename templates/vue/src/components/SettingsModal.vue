@@ -82,6 +82,14 @@
             </b-row>
           </b-form-group>
           <b-form-group
+            label='World map'
+            description='Replace Tapestry with a new authoring experience over a map of the Earth'>
+             <b-form-checkbox v-model="renderMap" switch>
+              {{ renderMap ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group
             class="mt-4"
             label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
@@ -171,6 +179,7 @@ export default {
       defaultDepth: 3,
       maxDepth: 0,
       renderImages: true,
+      renderMap: false,
     }
   },
   computed: {
@@ -200,6 +209,7 @@ export default {
         superuserOverridePermissions = true,
         defaultDepth = 3,
         renderImages = true,
+        renderMap = false,
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -209,6 +219,7 @@ export default {
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
+      this.renderMap = renderMap
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -220,6 +231,7 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
+        renderMap: this.renderMap
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()

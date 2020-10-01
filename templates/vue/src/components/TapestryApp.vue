@@ -44,6 +44,10 @@
         ></locked-tooltip>
       </svg>
     </main>
+    <div id='mapcontainer'>
+      <TapestryMap />
+    </div>
+    
   </div>
 </template>
 
@@ -51,6 +55,7 @@
 import DragSelect from "dragselect"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
+import TapestryMap from "@/components/TapestryMap"
 import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
 import SettingsModalButton from "@/components/SettingsModalButton"
@@ -58,10 +63,12 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
+import 'leaflet/dist/leaflet.css';
 
 export default {
   components: {
     TapestryNode,
+    TapestryMap,
     TapestryLink,
     TapestryDepthSlider,
     TapestryFilter,
