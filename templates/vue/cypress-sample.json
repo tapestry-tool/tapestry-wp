@@ -5,7 +5,6 @@
     "SUBSCRIBER_USERNAME": "subscriber_name",
     "SUBSCRIBER_PASSWORD": "subscriber_password"
   },
-  "baseUrl": "http://localhost:8000",
-  "retries": 1
+  "baseUrl": "http://localhost:8000"
 }
 

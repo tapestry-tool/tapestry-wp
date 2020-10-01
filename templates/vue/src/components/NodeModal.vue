@@ -14,7 +14,7 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="ready" fluid class="px-0">
+    <b-container v-if="ready" fluid class="px-0" data-qa="node-modal">
       <b-tabs card>
         <b-tab title="Content" active>
           <content-form

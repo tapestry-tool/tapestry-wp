@@ -5,30 +5,6 @@ const API_URL = `/wp-json/tapestry-tool/v1`
 
 const TEST_TAPESTRY_NAME = `cypress`
 
-const COMMAND_DELAY = Cypress.env("DELAY") || 500
-
-if (COMMAND_DELAY > 0) {
-  for (const command of [
-    "visit",
-    "click",
-    "trigger",
-    "type",
-    "clear",
-    "reload",
-    "contains",
-  ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args)
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(origVal)
-        }, COMMAND_DELAY)
-      })
-    })
-  }
-}
-
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
   cy.request("POST", `${API_URL}/login`, { username, password })
@@ -76,6 +52,11 @@ Cypress.Commands.add("getSelectedNode", () =>
 )
 
 Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) => {
+  if (!newNode) {
+    cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
+    return
+  }
+
   cy.server()
   cy.route("POST", `**/nodes`).as("postNode")
 
@@ -94,6 +75,11 @@ Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) =
 })
 
 Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
+  if (!newNode) {
+    cy.getByTestId(`edit-node-${node.id}`).click({ force: true })
+    return
+  }
+
   cy.server()
   cy.route("PUT", `**/nodes/**`).as("editNode")
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
@@ -126,7 +112,7 @@ Cypress.Commands.add("findNode", pred => {
   return cy
     .store()
     .its("state.nodes")
-    .then(nodes => Object.values(nodes).find(pred))
+    .then(nodes => Object.values(nodes).find(pred) || null)
 })
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))

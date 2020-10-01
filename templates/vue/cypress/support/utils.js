@@ -1,12 +1,10 @@
 // TODO: Add node generator
 // TODO: Add link generator
 
-const getModal = () => cy.get("#node-modal")
-
 const getByTestId = id => cy.get(`[data-testid=${id}]`)
 
 export const applyModalChanges = newNode => {
-  getModal().should("be.visible")
+  cy.getByTestId("node-modal").should("be.visible")
 
   const { appearance, mediaType, activity, typeData, permissions, ...rest } = newNode
   if (mediaType) {
