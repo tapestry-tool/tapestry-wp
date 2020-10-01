@@ -131,7 +131,6 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import { bus } from "@/utils/event-bus"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -159,6 +158,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    maxDepth: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -170,7 +173,6 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
-      maxDepth: 0,
       renderImages: true,
     }
   },
@@ -187,7 +189,6 @@ export default {
     this.getSettings()
     DragSelectModular.removeDragSelectListener()
 
-    bus.$on("max-depth-change", depth => (this.maxDepth = depth))
     this.$root.$on("bv::modal::hide", () => {
       this.$emit("close")
     })
