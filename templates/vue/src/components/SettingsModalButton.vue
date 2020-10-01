@@ -1,9 +1,12 @@
 <template>
-  <button class="settings-button" @click="this.showModal">
+  <button class="settings-button" @click="settingsModalOpen = true">
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
-      @close="this.closeModal"
+      :tab="tab"
+      :max-depth="maxDepth"
+      @close="settingsModalOpen = false"
+      @change:tab="changeTab"
     ></settings-modal>
   </button>
 </template>
@@ -11,23 +14,60 @@
 <script>
 import SettingsModal from "@/components/SettingsModal"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 
 export default {
   components: {
     SettingsModal,
     TapestryIcon,
   },
-  data() {
-    return {
-      settingsModalOpen: false,
-    }
+  props: {
+    maxDepth: {
+      type: Number,
+      required: true,
+    },
+  },
+  computed: {
+    settingsModalOpen: {
+      get() {
+        return this.$route.name === names.SETTINGS
+      },
+      set(open) {
+        this.$router.push({
+          name: open ? names.SETTINGS : names.APP,
+          params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+          query: this.$route.query,
+        })
+      },
+    },
+    tab() {
+      return this.$route.params.tab
+    },
+  },
+  watch: {
+    tab: {
+      immediate: true,
+      handler(requestedTab) {
+        if (this.settingsModalOpen) {
+          const acceptedTabs = ["appearance", "advanced", "access"]
+          if (!acceptedTabs.includes(requestedTab)) {
+            this.$router.replace({
+              name: names.SETTINGS,
+              params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+              query: this.$route.query,
+            })
+          }
+        }
+      },
+    },
   },
   methods: {
-    showModal() {
-      this.settingsModalOpen = true
-    },
-    closeModal() {
-      this.settingsModalOpen = false
+    changeTab(tab) {
+      this.$router.push({
+        name: names.SETTINGS,
+        params: { nodeId: this.$route.params.nodeId, tab },
+        query: this.$route.query,
+      })
     },
   },
 }
