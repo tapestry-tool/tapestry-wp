@@ -3,7 +3,6 @@
     ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
-      'fill-window': !node.fitWindow,
       'context-accordion': context === 'accordion',
     }"
     :style="{
@@ -82,13 +81,12 @@ export default {
   methods: {
     setFrameDimensions() {
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
-      let widthScaled = false
 
       // default
       this.frameHeight = h5pDimensions.height
       this.frameWidth = 0
 
-      if (this.node.fitWindow) {
+      if (this.node.fitWindow || this.context === "accordion") {
         // Video should fit within the smaller of the viewport or the container it's in
         let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
         if (this.context === "accordion") {
@@ -107,16 +105,10 @@ export default {
           scaleFactor = fitWidth / h5pDimensions.width
           this.frameWidth = h5pDimensions.width * scaleFactor
           this.frameHeight = h5pDimensions.height * scaleFactor
-        } else {
-          widthScaled = true
         }
       }
 
       if (this.loading) {
-        // Fix for unknown issue where H5P height is just a bit short
-        if (widthScaled && this.frameHeight) {
-          this.frameHeight += 8
-        }
         if (this.requiresRefresh) {
           this.$refs.h5p.contentWindow.location.reload()
           setTimeout(() => {
@@ -127,6 +119,11 @@ export default {
           this.loading = false
           this.$emit("is-loaded")
         }
+      }
+
+      // Fix for unknown issue where H5P height is just a bit short
+      if (this.frameHeight) {
+        this.frameHeight += 15
       }
 
       let updatedDimensions = { height: this.frameHeight }
