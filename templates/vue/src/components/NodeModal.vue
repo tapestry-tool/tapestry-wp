@@ -251,12 +251,11 @@ export default {
   watch: {
     nodeId: {
       immediate: true,
-      handler(nodeId) {
-        const isNodeValid = this.validateNodeRoute(nodeId)
-        if (!isNodeValid) {
-          this.$router.replace({ name: names.APP, params: { nodeId: this.rootId } })
-        } else {
-          this.initialize()
+      handler() {
+        if (this.show) {
+          if (this.isValid()) {
+            this.initialize()
+          }
         }
       },
     },
@@ -264,9 +263,11 @@ export default {
       immediate: true,
       handler(show) {
         if (show) {
-          DragSelectModular.removeDragSelectListener()
-          this.loading = false
-          this.initialize()
+          if (this.isValid()) {
+            DragSelectModular.removeDragSelectListener()
+            this.loading = false
+            this.initialize()
+          }
         } else {
           DragSelectModular.addDragSelectListener()
         }
@@ -277,16 +278,9 @@ export default {
     },
     tab: {
       immediate: true,
-      handler(tab) {
+      handler() {
         if (this.show) {
-          const isTabValid = this.validateTab(tab)
-          if (!isTabValid) {
-            this.$router.replace({
-              name: names.MODAL,
-              params: { nodeId: this.nodeId, type: this.type, tab: "content" },
-              query: this.$route.query,
-            })
-          }
+          this.isValid()
         }
       },
     },
@@ -295,6 +289,7 @@ export default {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
+    this.node = this.createDefaultNode()
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
@@ -305,6 +300,25 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    isValid() {
+      const isNodeValid = this.validateNodeRoute(this.nodeId)
+      if (!isNodeValid) {
+        this.$router.replace({
+          name: names.APP,
+          params: { nodeId: this.nodeId },
+        })
+        return false
+      }
+      const isTabValid = this.validateTab(this.tab)
+      if (!isTabValid) {
+        this.$router.replace({
+          name: names.MODAL,
+          params: { nodeId: this.nodeId, type: this.type, tab: "content" },
+          query: this.$route.query,
+        })
+      }
+      return true
+    },
     validateNodeRoute(nodeId) {
       if (Object.keys(this.nodes).length === 0 && this.type === "add") {
         return true
