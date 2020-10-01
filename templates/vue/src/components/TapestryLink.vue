@@ -5,18 +5,21 @@
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+        disabled:
+          !isLoggedIn,
       }"
       :x1="source.coordinates.x"
       :x2="target.coordinates.x"
       :y1="source.coordinates.y"
-      :y2="target.coordinates.y"
-      @click="remove"
+      :y2="target.coordinates.y"  
+      v-on="isLoggedIn ? { click: remove } : { click: null }"
     ></line>
   </transition>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
+import { isLoggedIn } from "@/utils/wp"
 
 export default {
   name: "tapestry-link",
@@ -35,6 +38,9 @@ export default {
     ...mapGetters(["getNeighbours", "isAccordion", "isVisible"]),
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
+    },
+    isLoggedIn() {
+      return isLoggedIn
     },
   },
   methods: {

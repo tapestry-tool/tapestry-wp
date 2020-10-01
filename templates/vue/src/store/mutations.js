@@ -45,11 +45,10 @@ function parseDataset(dataset) {
     if (mediaURL && typeof mediaURL === "string") {
       node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
     }
-
     const publicPermissions = node.permissions.public
     if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
       node.permissions.public = publicPermissions.filter(
-        perm => perm !== "add" && perm !== "edit"
+        perm => { perm !== "add" && perm !== "edit" }
       )
     }
   }

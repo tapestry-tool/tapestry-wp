@@ -620,8 +620,13 @@ function deleteTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        if (!TapestryHelpers::userIsAllowed('ADD', $linkIndex->source, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $linkIndex->target, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
         $tapestry = new Tapestry($postId);
-
         return $tapestry->removeLink($linkIndex);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
