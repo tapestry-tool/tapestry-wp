@@ -197,7 +197,7 @@ export async function deleteLink({ state, commit }, { source, target }) {
   const linkIndex = state.links.findIndex(
     link => link.source === source && link.target === target
   )
-  await client.deleteLink(linkIndex)
+  await client.deleteLink(JSON.stringify({linkIndex: linkIndex, link: state.links[linkIndex]}))
   commit("deleteLink", { source, target })
 }
 
