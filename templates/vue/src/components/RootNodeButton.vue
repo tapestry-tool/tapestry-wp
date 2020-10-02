@@ -1,6 +1,6 @@
 <template>
   <div id="root-node-button">
-    <div data-qa="root-node-button" @click="$emit('click')">
+    <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 
 export default {
@@ -40,8 +41,16 @@ export default {
     }
   },
   methods: {
-    showModal() {
-      this.$emit("add-root-node")
+    addRootNode() {
+      this.$router.push({
+        name: names.MODAL,
+        params: {
+          nodeId: 0,
+          type: "add",
+          tab: "content",
+        },
+        query: this.$route.query,
+      })
     },
     openFileBrowser() {
       this.$refs.fileInput.click()

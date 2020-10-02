@@ -4,6 +4,7 @@
       v-show="show"
       ref="node"
       :data-qa="`node-${node.id}`"
+      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
@@ -12,16 +13,9 @@
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
     >
-      <circle
-        ref="circle"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
-        :fill="fill"
-      ></circle>
+      <circle ref="circle" :fill="fill"></circle>
       <circle
         v-if="selected || !node.accessible"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
         :r="radius"
         :fill="overlayFill"
         class="node-overlay"
@@ -33,8 +27,6 @@
             !node.hideProgress
         "
         :data-qa="`node-progress-${node.id}`"
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
         :radius="radius"
         :progress="progress"
         :locked="!node.accessible"
@@ -46,8 +38,8 @@
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"
-          :x="node.coordinates.x - (140 * 5) / 6"
-          :y="node.coordinates.y - (140 * 5) / 6"
+          :x="-(140 * 5) / 6"
+          :y="-(140 * 5) / 6"
         >
           <div class="meta">
             <p class="title">{{ node.title }}</p>
@@ -58,14 +50,14 @@
           <foreignObject
             v-if="!node.hideMedia"
             class="node-button-wrapper"
-            :x="node.coordinates.x - 30"
-            :y="node.coordinates.y - radius - 30"
+            x="-30"
+            :y="-radius - 30"
           >
             <button
               class="node-button"
               :data-qa="`open-node-${node.id}`"
               :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
+              @click.stop="handleRequestOpen"
             >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
@@ -77,14 +69,14 @@
           <add-child-button
             v-if="hasPermission('add') && !isSubAccordionRow"
             :node="node"
-            :x="node.coordinates.x - 65"
-            :y="node.coordinates.y + radius - 30"
+            x="-65"
+            :y="radius - 30"
           ></add-child-button>
           <foreignObject
             v-if="hasPermission('edit')"
             class="node-button-wrapper"
-            :x="node.coordinates.x + 5"
-            :y="node.coordinates.y + radius - 30"
+            x="5"
+            :y="radius - 30"
           >
             <button
               :data-qa="`edit-node-${node.id}`"
@@ -120,6 +112,7 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import AddChildButton from "./tapestry-node/AddChildButton"
@@ -314,11 +307,29 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    updateRootNode() {
+      if (!this.root) {
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
+        this.updateSelectedNode(this.node.id)
+      }
+    },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -351,9 +362,7 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia
-          ? this.openNode()
-          : this.updateSelectedNode(this.node.id)
+        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
       }
     },
     hasPermission(action) {
