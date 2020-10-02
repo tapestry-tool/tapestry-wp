@@ -92,7 +92,7 @@
         Cancel
       </b-button>
       <b-button
-        v-if="rootId !== 0"
+        v-if="rootId !== 0 && node.status !== 'publish'"
         id="draft-button"
         size="sm"
         variant="secondary"
@@ -107,7 +107,7 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="!canMakeDraft || !canSubmit"
+        :disabled="!canPublish || !canSubmit"
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit" small></b-spinner>
