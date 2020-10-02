@@ -92,7 +92,7 @@
         Cancel
       </b-button>
       <b-button
-        v-if="rootId !== 0 && node.status !== 'publish'"
+        v-if="rootId !== 0 && canMakeDraft"
         id="draft-button"
         size="sm"
         variant="secondary"
