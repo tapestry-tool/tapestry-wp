@@ -7,6 +7,7 @@ export const applyModalChanges = newNode => {
   cy.getByTestId("node-modal").should("be.visible")
 
   const { appearance, mediaType, activity, typeData, permissions, ...rest } = newNode
+  console.log(rest)
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
   }
