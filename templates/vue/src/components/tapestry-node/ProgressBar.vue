@@ -3,17 +3,10 @@
     <circle
       ref="track"
       class="track"
-      :cx="x"
-      :cy="y"
       :stroke-width="width"
       :stroke="locked ? '#999' : 'currentColor'"
     ></circle>
-    <path
-      v-show="!locked && progress > 0"
-      ref="path"
-      class="bar"
-      :transform="`translate(${x}, ${y})`"
-    ></path>
+    <path v-show="!locked && progress > 0" ref="path" class="bar"></path>
   </g>
 </template>
 
@@ -32,14 +25,6 @@ export default {
       required: true,
     },
     radius: {
-      type: Number,
-      required: true,
-    },
-    x: {
-      type: Number,
-      required: true,
-    },
-    y: {
       type: Number,
       required: true,
     },

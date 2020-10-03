@@ -25,14 +25,29 @@ export default {
   components: {
     TapestryIcon,
   },
-  data() {
-    return {
-      currentDepth: 1,
-    }
-  },
   computed: {
-    ...mapState(["selectedNodeId", "nodes", "settings"]),
+    ...mapState(["nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
+    currentDepth: {
+      get() {
+        const { depth } = this.$route.query
+        if (depth) {
+          return Number(depth)
+        }
+        return this.settings.defaultDepth
+      },
+      set(depth) {
+        if (depth !== this.currentDepth) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, depth },
+          })
+        }
+      },
+    },
+    selectedNodeId() {
+      return Number(this.$route.params.nodeId)
+    },
     levels() {
       if (!Object.keys(this.nodes).length) {
         return []
@@ -73,8 +88,15 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function() {
-        this.updateNodeTypes()
+      handler: function(depth) {
+        if (depth > this.maxDepth) {
+          this.$router.replace({
+            ...this.$route,
+            query: { ...this.$route.query, depth: this.maxDepth },
+          })
+        } else {
+          this.updateNodeTypes()
+        }
       },
     },
     levels: {
@@ -90,14 +112,8 @@ export default {
       },
     },
   },
-  created() {
-    this.setDefaultDepth()
-  },
   methods: {
     ...mapMutations(["updateNode"]),
-    setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth
-    },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
       const updated = new Set()

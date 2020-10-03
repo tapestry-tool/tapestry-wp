@@ -11,6 +11,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { names } from "@/config/routes"
 
 export default {
   props: {
@@ -20,14 +21,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDirectParents", "getNode", "getNeighbours"]),
+    ...mapGetters(["getParent", "getNode", "getNeighbours"]),
     ...mapState(["nodes", "rootId"]),
     parent() {
-      const parents = this.getDirectParents(this.nodeId)
-      return parents && parents[0] ? this.getNode(parents[0]) : null
+      return this.getNode(this.getParent(this.nodeId))
     },
     isRoot() {
-      return this.parent === null
+      return this.parent === undefined
     },
     isDisabled() {
       if (this.isRoot) {
@@ -49,8 +49,9 @@ export default {
     ...mapActions(["deleteNode", "deleteLink"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     removeNode() {
+      this.$emit("submit")
       this.updateSelectedNode(this.rootId)
-      if (this.parent) {
+      if (!this.isRoot) {
         this.deleteLink({ source: this.parent.id, target: this.nodeId })
         this.updateNode({
           id: this.parent.id,
@@ -60,10 +61,15 @@ export default {
             ),
           },
         })
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.parent.id },
+          query: this.$route.query,
+        })
+      } else {
+        this.$router.push({ path: "/", query: this.$route.query })
       }
-      this.deleteNode(this.nodeId).then(() => {
-        this.$emit("submit")
-      })
+      this.deleteNode(this.nodeId)
     },
   },
 }
