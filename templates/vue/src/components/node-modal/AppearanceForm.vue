@@ -22,7 +22,7 @@
         v-model="addLockedThumbnail"
         data-testid="node-appearance-lockedThumbnail"
       >
-        Add a locked thumbnail
+        Show a different thumbnail when locked
       </b-form-checkbox>
     </b-form-group>
     <b-form-group v-if="addLockedThumbnail">
@@ -112,10 +112,10 @@ export default {
       if (!addLockedThumbnail) {
         this.node.lockedImageURL = ""
       }
-    }
+    },
   },
   created() {
-    this.addThumbnail = this.node.imageURL.length > 0 
+    this.addThumbnail = this.node.imageURL.length > 0
     this.addLockedThumbnail = this.node.lockedImageURL.length > 0
   },
   methods: {

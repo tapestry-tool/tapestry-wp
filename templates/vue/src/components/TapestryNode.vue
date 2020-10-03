@@ -88,7 +88,7 @@
           </foreignObject>
         </g>
       </g>
-      <defs v-if="node.imageURL">
+      <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
@@ -198,7 +198,20 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
+      if (
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
+        this.node.nodeType !== "grandchild" &&
+        showImages
+      ) {
         return `url(#node-image-${this.node.id})`
       }
       return "#8396a1"
