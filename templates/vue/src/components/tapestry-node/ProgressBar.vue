@@ -3,8 +3,6 @@
     <circle
       ref="track"
       class="track"
-      :cx="x"
-      :cy="y"
       :stroke-width="width"
       :stroke="locked || draft ? '#999' : 'currentColor'"
       :stroke-dasharray="draft ? dasharraySize : 0"
