@@ -15,6 +15,8 @@
     </b-button>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
+      <br />
+      Please try with another file.
     </div>
     <input
       ref="fileInput"
@@ -90,7 +92,15 @@ export default {
       this.isImporting = true
       const reader = new FileReader()
       reader.onload = async e => {
-        let upload = JSON.parse(e.target.result)
+        let upload
+        try {
+          upload = JSON.parse(e.target.result)
+          this.validateTapestryJSON(upload)
+        } catch (err) {
+          this.error = err
+          this.isImporting = false
+          return
+        }
         if (!(upload["site-url"] == wpData.wpUrl)) {
           await this.prepareImport(upload)
         }
@@ -133,6 +143,14 @@ export default {
           this.changes.noChange = false
         }
       }
+    },
+    validateTapestryJSON(upload) {
+      const properties = ["nodes", "links", "groups", "site-url"]
+      properties.forEach(property => {
+        if (!upload.hasOwnProperty(property)) {
+          throw new Error("Invalid Tapestry JSON.")
+        }
+      })
     },
   },
 }
