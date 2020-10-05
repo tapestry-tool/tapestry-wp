@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DEFAULT_DELAY=30
 
 # check for an configuration file

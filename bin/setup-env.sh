@@ -1,3 +1,4 @@
+#!/bin/bash
 ENV_FILE="templates/vue/.env"
 echo "Please enter your LinkPreview API key (linkpreview.net):"
 read key

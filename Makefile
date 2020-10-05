@@ -10,7 +10,7 @@ start-app:
 
 init:
 	make start-wp
-	sh ./bin/await-containers.sh
+	bash ./bin/await-containers.sh
 	make install
 	make env
 	@echo "All done!"
