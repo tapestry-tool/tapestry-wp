@@ -10,7 +10,11 @@ describe("Node Permissions", () => {
     cy.getSelectedNode().editNode({ permissions: edits })
   }
 
-  it("Should hide node and associated links if user does not have read access", () => {
+  it(`
+    Given: A user without any read permissions
+    When: The Tapestry loads
+    Then: The empty Tapestry text should be shown
+  `, () => {
     setup({
       public: [],
     })
@@ -18,7 +22,11 @@ describe("Node Permissions", () => {
     cy.contains(/is empty/i).should("exist")
   })
 
-  it("Should hide edit button if user does not have write access", () => {
+  it(`
+    Given: A node and a user without edit permission
+    When: The Tapestry loads
+    Then: The edit button should not exist
+  `, () => {
     setup({
       public: ["read"],
       authenticated: ["read", "edit"],
@@ -32,7 +40,11 @@ describe("Node Permissions", () => {
     })
   })
 
-  it("Should hide add button if user does not have add access", () => {
+  it(`
+    Given: A node and a user without add permission
+    When: The Tapestry loads
+    Then: The add button should not exist
+  `, () => {
     setup({
       public: ["read"],
       authenticated: ["read", "add"],
