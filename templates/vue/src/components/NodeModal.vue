@@ -267,6 +267,9 @@ export default {
     },
     canMakeDraft() {
       const { ID } = wpData.currentUser
+      if (this.node.status === "publish" && this.type === "edit") {
+        return false
+      }
       return this.hasDraftPermission(ID)
     },
     canSubmit() {
