@@ -91,6 +91,7 @@
           v-if="modalType === 'edit'"
           :node-id="nodeId"
           @submit="close"
+          @message="setDisabledMessage"
         ></delete-node-button>
         <span style="flex-grow:1;"></span>
         <b-button size="sm" variant="danger" @click="$emit('cancel')">
@@ -142,6 +143,8 @@
         :state="canMakeDraft"
       >
         {{ warningText }}
+        <br v-if="warningText" />
+        {{ deleteWarningText }}
       </b-form-invalid-feedback>
       <review-form v-else :node="node" @submit="handleSubmit"></review-form>
     </template>
@@ -239,6 +242,7 @@ export default {
       fileUploading: false,
       loadDuration: false,
       warningText: "",
+      deleteWarningText: "",
     }
   },
   computed: {
@@ -354,6 +358,9 @@ export default {
         return this.parent.mediaType === "accordion" && children.length > 0
       }
       return false
+    },
+    setDisabledMessage(msg) {
+      this.deleteWarningText = msg
     },
     close() {
       this.$bvModal.hide("node-modal")

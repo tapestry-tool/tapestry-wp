@@ -3,9 +3,6 @@
     <b-button :disabled="isDisabled" size="sm" variant="danger" @click="removeNode">
       Delete Node
     </b-button>
-    <b-form-invalid-feedback :state="!isDisabled">
-      {{ disabledMessage }}
-    </b-form-invalid-feedback>
   </div>
 </template>
 
@@ -44,6 +41,9 @@ export default {
       }
       return null
     },
+  },
+  mounted() {
+    this.$emit("message", this.disabledMessage)
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),
