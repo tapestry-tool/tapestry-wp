@@ -105,11 +105,11 @@
     <template slot="modal-footer">
       <delete-node-button
         v-if="type === 'edit'"
-        :node-id="nodeId"
+        :node-id="Number(nodeId)"
         @submit="loading = true"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="light" @click="$emit('cancel')">
+      <b-button size="sm" variant="light" @click="close">
         Cancel
       </b-button>
       <b-button
@@ -249,13 +249,13 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
     canPublish() {
-      if (!this.ready) return false
-      if (this.modalType === "add") {
-        return this.hasPermission(this.modalType, this.parent)
-      } else if (this.node.status === "draft" && this.modalType === "edit") {
+      if (this.loading) return false
+      if (this.type === "add") {
+        return this.hasPermission(this.type, this.parent)
+      } else if (this.node.status === "draft" && this.type === "edit") {
         return this.hasPermission("add", this.parent)
       } else {
-        return this.hasPermission(this.modalType, this.node)
+        return this.hasPermission(this.type, this.node)
       }
     },
     authoredNode() {
@@ -453,7 +453,7 @@ export default {
       if (!this.formErrors.length) {
         this.node.status = "publish"
         this.updateNodeCoordinates()
-        this.ready = false
+        this.loading = true
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -777,7 +777,7 @@ export default {
         return false
       }
 
-      if (this.modalType === "edit") {
+      if (this.type === "edit") {
         if (!this.authoredNode) {
           this.warningText = "You cannot make nodes you did not author into drafts"
           return false
