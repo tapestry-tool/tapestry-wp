@@ -46,6 +46,11 @@ export default {
       this.handleSubmit()
     },
     handleAccept() {
+      const { data } = wpData.currentUser
+
+      this.node.author.id = data.ID
+      this.node.author.name = data.user_nicename
+      console.log(this.node.author)
       this.node.status = "publish"
       this.handleSubmit()
     },
