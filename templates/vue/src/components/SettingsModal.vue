@@ -85,6 +85,13 @@
                     Export Tapestry
                   </div>
                 </b-button>
+                <b-alert
+                  :show="hasExported"
+                  variant="success"
+                  style="margin-top: 1em;"
+                >
+                  Your new Tapestry is ready! Click on the link below to view it.
+                </b-alert>
               </b-col>
               <b-col>
                 <duplicate-tapestry-button />
@@ -182,6 +189,7 @@ export default {
       maxDepth: 0,
       isExporting: false,
       renderImages: true,
+      hasExported: false,
     }
   },
   computed: {
@@ -258,6 +266,7 @@ export default {
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
       this.isExporting = false
+      this.hasExported = true
     },
   },
 }
@@ -288,7 +297,6 @@ export default {
     position: absolute;
     height: 1.5em;
     width: 1.5em;
-    left: 33%;
   }
   &.disabled {
     pointer-events: none;
