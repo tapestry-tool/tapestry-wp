@@ -1,16 +1,12 @@
-import { setup as setupTapestry, cleanup } from "../../support/utils"
+import { setup as setupTapestry } from "../support/utils"
 
-describe("Node permissions", () => {
+describe("Node Permissions", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    cy.fixture("two-nodes.json").as("twoNodes")
     setupTapestry("@oneNode")
   })
 
-  afterEach(cleanup)
-
   const setup = edits => {
-    setupTapestry("@oneNode")
     cy.getSelectedNode().editNode({ permissions: edits })
   }
 

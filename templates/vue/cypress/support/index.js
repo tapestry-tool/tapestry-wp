@@ -15,6 +15,6 @@
 
 // Import commands.js using ES2015 syntax:
 import "./commands"
+import { cleanup } from "./utils"
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+afterEach(cleanup)

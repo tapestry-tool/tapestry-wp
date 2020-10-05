@@ -11,8 +11,8 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
-    "test:open": "cypress open --config watchForFileChanges=false",
-    "test": "cypress run"
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open --config watchForFileChanges=false"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
