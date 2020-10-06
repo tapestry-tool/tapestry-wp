@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container">
+  <div class="embed-responsive embed-responsive-16by9">
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -14,6 +14,7 @@
       @close="close"
     />
     <youtube
+      class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
       :player-width="dimensions.width - 15"
       :player-height="dimensions.height - 40"
@@ -25,7 +26,7 @@
         enablejsapi: 1,
       }"
       @ready="ready"
-      @paused="handlePause(player.getCurrentTime())"
+      @paused="handlePause()"
       @ended="handleEnd"
     />
   </div>
@@ -73,12 +74,19 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
+    progress() {
+      if (this.node.progress) {
+        return this.node.progress
+      } else if (this.node.typeData.progress) {
+        return this.node.typeData.progress[0].value
+      }
+      return 0
+    },
   },
   beforeDestroy() {
     if (this.player) {
-      const time = this.player.getCurrentTime()
       this.player.stopVideo()
-      this.updateVideoProgress(time)
+      this.updateVideoProgress()
       this.updateSettings()
     }
   },
@@ -86,9 +94,7 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
-      const startTime =
-        this.node.typeData.progress[0].value * this.node.mediaDuration
-      this.player.seekTo(startTime, true)
+      this.player.seekTo(this.progress * this.player.getDuration(), true)
       this.applySettings()
     },
     openQuiz() {
@@ -115,20 +121,23 @@ export default {
       this.$emit("close")
     },
     getInitialEndScreenState() {
-      const progress = this.node.typeData.progress[0].value
-      if (progress >= 1) {
+      if (this.progress >= 1) {
         return true
       }
       if (this.player) {
-        const viewedAmount = progress * this.player.getDuration()
+        const viewedAmount = this.progress * this.player.getDuration()
         return this.player.getDuration() <= viewedAmount
       }
       return false
     },
-    updateVideoProgress(time) {
+    updateVideoProgress(ended = false) {
       if (this.player) {
-        const currentTime = time || this.player.getCurrentTime()
-        const amountViewed = currentTime / this.player.getDuration()
+        let amountViewed
+        if (ended) {
+          amountViewed = 1
+        } else {
+          amountViewed = this.player.getCurrentTime() / this.player.getDuration()
+        }
         this.$emit("timeupdate", amountViewed)
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
@@ -139,12 +148,13 @@ export default {
         }
       }
     },
-    handlePause(time) {
-      this.updateVideoProgress(time)
+    handlePause() {
+      this.updateVideoProgress()
       this.updateSettings()
     },
     handleEnd() {
-      this.updateVideoProgress(this.node.mediaDuration) // Pass update with video duration because video may be a few milliseconds short
+      // Video current time may be a few milliseconds short and so won't mark it as complete
+      this.updateVideoProgress(true)
       this.updateSettings()
       this.showEndScreen = true
     },
@@ -172,21 +182,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.video-container {
-  position: absolute;
-  left: 15px;
-  top: 15px;
-  width: 100%;
+.embed-responsive {
+  max-height: calc(100vh - 120px);
   height: 100%;
-  max-width: 100vw;
-
-  > div {
-    padding-right: 30px;
-
-    > iframe {
-      margin: 0;
-      padding: 0;
-    }
-  }
 }
 </style>
