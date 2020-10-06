@@ -97,7 +97,31 @@
               {{ renderMap ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-
+          <div v-if='renderMap'>
+             <b-row>
+              <b-col sm="3">
+                <span> NorthEast bound: </span> 
+              </b-col>
+              <b-col sm="3">
+                <b-form-input type='number' placeholder='latitude'  />  
+              </b-col>
+              <b-col sm="3">
+                <b-form-input type='number' placeholder='longitude'  />  
+              </b-col>
+            </b-row>
+             <b-row>
+              <b-col sm="3">
+                <span> SouthWest bound: </span> 
+              </b-col>
+              <b-col sm="3">
+                <b-form-input type='number' placeholder='latitude'  />  
+              </b-col>
+              <b-col sm="3">
+                <b-form-input type='number' placeholder='longitude'  />  
+              </b-col>
+            </b-row>
+          </div>
+          
           <b-form-group
             class="mt-4"
             label="Show thumbnails"
@@ -201,6 +225,10 @@ export default {
       defaultDepth: 3,
       renderImages: true,
       renderMap: false,
+      mapBounds:{
+        '_northEast': {'lat': "", 'lng': ""},
+        '_southWest': {'lat': "", "lng": ""}
+      }
     }
   },
   computed: {

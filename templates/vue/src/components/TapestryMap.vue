@@ -4,36 +4,34 @@
     <div style="height: 150px overflow: auto;">
       <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
       <p>Center is at {{ currentCenter }} and the zoom is: {{ currentZoom }}</p>
-      <button @click="showLongText">
-        Toggle long popup
-      </button>
-      <button @click="showMap = !showMap">
-        Toggle map
-      </button>
     </div>
+    <!-- :bounds="bounds" --> 
     <l-map
-      v-if="showMap"
       :zoom="zoom"
       :center="center"
       :options="mapOptions"
       style="height: 80%"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
+     
     >
       <l-tile-layer
         :url="url"
         :attribution="attribution"
       />
+      <l-control position="bottomleft" >
+      
+      </l-control>
     </l-map>
   </div>
 </template>
 
 <script>
-import { latLng } from "leaflet";
+import { latLng, latLngBounds } from "leaflet";
 import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
 
 export default {
-  name: "Example",
+  name: "Tapestry Map",
   components: {
     LMap,
     LTileLayer,
@@ -49,14 +47,16 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',         
       withPopup: latLng(47.41322, -1.219482),
+      /*bounds: latLng([
+        [settings.mapBounds._northEast.lat, settings.bounds._northEast.lng],
+        [settings.mapBounds._southWest.lat, settings.bounds._southWest.lng]
+      ]),
+      */
       withTooltip: latLng(47.41422, -1.250482),
-      currentZoom: 11.5,
-      currentCenter: latLng(47.41322, -1.219482),
       showParagraph: false,
       mapOptions: {
         zoomSnap: 0.5
       },
-      showMap: true
     };
   },
   methods: {
