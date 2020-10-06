@@ -120,7 +120,7 @@ export default {
     selectedId: {
       immediate: true,
       handler(nodeId) {
-        if (!this.nodes.hasOwnProperty(nodeId)) {
+        if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
           this.$router.replace(
             Object.keys(this.nodes).length === 0
               ? { path: "/", query: this.$route.query }
