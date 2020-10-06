@@ -65,6 +65,7 @@
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
+                context="accordion"
                 :autoplay="false"
                 :read-only="readOnly"
                 style="margin-bottom: 24px;"

@@ -22,6 +22,7 @@
       v-else
       :node-id="nodeId"
       :dimensions="dimensions"
+      context="lightbox"
       @load="handleLoad"
       @close="handleAutoClose"
       @complete="complete"
