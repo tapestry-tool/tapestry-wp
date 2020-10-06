@@ -116,6 +116,23 @@ export default {
     ...mapMutations(["updateNode"]),
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
+
+      if (depth === 0) {
+        const nodesToUpdate = Object.values(this.nodes).filter(
+          node => node.nodeType !== "child"
+        )
+        nodesToUpdate.forEach(node => {
+          this.updateNode({
+            id: node.id,
+            newNode: {
+              nodeType: "child",
+            },
+          })
+        })
+        this.$emit("change")
+        return
+      }
+
       const updated = new Set()
       const nodesAtCurrentDepth = this.levels[depth]
       if (nodesAtCurrentDepth) {
