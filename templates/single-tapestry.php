@@ -15,11 +15,6 @@ if (current_user_can('edit_post', get_the_ID())) {
     $additionalClasses = 'is-editor';
 }
 
-if (4683 === get_the_ID()) {
-    require_once 'geog-head.php';
-    echo '<style>svg{display: none;}#app{margin-top:0 !important;}</style>';
-}
-
 ?>
 
 <div id="primary" class="content-area col-md-12">
