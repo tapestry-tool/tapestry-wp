@@ -7,12 +7,7 @@
       :stroke="locked || draft ? '#999' : 'currentColor'"
       :stroke-dasharray="draft ? dasharraySize : 0"
     ></circle>
-    <path
-      v-show="!locked && progress > 0 && !draft"
-      ref="path"
-      class="bar"
-      :transform="`translate(${x}, ${y})`"
-    ></path>
+    <path v-show="!locked && progress > 0 && !draft" ref="path" class="bar"></path>
   </g>
 </template>
 
@@ -31,14 +26,6 @@ export default {
       required: true,
     },
     radius: {
-      type: Number,
-      required: true,
-    },
-    x: {
-      type: Number,
-      required: true,
-    },
-    y: {
       type: Number,
       required: true,
     },
