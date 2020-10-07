@@ -19,6 +19,7 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :node="node"
+      :context="context"
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @change:dimensions="$emit('change:dimensions', $event)"
@@ -53,6 +54,10 @@ export default {
     },
     dimensions: {
       type: Object,
+      required: true,
+    },
+    context: {
+      type: String,
       required: true,
     },
     autoplay: {
