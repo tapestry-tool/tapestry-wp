@@ -1,15 +1,14 @@
 <template>
   <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
     <div>
-      <tapestry-icon icon="zoom-in"></tapestry-icon>
       <input
         v-model="currentDepth"
         class="slider"
         type="range"
         min="1"
         :max="maxDepth"
+        :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
       />
-      <tapestry-icon icon="zoom-out"></tapestry-icon>
     </div>
     <p v-if="currentDepth < maxDepth" class="warning-text alert p-2 small">
       Some nodes might be hidden because you're not at maximum depth.
@@ -19,12 +18,10 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
+import ZoomIn from "@/assets/zoom-in.png"
+import ZoomOut from "@/assets/zoom-out.png"
 
 export default {
-  components: {
-    TapestryIcon,
-  },
   computed: {
     ...mapState(["nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
@@ -83,6 +80,12 @@ export default {
     },
     maxDepth() {
       return this.levels.length
+    },
+    zoomInBg() {
+      return "url(" + ZoomIn + ")"
+    },
+    zoomOutBg() {
+      return "url(" + ZoomOut + ")"
     },
   },
   watch: {
@@ -221,6 +224,7 @@ export default {
   transition: opacity 0.2s;
   position: relative;
   align-items: center;
+  margin: 0 38px;
 
   &:before,
   &:after {
@@ -228,6 +232,7 @@ export default {
     content: "";
     width: 30px;
     height: 30px;
+    background: var(--zoomInBg);
     background-size: 20px;
     background-position: center;
     background-repeat: no-repeat;
@@ -238,6 +243,7 @@ export default {
   }
 
   &:after {
+    background-image: var(--zoomOutBg);
     left: initial;
     right: -30px;
   }
