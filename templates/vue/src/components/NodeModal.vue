@@ -587,18 +587,26 @@ export default {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
         const url = this.node.typeData.mediaURL
         const { data } = await getLinkMetadata(url)
-        
+
         if (data) {
           this.node.typeData.linkMetadata = data
 
-          if (confirm("Would you like to use the link preview image as the thumbnail image?") || 
-             !this.node.imageURL) {
-              this.node.imageURL = data.image
+          if (
+            confirm(
+              "Would you like to use the link preview image as the thumbnail image?"
+            ) ||
+            !this.node.imageURL
+          ) {
+            this.node.imageURL = data.image
           }
 
-          if (confirm("Would you like to use the link preview image as the locked thumbnail image?") ||
-             !this.node.lockedImageURL) {
-              this.node.lockedImageURL = data.image
+          if (
+            confirm(
+              "Would you like to use the link preview image as the locked thumbnail image?"
+            ) ||
+            !this.node.lockedImageURL
+          ) {
+            this.node.lockedImageURL = data.image
           }
         }
       }
