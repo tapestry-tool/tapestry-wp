@@ -98,9 +98,11 @@ export default {
       this.importTapestry(file)
     },
     importTapestry(file) {
-      this.isImporting = true
       const reader = new FileReader()
       reader.onload = async e => {
+        this.error = ""
+
+        this.isImporting = true
         let upload
         try {
           upload = JSON.parse(e.target.result)
