@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 
-import root from "../../cypress/fixtures/root.json"
+import root from "../../../cypress/fixtures/root.json"
 import DuplicateTapestryButton from "@/components/settings-modal/DuplicateTapestryButton.vue"
 import client from "@/services/TapestryAPI"
 
