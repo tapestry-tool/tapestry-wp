@@ -40,6 +40,7 @@
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
+                context="accordion"
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(row.node.id)"
