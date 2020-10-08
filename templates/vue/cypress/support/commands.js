@@ -1,5 +1,6 @@
 import { applyModalChanges } from "./utils"
 import roles from "./roles"
+import Helpers from "../../src/utils/Helpers"
 
 const API_URL = `/wp-json/tapestry-tool/v1`
 
@@ -51,28 +52,59 @@ Cypress.Commands.add("getSelectedNode", () =>
     .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
 )
 
-Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) => {
-  if (!newNode) {
-    cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
-    return
-  }
-
+Cypress.Commands.add("addNode", (node, parent) => {
   cy.server()
-  cy.route("POST", `**/nodes`).as("postNode")
-
-  if (parent) {
-    cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
-  } else {
-    cy.getByTestId(`root-node-button`).click({ force: true })
-  }
-  applyModalChanges(newNode)
-  cy.contains("Submit").click({ force: true })
-
-  return cy
-    .wait("@postNode")
-    .its("response.body.id")
-    .then(id => cy.findNode(node => node.id === id))
+  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
+  cy.store().then(store => {
+    store.dispatch(
+      "addNode",
+      Helpers.deepMerge(store.getters.createDefaultNode(), node)
+    )
+    cy.wait("@editPermissions")
+    cy.getNodeByTitle(node.title).then(({ id }) => {
+      store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
+      if (parent) {
+        cy.addLink(parent, id)
+      }
+    })
+  })
 })
+
+Cypress.Commands.add("addLink", (source, target) => {
+  cy.server()
+  cy.route("POST", "**/links").as("postLink")
+  cy.store()
+    .its("dispatch")
+    .then(dispatch => dispatch("addLink", { source, target }))
+  cy.wait("@postLink")
+})
+
+Cypress.Commands.add(
+  "addNodeInModal",
+  { prevSubject: "optional" },
+  (parent, newNode) => {
+    if (!newNode) {
+      cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
+      return
+    }
+
+    cy.server()
+    cy.route("POST", "**/nodes").as("postNode")
+
+    if (parent) {
+      cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
+    } else {
+      cy.getByTestId(`root-node-button`).click({ force: true })
+    }
+    applyModalChanges(newNode)
+    cy.contains("Submit").click({ force: true })
+
+    return cy
+      .wait("@postNode")
+      .its("response.body.id")
+      .then(id => cy.findNode(node => node.id === id))
+  }
+)
 
 Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   if (!newNode) {
@@ -95,12 +127,10 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
 
 Cypress.Commands.add("submitModal", () => {
   cy.server()
-  cy.route("PUT", `**/nodes/**`).as("editNode")
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
-  cy.contains("Submit").click({ force: true })
+  cy.contains("Submit").click()
   cy.wait("@editPermissions")
-  cy.wait("@editNode")
 })
 
 Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {
@@ -112,15 +142,12 @@ Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) =
   cy.wait("@editNode")
 })
 
-Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
+Cypress.Commands.add("deleteNode", () => {
   cy.server()
   cy.route("DELETE", `**/nodes/**`).as("deleteNode")
 
-  cy.getByTestId(`edit-node-${node.id}`).click({ force: true })
-  cy.contains(/delete/i).click({ force: true })
+  cy.contains(/delete/i).click()
   cy.wait("@deleteNode")
-
-  return cy.wrap(node.id)
 })
 
 Cypress.Commands.add("findNode", pred => {

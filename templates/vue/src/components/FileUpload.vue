@@ -42,7 +42,7 @@
           name="text-input"
           :placeholder="placeholder"
           :value="value"
-          :data-testid="inputTestId"
+          :data-qa="inputTestId"
           :disabled="isUploading"
           required
           @input="$emit('input', $event)"
