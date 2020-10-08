@@ -135,3 +135,7 @@ Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))
 
 Cypress.Commands.add("getNodeById", id => cy.getByTestId(`node-${id}`))
+
+Cypress.Commands.add("getEditable", testId =>
+  cy.getByTestId(testId).find("[contenteditable=true]")
+)

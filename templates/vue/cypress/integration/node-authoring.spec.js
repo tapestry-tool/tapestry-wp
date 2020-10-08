@@ -6,22 +6,39 @@ describe("Node Authoring", () => {
     cy.fixture("two-nodes.json").as("twoNodes")
   })
 
-  it(`
+  it.only(`
     Given: An empty Tapestry
-    When: A user adds a root node
+    When: A user adds a node using the node modal
     Then: The root node should be added
   `, () => {
     setup()
+
     const node = {
       title: "Root",
       description: "I am a root node",
       mediaType: "text",
-      typeData: {
-        textContent: "Abcd",
-      },
+      textContent: "Abcd",
     }
-    cy.addNode(node)
+
+    cy.getByTestId(`root-node-button`).click()
+    cy.getByTestId(`node-title`).type(node.title)
+    cy.getEditable(`node-description`).type(node.description)
+
+    cy.getByTestId(`node-media-type`).select(node.mediaType)
+    cy.getEditable(`node-text-content`).type(node.textContent)
+
+    cy.submitModal()
+
     cy.contains(node.title).should("exist")
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        expect(Object.keys(nodes)).to.have.length(1)
+        const [root] = Object.values(nodes)
+
+        cy.getByTestId(`open-node-${root.id}`).click()
+        cy.contains(node.textContent).should("exist")
+      })
   })
 
   it(`
