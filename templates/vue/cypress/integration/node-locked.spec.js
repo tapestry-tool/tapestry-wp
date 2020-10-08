@@ -17,14 +17,20 @@ describe("Locked Nodes", () => {
       .then(nodes => {
         const [root, child] = Object.values(nodes)
 
-        cy.wrap(child).editNode({
-          conditions: [
-            {
-              type: conditionTypes.NODE_COMPLETED,
-              nodeId: root.id,
-            },
-          ],
-        })
+        const condition = {
+          type: conditionTypes.NODE_COMPLETED,
+          nodeId: root.id,
+        }
+
+        cy.getByTestId(`edit-node-${child.id}`).click()
+        cy.contains(/access/i).click()
+        cy.contains(/prevent access/i).click()
+
+        cy.getByTestId("add-condition").click()
+        cy.getByTestId("condition-type").select(condition.type)
+        cy.getByTestId("condition-id").select(String(condition.nodeId))
+
+        cy.submitModal()
 
         cy.openLightbox(child.id).should("exist")
 

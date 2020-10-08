@@ -93,6 +93,16 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   return cy.findNode(nd => nd.id === node.id)
 })
 
+Cypress.Commands.add("submitModal", () => {
+  cy.server()
+  cy.route("PUT", `**/nodes/**`).as("editNode")
+  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
+
+  cy.contains("Submit").click({ force: true })
+  cy.wait("@editPermissions")
+  cy.wait("@editNode")
+})
+
 Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {
   cy.server()
   cy.route("PUT", `**/nodes/**`).as("editNode")

@@ -16,12 +16,7 @@ describe("Node Permissions", () => {
       cy.contains(/access/i).click()
 
       cy.getByTestId(`node-permissions-public-read`).uncheck()
-
-      cy.server()
-      cy.route("PUT", "**/permissions").as("savePermissions")
-
-      cy.contains(/submit/i).click()
-      cy.wait("@savePermissions")
+      cy.submitModal()
 
       cy.logout().visitTapestry()
       cy.contains(/is empty/i).should("exist")
