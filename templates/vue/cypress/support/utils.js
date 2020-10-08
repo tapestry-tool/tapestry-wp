@@ -6,10 +6,36 @@ const getByTestId = id => cy.get(`[data-testid=${id}]`)
 export const applyModalChanges = newNode => {
   cy.getByTestId("node-modal").should("be.visible")
 
-  const { appearance, mediaType, activity, typeData, permissions, ...rest } = newNode
-  console.log(rest)
+  const {
+    appearance,
+    mediaType,
+    activity,
+    typeData,
+    permissions,
+    conditions,
+    ...rest
+  } = newNode
+
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
+  }
+
+  if (conditions && Array.isArray(conditions)) {
+    cy.contains(/access/i).click()
+    cy.contains(/prevent access/i).click()
+
+    conditions.forEach(({ type, nodeId, date }) => {
+      cy.getByTestId("add-condition").click()
+      cy.getByTestId("condition-type").select(type)
+
+      if (nodeId) {
+        cy.getByTestId("condition-id").select(String(nodeId))
+      }
+
+      if (date) {
+        cy.getByTestId("condition-date").click()
+      }
+    })
   }
 
   if (typeData) {
@@ -136,8 +162,4 @@ export const setup = (fixture, role = "admin") => {
     cy.login(role)
   }
   cy.visitTapestry()
-}
-
-export const cleanup = () => {
-  cy.deleteTapestry()
 }

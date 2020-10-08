@@ -27,7 +27,7 @@ Cypress.Commands.add("addTapestry", (body = {}) => {
   })
 })
 
-Cypress.Commands.add("deleteTapestry", () => {
+Cypress.Commands.add("deleteTestTapestry", () => {
   return cy.request({
     url: `${API_URL}/tapestries`,
     body: { title: TEST_TAPESTRY_NAME },
@@ -94,7 +94,12 @@ Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
 })
 
 Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {
-  cy.store().then(store => store.commit("updateNode", { id: node.id, newNode }))
+  cy.server()
+  cy.route("PUT", `**/nodes/**`).as("editNode")
+
+  cy.store().then(store => store.dispatch("updateNode", { id: node.id, newNode }))
+
+  cy.wait("@editNode")
 })
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
@@ -118,3 +123,5 @@ Cypress.Commands.add("findNode", pred => {
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 
 Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))
+
+Cypress.Commands.add("getNodeById", id => cy.getByTestId(`node-${id}`))
