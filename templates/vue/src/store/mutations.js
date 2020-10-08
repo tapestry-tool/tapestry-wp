@@ -47,9 +47,7 @@ function parseDataset(dataset) {
     }
     const publicPermissions = node.permissions.public
     if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
-      node.permissions.public = publicPermissions.filter(
-        perm => { perm !== "add" && perm !== "edit" }
-      )
+      node.permissions.public = ["read"];
     }
   }
 
