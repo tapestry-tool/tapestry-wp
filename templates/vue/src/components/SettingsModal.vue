@@ -103,10 +103,10 @@
                 <span> NorthEast bound: </span> 
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude'  />  
+                <b-form-input type='number' placeholder='latitude' v-model="nelat" />  
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude'  />  
+                <b-form-input type='number' placeholder='longitude' v-model="nelng" />  
               </b-col>
             </b-row>
              <b-row>
@@ -114,10 +114,10 @@
                 <span> SouthWest bound: </span> 
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude'  />  
+                <b-form-input type='number' placeholder='latitude' v-model="swlat" />  
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude'  />  
+                <b-form-input type='number' placeholder='longitude' v-model="swlng" />  
               </b-col>
             </b-row>
           </div>
@@ -180,6 +180,7 @@ import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
+import { latLngBounds } from "leaflet";
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -226,8 +227,8 @@ export default {
       renderImages: true,
       renderMap: false,
       mapBounds:{
-        '_northEast': {'lat': "", 'lng': ""},
-        '_southWest': {'lat': "", "lng": ""}
+        northEast:{lat: nelat, lng: nelng},
+        southWest:{lat: swlat, lng: swlng}
       }
     }
   },
@@ -268,6 +269,10 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        mapBounds = {
+          northEast:{lat: nelat, lng: nelng},
+          southWest:{lat: swlat, lng: swlng}
+          }
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -278,6 +283,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.mapBounds = mapBounds
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -289,7 +295,8 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
-        renderMap: this.renderMap
+        renderMap: this.renderMap,
+        mapBounds: this.mapBounds
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
