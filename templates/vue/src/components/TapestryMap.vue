@@ -3,15 +3,15 @@
   <div style="height: 800px; width: 100%">
     <div style="height: 150px overflow: auto;">
       <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
-      <p> The bounds are: {{ maxBounds }} </p>
+      <p> The bounds are: {{ mapBounds }} </p>
       <p> Settings are: {{this.settings}} </p>
     </div>
-    <button @click="hasBounds"> Test retrieve data from settings </button>
     <l-map
       :zoom="zoom"
       :center="center"
-      :max-bounds='mapBounds'
       :options="mapOptions"
+      :max-bounds="mapBounds"
+      :bounds='setBounds'
       style="height: 80%"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
@@ -63,12 +63,12 @@ export default {
     ...mapState(['settings']),
     setBounds(){
       const x = latLngBounds([
-        [this.settings.mapBounds.northEast.lat ? this.settings.mapBounds.northEast.lat : 90,
-         this.settings.mapBounds.northEast.lng ? this.settings.mapBounds.northEast.lng : 180],
-        [this.settings.mapBounds.southWest.lat ? this.settings.mapBounds.southWest.lat : -90,
-         this.settings.mapBounds.southWest.lng ? this.settings.mapBounds.southWest.lng : -180]
+        [this.settings.mapBounds.nelat || 90,
+         this.settings.mapBounds.nelng || 180],
+        [this.settings.mapBounds.swlat || -90,
+         this.settings.mapBounds.swlng || -180]
       ])
-      return x;
+      this.mapBounds = x;
     }
   },
   methods: {

@@ -103,10 +103,10 @@
                 <span> NorthEast bound: </span> 
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude' v-model="nelat" />  
+                <b-form-input type='number' placeholder='latitude' v-model="mapBounds.nelat" />  
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude' v-model="nelng" />  
+                <b-form-input type='number' placeholder='longitude' v-model="mapBounds.nelng" />  
               </b-col>
             </b-row>
              <b-row>
@@ -114,10 +114,10 @@
                 <span> SouthWest bound: </span> 
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude' v-model="swlat" />  
+                <b-form-input type='number' placeholder='latitude' v-model="mapBounds.swlat" />  
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude' v-model="swlng" />  
+                <b-form-input type='number' placeholder='longitude' v-model="mapBounds.swlng" />  
               </b-col>
             </b-row>
           </div>
@@ -226,10 +226,7 @@ export default {
       defaultDepth: 3,
       renderImages: true,
       renderMap: false,
-      mapBounds:{
-        northEast:{lat: nelat, lng: nelng},
-        southWest:{lat: swlat, lng: swlng}
-      }
+      mapBounds: {nelat: 90, nelng: 180, swlat: -90, swlng: -180}
     }
   },
   computed: {
@@ -269,10 +266,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
-        mapBounds = {
-          northEast:{lat: nelat, lng: nelng},
-          southWest:{lat: swlat, lng: swlng}
-          }
+        mapBounds = {nelat: 90, nelng: 180, swlat: -90, swlng: -180}
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -283,7 +277,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
-      this.mapBounds = mapBounds
+      this.mapBounds = mapBounds  
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -296,7 +290,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
-        mapBounds: this.mapBounds
+        mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
