@@ -6,8 +6,30 @@ describe("Node Permissions", () => {
     setupTapestry("@oneNode")
   })
 
+  it(`
+    Given: A Tapestry node
+    When: The node modal is used to edit its permissions
+    Then: The node should reflect the permissions
+  `, () => {
+    cy.getSelectedNode().then(node => {
+      cy.getByTestId(`edit-node-${node.id}`).click()
+      cy.contains(/access/i).click()
+
+      cy.getByTestId(`node-permissions-public-read`).uncheck()
+
+      cy.server()
+      cy.route("PUT", "**/permissions").as("savePermissions")
+
+      cy.contains(/submit/i).click()
+      cy.wait("@savePermissions")
+
+      cy.logout().visitTapestry()
+      cy.contains(/is empty/i).should("exist")
+    })
+  })
+
   const setup = edits => {
-    cy.getSelectedNode().editNode({ permissions: edits })
+    cy.getSelectedNode().editNodeInStore({ permissions: edits })
   }
 
   it(`

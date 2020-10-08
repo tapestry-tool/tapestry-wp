@@ -169,7 +169,10 @@ export default class Helpers {
     // Check 6: User has a role that is allowed in the node
     const isRoleAllowed = roles.some(role => {
       const permissions = node.permissions[role]
-      return permissions.includes(action)
+      if (permissions) {
+        return permissions.includes(action)
+      }
+      return false
     })
     if (isRoleAllowed) {
       return true

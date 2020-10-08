@@ -37,7 +37,7 @@ Cypress.Commands.add("deleteTestTapestry", () => {
 
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
-  cy.contains(/loading/i, { timeout: 60000 }).should("not.exist")
+  cy.contains(/loading/i).should("not.exist")
 })
 
 Cypress.Commands.add("getNodeByTitle", title =>
