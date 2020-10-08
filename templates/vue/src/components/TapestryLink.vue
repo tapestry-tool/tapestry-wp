@@ -2,6 +2,7 @@
   <transition name="fade">
     <line
       v-show="show"
+      :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
