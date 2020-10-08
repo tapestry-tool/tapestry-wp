@@ -29,8 +29,6 @@ export const licenses = {
   },
 }
 
-
 export const nodeStatuses = ["publish", "draft", "submitted", "reject"]
 
 export const DEFAULT_DEPTH = 3
-

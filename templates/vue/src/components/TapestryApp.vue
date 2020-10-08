@@ -18,7 +18,7 @@
       <svg id="vue-svg" :viewBox="viewBox">
         <g>
           <tapestry-link
-            v-for="link in links"
+            v-for="link in filteredLinks"
             :key="`${link.source}-${link.target}`"
             :source="nodes[link.source]"
             :target="nodes[link.target]"
@@ -26,7 +26,7 @@
         </g>
         <g>
           <tapestry-node
-            v-for="(node, id) in nodes"
+            v-for="(node, id) in filteredNodes"
             :key="id"
             :node="node"
             class="node"
@@ -74,6 +74,7 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      showRejected: true,
     }
   },
   computed: {
@@ -86,6 +87,19 @@ export default {
     },
     empty() {
       return Object.keys(this.nodes).length === 0
+    },
+    filteredNodes() {
+      let filteredNodes = Object.values(this.nodes).filter(node => {
+        return node.status !== "reject"
+      })
+      let filteredNodesObj = {}
+      filteredNodes.forEach(node => (filteredNodesObj[node.id] = node))
+      console.log(filteredNodesObj)
+      console.log(this.nodes)
+      return this.showRejected ? this.nodes : filteredNodesObj
+    },
+    filteredLinks() {
+      return this.links
     },
   },
   watch: {
