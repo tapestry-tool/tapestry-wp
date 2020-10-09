@@ -34,11 +34,11 @@ export default {
       required: true,
     },
     x: {
-      type: [String, Number],
+      type: Number,
       required: true,
     },
     y: {
-      type: [String, Number],
+      type: Number,
       required: true,
     },
   },
