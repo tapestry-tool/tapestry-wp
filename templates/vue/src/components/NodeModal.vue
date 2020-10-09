@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    v-if="node"
     id="node-modal"
     :visible="show"
     :title="title"
@@ -241,6 +242,9 @@ export default {
       }
       return ""
     },
+    isAuthenticated() {
+      return wpData.currentUser.ID !== 0
+    },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
@@ -361,8 +365,10 @@ export default {
       return true
     },
     validateNodeRoute(nodeId) {
-      if (Object.keys(this.nodes).length === 0 && this.type === "add") {
-        return true
+      if (this.type === "add") {
+        if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
+          return true
+        }
       }
       if (!this.nodes.hasOwnProperty(nodeId)) {
         return false
