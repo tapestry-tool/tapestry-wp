@@ -114,6 +114,7 @@ export default {
       position: absolute;
       display: flex;
       flex-direction: row-reverse;
+      width: 100%;
       top: -20px;
       right: -20px;
       z-index: 1000;

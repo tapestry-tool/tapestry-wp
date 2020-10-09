@@ -6,15 +6,10 @@
     title="Tapestry Settings"
     scrollable
     body-class="p-0"
-    @hidden="$emit('close')"
   >
     <b-container fluid class="px-0">
       <b-tabs card>
-        <b-tab
-          title="Appearance"
-          :active="tab === 'appearance'"
-          @click="$emit('change:tab', 'appearance')"
-        >
+        <b-tab title="Appearance" active>
           <b-form-group
             label="Background URL"
             description="Add a background image to the page where this tapestry
@@ -69,11 +64,7 @@
             </div>
           </b-form-group>
         </b-tab>
-        <b-tab
-          title="Advanced"
-          :active="tab === 'advanced'"
-          @click="$emit('change:tab', 'advanced')"
-        >
+        <b-tab title="Advanced">
           <b-form-group
             label="Export/Duplicate"
             description="Export your tapestry to a file and then you can import it on another site. 
@@ -100,11 +91,7 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
-        <b-tab
-          title="Access"
-          :active="tab === 'access'"
-          @click="$emit('change:tab', 'access')"
-        >
+        <b-tab title="Access">
           <b-form-group
             label="Default Permissions For New Nodes"
             description="Newly created nodes in this tapestry will have these permissions by default."
@@ -144,6 +131,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
+import { bus } from "@/utils/event-bus"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -171,15 +159,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    tab: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    maxDepth: {
-      type: Number,
-      required: true,
-    },
   },
   data() {
     return {
@@ -191,6 +170,7 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
+      maxDepth: 0,
       renderImages: true,
     }
   },
@@ -207,10 +187,9 @@ export default {
     this.getSettings()
     DragSelectModular.removeDragSelectListener()
 
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      if (modalId === "settings-modal") {
-        this.$emit("close")
-      }
+    bus.$on("max-depth-change", depth => (this.maxDepth = depth))
+    this.$root.$on("bv::modal::hide", () => {
+      this.$emit("close")
     })
   },
   beforeDestroy() {

@@ -13,8 +13,6 @@
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
-      :row-id="rowId"
-      :sub-row-id="subRowId"
       @close="close"
       @complete="complete"
     />
@@ -22,7 +20,6 @@
       v-else
       :node-id="nodeId"
       :dimensions="dimensions"
-      context="lightbox"
       @load="handleLoad"
       @close="close"
       @complete="complete"
@@ -32,13 +29,12 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex"
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./lightbox/AccordionMedia"
 import TapestryMedia from "./TapestryMedia"
-import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
+import { mapActions, mapGetters, mapState } from "vuex"
 import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
@@ -50,35 +46,27 @@ export default {
   },
   props: {
     nodeId: {
-      type: Number,
-      required: true,
-    },
-    rowId: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    subRowId: {
-      type: Number,
+      type: [String, Number],
       required: false,
       default: 0,
     },
   },
   data() {
     return {
+      isLoaded: false,
       dimensions: {
         top: 100,
         left: 50,
       },
+      timeSinceLastSaved: new Date(),
       showCompletionScreen: false,
     }
   },
   computed: {
-    ...mapState(["h5pSettings", "rootId"]),
-    ...mapGetters(["getNode", "isAccordion", "isAccordionRow"]),
+    ...mapState(["h5pSettings"]),
+    ...mapGetters(["getNode"]),
     node() {
-      const node = this.getNode(this.nodeId)
-      return node
+      return this.getNode(this.nodeId)
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
@@ -168,54 +156,13 @@ export default {
     },
   },
   watch: {
-    nodeId: {
-      immediate: true,
-      handler() {
-        if (!this.node) {
-          // Node ID doesn't exist, so reroute to default selected node
-          this.$router.replace({
-            name: names.APP,
-            params: { nodeId: this.rootId },
-            query: this.$route.query,
-          })
-        } else {
-          this.applyDimensions()
-        }
-      },
-    },
-    rowId: {
-      immediate: true,
-      handler(rowId) {
-        if (rowId) {
-          if (
-            !this.isAccordion(this.nodeId) ||
-            !this.isAccordionRow(rowId, this.nodeId)
-          ) {
-            this.$router.replace({
-              name: names.LIGHTBOX,
-              params: { nodeId: this.nodeId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
-    },
-    subRowId: {
-      immediate: true,
-      handler(subRowId) {
-        if (subRowId) {
-          if (!this.isAccordionRow(subRowId, this.rowId)) {
-            this.$router.replace({
-              name: names.ACCORDION,
-              params: { nodeId: this.nodeId, rowId: this.rowId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
+    nodeId() {
+      this.applyDimensions()
     },
   },
   mounted() {
+    this.isLoaded = true
+    this.applyDimensions()
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
   },
@@ -229,11 +176,7 @@ export default {
       this.completeNode(this.nodeId)
     },
     close() {
-      this.$router.push({
-        name: names.APP,
-        params: { nodeId: this.nodeId },
-        query: this.$route.query,
-      })
+      this.$router.go(-1)
     },
     handleLoad(dimensions) {
       if (dimensions) {

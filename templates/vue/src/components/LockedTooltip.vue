@@ -33,7 +33,7 @@
 
 <script>
 import moment from "moment-timezone"
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { conditionTypes } from "@/utils/constants"
 
 export default {
@@ -49,9 +49,7 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectParents", "getNode"]),
-    selectedNodeId() {
-      return this.$route.params.nodeId
-    },
+    ...mapState(["selectedNodeId"]),
     radius() {
       if (this.node.nodeType === "") {
         return 0

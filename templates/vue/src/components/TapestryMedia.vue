@@ -48,7 +48,6 @@
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
       :dimensions="dimensions"
-      :context="context"
       :node="node"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
@@ -112,11 +111,6 @@ export default {
     dimensions: {
       type: Object,
       required: true,
-    },
-    context: {
-      type: String,
-      required: false,
-      default: "lightbox",
     },
     autoplay: {
       type: Boolean,

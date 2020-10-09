@@ -73,7 +73,6 @@ export default {
 <style lang="scss" scoped>
 .external-media-container {
   height: 100%;
-  background: #fff;
 }
 
 .preview {
