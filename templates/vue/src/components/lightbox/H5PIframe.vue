@@ -1,14 +1,27 @@
 <template>
-  <iframe
-    id="h5p"
-    ref="h5p"
-    frameborder="0"
-    :height="frameHeight"
-    :src="node.typeData && node.typeData.mediaURL"
-    :width="frameWidth"
-    :scrolling="library === 'H5P.InteractiveVideo'"
-    @load="handleLoad"
-  ></iframe>
+  <div
+    ref="h5pIframeContainer"
+    class="h5p-iframe-container"
+    :class="{
+      'context-accordion': context === 'accordion',
+    }"
+    :style="{
+      height: this.frameHeight ? this.frameHeight + 'px' : 'auto',
+      width: this.frameWidth ? this.frameWidth + 'px' : '100%',
+      opacity: this.loading ? 0 : 1,
+    }"
+  >
+    <iframe
+      id="h5p"
+      ref="h5p"
+      height="100%"
+      width="100%"
+      frameborder="0"
+      :src="node.typeData && node.typeData.mediaURL"
+      :scrolling="scrollEnabled ? 'yes' : 'no'"
+      @load="handleLoad"
+    ></iframe>
+  </div>
 </template>
 
 <script>
@@ -28,6 +41,10 @@ export default {
       type: Object,
       required: true,
     },
+    context: {
+      type: String,
+      required: true,
+    },
     settings: {
       type: Object,
       required: false,
@@ -44,9 +61,16 @@ export default {
       instance: null,
       frameHeight: 0,
       frameWidth: "100%",
-      played: false,
       library: null,
+      loading: true,
+      requiresRefresh: false,
     }
+  },
+  computed: {
+    scrollEnabled() {
+      const noScrollLibraries = ['H5P.InteractiveVideo', 'H5P.ThreeImage']
+      return !noScrollLibraries.includes(this.library)
+    },
   },
   watch: {
     node(_, oldNode) {
@@ -55,22 +79,64 @@ export default {
   },
   beforeDestroy() {
     this.handlePause(this.node)
+    window.removeEventListener("resize", this.setFrameDimensions)
+    document.removeEventListener("fullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("webkitfullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("mozfullscreenchange", this.setFrameDimensions)
   },
   methods: {
-    setFrameHeight() {
-      const box = this.instance.parent.$container[0].getBoundingClientRect()
-      const videoHeight = box.height
-      if (videoHeight > this.dimensions.height && this.node.fitWindow) {
-        const scaleFactor = this.dimensions.height / videoHeight
-        this.frameHeight = 100 * scaleFactor + "%"
-        this.frameWidth = 100 * scaleFactor + "%"
-      } else {
-        this.frameHeight = "100%"
+    setFrameDimensions() {
+      const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
+
+      // default
+      this.frameHeight = h5pDimensions.height
+      this.frameWidth = 0
+
+      if (this.node.fitWindow || this.context === "accordion") {
+        // Video should fit within the smaller of the viewport or the container it's in
+        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
+        if (this.context === "accordion") {
+          // Count for the accordion header
+          // TODO: Find a better way of doing this without hardcoding the heigh value
+          fitHeight -= 100
+        }
+        // Proportionally make the frame smaller
+        let scaleFactor = fitHeight / h5pDimensions.height
+        this.frameHeight = h5pDimensions.height * scaleFactor
+        this.frameWidth = h5pDimensions.width * scaleFactor
+
+        // if the width is bigger than the available space, we need to scale based on the width
+        let fitWidth = this.$refs.h5pIframeContainer.clientWidth
+        if (this.frameWidth > fitWidth) {
+          scaleFactor = fitWidth / h5pDimensions.width
+          this.frameWidth = h5pDimensions.width * scaleFactor
+          this.frameHeight = h5pDimensions.height * scaleFactor
+        }
       }
-      this.$emit("change:dimensions", {
-        width: this.frameWidth,
-        height: this.frameHeight,
-      })
+
+      if (this.loading) {
+        if (this.requiresRefresh) {
+          this.$refs.h5p.contentWindow.location.reload()
+          setTimeout(() => {
+            this.loading = false
+            this.$emit("is-loaded")
+          }, 2000)
+        } else {
+          this.loading = false
+          this.$emit("is-loaded")
+        }
+      }
+
+      // Fix for unknown issue where H5P height is just a bit short
+      if (this.frameHeight) {
+        this.frameHeight += 15
+      }
+
+      let updatedDimensions = { height: this.frameHeight }
+      if (this.frameWidth) {
+        updatedDimensions.width = this.frameWidth
+      }
+      this.$emit("change:dimensions", updatedDimensions)
     },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -194,8 +260,23 @@ export default {
           const h5pIframeComponent = this
 
           const handleH5pAfterLoad = () => {
-            this.instance = h5pVideo
-            this.setFrameHeight()
+            h5pIframeComponent.instance = h5pVideo
+
+            h5pIframeComponent.setFrameDimensions()
+            window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
+            document.addEventListener(
+              "fullscreenchange",
+              h5pIframeComponent.setFrameDimensions
+            )
+            document.addEventListener(
+              "webkitfullscreenchange",
+              h5pIframeComponent.setFrameDimensions
+            )
+            document.addEventListener(
+              "mozfullscreenchange",
+              h5pIframeComponent.setFrameDimensions
+            )
+
             h5pIframeComponent.$emit("load", { el: h5pVideo })
 
             let currentPlayedTime
@@ -260,6 +341,7 @@ export default {
           }
 
           if (h5pVideo.getDuration() !== undefined) {
+            this.requiresRefresh = this.context === "accordion"
             handleH5pAfterLoad()
           } else {
             h5pVideo.on("loaded", handleH5pAfterLoad)
@@ -267,17 +349,20 @@ export default {
         }
         break
         case "H5P.ThreeImage": {
-          let threeSixtyLoadInterval = setInterval(()=>{
-            if (typeof h5pInstance.reDraw !== "undefined") {
-              clearInterval(threeSixtyLoadInterval)
-              h5pInstance.currentScene = h5pThreeSixtyScene
-              h5pInstance.reDraw()
-            }
-          }, 500)
+          // let threeSixtyLoadInterval = setInterval(()=>{
+          //   if (typeof h5pInstance.reDraw !== "undefined") {
+          //     clearInterval(threeSixtyLoadInterval)
+          //     h5pInstance.currentScene = h5pThreeSixtyScene
+          //     h5pInstance.reDraw()
+          //   }
+          // }, 500)
         }
         break
       }
-      this.$emit("is-loaded")
+      if (this.library !== "H5P.InteractiveVideo") {
+        this.loading = false
+        this.$emit("is-loaded")
+      }
     },
     toggleMuteIcon() {
       const body = this.$refs.h5p.contentWindow.H5P.$body[0]
@@ -287,3 +372,22 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.h5p-iframe-container {
+  margin: auto;
+  overflow: hidden;
+  border-radius: 15px;
+  &:not(.context-accordion) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+  iframe {
+    margin: -1px !important;
+    min-width: calc(100% + 4px);
+  }
+}
+</style>
