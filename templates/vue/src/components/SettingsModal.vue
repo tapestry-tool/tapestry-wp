@@ -91,37 +91,60 @@
             </b-row>
           </b-form-group>
           <b-form-group
-            label='World map'
-            description='Replace Tapestry with a new authoring experience over a map of the Earth'>
-             <b-form-checkbox v-model="renderMap" switch>
+            label="World map"
+            description="Replace Tapestry with a new authoring experience over a map of the Earth"
+          >
+            <b-form-checkbox v-model="renderMap" switch>
               {{ renderMap ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
-          <div v-if='renderMap'>
-             <b-row>
+          <div v-if="renderMap">
+            <p v-if="!latbound" class="error-message">
+              North coordinate must be greater than south coordinate
+            </p>
+            <p v-if="!lngbound" class="error-message">
+              East coordinate must be greater than west coordinate
+            </p>
+            <b-row>
               <b-col sm="3">
-                <span> NorthEast bound: </span> 
+                <span>Northeast bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude' v-model="mapBounds.nelat" />  
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  type="number"
+                  placeholder="90"
+                />
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude' v-model="mapBounds.nelng" />  
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  type="number"
+                  placeholder="180"
+                />
               </b-col>
             </b-row>
-             <b-row>
+            <b-row>
               <b-col sm="3">
-                <span> SouthWest bound: </span> 
+                <span>Southwest bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='latitude' v-model="mapBounds.swlat" />  
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  type="number"
+                  placeholder="-90"
+                />
               </b-col>
               <b-col sm="3">
-                <b-form-input type='number' placeholder='longitude' v-model="mapBounds.swlng" />  
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  type="number"
+                  placeholder="-180"
+                />
               </b-col>
             </b-row>
           </div>
-          
+
           <b-form-group
             class="mt-4"
             label="Show thumbnails"
@@ -164,7 +187,7 @@
         id="save-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading"
+        :disabled="fileUploading || !latbound || !lngbound"
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -180,7 +203,6 @@ import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
-import { latLngBounds } from "leaflet";
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -226,12 +248,18 @@ export default {
       defaultDepth: 3,
       renderImages: true,
       renderMap: false,
-      mapBounds: {nelat: 90, nelng: 180, swlat: -90, swlng: -180}
+      mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
     }
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
     ...mapState(["settings", "rootId"]),
+    latbound() {
+      return (this.mapBounds.neLat || 90) > (this.mapBounds.swLat || -90)
+    },
+    lngbound() {
+      return (this.mapBounds.neLng || 180) > (this.mapBounds.swLng || -180)
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -266,7 +294,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
-        mapBounds = {nelat: 90, nelng: 180, swlat: -90, swlng: -180}
+        mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -277,7 +305,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
-      this.mapBounds = mapBounds  
+      this.mapBounds = mapBounds
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {

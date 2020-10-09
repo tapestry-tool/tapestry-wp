@@ -50,10 +50,9 @@
         ></locked-tooltip>
       </svg>
     </main>
-    <div id='mapcontainer' v-if="settings.renderMap">
-      <TapestryMap />
+    <div v-if="settings.renderMap" id="map-container">
+      <tapestry-map />
     </div>
-    
   </div>
 </template>
 
@@ -69,7 +68,7 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css"
 import { names } from "@/config/routes"
 
 export default {
