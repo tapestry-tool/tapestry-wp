@@ -6,6 +6,7 @@
       frameborder="0"
       allowfullscreen="allowfullscreen"
       :src="normalizedUrl"
+      :style="'min-height:' + this.dimensions.height + 'px'"
       @load="$emit('load')"
     ></iframe>
     <div v-else class="preview" :style="previewStyles">
@@ -72,6 +73,7 @@ export default {
 <style lang="scss" scoped>
 .external-media-container {
   height: 100%;
+  background: #fff;
 }
 
 .preview {
@@ -131,6 +133,6 @@ export default {
 
 #external {
   width: 100%;
-  min-height: 400px;
+  height: 100%;
 }
 </style>
