@@ -15,5 +15,7 @@ cypress/videos/
 *.njsproj
 *.sln
 
+.env
+
 .nyc_output
 coverage/

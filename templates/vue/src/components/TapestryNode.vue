@@ -70,7 +70,7 @@
           <add-child-button
             v-if="hasPermission('add') && !isSubAccordionRow"
             :node="node"
-            x="-65"
+            :x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
