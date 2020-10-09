@@ -292,7 +292,7 @@ export default {
     this.node = this.createDefaultNode()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -439,17 +439,10 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.$store.commit("updateNode", {
-            id: this.parent.id,
-            newNode: {
-              childOrdering: [...this.parent.childOrdering, id],
-            },
-          })
         } else {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
         }
-        this.updateVisibleNodes([...this.visibleNodes, id])
       } else {
         await this.updateNode({
           id: this.node.id,

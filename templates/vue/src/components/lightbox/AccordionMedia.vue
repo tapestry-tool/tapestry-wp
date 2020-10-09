@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="media-container">
+  <div ref="container" class="media-container" data-qa="accordion">
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>

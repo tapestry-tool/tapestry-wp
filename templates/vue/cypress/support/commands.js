@@ -1,3 +1,4 @@
+import "cypress-file-upload"
 import { applyModalChanges } from "./utils"
 import roles from "./roles"
 import Helpers from "../../src/utils/Helpers"
@@ -5,6 +6,20 @@ import Helpers from "../../src/utils/Helpers"
 const API_URL = `/wp-json/tapestry-tool/v1`
 
 const TEST_TAPESTRY_NAME = `cypress`
+
+Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role) => {
+  if (fixture) {
+    cy.get(fixture).then(tapestry => {
+      cy.addTapestry(tapestry)
+    })
+  } else {
+    cy.addTapestry()
+  }
+  if (role !== "public") {
+    cy.login(role)
+  }
+  cy.visitTapestry()
+})
 
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
