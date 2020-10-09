@@ -1,7 +1,7 @@
 <template>
   <div id="app-container">
     <div class="toolbar">
-      <tapestry-filter style="z-index: 10;" />
+      <tapestry-filter style="z-index: 10;" @toggleReject="toggleReject" />
       <div class="slider-wrapper">
         <settings-modal-button v-if="canEdit"></settings-modal-button>
         <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
@@ -74,7 +74,7 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
-      showRejected: true,
+      showRejected: false,
     }
   },
   computed: {
@@ -94,12 +94,15 @@ export default {
       })
       let filteredNodesObj = {}
       filteredNodes.forEach(node => (filteredNodesObj[node.id] = node))
-      console.log(filteredNodesObj)
-      console.log(this.nodes)
+    
       return this.showRejected ? this.nodes : filteredNodesObj
     },
     filteredLinks() {
-      return this.links
+      let filteredLinks = this.links.filter(link => {
+    
+        return this.nodes[link.source].status !== "reject" && this.nodes[link.target].status !== "reject"
+      })
+      return this.showRejected ? this.links : filteredLinks
     },
   },
   watch: {
@@ -118,6 +121,9 @@ export default {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    toggleReject(showStatus) {
+      this.showRejected = showStatus
     },
     updateViewBox() {
       const MAX_RADIUS = 240

@@ -122,6 +122,11 @@ export default {
   },
   watch: {
     async filterValue(next) {
+      if (this.filterValue === "reject") {
+        this.$emit("toggleReject", true)
+      } else {
+        this.$emit("toggleReject", false)
+      }
       await this.refetchTapestryData(Number(next))
       this.updateVisibleNodes(this.getVisibleNodes())
     },
@@ -150,6 +155,10 @@ export default {
         this.getVisibleNodes()
       }
     })
+  },
+  beforeDestroy() {
+            this.$emit("toggleReject", false)
+
   },
   methods: {
     ...mapMutations(["updateVisibleNodes", "updateNode"]),
