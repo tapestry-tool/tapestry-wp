@@ -9,7 +9,7 @@
       @input="changeRow"
     >
       <template v-slot="{ isVisible, hasNext, next, toggle }">
-        <div>
+        <div data-qa="accordion-rows">
           <div
             v-for="(row, index) in rows"
             :key="row.node.id"
@@ -36,7 +36,10 @@
                 <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
               </a>
             </div>
-            <div v-if="isVisible(row.node.id)">
+            <div
+              v-if="isVisible(row.node.id)"
+              :data-qa="`row-content-${row.node.id}`"
+            >
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
