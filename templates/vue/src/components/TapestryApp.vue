@@ -4,7 +4,9 @@
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
         <settings-modal-button v-if="canEdit"></settings-modal-button>
+
         <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+        <tapestry-notifications />
       </div>
     </div>
     <root-node-button
@@ -57,6 +59,7 @@ import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
+import TapestryNotifications from "@/components/TapestryNotifications"
 import Helpers from "@/utils/Helpers"
 
 export default {
@@ -68,6 +71,7 @@ export default {
     SettingsModalButton,
     RootNodeButton,
     LockedTooltip,
+    TapestryNotifications,
   },
   data() {
     return {
