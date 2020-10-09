@@ -157,8 +157,7 @@ export default {
     })
   },
   beforeDestroy() {
-            this.$emit("toggleReject", false)
-
+    this.$emit("toggleReject", false)
   },
   methods: {
     ...mapMutations(["updateVisibleNodes", "updateNode"]),

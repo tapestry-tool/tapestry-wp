@@ -94,13 +94,15 @@ export default {
       })
       let filteredNodesObj = {}
       filteredNodes.forEach(node => (filteredNodesObj[node.id] = node))
-    
+
       return this.showRejected ? this.nodes : filteredNodesObj
     },
     filteredLinks() {
       let filteredLinks = this.links.filter(link => {
-    
-        return this.nodes[link.source].status !== "reject" && this.nodes[link.target].status !== "reject"
+        return (
+          this.nodes[link.source].status !== "reject" &&
+          this.nodes[link.target].status !== "reject"
+        )
       })
       return this.showRejected ? this.links : filteredLinks
     },
