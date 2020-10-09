@@ -15,6 +15,13 @@
         <tapestry-icon icon="copyright" />
       </button>
       <button
+        v-if="node.status !== 'publish'"
+        :class="['anchor-button', { active: active === 'review' }]"
+        @click.stop="scrollToRef('review')"
+      >
+        <tapestry-icon icon="comments" />
+      </button>
+      <button
         :class="['toggle-button', { closed: isClosed }]"
         @click.stop="isClosed = !isClosed"
       >
@@ -74,7 +81,7 @@
               v-html="license.description"
             ></div>
           </section>
-          <section>
+          <section v-if="node.status !== 'publish'" ref="review" data-name="review">
             <h2 class="content-header">Review</h2>
             <div class="content-body">Status: {{ node.status }}</div>
             <h2 class="content-header">Comments</h2>
