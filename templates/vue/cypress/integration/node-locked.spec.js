@@ -1,10 +1,9 @@
-import { setup } from "../support/utils"
 import { conditionTypes } from "../../src/utils/constants"
 
 describe("Locked Nodes", () => {
   beforeEach(() => {
     cy.fixture("two-nodes.json").as("twoNodes")
-    setup("@twoNodes")
+    cy.setup("@twoNodes")
   })
 
   it(`
@@ -22,7 +21,7 @@ describe("Locked Nodes", () => {
           nodeId: root.id,
         }
 
-        cy.getByTestId(`edit-node-${child.id}`).click()
+        cy.openModal("edit", child.id)
         cy.contains(/access/i).click()
         cy.contains(/prevent access/i).click()
 
@@ -32,21 +31,20 @@ describe("Locked Nodes", () => {
 
         cy.submitModal()
 
-        cy.openLightbox(child.id).should("exist")
+        cy.getByTestId(`open-node-${child.id}`).should("not.be.disabled")
 
         cy.login("subscriber").visitTapestry()
-        cy.openLightbox(child.id).should("not.exist")
+        cy.getByTestId(`open-node-${child.id}`).should("be.disabled")
 
         cy.server()
         cy.route("POST", "**/progress").as("complete")
 
         cy.openLightbox(root.id).should("exist")
-        cy.getByTestId("close-lightbox").click()
+        cy.closeLightbox()
 
         cy.wait("@complete")
 
-        cy.getByTestId(`open-node-${child.id}`).click()
-        cy.get("#lightbox").should("exist")
+        cy.getByTestId(`open-node-${child.id}`).should("not.be.disabled")
       })
   })
 })

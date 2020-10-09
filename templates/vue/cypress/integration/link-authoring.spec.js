@@ -1,5 +1,3 @@
-import { setup } from "../support/utils"
-
 describe("Link Authoring", () => {
   /**
    * Currently, d3-drag (which handles our drag events) and Cypress are incompatible.
@@ -51,7 +49,7 @@ describe("Link Authoring", () => {
   describe("Deletion", () => {
     beforeEach(() => {
       cy.fixture("stump.json").as("stump")
-      setup("@stump")
+      cy.setup("@stump")
     })
 
     it(`
@@ -70,8 +68,7 @@ describe("Link Authoring", () => {
 
           cy.on("window:confirm", stub)
 
-          const link = `link-${child1.id}-${child2.id}`
-          cy.getByTestId(link)
+          cy.link(child1.id, child2.id)
             .click()
             .then(() => {
               expect(stub).to.be.called
@@ -79,7 +76,7 @@ describe("Link Authoring", () => {
                 /are you sure you want to delete the link/i
               )
             })
-          cy.getByTestId(link).should("not.exist")
+          cy.link(child1.id, child2.id).should("not.exist")
         })
     })
 
@@ -100,14 +97,13 @@ describe("Link Authoring", () => {
           cy.on("window:confirm", confirm)
           cy.on("window:alert", alert)
 
-          const link = `link-${root.id}-${child.id}`
-          cy.getByTestId(link)
+          cy.link(root.id, child.id)
             .click()
             .then(() => {
               expect(alert).to.be.called
               expect(alert.getCall(0).lastArg).to.match(/cannot delete this link/i)
             })
-          cy.getByTestId(link).should("exist")
+          cy.link(root.id, child.id).should("exist")
         })
     })
 
@@ -151,24 +147,30 @@ describe("Link Authoring", () => {
         .then(nodes => {
           const [root, child1, child2] = Object.values(nodes)
 
-          cy.getByTestId(`edit-node-${root.id}`).click()
-          cy.getByTestId(`node-media-type`).select("accordion")
+          cy.openModal("edit", root.id)
+          cy.changeMediaType("accordion")
           cy.submitModal()
 
-          cy.addLink(child1.id, child2.id)
-          cy.getByTestId(`link-${child1.id}-${child2.id}`).should("exist")
+          /**
+           * Reload so accordions have correct rows. See:
+           *  - https://app.asana.com/0/1126491658233864/1198168819652457
+           */
+          cy.visitTapestry()
 
-          cy.getByTestId(`open-node-${root.id}`).click()
-          cy.getByTestId("lightbox").within(() => {
+          cy.addLink(child1.id, child2.id)
+          cy.link(child1.id, child2.id).should("exist")
+
+          cy.openLightbox(root.id)
+          cy.lightbox().within(() => {
             cy.contains(child1.title).should("exist")
           })
-          cy.getByTestId("close-lightbox").click()
+          cy.closeLightbox()
 
-          cy.getByTestId(`link-${root.id}-${child1.id}`)
+          cy.link(root.id, child1.id)
             .click()
             .should("not.exist")
-          cy.getByTestId(`open-node-${root.id}`).click()
-          cy.getByTestId("lightbox").within(() => {
+          cy.openLightbox(root.id)
+          cy.lightbox().within(() => {
             cy.contains(child1.title).should("not.exist")
           })
         })

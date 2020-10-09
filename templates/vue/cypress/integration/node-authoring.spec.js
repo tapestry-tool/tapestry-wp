@@ -1,5 +1,3 @@
-import { setup } from "../support/utils"
-
 describe("Node Authoring", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
@@ -11,7 +9,7 @@ describe("Node Authoring", () => {
     When: A user adds a node using the node modal
     Then: The root node should be added
   `, () => {
-    setup()
+    cy.setup()
 
     const node = {
       title: "Root",
@@ -46,13 +44,13 @@ describe("Node Authoring", () => {
     When: A user tries to delete the node using the node modal
     Then: The node should be deleted
   `, () => {
-    setup("@twoNodes")
+    cy.setup("@twoNodes")
 
     cy.store()
       .its("state.nodes")
       .then(nodes => {
         const leaf = Object.values(nodes)[1]
-        cy.getByTestId(`edit-node-${leaf.id}`).click()
+        cy.openModal("edit", leaf.id)
         cy.deleteNode()
 
         cy.getNodeById(leaf.id).should("not.exist")
@@ -69,26 +67,24 @@ describe("Node Authoring", () => {
     When: A user tries to delete the node
     Then: The delete button should be disabled and a warning shown
   `, () => {
-    setup("@twoNodes")
+    cy.setup("@twoNodes")
 
     cy.store()
       .its("state.nodes")
       .then(nodes => {
         const [root, child] = Object.values(nodes)
 
-        cy.addNode(
-          {
-            title: "child 2",
-            typeData: {
-              textContent: "abcd",
-            },
+        cy.addNode(root.id, {
+          title: "child 2",
+          typeData: {
+            textContent: "abcd",
           },
-          root.id
-        )
+        })
+
         cy.getNodeByTitle("child 2").then(({ id }) => {
           cy.addLink(id, child.id)
 
-          cy.getByTestId(`edit-node-${id}`).click()
+          cy.openModal("edit", id)
           cy.contains(/delete node/i).should("be.disabled")
         })
       })
@@ -96,7 +92,7 @@ describe("Node Authoring", () => {
 
   describe("Non-empty", () => {
     beforeEach(() => {
-      setup("@oneNode")
+      cy.setup("@oneNode")
     })
 
     it(`
@@ -114,11 +110,11 @@ describe("Node Authoring", () => {
           },
         }
 
-        cy.getByTestId(`add-node-${parent.id}`).click()
+        cy.openModal("add", parent.id)
         cy.getByTestId(`node-title`).type(child.title)
         cy.getEditable(`node-description`).type(child.description)
 
-        cy.getByTestId(`node-media-type`).select(child.mediaType)
+        cy.changeMediaType(child.mediaType)
         cy.getEditable(`node-text-content`).type(child.typeData.textContent)
 
         cy.submitModal()
@@ -135,7 +131,7 @@ describe("Node Authoring", () => {
         const oldTitle = node.title
         cy.contains(oldTitle).should("exist")
 
-        cy.getByTestId(`edit-node-${node.id}`).click()
+        cy.openModal("edit", node.id)
         cy.getByTestId(`node-title`)
           .clear()
           .type("new title")
@@ -157,13 +153,12 @@ describe("Node Authoring", () => {
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
 
       cy.getSelectedNode().then(node => {
-        cy.getByTestId(`edit-node-${node.id}`).click()
-        cy.getByTestId(`node-media-type`).select("video")
+        cy.openModal("edit", node.id)
+        cy.changeMediaType("video")
         cy.getByTestId(`node-video-url`).type(url)
         cy.submitModal()
 
-        cy.getByTestId(`open-node-${node.id}`).click()
-        cy.getByTestId("lightbox").within(() => {
+        cy.openLightbox(node.id).within(() => {
           cy.get("video").should("have.attr", "src", url)
         })
       })

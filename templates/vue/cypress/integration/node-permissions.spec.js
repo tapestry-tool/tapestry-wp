@@ -1,9 +1,7 @@
-import { setup as setupTapestry } from "../support/utils"
-
 describe("Node Permissions", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    setupTapestry("@oneNode")
+    cy.setup("@oneNode")
   })
 
   it(`
@@ -12,7 +10,7 @@ describe("Node Permissions", () => {
     Then: The node should reflect the permissions
   `, () => {
     cy.getSelectedNode().then(node => {
-      cy.getByTestId(`edit-node-${node.id}`).click()
+      cy.openModal("edit", node.id)
       cy.contains(/access/i).click()
 
       cy.getByTestId(`node-permissions-public-read`).uncheck()
@@ -24,20 +22,8 @@ describe("Node Permissions", () => {
   })
 
   const setup = edits => {
-    cy.getSelectedNode().editNodeInStore({ permissions: edits })
+    cy.getSelectedNode().then(node => cy.editNode(node.id, { permissions: edits }))
   }
-
-  it(`
-    Given: A user without any read permissions
-    When: The Tapestry loads
-    Then: The empty Tapestry text should be shown
-  `, () => {
-    setup({
-      public: [],
-    })
-    cy.logout().visitTapestry()
-    cy.contains(/is empty/i).should("exist")
-  })
 
   it(`
     Given: A node and a user without edit permission

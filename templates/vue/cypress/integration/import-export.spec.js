@@ -1,5 +1,3 @@
-import { setup } from "../support/utils"
-
 describe("Import Export", () => {
   it(`
     Given: An empty Tapestry
@@ -7,7 +5,7 @@ describe("Import Export", () => {
     Then: The Tapestry should be imported
   `, () => {
     const tapestry = "root.json"
-    setup()
+    cy.setup()
 
     cy.server()
     cy.route("PUT", "**/tapestries/**").as("import")

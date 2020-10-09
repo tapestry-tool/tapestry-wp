@@ -1,5 +1,3 @@
-import { setup } from "../../support/utils"
-
 describe("Accordion", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
@@ -11,15 +9,14 @@ describe("Accordion", () => {
     When: It's edited to an accordion and opened
     Then: An accordion lightbox should appear
   `, () => {
-    setup("@oneNode")
+    cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {
-      cy.getByTestId(`edit-node-${node.id}`).click()
-      cy.getByTestId(`node-media-type`).select("accordion")
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("accordion")
       cy.submitModal()
 
-      cy.getByTestId(`open-node-${node.id}`).click()
-      cy.getByTestId("lightbox").within(() => {
+      cy.openLightbox(node.id).within(() => {
         cy.getByTestId("accordion").should("be.visible")
         cy.contains(node.title).should("be.visible")
       })
@@ -31,11 +28,13 @@ describe("Accordion", () => {
     When: Child nodes are added and the accordion opened
     Then: Rows should appear and be clickable
   `, () => {
-    setup("@oneNode")
+    cy.setup("@oneNode")
 
-    cy.getSelectedNode().editNodeInStore({
-      mediaType: "accordion",
-    })
+    cy.getSelectedNode().then(node =>
+      cy.editNode(node.id, {
+        mediaType: "accordion",
+      })
+    )
 
     const rows = [
       {
@@ -54,11 +53,10 @@ describe("Accordion", () => {
 
     cy.getSelectedNode().then(node => {
       for (const row of rows) {
-        cy.addNode(row, node.id)
+        cy.addNode(node.id, row)
       }
 
-      cy.getByTestId(`open-node-${node.id}`).click()
-      cy.getByTestId("lightbox").within(() => {
+      cy.openLightbox(node.id).within(() => {
         cy.getByTestId("accordion-rows")
           .find("div.accordion-row")
           .each(($el, index) => {
@@ -81,19 +79,18 @@ describe("Accordion", () => {
     When: Its rows are locked
     Then: Only the first row should be clickable until completed
   `, () => {
-    setup("@accordion")
+    cy.setup("@accordion")
 
     cy.store()
       .its("state.nodes")
       .then(nodes => {
         const [accordion, row1, row2] = Object.values(nodes)
 
-        cy.getByTestId(`edit-node-${accordion.id}`).click()
+        cy.openModal("edit", accordion.id)
         cy.contains(/lock rows/i).click()
         cy.submitModal()
 
-        cy.getByTestId(`open-node-${accordion.id}`).click()
-        cy.getByTestId("lightbox").within(() => {
+        cy.openLightbox(accordion.id).within(() => {
           cy.contains(row1.title).should("not.be.disabled")
           cy.contains(row2.title).should("be.disabled")
 
@@ -111,18 +108,17 @@ describe("Accordion", () => {
     When: Its rows are reordered
     Then: The lightbox should reflect the new order
   `, () => {
-    setup("@accordion")
+    cy.setup("@accordion")
 
     cy.getSelectedNode().then(node => {
       const [row1, row2] = node.childOrdering
       const newOrdering = [row2, row1]
 
-      cy.wrap(node).editNodeInStore({
+      cy.editNode(node.id, {
         childOrdering: newOrdering,
       })
 
-      cy.getByTestId(`open-node-${node.id}`).click()
-      cy.getByTestId("lightbox").within(() => {
+      cy.openLightbox(node.id).within(() => {
         cy.getByTestId("accordion-rows")
           .find("div.accordion-row")
           .each(($el, index) => {
@@ -144,7 +140,7 @@ describe("Accordion", () => {
     When: A child node is added to it
     Then: The row should appear as a subaccordion
   `, () => {
-    setup("@accordion")
+    cy.setup("@accordion")
 
     const row = {
       title: "sub row",
@@ -157,10 +153,9 @@ describe("Accordion", () => {
       .its("state.nodes")
       .then(nodes => {
         const [root, child] = Object.values(nodes)
-        cy.addNode(row, child.id)
+        cy.addNode(child.id, row)
 
-        cy.getByTestId(`open-node-${root.id}`).click()
-        cy.getByTestId("lightbox").within(() => {
+        cy.openLightbox(root.id).within(() => {
           cy.contains(child.title).click()
           cy.getByTestId(`row-content-${child.id}`).within(() => {
             cy.contains(row.title).click()

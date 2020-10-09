@@ -1,9 +1,7 @@
-import { setup } from "../support/utils"
-
 describe("Node Appearance", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    setup("@oneNode")
+    cy.setup("@oneNode")
   })
 
   it(`
@@ -12,7 +10,7 @@ describe("Node Appearance", () => {
     Then: It should reflect the changes
   `, () => {
     cy.getSelectedNode().then(node => {
-      cy.getByTestId(`edit-node-${node.id}`).click()
+      cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
 
       cy.contains(/node title/i).click()

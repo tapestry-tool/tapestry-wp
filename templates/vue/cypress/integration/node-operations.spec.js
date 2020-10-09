@@ -1,9 +1,7 @@
-import { setup } from "../support/utils"
-
 describe("Node Operations", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    setup("@oneNode")
+    cy.setup("@oneNode")
   })
 
   it(`
@@ -12,16 +10,15 @@ describe("Node Operations", () => {
     Then: Its add, edit, and media buttons should be visible and clickable
   `, () => {
     cy.getSelectedNode().then(({ id }) => {
-      cy.getByTestId(`add-node-${id}`).click()
+      cy.openModal("add", id)
       cy.getByTestId("node-modal").should("be.visible")
       cy.contains(/cancel/i).click()
 
-      cy.getByTestId(`edit-node-${id}`).click()
+      cy.openModal("edit", id)
       cy.getByTestId("node-modal").should("be.visible")
       cy.contains(/cancel/i).click()
 
-      cy.getByTestId(`open-node-${id}`).click()
-      cy.getByTestId("lightbox").should("be.visible")
+      cy.openLightbox(id).should("be.visible")
     })
   })
 
@@ -31,11 +28,11 @@ describe("Node Operations", () => {
     Then: Its lightbox should be visible
   `, () => {
     cy.getSelectedNode().then(node => {
-      cy.wrap(node).editNodeInStore({
+      cy.editNode(node.id, {
         hideMedia: true,
       })
-      cy.getByTestId(`node-${node.id}`).click()
-      cy.getByTestId("lightbox").should("be.visible")
+      cy.getNodeById(node.id).click()
+      cy.lightbox().should("be.visible")
     })
   })
 })

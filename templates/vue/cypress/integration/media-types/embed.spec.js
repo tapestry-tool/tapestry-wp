@@ -1,9 +1,7 @@
-import { setup } from "../../support/utils"
-
 describe("External link", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    setup("@oneNode")
+    cy.setup("@oneNode")
   })
 
   it(`
@@ -17,14 +15,13 @@ describe("External link", () => {
         "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
     }
     cy.getSelectedNode().then(node => {
-      cy.getByTestId(`edit-node-${node.id}`).click()
-      cy.getByTestId(`node-media-type`).select("url-embed")
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("url-embed")
       cy.getByTestId(`node-link-url`).type(newNode.url)
       cy.contains(/new window/i).click()
       cy.submitModal()
 
-      cy.getByTestId(`open-node-${node.id}`).click()
-      cy.getByTestId("lightbox").within(() => {
+      cy.openLightbox(node.id).within(() => {
         cy.contains(newNode.title).should("exist")
       })
     })
