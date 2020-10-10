@@ -15,6 +15,7 @@ describe("Import Export", () => {
     cy.wait("@import")
     cy.wait("@load")
 
+    cy.contains(/loading/i).should("not.exist")
     cy.fixture(tapestry).then(({ nodes }) => {
       nodes.forEach(node => cy.getNodeByTitle(node.title).should("exist"))
     })

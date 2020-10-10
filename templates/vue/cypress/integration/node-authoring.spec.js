@@ -143,25 +143,5 @@ describe("Node Authoring", () => {
         })
       })
     })
-
-    it(`
-      Given: A Tapestry node
-      When: It's changed to a video node and opened
-      Then: It should show the corresponding video
-    `, () => {
-      const url =
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-
-      cy.getSelectedNode().then(node => {
-        cy.openModal("edit", node.id)
-        cy.changeMediaType("video")
-        cy.getByTestId(`node-video-url`).type(url)
-        cy.submitModal()
-
-        cy.openLightbox(node.id).within(() => {
-          cy.get("video").should("have.attr", "src", url)
-        })
-      })
-    })
   })
 })

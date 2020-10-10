@@ -36,6 +36,9 @@ describe("Locked Nodes", () => {
         cy.login("subscriber").visitTapestry()
         cy.getByTestId(`open-node-${child.id}`).should("be.disabled")
 
+        cy.getNodeById(child.id).click()
+        cy.contains(/this node will be unlocked/i).should("be.visible")
+
         cy.server()
         cy.route("POST", "**/progress").as("complete")
 
