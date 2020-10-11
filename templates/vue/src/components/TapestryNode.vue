@@ -64,11 +64,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="
-              (hasPermission('add') || isAuthenticated) &&
-                node.status !== 'draft' &&
-                !isSubAccordionRow
-            "
+            v-if="(hasPermission('add') || isAuthenticated) && !isSubAccordionRow"
             :node="node"
             :x="-65"
             :y="radius - 30"

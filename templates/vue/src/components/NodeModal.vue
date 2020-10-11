@@ -118,7 +118,7 @@
         id="draft-button"
         size="sm"
         variant="secondary"
-        :disabled="!canMakeDraft || !canSubmit"
+        :disabled="!canSubmit"
         @click="handleDraftSubmit"
       >
         <b-spinner v-if="!canSubmit"></b-spinner>
@@ -129,7 +129,7 @@
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="!canPublish || !canSubmit"
+        :disabled="!canSubmit"
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit" small></b-spinner>
@@ -255,11 +255,19 @@ export default {
     canPublish() {
       if (this.loading) return false
       if (this.type === "add") {
-        return this.hasPermission(this.type, this.parent)
+        return (
+          Helpers.hasPermission(this.parent, this.type) &&
+          this.parent.status !== "draft"
+        )
       } else if (this.node.status === "draft" && this.type === "edit") {
-        return this.hasPermission("add", this.parent)
+        return this.getNeighbours(this.nodeId).some(neighbourId => {
+          let neighbour = this.getNode(neighbourId)
+          return (
+            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
+          )
+        })
       } else {
-        return this.hasPermission(this.type, this.node)
+        return Helpers.hasPermission(this.node, this.type)
       }
     },
     authoredNode() {
@@ -615,14 +623,14 @@ export default {
           errMsgs.push("Please enter a Video URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
+          this.node.mediaDuration = 0
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
+          this.node.mediaDuration = 0
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -730,56 +738,6 @@ export default {
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL
     },
-    hasPermission(action, node) {
-      if (!node || node === null || !node.author) {
-        return wpData.wpCanEditTapestry === "1"
-      }
-
-      // Check 1: Has edit permissions for Tapestry
-      if (wpData.wpCanEditTapestry === "1") {
-        return true
-      }
-
-      // Check 2: User is the author of the node
-      if (wpData.currentUser.ID == parseInt(node.author.id)) {
-        return true
-      }
-
-      // Check 3: User has a role with general edit permissions
-      const { ID, roles } = wpData.currentUser
-      const allowedRoles = ["administrator", "editor", "author"]
-      if (allowedRoles.some(role => roles.includes(role))) {
-        return true
-      }
-
-      const { public: publicPermissions, authenticated } = node.permissions
-      // Check 4: Node has public permissions
-      if (publicPermissions.includes(action)) {
-        return true
-      }
-
-      // Check 5: Node has authenticated permissions
-      if (wpData.currentUser.ID && authenticated.includes(action)) {
-        return true
-      }
-
-      // Check 6: User has a role that is allowed in the node
-      const isRoleAllowed = roles.some(role => {
-        const permissions = node.permissions[role]
-        return permissions.includes(action)
-      })
-      if (isRoleAllowed) {
-        return true
-      }
-
-      // Check 7: User has a permission associated with its ID
-      const userPermissions = node.permissions[`user-${ID}`]
-      if (userPermissions && userPermissions.includes(action)) {
-        return true
-      }
-
-      return false
-    },
     hasDraftPermission(ID) {
       if (ID === 0) {
         this.warningText = "You must be authenticated to create a draft node"
@@ -789,11 +747,6 @@ export default {
       if (this.type === "edit") {
         if (!this.authoredNode) {
           this.warningText = "You cannot make nodes you did not author into drafts"
-          return false
-        }
-
-        if (this.getNeighbours(this.nodeId).length > 1) {
-          this.warningText = "" // Handled by DeleteButton component
           return false
         }
       }

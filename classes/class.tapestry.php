@@ -179,7 +179,10 @@ class Tapestry implements ITapestry
         // Delete associated links with this node
         foreach ($this->links as $index => $link) {
             if ($link->source == $nodeId || $link->target == $nodeId) {
-                $this->removeLink($index);
+                $this->removeLink([
+                    'source' => $link->source,
+                    'target' => $link->target,
+                    ]);
             }
         }
 
@@ -216,13 +219,18 @@ class Tapestry implements ITapestry
     /**
      * Delete a link from links array.
      *
-     * @param int $linkIndex Link Index
+     * @param int $link an array containing the node IDs that this connects
      *
      * @return array $links     Tapestry links
      */
-    public function removeLink($linkIndex)
+    public function removeLink($linkToDelete)
     {
-        array_splice($this->links, $linkIndex, 1);
+        foreach ($this->links as $linkIndex => $link) {
+            if ($link->source == $linkToDelete->source && $link->target == $linkToDelete->target) {
+                array_splice($this->links, $linkIndex, 1);
+                break;
+            }
+        }
         $this->_saveToDatabase();
 
         return $this->links;
@@ -537,11 +545,9 @@ class Tapestry implements ITapestry
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
-            $nodeMeta = $node->getMeta();
-            if ('draft' == $nodeMeta->status && $nodeMeta->author->id != $currentUserId) {
-                continue;
+            if ($node->isAvailableToUser()) {
+                array_push($nodesPermitted, $nodeId);
             }
-            array_push($nodesPermitted, $nodeId);
         }
 
         return $nodesPermitted;
