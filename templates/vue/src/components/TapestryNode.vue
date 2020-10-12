@@ -25,9 +25,10 @@
             node.nodeType !== '' &&
             !node.hideProgress
         "
-        :radius="radius"
+        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
+        :draft="node.status === 'draft'"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
@@ -63,7 +64,7 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add') && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isAuthenticated) && !isSubAccordionRow"
             :node="node"
             :x="-65"
             :y="radius - 30"
@@ -212,7 +213,12 @@ export default {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
-      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+        .map(this.getNode)
+        .filter(n => n.status !== "draft")
+      return rows.filter(row => row.completed).length / rows.length
+    },
+    isAuthenticated() {
+      return wpData.currentUser.ID !== 0
     },
   },
   watch: {
