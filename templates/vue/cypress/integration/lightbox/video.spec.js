@@ -4,7 +4,7 @@ describe("Video", () => {
     cy.setup("@oneNode")
   })
 
-  it.only(`
+  it(`
     Given: A Tapestry node
     When: It's changed to a video node and opened
     Then: It should show the corresponding video

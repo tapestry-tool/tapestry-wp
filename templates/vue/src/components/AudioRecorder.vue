@@ -4,7 +4,12 @@
   </div>
   <div v-else class="recorder">
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
-    <button v-else class="main-button my-2" @click="toggleRecording">
+    <button
+      v-else
+      class="main-button my-2"
+      data-qa="record"
+      @click="toggleRecording"
+    >
       <i
         :class="'fas fa-' + (state === states.RECORDING ? 'pause' : 'microphone')"
       ></i>
