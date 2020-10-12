@@ -14,16 +14,14 @@ jobs:
       - name: Launch containers
         run: docker-compose up -d
       - name: Wait for containers to be ready
-        uses: jakejarvis/wait-action@master
-        with:
-          time: "10s"
+        run: bash ./bin/await-containers.sh
       - name: Setup WP
         run: sh ./bin/install.sh
       - name: Setup link preview config
         working-directory: templates/vue
         env:
           LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
-        run: echo 'export const LINK_PREVIEW_API_KEY = "'$LINK_KEY'"' > config.js
+        run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
@@ -34,3 +32,4 @@ jobs:
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080/dist/build.js"
           working-directory: templates/vue
+
