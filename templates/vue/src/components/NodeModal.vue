@@ -25,6 +25,7 @@
         <b-tab
           title="Content"
           :active="tab === 'content'"
+          style="overflow-x: hidden;"
           @click="changeTab('content')"
         >
           <content-form
@@ -55,9 +56,11 @@
           :active="tab === 'access'"
           @click="changeTab('access')"
         >
-          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
-          <permissions-table v-model="node.permissions" />
-          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+          <h6 class="mb-3">Node Permissions</h6>
+          <b-card no-body>
+            <permissions-table v-model="node.permissions" />
+          </b-card>
+          <h6 class="mt-4 mb-3">Lock Node</h6>
           <conditions-form :node="node" />
         </b-tab>
         <b-tab
@@ -762,6 +765,10 @@ export default {
   position: fixed;
   left: 101vw;
   width: 1px;
+}
+
+h6 {
+  font-weight: 400;
 }
 </style>
 
