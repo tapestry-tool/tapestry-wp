@@ -4,7 +4,7 @@ describe("Video", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
+  it.only(`
     Given: A Tapestry node
     When: It's changed to a video node and opened
     Then: It should show the corresponding video
@@ -18,8 +18,20 @@ describe("Video", () => {
       cy.getByTestId(`node-video-url`).type(url)
       cy.submitModal()
 
+      cy.server()
+      cy.route("POST", `**/users/progress`).as("saveProgress")
+
       cy.openLightbox(node.id).within(() => {
         cy.get("video").should("have.attr", "src", url)
+        cy.wait("@saveProgress")
+
+        cy.get("video").then($el => {
+          const video = $el.get(0)
+          expect(video.paused).to.be.false
+          video.pause()
+        })
+
+        cy.getByTestId("play-screen").should("exist")
       })
       cy.closeLightbox()
 
