@@ -23,9 +23,12 @@ describe("Video", () => {
       })
       cy.closeLightbox()
 
-      cy.editNode(node.id, {
-        progress: 1,
-      })
+      /**
+       * Skip to end screen but don't set progress to 1:
+       *    If progress is 1, the app automatically restarts the video
+       *    when the lightbox is opened again.
+       */
+      cy.updateNodeProgress(node.id, 0.98)
 
       cy.openLightbox(node.id).within(() => {
         cy.contains(/rewatch/i).should("be.visible")
