@@ -76,13 +76,6 @@ export default {
           orderedPermissions.push([permission, this.value[higherPermission]])
         }
       })
-      Object.entries(this.value)
-        .filter(entry => {
-          return !orderedPermissions.some(
-            permissionMap => permissionMap[0] === entry[0]
-          )
-        })
-        .forEach(entry => orderedPermissions.push(entry))
       return orderedPermissions
     },
   },
