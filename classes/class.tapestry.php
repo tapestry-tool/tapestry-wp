@@ -179,7 +179,10 @@ class Tapestry implements ITapestry
         // Delete associated links with this node
         foreach ($this->links as $index => $link) {
             if ($link->source == $nodeId || $link->target == $nodeId) {
-                $this->removeLink($index);
+                $this->removeLink([
+                    'source' => $link->source,
+                    'target' => $link->target,
+                    ]);
             }
         }
 
@@ -216,13 +219,18 @@ class Tapestry implements ITapestry
     /**
      * Delete a link from links array.
      *
-     * @param int $linkIndex Link Index
+     * @param int $link an array containing the node IDs that this connects
      *
      * @return array $links     Tapestry links
      */
-    public function removeLink($linkIndex)
+    public function removeLink($linkToDelete)
     {
-        array_splice($this->links, $linkIndex, 1);
+        foreach ($this->links as $linkIndex => $link) {
+            if ($link->source == $linkToDelete->source && $link->target == $linkToDelete->target) {
+                array_splice($this->links, $linkIndex, 1);
+                break;
+            }
+        }
         $this->_saveToDatabase();
 
         return $this->links;
@@ -336,6 +344,9 @@ class Tapestry implements ITapestry
 
     private function _recursivelySetAccessible($node, $visited, $nodeList)
     {
+        if (!isset($node)) {
+            return;
+        }
         if (!in_array($node, $visited)) {
             array_push($visited, $node);
         }
@@ -481,7 +492,11 @@ class Tapestry implements ITapestry
             $tapestry->settings->superuserOverridePermissions = true;
         }
 
+        $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
+
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+            $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
+
             return $tapestry;
         } else {
             $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->rootId,
@@ -519,6 +534,20 @@ class Tapestry implements ITapestry
         $checked = [];
         $nodesPermitted = [];
         $this->_traverseNodes($rootId, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
+
+        return $nodesPermitted;
+    }
+
+    private function _filterNodesMetaIdsByStatus($nodeMetaIds)
+    {
+        $currentUserId = wp_get_current_user()->ID;
+        $nodesPermitted = [];
+        foreach ($nodeMetaIds as $nodeId) {
+            $node = new TapestryNode($this->postId, $nodeId);
+            if ($node->isAvailableToUser()) {
+                array_push($nodesPermitted, $nodeId);
+            }
+        }
 
         return $nodesPermitted;
     }
