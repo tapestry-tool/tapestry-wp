@@ -252,10 +252,9 @@ export function addLink(state, link) {
 }
 
 export function deleteLink(state, { source, target }) {
-  const linkIndex = state.links.findIndex(
-    link => link.source === source && link.target === target
+  state.links = state.links.filter(
+    link => link.source !== source || link.target !== target
   )
-  state.links = state.links.filter((_, i) => i !== linkIndex)
 }
 
 // quizzes
