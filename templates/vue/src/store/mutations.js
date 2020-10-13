@@ -80,6 +80,11 @@ function parseDataset(dataset) {
     dataset.settings.defaultDepth = DEFAULT_DEPTH
   }
 
+  const defaultPublicPerm = dataset.settings.defaultPermissions.public
+  if (defaultPublicPerm.includes("add") || defaultPublicPerm.includes("edit")) {
+    dataset.settings.defaultPermissions.public = ['read'];
+  }
+
   return dataset
 }
 
