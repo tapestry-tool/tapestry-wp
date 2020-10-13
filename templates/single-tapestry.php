@@ -10,15 +10,10 @@
  */
 
 get_header();
-
-if (current_user_can('edit_post', get_the_ID())) {
-    $additionalClasses = 'is-editor';
-}
-
 ?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="site-main post-wrap <?php echo $additionalClasses; ?>" role="main">
+    <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) ? 'is-editor' : ''; ?>" role="main">
 
 <?php
 

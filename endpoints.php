@@ -612,6 +612,11 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+            || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
+            $tapestry = new Tapestry($postId);
+            return $tapestry->addLink($link);
+        }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
@@ -636,14 +641,14 @@ function addTapestryLink($request)
 function deleteTapestryLink($request)
 {
     $postId = $request['tapestryPostId'];
-    $linkIndex = json_decode($request->get_body());
+    $link = json_decode($request->get_body());
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
 
-        return $tapestry->removeLink($linkIndex);
+        return $tapestry->removeLink($link);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

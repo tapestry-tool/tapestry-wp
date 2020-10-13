@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    v-if="node"
     id="node-modal"
     :visible="show"
     :title="title"
@@ -24,6 +25,7 @@
         <b-tab
           title="Content"
           :active="tab === 'content'"
+          style="overflow-x: hidden;"
           @click="changeTab('content')"
         >
           <content-form
@@ -54,9 +56,11 @@
           :active="tab === 'access'"
           @click="changeTab('access')"
         >
-          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
-          <permissions-table v-model="node.permissions" />
-          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+          <h6 class="mb-3">Node Permissions</h6>
+          <b-card no-body>
+            <permissions-table v-model="node.permissions" />
+          </b-card>
+          <h6 class="mt-4 mb-3">Lock Node</h6>
           <conditions-form :node="node" />
         </b-tab>
         <b-tab
@@ -105,23 +109,38 @@
     <template slot="modal-footer">
       <delete-node-button
         v-if="type === 'edit'"
-        :node-id="nodeId"
+        :node-id="Number(nodeId)"
         @submit="loading = true"
       ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="close">
+      <b-button size="sm" variant="light" @click="close">
         Cancel
       </b-button>
       <b-button
+        v-if="rootId !== 0 && canMakeDraft"
+        id="draft-button"
+        size="sm"
+        variant="secondary"
+        :disabled="!canSubmit"
+        @click="handleDraftSubmit"
+      >
+        <b-spinner v-if="!canSubmit"></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Save as Private Draft</div>
+      </b-button>
+      <b-button
+        v-if="canPublish"
         id="submit-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading"
+        :disabled="!canSubmit"
         @click="handleSubmit"
       >
-        <b-spinner v-if="fileUploading" small></b-spinner>
-        <div :style="fileUploading ? 'opacity: 50%;' : ''">Submit</div>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
       </b-button>
+      <b-form-invalid-feedback :state="canMakeDraft">
+        {{ warningText }}
+      </b-form-invalid-feedback>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -198,6 +217,7 @@ export default {
       videoLoaded: false,
       fileUploading: false,
       loadDuration: false,
+      warningText: "",
     }
   },
   computed: {
@@ -206,6 +226,7 @@ export default {
       "getDirectChildren",
       "getParent",
       "getNode",
+      "getNeighbours",
     ]),
     ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
     parent() {
@@ -224,12 +245,47 @@ export default {
       }
       return ""
     },
+    isAuthenticated() {
+      return wpData.currentUser.ID !== 0
+    },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
         : this.settings.showAccess
         ? true
         : wpData.wpCanEditTapestry !== ""
+    },
+    canPublish() {
+      if (this.loading) return false
+      if (this.type === "add") {
+        return (
+          Helpers.hasPermission(this.parent, this.type) &&
+          this.parent.status !== "draft"
+        )
+      } else if (this.node.status === "draft" && this.type === "edit") {
+        return this.getNeighbours(this.nodeId).some(neighbourId => {
+          let neighbour = this.getNode(neighbourId)
+          return (
+            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
+          )
+        })
+      } else {
+        return Helpers.hasPermission(this.node, this.type)
+      }
+    },
+    authoredNode() {
+      const { ID } = wpData.currentUser
+      if (this.node.author) {
+        return parseInt(this.node.author.id) === ID
+      }
+      return true
+    },
+    canMakeDraft() {
+      const { ID } = wpData.currentUser
+      if (this.node.status === "publish" && this.type === "edit") {
+        return false
+      }
+      return this.hasDraftPermission(ID)
     },
     canSubmit() {
       return !this.fileUploading
@@ -320,8 +376,10 @@ export default {
       return true
     },
     validateNodeRoute(nodeId) {
-      if (Object.keys(this.nodes).length === 0 && this.type === "add") {
-        return true
+      if (this.type === "add") {
+        if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
+          return true
+        }
       }
       if (!this.nodes.hasOwnProperty(nodeId)) {
         return false
@@ -413,6 +471,25 @@ export default {
       this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
+        this.node.status = "publish"
+        this.updateNodeCoordinates()
+        this.loading = true
+
+        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+          await this.setLinkData()
+        }
+
+        if (this.shouldReloadDuration()) {
+          this.loadDuration = true
+        } else {
+          return this.submitNode()
+        }
+      }
+    },
+    async handleDraftSubmit() {
+      this.formErrors = this.validateNode()
+      if (!this.formErrors.length) {
+        this.node.status = "draft"
         this.updateNodeCoordinates()
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
@@ -439,12 +516,14 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          this.$store.commit("updateNode", {
-            id: this.parent.id,
-            newNode: {
-              childOrdering: [...this.parent.childOrdering, id],
-            },
-          })
+          if (this.node.status !== "draft") {
+            this.$store.commit("updateNode", {
+              id: this.parent.id,
+              newNode: {
+                childOrdering: [...this.parent.childOrdering, id],
+              },
+            })
+          }
         } else {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
@@ -546,12 +625,15 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter a Video URL")
         }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          this.node.mediaDuration = 0
+        }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
+          this.node.mediaDuration = 0
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -659,6 +741,21 @@ export default {
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL
     },
+    hasDraftPermission(ID) {
+      if (ID === 0) {
+        this.warningText = "You must be authenticated to create a draft node"
+        return false
+      }
+
+      if (this.type === "edit") {
+        if (!this.authoredNode) {
+          this.warningText = "You cannot make nodes you did not author into drafts"
+          return false
+        }
+      }
+
+      return true
+    },
   },
 }
 </script>
@@ -668,6 +765,10 @@ export default {
   position: fixed;
   left: 101vw;
   width: 1px;
+}
+
+h6 {
+  font-weight: 400;
 }
 </style>
 
@@ -783,5 +884,9 @@ table {
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 </style>
