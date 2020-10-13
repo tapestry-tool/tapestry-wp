@@ -13,6 +13,7 @@
     <b-row v-if="isUploading">
       <b-col class="progress-wrapper">
         <b-progress
+          data-qa="progress"
           :value="uploadPercentage"
           :max="100"
           :animated="uploadPercentage < 100"
@@ -85,7 +86,7 @@ export default {
     inputTestId: {
       type: String,
       required: false,
-      default: "node-uploadInput",
+      default: "node-upload-input",
     },
   },
   data() {

@@ -1,10 +1,7 @@
 import "cypress-file-upload"
 import roles from "./roles"
 import Helpers from "../../src/utils/Helpers"
-
-const API_URL = `/wp-json/tapestry-tool/v1`
-
-const TEST_TAPESTRY_NAME = `cypress`
+import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 
 Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
   if (fixture) {
@@ -35,10 +32,10 @@ Cypress.Commands.add("addTapestry", (body = {}) => {
   })
 })
 
-Cypress.Commands.add("deleteTestTapestry", () => {
+Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
   return cy.request({
     url: `${API_URL}/tapestries`,
-    body: { title: TEST_TAPESTRY_NAME },
+    body: { title },
     method: "DELETE",
   })
 })
@@ -123,7 +120,7 @@ Cypress.Commands.add("getNodeById", id => cy.getByTestId(`node-${id}`))
 Cypress.Commands.add("lightbox", () => cy.getByTestId("lightbox"))
 
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
-  cy.getByTestId(`open-node-${id || node.id}`).click()
+  cy.getByTestId(`open-node-${id || node.id}`).click({ force: true })
   return cy.lightbox()
 })
 
@@ -165,6 +162,16 @@ Cypress.Commands.add("submitModal", () => {
 
   cy.contains("Submit").click()
   cy.wait("@editPermissions")
+})
+
+Cypress.Commands.add("submitSettingsModal", () => {
+  cy.server()
+  cy.route("PUT", `**/settings`).as("save")
+
+  cy.getByTestId("settings-modal").within(() => {
+    cy.getByTestId("submit-button").click()
+  })
+  cy.wait("@save")
 })
 
 Cypress.Commands.add("changeMediaType", type =>

@@ -18,5 +18,5 @@ import "@cypress/code-coverage/support"
 import "./commands"
 
 beforeEach(() => {
-  cy.deleteTestTapestry()
+  cy.deleteTapestry()
 })
