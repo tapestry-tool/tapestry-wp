@@ -273,7 +273,7 @@ export default {
       if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
-          this.parent.status !== "draft"
+          (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
         return this.getNeighbours(this.nodeId).some(neighbourId => {

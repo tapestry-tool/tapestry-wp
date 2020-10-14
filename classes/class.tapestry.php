@@ -703,7 +703,7 @@ class Tapestry implements ITapestry
 
         return $parent;
     }
-    
+
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
         return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
