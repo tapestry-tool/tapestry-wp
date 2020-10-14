@@ -10,7 +10,7 @@
         required
       />
     </b-form-group>
-    <b-form-group label="Description">
+    <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
         v-model="node.description"
@@ -18,6 +18,9 @@
         placeholder="Enter description"
       />
     </b-form-group>
+    <div v-else class="text-right mt-n3 mb-n2">
+      <a href="#" class="small" @click="addDesc = true">Add Description</a>
+    </div>
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
@@ -30,13 +33,22 @@
         @change="handleTypeChange"
       ></b-form-select>
     </b-form-group>
-    <component
-      :is="activeForm"
-      v-if="activeForm"
-      :node="node"
-      @load="$emit('load')"
-      @unload="$emit('unload')"
-    ></component>
+    <b-form-group label="Content Details">
+      <b-card
+        bg-variant="light"
+        class="px-4 py-3 pb-4 mx-n4 mb-n5"
+        style="border-radius: 0; border-bottom:0;"
+        no-body
+      >
+        <component
+          :is="activeForm"
+          v-if="activeForm"
+          :node="node"
+          @load="$emit('load')"
+          @unload="$emit('unload')"
+        ></component>
+      </b-card>
+    </b-form-group>
   </div>
 </template>
 
@@ -73,6 +85,7 @@ export default {
   },
   data() {
     return {
+      addDesc: false,
       mediaTypes: [
         { value: "", text: "Select content type" },
         { value: "text", text: "Text" },
