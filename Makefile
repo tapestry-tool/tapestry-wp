@@ -10,39 +10,15 @@ start-app:
 
 init:
 	make start-wp
-	bash ./bin/await-containers.sh
+	@echo "Waiting for 15s for containers to be ready..."
+	# Change 15 to a higher number if it fails to install
+	@sleep 15
 	make install
-	make env
-	@echo "All done!"
 
 install:
-	make install-wp
-	make install-app
-
-install-wp:
 	sh ./bin/install.sh
-
-install-app:
-	sh ./bin/node-install.sh
-
-env:
-	bash ./bin/setup-env.sh
-
-clear-db:
-	docker volume rm tapestry-wp_db_data
-
-uninstall:
-	make stop
-	make clear-db
-	cd templates/vue && rm -r node_modules
+	cd templates/vue && npm i
 
 stop:
-	make stop-app
-	make stop-wp
-
-stop-wp:
-	docker-compose down
-
-stop-app:
-	sh ./bin/stop-app.sh
+	kill $$(lsof -t -i:8080) && docker-compose down
 	

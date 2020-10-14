@@ -3,11 +3,18 @@
     <circle
       ref="track"
       class="track"
+      :cx="x"
+      :cy="y"
       :stroke-width="width"
       :stroke="locked ? '#999' : strokeColor"
       :stroke-dasharray="status === 'publish' ? 0 : dasharraySize"
     ></circle>
-    <path v-show="!locked && progress > 0 && !draft" ref="path" class="bar"></path>
+    <path
+      v-show="!locked && progress > 0 && status === 'publish'"
+      ref="path"
+      class="bar"
+      :transform="`translate(${x}, ${y})`"
+    ></path>
   </g>
 </template>
 
@@ -26,6 +33,14 @@ export default {
       required: true,
     },
     radius: {
+      type: Number,
+      required: true,
+    },
+    x: {
+      type: Number,
+      required: true,
+    },
+    y: {
       type: Number,
       required: true,
     },

@@ -20,34 +20,20 @@
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { bus } from "@/utils/event-bus"
 
 export default {
   components: {
     TapestryIcon,
   },
+  data() {
+    return {
+      currentDepth: 1,
+    }
+  },
   computed: {
-    ...mapState(["nodes", "settings"]),
+    ...mapState(["selectedNodeId", "nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
-    currentDepth: {
-      get() {
-        const { depth } = this.$route.query
-        if (depth) {
-          return Number(depth)
-        }
-        return this.settings.defaultDepth
-      },
-      set(depth) {
-        if (depth !== this.currentDepth) {
-          this.$router.push({
-            ...this.$route,
-            query: { ...this.$route.query, depth },
-          })
-        }
-      },
-    },
-    selectedNodeId() {
-      return Number(this.$route.params.nodeId)
-    },
     levels() {
       if (!Object.keys(this.nodes).length) {
         return []
@@ -88,15 +74,8 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function(depth) {
-        if (depth > this.maxDepth) {
-          this.$router.replace({
-            ...this.$route,
-            query: { ...this.$route.query, depth: this.maxDepth },
-          })
-        } else {
-          this.updateNodeTypes()
-        }
+      handler: function() {
+        this.updateNodeTypes()
       },
     },
     levels: {
@@ -108,31 +87,20 @@ export default {
     maxDepth: {
       immediate: true,
       handler: function(maxDepth) {
-        this.$emit("change:max-depth", maxDepth)
+        bus.$emit("max-depth-change", maxDepth)
       },
     },
   },
+  created() {
+    this.setDefaultDepth()
+  },
   methods: {
     ...mapMutations(["updateNode"]),
+    setDefaultDepth() {
+      this.currentDepth = this.settings.defaultDepth
+    },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
-
-      if (depth === 0) {
-        const nodesToUpdate = Object.values(this.nodes).filter(
-          node => node.nodeType !== "child"
-        )
-        nodesToUpdate.forEach(node => {
-          this.updateNode({
-            id: node.id,
-            newNode: {
-              nodeType: "child",
-            },
-          })
-        })
-        this.$emit("change")
-        return
-      }
-
       const updated = new Set()
       const nodesAtCurrentDepth = this.levels[depth]
       if (nodesAtCurrentDepth) {

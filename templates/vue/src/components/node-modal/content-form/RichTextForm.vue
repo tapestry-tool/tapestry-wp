@@ -103,7 +103,12 @@
         </button>
       </div>
     </editor-menu-bar>
-    <editor-content class="editor__content" :editor="editor" />
+    <editor-content
+      class="editor__content"
+      :editor="editor"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    />
   </div>
 </template>
 
@@ -140,8 +145,7 @@ export default {
   props: {
     value: {
       type: String,
-      required: false,
-      default: "",
+      required: true,
     },
     placeholder: {
       type: String,
@@ -159,16 +163,14 @@ export default {
       gapRight: {
         marginRight: "1em",
       },
-      editorChange: false,
     }
   },
   watch: {
     value(val) {
       // so cursor doesn't jump to start on typing
-      if (this.editor && !this.editorChange) {
+      if (this.editor && val !== this.value) {
         this.editor.setContent(val, true)
       }
-      this.editorChange = false
     },
   },
   mounted() {
@@ -201,7 +203,6 @@ export default {
       ],
       content: this.value,
       onUpdate: ({ getHTML }) => {
-        this.editorChange = true
         this.$emit("input", getHTML())
       },
     })

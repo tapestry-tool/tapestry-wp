@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrapper" :class="['sidebar-container', { closed: closed }]">
+  <div ref="wrapper" :class="['sidebar-container', { closed: isClosed }]">
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
@@ -14,17 +14,21 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button :class="['toggle-button', { closed: closed }]" @click.stop="toggle">
-        <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
+      <button
+        :class="['toggle-button', { closed: isClosed }]"
+        @click.stop="isClosed = !isClosed"
+      >
+        <tapestry-icon v-if="isClosed" icon="chevron-left" />
+        <tapestry-icon v-else icon="chevron-right" />
       </button>
       <button
-        :class="['anchor-button', 'close-button-mobile', { closed: closed }]"
-        @click.stop="toggle"
+        :class="['anchor-button', 'close-button-mobile', { closed: isClosed }]"
+        @click.stop="isClosed = true"
       >
         <tapestry-icon icon="times" />
       </button>
     </div>
-    <aside ref="content" :class="['sidebar', { closed: closed }]">
+    <aside ref="content" :class="['sidebar', { closed: isClosed }]">
       <header class="sidebar-header">
         <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
         <div class="button-container">
@@ -32,7 +36,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$root.$emit('edit-node', nodeId)">
+          <b-button v-if="canEdit" @click="$root.$emit('edit-node', selectedNodeId)">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -81,9 +85,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
-import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
 
@@ -96,30 +99,20 @@ export default {
   },
   data() {
     return {
+      isClosed: true,
       active: null,
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
-    closed: {
-      get() {
-        return !this.$route.query.sidebar
-      },
-      set(closed) {
-        // eslint-disable-next-line no-unused-vars
-        const { sidebar: _, ...rest } = this.$route.query
-        const newQuery = closed ? rest : { ...this.$route.query, sidebar: true }
-        this.$router.push({ ...this.$route, query: newQuery })
-      },
-    },
-    nodeId() {
-      return parseInt(this.$route.params.nodeId, 10)
-    },
+    ...mapState(["selectedNodeId"]),
     node() {
-      return this.getNode(this.nodeId)
+      return this.getNode(this.selectedNodeId)
     },
     canEdit() {
-      return Helpers.hasPermission(this.node, "edit")
+      return (
+        wpData.wpCanEditTapestry === "1" || Helpers.hasPermission(this.node, "edit")
+      )
     },
     licenseTypes() {
       return licenseTypes
@@ -132,13 +125,17 @@ export default {
     },
   },
   watch: {
-    closed(closed) {
-      if (closed) {
+    isClosed(isClosed) {
+      const tapestryContainer = document.getElementById("app-container")
+      if (isClosed) {
+        tapestryContainer.classList.remove("sidebar-open")
         this.active = null
+      } else {
+        tapestryContainer.classList.add("sidebar-open")
       }
     },
-    nodeId() {
-      if (!this.closed) {
+    selectedNodeId() {
+      if (!this.isClosed) {
         this.active = "info"
       }
     },
@@ -151,7 +148,7 @@ export default {
   },
   methods: {
     handleObserve(entries) {
-      if (this.closed) {
+      if (this.isClosed) {
         return
       }
 
@@ -163,8 +160,8 @@ export default {
       }
     },
     scrollToRef(refName) {
-      if (this.closed) {
-        this.toggle()
+      if (this.isClosed) {
+        this.isClosed = false
       }
       this.$nextTick(() => {
         const el = this.$refs[refName]
@@ -173,14 +170,7 @@ export default {
       })
     },
     viewNode() {
-      this.$router.push({
-        name: names.LIGHTBOX,
-        params: { nodeId: this.nodeId },
-        query: this.$route.query,
-      })
-    },
-    toggle() {
-      this.closed = !this.closed
+      this.$router.push(`/nodes/${this.selectedNodeId}`)
     },
   },
 }

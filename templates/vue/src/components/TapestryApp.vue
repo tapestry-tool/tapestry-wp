@@ -1,16 +1,10 @@
 <template>
-  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
+  <div id="app-container">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" @toggleReject="toggleReject" />
       <div class="slider-wrapper">
-        <settings-modal-button
-          v-if="canEdit"
-          :max-depth="maxDepth"
-        ></settings-modal-button>
-        <tapestry-depth-slider
-          @change="updateViewBox"
-          @change:max-depth="maxDepth = $event"
-        ></tapestry-depth-slider>
+        <settings-modal-button v-if="canEdit"></settings-modal-button>
+        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
       </div>
     </div>
     <root-node-button
@@ -37,7 +31,7 @@
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == selectedId"
+            :root="id == selectedNodeId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -64,7 +58,6 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
-import { names } from "@/config/routes"
 
 export default {
   components: {
@@ -86,7 +79,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -129,28 +122,9 @@ export default {
         app.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
-    selectedId: {
-      immediate: true,
-      handler(nodeId) {
-        if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
-          this.$router.replace(
-            Object.keys(this.nodes).length === 0
-              ? { path: "/", query: this.$route.query }
-              : {
-                  name: names.APP,
-                  params: { nodeId: this.rootId },
-                  query: this.$route.query,
-                }
-          )
-        }
-      },
-    },
   },
   created() {
     DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
-  },
-  mounted() {
-    this.updateViewBox()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),

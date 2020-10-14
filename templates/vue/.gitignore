@@ -14,4 +14,3 @@ cypress/videos/
 *.ntvs*
 *.njsproj
 *.sln
-.env

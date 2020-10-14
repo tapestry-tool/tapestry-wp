@@ -1,10 +1,6 @@
 <template>
   <div ref="container">
-    <tapestry-accordion
-      :rows="rows.map(row => row.id)"
-      :value="rowId"
-      @input="changeRow"
-    >
+    <tapestry-accordion :rows="rows.map(row => row.id)" :default-index="-1">
       <template v-slot="{ isVisible, toggle }">
         <div>
           <div
@@ -31,7 +27,6 @@
               v-if="isVisible(row.id)"
               :node-id="row.id"
               :dimensions="dimensions"
-              context="accordion"
               :autoplay="false"
               @complete="completeNode(row.id)"
               @close="toggle(row.id)"
@@ -45,10 +40,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
 import TapestryAccordion from "@/components/TapestryAccordion"
 import TapestryMedia from "@/components/TapestryMedia"
-import { names } from "@/config/routes"
+import { mapGetters, mapActions } from "vuex"
 
 export default {
   name: "sub-accordion",
@@ -66,10 +60,6 @@ export default {
       type: Array,
       required: true,
     },
-    rowId: {
-      type: Number,
-      required: true,
-    },
   },
   computed: {
     ...mapGetters(["isFavourite"]),
@@ -78,22 +68,6 @@ export default {
     ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(idx) {
       this.$emit("load", this.$refs.rowRefs[idx])
-    },
-    changeRow(subRowId) {
-      const { nodeId, rowId } = this.$route.params
-      if (subRowId) {
-        this.$router.push({
-          name: names.SUBACCORDION,
-          params: { nodeId, rowId, subRowId },
-          query: this.$route.query,
-        })
-      } else {
-        this.$router.push({
-          name: names.ACCORDION,
-          params: { nodeId, rowId },
-          query: this.$route.query,
-        })
-      }
     },
   },
 }
