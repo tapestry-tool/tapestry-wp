@@ -6,9 +6,9 @@
       'context-accordion': context === 'accordion',
     }"
     :style="{
-      height: this.frameHeight ? this.frameHeight + 'px' : 'auto',
-      width: this.frameWidth ? this.frameWidth + 'px' : '100%',
-      opacity: this.loading ? 0 : 1,
+      height: frameHeight ? frameHeight + 'px' : 'auto',
+      width: frameWidth ? frameWidth + 'px' : '100%',
+      opacity: loading ? 0 : 1,
     }"
   >
     <iframe
