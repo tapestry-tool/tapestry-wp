@@ -136,7 +136,9 @@
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
+        <div data-qa="submit-node-modal" :style="canSubmit ? '' : 'opacity: 50%;'">
+          Publish
+        </div>
       </b-button>
       <b-form-invalid-feedback :state="canMakeDraft">
         {{ warningText }}

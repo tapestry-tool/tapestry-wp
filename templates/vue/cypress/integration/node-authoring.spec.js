@@ -20,6 +20,7 @@ describe("Node Authoring", () => {
 
     cy.getByTestId(`root-node-button`).click()
     cy.getByTestId(`node-title`).type(node.title)
+    cy.contains(/add description/i).click()
     cy.getEditable(`node-description`).type(node.description)
 
     cy.getByTestId(`node-media-type`).select(node.mediaType)
@@ -112,6 +113,7 @@ describe("Node Authoring", () => {
 
         cy.openModal("add", parent.id)
         cy.getByTestId(`node-title`).type(child.title)
+        cy.contains(/add description/i).click()
         cy.getEditable(`node-description`).type(child.description)
 
         cy.changeMediaType(child.mediaType)
