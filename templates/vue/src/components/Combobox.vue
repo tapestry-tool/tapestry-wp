@@ -8,6 +8,7 @@
       :style="inputStyle"
       @blur="handleBlur"
       @focus="handleFocus"
+      autocomplete="autocomplete"
     ></b-form-input>
     <div v-if="isOpen && !showEmptyMessage" class="combobox">
       <button
@@ -73,6 +74,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    disableAutocomplete: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -116,6 +122,9 @@ export default {
           : options
         : this.options
     },
+    autocomplete() {
+      return this.disableAutocomplete ? "off" : "on"
+    }
   },
   watch: {
     text(newText) {
