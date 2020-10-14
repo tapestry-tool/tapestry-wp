@@ -6,7 +6,7 @@
       :placeholder="placeholder"
       :size="size"
       :style="inputStyle"
-      autocomplete="autocomplete"
+      :autocomplete="autocomplete"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
