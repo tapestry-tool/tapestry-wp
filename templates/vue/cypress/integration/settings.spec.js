@@ -44,9 +44,14 @@ describe("Settings", () => {
 
   it(`should be able to duplicate a tapestry`, () => {
     cy.contains(/advanced/i).click()
-    cy.contains(/duplicate tapestry/i).click()
 
+    cy.server()
+    cy.route("POST", "**/tapestries").as("duplicate")
+
+    cy.contains(/duplicate tapestry/i).click()
     cy.getByTestId("spinner").should("be.visible")
+    cy.wait("@duplicate")
+
     cy.getByTestId("duplicate-tapestry-link")
       .should("be.visible")
       .then($el => {

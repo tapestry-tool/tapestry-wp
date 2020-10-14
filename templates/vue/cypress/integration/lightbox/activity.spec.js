@@ -25,14 +25,12 @@ describe("Activity", () => {
 
       cy.submitModal()
 
-      cy.updateNodeProgress(node.id, 0.98)
+      cy.updateNodeProgress(node.id, 1)
       cy.openLightbox(node.id)
 
       cy.contains(/question/i).click()
-      cy.getByTestId("record").click()
-      cy.wait(1000)
-
-      cy.contains(/done/i).click()
+      cy.getByTestId("record").should("be.visible")
+      cy.contains(/done/i).should("be.disabled")
     })
   })
 })

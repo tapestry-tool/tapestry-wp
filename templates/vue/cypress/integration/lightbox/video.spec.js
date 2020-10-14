@@ -23,24 +23,18 @@ describe("Video", () => {
 
       cy.openLightbox(node.id).within(() => {
         cy.get("video").should("have.attr", "src", url)
-        cy.wait("@saveProgress")
 
-        cy.get("video").then($el => {
+        cy.get("video").should($el => {
           const video = $el.get(0)
           expect(video.paused).to.be.false
-          video.pause()
         })
+        cy.get("video").then($el => $el.get(0).pause())
 
         cy.getByTestId("play-screen").should("exist")
       })
       cy.closeLightbox()
 
-      /**
-       * Skip to end screen but don't set progress to 1:
-       *    If progress is 1, the app automatically restarts the video
-       *    when the lightbox is opened again.
-       */
-      cy.updateNodeProgress(node.id, 0.98)
+      cy.updateNodeProgress(node.id, 1)
 
       cy.openLightbox(node.id).within(() => {
         cy.contains(/rewatch/i).should("be.visible")
