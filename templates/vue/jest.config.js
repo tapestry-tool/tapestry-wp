@@ -11,4 +11,7 @@ module.exports = {
   },
   transformIgnorePatterns: ["/node_modules/"],
   setupFilesAfterEnv: ["./config/jest-setup.js"],
+  collectCoverage: true,
+  // The directory where Jest should output its coverage files
+  coverageDirectory: "coverage-jest",
 }

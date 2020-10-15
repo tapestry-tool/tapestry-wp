@@ -1,6 +1,6 @@
 import { render } from "@/utils/test"
 import Lightbox from "@/components/Lightbox.vue"
-import root from "../../cypress/fixtures/root.json"
+import root from "@/fixtures/root.json"
 
 describe("lightbox", () => {
   it("should render a text lightbox", async () => {

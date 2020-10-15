@@ -6,14 +6,16 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "npm run dev",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
     "test:open": "cypress open --config watchForFileChanges=false",
     "test:e2e": "cypress run",
-    "test": "jest __tests__"
+    "test:jest": "jest __tests__",
+    "test": "npm run test:jest && npm run test:e2e",
+    "report:jest": "open coverage-jest/lcov-report/index.html",
+    "start": "npm run dev"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",

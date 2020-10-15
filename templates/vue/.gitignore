@@ -14,3 +14,8 @@ cypress/videos/
 *.ntvs*
 *.njsproj
 *.sln
+
+# Testing
+.nyc_output/
+coverage/
+coverage-jest/
