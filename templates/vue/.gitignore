@@ -6,6 +6,7 @@ config.js
 cypress.json
 cypress/screenshots/
 cypress/videos/
+.env
 
 # Editor directories and files
 .DS_Store
