@@ -159,7 +159,7 @@ export default {
       const properties = ["nodes", "links", "groups", "site-url"]
       properties.forEach(property => {
         if (!upload.hasOwnProperty(property)) {
-          throw new Error("Invalid Tapestry JSON.")
+          throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
         }
       })
     },
