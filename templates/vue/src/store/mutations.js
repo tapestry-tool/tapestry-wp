@@ -157,18 +157,6 @@ export function updateDataset(state, { nodes, links }) {
   links.deletions.forEach(link => deleteLink(state, link))
 }
 
-export function updateDataset(state, { nodes, links }) {
-  nodes.additions.forEach(node => addNode(state, node))
-  nodes.deletions.forEach(node => {
-    if (node.id == state.selectedNodeId) {
-      state.selectedNodeId = state.rootId
-    }
-    deleteNode(state, node.id)
-  })
-  links.additions.forEach(link => addLink(state, link))
-  links.deletions.forEach(link => deleteLink(state, link))
-}
-
 export function updateSettings(state, newSettings) {
   state.settings = newSettings
 }
