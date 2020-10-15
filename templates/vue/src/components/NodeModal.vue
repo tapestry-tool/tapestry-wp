@@ -20,7 +20,7 @@
     <b-container v-if="loading" class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
-    <b-container v-else fluid class="px-0">
+    <b-container v-else fluid class="px-0" data-qa="node-modal">
       <b-tabs card>
         <b-tab
           title="Content"
@@ -136,7 +136,9 @@
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
+        <div data-qa="submit-node-modal" :style="canSubmit ? '' : 'opacity: 50%;'">
+          Publish
+        </div>
       </b-button>
       <b-form-invalid-feedback :state="canMakeDraft">
         {{ warningText }}
@@ -348,7 +350,7 @@ export default {
     this.node = this.createDefaultNode()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -528,7 +530,6 @@ export default {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
         }
-        this.updateVisibleNodes([...this.visibleNodes, id])
       } else {
         await this.updateNode({
           id: this.node.id,

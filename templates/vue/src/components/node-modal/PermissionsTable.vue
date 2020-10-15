@@ -16,7 +16,7 @@
             <b-form-checkbox
               :checked="permissionsList.includes(type)"
               :disabled="isPermissionOverridden(rowName, type)"
-              :data-testid="`node-permissions-${rowName}-${type}`"
+              :data-qa="`node-permissions-${rowName}-${type}`"
               @change="updatePermissions($event, rowName, type)"
             ></b-form-checkbox>
           </b-td>
