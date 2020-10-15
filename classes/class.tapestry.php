@@ -148,7 +148,6 @@ class Tapestry implements ITapestry
         return $node;
     }
 
-
     /**
      * Delete a node.
      *

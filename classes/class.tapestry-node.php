@@ -474,10 +474,9 @@ class TapestryNode implements ITapestryNode
                 'id' => $id,
                 'name' => $user->display_name,
                 'email' => $user->user_email,
-                'original_author_name' => "",
-                'original_author_email' => "",
+                'original_author_name' => '',
+                'original_author_email' => '',
             ];
         }
     }
-
 }
