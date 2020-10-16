@@ -78,9 +78,9 @@ class TapestryApi {
     return response
   }
 
-  async deleteLink(linkIndex) {
+  async deleteLink(link) {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
-    return await axios.delete(url, { data: linkIndex })
+    return await axios.delete(url, { data: link })
   }
 
   /**
