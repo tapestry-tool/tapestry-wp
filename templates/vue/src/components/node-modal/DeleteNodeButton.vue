@@ -27,7 +27,7 @@ export default {
       return this.getNode(this.getParent(this.nodeId))
     },
     isRoot() {
-      return this.parent === undefined
+      return this.nodeId === this.rootId
     },
     isDisabled() {
       if (this.isRoot) {
