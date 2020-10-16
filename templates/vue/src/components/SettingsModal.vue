@@ -99,10 +99,10 @@
             </b-form-checkbox>
           </b-form-group>
           <div v-if="renderMap">
-            <p v-if="!latbound" class="error-message">
+            <p v-if="!latitudeRangeValid" class="error-message">
               North coordinate must be greater than south coordinate
             </p>
-            <p v-if="!lngbound" class="error-message">
+            <p v-if="!longitudeRangeValid" class="error-message">
               East coordinate must be greater than west coordinate
             </p>
             <b-row>
@@ -112,14 +112,14 @@
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.neLat"
-                  type="number"
+                  :type="number"
                   placeholder="90"
                 />
               </b-col>
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.neLng"
-                  type="number"
+                  :type="number"
                   placeholder="180"
                 />
               </b-col>
@@ -131,14 +131,14 @@
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.swLat"
-                  type="number"
+                  :type="number"
                   placeholder="-90"
                 />
               </b-col>
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.swLng"
-                  type="number"
+                  :type="number"
                   placeholder="-180"
                 />
               </b-col>
@@ -187,7 +187,10 @@
         id="save-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading || !latbound || !lngbound"
+        :disabled="
+          fileUploading ||
+            ((!latitudeRangeValid || !longitudeRangeValid) && renderMap)
+        "
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -254,11 +257,12 @@ export default {
   computed: {
     ...mapGetters(["tapestryJson"]),
     ...mapState(["settings", "rootId"]),
-    latbound() {
-      return (this.mapBounds.neLat || 90) > (this.mapBounds.swLat || -90)
+    // the + before this.mapBounds changes type from string to int for correct comparison
+    latitudeRangeValid() {
+      return (+this.mapBounds.neLat || 90) > (+this.mapBounds.swLat || -90)
     },
-    lngbound() {
-      return (this.mapBounds.neLng || 180) > (this.mapBounds.swLng || -180)
+    longitudeRangeValid() {
+      return (+this.mapBounds.neLng || 180) > (+this.mapBounds.swLng || -180)
     },
   },
   created() {

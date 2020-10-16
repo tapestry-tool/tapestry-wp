@@ -16,14 +16,14 @@
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
+      <l-rectangle :bounds="rectangleBounds" :l-style="rectangle.style" />
     </l-map>
   </div>
 </template>
 
 <script>
 import { latLng, latLngBounds } from "leaflet"
-//  LMarker, LPopup, LTooltip
-import { LMap, LTileLayer } from "vue2-leaflet"
+import { LMap, LTileLayer, LRectangle } from "vue2-leaflet"
 import { mapState } from "vuex"
 
 export default {
@@ -31,9 +31,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    // LMarker,
-    // LPopup,
-    // LTooltip
+    LRectangle,
   },
   data() {
     return {
@@ -43,6 +41,9 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(47.41322, -1.219482),
+      rectangle: {
+        style: { color: "red", weight: 5 },
+      },
       mapOptions: {
         zoomSnap: 0.5,
       },
@@ -52,10 +53,26 @@ export default {
     ...mapState(["settings"]),
     setBounds() {
       const x = latLngBounds([
-        [this.settings.mapBounds.neLat || 90, this.settings.mapBounds.neLng || 180],
         [
-          this.settings.mapBounds.swLat || -90,
-          this.settings.mapBounds.swLng || -180,
+          +this.settings.mapBounds.swLat || -90,
+          +this.settings.mapBounds.swLng || -180,
+        ],
+        [
+          +this.settings.mapBounds.neLat || 90,
+          +this.settings.mapBounds.neLng || 180,
+        ],
+      ])
+      return x
+    },
+    rectangleBounds() {
+      const x = latLngBounds([
+        [
+          +this.settings.mapBounds.neLat || 90,
+          +this.settings.mapBounds.neLng || 180,
+        ],
+        [
+          +this.settings.mapBounds.swLat || -90,
+          +this.settings.mapBounds.swLng || -180,
         ],
       ])
       return x
