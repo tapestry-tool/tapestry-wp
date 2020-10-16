@@ -253,3 +253,9 @@ export function getNeighbours(state) {
       .map(link => (link.source == id ? link.target : link.source))
   }
 }
+
+export function getNeighbouringLinks(state) {
+  return id => {
+    return state.links.filter(link => link.source == id || link.target == id)
+  }
+}

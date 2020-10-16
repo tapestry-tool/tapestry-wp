@@ -21,10 +21,17 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getParent", "getNode", "getNeighbours"]),
+    ...mapGetters(["getNode", "getNeighbouringLinks"]),
     ...mapState(["nodes", "rootId"]),
-    parent() {
-      return this.getNode(this.getParent(this.nodeId))
+    neighbourLink() {
+      return this.getNeighbouringLinks(this.nodeId)[0]
+    },
+    neighbour() {
+      const neighbour =
+        this.neighbourLink.source == this.nodeId
+          ? this.neighbourLink.target
+          : this.neighbour.source
+      return this.getNode(neighbour)
     },
     isRoot() {
       return this.nodeId === this.rootId
@@ -33,7 +40,7 @@ export default {
       if (this.isRoot) {
         return Object.keys(this.nodes).length > 1
       } else {
-        return this.getNeighbours(this.nodeId).length > 1
+        return this.getNeighbouringLinks(this.nodeId).length > 1
       }
     },
     disabledMessage() {
@@ -52,18 +59,21 @@ export default {
       this.$emit("submit")
       this.updateSelectedNode(this.rootId)
       if (!this.isRoot) {
-        this.deleteLink({ source: this.parent.id, target: this.nodeId })
+        this.deleteLink({
+          source: this.neighbourLink.source,
+          target: this.neighbourLink.target,
+        })
         this.updateNode({
-          id: this.parent.id,
+          id: this.neighbour.id,
           newNode: {
-            childOrdering: this.parent.childOrdering.filter(
+            childOrdering: this.neighbour.childOrdering.filter(
               id => id !== this.nodeId
             ),
           },
         })
         this.$router.push({
           name: names.APP,
-          params: { nodeId: this.parent.id },
+          params: { nodeId: this.neighbour.id },
           query: this.$route.query,
         })
       } else {
