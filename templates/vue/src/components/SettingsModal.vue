@@ -99,7 +99,8 @@
                   variant="success"
                   style="margin-top: 1em;"
                 >
-                  Your new Tapestry is ready! Click on the link below to view it.
+                  Your Tapestry has been exported! Find the .json file in your
+                  downloads.
                 </b-alert>
               </b-col>
               <b-col>
@@ -278,7 +279,11 @@ export default {
     },
     exportTapestry() {
       this.isExporting = true
-      const tapestry = this.tapestryJson
+      let filteredTapestry = this.tapestryJson
+      filteredTapestry.nodes = filteredTapestry.nodes.filter(
+        node => node.status === "publish"
+      )
+      const tapestry = filteredTapestry
       tapestry["site-url"] = wpData.wpUrl
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
