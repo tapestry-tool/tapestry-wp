@@ -1,10 +1,16 @@
 <template>
-  <div id="app-container">
+  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <settings-modal-button v-if="canEdit"></settings-modal-button>
-        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
       </div>
     </div>
     <root-node-button
@@ -31,7 +37,7 @@
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == selectedNodeId"
+            :root="id == selectedId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
@@ -58,6 +64,7 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
+import { names } from "@/config/routes"
 
 export default {
   components: {
@@ -74,10 +81,11 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      maxDepth: 0,
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     background() {
       return this.settings.backgroundUrl
     },
@@ -86,6 +94,12 @@ export default {
     },
     empty() {
       return Object.keys(this.nodes).length === 0
+    },
+    selectedId() {
+      return Number(this.$route.params.nodeId)
+    },
+    isSidebarOpen() {
+      return Boolean(this.$route.query.sidebar)
     },
   },
   watch: {
@@ -96,9 +110,28 @@ export default {
         app.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
+    selectedId: {
+      immediate: true,
+      handler(nodeId) {
+        if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
+          this.$router.replace(
+            Object.keys(this.nodes).length === 0
+              ? { path: "/", query: this.$route.query }
+              : {
+                  name: names.APP,
+                  params: { nodeId: this.rootId },
+                  query: this.$route.query,
+                }
+          )
+        }
+      },
+    },
   },
   created() {
     DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+  },
+  mounted() {
+    this.updateViewBox()
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),

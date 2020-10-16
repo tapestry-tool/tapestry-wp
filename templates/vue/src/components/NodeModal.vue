@@ -1,11 +1,14 @@
 <template>
   <b-modal
+    v-if="node"
     id="node-modal"
+    :visible="show"
     :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
+    @hidden="close"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -14,9 +17,17 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="ready" fluid class="px-0">
+    <b-container v-if="loading" class="spinner">
+      <b-spinner variant="secondary"></b-spinner>
+    </b-container>
+    <b-container v-else fluid class="px-0">
       <b-tabs card>
-        <b-tab title="Content" active>
+        <b-tab
+          title="Content"
+          :active="tab === 'content'"
+          style="overflow-x: hidden;"
+          @click="changeTab('content')"
+        >
           <content-form
             :node="node"
             @load="videoLoaded = true"
@@ -24,34 +35,47 @@
             @type-changed="handleTypeChange"
           />
         </b-tab>
-        <b-tab title="Appearance">
+        <b-tab
+          title="Appearance"
+          :active="tab === 'appearance'"
+          @click="changeTab('appearance')"
+        >
           <appearance-form :node="node" />
         </b-tab>
         <b-tab
-          v-if="
-            node.mediaType === 'h5p' ||
-              node.mediaType === 'video' ||
-              node.mediaType === 'accordion'
-          "
+          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+          :active="tab === 'behaviour'"
           title="Behaviour"
+          @click="changeTab('behaviour')"
         >
           <behaviour-form :node="node" />
         </b-tab>
-        <b-tab v-if="viewAccess" title="Access">
-          <h6 class="mt-4 mb-3 text-muted">Node Permissions</h6>
-          <permissions-table v-model="node.permissions" />
-          <h6 class="mt-4 mb-3 text-muted">Lock Node</h6>
+        <b-tab
+          v-if="viewAccess"
+          title="Access"
+          :active="tab === 'access'"
+          @click="changeTab('access')"
+        >
+          <h6 class="mb-3">Node Permissions</h6>
+          <b-card no-body>
+            <permissions-table v-model="node.permissions" />
+          </b-card>
+          <h6 class="mt-4 mb-3">Lock Node</h6>
           <conditions-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Activity"
+          :active="tab === 'activity'"
+          @click="changeTab('activity')"
         >
           <activity-form :node="node" />
         </b-tab>
         <b-tab
           v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
           title="Ordering"
+          :active="tab === 'ordering'"
+          @click="changeTab('ordering')"
         >
           <div>
             <slick-list
@@ -73,51 +97,54 @@
             </slick-list>
           </div>
         </b-tab>
-        <b-tab title="More Information">
+        <b-tab
+          title="More Information"
+          :active="tab === 'more-information'"
+          @click="changeTab('more-information')"
+        >
           <more-information-form :node="node" />
         </b-tab>
       </b-tabs>
     </b-container>
-    <b-container v-else class="spinner">
+    <template v-if="loading" slot="modal-footer">
       <b-spinner variant="secondary"></b-spinner>
-    </b-container>
-    <template v-if="ready" slot="modal-footer">
+    </template>
+    <template v-else slot="modal-footer">
       <div
         v-if="!(tapestryEditor && node.status === 'submitted')"
         style="display: flex; width: 100%;"
         class="buttons-container"
       >
         <delete-node-button
-          v-if="modalType === 'edit'"
-          :node-id="nodeId"
-          @submit="close"
+          v-if="type === 'edit'"
+          :node-id="Number(nodeId)"
+          @submit="loading = true"
           @message="setDisabledMessage"
         ></delete-node-button>
         <span style="flex-grow:1;"></span>
-        <b-button size="sm" variant="danger" @click="$emit('cancel')">
+        <b-button size="sm" variant="light" @click="close">
           Cancel
         </b-button>
         <b-button
-          v-if="rootId !== 0"
+          v-if="rootId !== 0 && canMakeDraft"
           id="draft-button"
           size="sm"
           variant="secondary"
-          :disabled="!canMakeDraft || !canSubmit"
+          :disabled="!canSubmit"
           @click="handleDraftSubmit"
         >
-          <b-spinner v-if="!canSubmit"></b-spinner>
-          <div :style="canSubmit ? '' : 'opacity: 50%;'">
-            Save as Private Draft
-          </div>
+          <b-spinner v-if="!canSubmit" small></b-spinner>
+          <div :style="canSubmit ? '' : 'opacity: 50%;'">Save as Private Draft</div>
         </b-button>
         <b-button
           v-if="canPublish"
           id="submit-button"
           size="sm"
           variant="primary"
+          :disabled="!canSubmit"
           @click="handlePublish"
         >
-          <b-spinner v-if="!canSubmit"></b-spinner>
+          <b-spinner v-if="!canSubmit" small></b-spinner>
           <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
         </b-button>
         <b-button
@@ -127,7 +154,7 @@
           :disabled="!canMakeDraft || !canSubmit"
           @click="handleSubmitForReview"
         >
-          <b-spinner v-if="!canSubmit"></b-spinner>
+          <b-spinner v-if="!canSubmit" small></b-spinner>
           <div :style="canSubmit ? '' : 'opacity: 50%;'">
             {{
               node.status !== "publish" && node.status !== "draft"
@@ -147,9 +174,6 @@
         {{ deleteWarningText }}
       </b-form-invalid-feedback>
       <review-form v-else :node="node" @submit="handleSubmit"></review-form>
-    </template>
-    <template v-else slot="modal-footer">
-      <b-spinner variant="secondary"></b-spinner>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -188,6 +212,7 @@ import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -217,23 +242,9 @@ export default {
     DeleteNodeButton,
     ReviewForm,
   },
-  props: {
-    nodeId: {
-      type: Number,
-      required: false,
-      default: null,
-    },
-    modalType: {
-      type: String,
-      required: true,
-      validator: value => {
-        return ["", "add", "edit"].includes(value)
-      },
-    },
-  },
   data() {
     return {
-      ready: false,
+      loading: false,
       userId: null,
       formErrors: [],
       maxDescriptionLength: 250,
@@ -249,30 +260,29 @@ export default {
     ...mapGetters([
       "createDefaultNode",
       "getDirectChildren",
-      "getDirectParents",
+      "getParent",
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["rootId", "settings", "visibleNodes"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
     parent() {
-      if (this.modalType === "add") {
-        const parent = this.getNode(this.nodeId)
-        if (parent) {
-          return parent
-        }
-      }
-      const parents = this.getDirectParents(this.nodeId)
-      return parents && parents[0] ? this.getNode(parents[0]) : null
+      const parent = this.getNode(
+        this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
+      )
+      return parent ? parent : null
     },
     title() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return this.parent
           ? `Add new sub-topic to ${this.parent.title}`
           : "Add root node"
-      } else if (this.modalType === "edit") {
+      } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
       }
       return ""
+    },
+    isAuthenticated() {
+      return wpData.currentUser.ID !== 0
     },
     viewAccess() {
       return this.settings.showAccess === undefined
@@ -282,13 +292,21 @@ export default {
         : wpData.wpCanEditTapestry !== ""
     },
     canPublish() {
-      if (!this.ready) return false
-      if (this.modalType === "add") {
-        return this.hasPermission(this.modalType, this.parent)
-      } else if (this.node.status !== "publish" && this.modalType === "edit") {
-        return this.hasPermission("add", this.parent)
+      if (this.loading) return false
+      if (this.type === "add") {
+        return (
+          Helpers.hasPermission(this.parent, this.type) &&
+          (!this.parent || this.parent.status !== "draft")
+        )
+      } else if (this.node.status !== "draft" && this.type === "edit") {
+        return this.getNeighbours(this.nodeId).some(neighbourId => {
+          let neighbour = this.getNode(neighbourId)
+          return (
+            neighbour.status === "publish" && Helpers.hasPermission(neighbour, "add")
+          )
+        })
       } else {
-        return this.hasPermission(this.modalType, this.node)
+        return Helpers.hasPermission(this.node, this.type)
       }
     },
     authoredNode() {
@@ -300,6 +318,9 @@ export default {
     },
     canMakeDraft() {
       const { ID } = wpData.currentUser
+      if (this.node.status === "publish" && this.type === "edit") {
+        return false
+      }
       return this.hasDraftPermission(ID)
     },
     tapestryEditor() {
@@ -308,40 +329,62 @@ export default {
     canSubmit() {
       return !this.fileUploading
     },
+    nodeId() {
+      const nodeId = this.$route.params.nodeId
+      return nodeId || Number(nodeId)
+    },
+    show() {
+      return this.$route.name === names.MODAL
+    },
+    tab() {
+      return this.$route.params.tab || ""
+    },
+    type() {
+      return this.$route.params.type || ""
+    },
   },
-  created() {
-    this.node = this.createDefaultNode()
+  watch: {
+    nodeId: {
+      immediate: true,
+      handler() {
+        if (this.show) {
+          if (this.isValid()) {
+            this.initialize()
+          }
+        }
+      },
+    },
+    show: {
+      immediate: true,
+      handler(show) {
+        if (show) {
+          if (this.isValid()) {
+            DragSelectModular.removeDragSelectListener()
+            this.loading = false
+            this.initialize()
+          }
+        } else {
+          DragSelectModular.addDragSelectListener()
+        }
+      },
+    },
+    type() {
+      this.initialize()
+    },
+    tab: {
+      immediate: true,
+      handler() {
+        if (this.show) {
+          this.isValid()
+        }
+      },
+    },
   },
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
-    this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
-      if (modalId == "node-modal") {
-        this.formErrors = ""
-      }
-    })
-    this.$root.$on("bv::modal::shown", (_, modalId) => {
-      DragSelectModular.removeDragSelectListener()
-
-      if (modalId == "node-modal") {
-        let copy = this.createDefaultNode()
-        if (this.modalType === "edit") {
-          const node = this.getNode(this.nodeId)
-          copy = Helpers.deepCopy(node)
-        }
-        copy.hasSubAccordion = this.hasSubAccordion(copy)
-        this.node = copy
-        this.ready = true
-      }
-    })
-    this.$root.$on("bv::modal::hide", (_, modalId) => {
-      DragSelectModular.addDragSelectListener()
-
-      if (modalId == "node-modal") {
-        this.ready = false
-      }
-    })
+    this.node = this.createDefaultNode()
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
@@ -352,6 +395,80 @@ export default {
       "updateNodePermissions",
       "updateLockedStatus",
     ]),
+    isValid() {
+      const isNodeValid = this.validateNodeRoute(this.nodeId)
+      if (!isNodeValid) {
+        this.$router.replace({
+          name: names.APP,
+          params: { nodeId: this.nodeId },
+        })
+        return false
+      }
+      const isTabValid = this.validateTab(this.tab)
+      if (!isTabValid) {
+        this.$router.replace({
+          name: names.MODAL,
+          params: { nodeId: this.nodeId, type: this.type, tab: "content" },
+          query: this.$route.query,
+        })
+      }
+      return true
+    },
+    validateNodeRoute(nodeId) {
+      if (this.type === "add") {
+        if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
+          return true
+        }
+      }
+      if (!this.nodes.hasOwnProperty(nodeId)) {
+        return false
+      }
+      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const messages = {
+        edit: `You don't have permission to edit this node`,
+        add: `You don't have permission to add to this node`,
+      }
+      if (!isAllowed && this.type in messages) {
+        alert(messages[this.type])
+      }
+      return isAllowed
+    },
+    initialize() {
+      this.formErrors = ""
+      let copy = this.createDefaultNode()
+      if (this.type === "edit") {
+        const node = this.getNode(this.nodeId)
+        copy = Helpers.deepCopy(node)
+      }
+      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      this.node = copy
+    },
+    validateTab(requestedTab) {
+      // Tabs that are valid for ALL node types and modal types
+      const okTabs = ["content", "appearance", "more-information"]
+      if (okTabs.includes(requestedTab)) {
+        return true
+      }
+
+      // If requested tab is access, check if the user can access it
+      if (requestedTab === "access") {
+        return this.viewAccess
+      }
+
+      switch (requestedTab) {
+        case "activity": {
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+        }
+        case "behaviour": {
+          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+        }
+        case "ordering": {
+          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+        }
+      }
+
+      return false
+    },
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
@@ -362,15 +479,43 @@ export default {
     setDisabledMessage(msg) {
       this.deleteWarningText = msg
     },
+    changeTab(tab) {
+      // Prevent multiple clicks
+      if (tab !== this.tab) {
+        this.$router.push({
+          name: names.MODAL,
+          params: { nodeId: this.nodeId, type: this.type, tab },
+          query: this.$route.query,
+        })
+      }
+    },
     close() {
-      this.$bvModal.hide("node-modal")
-      this.$emit("cancel")
+      if (this.show) {
+        if (Object.keys(this.nodes).length === 0) {
+          this.$router.push({ path: "/", query: this.$route.query })
+        } else if (this.rootId && !this.nodeId) {
+          // We just added a root node
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.rootId },
+            query: this.$route.query,
+          })
+        } else {
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.nodeId },
+            query: this.$route.query,
+          })
+        }
+      }
     },
     async handleSubmit() {
+      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
+        this.node.status = "publish"
         this.updateNodeCoordinates()
-        this.ready = false
+        this.loading = true
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -396,7 +541,7 @@ export default {
       this.handleSubmit()
     },
     async submitNode() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
         if (this.parent) {
@@ -428,7 +573,8 @@ export default {
         })
       }
       await this.updateLockedStatus()
-      this.$emit("submit")
+      this.close()
+      this.loading = false
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
@@ -487,7 +633,7 @@ export default {
       }
     },
     updateNodeCoordinates() {
-      if (this.modalType === "add" && this.parent) {
+      if (this.type === "add" && this.parent) {
         this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
@@ -517,14 +663,14 @@ export default {
           errMsgs.push("Please enter a Video URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for Video Duration")
+          this.node.mediaDuration = 0
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          errMsgs.push("Please enter numeric value for H5P Video Duration")
+          this.node.mediaDuration = 0
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
@@ -623,7 +769,7 @@ export default {
       if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
         return false
       }
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         return true
       }
       const oldNode = this.getNode(this.nodeId)
@@ -632,70 +778,15 @@ export default {
         ? this.node.typeData.youtubeID !== youtubeID
         : this.node.mediaURL !== mediaURL
     },
-    hasPermission(action, node) {
-      if (!node || node === null || !node.author) {
-        return wpData.wpCanEditTapestry === "1"
-      }
-
-      // Check 1: Has edit permissions for Tapestry
-      if (wpData.wpCanEditTapestry === "1") {
-        return true
-      }
-
-      // Check 2: User is the author of the node
-      if (wpData.currentUser.ID == parseInt(node.author.id)) {
-        return true
-      }
-
-      // Check 3: User has a role with general edit permissions
-      const { ID, roles } = wpData.currentUser
-      const allowedRoles = ["administrator", "editor", "author"]
-      if (allowedRoles.some(role => roles.includes(role))) {
-        return true
-      }
-
-      const { public: publicPermissions, authenticated } = node.permissions
-      // Check 4: Node has public permissions
-      if (publicPermissions.includes(action)) {
-        return true
-      }
-
-      // Check 5: Node has authenticated permissions
-      if (wpData.currentUser.ID && authenticated.includes(action)) {
-        return true
-      }
-
-      // Check 6: User has a role that is allowed in the node
-      const isRoleAllowed = roles.some(role => {
-        const permissions = node.permissions[role]
-        return permissions.includes(action)
-      })
-      if (isRoleAllowed) {
-        return true
-      }
-
-      // Check 7: User has a permission associated with its ID
-      const userPermissions = node.permissions[`user-${ID}`]
-      if (userPermissions && userPermissions.includes(action)) {
-        return true
-      }
-
-      return false
-    },
     hasDraftPermission(ID) {
       if (ID === 0) {
         this.warningText = "You must be authenticated to create a draft node"
         return false
       }
 
-      if (this.modalType === "edit") {
+      if (this.type === "edit") {
         if (!this.authoredNode) {
-          this.warningText = "You can only make nodes you authored into drafts"
-          return false
-        }
-
-        if (this.getNeighbours(this.nodeId).length > 1) {
-          this.warningText = "" // Handled by DeleteButton component
+          this.warningText = "You cannot make nodes you did not author into drafts"
           return false
         }
       }
@@ -711,6 +802,10 @@ export default {
   position: fixed;
   left: 101vw;
   width: 1px;
+}
+
+h6 {
+  font-weight: 400;
 }
 </style>
 

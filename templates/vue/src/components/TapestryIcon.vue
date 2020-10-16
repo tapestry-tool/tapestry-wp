@@ -5,14 +5,10 @@
 
 <script>
 import TextIcon from "@/assets/Aa.svg"
-import ZoomIn from "@/assets/zoom-in.png"
-import ZoomOut from "@/assets/zoom-out.png"
 import Helpers from "@/utils/Helpers"
 
 const images = {
   text: TextIcon,
-  "zoom-in": ZoomIn,
-  "zoom-out": ZoomOut,
 }
 
 export default {

@@ -3,8 +3,6 @@
     <circle
       ref="track"
       class="track"
-      :cx="x"
-      :cy="y"
       :stroke-width="width"
       :stroke="locked ? '#999' : strokeColor"
       :stroke-dasharray="status === 'publish' ? 0 : dasharraySize"
@@ -36,13 +34,10 @@ export default {
       type: Number,
       required: true,
     },
-    x: {
-      type: Number,
-      required: true,
-    },
-    y: {
-      type: Number,
-      required: true,
+    draft: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     status: {
       type: String,
