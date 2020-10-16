@@ -145,6 +145,7 @@ class Tapestry implements ITapestry
 
         $tapestryNode = new TapestryNode($this->postId);
         $tapestryNode->set($node);
+
         $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);

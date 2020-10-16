@@ -31,10 +31,28 @@ class TapestryApi {
     return response.data
   }
 
+  async getAllRoles() {
+    const usersRequest = await axios.get(`${apiUrl}/roles`)
+    const users = usersRequest.data
+    let wp_roles = new Set()
+    //defaults
+    wp_roles.add("public")
+    wp_roles.add("authenticated")
+    for (let role of Object.keys(users)) {
+      wp_roles.add(role)
+    }
+    wp_roles.delete("administrator")
+    return wp_roles
+  }
+
   async importTapestry(data) {
     const url = `${apiUrl}/tapestries/${this.postId}`
-    const response = await axios.put(url, data)
-    return response.data
+    try {
+      const response = await axios.put(url, data)
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   async getNode(id) {

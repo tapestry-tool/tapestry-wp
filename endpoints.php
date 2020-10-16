@@ -292,6 +292,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
+    'GET_ALL_ROLES' => (object) [
+        'ROUTE' => '/roles',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'get_all_user_roles',
+        ],
+    ],
 ];
 
 /*
@@ -342,6 +349,16 @@ function saveAnalytics($request)
 
     return new WP_REST_Response(null, 201);
 }
+
+function get_all_user_roles($request)
+{
+    global $wp_roles;
+    
+    $roles = $wp_roles->roles;
+    
+    return $roles;
+}
+  
 
 function login($request)
 {
@@ -523,6 +540,7 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+
             $tapestryNode->set($node);
             $tapestryNode->save();
         }
@@ -540,6 +558,7 @@ function importTapestry($postId, $tapestryData)
 
     return $tapestry->save();
 }
+
 
 function deleteTapestry($request)
 {
@@ -632,7 +651,7 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
-        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId)
             || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
             $tapestry = new Tapestry($postId);
             return $tapestry->addLink($link);
