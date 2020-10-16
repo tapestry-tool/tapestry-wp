@@ -478,9 +478,6 @@ function importTapestry($postId, $tapestryData)
 
         // Construct ID map and add nodes to new Tapestry
         foreach ($tapestryData->nodes as $node) {
-            
-        // $node->permissions = TapestryNodePermissions::getDefaultNodePermissions($postID);
-
             $oldNodeId = $node->id;
             $newNode = $tapestry->addNode($node);
             $newNodeId = $newNode->id;
