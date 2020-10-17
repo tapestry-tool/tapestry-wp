@@ -47,7 +47,7 @@ function parseDataset(dataset) {
     }
     const publicPermissions = node.permissions.public
     if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
-      node.permissions.public = ["read"];
+      node.permissions.public = ["read"]
     }
   }
 
@@ -82,7 +82,7 @@ function parseDataset(dataset) {
 
   const defaultPublicPerm = dataset.settings.defaultPermissions.public
   if (defaultPublicPerm.includes("add") || defaultPublicPerm.includes("edit")) {
-    dataset.settings.defaultPermissions.public = ['read'];
+    dataset.settings.defaultPermissions.public = ["read"]
   }
 
   return dataset
@@ -249,10 +249,9 @@ export function addLink(state, link) {
 }
 
 export function deleteLink(state, { source, target }) {
-  const linkIndex = state.links.findIndex(
-    link => link.source === source && link.target === target
+  state.links = state.links.filter(
+    link => link.source !== source || link.target !== target
   )
-  state.links = state.links.filter((_, i) => i !== linkIndex)
 }
 
 // quizzes
