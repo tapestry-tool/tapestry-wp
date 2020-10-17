@@ -47,7 +47,7 @@ const PERMISSIONS_ORDER = [
   "public",
   "authenticated",
   ...Object.keys(wpData.roles).filter(
-    role => role !== "administrator" && role !== "author"
+    role => role !== "editor" && role !== "administrator" && role !== "author"
   ),
 ]
 
@@ -79,13 +79,6 @@ export default {
           ])
         }
       })
-      Object.entries(this.value)
-        .filter(entry => {
-          return !orderedPermissions.some(
-            permissionMap => permissionMap[0] === entry[0]
-          )
-        })
-        .forEach(entry => orderedPermissions.push(entry))
       return orderedPermissions
     },
   },
