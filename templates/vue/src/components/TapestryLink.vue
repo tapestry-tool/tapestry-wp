@@ -5,6 +5,7 @@
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+        disabled: !isLoggedIn,
       }"
       :x1="source.coordinates.x"
       :x2="target.coordinates.x"
@@ -17,6 +18,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
+import { isLoggedIn } from "@/utils/wp"
 
 export default {
   name: "tapestry-link",
@@ -36,6 +38,9 @@ export default {
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
+    isLoggedIn() {
+      return isLoggedIn
+    },
   },
   methods: {
     ...mapActions(["deleteLink"]),
@@ -49,6 +54,9 @@ export default {
       return sourceNeighbours.length > 0 && targetNeighbours.length > 0
     },
     async remove() {
+      if (event.target.classList.contains("disabled")) {
+        return
+      }
       const userConfirmDelete = confirm(
         `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
       )

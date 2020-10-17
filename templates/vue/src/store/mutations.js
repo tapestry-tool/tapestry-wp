@@ -52,6 +52,10 @@ function parseDataset(dataset) {
     if (mediaURL && typeof mediaURL === "string") {
       node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
     }
+    const publicPermissions = node.permissions.public
+    if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
+      node.permissions.public = ["read"]
+    }
   }
 
   for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
@@ -81,6 +85,11 @@ function parseDataset(dataset) {
   const { defaultDepth } = dataset.settings
   if (defaultDepth === undefined) {
     dataset.settings.defaultDepth = DEFAULT_DEPTH
+  }
+
+  const defaultPublicPerm = dataset.settings.defaultPermissions.public
+  if (defaultPublicPerm.includes("add") || defaultPublicPerm.includes("edit")) {
+    dataset.settings.defaultPermissions.public = ["read"]
   }
 
   return dataset
