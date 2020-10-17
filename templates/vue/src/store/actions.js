@@ -189,7 +189,10 @@ export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
 
 // links
 export async function addLink({ commit }, newLink) {
-  await client.addLink(JSON.stringify(newLink))
+  const response = await client.addLink(JSON.stringify(newLink))
+  if (!response) {
+    return
+  }
   commit("addLink", newLink)
 }
 
