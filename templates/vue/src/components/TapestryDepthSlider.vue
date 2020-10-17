@@ -1,5 +1,9 @@
 <template>
-  <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
+  <div
+    v-if="maxDepth > 1 && settings.defaultDepth > 0"
+    class="depth-slider"
+    @mousedown="pauseDragSelect"
+  >
     <div>
       <input
         v-model="currentDepth"
@@ -20,6 +24,7 @@
 import { mapState, mapGetters, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   computed: {
@@ -184,6 +189,9 @@ export default {
         })
       })
       this.$emit("change")
+    },
+    pauseDragSelect() {
+      DragSelectModular.pauseDragSelect()
     },
   },
 }
