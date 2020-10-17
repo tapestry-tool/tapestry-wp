@@ -146,10 +146,10 @@ export default {
       }
 
       if (
-        currentPermissions.includes("add") ||
-        currentPermissions.includes("edit")
+        type === "read" &&
+        (currentPermissions.includes("add") || currentPermissions.includes("edit"))
       ) {
-        return type === "read"
+        return true
       }
 
       // If the row is the first in order, it should never be overridden
