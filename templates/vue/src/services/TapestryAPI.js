@@ -92,7 +92,11 @@ class TapestryApi {
    */
   async addLink(link) {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
-    const response = await axios.post(url, link)
+    try {
+      var response = await axios.post(url, link)
+    } catch(err) {
+      return
+    }
     return response
   }
 
