@@ -172,7 +172,7 @@ const defaultPermissions = Object.fromEntries(
     "public",
     "authenticated",
     ...Object.keys(wpData.roles).filter(
-      role => role !== "administrator" && role !== "author"
+      role => role !== "editor" && role !== "administrator" && role !== "author"
     ),
   ].map(rowName => [rowName, ["read"]])
 )
