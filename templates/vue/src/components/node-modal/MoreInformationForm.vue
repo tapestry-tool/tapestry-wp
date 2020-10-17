@@ -7,7 +7,7 @@
         item-value="type"
         :options="licenses"
         placeholder="Please select a license"
-        class="combobox"
+        class="combobox mb-0"
       >
         <template v-slot="{ option }">
           <div class="license-option">
@@ -21,6 +21,7 @@
       <b-form-group
         v-if="node.license.type === licenseTypes.CUSTOM"
         label="License link"
+        class="mt-3"
       >
         <b-form-input
           v-model="node.license.link"
@@ -30,7 +31,7 @@
       <b-form-group
         v-if="node.license.type === licenseTypes.CUSTOM"
         label="License description"
-        style="margin-bottom: 0;"
+        class="mb-0"
       >
         <rich-text-form
           v-model="node.license.description"

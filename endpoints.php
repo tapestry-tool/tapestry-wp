@@ -285,6 +285,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getTapestryContributors',
         ],
     ],
+    'GET_ALL_ROLES' => (object) [
+        'ROUTE' => '/roles',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'get_all_user_roles',
+        ],
+    ],
 ];
 
 /*
@@ -302,6 +309,15 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
         }
     );
 }
+
+function get_all_user_roles($request) {
+    global $wp_roles;
+	
+	$roles = $wp_roles->roles;
+	
+	return $roles;
+}
+  
 
 function login($request)
 {
@@ -483,6 +499,7 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
+
             $tapestryNode->set($node);
             $tapestryNode->save();
         }
@@ -500,6 +517,7 @@ function importTapestry($postId, $tapestryData)
 
     return $tapestry->save();
 }
+
 
 function deleteTapestry($request)
 {
@@ -591,6 +609,11 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+            || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
+            $tapestry = new Tapestry($postId);
+            return $tapestry->addLink($link);
+        }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
             throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
         }
@@ -615,14 +638,20 @@ function addTapestryLink($request)
 function deleteTapestryLink($request)
 {
     $postId = $request['tapestryPostId'];
-    $linkIndex = json_decode($request->get_body());
+    $link = json_decode($request->get_body());
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
         $tapestry = new Tapestry($postId);
 
-        return $tapestry->removeLink($linkIndex);
+        return $tapestry->removeLink($link);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

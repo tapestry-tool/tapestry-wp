@@ -25,9 +25,10 @@
             node.nodeType !== '' &&
             !node.hideProgress
         "
-        :radius="radius"
+        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
+        :draft="node.status === 'draft'"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
@@ -63,13 +64,13 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add') && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
-            x="-65"
+            :x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
-            v-if="hasPermission('edit')"
+            v-if="isLoggedIn && hasPermission('edit')"
             class="node-button-wrapper"
             x="5"
             :y="radius - 30"
@@ -107,6 +108,7 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -142,6 +144,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    isLoggedIn() {
+      return isLoggedIn
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -225,7 +230,9 @@ export default {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
-      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+        .map(this.getNode)
+        .filter(n => n.status !== "draft")
+      return rows.filter(row => row.completed).length / rows.length
     },
   },
   watch: {

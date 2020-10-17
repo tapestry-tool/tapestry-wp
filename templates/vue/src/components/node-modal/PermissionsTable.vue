@@ -1,6 +1,6 @@
 <template>
   <div id="modal-permissions">
-    <b-table-simple class="text-center" striped responsive>
+    <b-table-simple class="text-center mb-0" striped responsive>
       <b-thead>
         <b-tr>
           <b-th></b-th>
@@ -140,6 +140,11 @@ export default {
         this.getPermissionRowIndex(rowName)
       ][1]
 
+      // We don't support node additions or editing for public users
+      if (rowName === "public" && (type === "add" || type === "edit")) {
+        return true
+      }
+
       if (
         currentPermissions.includes("add") ||
         currentPermissions.includes("edit")
@@ -227,4 +232,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+table {
+  border: none;
+  th {
+    border-top: none;
+  }
+}
+</style>
