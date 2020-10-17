@@ -643,6 +643,12 @@ function deleteTapestryLink($request)
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
+            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        }
         $tapestry = new Tapestry($postId);
 
         return $tapestry->removeLink($link);
