@@ -245,8 +245,16 @@ export default {
         ? this.settings.renderImages
         : true
       if (
-        this.imageUrl &&
-        this.imageUrl.length > 0 &&
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
         this.node.nodeType !== "grandchild" &&
         showImages
       ) {
