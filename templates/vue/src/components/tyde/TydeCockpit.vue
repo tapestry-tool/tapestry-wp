@@ -11,7 +11,7 @@
 
 <script>
 import { tydeTypes } from "@/utils/constants"
-import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 import TydeSpaceshipPart from "@/components/tyde/TydeSpaceshipPart"
 
 export default {
@@ -20,14 +20,14 @@ export default {
     TydeSpaceshipPart,
   },
   computed: {
-    ...mapGetters(["settings", "nodes"]),
+    ...mapState(["settings", "nodes"]),
     cockpitImage() {
       return {
         backgroundImage: `url(${this.settings.spaceshipBackgroundUrl})`,
       }
     },
     modules() {
-      return this.nodes.filter(this.isNodeModuleType)
+      return Object.values(this.nodes).filter(this.isNodeModuleType)
     },
   },
   methods: {

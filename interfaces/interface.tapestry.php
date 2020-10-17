@@ -33,7 +33,7 @@ interface ITapestry
      *
      * @return object $tapestry
      */
-    public function get();
+    public function get($filterUserId);
 
     /**
      * Get node IDs.
@@ -109,4 +109,11 @@ interface ITapestry
      * @return object the parent node, if it exists
      */
     public function getNodeParent($nodeId);
+
+    /**
+     * Returns all users who have authored a node within the tapestry.
+     *
+     * @return array Wordpress users
+     */
+    public function getAllContributors();
 }

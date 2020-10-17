@@ -119,7 +119,7 @@ class TapestryHelpers
      *
      * @return Number $postId
      */
-    public static function updatePost($post, $postType = 'tapestry', $postId = 0)
+    public static function updatePost($post, $postType = 'tapestry', $postId = 0, $author = 0)
     {
         switch ($postType) {
             case self::POST_TYPES['TAPESTRY_NODE']:
@@ -134,8 +134,13 @@ class TapestryHelpers
                 break;
         }
 
+        if (!$author) {
+            $author = wp_get_current_user()->ID;
+        }
+
         return wp_insert_post([
             'ID' => $postId,
+            'post_author' => $author,
             'post_type' => $postType,
             'post_status' => $postStatus,
             'post_title' => $postTitle,
@@ -151,18 +156,18 @@ class TapestryHelpers
      *
      * @return bool
      */
-    public static function currentUserIsAllowed($action, $nodeMetaId, $tapestryPostId)
+    public static function userIsAllowed($action, $nodeMetaId, $tapestryPostId, $superuser_override = true, $_userId = null)
     {
         $options = TapestryNodePermissions::getNodePermissions();
-        $userId = wp_get_current_user()->ID;
-        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
+        $userId = $_userId;
+        if (is_null($userId)) {
+            $userId = wp_get_current_user()->ID;
+        }
+        $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
+        $roles = new TapestryUserRoles($userId);
 
-        if ((TapestryUserRoles::isEditor())
-            || (TapestryUserRoles::isAdministrator())
-            || (TapestryUserRoles::isAuthorOfThePost($tapestryPostId))
-            || (TapestryUserRoles::isAuthorOfThePost($nodePostId))
-        ) {
+        if (($roles->canEdit($tapestryPostId) && $superuser_override) || $roles->isAuthorOfThePost($nodePostId)) {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;

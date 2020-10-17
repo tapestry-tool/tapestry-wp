@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.27.0-tyde-beta
+ * Version: 2.30.0-tyde-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.27.0-tyde-beta';
+$TAPESTRY_VERSION_NUMBER = '2.30.0-tyde-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -109,50 +109,10 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
  */
 
 add_action('wp_enqueue_scripts', 'tapestry_enqueue_libraries');
-add_action('wp_enqueue_scripts', 'enqueue_tapestry_js');
-add_action('wp_enqueue_scripts', 'enqueue_vue_app_build');
+add_action('wp_enqueue_scripts', 'tapestry_enqueue_vue_app');
 add_filter('style_loader_tag', 'tapestry_add_style_attributes', 10, 2);
 
-function enqueue_tapestry_js()
-{
-    global $post;
-    if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
-        global $TAPESTRY_VERSION_NUMBER;
-        global $wp_roles;
-        $params = [
-            'nonce' => wp_create_nonce('wp_rest'),
-            'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
-            'userLoggedIn' => 0 != get_current_user_id() ? 'true' : 'false',
-        ];
-
-        wp_register_script(
-            'wp_tapestry_script',
-            plugin_dir_url(__FILE__).'templates/tapestry.js?v='.$TAPESTRY_VERSION_NUMBER,
-            ['jquery'],
-            null,
-            true
-        );
-        wp_localize_script('wp_tapestry_script', 'wpApiSettings', $params);
-        wp_localize_script('wp_tapestry_script', 'wp', ['roles' => $wp_roles->get_names()]);
-        wp_enqueue_script('wp_tapestry_script');
-
-        wp_add_inline_script('wp_tapestry_script', "
-			var thisTapestryTool;
-			$(document).ready(function(){
-				thisTapestryTool = new tapestryTool({
-				'containerId': 'tapestry',
-				'apiUrl': '".get_rest_url(null, 'tapestry-tool/v1')."',
-				'wpUserId': '".apply_filters('determine_current_user', false)."',
-				'wpPostId': '".get_the_ID()."',
-				'wpCanEditTapestry': '".current_user_can('edit_post', get_the_ID())."',
-				'addNodeModalUrl': '".plugin_dir_url(__FILE__)."modal-add-node.html',
-				});
-			});
-		");
-    }
-}
-
-function enqueue_vue_app_build()
+function tapestry_enqueue_vue_app()
 {
     global $post;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
@@ -195,6 +155,8 @@ function enqueue_vue_app_build()
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),
                 'roles' => $wp_roles->get_names(),
+                'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
+                'currentUser' => wp_get_current_user(),
             ]
         );
 
@@ -212,7 +174,6 @@ function tapestry_enqueue_libraries()
 
         wp_enqueue_style('font-awesome-5', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', [], null);
         wp_enqueue_style('tapestry-css', plugin_dir_url(__FILE__).'templates/tapestry.css', [], $TAPESTRY_VERSION_NUMBER);
-        wp_enqueue_style('jquery-ui', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', [], $TAPESTRY_VERSION_NUMBER);
 
         if (class_exists('GFCommon')) {
             wp_enqueue_style('gf-formsmain', GFCommon::get_base_url().'/css/formsmain.min.css');
@@ -229,14 +190,6 @@ function tapestry_enqueue_libraries()
             $GF_Image_Choices_Object = new GFImageChoices();
             wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
         }
-
-        wp_enqueue_script('jquery-min', plugin_dir_url(__FILE__).'templates/libs/jquery.min.js');
-        wp_enqueue_script('jquery-ui', plugin_dir_url(__FILE__).'templates/libs/jquery-ui.min.js', ['jquery-min']);
-        wp_enqueue_script('jscookie', plugin_dir_url(__FILE__).'templates/libs/jscookie.js', ['jquery']);
-        wp_enqueue_script('d3-v5', plugin_dir_url(__FILE__).'templates/libs/d3.v5.min.js', [], null);
-        wp_enqueue_script('dragselect', plugin_dir_url(__FILE__).'templates/libs/dragselect.min.js', [], null);
-        wp_enqueue_script('momentjs', plugin_dir_url(__FILE__).'templates/libs/moment.min.js', [], null);
-        wp_enqueue_script('moment-timezone-data', plugin_dir_url(__FILE__).'templates/libs/moment-timezone-with-data-2015-2025.js', ['momentjs'], null);
     }
 }
 
@@ -271,40 +224,58 @@ function load_tapestry_template($singleTemplate)
 }
 add_filter('single_template', 'load_tapestry_template');
 
-/**
- * Set Up Tapestry Post Upon Insertion.
- *
- * @param int    $postId Post ID
- * @param object $post   Post Object
- * @param bool   $update Post Object
- *
- * @return object Null
- */
-function add_tapestry_post_meta_on_publish($postId, $post, $update = false)
+function create_new_tapestry()
 {
-    if (!isset($postId) || !isset($post) || 'tapestry' != get_post_type($postId)) {
-        return;
-    }
+    $prefix = get_rest_url(null, 'tapestry-tool/v1');
 
-    $tapestry = new Tapestry($postId);
-    $tapestryData = $tapestry->get();
-
-    if ($update && !empty($tapestryData->settings)) {
-        $tapestryData->settings->tapestrySlug = $post->post_name;
-        $tapestryData->settings->title = $post->post_title;
-        $tapestryData->settings->status = $post->post_status;
-    } else {
-        $tapestryData->settings = (object) [
-            'tapestrySlug' => $post->post_name,
-            'title' => $post->post_title,
-            'status' => $post->post_status,
-        ];
-    }
-
-    $tapestry->set((object) ['settings' => $tapestryData->settings]);
-    $tapestry->saveOnPublish();
+    return "
+        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
+        <button id='new_tapestry_button'>
+            Add Tapestry
+        </button>
+        <script type='text/javascript'>
+        var apiUrl = '{$prefix}';
+            $('#new_tapestry_button').click(function() {
+                let name = prompt(`Enter a name`);
+                let payload = {};
+                payload[`nodes`] = [];
+                payload[`groups`] = [];
+                payload[`links`] = [];
+                payload[`title`] = name;
+                return new Promise((fulfill, reject) => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', apiUrl + '/tapestries');
+                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            fulfill(xhr.response);
+                        } else {
+                            reject({
+                                status: xhr.status,
+                                statusText: xhr.statusText
+                            });
+                        }
+                    };
+                    xhr.onerror = () => {
+                        reject({
+                            status: xhr.status,
+                            statusText: xhr.statusText
+                        });
+                    };
+                    xhr.send(JSON.stringify(payload));
+                }).then(data => {
+                    let res = JSON.parse(data);
+                    window.location.href = res.settings.permalink;
+                }).catch(err => {
+                    console.log(err);
+                    alert(`Error occured while creating tapestry, please try again`);
+                })
+            })
+        </script>
+    ";
 }
-add_action('publish_tapestry', 'add_tapestry_post_meta_on_publish', 10, 3);
+
+add_shortcode('new_tapestry_button', 'create_new_tapestry');
 
 // Gravity Forms Pluggin
 
@@ -443,3 +414,22 @@ function save_copilot_teen_field($user_id)
 }
 add_action('personal_options_update', 'save_copilot_teen_field');
 add_action('edit_user_profile_update', 'save_copilot_teen_field');
+
+function replace_special_apostrophe($str)
+{
+    return str_replace('’', "'", $str);
+}
+
+$quote_style = 'ENT_QUOTES';
+add_filter('rest_prepare_post', 'prefix_title_entity_decode');
+function prefix_title_entity_decode($response)
+{
+    $data = $response->get_data();
+    $data['title']['rendered'] = wp_specialchars_decode(html_entity_decode($data['title']['rendered']), $quote_style);
+    $data['title']['rendered'] = replace_special_apostrophe($data['title']['rendered']);
+    $data['content']['rendered'] = wp_specialchars_decode(html_entity_decode($data['content']['rendered']), $quote_style);
+    $data['content']['rendered'] = replace_special_apostrophe($data['content']['rendered']);
+    $response->set_data($data);
+
+    return $response;
+}

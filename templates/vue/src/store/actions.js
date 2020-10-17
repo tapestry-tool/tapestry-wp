@@ -1,6 +1,7 @@
-import TapestryApi from "../services/TapestryAPI"
+import client from "../services/TapestryAPI"
+import Helpers from "../utils/Helpers"
 
-const client = new TapestryApi(wpPostId)
+const LOCAL_PROGRESS_ID = "tapestry-progress"
 
 export async function updateSettings({ commit }, newSettings) {
   await client.updateSettings(JSON.stringify(newSettings))
@@ -45,48 +46,122 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
     id,
     newNode,
   })
-  commit("updateNodeCoordinates", {
-    id,
-    coordinates: {
-      [getters.xOrFx]: newNode.coordinates.x,
-      [getters.yOrFy]: newNode.coordinates.y,
-    },
-  })
-  dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
+  if (newNode.coordinates) {
+    commit("updateNodeCoordinates", {
+      id,
+      coordinates: {
+        [getters.xOrFx]: newNode.coordinates.x,
+        [getters.yOrFy]: newNode.coordinates.y,
+      },
+    })
+  }
+  if (newNode.permissions) {
+    dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
+  }
   return id
+}
+
+export async function updateLockedStatus({ commit, getters }) {
+  const userProgress = await client.getUserProgress()
+  for (const [nodeId, progress] of Object.entries(userProgress)) {
+    const node = getters.getNode(nodeId)
+    if (node) {
+      const { accessible, unlocked } = progress
+      if (
+        Helpers.isDifferent(
+          {
+            accessible: node.accessible,
+            unlocked: node.unlocked,
+          },
+          { accessible, unlocked }
+        )
+      ) {
+        commit("updateNode", { id: nodeId, newNode: { accessible, unlocked } })
+      }
+    }
+  }
 }
 
 export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
-  await client.updateUserProgress(id, progress)
+
+  if (!wpData.wpUserId) {
+    const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+    const nodeProgress = progressObj[id] || {}
+    nodeProgress.progress = progress
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+  } else {
+    await client.updateUserProgress(id, progress)
+  }
+
   commit("updateNodeProgress", { id, progress })
-  thisTapestryTool.updateProgressBars()
 }
 
-export async function updateUserProgress() {
-  const progress = await client.getUserProgress()
-  thisTapestryTool.setDatasetProgress(progress)
-  thisTapestryTool.reload()
+export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
+  await client.updateNodeCoordinates(id, coordinates)
+  commit("updateNode", { id, newNode: { coordinates } })
 }
 
-export async function completeNode({ commit, dispatch, getters }, nodeId) {
-  const node = getters.getNode(nodeId)
-  await client.completeNode(nodeId)
+export async function completeNode(context, nodeId) {
+  const { commit, dispatch, getters } = context
+
+  if (!wpData.wpUserId) {
+    const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
+    const nodeProgress = progressObj[nodeId] || {}
+    nodeProgress.completed = true
+    localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
+  } else {
+    await client.completeNode(nodeId)
+  }
+
   commit("updateNode", {
     id: nodeId,
     newNode: { completed: true },
   })
+
+  const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {
     await dispatch("updateNodeProgress", {
       id: nodeId,
       progress: 1,
     })
   }
-  dispatch("updateUserProgress")
+  return unlockNodes(context)
+}
+
+async function unlockNodes({ commit, getters }) {
+  const progress = await client.getUserProgress()
+  for (const [id, nodeProgress] of Object.entries(progress)) {
+    const currentNode = getters.getNode(id)
+    if (
+      currentNode &&
+      Helpers.isDifferent(
+        {
+          accessible: nodeProgress.accessible,
+          unlocked: nodeProgress.unlocked,
+        },
+        { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
+      )
+    ) {
+      const { accessible, unlocked, content, conditions } = nodeProgress
+      const newNode = { accessible, unlocked, conditions }
+      if (accessible) {
+        const { quiz, typeData } = content
+        newNode.quiz = quiz
+        newNode.typeData = typeData
+      }
+      commit("updateNode", { id, newNode })
+    }
+  }
 }
 
 export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
+}
+
+export async function deleteNode({ commit }, id) {
+  await client.deleteNode(id)
+  commit("deleteNode", id)
 }
 
 export async function completeQuestion(
@@ -117,6 +192,14 @@ export async function addLink({ commit }, newLink) {
   commit("addLink", newLink)
 }
 
+export async function deleteLink({ state, commit }, { source, target }) {
+  const linkIndex = state.links.findIndex(
+    link => link.source === source && link.target === target
+  )
+  await client.deleteLink(linkIndex)
+  commit("deleteLink", { source, target })
+}
+
 // favourites
 export function toggleFavourite({ dispatch, getters }, id) {
   const favourites = getters.favourites
@@ -129,4 +212,29 @@ export function toggleFavourite({ dispatch, getters }, id) {
 export async function updateUserFavourites({ commit }, favourites) {
   await client.updateUserFavourites(JSON.stringify(favourites))
   commit("updateFavourites", { favourites })
+}
+
+export async function refetchTapestryData({ commit, state }, filterUserId = null) {
+  const query = filterUserId === null ? {} : { filterUserId: filterUserId }
+  const tapestry = await client.getTapestry(query)
+  const { nodes, links } = state
+
+  const nodeIds = new Set(Object.values(nodes).map(node => node.id))
+  const newNodeIds = new Set(tapestry.nodes.map(node => node.id))
+
+  const nodeDiff = {
+    additions: tapestry.nodes.filter(node => !nodeIds.has(node.id)),
+    deletions: Object.values(nodes).filter(node => !newNodeIds.has(node.id)),
+  }
+
+  const getLinkId = link => `${link.source}-${link.target}`
+  const currentLinks = new Set(links.map(getLinkId))
+  const newLinks = new Set(tapestry.links.map(getLinkId))
+
+  const linkDiff = {
+    additions: tapestry.links.filter(link => !currentLinks.has(getLinkId(link))),
+    deletions: links.filter(link => !newLinks.has(getLinkId(link))),
+  }
+
+  commit("updateDataset", { nodes: nodeDiff, links: linkDiff })
 }

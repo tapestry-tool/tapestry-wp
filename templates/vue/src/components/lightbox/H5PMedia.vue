@@ -38,6 +38,7 @@ import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import H5PIframe from "./H5PIframe"
 import QuizScreen from "./QuizScreen"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "h5p-media",
@@ -106,7 +107,7 @@ export default {
       this.$emit("load")
     },
     updateSettings(settings) {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "update-settings",
         "h5p-video",

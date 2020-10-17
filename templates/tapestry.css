@@ -16,6 +16,11 @@ body {
     z-index: 0;
 }
 
+body.admin-bar .modal[role="dialog"] {
+    top: 3em;
+    height: calc(100vh - 3em);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -47,7 +52,7 @@ body {
     padding-top: 33px;
     margin: 0;
 }
-#header div, p {
+#header div {
     vertical-align: middle;
     padding-left: 50px;
     display: inline-block;
@@ -273,10 +278,6 @@ body {
 
 .node:hover .imageOverlay:not(.locked) {
     opacity: 0;
-}
-
-.node:hover text {
-    display: none;
 }
 
 .links line {

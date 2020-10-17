@@ -1,29 +1,83 @@
 <template>
-  <div id="app">
+  <loading v-if="loading" style="height: 75vh;"></loading>
+  <div v-else id="app">
     <tyde />
-    <router-view v-if="tapestryIsLoaded"></router-view>
-    <tapestry-filter v-if="tapestryIsLoaded && enableFilter" />
+    <router-view></router-view>
+    <tapestry-sidebar />
+    <node-modal
+      :node-id="nodeId"
+      :modal-type="modalType"
+      @cancel="closeModal"
+      @submit="closeModal"
+    />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapMutations } from "vuex"
 import Tyde from "./components/Tyde"
-import TapestryFilter from "./components/TapestryFilter"
+import NodeModal from "@/components/NodeModal"
+import TapestrySidebar from "@/components/TapestrySidebar"
+import Loading from "./components/Loading"
+import client from "./services/TapestryAPI"
 
 export default {
   name: "app",
   components: {
     Tyde,
-    TapestryFilter,
+    NodeModal,
+    Loading,
+    TapestrySidebar,
   },
   data() {
     return {
+      modalType: "",
+      nodeId: null,
       enableFilter: false,
+      loading: true,
     }
   },
   computed: {
-    ...mapState(["tapestryIsLoaded"]),
+    ...mapGetters(["getParent"]),
+  },
+  mounted() {
+    window.addEventListener("click", this.recordAnalytics)
+    const data = [client.getTapestry(), client.getUserProgress()]
+    Promise.all(data).then(([dataset, progress]) => {
+      this.init({ dataset, progress })
+      this.loading = false
+    })
+
+    this.$root.$on("add-node", to => {
+      this.modalType = "add"
+      this.nodeId = to
+      this.$bvModal.show("node-modal")
+    })
+
+    this.$root.$on("edit-node", nodeId => {
+      this.modalType = "edit"
+      this.nodeId = nodeId
+      this.$bvModal.show("node-modal")
+    })
+  },
+  beforeDestroy() {
+    window.removeEventListener("click", this.recordAnalytics)
+  },
+  methods: {
+    ...mapMutations(["init"]),
+    closeModal() {
+      this.parentId = null
+      this.$bvModal.hide("node-modal")
+      this.modalType = ""
+    },
+    recordAnalytics(evt) {
+      const x = evt.clientX + window.scrollLeft
+      const y = evt.clientY + window.scrollTop
+      client.recordAnalyticsEvent("user", "click", "screen", null, {
+        x: x,
+        y: y,
+      })
+    },
   },
 }
 </script>
@@ -40,16 +94,18 @@ html {
     color: #2c3e50;
     margin-top: 60px;
 
-    h1:before {
-      content: none;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      &::before {
+        display: none;
+      }
     }
 
     p {
       padding: 0;
-    }
-
-    a {
-      color: #42b983;
     }
 
     button:focus {

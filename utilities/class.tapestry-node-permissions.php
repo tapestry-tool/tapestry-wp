@@ -12,21 +12,28 @@ class TapestryNodePermissions
      */
     public static function getDefaultNodePermissions($tapestryPostId)
     {
+        global $wp_roles;
+        $roles = $wp_roles->get_names();
+        $permissions = [
+            'public' => ['read'],
+            'authenticated' => ['read'],
+        ];
+
+        foreach ($roles as $role) {
+            if ('Administrator' !== $role && 'Author' !== $role) {
+                $permissions[strtolower($role)] = ['read'];
+            }
+        }
+
         if (0 == $tapestryPostId) {
-            return (object) [
-                'public' => ['read'],
-                'authenticated' => ['read'],
-            ];
+            return (object) $permissions;
         }
 
         $tapestry = get_post_meta($tapestryPostId, 'tapestry', true);
         $defaultPermissions = (isset($tapestry->settings->defaultPermissions) ? $tapestry->settings->defaultPermissions : false);
 
         if (!$defaultPermissions) {
-            return (object) [
-                'public' => ['read'],
-                'authenticated' => ['read'],
-            ];
+            return (object) $permissions;
         }
 
         return $defaultPermissions;

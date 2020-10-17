@@ -24,6 +24,7 @@ import axios from "axios"
 import Loading from "@/components/Loading"
 import TapestryActivity from "@/components/TapestryActivity"
 import GravityFormsApi from "@/services/GravityFormsApi"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "gravity-form",
@@ -111,7 +112,7 @@ export default {
         const events = ["focus", "blur"]
         events.forEach(event =>
           textarea.addEventListener(event, () =>
-            globals.recordAnalyticsEvent("user", event, "gf-textarea", this.id)
+            client.recordAnalyticsEvent("user", event, "gf-textarea", this.id)
           )
         )
       })
@@ -122,17 +123,12 @@ export default {
           const events = ["focus", "blur"]
           events.forEach(event =>
             input.addEventListener(event, () =>
-              globals.recordAnalyticsEvent("user", event, "gf-input", this.id)
+              client.recordAnalyticsEvent("user", event, "gf-input", this.id)
             )
           )
         } else {
           input.addEventListener("input", () => {
-            globals.recordAnalyticsEvent(
-              "user",
-              "input",
-              `gf-${input.type}`,
-              this.id
-            )
+            client.recordAnalyticsEvent("user", "input", `gf-${input.type}`, this.id)
           })
         }
       })
@@ -157,7 +153,7 @@ export default {
             delete window[`gf_submitting_${this.id}`]
             this.html = response.data
           } else {
-            globals.recordAnalyticsEvent("user", "submit", "gf", this.id)
+            client.recordAnalyticsEvent("user", "submit", "gf", this.id)
             this.$emit("submit")
           }
         })

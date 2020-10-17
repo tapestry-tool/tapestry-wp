@@ -12,6 +12,7 @@ module.exports = {
   ],
   rules: {
     "cypress/no-unnecessary-waiting": "off",
+    "vue/attribute-hyphenation": "off",
     "vue/component-name-in-template-casing": ["error", "kebab-case"],
     "vue/name-property-casing": ["error", "kebab-case"],
     "vue/no-v-html": "off",
@@ -26,7 +27,7 @@ module.exports = {
         htmlWhitespaceSensitivity: "ignore",
         printWidth: 85,
         trailingComma: "es5",
-        endOfLine: "auto"
+        endOfLine: "auto",
       },
     ],
   },
@@ -35,14 +36,8 @@ module.exports = {
   },
   globals: {
     adminAjaxUrl: "readonly",
-    wpApiSettings: "readonly",
     wpData: "readonly",
     wpPostId: "readonly",
     apiUrl: "readonly",
-    thisTapestryTool: "readonly",
-    globals: "readonly",
-  },
-  env: {
-    jquery: true,
   },
 }

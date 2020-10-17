@@ -37,6 +37,7 @@ import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
 import Helpers from "@/utils/Helpers"
 import BackgroundImg from "@/assets/question-screen-bg.png"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "quiz-screen",
@@ -92,7 +93,7 @@ export default {
     },
     next() {
       this.showCompletionScreen = false
-      globals.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
+      client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex + 1,
       })
@@ -100,14 +101,14 @@ export default {
     },
     prev() {
       this.showCompletionScreen = false
-      globals.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
+      client.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
         from: this.activeQuestionIndex,
         to: this.activeQuestionIndex - 1,
       })
       this.activeQuestionIndex--
     },
     close() {
-      globals.recordAnalyticsEvent("user", "close", "activity", this.node.id)
+      client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
       this.$emit("close")
     },
   },

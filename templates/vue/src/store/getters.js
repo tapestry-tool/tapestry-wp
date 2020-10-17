@@ -1,7 +1,62 @@
+import { tydeTypes } from "@/utils/constants"
+import Helpers from "@/utils/Helpers"
+
+export function getDirectChildren(state) {
+  return id => {
+    const links = state.links
+    return links.filter(link => link.source == id).map(link => link.target)
+  }
+}
+
+export function getDirectParents(state) {
+  return id => {
+    return state.links.filter(link => link.target == id).map(link => link.source)
+  }
+}
+
+export function getNode(state) {
+  return id => state.nodes[id]
+}
+
 export function getParent(state) {
   return id => {
     const link = state.links.find(l => l.target == id || l.target.id == id)
     return link ? link.source : null
+  }
+}
+
+export function isAccordion(_, { getNode, getParent }) {
+  return id => {
+    const node = getNode(id)
+    if (node.mediaType === "accordion") {
+      return true
+    }
+    const parent = getParent(node.id)
+    if (parent) {
+      const parentNode = getNode(parent)
+      return parentNode.mediaType === "accordion"
+    }
+    return false
+  }
+}
+
+export function isAccordionRow(_, { getParent, isAccordion }) {
+  return id => {
+    const parent = getParent(id)
+    return parent ? isAccordion(parent) : false
+  }
+}
+
+export function isVisible(_, { getNode, isAccordionRow }) {
+  return id => {
+    const node = getNode(id)
+    if (node.nodeType === "") {
+      return false
+    }
+    if (!Helpers.hasPermission(node, "edit")) {
+      return !isAccordionRow(node.id)
+    }
+    return true
   }
 }
 
@@ -45,6 +100,44 @@ export function getEntry(_, { getQuestion }) {
   }
 }
 
+export function hasPath(state) {
+  return (from, to, options = {}) => {
+    const { exclude = [] } = options
+    const allowedLinks = state.links.filter(link => {
+      return (
+        exclude.find(
+          blacklistedLink =>
+            blacklistedLink.source === link.source &&
+            blacklistedLink.target === link.target
+        ) !== undefined
+      )
+    })
+
+    const stack = []
+    const visited = new Set()
+
+    stack.push(from)
+    visited.add(from)
+    while (stack.length > 0) {
+      const node = stack.pop()
+      if (node === to) {
+        return true
+      }
+
+      const neighbours = allowedLinks
+        .filter(link => link.source == node || link.target == node)
+        .map(link => (link.source == node ? link.target : link.source))
+      for (const neighbour of neighbours) {
+        if (!visited.has(neighbour)) {
+          visited.add(neighbour)
+          stack.push(neighbour)
+        }
+      }
+    }
+    return false
+  }
+}
+
 export function favourites(state) {
   return state.favourites || []
 }
@@ -74,7 +167,7 @@ function formatEntry(answers, answerType) {
 
 export function tapestryJson(state) {
   const exportedTapestry = {
-    nodes: state.nodes.map(node => {
+    nodes: Object.values(state.nodes).map(node => {
       const newNode = { ...node }
       if (newNode.quiz) {
         newNode.quiz = newNode.quiz.map(question => {
@@ -108,7 +201,7 @@ export function createDefaultNode({ settings }) {
     conditions: [],
     behaviour: "new-window",
     status: "publish",
-    nodeType: "",
+    nodeType: "child",
     title: "",
     imageURL: "",
     lockedImageURL: "",
@@ -117,16 +210,13 @@ export function createDefaultNode({ settings }) {
     mediaDuration: 0,
     typeId: 1,
     group: 1,
+    progress: 0,
     permissions: settings.defaultPermissions || {
       public: ["read"],
       authenticated: ["read"],
     },
     typeData: {
       linkMetadata: null,
-      progress: [
-        { group: "viewed", value: 0 },
-        { group: "unviewed", value: 1 },
-      ],
       mediaURL: "",
       mediaWidth: 960, //TODO: This needs to be flexible with H5P
       mediaHeight: 600,
@@ -153,6 +243,10 @@ export function createDefaultNode({ settings }) {
     },
     childOrdering: [],
     quiz: [],
+    license: "",
+    references: "",
+    unlocked: true,
+    accessible: true,
   })
 }
 
@@ -243,7 +337,7 @@ function getCompletedActivities(node) {
 
 export function getProfileActivities({ nodes, settings }) {
   let activities = []
-  let nodesWithQuestions = nodes.filter(
+  let nodesWithQuestions = Object.values(nodes).filter(
     node =>
       node.quiz &&
       node.quiz.some(
@@ -276,4 +370,36 @@ export function getProfileActivities({ nodes, settings }) {
     }
   }
   return profileActivities
+}
+
+export function getNeighbours(state) {
+  return id => {
+    return state.links
+      .filter(link => link.source == id || link.target == id)
+      .map(link => (link.source == id ? link.target : link.source))
+  }
+}
+
+export function getTydeProgress(_, { getNode, getDirectChildren }) {
+  return id => {
+    const node = getNode(id)
+    if (node.tydeType !== tydeTypes.MODULE && node.tydeType !== tydeTypes.STAGE) {
+      return 0
+    }
+
+    let topics = []
+    if (node.tydeType === tydeTypes.MODULE) {
+      const stages = getDirectChildren(id)
+      topics = stages.flatMap(getDirectChildren).map(getNode)
+    } else {
+      topics = getDirectChildren(id).map(getNode)
+    }
+
+    if (!topics.length) {
+      return 1
+    }
+
+    const completedTopics = topics.filter(topic => topic.completed)
+    return completedTopics.length / topics.length
+  }
 }

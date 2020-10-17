@@ -38,6 +38,10 @@
           ></tapestry-activity>
         </div>
       </div>
+      <h1 class="question-title">
+        {{ question.text }}
+      </h1>
+      <p v-if="!isLoggedIn">Please login to have your answers saved.</p>
       <gravity-form
         v-else-if="formOpened"
         :id="formId"
@@ -93,6 +97,7 @@ import Loading from "../../Loading"
 import TapestryActivity from "@/components/TapestryActivity"
 import SpeechBubble from "@/components/SpeechBubble"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "question",
@@ -137,6 +142,9 @@ export default {
     ...mapGetters(["getEntry", "getQuestion"]),
     answers() {
       return this.getAnswers(this.question)
+    },
+    isLoggedIn() {
+      return Boolean(wpData.wpUserId)
     },
     lastQuestion() {
       if (this.question.previousEntry) {
@@ -188,7 +196,7 @@ export default {
         .filter(Boolean)
     },
     back() {
-      globals.recordAnalyticsEvent("user", "back", "question", this.question.id)
+      client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       const wasOpened = this.formOpened || this.recorderOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
@@ -197,7 +205,7 @@ export default {
       this.recorderOpened = false
     },
     openRecorder() {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "click",
         "answer-button",
@@ -209,7 +217,7 @@ export default {
       this.recorderOpened = true
     },
     openForm(id, answerType) {
-      globals.recordAnalyticsEvent(
+      client.recordAnalyticsEvent(
         "user",
         "click",
         "answer-button",
@@ -225,6 +233,9 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       if (Helpers.canUserUpdateProgress(this.node)) {
         this.loading = true
         await this.completeQuestion({
@@ -234,18 +245,18 @@ export default {
           questionId: this.question.id,
         })
         this.loading = false
-        globals.recordAnalyticsEvent(
-          "user",
-          "submit",
-          "question",
-          this.question.id,
-          { type: this.formType, id: this.formId }
-        )
+        client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+          type: this.formType,
+          id: this.formId,
+        })
         this.$emit("submit")
       }
     },
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
+      if (!wpData.wpUserId) {
+        return this.$emit("submit")
+      }
       this.loading = true
       await this.completeQuestion({
         nodeId: this.node.id,
@@ -259,7 +270,7 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
-      globals.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: "audio",
       })
       this.$emit("submit")

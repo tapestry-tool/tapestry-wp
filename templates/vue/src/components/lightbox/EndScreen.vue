@@ -47,6 +47,7 @@
 <script>
 import SpeechBubble from "../SpeechBubble"
 import EndScreenBg from "../../assets/end-screen-bg.png"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "end-screen",
@@ -73,7 +74,7 @@ export default {
   },
   methods: {
     handleClick(evt, type) {
-      globals.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
+      client.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })

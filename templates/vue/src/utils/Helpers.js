@@ -178,4 +178,51 @@ export default class Helpers {
 
     return outObject
   }
+
+  static hasPermission(node, action) {
+    // Check 1: Has edit permissions for Tapestry
+    if (wpData.wpCanEditTapestry === "1") {
+      return true
+    }
+
+    // Check 2: User is the author of the node
+    if (wpData.currentUser.ID == node.author.id) {
+      return true
+    }
+
+    // Check 3: User has a role with general edit permissions
+    const { ID, roles } = wpData.currentUser
+    const allowedRoles = ["administrator", "editor", "author"]
+    if (allowedRoles.some(role => roles.includes(role))) {
+      return true
+    }
+
+    const { public: publicPermissions, authenticated } = node.permissions
+    // Check 4: Node has public permissions
+    if (publicPermissions.includes(action)) {
+      return true
+    }
+
+    // Check 5: Node has authenticated permissions
+    if (wpData.currentUser.ID && authenticated.includes(action)) {
+      return true
+    }
+
+    // Check 6: User has a role that is allowed in the node
+    const isRoleAllowed = roles.some(role => {
+      const permissions = node.permissions[role]
+      return permissions.includes(action)
+    })
+    if (isRoleAllowed) {
+      return true
+    }
+
+    // Check 7: User has a permission associated with its ID
+    const userPermissions = node.permissions[`user-${ID}`]
+    if (userPermissions) {
+      return userPermissions.includes(action)
+    }
+
+    return false
+  }
 }

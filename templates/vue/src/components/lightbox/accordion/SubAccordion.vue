@@ -1,17 +1,17 @@
 <template>
   <div ref="container" class="sub-container">
-    <tapestry-accordion :rows="rows" :default-index="-1">
+    <tapestry-accordion :rows="rows.map(row => row.id)" :default-index="-1">
       <template v-slot="{ isVisible, toggle }">
         <div>
           <div
-            v-for="(row, index) in rows"
+            v-for="row in rows"
             :key="row.id"
             ref="rowRefs"
             class="sub-accordion-row"
           >
             <div class="button-row">
-              <button class="button-row-trigger" @click="toggle(row)">
-                <i :class="isVisible(row) ? 'fas fa-minus' : 'fas fa-plus'"></i>
+              <button class="button-row-trigger" @click="toggle(row.id)">
+                <i :class="isVisible(row.id) ? 'fas fa-minus' : 'fas fa-plus'"></i>
                 {{ row.title }}
               </button>
               <a @click="toggleFavourite(row.id)">
@@ -24,12 +24,13 @@
               </a>
             </div>
             <tapestry-media
-              v-if="isVisible(row)"
+              v-if="isVisible(row.id)"
               :node-id="row.id"
               :dimensions="dimensions"
               :autoplay="false"
               :read-only="readOnly"
-              @close="toggle(row)"
+              @complete="completeNode(row.id)"
+              @close="toggle(row.id)"
               @load="handleLoad(index)"
             />
           </div>
@@ -70,7 +71,7 @@ export default {
     ...mapGetters(["isFavourite"]),
   },
   methods: {
-    ...mapActions(["toggleFavourite"]),
+    ...mapActions(["completeNode", "toggleFavourite"]),
     handleLoad(idx) {
       this.$emit("load", this.$refs.rowRefs[idx])
     },

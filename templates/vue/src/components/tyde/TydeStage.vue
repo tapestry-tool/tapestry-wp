@@ -51,6 +51,7 @@ import ActiveStar from "@/assets/star-active.png"
 import InactiveStar from "@/assets/star-inactive.png"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "tyde-stage",
@@ -78,14 +79,20 @@ export default {
   },
   watch: {
     isLightboxOpen() {
-      if (this.notCompleted && this.getNode(this.nodeId).tydeProgress == 1) {
+      const tydeProgress = this.getTydeProgress(this.nodeId)
+      if (this.notCompleted && tydeProgress == 1) {
         this.showStar = true
         this.notCompleted = false
       }
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
+    ...mapGetters([
+      "getNode",
+      "getDirectChildren",
+      "getDirectParents",
+      "getTydeProgress",
+    ]),
     ...mapState(["selectedModuleId"]),
     done() {
       return this.topics.every(topic => topic.completed)
@@ -130,7 +137,7 @@ export default {
   },
   mounted() {
     document.querySelector("body").classList.add("tapestry-stage-open")
-    this.notCompleted = this.getNode(this.nodeId).tydeProgress !== 1
+    this.notCompleted = this.getTydeProgress(this.nodeId) !== 1
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-stage-open")
@@ -143,18 +150,18 @@ export default {
       return {}
     },
     openTopic(evt, id) {
-      globals.recordAnalyticsEvent("user", "click", "topic", id, {
+      client.recordAnalyticsEvent("user", "click", "topic", id, {
         x: evt.clientX,
         y: evt.clientY,
       })
       this.openLightbox(id)
     },
     openLightbox(id) {
-      globals.recordAnalyticsEvent("user", "open", "topic", id)
+      client.recordAnalyticsEvent("user", "open", "topic", id)
       this.$router.push(`/nodes/${id}`)
     },
     handleClick(evt, type) {
-      globals.recordAnalyticsEvent("user", "click", `stage-${type}-button`, null, {
+      client.recordAnalyticsEvent("user", "click", `stage-${type}-button`, null, {
         x: evt.clientX,
         y: evt.clientY,
       })

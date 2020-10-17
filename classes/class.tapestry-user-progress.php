@@ -38,12 +38,13 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function get()
     {
         $this->_isValidTapestryPost();
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
 
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
+        $roles = new TapestryUserRoles();
 
-        if (!TapestryUserRoles::isRole('copilot')) {
+        if (!$roles->isRole('copilot')) {
             return $this->_getUserProgress($nodeIds, $this->_userId);
         }
 
@@ -65,7 +66,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function updateUserProgress($progressValue)
     {
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
 
         if (null !== $progressValue) {
             $progressValue = floatval($progressValue);
@@ -86,7 +87,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function complete()
     {
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
         $this->_complete();
     }
 
@@ -99,7 +100,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function completeQuestion($questionId)
     {
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
         $this->_completeQuestion($questionId);
     }
 
@@ -113,7 +114,7 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function updateH5PSettings($h5pSettingsData)
     {
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
         $this->_updateUserH5PSettings($h5pSettingsData);
     }
 
@@ -125,7 +126,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function getH5PSettings()
     {
         $this->_isValidTapestryPost();
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
 
         return $this->_getUserH5PSettings();
     }
@@ -335,7 +336,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     public function getFavourites()
     {
         $this->_isValidTapestryPost();
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
 
         $favourites = get_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, true);
         if ($favourites) {
@@ -354,18 +355,14 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function updateFavourites($favourites)
     {
-        $this->_checkUserAndPostId();
+        $this->_checkPostId();
         update_user_meta($this->_userId, 'tapestry_favourites_'.$this->postId, $favourites);
     }
 
     /* Helpers */
 
-    private function _checkUserAndPostId()
+    private function _checkPostId()
     {
-        if (!isset($this->_userId)) {
-            throw new Exception('postId is invalid');
-        }
-
         if (!isset($this->postId)) {
             throw new Exception('postId is invalid');
         }

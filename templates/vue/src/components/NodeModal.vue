@@ -22,6 +22,7 @@
             :parent="parent"
             @load="videoLoaded = true"
             @unload="videoLoaded = false"
+            @type-changed="handleTypeChange"
           />
         </b-tab>
         <b-tab title="Appearance">
@@ -81,45 +82,63 @@
             </slick-list>
           </div>
         </b-tab>
+        <b-tab title="More Information">
+          <more-information-form :node="node" />
+        </b-tab>
       </b-tabs>
     </b-container>
     <b-container v-else class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
     <template slot="modal-footer">
-      <b-button
-        v-show="modalType === 'edit'"
-        size="sm"
-        variant="danger"
-        :disabled="disableDeleteButton"
-        @click="deleteNode"
-      >
-        Delete Node
-      </b-button>
-      <p v-if="disableDeleteButton" class="disable-message text-muted">
-        You cannot delete this node because this {{ node.tydeType }} node still has
-        children.
-      </p>
+      <delete-node-button
+        v-if="modalType === 'edit'"
+        :node-id="nodeId"
+        @submit="close"
+      ></delete-node-button>
       <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="secondary" @click="$emit('cancel')">
+      <b-button size="sm" variant="secondary" @click="close">
         Cancel
       </b-button>
       <b-button
         id="submit-button"
         size="sm"
         variant="primary"
-        :class="accessSubmit ? '' : 'disabled'"
-        @click="submit"
+        :disabled="!canSubmit"
+        @click="handleSubmit"
       >
-        <b-spinner v-if="!accessSubmit"></b-spinner>
-        <div :style="accessSubmit ? '' : 'opacity: 50%;'">Submit</div>
+        <b-spinner v-if="!canSubmit" small></b-spinner>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">Submit</div>
       </b-button>
     </template>
+    <div v-if="loadDuration">
+      <iframe
+        v-if="node.mediaType === 'h5p'"
+        ref="frame"
+        class="duration-calculator"
+        :src="node.typeData.mediaURL"
+        @load="setH5pDuration"
+      ></iframe>
+      <video
+        v-if="node.mediaFormat === 'mp4'"
+        ref="video"
+        :src="node.typeData.mediaURL"
+        style="display: none;"
+        @loadeddata="setVideoDuration"
+      ></video>
+      <youtube
+        v-if="node.mediaFormat === 'youtube'"
+        :video-id="node.typeData.youtubeID"
+        :player-vars="{ autoplay: 0 }"
+        style="display: none;"
+        @ready="setYouTubeDuration"
+      ></youtube>
+    </div>
   </b-modal>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
 import { SlickList, SlickItem } from "vue-slicksort"
 import ActivityForm from "./node-modal/content-form/ActivityForm"
 import { tydeTypes } from "../utils/constants"
@@ -128,7 +147,9 @@ import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
 import ContentForm from "./node-modal/ContentForm"
 import SpaceshipPartForm from "./node-modal/SpaceshipPartForm"
+import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
+import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
@@ -149,18 +170,15 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    MoreInformationForm,
     SlickItem,
     SlickList,
     PermissionsTable,
     SpaceshipPartForm,
+    DeleteNodeButton,
   },
   props: {
     nodeId: {
-      type: Number,
-      required: false,
-      default: null,
-    },
-    parentId: {
       type: Number,
       required: false,
       default: null,
@@ -182,6 +200,8 @@ export default {
       tydeTypes: tydeTypes,
       node: null,
       videoLoaded: false,
+      fileUploading: false,
+      loadDuration: false,
     }
   },
   computed: {
@@ -190,26 +210,13 @@ export default {
       "getDirectChildren",
       "getDirectParents",
       "getNode",
-      "settings",
+      "getParent",
     ]),
+    ...mapState(["rootId", "settings", "visibleNodes"]),
     parent() {
-      return this.getNode(this.parentId)
-    },
-    hasChildren() {
-      if (this.modalType === "edit-node") {
-        return this.getDirectChildren(this.node.id).length > 0
-      } else {
-        return false
-      }
-    },
-    disableDeleteButton() {
-      if (
-        this.node.tydeType === tydeTypes.MODULE ||
-        this.node.tydeType === tydeTypes.STAGE
-      ) {
-        return this.hasChildren
-      }
-      return false
+      return this.getNode(
+        this.modalType === "add" ? this.nodeId : this.getParent(this.nodeId)
+      )
     },
     title() {
       if (this.modalType === "add") {
@@ -228,22 +235,20 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
-    accessSubmit() {
-      // Locks access to submit button while youtube video loads to grab duration
-      return (
-        (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") ||
-        this.videoLoaded
-      )
+    canSubmit() {
+      return !this.fileUploading
     },
   },
   created() {
     this.node = this.createDefaultNode()
   },
   mounted() {
+    this.$root.$on("node-modal::uploading", isUploading => {
+      this.fileUploading = isUploading
+    })
     this.$root.$on("bv::modal::show", (bvEvent, modalId) => {
       if (modalId == "node-modal") {
         this.formErrors = ""
-        thisTapestryTool.disableMovements()
       }
     })
     this.$root.$on("bv::modal::shown", (_, modalId) => {
@@ -252,120 +257,163 @@ export default {
         if (this.modalType === "edit") {
           const node = this.getNode(this.nodeId)
           copy = Helpers.deepCopy(node)
+        } else if (this.modalType === "add") {
+          this.node.tydeType = this.getInitialTydeType(this.parent)
         }
         copy.hasSubAccordion = this.hasSubAccordion(copy)
         this.node = copy
-        this.setInitialTydeType()
         this.ready = true
       }
     })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId == "node-modal") {
-        thisTapestryTool.enableMovements()
         this.ready = false
       }
     })
   },
   methods: {
-    ...mapMutations(["updateOrdering", "updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateNodePermissions"]),
-    setInitialTydeType() {
-      // only set node types if adding a new node
-      if (this.parent && this.modalType === "add") {
-        const parentType = this.parent.tydeType
-        this.node.tydeType =
-          parentType === tydeTypes.MODULE
-            ? tydeTypes.STAGE
-            : parentType === tydeTypes.STAGE
-            ? tydeTypes.QUESTION_SET
-            : tydeTypes.REGULAR
+    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateNodePermissions",
+      "updateLockedStatus",
+    ]),
+    getInitialTydeType(parent) {
+      if (this.parent) {
+        const parentType = parent.tydeType
+        return parentType === tydeTypes.MODULE
+          ? tydeTypes.STAGE
+          : parentType === tydeTypes.STAGE
+          ? tydeTypes.QUESTION_SET
+          : tydeTypes.REGULAR
       }
+      return null
     },
     hasSubAccordion(node) {
-      const parents = this.getDirectParents(node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
+      if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return parent.mediaType === "accordion" && children.length > 0
+        return this.parent.mediaType === "accordion" && children.length > 0
       }
       return false
     },
     close() {
       this.$bvModal.hide("node-modal")
+      this.$emit("cancel")
     },
-    deleteNode() {
-      thisTapestryTool.deleteNodeFromTapestry()
-    },
-    async submit() {
+    async handleSubmit() {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
-        const parent = this.parent
         this.ready = false
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
-          if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
-            const url = this.node.typeData.mediaURL
-            const { data } = await getLinkMetadata(url)
-
-            if (data) {
-              this.node.typeData.linkMetadata = data
-
-              if (
-                !this.node.imageURL ||
-                confirm(
-                  "Would you like to use the link preview image as the thumbnail image?"
-                )
-              ) {
-                this.node.imageURL = data.image
-              }
-              if (
-                !this.node.lockedImageURL ||
-                confirm(
-                  "Would you like to use the link preview image as the locked thumbnail image?"
-                )
-              ) {
-                this.node.lockedImageURL = data.image
-              }
-            }
-          }
+          await this.setLinkData()
         }
 
-        if (this.modalType === "add") {
-          const parent = this.parent
-          const id = await this.addNode({
-            newNode: this.node,
-            parentId: parent && parent.id,
-          })
-          this.node.id = id
-          if (parent) {
-            // Add link from parent node to this node
-            const newLink = {
-              source: parent.id,
-              target: id,
-              value: 1,
-              type: "",
-            }
-            await this.addLink(newLink)
-            parent.childOrdering.push(id)
-          } else {
-            this.updateRootNode(id)
-            this.updateSelectedNode(id)
-          }
+        if (this.shouldReloadDuration()) {
+          this.loadDuration = true
         } else {
-          await this.updateNode({
-            id: this.node.id,
-            newNode: this.node,
-          })
+          return this.submitNode()
         }
-
-        this.$emit("submit")
+      }
+    },
+    async submitNode() {
+      if (this.modalType === "add") {
+        const id = await this.addNode({
+          newNode: this.node,
+          parentId: this.parent && this.parent.id,
+        })
+        this.node.id = id
+        if (this.parent) {
+          // Add link from parent node to this node
+          const newLink = {
+            source: this.parent.id,
+            target: id,
+            value: 1,
+            type: "",
+          }
+          await this.addLink(newLink)
+          this.updateNode({
+            id: this.parent.id,
+            newNode: {
+              childOrdering: [...this.parent.childOrdering, id],
+            },
+          })
+        } else {
+          this.updateRootNode(id)
+          this.updateSelectedNode(id)
+        }
+        this.updateVisibleNodes([...this.visibleNodes, id])
+      } else {
+        await this.updateNode({
+          id: this.node.id,
+          newNode: this.node,
+        })
+      }
+      await this.updateLockedStatus()
+      this.$emit("submit")
+    },
+    getRandomNumber(min, max) {
+      return Math.random() * (max - min) + min
+    },
+    coinToss() {
+      return Math.floor(Math.random() * 2) == 0
+    },
+    calculateX(yIsCalculated) {
+      if (!yIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.x = this.getRandomNumber(
+            this.parent.coordinates.x -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateY(true)
+      } else {
+        this.node.coordinates.x = this.getRandomNumber(
+          this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
+        )
+      }
+    },
+    calculateY(xIsCalculated) {
+      if (!xIsCalculated) {
+        if (this.coinToss()) {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y +
+              sizes.NODE_RADIUS_SELECTED +
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+          )
+        } else {
+          this.node.coordinates.y = this.getRandomNumber(
+            this.parent.coordinates.y -
+              sizes.NODE_RADIUS_SELECTED -
+              sizes.NODE_RADIUS,
+            this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
+          )
+        }
+        this.calculateX(true)
+      } else {
+        this.node.coordinates.y = this.getRandomNumber(
+          this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
+          this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
+        )
       }
     },
     updateNodeCoordinates() {
       if (this.modalType === "add" && this.parent) {
-        this.node.coordinates.x = this.parent.x + sizes.NODE_RADIUS_SELECTED * 2 + 50
-        this.node.coordinates.y = this.parent.y
+        this.coinToss() ? this.calculateX(false) : this.calculateY(false)
       }
     },
     validateNode() {
@@ -397,6 +445,9 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please select an H5P content for this node")
         }
+        if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
+          errMsgs.push("Please enter numeric value for H5P Video Duration")
+        }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
@@ -420,41 +471,100 @@ export default {
       })
     },
     updateOrderingArray(arr) {
-      this.updateOrdering({
-        id: this.node.id,
-        ord: arr,
-      })
+      this.node.childOrdering = arr
+    },
+    handleTypeChange() {
+      this.node.quiz = this.node.quiz.filter(q =>
+        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
+      )
+    },
+    async setLinkData() {
+      if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+        const url = this.node.typeData.mediaURL
+        const { data } = await getLinkMetadata(url)
+
+        if (data) {
+          this.node.typeData.linkMetadata = data
+
+          if (
+            !this.node.imageURL ||
+            confirm(
+              "Would you like to use the link preview image as the thumbnail image?"
+            )
+          ) {
+            this.node.imageURL = data.image
+          }
+          if (
+            !this.node.lockedImageURL ||
+            confirm(
+              "Would you like to use the link preview image as the locked thumbnail image?"
+            )
+          ) {
+            this.node.lockedImageURL = data.image
+          }
+        }
+      }
     },
     setVideoDuration() {
-      this.node.mediaDuration = this.$refs.video ? this.$refs.video.duration : 0
+      this.node.mediaDuration = parseInt(this.$refs.video.duration)
+      this.loadDuration = false
+      return this.submitNode()
     },
-    handleIframeload() {
-      // Set media duration if video is loaded
-      const h5pFrame = this.$refs.h5pNone.contentWindow.H5P
-      const h5pVideo = h5pFrame.instances[0].video
-      if (!h5pVideo) {
-        this.videoLoaded = true
-        return
-      }
-      const handleH5PLoad = () => {
-        this.node.mediaDuration = h5pVideo.getDuration()
-        this.videoLoaded = true
-      }
-      if (h5pVideo.getDuration() !== undefined) {
-        handleH5PLoad()
-      } else {
-        h5pVideo.on("loaded", handleH5PLoad)
-      }
+    setYouTubeDuration(evt) {
+      this.node.mediaDuration = evt.target.getDuration()
+      this.loadDuration = false
+      return this.submitNode()
     },
-    handleYouTubeload(event) {
-      // Set media duration and ID if youtube video loads
-      this.node.mediaDuration = event.target.getDuration()
-      this.node.typeData.youtubeID = this.videoUrlYoutubeID
-      this.videoLoaded = true
+    setH5pDuration() {
+      const frame = this.$refs.frame
+      const h5p = frame.contentWindow.H5P
+      if (h5p) {
+        const instance = h5p.instances[0]
+        const libraryName = instance.libraryInfo.machineName
+        if (libraryName === "H5P.InteractiveVideo") {
+          const h5pVideo = instance.video
+          const handleH5PLoad = () => {
+            this.node.mediaDuration = parseInt(h5pVideo.getDuration())
+            this.loadDuration = false
+            return this.submitNode()
+          }
+          if (h5pVideo.getDuration() !== undefined) {
+            handleH5PLoad()
+          } else {
+            h5pVideo.on("loaded", handleH5PLoad)
+          }
+          return
+        } else {
+          this.node.mediaDuration = 0
+        }
+      }
+      this.loadDuration = false
+      return this.submitNode()
+    },
+    shouldReloadDuration() {
+      if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
+        return false
+      }
+      if (this.modalType === "add") {
+        return true
+      }
+      const oldNode = this.getNode(this.nodeId)
+      const { youtubeID, mediaURL } = oldNode.typeData
+      return this.node.mediaFormat === "youtube"
+        ? this.node.typeData.youtubeID !== youtubeID
+        : this.node.mediaURL !== mediaURL
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.duration-calculator {
+  position: fixed;
+  left: 101vw;
+  width: 1px;
+}
+</style>
 
 <style lang="scss">
 /* Use non-scoped styles to overwrite WP theme styles */
@@ -505,6 +615,16 @@ table {
   justify-content: center;
 }
 
+#submit-button {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div {
+    margin-right: 4px;
+  }
+}
+
 #node-modal-container {
   * {
     outline: none;
@@ -535,6 +655,11 @@ table {
       width: 1.5em;
       left: 33%;
     }
+
+    &:disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+    }
   }
 
   .slick-list-item {
@@ -553,62 +678,16 @@ table {
     > span:last-of-type {
       margin-left: auto;
     }
-  }
-}
 
-.slick-list-item {
-  display: flex;
-  height: 25px;
-  border: lightgray solid 1.5px;
-  margin: 10px 25px;
-  border-radius: 5px;
-  padding: 15px;
-  align-items: center;
-  > span {
-    margin-right: 25px;
-  }
-  > span:last-of-type {
-    margin-left: auto;
-  }
-}
-
-.slick-list-item {
-  display: flex;
-  height: 25px;
-  border: lightgray solid 1.5px;
-  margin: 10px 25px;
-  border-radius: 5px;
-  padding: 15px;
-  align-items: center;
-  > span {
-    margin-right: 25px;
-  }
-  > span:last-of-type {
-    margin-left: auto;
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
+    &.disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+    }
   }
 }
 
 .indented-options {
   border-left: solid 2px #ccc;
   padding-left: 1em;
-}
-
-#submit-button {
-  position: relative;
-  > span {
-    position: absolute;
-    height: 1.5em;
-    width: 1.5em;
-    left: 33%;
-  }
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
 }
 </style>

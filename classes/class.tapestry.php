@@ -34,19 +34,15 @@ class Tapestry implements ITapestry
         $this->postId = (int) $postId;
         $this->author = (int) $this->_getAuthor();
 
+        $this->nodes = [];
+        $this->links = [];
+        $this->groups = [];
+        $this->rootId = 0;
+        $this->settings = $this->_getDefaultSettings();
+
         if (TapestryHelpers::isValidTapestry($this->postId)) {
             $tapestry = $this->_loadFromDatabase();
-            $this->nodes = $tapestry->nodes;
-            $this->links = $tapestry->links;
-            $this->groups = $tapestry->groups;
-            $this->rootId = $tapestry->rootId;
-            $this->settings = $tapestry->settings;
-        } else {
-            $this->nodes = [];
-            $this->links = [];
-            $this->groups = [];
-            $this->rootId = 0;
-            $this->settings = (object) [];
+            $this->set($tapestry);
         }
     }
 
@@ -105,13 +101,13 @@ class Tapestry implements ITapestry
      *
      * @return object $tapestry
      */
-    public function get()
+    public function get($filterUserId)
     {
         if (!$this->postId) {
             throw new TapestryError('INVALID_POST_ID');
         }
 
-        return $this->_getTapestry();
+        return $this->_getTapestry($filterUserId);
     }
 
     /**
@@ -311,7 +307,8 @@ class Tapestry implements ITapestry
         $nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
-                if (TapestryUserRoles::isRole('copilot')) {
+                $roles = new TapestryUserRoles();
+                if ($roles->isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';
                     } else {
@@ -327,7 +324,8 @@ class Tapestry implements ITapestry
         return array_map(
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
-                $data = TapestryUserRoles::canEdit($this->postId) || $nodeData->accessible || 'teen' === $nodeData->userType ? $node->get() : $node->getMeta();
+                $roles = new TapestryUserRoles();
+                $data = $roles->canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
@@ -336,6 +334,18 @@ class Tapestry implements ITapestry
             },
             $nodes
         );
+    }
+
+    public function getAllContributors()
+    {
+        return array_unique(array_map(
+            function ($node) {
+                $node = new TapestryNode($this->postId, $node);
+
+                return $node->get()->author;
+            },
+            $this->nodes
+        ), SORT_REGULAR);
     }
 
     private function _setAccessibleStatus($nodes, $userId)
@@ -407,16 +417,40 @@ class Tapestry implements ITapestry
     {
         $tapestry = get_post_meta($this->postId, 'tapestry', true);
         if (empty($tapestry)) {
-            return (object) [
-                'nodes' => [],
-                'links' => [],
-                'groups' => [],
-                'rootId' => 0,
-                'settings' => (object) [],
-            ];
+            return $this->_getDefaultTapestry();
         }
 
         return $tapestry;
+    }
+
+    private function _getDefaultTapestry()
+    {
+        $tapestry = new stdClass();
+        $tapestry->nodes = [];
+        $tapestry->links = [];
+        $tapestry->groups = [];
+        $tapestry->rootId = 0;
+        $tapestry->settings = $this->_getDefaultSettings();
+
+        return $tapestry;
+    }
+
+    private function _getDefaultSettings()
+    {
+        $post = get_post($this->postId);
+        $settings = new stdClass();
+        $settings->tapestrySlug = $post->post_name;
+        $settings->title = $post->post_title;
+        $settings->status = $post->post_status;
+        $settings->backgroundUrl = '';
+        $settings->autoLayout = false;
+        $settings->nodeDraggable = true;
+        $settings->showAccess = true;
+        $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
+        $settings->superuserOverridePermissions = true;
+        $settings->permalink = get_permalink($this->postId);
+
+        return $settings;
     }
 
     private function _getAuthor()
@@ -443,11 +477,6 @@ class Tapestry implements ITapestry
     {
         $tapestry = $this->_formTapestry();
 
-        if ($this->updateTapestryPost) {
-            $this->postId = TapestryHelpers::updatePost($tapestry, 'tapestry', $this->postId);
-            $this->_resetAuthor();
-        }
-
         update_post_meta($this->postId, 'tapestry', $tapestry);
 
         return $tapestry;
@@ -461,15 +490,16 @@ class Tapestry implements ITapestry
         ]);
     }
 
-    private function _getTapestry()
+    private function _getTapestry($filterUserId)
     {
-        $tapestry = $this->_filterTapestry($this->_formTapestry());
+        $tapestry = $this->_filterTapestry($this->_formTapestry(), $filterUserId);
 
         $tapestry->nodes = $this->setUnlocked($tapestry->nodes);
         $tapestry->nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
-                if (TapestryUserRoles::isRole('copilot')) {
+                $roles = new TapestryUserRoles();
+                if ($roles->isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';
                     } else {
@@ -494,13 +524,19 @@ class Tapestry implements ITapestry
         return $tapestry;
     }
 
-    private function _filterTapestry($tapestry)
+    private function _filterTapestry($tapestry, $filterUserId)
     {
-        if ((!TapestryUserRoles::isEditor())
-            && (!TapestryUserRoles::isAdministrator())
-            && (!TapestryUserRoles::isAuthorOfThePost($this->postId))
-        ) {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId);
+        $roles = new TapestryUserRoles();
+
+        if (!isset($tapestry->settings->superuserOverridePermissions)) {
+            $tapestry->settings->superuserOverridePermissions = true;
+        }
+
+        if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+            return $tapestry;
+        } else {
+            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->nodes, $tapestry->rootId,
+                $tapestry->settings->superuserOverridePermissions, $filterUserId);
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -523,15 +559,14 @@ class Tapestry implements ITapestry
         return $newLinks;
     }
 
-    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId)
+    private function _filterNodeMetaIdsByPermissions($nodeMetaIds, $rootId, $superuser_override, $secondaryUserId)
     {
-        $options = TapestryNodePermissions::getNodePermissions();
-        $userId = wp_get_current_user()->ID;
-        $groupIds = TapestryHelpers::getGroupIdsOfUser($userId, $this->postId);
+        $currentUserId = wp_get_current_user()->ID;
 
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeMetaId) {
-            if ($this->_pathIsAllowed($nodeMetaId, $rootId)) {
+            if ($this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $currentUserId)
+                || $this->_pathIsAllowed($nodeMetaId, $rootId, [], $superuser_override, $secondaryUserId)) {
                 array_push($nodesPermitted, $nodeMetaId);
             }
         }
@@ -539,13 +574,15 @@ class Tapestry implements ITapestry
         return $nodesPermitted;
     }
 
-    private function _pathIsAllowed($from, $to, $checked = [])
+    private function _pathIsAllowed($from, $to, $checked = [], $superuser_override, $userId)
     {
         if (in_array($from, $checked)) {
             return false;
         }
 
-        if (TapestryHelpers::currentUserIsAllowed('READ', $from, $this->postId) || (TapestryHelpers::currentUserIsAllowed('ADD', $from, $this->postId) || TapestryHelpers::currentUserIsAllowed('EDIT', $from, $this->postId))) {
+        if (TapestryHelpers::userIsAllowed('READ', $from, $this->postId, $superuser_override, $userId)
+            || (TapestryHelpers::userIsAllowed('ADD', $from, $this->postId, $superuser_override, $userId)
+            || TapestryHelpers::userIsAllowed('EDIT', $from, $this->postId, $superuser_override, $userId))) {
             if ($from == $to) {
                 return true;
             }
@@ -553,8 +590,8 @@ class Tapestry implements ITapestry
             $checked[] = $from;
 
             foreach ($this->links as $link) {
-                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked)) ||
-                    ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked))) {
+                if (($link->target == $from && $this->_pathIsAllowed($link->source, $to, $checked, $superuser_override, $userId)) ||
+                        ($link->source == $from && $this->_pathIsAllowed($link->target, $to, $checked, $superuser_override, $userId))) {
                     return true;
                 }
             }
