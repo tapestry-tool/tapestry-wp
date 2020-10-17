@@ -76,14 +76,32 @@
         >
           <b-form-group
             label="Export/Duplicate"
-            description="Export your tapestry to a file and then you can import it on another site. 
+            description="Export your tapestry to a file and then you can import it on another site.
               Duplicating will create a copy of this tapestry on this site."
           >
             <b-row class="mb-2">
               <b-col>
-                <b-button block variant="light" @click="exportTapestry">
-                  Export Tapestry
+                <b-button
+                  id="export-button"
+                  block
+                  variant="light"
+                  :class="isExporting ? 'disabled' : ''"
+                  :disabled="isExporting"
+                  @click="exportTapestry"
+                >
+                  <b-spinner v-if="isExporting" small></b-spinner>
+                  <div :style="isExporting ? 'opacity: 50%;' : ''">
+                    Export Tapestry
+                  </div>
                 </b-button>
+                <b-alert
+                  :show="hasExported"
+                  variant="success"
+                  style="margin-top: 1em;"
+                >
+                  Your Tapestry has been exported! Find the .json file in your
+                  downloads.
+                </b-alert>
               </b-col>
               <b-col>
                 <duplicate-tapestry-button />
@@ -191,7 +209,9 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       defaultDepth: 3,
+      isExporting: false,
       renderImages: true,
+      hasExported: false,
     }
   },
   computed: {
@@ -258,7 +278,13 @@ export default {
       this.fileUploading = status
     },
     exportTapestry() {
-      const tapestry = this.tapestryJson
+      this.isExporting = true
+      let filteredTapestry = this.tapestryJson
+      filteredTapestry.nodes = filteredTapestry.nodes.filter(
+        node => node.status === "publish"
+      )
+      const tapestry = filteredTapestry
+      tapestry["site-url"] = wpData.wpUrl
       const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
         type: "application/json",
       })
@@ -271,6 +297,8 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+      this.isExporting = false
+      this.hasExported = true
     },
   },
 }
@@ -293,6 +321,19 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#export-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+  }
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 
 #save-button {
