@@ -1,10 +1,12 @@
 <template>
   <div style="height: 800px; width: 100%">
+    <!--
     <div style="height: 150px overflow: auto;">
       <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
       <p>The bounds are: {{ setBounds }}</p>
       <p>Settings are: {{ settings }}</p>
     </div>
+    -->
     <l-map
       :zoom="zoom"
       :center="center"
