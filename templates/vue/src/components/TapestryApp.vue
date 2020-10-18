@@ -68,7 +68,6 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
-import "leaflet/dist/leaflet.css"
 import { names } from "@/config/routes"
 
 export default {
