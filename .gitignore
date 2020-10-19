@@ -7,3 +7,4 @@ cypress/screenshots
 cypress.json
 
 data/
+/.env
