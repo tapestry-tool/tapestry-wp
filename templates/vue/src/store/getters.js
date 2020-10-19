@@ -253,3 +253,7 @@ export function getNeighbours(state) {
       .map(link => (link.source == id ? link.target : link.source))
   }
 }
+
+export function getTapestryError(state) {
+  return state.TapestryError
+}

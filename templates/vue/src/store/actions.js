@@ -1,22 +1,34 @@
 import client from "../services/TapestryAPI"
 import Helpers from "../utils/Helpers"
+import ErrorHelper from "../utils/errorHelper"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
-export async function updateSettings({ commit }, newSettings) {
-  await client.updateSettings(JSON.stringify(newSettings))
+export async function updateSettings({ commit, dispatch }, newSettings) {
+  const response = await client.updateSettings(JSON.stringify(newSettings))
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("updateSettings", newSettings)
 }
 
-export async function updateH5pSettings({ commit }, newSettings) {
-  await client.updateH5pSettings(newSettings)
+export async function updateH5pSettings({ commit, dispatch }, newSettings) {
+  const response = await client.updateH5pSettings(newSettings)
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("updateH5pSettings", newSettings)
 }
 
 // nodes
 export async function addNode({ commit, dispatch, getters }, newNode) {
   const response = await client.addNode(JSON.stringify(newNode))
-
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   const nodeToAdd = { ...newNode }
   const id = response.data.id
   nodeToAdd.id = id
@@ -39,7 +51,10 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
     payload.id,
     JSON.stringify(payload.newNode)
   )
-
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   const newNode = { ...payload.newNode }
   newNode.id = response.data.id
   const id = payload.id
@@ -62,8 +77,12 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
   return id
 }
 
-export async function updateLockedStatus({ commit, getters }) {
+export async function updateLockedStatus({ commit, getters, dispatch }) {
   const userProgress = await client.getUserProgress()
+  if (ErrorHelper.isError(userProgress)) {
+    dispatch("addTapestryError", userProgress)
+    return
+  }
   for (const [nodeId, progress] of Object.entries(userProgress)) {
     const node = getters.getNode(nodeId)
     if (node) {
@@ -83,7 +102,7 @@ export async function updateLockedStatus({ commit, getters }) {
   }
 }
 
-export async function updateNodeProgress({ commit }, payload) {
+export async function updateNodeProgress({ commit, dispatch }, payload) {
   const { id, progress } = payload
 
   if (!wpData.wpUserId) {
@@ -92,14 +111,22 @@ export async function updateNodeProgress({ commit }, payload) {
     nodeProgress.progress = progress
     localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
   } else {
-    await client.updateUserProgress(id, progress)
+    const response = await client.updateUserProgress(id, progress)
+    if (ErrorHelper.isError(response)) {
+      dispatch("addTapestryError", response)
+      return
+    }
   }
 
   commit("updateNodeProgress", { id, progress })
 }
 
-export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
-  await client.updateNodeCoordinates(id, coordinates)
+export async function updateNodeCoordinates({ commit, dispatch }, { id, coordinates }) {
+  const response = await client.updateNodeCoordinates(id, coordinates)
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("updateNode", { id, newNode: { coordinates } })
 }
 
@@ -112,7 +139,11 @@ export async function completeNode(context, nodeId) {
     nodeProgress.completed = true
     localStorage.setItem(LOCAL_PROGRESS_ID, JSON.stringify(progressObj))
   } else {
-    await client.completeNode(nodeId)
+    const response = await client.completeNode(nodeId)
+    if (ErrorHelper.isError(response)) {
+      dispatch("addTapestryError", response)
+      return
+    }
   }
 
   commit("updateNode", {
@@ -122,16 +153,24 @@ export async function completeNode(context, nodeId) {
 
   const node = getters.getNode(nodeId)
   if (node.mediaType !== "video") {
-    await dispatch("updateNodeProgress", {
+    const response = await dispatch("updateNodeProgress", {
       id: nodeId,
       progress: 1,
     })
+    if (ErrorHelper.isError(response)) {
+      dispatch("addTapestryError", response)
+      return
+    }
   }
   return unlockNodes(context)
 }
 
-async function unlockNodes({ commit, getters }) {
+async function unlockNodes({ commit, getters, dispatch }) {
   const progress = await client.getUserProgress()
+  if (ErrorHelper.isError(progress)) {
+    dispatch("addTapestryError", progress)
+    return
+  }
   for (const [id, nodeProgress] of Object.entries(progress)) {
     const currentNode = getters.getNode(id)
     if (
@@ -160,25 +199,41 @@ export function updateNodePermissions(_, payload) {
   client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
 }
 
-export async function deleteNode({ commit }, id) {
-  await client.deleteNode(id)
+export async function deleteNode({ commit, dispatch }, id) {
+  const response = await client.deleteNode(id)
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("deleteNode", id)
 }
 
 export async function completeQuestion(
-  { commit },
+  { commit, dispatch },
   { answerType, formId, nodeId, questionId }
 ) {
-  await client.completeQuestion(nodeId, questionId)
+  const response = await client.completeQuestion(nodeId, questionId)
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   if (answerType !== "audioId") {
     const entry = await client.getUserEntry(formId)
+    if (ErrorHelper.isError(entry)) {
+      dispatch("addTapestryError", entry)
+      return
+    }
     commit("updateEntry", { answerType, entry, nodeId, questionId })
   }
   commit("completeQuestion", { nodeId, questionId })
 }
 
-export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
-  await client.saveAudio(audio, nodeId, questionId)
+export async function saveAudio({ commit, dispatch }, { audio, nodeId, questionId }) {
+  const response = await client.saveAudio(audio, nodeId, questionId)
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("updateEntry", {
     answerType: "audioId",
     entry: { audio },
@@ -188,16 +243,22 @@ export async function saveAudio({ commit }, { audio, nodeId, questionId }) {
 }
 
 // links
-export async function addLink({ commit }, newLink) {
+export async function addLink({ commit, dispatch }, newLink) {
   const response = await client.addLink(JSON.stringify(newLink))
-  if (!response) {
+  if (ErrorHelper.isError(response)) {
+    console.log(response)
+    dispatch("addTapestryError", response)
     return
   }
   commit("addLink", newLink)
 }
 
-export async function deleteLink({ commit }, { source, target }) {
-  await client.deleteLink({ source: source, target: target })
+export async function deleteLink({ commit, dispatch }, { source, target }) {
+  const response = await client.deleteLink({ source: source, target: target })
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("deleteLink", { source, target })
 }
 
@@ -210,14 +271,22 @@ export function toggleFavourite({ dispatch, getters }, id) {
   dispatch("updateUserFavourites", newFavourites)
 }
 
-export async function updateUserFavourites({ commit }, favourites) {
-  await client.updateUserFavourites(JSON.stringify(favourites))
+export async function updateUserFavourites({ commit, dispatch }, favourites) {
+  const response = await client.updateUserFavourites(JSON.stringify(favourites))
+  if (ErrorHelper.isError(response)) {
+    dispatch("addTapestryError", response)
+    return
+  }
   commit("updateFavourites", { favourites })
 }
 
-export async function refetchTapestryData({ commit, state }, filterUserId = null) {
+export async function refetchTapestryData({ commit, state, dispatch }, filterUserId = null) {
   const query = filterUserId === null ? {} : { filterUserId: filterUserId }
   const tapestry = await client.getTapestry(query)
+  if (ErrorHelper.isError(tapestry)) {
+    dispatch("addTapestryError", tapestry)
+    return
+  }
   const { nodes, links } = state
 
   const nodeIds = new Set(Object.values(nodes).map(node => node.id))
@@ -238,4 +307,9 @@ export async function refetchTapestryData({ commit, state }, filterUserId = null
   }
 
   commit("updateDataset", { nodes: nodeDiff, links: linkDiff })
+}
+
+export function addTapestryError({ commit }, error) {
+  const message = ErrorHelper.getErrorMessage(error)
+  commit("addTapestryError", { error: message })
 }

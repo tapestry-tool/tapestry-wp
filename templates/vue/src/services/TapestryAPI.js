@@ -21,28 +21,40 @@ class TapestryApi {
     if (data.filterUserId && data.filterUserId !== undefined) {
       url += "?filter_user_id=" + data.filterUserId
     }
-    const response = await axios.get(url)
-    return response.data
+    try {
+      const response = await axios.get(url)
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async addTapestry(data = {}) {
     const url = `${apiUrl}/tapestries`
-    const response = await axios.post(url, data)
-    return response.data
+    try {
+      const response = await axios.post(url, data)
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async getAllRoles() {
-    const usersRequest = await axios.get(`${apiUrl}/roles`)
-    const users = usersRequest.data
-    let wp_roles = new Set()
-    //defaults
-    wp_roles.add("public")
-    wp_roles.add("authenticated")
-    for (let role of Object.keys(users)) {
-      wp_roles.add(role)
+    try {
+      const usersRequest = await axios.get(`${apiUrl}/roles`)
+      const users = usersRequest.data
+      let wp_roles = new Set()
+      //defaults
+      wp_roles.add("public")
+      wp_roles.add("authenticated")
+      for (let role of Object.keys(users)) {
+        wp_roles.add(role)
+      }
+      wp_roles.delete("administrator")
+      return wp_roles
+    } catch (error) {
+      return error
     }
-    wp_roles.delete("administrator")
-    return wp_roles
   }
 
   async importTapestry(data) {
@@ -56,13 +68,21 @@ class TapestryApi {
   }
 
   async getNode(id) {
-    const data = await this.getTapestry()
-    return data.nodes[Helpers.findNodeIndex(id, data)]
+    try {
+      const data = await this.getTapestry()
+      return data.nodes[Helpers.findNodeIndex(id, data)]
+    } catch (error) {
+      return error
+    }
   }
 
   async getNodeProgress(id) {
-    const progress = await this.getUserProgress()
-    return progress[id]
+    try {
+      const progress = await this.getUserProgress()
+      return progress[id]
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -73,14 +93,22 @@ class TapestryApi {
    * @return  {Object}
    */
   async addNode(node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes`
-    const response = await axios.post(url, node)
-    return response
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes`
+      const response = await axios.post(url, node)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async deleteNode(id) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}`
-    return await axios.delete(url)
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}`
+      return await axios.delete(url)
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -94,15 +122,19 @@ class TapestryApi {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
     try {
       var response = await axios.post(url, link)
-    } catch(err) {
-      return
+      return response
+    } catch (error) {
+      return error
     }
-    return response
   }
 
   async deleteLink(link) {
-    const url = `${apiUrl}/tapestries/${this.postId}/links`
-    return await axios.delete(url, { data: link })
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/links`
+      return await axios.delete(url, { data: link })
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -114,9 +146,13 @@ class TapestryApi {
    * @return  {Object}
    */
   async updatePermissions(nodeMetaId, permissions) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/permissions`
-    const response = await axios.put(url, permissions)
-    return response
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/permissions`
+      const response = await axios.put(url, permissions)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -128,52 +164,80 @@ class TapestryApi {
    * @return  {Object}
    */
   async updateNode(nodeMetaId, node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
-    const response = await axios.put(url, node)
-    return response
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
+      const response = await axios.put(url, node)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async updateNodeCoordinates(id, coordinates) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/coordinates`
-    return await axios.put(url, coordinates)
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/coordinates`
+      return await axios.put(url, coordinates)
+    } catch (error) {
+      return error
+    }
   }
 
   async getUserProgress() {
-    const url = `${apiUrl}/users/progress?post_id=${this.postId}`
-    const response = await axios.get(url)
-    return response.data
+    try {
+      const url = `${apiUrl}/users/progress?post_id=${this.postId}`
+      const response = await axios.get(url)
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async updateUserProgress(id, progressValue) {
-    const url = `${apiUrl}/users/progress`
-    const response = await axios.post(url, {
-      post_id: this.postId,
-      node_id: id,
-      progress_value: progressValue,
-    })
-    return response
+    try {
+      const url = `${apiUrl}/users/progress`
+      const response = await axios.post(url, {
+        post_id: this.postId,
+        node_id: id,
+        progress_value: progressValue,
+      })
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async getUserEntry(formId = 0) {
-    const url = `${apiUrl}/users/entries`
-    const response = await axios.get(url, {
-      params: {
-        post_id: this.postId,
-        form_id: formId,
-      },
-    })
-    return response.data
+    try {
+      const url = `${apiUrl}/users/entries`
+      const response = await axios.get(url, {
+        params: {
+          post_id: this.postId,
+          form_id: formId,
+        },
+      })
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async getSettings() {
-    const tapestry = await this.getTapestry()
-    return tapestry.settings
+    try {
+      const tapestry = await this.getTapestry()
+      return tapestry.settings
+    } catch (error) {
+      return error
+    }
   }
 
   async updateSettings(settings) {
-    const url = `${apiUrl}/tapestries/${this.postId}/settings`
-    const response = await axios.put(url, settings)
-    return response
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/settings`
+      const response = await axios.put(url, settings)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -185,9 +249,13 @@ class TapestryApi {
    * @return  {Object}
    */
   async saveAudio(audio, nodeId, questionId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio`
-    const response = await axios.post(url, { audio, questionId })
-    return response
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio`
+      const response = await axios.post(url, { audio, questionId })
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   /**
@@ -198,48 +266,76 @@ class TapestryApi {
    * @return  {String}    audio       base64 data string
    */
   async getAudio(nodeId, questionId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
-    const response = await axios.get(url)
-    return response.data
+    try {
+      const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
+      const response = await axios.get(url)
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async completeNode(nodeId) {
-    const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
-    const response = await axios.post(url)
-    return response
+    try {
+      const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
+      const response = await axios.post(url)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async completeQuestion(nodeId, questionId) {
-    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
-    const response = await axios.post(url)
-    return response
+    try {
+      const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+      const response = await axios.post(url)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async getH5pSettings() {
-    const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
-    const response = await axios.get(url)
-    return response
+    try {
+      const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
+      const response = await axios.get(url)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async updateH5pSettings(settings) {
-    const url = `${apiUrl}/users/h5pSettings/${this.postId}`
-    const response = await axios.post(url, settings)
-    return response
+    try {
+      const url = `${apiUrl}/users/h5pSettings/${this.postId}`
+      const response = await axios.post(url, settings)
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async getUserFavourites() {
-    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
-    const response = await axios.get(url)
-    return response.data
+    try {
+      const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
+      const response = await axios.get(url)
+      return response.data
+    } catch (error) {
+      return error
+    }
   }
 
   async updateUserFavourites(favourites) {
-    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
-    const response = await axios.post(url, {
-      post_id: this.postId,
-      favourites: favourites,
-    })
-    return response
+    try {
+      const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
+      const response = await axios.post(url, {
+        post_id: this.postId,
+        favourites: favourites,
+      })
+      return response
+    } catch (error) {
+      return error
+    }
   }
 
   async getAllContributors() {

@@ -300,3 +300,7 @@ export function updateOrdering(state, payload) {
 export function updateVisibleNodes(state, nodes) {
   state.visibleNodes = nodes
 }
+
+export function addTapestryError(state, error) {
+  state.tapestryError = error
+}
