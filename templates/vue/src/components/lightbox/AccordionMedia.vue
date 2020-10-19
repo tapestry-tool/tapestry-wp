@@ -168,7 +168,6 @@ export default {
     return {
       showCompletion: false,
       isMounted: false,
-      activeIndex: 0,
     }
   },
   computed: {
@@ -196,9 +195,6 @@ export default {
     },
     headerBackground() {
       return { backgroundImage: `url(${Helpers.getImagePath(AccordionHeader)})` }
-    },
-    hasNext() {
-      return this.activeIndex < this.rows.length - 1
     },
     rows() {
       return this.node.childOrdering.map(id => {
@@ -228,6 +224,17 @@ export default {
     },
     moduleOpened() {
       return this.selectedModuleId !== null
+    },
+    progress() {
+      const rows = this.getDirectChildren(this.node.id)
+      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+    },
+  },
+  watch: {
+    progress(val) {
+      if (val >= 1) {
+        this.$emit("complete")
+      }
     },
   },
   mounted() {
@@ -260,36 +267,6 @@ export default {
         el.scrollTop = 0
       }
     },
-    toggle(index) {
-      if (this.activeIndex === index) {
-        const activeRowId = this.rows[this.activeIndex].node.id
-        this.activeIndex = -1
-        client.recordAnalyticsEvent("user", "close", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      } else {
-        this.activeIndex = index
-        const activeRowId = this.rows[this.activeIndex].node.id
-        client.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      }
-    },
-    next(evt) {
-      client.recordAnalyticsEvent("user", "next", "accordion", this.node.id, {
-        x: evt.clientX,
-        y: evt.clientY,
-      })
-      if (this.hasNext) {
-        this.activeIndex++
-        const activeRowId = this.rows[this.activeIndex].node.id
-        client.recordAnalyticsEvent("user", "open", "accordion-row", activeRowId, {
-          accordion: this.node.id,
-        })
-      } else {
-        this.showCompletion = true
-      }
-    },
     handleClose(evt) {
       client.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
         x: evt.clientX,
@@ -316,23 +293,10 @@ export default {
       }
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
-    async updateProgress(rowId) {
+    updateProgress(rowId) {
       const row = this.getNode(rowId)
       if (Helpers.canUserUpdateProgress(row) && !this.readOnly) {
-        const { accordionProgress } = this.node
-        if (!accordionProgress.includes(rowId)) {
-          accordionProgress.push(rowId)
-
-          await this.updateNode({
-            id: this.node.id,
-            newNode: { accordionProgress },
-          })
-          await this.completeNode(rowId)
-
-          if (accordionProgress.length === this.rows.length) {
-            this.$emit("complete")
-          }
-        }
+        this.completeNode(rowId)
       }
     },
     showActivityIcon(mediaType) {
