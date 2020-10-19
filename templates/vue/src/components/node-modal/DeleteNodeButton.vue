@@ -21,17 +21,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getNeighbouringLinks"]),
+    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
     ...mapState(["nodes", "rootId"]),
     neighbourLink() {
       return this.getNeighbouringLinks(this.nodeId)[0]
     },
     neighbour() {
-      const neighbour =
-        this.neighbourLink.source == this.nodeId
-          ? this.neighbourLink.target
-          : this.neighbour.source
-      return this.getNode(neighbour)
+      return this.getNode(this.getNeighbours(this.nodeId)[0])
     },
     isRoot() {
       return this.nodeId === this.rootId
