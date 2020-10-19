@@ -11,7 +11,6 @@
       v-show="!locked && progress > 0 && status === 'publish'"
       ref="path"
       class="bar"
-      :transform="`translate(${x}, ${y})`"
     ></path>
   </g>
 </template>
