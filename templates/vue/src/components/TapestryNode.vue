@@ -438,7 +438,7 @@ export default {
       } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
           ? this.handleRequestOpen()
-          : this.updateSelectedNode(this.node.id)
+          : this.updateRootNode()
       }
     },
     hasPermission(action) {
