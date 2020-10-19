@@ -68,13 +68,13 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="(hasPermission('add') || isAuthenticated) && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
             :x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
-            v-if="hasPermission('edit')"
+            v-if="isLoggedIn && hasPermission('edit')"
             class="node-button-wrapper"
             x="5"
             :y="radius - 30"
@@ -89,7 +89,7 @@
           </foreignObject>
         </g>
       </g>
-      <defs v-if="node.imageURL">
+      <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
@@ -116,6 +116,7 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -151,6 +152,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    isLoggedIn() {
+      return isLoggedIn
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -200,7 +204,20 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
+      if (
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
+        this.node.nodeType !== "grandchild" &&
+        showImages
+      ) {
         return `url(#node-image-${this.node.id})`
       }
       return "#8396a1"
@@ -224,9 +241,6 @@ export default {
         .map(this.getNode)
         .filter(n => n.status !== "draft")
       return rows.filter(row => row.completed).length / rows.length
-    },
-    isAuthenticated() {
-      return wpData.currentUser.ID !== 0
     },
   },
   watch: {

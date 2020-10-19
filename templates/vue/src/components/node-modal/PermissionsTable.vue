@@ -47,7 +47,7 @@ const PERMISSIONS_ORDER = [
   "public",
   "authenticated",
   ...Object.keys(wpData.roles).filter(
-    role => role !== "administrator" && role !== "author"
+    role => role !== "editor" && role !== "administrator" && role !== "author"
   ),
 ]
 
@@ -76,13 +76,6 @@ export default {
           orderedPermissions.push([permission, this.value[higherPermission]])
         }
       })
-      Object.entries(this.value)
-        .filter(entry => {
-          return !orderedPermissions.some(
-            permissionMap => permissionMap[0] === entry[0]
-          )
-        })
-        .forEach(entry => orderedPermissions.push(entry))
       return orderedPermissions
     },
   },
@@ -140,11 +133,16 @@ export default {
         this.getPermissionRowIndex(rowName)
       ][1]
 
+      // We don't support node additions or editing for public users
+      if (rowName === "public" && (type === "add" || type === "edit")) {
+        return true
+      }
+
       if (
-        currentPermissions.includes("add") ||
-        currentPermissions.includes("edit")
+        type === "read" &&
+        (currentPermissions.includes("add") || currentPermissions.includes("edit"))
       ) {
-        return type === "read"
+        return true
       }
 
       // If the row is the first in order, it should never be overridden
