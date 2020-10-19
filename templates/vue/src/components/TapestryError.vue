@@ -13,7 +13,7 @@ export default {
     }
   },
   watch: {
-    hasError(error) {
+    hasError() {
       console.log("watch");
       if (this.tapestryError) {
         this.makeToast("Error", this.tapestryError.error);
