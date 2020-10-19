@@ -2,7 +2,6 @@
   <loading v-if="loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tyde />
-    <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
     <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>

@@ -36,8 +36,14 @@ export default {
       escMenuOpenListener: null,
     }
   },
-  async mounted() {
-    this.escMenuOpenListener = window.addEventListener("keydown", evt => {
+  computed: {
+    ...mapState(["lightbox"]),
+    spaceshipIconUrl() {
+      return Helpers.getImagePath(SpaceshipIcon)
+    },
+  },
+  mounted() {
+    this.escMenuOpenListener = evt => {
       if (evt.code === "Escape") {
         if (this.lightbox) {
           if (
@@ -51,17 +57,12 @@ export default {
         }
         this.toggleMenu()
       }
-    })
+    }
+    window.addEventListener("keydown", this.escMenuOpenListener)
     this.backgroundAudio.loop = true
   },
-  computed: {
-    ...mapState(["lightbox"]),
-    spaceshipIconUrl() {
-      return Helpers.getImagePath(SpaceshipIcon)
-    },
-  },
   beforeDestroy() {
-    window.removeEventListener(this.escMenuOpenListener)
+    window.removeEventListener("keydown", this.escMenuOpenListener)
   },
   methods: {
     continueTapestry() {
