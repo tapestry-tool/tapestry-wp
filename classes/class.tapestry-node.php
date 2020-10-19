@@ -41,6 +41,7 @@ class TapestryNode implements ITapestryNode
     private $comments;
     private $license;
     private $references;
+    private $reviewed;
 
     /**
      * Constructor.
@@ -83,6 +84,7 @@ class TapestryNode implements ITapestryNode
         $this->comments = [];
         $this->license = '';
         $this->references = '';
+        $this->reviewed = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -190,6 +192,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->references) && is_string($node->references)) {
             $this->references = $node->references;
+        }
+        if (isset($node->reviewed) && is_bool($node->reviewed)) {
+            $this->reviewed = $node->reviewed;
         }
     }
 
@@ -415,6 +420,7 @@ class TapestryNode implements ITapestryNode
             'comments' => $this->comments,
             'license' => $this->license,
             'references' => $this->references,
+            'reviewed' => $this->reviewed,
         ];
     }
 
