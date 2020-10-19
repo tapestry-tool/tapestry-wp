@@ -1,5 +1,6 @@
 <template>
   <div v-if="canReview">
+    <div class="pl-1 pr-1">Last Updated: {{ currTime }}</div>
     <b-dropdown id="dropdown-1" :disabled="pending < 1" class="m-md-2">
       <template #button-content>
         {{ text }}
@@ -22,6 +23,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex"
+import moment from "moment-timezone"
 
 export default {
   name: "tapestry-notifications",
@@ -30,6 +32,9 @@ export default {
   },
   computed: {
     ...mapState(["nodes"]),
+    currTime() {
+      return moment().format("YYYY-MM-DD HH:mm")
+    },
     canReview() {
       return wpData.wpCanEditTapestry === "1"
     },
