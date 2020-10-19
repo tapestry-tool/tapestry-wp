@@ -132,6 +132,7 @@ export default {
   },
   mounted() {
     this.updateViewBox()
+    DragSelectModular.initializeDragSelectZone("tapestry")
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
