@@ -1,6 +1,13 @@
 <template>
   <div v-if="canReview">
-    <b-dropdown id="dropdown-1" :disabled="pending < 1" :text="text" class="m-md-2">
+    <b-dropdown id="dropdown-1" :disabled="pending < 1" class="m-md-2">
+      <template #button-content>
+        {{ text }}
+        <b-badge v-if="newReviewables > 0" pill variant="primary">
+          {{ newReviewables }} new
+        </b-badge>
+      </template>
+
       <b-dropdown-item
         v-for="node in reviewNodes"
         :key="node.id"
@@ -10,7 +17,6 @@
         <b-badge v-if="isNew(node)">New</b-badge>
       </b-dropdown-item>
     </b-dropdown>
-    <div v-if="newReviewables > 0">New: {{ newReviewables }}</div>
   </div>
 </template>
 
