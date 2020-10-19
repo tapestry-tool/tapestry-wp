@@ -231,7 +231,7 @@ export function createDefaultNode({ settings }) {
 
 export function tapestryJson(state) {
   const exportedTapestry = {
-    nodes: state.nodes.map(node => {
+    nodes: Object.values(state.nodes).map(node => {
       const newNode = { ...node }
       if (newNode.quiz) {
         newNode.quiz = newNode.quiz.map(question => {
