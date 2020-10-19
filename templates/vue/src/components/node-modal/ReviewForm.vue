@@ -21,6 +21,7 @@
 <script>
 import RichTextForm from "./content-form/RichTextForm"
 import moment from "moment-timezone"
+import { mapActions } from "vuex"
 
 export default {
   components: {
@@ -39,8 +40,11 @@ export default {
   },
   mounted() {
     moment.tz.setDefault("America/Vancouver")
+    this.setReviewStatus()
   },
   methods: {
+    ...mapActions(["updateNode"]),
+
     handleReject() {
       this.node.status = "reject"
       this.handleSubmit()
@@ -58,6 +62,13 @@ export default {
         author_email: data.user_email,
       })
       this.$emit("submit")
+    },
+    async setReviewStatus() {
+      this.node.reviewed = true
+      await this.updateNode({
+        id: this.node.id,
+        newNode: this.node,
+      })
     },
   },
 }
