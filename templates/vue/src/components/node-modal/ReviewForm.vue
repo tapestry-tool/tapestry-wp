@@ -43,7 +43,6 @@ export default {
   methods: {
     handleReject() {
       this.node.status = "reject"
-      console.log(this.node.status)
       this.handleSubmit()
     },
     handleAccept() {
