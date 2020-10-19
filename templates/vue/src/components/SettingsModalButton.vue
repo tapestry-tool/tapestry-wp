@@ -49,7 +49,13 @@ export default {
       immediate: true,
       handler(requestedTab) {
         if (this.settingsModalOpen) {
-          const acceptedTabs = ["appearance", "advanced", "access"]
+          const acceptedTabs = [
+            "appearance",
+            "tyde",
+            "profile",
+            "advanced",
+            "access",
+          ]
           if (!acceptedTabs.includes(requestedTab)) {
             this.$router.replace({
               name: names.SETTINGS,

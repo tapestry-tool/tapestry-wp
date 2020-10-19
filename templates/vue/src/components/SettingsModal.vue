@@ -84,7 +84,11 @@
             />
           </b-form-group>
         </b-tab>
-        <b-tab title="Profile">
+        <b-tab
+          title="Profile"
+          :active="tab === 'profile'"
+          @click="$emit('change:tab', 'profile')"
+        >
           <slick-list
             :value="profileActivities"
             lock-axis="y"
