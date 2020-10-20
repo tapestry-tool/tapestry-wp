@@ -51,13 +51,4 @@ export default class DragSelectModular {
   static pauseDragSelect() {
     DragSelectModular.dragSelect.break()
   }
-
-  static initializeDragSelectZone(mainElementId) {
-    let allowedArea = document.getElementById(mainElementId)
-    document.body.addEventListener("mousedown", function(event) {
-      if (!allowedArea.contains(event.target)) {
-        DragSelectModular.pauseDragSelect()
-      }
-    })
-  }
 }

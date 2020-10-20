@@ -30,7 +30,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g>
+        <g v-if="dragSelectReady">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -41,6 +41,7 @@
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
+            @nodemounted="updateSelectableNodes"
           ></tapestry-node>
         </g>
         <locked-tooltip
@@ -82,6 +83,7 @@ export default {
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
       maxDepth: 0,
+      dragSelectReady: false,
     }
   },
   computed: {
@@ -127,17 +129,18 @@ export default {
       },
     },
   },
-  created() {
-    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
-  },
   mounted() {
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     this.updateViewBox()
-    DragSelectModular.initializeDragSelectZone("tapestry")
+    this.dragSelectReady = true
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    updateSelectableNodes() {
+      DragSelectModular.updateSelectableNodes()
     },
     updateViewBox() {
       const MAX_RADIUS = 240
