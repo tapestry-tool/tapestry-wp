@@ -7,13 +7,14 @@
       <p>Settings are: {{ settings }}</p>
     </div>
     -->
+
     <l-map
-      :zoom="zoom"
-      :center="center"
       :options="mapOptions"
       :max-bounds="setBounds"
       :bounds="setBounds"
       style="height: 80%"
+      :zoom="zoom"
+      :center="center"
       @update:center="updateCenter"
       @update:zoom="updateZoom"
     >
@@ -49,6 +50,8 @@ export default {
       },
       mapOptions: {
         zoomSnap: 0.5,
+        zoomControl: false,
+        scrollWheelZoom: false,
       },
     }
   },
