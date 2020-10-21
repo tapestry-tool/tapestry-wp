@@ -16,7 +16,7 @@ describe("duplicate tapestry button", () => {
   it("should show confirmation with the link if duplication succeeds", async () => {
     const slug = "testing"
     client.addTapestry.mockImplementationOnce(() =>
-      Promise.resolve({ settings: { tapestrySlug: slug } })
+      Promise.resolve({ settings: { permalink: slug } })
     )
 
     const screen = render(DuplicateTapestryButton, root)
