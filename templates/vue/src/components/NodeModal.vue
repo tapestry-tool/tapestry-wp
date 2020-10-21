@@ -192,7 +192,7 @@ const shouldFetch = (url, selectedNode) => {
     return true
   }
   const oldUrl = selectedNode.typeData.linkMetadata.url
-  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
+  return oldUrl != Helpers.normalizeUrl(url)
 }
 
 export default {
@@ -262,7 +262,7 @@ export default {
       if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
-          this.parent.status !== "draft"
+          (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
         return this.getNeighbours(this.nodeId).some(neighbourId => {
@@ -494,7 +494,7 @@ export default {
         this.node.status = "draft"
         this.updateNodeCoordinates()
 
-        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+        if (this.node.mediaType == "url-embed" && this.node.behaviour != "embed") {
           await this.setLinkData()
         }
 
@@ -673,9 +673,7 @@ export default {
 
         if (data) {
           this.node.typeData.linkMetadata = data
-
           if (
-            !this.node.imageURL ||
             confirm(
               "Would you like to use the link preview image as the thumbnail image?"
             )
@@ -683,7 +681,6 @@ export default {
             this.node.imageURL = data.image
           }
           if (
-            !this.node.lockedImageURL ||
             confirm(
               "Would you like to use the link preview image as the locked thumbnail image?"
             )

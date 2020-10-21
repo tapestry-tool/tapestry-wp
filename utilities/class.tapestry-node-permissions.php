@@ -20,7 +20,7 @@ class TapestryNodePermissions
         ];
 
         foreach ($roles as $role) {
-            if ('Administrator' !== $role && 'Author' !== $role) {
+            if ('Editor' !== $role && 'Administrator' !== $role && 'Author' !== $role) {
                 $permissions[strtolower($role)] = ['read'];
             }
         }

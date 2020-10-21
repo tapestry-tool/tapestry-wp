@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.32.0-beta
+ * Version: 2.35.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.32.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.35.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -45,9 +45,6 @@ function create_tapestry_type()
         'show_in_nav_menus' => true,
         'exclude_from_search' => false,
         'capability_type' => 'post',
-        'capabilities' => [
-            'create_posts' => 'administrator',
-        ],
         'map_meta_cap' => true,
         'hierarchical' => false,
         'rewrite' => ['with_front' => true],
@@ -143,6 +140,7 @@ function tapestry_enqueue_vue_app()
                 'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
+                'wpUrl' => get_bloginfo('url'),
                 'app_path' => $post->post_name, // page where the custom page template is loaded.
                 'post_categories' => get_terms([
                     'taxonomy' => 'category', // default post categories.
