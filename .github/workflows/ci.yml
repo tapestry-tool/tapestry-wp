@@ -14,6 +14,8 @@ jobs:
       - name: Launch containers
         run: docker-compose up -d
       - name: Wait for containers to be ready
+        env:
+          DOCKER_WP_INSTALL_DELAY: 60
         run: bash ./bin/await-containers.sh
       - name: Setup WP
         run: sh ./bin/install.sh
@@ -32,4 +34,3 @@ jobs:
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080/dist/build.js"
           working-directory: templates/vue
-
