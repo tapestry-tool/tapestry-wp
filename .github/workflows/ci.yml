@@ -30,6 +30,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          config: defaultCommandTimeout=10000,requestTimeout=10000
           start: npm start
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080/dist/build.js"

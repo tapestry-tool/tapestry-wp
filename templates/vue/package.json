@@ -11,7 +11,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
-    "test:e2e": "cypress run --headless -b chrome --config watchForFileChanges=false,defaultCommandTimeout=10000,requestTimeout=10000",
+    "test:e2e": "cypress run --headless -b chrome --config watchForFileChanges=false",
     "test:e2e:open": "cypress open",
     "report:e2e": "nyc report --reporter=text",
     "report:e2e:open": "nyc report --reporter=html && open coverage/index.html"
