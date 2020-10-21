@@ -1,29 +1,33 @@
 <template>
   <div style="height: 800px; width: 100%">
+    <!--
     <div style="height: 150px overflow: auto;">
       <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
       <p>The bounds are: {{ setBounds }}</p>
       <p>Settings are: {{ settings }}</p>
     </div>
+    -->
+
     <l-map
-      :zoom="zoom"
-      :center="center"
       :options="mapOptions"
       :max-bounds="setBounds"
       :bounds="setBounds"
       style="height: 80%"
+      :zoom="zoom"
+      :center="center"
       @update:center="updateCenter"
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
+      <l-rectangle :bounds="rectangleBounds" :l-style="rectangle.style" />
     </l-map>
   </div>
 </template>
 
 <script>
+import "leaflet/dist/leaflet.css"
 import { latLng, latLngBounds } from "leaflet"
-//  LMarker, LPopup, LTooltip
-import { LMap, LTileLayer } from "vue2-leaflet"
+import { LMap, LTileLayer, LRectangle } from "vue2-leaflet"
 import { mapState } from "vuex"
 
 export default {
@@ -31,9 +35,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    // LMarker,
-    // LPopup,
-    // LTooltip
+    LRectangle,
   },
   data() {
     return {
@@ -43,8 +45,13 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(47.41322, -1.219482),
+      rectangle: {
+        style: { color: "red", weight: 2, fill: false },
+      },
       mapOptions: {
         zoomSnap: 0.5,
+        zoomControl: false,
+        scrollWheelZoom: false,
       },
     }
   },
@@ -52,10 +59,26 @@ export default {
     ...mapState(["settings"]),
     setBounds() {
       const x = latLngBounds([
-        [this.settings.mapBounds.neLat || 90, this.settings.mapBounds.neLng || 180],
         [
-          this.settings.mapBounds.swLat || -90,
-          this.settings.mapBounds.swLng || -180,
+          +this.settings.mapBounds.swLat || -90,
+          +this.settings.mapBounds.swLng || -180,
+        ],
+        [
+          +this.settings.mapBounds.neLat || 90,
+          +this.settings.mapBounds.neLng || 180,
+        ],
+      ])
+      return x
+    },
+    rectangleBounds() {
+      const x = latLngBounds([
+        [
+          +this.settings.mapBounds.neLat || 90,
+          +this.settings.mapBounds.neLng || 180,
+        ],
+        [
+          +this.settings.mapBounds.swLat || -90,
+          +this.settings.mapBounds.swLng || -180,
         ],
       ])
       return x
