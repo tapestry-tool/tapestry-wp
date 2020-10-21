@@ -513,7 +513,6 @@ export default {
       this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
-        this.node.status = "publish"
         this.updateNodeCoordinates()
         this.loading = true
 
