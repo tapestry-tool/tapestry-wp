@@ -19,7 +19,6 @@
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
-      <l-rectangle :bounds="rectangleBounds" :l-style="rectangle.style" />
     </l-map>
   </div>
 </template>
@@ -27,7 +26,7 @@
 <script>
 import "leaflet/dist/leaflet.css"
 import { latLng, latLngBounds } from "leaflet"
-import { LMap, LTileLayer, LRectangle } from "vue2-leaflet"
+import { LMap, LTileLayer } from "vue2-leaflet"
 import { mapState } from "vuex"
 
 export default {
@@ -35,7 +34,6 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LRectangle,
   },
   data() {
     return {
@@ -45,12 +43,8 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(47.41322, -1.219482),
-      rectangle: {
-        style: { color: "red", weight: 2, fill: false },
-      },
       mapOptions: {
-        zoomSnap: 0.5,
-        zoomControl: false,
+        zoomSnap: 0.1,
         scrollWheelZoom: false,
       },
     }
