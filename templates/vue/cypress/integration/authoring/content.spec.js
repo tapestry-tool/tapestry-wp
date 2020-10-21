@@ -3,7 +3,6 @@ import { setup, cleanup } from "../../support/utils"
 describe("Node content", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    cy.fixture("two-nodes.json").as("twoNodes")
   })
 
   afterEach(cleanup)
@@ -11,14 +10,16 @@ describe("Node content", () => {
   it("Should be able to edit content fields and see the changes applied", () => {
     setup("@oneNode")
 
-    const newNode = {
-      title: "New root!",
-    }
-    cy.getNodeByIndex(0).then(node => {
+    cy.getSelectedNode().then(node => {
       const oldTitle = node.title
-      cy.getNodeByIndex(0).editNode(newNode)
+      cy.contains(oldTitle).should("exist")
+
+      cy.getNodeByTitle(oldTitle).editNode({
+        title: "new title",
+      })
+
       cy.contains(oldTitle).should("not.exist")
-      cy.contains(newNode.title).should("exist")
+      cy.contains("new title").should("exist")
     })
   })
 
@@ -34,7 +35,7 @@ describe("Node content", () => {
           textContent: "Hello world!",
         },
       }
-      cy.getNodeByIndex(0)
+      cy.getSelectedNode()
         .editNode(newNode)
         .openLightbox()
         .contains(newNode.typeData.textContent)
@@ -49,7 +50,7 @@ describe("Node content", () => {
             "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
         },
       }
-      cy.getNodeByIndex(0)
+      cy.getSelectedNode()
         .editNode(newNode)
         .openLightbox()
         .within(() => {
@@ -57,7 +58,26 @@ describe("Node content", () => {
         })
     })
 
-    it("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {
+    it("Should be able to add an external link node and have it show a summary of the external page", () => {
+      const newNode = {
+        mediaType: "url-embed",
+        typeData: {
+          behaviour: "new-window",
+          title: "5 JavaScript Tricks That Are Good To Know",
+          url:
+            "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
+        },
+      }
+      cy.getSelectedNode()
+        .editNode(newNode)
+        .openLightbox()
+        .within(() => {
+          cy.contains(newNode.typeData.title).should("exist")
+        })
+    })
+
+    // Skipping this because related to gravity forms
+    it.skip("Should be able to add a quiz to a video and have that quiz appear at the end of the video", () => {
       const newNode = {
         mediaType: "video",
         typeData: {
@@ -74,7 +94,7 @@ describe("Node content", () => {
         ],
       }
 
-      cy.getNodeByIndex(0)
+      cy.getSelectedNode()
         .editNode(newNode) // TODO: Add support for quiz updates
         .openLightbox()
         .within(() => {
@@ -91,35 +111,18 @@ describe("Node content", () => {
         })
     })
 
-    it("Should be able to add a Gravity Form and have the form be visible", () => {
+    // Skipping this because related to gravity forms
+    it.skip("Should be able to add a Gravity Form and have the form be visible", () => {
       const newNode = {
         mediaType: "gravity-form",
         typeData: {
           id: 1,
         },
       }
-      cy.getNodeByIndex(0)
+      cy.getSelectedNode()
         .editNode(newNode)
         .openLightbox()
         .within(() => cy.get(".gf-container").should("exist"))
-    })
-
-    it("Should be able to add an external link node and have it show a summary of the external page", () => {
-      const newNode = {
-        mediaType: "url-embed",
-        typeData: {
-          behaviour: "new-window",
-          title: "5 JavaScript Tricks That Are Good To Know",
-          url:
-            "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
-        },
-      }
-      cy.getNodeByIndex(0)
-        .editNode(newNode)
-        .openLightbox()
-        .within(() => {
-          cy.contains(newNode.typeData.title).should("exist")
-        })
     })
   })
 })
