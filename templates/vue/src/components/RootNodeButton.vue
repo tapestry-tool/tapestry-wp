@@ -1,15 +1,22 @@
 <template>
   <div id="root-node-button">
+    <import-changelog :changes="changes" />
     <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
     <p>Or</p>
     <b-button class="import-button" @click="openFileBrowser">
-      Import a Tapestry
+      <b-spinner v-if="isImporting"></b-spinner>
+
+      <div v-else>
+        Import a Tapestry
+      </div>
     </b-button>
     <div v-if="error" style="margin-top: 16px;">
       {{ error.message }}
+      <br />
+      Please try with another file.
     </div>
     <input
       ref="fileInput"
@@ -33,13 +40,22 @@
 <script>
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
+import ImportChangelog from "./ImportChangelog"
 
 export default {
   name: "root-node-button",
+  components: {
+    ImportChangelog,
+  },
   data() {
     return {
       error: null,
       isDragover: false,
+      isImporting: false,
+      changes: {
+        noChange: true,
+        permissions: new Set(),
+      },
     }
   },
   methods: {
@@ -85,13 +101,69 @@ export default {
     },
     importTapestry(file) {
       const reader = new FileReader()
-      reader.onload = e => {
+      reader.onload = async e => {
+        this.error = ""
+
+        this.isImporting = true
+        let upload
+        try {
+          upload = JSON.parse(e.target.result)
+          this.validateTapestryJSON(upload)
+        } catch (err) {
+          this.error = err
+          this.isImporting = false
+          return
+        }
+        if (!(upload["site-url"] == wpData.wpUrl)) {
+          await this.prepareImport(upload)
+        }
         client
-          .importTapestry(JSON.parse(e.target.result))
-          .then(() => location.reload()) // TODO: Change this so a refresh isn't required
-          .catch(err => (this.error = err))
+          .importTapestry(upload)
+          .then(() => {
+            this.isImporting = false
+            this.$bvModal.show("import-changelog")
+          }) // TODO: Change this so a refresh isn't required
+          .catch(err => {
+            this.error = err
+          })
       }
       reader.readAsText(file)
+    },
+    async prepareImport(data) {
+      let wp_roles = await client.getAllRoles()
+      for (let node of data.nodes) {
+        const originalPerms = node.permissions
+        node.permissions = Object.keys(node.permissions)
+          .filter(key => wp_roles.has(key))
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: node.permissions[key],
+            }
+          }, {})
+        const keys = Object.keys(node.permissions)
+        for (let key in originalPerms) {
+          if (!keys.includes(key)) {
+            this.changes.permissions.add(key)
+          }
+        }
+        if (node.permissionsOrder) {
+          node.permissionsOrder = node.permissionsOrder.filter(role =>
+            wp_roles.has(role)
+          )
+        }
+        if (this.changes.permissions.size > 0) {
+          this.changes.noChange = false
+        }
+      }
+    },
+    validateTapestryJSON(upload) {
+      const properties = ["nodes", "links", "groups", "site-url"]
+      properties.forEach(property => {
+        if (!upload.hasOwnProperty(property)) {
+          throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
+        }
+      })
     },
   },
 }
@@ -158,5 +230,12 @@ export default {
   &.drag-over {
     opacity: 1;
   }
+}
+
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

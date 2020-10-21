@@ -141,19 +141,11 @@ export default class Helpers {
     const out = { ...source }
     for (const key in other) {
       const value = other[key]
-      if (typeof value === "object" && !Array.isArray(value)) {
-        out[key] = Helpers.merge(out[key], value)
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        out[key] = Helpers.deepMerge(out[key], value)
       } else {
         out[key] = value
       }
-    }
-    return out
-  }
-
-  static merge(source, other) {
-    const out = { ...source }
-    for (const key in other) {
-      out[key] = other[key]
     }
     return out
   }
