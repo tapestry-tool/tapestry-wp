@@ -1,41 +1,9 @@
-import {
-  getMediaButton,
-  API_URL,
-  getStore,
-  openAddNodeModal,
-  submitModal,
-  getNode,
-  openRootNodeModal,
-  openEditNodeModal,
-  TEST_TAPESTRY_NAME,
-  findNode,
-  applyModalChanges,
-} from "./utils"
+import { applyModalChanges } from "./utils"
 import roles from "./roles"
 
-const COMMAND_DELAY = Cypress.env("DELAY") || 500
+const API_URL = `/wp-json/tapestry-tool/v1`
 
-if (COMMAND_DELAY > 0) {
-  for (const command of [
-    "visit",
-    "click",
-    "trigger",
-    "type",
-    "clear",
-    "reload",
-    "contains",
-  ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args)
-  
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(origVal)
-        }, COMMAND_DELAY)
-      })
-    })
-  }
-}
+const TEST_TAPESTRY_NAME = `cypress`
 
 Cypress.Commands.add("login", role => {
   const { username, password } = roles[role]
@@ -47,7 +15,7 @@ Cypress.Commands.add("logout", () => cy.request(`${API_URL}/logout`))
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
   cy.scrollTo(0, 0)
   const nodeId = id || node.id
-  getMediaButton(nodeId).click({ force: true })
+  cy.getByTestId(`open-node-${nodeId}`).click({ force: true })
   return cy.get("#lightbox")
 })
 
@@ -72,75 +40,81 @@ Cypress.Commands.add("visitTapestry", () => {
   cy.contains(/loading/i, { timeout: 60000 }).should("not.exist")
 })
 
-Cypress.Commands.add("getNodeByIndex", idx => getStore().its(`state.nodes.${idx}`))
+Cypress.Commands.add("getNodeByTitle", title =>
+  cy.findNode(node => node.title === title)
+)
+
+Cypress.Commands.add("getSelectedNode", () =>
+  cy
+    .store()
+    .its("state")
+    .then(({ nodes, selectedNodeId }) => nodes[selectedNodeId])
+)
 
 Cypress.Commands.add("addNode", { prevSubject: "optional" }, (parent, newNode) => {
   if (!newNode) {
-    return parent ? openAddNodeModal(parent.id) : openRootNodeModal()
+    cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
+    return
   }
 
   cy.server()
-  cy.route("POST", `${API_URL}/tapestries/**/nodes`).as("postNode")
+  cy.route("POST", `**/nodes`).as("postNode")
 
   if (parent) {
-    openAddNodeModal(parent.id)
+    cy.getByTestId(`add-node-${parent.id}`).click({ force: true })
   } else {
-    openRootNodeModal()
+    cy.getByTestId(`root-node-button`).click({ force: true })
   }
   applyModalChanges(newNode)
-  submitModal()
+  cy.contains("Submit").click({ force: true })
 
   return cy
     .wait("@postNode")
     .its("response.body.id")
-    .then(id => findNode(node => node.id === id))
+    .then(id => cy.findNode(node => node.id === id))
 })
 
 Cypress.Commands.add("editNode", { prevSubject: true }, (node, newNode) => {
   if (!newNode) {
-    return openEditNodeModal(node.id)
+    cy.getByTestId(`edit-node-${node.id}`).click({ force: true })
+    return
   }
 
   cy.server()
-  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**`).as("editNode")
-  cy.route("PUT", `${API_URL}/tapestries/**/nodes/**/permissions`).as(
-    "editPermissions"
-  )
+  cy.route("PUT", `**/nodes/**`).as("editNode")
+  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
-  openEditNodeModal(node.id)
+  cy.getByTestId(`edit-node-${node.id}`).click({ force: true })
   applyModalChanges(newNode)
-  submitModal()
+  cy.contains("Submit").click({ force: true })
 
   cy.wait("@editPermissions")
   cy.wait("@editNode")
-  return findNode(nd => nd.id === node.id)
+  return cy.findNode(nd => nd.id === node.id)
+})
+
+Cypress.Commands.add("editNodeInStore", { prevSubject: true }, (node, newNode) => {
+  cy.store().then(store => store.commit("updateNode", { id: node.id, newNode }))
 })
 
 Cypress.Commands.add("deleteNode", { prevSubject: true }, node => {
   cy.server()
-  cy.route("DELETE", `${API_URL}/tapestries/**/nodes/**`).as("deleteNode")
-  cy.route("GET", `${API_URL}/tapestries/**`).as("getTapestry")
+  cy.route("DELETE", `**/nodes/**`).as("deleteNode")
 
-  openEditNodeModal(node.id)
+  cy.getByTestId(`edit-node-${node.id}`).click({ force: true })
   cy.contains(/delete/i).click({ force: true })
   cy.wait("@deleteNode")
-  cy.wait("@getTapestry")
 
   return cy.wrap(node.id)
 })
 
-Cypress.Commands.add("getDOMNodeByIndex", index =>
-  cy
-    .getNodeByIndex(index)
-    .its("id")
-    .then(getNode)
-)
-
 Cypress.Commands.add("findNode", pred => {
   return cy
     .store()
-    .its("nodes")
-    .then(nodes => nodes.find(pred))
+    .its("state.nodes")
+    .then(nodes => Object.values(nodes).find(pred) || null)
 })
 
-Cypress.Commands.add("store", () => getStore().its("state"))
+Cypress.Commands.add("store", () => cy.window().its("app.$store"))
+
+Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))

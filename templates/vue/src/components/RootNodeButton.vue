@@ -1,7 +1,7 @@
 <template>
   <div id="root-node-button">
     <import-changelog :changes="changes" />
-    <div data-testid="root-node-button" @click="addRootNode">
+    <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>

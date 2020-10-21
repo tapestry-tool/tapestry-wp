@@ -1,70 +1,52 @@
-import { setup, cleanup } from "../../support/utils"
+import { setup as setupTapestry, cleanup } from "../../support/utils"
 
 describe("Node permissions", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")
-    setup("@oneNode")
+    setupTapestry("@oneNode")
   })
-  
+
   afterEach(cleanup)
 
+  const setup = edits => {
+    setupTapestry("@oneNode")
+    cy.getSelectedNode().editNode({ permissions: edits })
+  }
+
   it("Should hide node and associated links if user does not have read access", () => {
-    const newNode = {
-      permissions: {
-        public: [],
-      },
-    }
-    cy.getNodeByIndex(0).editNode(newNode)
+    setup({
+      public: [],
+    })
     cy.logout().visitTapestry()
-    cy.getNodeByIndex(0).should("not.exist")
+    cy.contains(/is empty/i).should("exist")
   })
 
   it("Should hide edit button if user does not have write access", () => {
-    const newNode = {
-      permissions: {
-        public: ["read"],
-        authenticated: ["read", "edit"],
-      },
-    }
-    cy.getNodeByIndex(0).editNode(newNode)
+    setup({
+      public: ["read"],
+      authenticated: ["read", "edit"],
+    })
+    cy.getSelectedNode().then(node => {
+      cy.logout().visitTapestry()
+      cy.getByTestId(`edit-node-${node.id}`).should("not.exist")
 
-    cy.logout().visitTapestry()
-    cy.getDOMNodeByIndex(0)
-      .click({ force: true })
-      .within(() => {
-        cy.get(".editNodeButton").should("not.exist")
-      })
-
-    cy.login("subscriber").visitTapestry()
-    cy.getDOMNodeByIndex(0)
-      .click({ force: true })
-      .within(() => {
-        cy.get(".editNodeButton").should("exist")
-      })
+      cy.login("subscriber").visitTapestry()
+      cy.getByTestId(`edit-node-${node.id}`).should("exist")
+    })
   })
 
   it("Should hide add button if user does not have add access", () => {
-    const newNode = {
-      permissions: {
-        public: ["read"],
-        authenticated: ["read", "add"],
-      },
-    }
-    cy.getNodeByIndex(0).editNode(newNode)
+    setup({
+      public: ["read"],
+      authenticated: ["read", "add"],
+    })
+    cy.getSelectedNode().then(node => {
+      cy.logout().visitTapestry()
+      cy.getByTestId(`add-node-${node.id}`).should("not.exist")
 
-    cy.logout().visitTapestry()
-    cy.getDOMNodeByIndex(0)
-      .click({ force: true })
-      .within(() => {
-        cy.get(".addNodeButton").should("not.exist")
-      })
-
-    cy.login("subscriber").visitTapestry()
-    cy.getDOMNodeByIndex(0)
-      .click({ force: true })
-      .within(() => {
-        cy.get(".addNodeButton").should("exist")
-      })
+      cy.login("subscriber").visitTapestry()
+      cy.getByTestId(`add-node-${node.id}`).should("exist")
+    })
   })
 })

@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :data-qa="`node-${node.id}`"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
@@ -20,11 +21,12 @@
         class="node-overlay"
       ></circle>
       <progress-bar
-        v-show="
+        v-if="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
+        :data-qa="`node-progress-${node.id}`"
         :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
@@ -33,6 +35,7 @@
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
+          :data-qa="`node-title-${node.id}`"
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"
@@ -53,6 +56,7 @@
           >
             <button
               class="node-button"
+              :data-qa="`open-node-${node.id}`"
               :disabled="!node.accessible && !hasPermission('edit')"
               @click.stop="handleRequestOpen"
             >
@@ -75,7 +79,11 @@
             x="5"
             :y="radius - 30"
           >
-            <button class="node-button" @click.stop="editNode">
+            <button
+              :data-qa="`edit-node-${node.id}`"
+              class="node-button"
+              @click.stop="editNode"
+            >
               <tapestry-icon icon="pen"></tapestry-icon>
             </button>
           </foreignObject>
