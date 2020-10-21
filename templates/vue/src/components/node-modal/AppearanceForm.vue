@@ -18,7 +18,7 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-      <b-form-group v-if="addThumbnail">
+      <b-form-group>
         <b-form-checkbox
           v-model="addLockedThumbnail"
           data-testid="node-appearance-lockedThumbnail"
@@ -26,7 +26,7 @@
           Show a different thumbnail when locked
         </b-form-checkbox>
       </b-form-group>
-      <b-form-group v-if="addThumbnail && addLockedThumbnail">
+      <b-form-group v-if="addLockedThumbnail">
         <file-upload
           v-model="node.lockedImageURL"
           input-test-id="node-lockedImageURL"
@@ -105,6 +105,18 @@ export default {
       addThumbnail: false,
       addLockedThumbnail: false,
     }
+  },
+  watch: {
+    addThumbnail(addThumbnail) {
+      if (!addThumbnail) {
+        this.node.imageURL = ""
+      }
+    },
+    addLockedThumbnail(addLockedThumbnail) {
+      if (!addLockedThumbnail) {
+        this.node.lockedImageURL = ""
+      }
+    },
   },
   created() {
     this.addThumbnail = this.node.imageURL.length > 0

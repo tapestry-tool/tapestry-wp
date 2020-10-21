@@ -20,7 +20,7 @@
     <b-container v-if="loading" class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
-    <b-container v-else fluid class="px-0">
+    <b-container v-else fluid class="px-0" data-qa="node-modal">
       <b-tabs card>
         <b-tab
           title="Content"
@@ -224,7 +224,7 @@ const shouldFetch = (url, selectedNode) => {
     return true
   }
   const oldUrl = selectedNode.typeData.linkMetadata.url
-  return !oldUrl.startsWith(Helpers.normalizeUrl(url))
+  return oldUrl != Helpers.normalizeUrl(url)
 }
 
 export default {
@@ -293,7 +293,10 @@ export default {
     },
     canPublish() {
       if (this.loading) return false
-      if (this.type === "add") {
+      if (
+        this.type === "add" ||
+        (this.type === "edit" && this.node.status === "draft")
+      ) {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
           (!this.parent || this.parent.status !== "draft")
@@ -708,9 +711,7 @@ export default {
 
         if (data) {
           this.node.typeData.linkMetadata = data
-
           if (
-            !this.node.imageURL ||
             confirm(
               "Would you like to use the link preview image as the thumbnail image?"
             )
@@ -718,7 +719,6 @@ export default {
             this.node.imageURL = data.image
           }
           if (
-            !this.node.lockedImageURL ||
             confirm(
               "Would you like to use the link preview image as the locked thumbnail image?"
             )

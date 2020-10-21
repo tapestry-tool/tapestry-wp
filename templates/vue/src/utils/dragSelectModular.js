@@ -47,4 +47,8 @@ export default class DragSelectModular {
   static updateSelectableNodes() {
     DragSelectModular.dragSelect.addSelectables(document.querySelectorAll(".node"))
   }
+
+  static pauseDragSelect() {
+    DragSelectModular.dragSelect.break()
+  }
 }

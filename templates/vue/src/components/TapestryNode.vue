@@ -3,6 +3,7 @@
     <g
       v-show="show"
       ref="node"
+      :data-qa="`node-${node.id}`"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
@@ -20,7 +21,7 @@
         class="node-overlay"
       ></circle>
       <progress-bar
-        v-show="
+        v-if="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
@@ -28,6 +29,7 @@
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="node.status === 'publish' ? radius : radius + 15"
+        :data-qa="`node-progress-${node.id}`"
         :progress="progress"
         :locked="!node.accessible"
         :status="node.status"
@@ -35,6 +37,7 @@
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
+          :data-qa="`node-title-${node.id}`"
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"
@@ -55,6 +58,7 @@
           >
             <button
               class="node-button"
+              :data-qa="`open-node-${node.id}`"
               :disabled="!node.accessible && !hasPermission('edit')"
               @click.stop="handleRequestOpen"
             >
@@ -66,24 +70,28 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="(hasPermission('add') || isAuthenticated) && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
             :x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
-            v-if="hasPermission('edit')"
+            v-if="isLoggedIn && hasPermission('edit')"
             class="node-button-wrapper"
             x="5"
             :y="radius - 30"
           >
-            <button class="node-button" @click.stop="editNode">
+            <button
+              :data-qa="`edit-node-${node.id}`"
+              class="node-button"
+              @click.stop="editNode"
+            >
               <tapestry-icon icon="pen"></tapestry-icon>
             </button>
           </foreignObject>
         </g>
       </g>
-      <defs v-if="node.imageURL">
+      <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
@@ -110,6 +118,7 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -145,6 +154,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    isLoggedIn() {
+      return isLoggedIn
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -194,7 +206,20 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
+      if (
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
+        this.node.nodeType !== "grandchild" &&
+        showImages
+      ) {
         return `url(#node-image-${this.node.id})`
       }
       return "#8396a1"
@@ -218,9 +243,6 @@ export default {
         .map(this.getNode)
         .filter(n => n.status !== "draft")
       return rows.filter(row => row.completed).length / rows.length
-    },
-    isAuthenticated() {
-      return wpData.currentUser.ID !== 0
     },
   },
   watch: {
