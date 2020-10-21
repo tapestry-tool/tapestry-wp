@@ -485,6 +485,7 @@ export default {
           return this.submitNode()
         }
       }
+      this.loading = false
     },
     async handleDraftSubmit() {
       this.formErrors = this.validateNode()
