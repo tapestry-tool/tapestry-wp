@@ -18,6 +18,10 @@
    * @return {String}
    */
     static getErrorMessage(response) {
-        return response.response.data.message
+        let message = response.response.data.message
+        if (message.toLowerCase() == "cookie nonce is invalid") {
+            message = "Please log in to edit the tapestry"
+        }
+        return message
     }
 }

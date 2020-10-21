@@ -20,7 +20,7 @@ const store = new Vuex.Store({
     selectedNodeId: null,
     favourites: [],
     visibleNodes: [],
-    tapestryError: null
+    apiError: null
   },
   getters,
   mutations,

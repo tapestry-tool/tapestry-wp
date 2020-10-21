@@ -283,35 +283,37 @@ export default {
         })
         .on("end", () => {
           this.$emit("dragend")
-          if (this.hasPermission("edit")) {
             if (this.selection.length) {
               this.selection.forEach(id => {
                 const node = this.getNode(id)
                 this.updateNodeCoordinates({
                   id: node.id,
                   coordinates: {
-                    x: node.coordinates.x,
-                    y: node.coordinates.y,
+                    updated: {
+                      x: node.coordinates.x,
+                      y: node.coordinates.y,
+                    },
+                    original: {
+                      x: this.coordinates[id].x,
+                      y: this.coordinates[id].y
+                    },
                   },
-                }).catch(() => {
-                  alert("Failed to save coordinates.")
-                  node.coordinates.x = this.coordinates[id].x
-                  node.coordinates.y = this.coordinates[id].y
                 })
               })
             } else {
               this.updateNodeCoordinates({
                 id: this.node.id,
                 coordinates: {
+                  updated: {
                   x: this.node.coordinates.x,
                   y: this.node.coordinates.y,
+                  },
+                  original: {
+                  x: this.originalX,
+                  y: this.originalY,
+                  },
                 },
-              }).catch(() => {
-                alert("Failed to save coordinates.")
-                this.node.coordinates.x = this.originalFx
-                this.node.coordinates.y = this.originalFy
-              })
-            }
+            })
           }
         })
     )

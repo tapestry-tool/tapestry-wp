@@ -301,6 +301,8 @@ export function updateVisibleNodes(state, nodes) {
   state.visibleNodes = nodes
 }
 
-export function addTapestryError(state, error) {
-  state.tapestryError = error
+export function addApiError(state, error) {
+
+  console.log(state)
+  state.apiError = error
 }

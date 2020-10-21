@@ -9,7 +9,7 @@ export async function updateSettings({ commit, dispatch }, newSettings) {
     await client.updateSettings(JSON.stringify(newSettings))
     commit("updateSettings", newSettings)
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -18,7 +18,7 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
     await client.updateH5pSettings(newSettings)
     commit("updateH5pSettings", newSettings)
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -43,7 +43,7 @@ export async function addNode({ commit, dispatch, getters }, newNode) {
     dispatch("updateNodePermissions", { id, permissions: nodeToAdd.permissions })
     return id
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -75,7 +75,7 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
     }
     return id
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -100,7 +100,7 @@ export async function updateLockedStatus({ commit, getters, dispatch }) {
       }
     }
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -119,16 +119,22 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
 
     commit("updateNodeProgress", { id, progress })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
 export async function updateNodeCoordinates({ commit, dispatch }, { id, coordinates }) {
+  const updatedCoordinates = coordinates.updated
+  const originalCoordinates = coordinates.original
   try {
+    const coordinates = updatedCoordinates
     await client.updateNodeCoordinates(id, coordinates)
+    console.log(coordinates)
     commit("updateNode", { id, newNode: { coordinates } })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    coordinates = originalCoordinates
+    commit("updateNode", { id, newNode: { coordinates } })
+    dispatch("addApiError", error)
   }
 }
 
@@ -159,7 +165,7 @@ export async function completeNode(context, nodeId) {
     }
     return unlockNodes(context)
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -189,12 +195,16 @@ async function unlockNodes({ commit, getters, dispatch }) {
       }
     }
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
-export function updateNodePermissions(_, payload) {
-  client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
+export function updateNodePermissions({ dispatch }, payload) {
+  try {
+    client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
 }
 
 export async function deleteNode({ commit, dispatch }, id) {
@@ -202,7 +212,7 @@ export async function deleteNode({ commit, dispatch }, id) {
     await client.deleteNode(id)
     commit("deleteNode", id)
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -218,7 +228,7 @@ export async function completeQuestion(
     }
     commit("completeQuestion", { nodeId, questionId })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -232,7 +242,7 @@ export async function saveAudio({ commit, dispatch }, { audio, nodeId, questionI
       questionId,
     })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -242,7 +252,7 @@ export async function addLink({ commit, dispatch }, newLink) {
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -251,7 +261,7 @@ export async function deleteLink({ commit, dispatch }, { source, target }) {
     await client.deleteLink({ source: source, target: target })
     commit("deleteLink", { source, target })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -269,7 +279,7 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
     await client.updateUserFavourites(JSON.stringify(favourites))
     commit("updateFavourites", { favourites })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
@@ -298,12 +308,12 @@ export async function refetchTapestryData({ commit, state, dispatch }, filterUse
 
     commit("updateDataset", { nodes: nodeDiff, links: linkDiff })
   } catch (error) {
-    dispatch("addTapestryError", error)
+    dispatch("addApiError", error)
   }
 }
 
-export function addTapestryError({ commit }, error) {
+export function addApiError({ commit }, error) {
   const message = ErrorHelper.getErrorMessage(error)
   console.log("message")
-  commit("addTapestryError", { error: message })
+  commit("addApiError", { error: message })
 }

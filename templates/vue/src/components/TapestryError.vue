@@ -7,23 +7,24 @@ import {mapState } from "vuex";
 export default {
   name: "tapestry-error",
   computed: {
-    ...mapState(["tapestryError"]),
+    ...mapState(["apiError"]),
     hasError() {
-      return this.tapestryError
+      return this.apiError
     }
   },
   watch: {
     hasError() {
       console.log("watch");
-      if (this.tapestryError) {
-        this.makeToast("Error", this.tapestryError.error);
+      if (this.apiError) {
+        this.makeToast("Error", this.apiError.error, "danger");
       }
     }
   },
   methods: {
-    makeToast(title, message) {
+    makeToast(title, message, variant) {
       this.$bvToast.toast(message, {
-        title: title
+        title: title,
+        variant: variant
       });
     },
   }
