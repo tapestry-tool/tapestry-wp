@@ -1,60 +1,13 @@
 // TODO: Add node generator
 // TODO: Add link generator
 
-export const API_URL = `/wp-json/tapestry-tool/v1`
-
-export const TEST_TAPESTRY_NAME = `cypress`
-
-export const getStore = () => cy.window().its("app.$store")
-
-export const visitTapestry = (name = "empty") => {
-  cy.visit(`/tapestry/${name}`)
-  cy.get("#content")
-}
-
-export const openRootNodeModal = () => getByTestId("root-node-button").click()
-
-export const openAddNodeModal = id => {
-  cy.get(`#node-${id}`).click({ force: true })
-  getAddNodeButton(id).click({ force: true })
-  return cy.get(`#node-modal`)
-}
-
-export const openEditNodeModal = id => {
-  cy.get(`#node-${id}`).click({ force: true })
-  getEditNodeButton(id).click({ force: true })
-  return cy.get(`#node-modal`)
-}
-
-export const getModal = () => cy.get("#node-modal")
-
-export const submitModal = () => cy.contains("Submit").click({ force: true })
-
-export const getMediaButton = id => cy.get(`#mediaButton${id} > i`)
-
-export const getAddNodeButton = id => cy.get(`#addNodeIcon${id}`)
-
-export const getEditNodeButton = id => cy.get(`#editNodeIcon${id}`)
-
-export const getByTestId = id => cy.get(`[data-testid=${id}]`)
-
-export const getNode = id => cy.get(`#node-${id}`)
-
-export const getLightbox = () => cy.get("#lightbox")
-
-export const findNode = pred =>
-  getStore()
-    .its("state.nodes")
-    .then(nodes => nodes.find(pred))
-
-export const normalizeUrl = url => {
-  return url.startsWith("http:") || url.startsWith("https:") ? url : `https:${url}`
-}
+const getByTestId = id => cy.get(`[data-testid=${id}]`)
 
 export const applyModalChanges = newNode => {
-  getModal().should("be.visible")
+  cy.getByTestId("node-modal").should("be.visible")
 
   const { appearance, mediaType, activity, typeData, permissions, ...rest } = newNode
+  console.log(rest)
   if (mediaType) {
     getByTestId("node-mediaType").select(mediaType)
   }
@@ -98,11 +51,14 @@ export const applyModalChanges = newNode => {
 
   Object.entries(rest).forEach(([testId, value]) => {
     if (testId === "description") {
-      getByTestId(`node-description`).find("[contenteditable=true]").clear().type(value)
+      getByTestId(`node-description`)
+        .find("[contenteditable=true]")
+        .clear()
+        .type(value)
     } else {
       getByTestId(`node-${testId}`)
-      .clear()
-      .type(value)
+        .clear()
+        .type(value)
     }
   })
 
