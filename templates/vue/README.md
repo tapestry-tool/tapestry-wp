@@ -40,9 +40,9 @@ git config core.hooksPath .githooks
 
 ## Testing Setup
 
-### E2E Testing
+### End-to-End Testing
 
-Cypress is the framework we use for E2E testing. For it to work, it needs to be configured with some environment variables. In the `cypress-sample.json` file, you should see something like:
+Cypress is the framework we use for end-to-end (e2e) testing. For it to work, it needs to be configured with some environment variables. In the `cypress-sample.json` file, you should see something like:
 
 ```json
 {
