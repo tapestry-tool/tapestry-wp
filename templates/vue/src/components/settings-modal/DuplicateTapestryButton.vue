@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-button block variant="light" @click="duplicateTapestry">
-      <b-spinner v-if="loading"></b-spinner>
+      <b-spinner v-if="loading" small></b-spinner>
       <div v-else>Duplicate Tapestry</div>
     </b-button>
     <b-alert :show="showConfirmation" variant="success" style="margin-top: 1em;">
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 
 export default {
@@ -26,8 +26,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["settings"]),
     ...mapGetters(["tapestryJson"]),
+    ...mapState(["settings"]),
   },
   methods: {
     duplicateTapestry() {
@@ -36,12 +36,15 @@ export default {
       client
         .addTapestry({ title: this.settings.title, ...tapestry })
         .then(res => {
-          const href = `${location.origin}/tapestry/${res.settings.tapestrySlug}`
+          const href = res.settings.permalink
           this.link = href
           this.showConfirmation = true
         })
         .finally(() => {
           this.loading = false
+        })
+        .catch(err => {
+          console.log(err)
         })
     },
   },

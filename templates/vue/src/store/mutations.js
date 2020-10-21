@@ -1,10 +1,10 @@
 import Vue from "vue"
 import * as getters from "./getters"
-import { parse } from "@/utils/dataset"
+import { DEFAULT_DEPTH } from "@/utils/constants"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = setDatasetProgress(
-    parse(dataset),
+    parseDataset(dataset),
     applyLocalProgress(progress)
   )
   setDataset(state, datasetWithProgress)
@@ -25,6 +25,66 @@ function applyLocalProgress(progress) {
     }
   }
   return progress
+}
+
+function parseDataset(dataset) {
+  for (const node of dataset.nodes) {
+    const { imageURL, lockedImageURL } = node
+    const { mediaURL } = node.typeData
+    if (imageURL) {
+      node.imageURL = imageURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+    if (lockedImageURL) {
+      node.lockedImageURL = lockedImageURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+    if (mediaURL && typeof mediaURL === "string") {
+      node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
+    }
+    const publicPermissions = node.permissions.public
+    if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
+      node.permissions.public = ["read"]
+    }
+  }
+
+  for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
+    const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
+    accordionRowIds.forEach(accordionRowId => {
+      const accordionRow = getNode(dataset, accordionRowId)
+      accordionRow.presentationStyle = "accordion-row"
+      const subRows = getChildIds({ links: dataset.links }, accordionRowId)
+      if (subRows.length) {
+        accordionRow.isSubAccordion = true
+      }
+      subRows.forEach(id => {
+        const subRow = getNode(dataset, id)
+        subRow.presentationStyle = "accordion-row"
+      })
+    })
+  }
+
+  dataset.links = dataset.links.filter(link => {
+    const { source, target } = link
+    return (
+      getNode(dataset, source) !== undefined &&
+      getNode(dataset, target) !== undefined
+    )
+  })
+
+  const { defaultDepth } = dataset.settings
+  if (defaultDepth === undefined) {
+    dataset.settings.defaultDepth = DEFAULT_DEPTH
+  }
+
+  const defaultPublicPerm = dataset.settings.defaultPermissions.public
+  if (defaultPublicPerm.includes("add") || defaultPublicPerm.includes("edit")) {
+    dataset.settings.defaultPermissions.public = ["read"]
+  }
+
+  return dataset
+}
+
+function getNode(dataset, nodeId) {
+  return dataset.nodes.find(node => node.id == nodeId)
 }
 
 function setDatasetProgress(dataset, progress) {
@@ -208,6 +268,15 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
 // favourites
 export function updateFavourites(state, { favourites }) {
   state.favourites = favourites
+}
+
+function getChildIds(state, nodeId) {
+  const links = state.links
+  return links
+    .filter(link =>
+      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
+    )
+    .map(link => link.target)
 }
 
 export function updateOrdering(state, payload) {
