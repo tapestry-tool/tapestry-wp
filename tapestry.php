@@ -45,9 +45,6 @@ function create_tapestry_type()
         'show_in_nav_menus' => true,
         'exclude_from_search' => false,
         'capability_type' => 'post',
-        'capabilities' => [
-            'create_posts' => 'administrator',
-        ],
         'map_meta_cap' => true,
         'hierarchical' => false,
         'rewrite' => ['with_front' => true],

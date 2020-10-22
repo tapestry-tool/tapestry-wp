@@ -1,18 +1,13 @@
 import Vue from "vue"
 import * as getters from "./getters"
-import { DEFAULT_DEPTH } from "@/utils/constants"
+import { parse } from "@/utils/dataset"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = setDatasetProgress(
-    parseDataset(dataset),
+    parse(dataset),
     applyLocalProgress(progress)
   )
   setDataset(state, datasetWithProgress)
-  state.selectedNodeId = dataset.rootId
-  Object.values(state.nodes)
-    .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
-    .forEach(n => initializeOrdering(state, n.id))
-  state.visibleNodes = Object.keys(state.nodes).map(id => parseInt(id, 10))
 }
 
 function applyLocalProgress(progress) {
@@ -32,72 +27,12 @@ function applyLocalProgress(progress) {
   return progress
 }
 
-function parseDataset(dataset) {
-  for (const node of dataset.nodes) {
-    const { imageURL, lockedImageURL } = node
-    const { mediaURL } = node.typeData
-    if (imageURL) {
-      node.imageURL = imageURL.replace(/(http(s?)):\/\//gi, "//")
-    }
-    if (lockedImageURL) {
-      node.lockedImageURL = lockedImageURL.replace(/(http(s?)):\/\//gi, "//")
-    }
-    if (mediaURL && typeof mediaURL === "string") {
-      node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
-    }
-    const publicPermissions = node.permissions.public
-    if (publicPermissions.includes("add") || publicPermissions.includes("edit")) {
-      node.permissions.public = ["read"]
-    }
-  }
-
-  for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
-    const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
-    accordionRowIds.forEach(accordionRowId => {
-      const accordionRow = getNode(dataset, accordionRowId)
-      accordionRow.presentationStyle = "accordion-row"
-      const subRows = getChildIds({ links: dataset.links }, accordionRowId)
-      if (subRows.length) {
-        accordionRow.isSubAccordion = true
-      }
-      subRows.forEach(id => {
-        const subRow = getNode(dataset, id)
-        subRow.presentationStyle = "accordion-row"
-      })
-    })
-  }
-
-  dataset.links = dataset.links.filter(link => {
-    const { source, target } = link
-    return (
-      getNode(dataset, source) !== undefined &&
-      getNode(dataset, target) !== undefined
-    )
-  })
-
-  const { defaultDepth } = dataset.settings
-  if (defaultDepth === undefined) {
-    dataset.settings.defaultDepth = DEFAULT_DEPTH
-  }
-
-  const defaultPublicPerm = dataset.settings.defaultPermissions.public
-  if (defaultPublicPerm.includes("add") || defaultPublicPerm.includes("edit")) {
-    dataset.settings.defaultPermissions.public = ["read"]
-  }
-
-  return dataset
-}
-
-function getNode(dataset, nodeId) {
-  return dataset.nodes.find(node => node.id == nodeId)
-}
-
 function setDatasetProgress(dataset, progress) {
   if (!wpData.wpUserId) {
     localStorage.setItem("tapestry-progress", JSON.stringify(progress))
   }
   for (const [id, nodeProgress] of Object.entries(progress)) {
-    const node = dataset.nodes.find(node => node.id == id)
+    const node = dataset.nodes[id]
     if (node) {
       const willLock = node.unlocked && !nodeProgress.unlocked
       if (willLock && !wpData.wpCanEditTapestry) {
@@ -145,7 +80,8 @@ export function setDataset(state, dataset) {
   Object.entries(dataset).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
-      value.forEach(node => {
+      Object.values(value).forEach(node => {
+        // Has to call this so `state.nodes` is reactive
         Vue.set(state.nodes, node.id, node)
       })
     } else {
@@ -272,24 +208,6 @@ export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
 // favourites
 export function updateFavourites(state, { favourites }) {
   state.favourites = favourites
-}
-
-function getChildIds(state, nodeId) {
-  const links = state.links
-  return links
-    .filter(link =>
-      link.source.id == undefined ? link.source == nodeId : link.source.id == nodeId
-    )
-    .map(link => link.target)
-}
-
-export function initializeOrdering(state, id) {
-  const node = state.nodes[id]
-  getChildIds(state, id)
-    .filter(cid => !node.childOrdering.includes(cid))
-    .forEach(id => node.childOrdering.push(id))
-  const children = getChildIds(state, id)
-  node.childOrdering = node.childOrdering.filter(id => children.includes(id))
 }
 
 export function updateOrdering(state, payload) {
