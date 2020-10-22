@@ -1,3 +1,4 @@
+// This file is necessary for jest to run
 {
   "presets": [
     [
