@@ -40,7 +40,9 @@ git config core.hooksPath .githooks
 
 ## Testing Setup
 
-The testing framework that we use, Cypress, needs to be configured with some environment variables. In the `cypress-sample.json` file, you should see something like:
+### End-to-End Testing
+
+Cypress is the framework we use for end-to-end (e2e) testing. For it to work, it needs to be configured with some environment variables. In the `cypress-sample.json` file, you should see something like:
 
 ```json
 {
@@ -68,4 +70,20 @@ Once that is done, run the following command to open the test GUI:
 
 ```
 npm install && npm run test:open
+```
+
+### Integration Testing
+
+For integration tests we use [Vue Testing Library](https://github.com/testing-library/vue-testing-library). It's an awesome library that encourages accessible practices and robust tests by not letting you [test implementation details](https://kentcdodds.com/blog/testing-implementation-details).
+
+Unlike Cypress, Vue Testing Library should work out of the box. To run the tests, run the following command:
+
+```bash
+npm run test:jest
+```
+
+On top of running the tests, this command also generates a code coverage report that you can open by running:
+
+```bash
+npm run report:jest
 ```
