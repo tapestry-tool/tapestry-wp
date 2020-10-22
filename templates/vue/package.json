@@ -10,12 +10,13 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
-    "test:e2e": "cypress run",
+    "test:e2e": "cypress run --headless -b chrome",
     "test:e2e:open": "cypress open --config watchForFileChanges=false",
     "test:jest": "jest __tests__",
     "test": "npm run test:jest && npm run test:e2e && npm run report:merge",
     "prereport:merge": "mv coverage-jest/coverage-final.json .nyc_output",
     "report:merge": "nyc merge .nyc_output coverage/coverage.json",
+    "report:jest": "open coverage-jest/lcov-report/index.html",
     "report:open": "nyc report --reporter=html && open coverage/index.html",
     "report": "nyc report --reporter=text-summary",
     "start": "npm run dev"
@@ -87,6 +88,8 @@
       ".js",
       ".vue"
     ],
-    "reporter": []
+    "reporter": [
+      "html"
+    ]
   }
 }
