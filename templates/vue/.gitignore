@@ -16,6 +16,7 @@ cypress/videos/
 *.njsproj
 *.sln
 
-# Config and package lock
-config.js
-package-lock.json
+# Testing
+.nyc_output/
+coverage/
+coverage-jest/
