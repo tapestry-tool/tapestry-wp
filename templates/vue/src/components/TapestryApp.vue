@@ -233,29 +233,33 @@ export default {
 
 <style lang="scss" scoped>
 #app-container {
+  position: relative;
   transform: scale(1);
   transform-origin: top left;
   transition: all 0.2s ease-out;
+  width: 100%;
   z-index: 0;
 
   @media screen and (min-width: 500px) {
     &.sidebar-open {
-      transform: scale(0.7);
+      width: calc(100% - max(340px, 30%));
+      padding-right: 0;
+
+      .toolbar {
+        padding-right: 1.5vw;
+      }
     }
   }
+  #tapestry svg {
+    position: relative;
+  }
 }
-
-main {
-  position: relative;
-  z-index: 0;
-}
-
 .toolbar {
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
+  transition: all 0.2s ease-out;
 }
-
 .slider-wrapper {
   background: #fbfbfb;
   box-shadow: 0 0 7px 0 #ddd;
