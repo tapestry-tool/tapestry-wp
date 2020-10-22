@@ -20,7 +20,7 @@
     <b-container v-if="loading" class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
-    <b-container v-else fluid class="px-0">
+    <b-container v-else fluid class="px-0" data-qa="node-modal">
       <b-tabs card>
         <b-tab
           title="Content"
