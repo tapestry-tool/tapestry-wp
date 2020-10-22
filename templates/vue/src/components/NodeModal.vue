@@ -63,6 +63,7 @@
           <h6 class="mt-4 mb-3">Lock Node</h6>
           <conditions-form :node="node" />
         </b-tab>
+
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Activity"
@@ -96,6 +97,14 @@
               </slick-item>
             </slick-list>
           </div>
+        </b-tab>
+        <b-tab
+          v-if="showMap"
+          title="Coordinate"
+          :active="tab === 'coordinate'"
+          @click="changeTab('coordinate')"
+        >
+          <coordinate-form :node="node" />
         </b-tab>
         <b-tab
           title="More Information"
@@ -175,6 +184,7 @@ import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
+import CoordinateForm from "./node-modal/CoordinateForm"
 import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -201,6 +211,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    CoordinateForm,
     MoreInformationForm,
     SlickItem,
     SlickList,
@@ -254,6 +265,9 @@ export default {
         : this.settings.showAccess
         ? true
         : wpData.wpCanEditTapestry !== ""
+    },
+    showMap() {
+      return this.settings.renderMap
     },
     canPublish() {
       if (this.loading) return false
@@ -406,7 +420,7 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information"]
+      const okTabs = ["content", "appearance", "more-information", "coordinate"]
       if (okTabs.includes(requestedTab)) {
         return true
       }
