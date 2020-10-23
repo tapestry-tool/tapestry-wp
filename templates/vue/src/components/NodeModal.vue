@@ -622,8 +622,8 @@ export default {
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
-        if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter a Video URL")
+        if (!this.isValidVideo(this.node.typeData)) {
+          errMsgs.push("Please enter a valid Video URL")
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
           this.node.mediaDuration = 0
@@ -649,6 +649,12 @@ export default {
       }
 
       return errMsgs
+    },
+    isValidVideo(typeData) {
+      return (
+        typeData.mediaURL !== "" &&
+        (typeData.hasOwnProperty("youtubeId") || typeData.mediaURL.endsWith(".mp4"))
+      )
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
