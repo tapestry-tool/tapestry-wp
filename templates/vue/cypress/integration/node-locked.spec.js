@@ -6,11 +6,7 @@ describe("Locked Nodes", () => {
     cy.setup("@twoNodes")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: A condition is added through the node modal
-    Then: It should be locked until the condition is fulfilled
-  `, () => {
+  it("should be able to lock and unlock a node", () => {
     cy.store()
       .its("state.nodes")
       .then(nodes => {

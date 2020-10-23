@@ -1,9 +1,5 @@
 describe("Activity", () => {
-  it(`
-    Given: A video node
-    When: A question is added with an audio-based answer
-    Then: A user should be able to visit and answer the question
-  `, () => {
+  it("should be able to complete an activity with an audio-based answer", () => {
     cy.fixture("root.json").as("oneNode")
     cy.setup("@oneNode")
 

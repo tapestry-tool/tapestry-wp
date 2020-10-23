@@ -4,11 +4,7 @@ describe("Node Authoring", () => {
     cy.fixture("two-nodes.json").as("twoNodes")
   })
 
-  it(`
-    Given: An empty Tapestry
-    When: A user adds a node using the node modal
-    Then: The root node should be added
-  `, () => {
+  it("should be able to add a root node using the node modal", () => {
     cy.setup()
 
     const node = {
@@ -40,11 +36,10 @@ describe("Node Authoring", () => {
       })
   })
 
-  it(`
-    Given: A node with one attached link
-    When: A user tries to delete the node using the node modal
-    Then: The node should be deleted
-  `, () => {
+  /**
+   * A "leaf" node is a node with exactly 1 link connected to it.
+   */
+  it("should be able to delete a leaf node", () => {
     cy.setup("@twoNodes")
 
     cy.store()
@@ -63,11 +58,7 @@ describe("Node Authoring", () => {
       })
   })
 
-  it(`
-    Given: A node with several attached links
-    When: A user tries to delete the node
-    Then: The delete button should be disabled and a warning shown
-  `, () => {
+  it("should not be able to delete a non-leaf node", () => {
     cy.setup("@twoNodes")
 
     cy.store()
@@ -96,11 +87,7 @@ describe("Node Authoring", () => {
       cy.setup("@oneNode")
     })
 
-    it(`
-      Given: A Tapestry with one node
-      When: A user adds a child node with the modal
-      Then: The child node should be added with no errors
-    `, () => {
+    it("should be able to add a child node using the node modal", () => {
       cy.getSelectedNode().then(parent => {
         const child = {
           title: "Child 1",
@@ -124,11 +111,7 @@ describe("Node Authoring", () => {
       })
     })
 
-    it(`
-      Given: A Tapestry node
-      When: Its title is changed using the modal
-      Then: It should show its new title
-    `, () => {
+    it("should be able to edit a node's title using the node modal", () => {
       cy.getSelectedNode().then(node => {
         const oldTitle = node.title
         cy.contains(oldTitle).should("exist")

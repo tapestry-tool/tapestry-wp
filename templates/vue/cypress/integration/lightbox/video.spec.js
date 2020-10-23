@@ -4,11 +4,7 @@ describe("Video", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: It's changed to a video node and opened
-    Then: It should show the corresponding video
-  `, () => {
+  it("should be able to add a video node via url", () => {
     const url =
       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
 
@@ -44,11 +40,7 @@ describe("Video", () => {
     })
   })
 
-  it(`
-    Given: A Tapestry node
-    When: It is given a YouTube url
-    Then: It should show the YouTube video
-  `, () => {
+  it("should be able to add a video node via youtube", () => {
     const url = "https://www.youtube.com/watch?v=wAPCSnAhhC8"
 
     cy.getSelectedNode().then(node => {

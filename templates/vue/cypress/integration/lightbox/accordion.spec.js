@@ -4,11 +4,7 @@ describe("Accordion", () => {
     cy.fixture("accordion.json").as("accordion")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: It's edited to an accordion and opened
-    Then: An accordion lightbox should appear
-  `, () => {
+  it("should be able to make a node an accordion", () => {
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {
@@ -23,11 +19,7 @@ describe("Accordion", () => {
     })
   })
 
-  it(`
-    Given: An accordion
-    When: Child nodes are added and the accordion opened
-    Then: Rows should appear and be clickable
-  `, () => {
+  it("should be able to add child rows to an accordion", () => {
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node =>
@@ -74,11 +66,7 @@ describe("Accordion", () => {
     })
   })
 
-  it(`
-    Given: A non-empty accordion
-    When: Its rows are locked
-    Then: Only the first row should be clickable until completed
-  `, () => {
+  it("should be able to lock accordion rows and progress through them", () => {
     cy.setup("@accordion")
 
     cy.store()
@@ -103,11 +91,7 @@ describe("Accordion", () => {
       })
   })
 
-  it(`
-    Given: A non-empty accordion
-    When: Its rows are reordered
-    Then: The lightbox should reflect the new order
-  `, () => {
+  it("should be able to reorder accordion rows", () => {
     cy.setup("@accordion")
 
     cy.getSelectedNode().then(node => {
@@ -135,11 +119,7 @@ describe("Accordion", () => {
     })
   })
 
-  it(`
-    Given: An accordion row
-    When: A child node is added to it
-    Then: The row should appear as a subaccordion
-  `, () => {
+  it("should be able to add child nodes to accordion rows and have them appear as subaccordions", () => {
     cy.setup("@accordion")
 
     const row = {

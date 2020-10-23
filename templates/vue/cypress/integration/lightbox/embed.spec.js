@@ -4,11 +4,7 @@ describe("External link", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: It's changed to an external link node and opened
-    Then: It should show a summary of the external link
-  `, () => {
+  it("should be able to add an external link using the url input", () => {
     const newNode = {
       title: "5 JavaScript Tricks That Are Good To Know",
       url:
@@ -27,9 +23,5 @@ describe("External link", () => {
     })
   })
 
-  it(`
-    Given: An external link node
-    When: A file is uploaded
-    Then: It should show an iframe with that file's url
-  `)
+  it("should be able to add an external link using the file upload")
 })
