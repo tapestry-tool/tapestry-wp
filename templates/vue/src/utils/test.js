@@ -1,4 +1,4 @@
-import { render as r } from "@testing-library/vue"
+import { render as r, prettyDOM } from "@testing-library/vue"
 import { store } from "@/store"
 import { parse } from "./dataset"
 
@@ -30,11 +30,19 @@ export function parseFixture(fixture) {
 }
 
 export function render(component, fixture = null, options = {}) {
+  const defaultStore = { ...store }
+
+  if (fixture) {
+    const state = parseFixture(fixture)
+    defaultStore.state = state
+  }
+
   return r(component, {
-    store: {
-      ...store,
-      state: parseFixture(fixture),
-    },
+    store: defaultStore,
     ...options,
   })
+}
+
+export function debug(el) {
+  console.log(prettyDOM(el))
 }
