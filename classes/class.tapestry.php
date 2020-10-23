@@ -498,11 +498,13 @@ class Tapestry implements ITapestry
 
             return $tapestry;
         } else {
-            $nodesFilteredByStatus = $tapestry->nodes;
-
-            $tapestry->nodes = array_intersect($nodesFilteredByStatus, $this->_filterNodeMetaIdsByPermissions($tapestry->rootId,
-                $tapestry->settings->superuserOverridePermissions, $filterUserId));
-
+            $tapestry->nodes = array_intersect($tapestry->nodes,
+                $this->_filterNodeMetaIdsByPermissions(
+                    $tapestry->rootId,
+                    $tapestry->settings->superuserOverridePermissions,
+                    $filterUserId
+                )
+            );
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
@@ -535,6 +537,7 @@ class Tapestry implements ITapestry
         $checked = [];
         $nodesPermitted = [];
         $this->_traverseNodes($rootId, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
+
         return $nodesPermitted;
     }
 
