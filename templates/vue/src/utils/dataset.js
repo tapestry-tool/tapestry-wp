@@ -5,6 +5,8 @@ export function parse(dataset) {
     ...dataset,
   }
 
+  if (!Array.isArray(dataset.nod)) dataset.nodes = Object.values(dataset.nodes)
+
   for (const node of dataset.nodes) {
     const { imageURL, lockedImageURL } = node
     const { mediaURL } = node.typeData
