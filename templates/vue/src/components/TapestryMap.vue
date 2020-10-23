@@ -6,11 +6,11 @@
       <p>The bounds are: {{ setBounds }}</p>
       <p>Settings are: {{ settings }}</p>
     </div>
+     :max-bounds="setBounds"
     -->
 
     <l-map
       :options="mapOptions"
-      :max-bounds="setBounds"
       :bounds="setBounds"
       style="height: 80%"
       :zoom="zoom"
@@ -19,6 +19,7 @@
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
+      <l-marker :lat-lng="markerLatLng"></l-marker>
     </l-map>
   </div>
 </template>
@@ -26,7 +27,7 @@
 <script>
 import "leaflet/dist/leaflet.css"
 import { latLng, latLngBounds } from "leaflet"
-import { LMap, LTileLayer } from "vue2-leaflet"
+import { LMap, LTileLayer, LMarker } from "vue2-leaflet"
 import { mapState } from "vuex"
 
 export default {
@@ -34,6 +35,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
+    LMarker,
   },
   data() {
     return {
@@ -42,11 +44,11 @@ export default {
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      withPopup: latLng(47.41322, -1.219482),
       mapOptions: {
         zoomSnap: 0.1,
         scrollWheelZoom: false,
       },
+      markerLatLng: latLng(47.412, -1.218),
     }
   },
   computed: {
@@ -60,19 +62,6 @@ export default {
         [
           +this.settings.mapBounds.neLat || 90,
           +this.settings.mapBounds.neLng || 180,
-        ],
-      ])
-      return x
-    },
-    rectangleBounds() {
-      const x = latLngBounds([
-        [
-          +this.settings.mapBounds.neLat || 90,
-          +this.settings.mapBounds.neLng || 180,
-        ],
-        [
-          +this.settings.mapBounds.swLat || -90,
-          +this.settings.mapBounds.swLng || -180,
         ],
       ])
       return x

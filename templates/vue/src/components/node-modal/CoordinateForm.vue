@@ -1,18 +1,24 @@
 <template>
   <div id="modal-behaviour">
     <b-form-group>
-      <b-form-checkbox
-        v-if="node.mediaType !== 'accordion'"
-        v-model="node.skippable"
-        data-testid="node-behaviour-skippable"
-      >
-        Coordinae Form
-      </b-form-checkbox>
+      <b-form-input
+        v-model="getMapCoordinates.lat"
+        :type="number"
+        placeholder="enter latitude coordinate here"
+      />
+
+      <b-form-input
+        v-model="getMapCoordinates.lng"
+        :type="number"
+        placeholder="enter longitude coordinate here"
+      />
     </b-form-group>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
+
 export default {
   props: {
     node: {
@@ -20,33 +26,23 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      nodeLat: 55,
+      nodeLng: 23,
+    }
+  },
+  computed: {
+    ...mapGetters(["getNode"]),
+    getMapCoordinates() {
+      return this.node.mapCoordinates ? this.node.mapCoordinates : 0
+    },
+  },
 }
 </script>
 
 <!--
-<template>
-    <div>
-        Hello from Coordinate form
-    </div>
 
-
-    <div id="modal-coordinate">
-        <b-form-group>
-        <b-form-input
-                v-model="nodeLatitude"
-                :type="number"
-                placeholder="latitude"
-            />
-            <b-form-input
-                v-model="nodeLongitude"
-                :type="number"
-                placeholder="longitude"
-            />
-                    
-        </b-form-group>
-    </div>
-
-</template>
 
 
 <script>
