@@ -19,8 +19,9 @@
 </template>
 
 <script>
-import RichTextForm from "./content-form/RichTextForm"
 import moment from "moment-timezone"
+import { getCurrentUser } from "@/services/wp"
+import RichTextForm from "./content-form/RichTextForm"
 
 export default {
   components: {
@@ -46,19 +47,19 @@ export default {
       this.handleSubmit()
     },
     handleAccept() {
-      const { data } = wpData.currentUser
-      this.node.author.id = data.ID
-      this.node.author.name = data.user_nicename
+      const { id, name } = getCurrentUser()
+      this.node.author.id = id
+      this.node.author.name = name
       this.node.status = "publish"
       this.handleSubmit()
     },
     handleSubmit() {
-      const { data } = wpData.currentUser
+      const { name, email } = getCurrentUser()
       this.node.comments.push({
         timestamp: moment().toISOString(),
         comment: this.comment,
-        author_name: data.user_nicename,
-        author_email: data.user_email,
+        author_name: name,
+        author_email: email,
       })
       this.$emit("submit")
     },
