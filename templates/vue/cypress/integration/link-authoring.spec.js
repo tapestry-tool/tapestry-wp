@@ -88,7 +88,7 @@ describe("Link Authoring", () => {
         cy.submitModal()
 
         /**
-         * Reload so accordions have correct rows. See:
+         * Reload so accordions have correct rows. See bug report:
          *  - https://app.asana.com/0/1126491658233864/1198168819652457
          */
         cy.visitTapestry()

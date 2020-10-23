@@ -23,5 +23,24 @@ describe("External link", () => {
     })
   })
 
-  it("should be able to add an external link using the file upload")
+  it("should be able to add an external link using the file upload", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("url-embed")
+
+      cy.server()
+      cy.route("POST", "**/async-upload.php").as("upload")
+
+      cy.get("[name=async-upload]").attachFile("reddit.png")
+      cy.wait("@upload")
+        .its("response.body.data.url")
+        .then(url => {
+          cy.getByTestId("node-link-url").should("have.value", url)
+          cy.submitModal()
+
+          cy.openLightbox(node.id)
+          cy.get("iframe").should("have.attr", "src", url)
+        })
+    })
+  })
 })
