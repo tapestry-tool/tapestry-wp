@@ -20,6 +20,7 @@ export const store = {
     selectedNodeId: null,
     favourites: [],
     visibleNodes: [],
+    apiError: null
   },
   getters,
   mutations,

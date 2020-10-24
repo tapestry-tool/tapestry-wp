@@ -65,6 +65,7 @@ import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
+import { max } from 'moment'
 
 export default {
   components: {
@@ -200,24 +201,29 @@ export default {
         x0: 30000,
         y0: 30000,
         x: 0,
-        y: 0,
+        y: 0
       }
-
       for (const node of Object.values(this.nodes)) {
         if (node.nodeType !== "") {
           const { x, y } = node.coordinates
-          if (x < box.x0) {
-            box.x0 = x
-          }
-          if (y < box.y0) {
-            box.y0 = y
-          }
-          if (x > box.x) {
-            box.x = x
-          }
-          if (y > box.y) {
-            box.y = y
-          }
+          console.log({x, y})
+          box.x0 = Math.min(x, box.x0)
+          box.y0 = Math.min(y, box.y0)
+          box.x = Math.max(x, box.x)
+          box.y = Math.max(y, box.y)
+          console.log(box)
+          // if (x < box.x0) {
+          //   box.x0 = x
+          // }
+          // if (y < box.y0) {
+          //   box.y0 = y
+          // }
+          // if (x > box.x) {
+          //   box.x = x
+          // }
+          // if (y > box.y) {
+          //   box.y = y
+          // }
         }
       }
 
