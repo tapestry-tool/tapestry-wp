@@ -491,15 +491,18 @@ class Tapestry implements ITapestry
         if (!isset($tapestry->settings->superuserOverridePermissions)) {
             $tapestry->settings->superuserOverridePermissions = true;
         }
-
         $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
 
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
         } else {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions($tapestry->rootId,
-                $tapestry->settings->superuserOverridePermissions, $filterUserId);
-
+            $tapestry->nodes = array_intersect($tapestry->nodes,
+                $this->_filterNodeMetaIdsByPermissions(
+                    $tapestry->rootId,
+                    $tapestry->settings->superuserOverridePermissions,
+                    $filterUserId
+                )
+            );
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
