@@ -5,7 +5,7 @@ export const data = {
   vue_uri: "testing",
 }
 
-export const getCurrentUser = () => ({
+export const getCurrentUser = jest.fn().mockReturnValue({
   id: "1",
   name: "admin",
   email: "foo@bar.com",
