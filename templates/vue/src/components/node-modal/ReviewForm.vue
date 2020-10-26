@@ -55,12 +55,14 @@ export default {
     },
     handleSubmit() {
       const { name, email } = getCurrentUser()
-      this.node.comments.push({
-        timestamp: moment().toISOString(),
-        comment: this.comment,
-        author_name: name,
-        author_email: email,
-      })
+      if (this.comment.length > 0) {
+        this.node.comments.push({
+          timestamp: moment().toISOString(),
+          comment: this.comment,
+          author_name: name,
+          author_email: email,
+        })
+      }
       this.$emit("submit")
     },
   },
