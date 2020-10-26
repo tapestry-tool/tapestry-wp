@@ -225,16 +225,17 @@ export default {
   },
   mounted() {
     this.getSettings()
-    DragSelectModular.removeDragSelectListener()
-
+    this.$root.$on("bv::modal::show", (_, modalId) => {
+      if (modalId === "settings-modal") {
+        DragSelectModular.removeDragSelectListener()
+      }
+    })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
+        DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
     })
-  },
-  beforeDestroy() {
-    DragSelectModular.addDragSelectListener()
   },
   methods: {
     closeModal() {
