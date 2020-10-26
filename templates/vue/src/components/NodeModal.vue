@@ -218,6 +218,7 @@ export default {
       fileUploading: false,
       loadDuration: false,
       warningText: "",
+      submissionError: null,
     }
   },
   computed: {
@@ -228,7 +229,7 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -303,6 +304,9 @@ export default {
     type() {
       return this.$route.params.type || ""
     },
+    hasSubmissionApiError() {
+      return this.apiError
+    },
   },
   watch: {
     nodeId: {
@@ -339,6 +343,11 @@ export default {
           this.isValid()
         }
       },
+    },
+    hasSubmissionApiError() {
+      if (this.apiError) {
+        this.submissionError = this.apiError
+      }
     },
   },
   mounted() {
@@ -504,6 +513,7 @@ export default {
       }
     },
     async submitNode() {
+      this.submissionError = null
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
@@ -536,8 +546,12 @@ export default {
         })
       }
       await this.updateLockedStatus()
-      this.close()
       this.loading = false
+      if (!this.submissionError) {
+        this.close()
+      } else {
+        this.displaySubmissionError()
+      }
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
@@ -752,6 +766,11 @@ export default {
       }
 
       return true
+    },
+    displaySubmissionError() {
+      this.formErrors.push(
+        "An unexpected error occurred during submission - see messages for details"
+      )
     },
   },
 }
