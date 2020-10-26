@@ -4,3 +4,9 @@ export const data = {
   nonce: "my_nonce",
   vue_uri: "testing",
 }
+
+export const getCurrentUser = () => ({
+  id: "1",
+  name: "admin",
+  email: "foo@bar.com",
+})
