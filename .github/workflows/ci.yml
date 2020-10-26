@@ -35,3 +35,7 @@ jobs:
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080/dist/build.js"
           working-directory: templates/vue
+          record: true
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
