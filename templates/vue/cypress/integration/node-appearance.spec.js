@@ -4,11 +4,7 @@ describe("Node Appearance", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: Its appearance is changed using the modal
-    Then: It should reflect the changes
-  `, () => {
+  it("should be able to edit a node's appearance using the node modal", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()

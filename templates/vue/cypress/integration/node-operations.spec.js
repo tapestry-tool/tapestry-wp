@@ -4,11 +4,7 @@ describe("Node Operations", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node and its author
-    When: The tapestry loads
-    Then: Its add, edit, and media buttons should be visible and clickable
-  `, () => {
+  it("should be able to see the add, edit, and media buttons on load", () => {
     cy.getSelectedNode().then(({ id }) => {
       cy.openModal("add", id)
       cy.getByTestId("node-modal").should("be.visible")
@@ -22,11 +18,7 @@ describe("Node Operations", () => {
     })
   })
 
-  it(`
-    Given: A Tapestry node that does not have a media button
-    When: The node is clicked
-    Then: Its lightbox should be visible
-  `, () => {
+  it("should show the lightbox when the node is clicked if the node doesn't have a media button", () => {
     cy.getSelectedNode().then(node => {
       cy.editNode(node.id, {
         hideMedia: true,

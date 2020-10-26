@@ -1,9 +1,5 @@
 describe("Import Export", () => {
-  it(`
-    Given: An empty Tapestry
-    When: A Tapestry JSON is imported using the file input
-    Then: The Tapestry should be imported
-  `, () => {
+  it("should be able to import a Tapestry using the file input", () => {
     const tapestry = "root.json"
     cy.setup()
 

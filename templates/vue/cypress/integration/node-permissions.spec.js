@@ -4,11 +4,7 @@ describe("Node Permissions", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: The node modal is used to edit its permissions
-    Then: The node should reflect the permissions
-  `, () => {
+  it("should be able to edit node permissions using the node modal", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.contains(/access/i).click()
@@ -25,11 +21,7 @@ describe("Node Permissions", () => {
     cy.getSelectedNode().then(node => cy.editNode(node.id, { permissions: edits }))
   }
 
-  it(`
-    Given: A node and a user without edit permission
-    When: The Tapestry loads
-    Then: The edit button should not exist
-  `, () => {
+  it("should not see the edit button if the user doesn't have edit permission", () => {
     setup({
       public: ["read"],
       authenticated: ["read", "edit"],
@@ -43,11 +35,7 @@ describe("Node Permissions", () => {
     })
   })
 
-  it(`
-    Given: A node and a user without add permission
-    When: The Tapestry loads
-    Then: The add button should not exist
-  `, () => {
+  it("should not see the add button if the user doesn't have add permission", () => {
     setup({
       public: ["read"],
       authenticated: ["read", "add"],

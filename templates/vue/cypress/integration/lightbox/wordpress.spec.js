@@ -4,11 +4,7 @@ describe("Wordpress", () => {
     cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node
-    When: It is changed to a WP post type
-    Then: The WP post should be visible
-  `, () => {
+  it("should be able to add a wp post node", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("wp-post")
