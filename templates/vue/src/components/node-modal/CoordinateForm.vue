@@ -1,15 +1,20 @@
 <template>
   <div id="modal-behaviour">
     <b-form-group>
+      <b-form-checkbox
+        v-model="isOnMap"
+      >
+          Show this node on map
+      </b-form-checkbox>
+    </b-form-group>
+    <b-form-group v-if="isOnMap">
       <b-form-input
-        v-model="getMapCoordinates.lat"
-        :type="number"
+        v-model="nodeLat"
         placeholder="enter latitude coordinate here"
       />
 
       <b-form-input
-        v-model="getMapCoordinates.lng"
-        :type="number"
+        v-model="nodeLng"
         placeholder="enter longitude coordinate here"
       />
     </b-form-group>
@@ -28,44 +33,30 @@ export default {
   },
   data() {
     return {
-      nodeLat: 55,
-      nodeLng: 23,
+      nodeLat: null,
+      nodeLng: null,
+      isOnMap: false, 
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
-    getMapCoordinates() {
-      return this.node.mapCoordinates ? this.node.mapCoordinates : 0
+  },
+  watch: {
+    updateLat(nodeLat){
+      console.log(nodeLat)
+      this.node.latCoordinate = this.nodeLat
     },
+    updateLng(nodeLng){
+      this.node.lngCoordinate = this.nodeLng
+    },
+    updateShow(isOnMap){
+      this.node.isOnMap = this.isOnMap
+    }
+  },
+  created() {
+    this.nodeLat = this.node.latCoordinate
+    this.nodeLng = this.node.lngCoordinate
+    this.isOnMap = this.node.isOnMap
   },
 }
 </script>
-
-<!--
-
-
-
-<script>
-export default {
-    name: "coordinate-form",
-    props: {
-        node: {
-            type: Object,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            nodeLatitude: null,
-            nodeLongitude: null,
-        }
-    },
-    computed: {
-        ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
-        //getMapCoordinates(){
-          //  return this.node.mapCoordinates ? this.node.mapCoordinates : null
-        //}
-    },
-}
-</script>
--->

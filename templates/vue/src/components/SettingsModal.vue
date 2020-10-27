@@ -130,14 +130,12 @@
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.neLat"
-                  :type="number"
                   placeholder="90"
                 />
               </b-col>
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.neLng"
-                  :type="number"
                   placeholder="180"
                 />
               </b-col>
@@ -149,14 +147,12 @@
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.swLat"
-                  :type="number"
                   placeholder="-90"
                 />
               </b-col>
               <b-col sm="3">
                 <b-form-input
                   v-model="mapBounds.swLng"
-                  :type="number"
                   placeholder="-180"
                 />
               </b-col>

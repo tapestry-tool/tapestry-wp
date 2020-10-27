@@ -19,14 +19,18 @@
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
-      <l-marker :lat-lng="markerLatLng"></l-marker>
+       <l-marker
+        :lat-lng="[47.41322, -1.209482]"
+        :icon="icon"
+      />
     </l-map>
   </div>
 </template>
 
 <script>
 import "leaflet/dist/leaflet.css"
-import { latLng, latLngBounds } from "leaflet"
+import mapMarker from "@/assets/map-marker.png"
+import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker } from "vue2-leaflet"
 import { mapState } from "vuex"
 
@@ -49,6 +53,11 @@ export default {
         scrollWheelZoom: false,
       },
       markerLatLng: latLng(47.412, -1.218),
+      icon: icon({
+        iconUrl: mapMarker,
+        iconSize: [32, 33],
+        iconAnchor: [16, 37]
+      }),
     }
   },
   computed: {
@@ -76,9 +85,6 @@ export default {
     },
     showLongText() {
       this.showParagraph = !this.showParagraph
-    },
-    innerClick() {
-      alert("Click!")
     },
   },
 }
