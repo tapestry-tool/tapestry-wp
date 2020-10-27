@@ -186,7 +186,7 @@ export default class Helpers {
     }
 
     // Check 2: User is the author of the node
-    if (wpData.currentUser.ID == node.author.id) {
+    if (node.author && wpData.currentUser.ID == parseInt(node.author.id)) {
       return true
     }
 
@@ -204,14 +204,14 @@ export default class Helpers {
     }
 
     // Check 5: Node has authenticated permissions
-    if (wpData.currentUser.ID && authenticated.includes(action)) {
+    if (wpData.currentUser.ID && authenticated && authenticated.includes(action)) {
       return true
     }
 
     // Check 6: User has a role that is allowed in the node
     const isRoleAllowed = roles.some(role => {
       const permissions = node.permissions[role]
-      return permissions.includes(action)
+      return permissions && permissions.includes(action)
     })
     if (isRoleAllowed) {
       return true

@@ -1,15 +1,18 @@
 <template>
-  <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="depth-slider">
+  <div
+    v-if="maxDepth > 1 && settings.defaultDepth > 0"
+    class="depth-slider"
+    @mousedown="pauseDragSelect"
+  >
     <div>
-      <tapestry-icon icon="zoom-in"></tapestry-icon>
       <input
         v-model="currentDepth"
         class="slider"
         type="range"
         min="1"
         :max="maxDepth"
+        :style="{ '--zoomInBg': zoomInBg, '--zoomOutBg': zoomOutBg }"
       />
-      <tapestry-icon icon="zoom-out"></tapestry-icon>
     </div>
     <p v-if="currentDepth < maxDepth" class="warning-text alert p-2 small">
       Some nodes might be hidden because you're not at maximum depth.
@@ -19,21 +22,34 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
-import { bus } from "@/utils/event-bus"
+import ZoomIn from "@/assets/zoom-in.png"
+import ZoomOut from "@/assets/zoom-out.png"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
-  components: {
-    TapestryIcon,
-  },
-  data() {
-    return {
-      currentDepth: 1,
-    }
-  },
   computed: {
-    ...mapState(["selectedNodeId", "nodes", "settings"]),
+    ...mapState(["nodes", "settings"]),
     ...mapGetters(["getNeighbours", "getNode"]),
+    currentDepth: {
+      get() {
+        const { depth } = this.$route.query
+        if (depth) {
+          return Number(depth)
+        }
+        return this.settings.defaultDepth
+      },
+      set(depth) {
+        if (depth !== this.currentDepth) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, depth },
+          })
+        }
+      },
+    },
+    selectedNodeId() {
+      return Number(this.$route.params.nodeId)
+    },
     levels() {
       if (!Object.keys(this.nodes).length) {
         return []
@@ -70,12 +86,25 @@ export default {
     maxDepth() {
       return this.levels.length
     },
+    zoomInBg() {
+      return "url(" + ZoomIn + ")"
+    },
+    zoomOutBg() {
+      return "url(" + ZoomOut + ")"
+    },
   },
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function() {
-        this.updateNodeTypes()
+      handler: function(depth) {
+        if (depth > this.maxDepth) {
+          this.$router.replace({
+            ...this.$route,
+            query: { ...this.$route.query, depth: this.maxDepth },
+          })
+        } else {
+          this.updateNodeTypes()
+        }
       },
     },
     levels: {
@@ -87,20 +116,31 @@ export default {
     maxDepth: {
       immediate: true,
       handler: function(maxDepth) {
-        bus.$emit("max-depth-change", maxDepth)
+        this.$emit("change:max-depth", maxDepth)
       },
     },
   },
-  created() {
-    this.setDefaultDepth()
-  },
   methods: {
     ...mapMutations(["updateNode"]),
-    setDefaultDepth() {
-      this.currentDepth = this.settings.defaultDepth || this.maxDepth + 1
-    },
     updateNodeTypes() {
       const depth = parseInt(this.currentDepth)
+
+      if (depth === 0) {
+        const nodesToUpdate = Object.values(this.nodes).filter(
+          node => node.nodeType !== "child"
+        )
+        nodesToUpdate.forEach(node => {
+          this.updateNode({
+            id: node.id,
+            newNode: {
+              nodeType: "child",
+            },
+          })
+        })
+        this.$emit("change")
+        return
+      }
+
       const updated = new Set()
       const nodesAtCurrentDepth = this.levels[depth]
       if (nodesAtCurrentDepth) {
@@ -150,6 +190,9 @@ export default {
       })
       this.$emit("change")
     },
+    pauseDragSelect() {
+      DragSelectModular.pauseDragSelect()
+    },
   },
 }
 </script>
@@ -189,6 +232,7 @@ export default {
   transition: opacity 0.2s;
   position: relative;
   align-items: center;
+  margin: 0 38px;
 
   &:before,
   &:after {
@@ -196,6 +240,7 @@ export default {
     content: "";
     width: 30px;
     height: 30px;
+    background: var(--zoomInBg);
     background-size: 20px;
     background-position: center;
     background-repeat: no-repeat;
@@ -206,6 +251,7 @@ export default {
   }
 
   &:after {
+    background-image: var(--zoomOutBg);
     left: initial;
     right: -30px;
   }

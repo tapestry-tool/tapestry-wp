@@ -333,6 +333,16 @@ class TapestryNode implements ITapestryNode
         ];
     }
 
+    public function isAvailableToUser($userId = 0)
+    {
+        if (!$userId) {
+            $userId = wp_get_current_user()->ID;
+        }
+        $nodeMeta = $this->getMeta();
+
+        return $nodeMeta->author->id == $userId || 'draft' != $nodeMeta->status;
+    }
+
     private function _saveToDatabase()
     {
         $node = $this->_formNode();
@@ -485,6 +495,9 @@ class TapestryNode implements ITapestryNode
             return (object) [
                 'id' => $id,
                 'name' => $user->display_name,
+                'email' => $user->user_email,
+                'original_author_name' => '',
+                'original_author_email' => '',
             ];
         }
     }

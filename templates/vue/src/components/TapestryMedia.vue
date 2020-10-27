@@ -51,6 +51,7 @@
       v-if="node.mediaFormat === 'h5p'"
       :autoplay="autoplay"
       :dimensions="dimensions"
+      :context="context"
       :node="node"
       :allow-end-screen="allowEndScreen"
       :read-only="readOnly"
@@ -132,6 +133,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "lightbox",
     },
     autoplay: {
       type: Boolean,

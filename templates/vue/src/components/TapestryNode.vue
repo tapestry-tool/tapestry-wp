@@ -13,15 +13,22 @@
       @mouseleave="$emit('mouseleave')"
     >
       <circle ref="circle" :fill="fill"></circle>
+      <circle
+        v-if="selected || !node.accessible"
+        :r="radius"
+        :fill="overlayFill"
+        class="node-overlay"
+      ></circle>
       <progress-bar
         v-show="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
-        :radius="radius"
+        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
+        :draft="node.status === 'draft'"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
@@ -47,7 +54,7 @@
             <button
               class="node-button"
               :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
+              @click.stop="handleRequestOpen"
             >
               <tapestry-icon
                 v-if="node.mediaType !== 'text'"
@@ -57,13 +64,13 @@
             </button>
           </foreignObject>
           <add-child-button
-            v-if="hasPermission('add') && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
-            x="-65"
+            :x="-65"
             :y="radius - 30"
           ></add-child-button>
           <foreignObject
-            v-if="hasPermission('edit')"
+            v-if="isLoggedIn && hasPermission('edit')"
             class="node-button-wrapper"
             x="5"
             :y="radius - 30"
@@ -124,11 +131,14 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
+import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "tapestry-node",
@@ -162,6 +172,9 @@ export default {
       "isAccordionRow",
       "getTydeProgress",
     ]),
+    isLoggedIn() {
+      return isLoggedIn
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -232,20 +245,30 @@ export default {
         ? this.settings.renderImages
         : true
       if (
-        this.imageUrl &&
-        this.imageUrl.length > 0 &&
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
         this.node.nodeType !== "grandchild" &&
         showImages
       ) {
         return `url(#node-image-${this.node.id})`
       }
+      return "#8396a1"
+    },
+    overlayFill() {
       if (this.selected) {
         return "#11a6d8"
-      }
-      if (!this.node.accessible) {
+      } else if (!this.node.accessible) {
         return "#8a8a8c"
       }
-      return "#8396a1"
+      return "transparent"
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -285,6 +308,7 @@ export default {
     },
   },
   mounted() {
+    DragSelectModular.updateSelectableNodes()
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
@@ -357,11 +381,29 @@ export default {
       "updateSelectedNode",
       "updateSelectedModule",
     ]),
+    updateRootNode() {
+      if (!this.root) {
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
+        this.updateSelectedNode(this.node.id)
+      }
+    },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -396,7 +438,7 @@ export default {
       } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
           ? this.handleRequestOpen()
-          : this.updateSelectedNode(this.node.id)
+          : this.updateRootNode()
       }
     },
     hasPermission(action) {
@@ -453,5 +495,9 @@ export default {
     width: 65px;
     height: 65px;
   }
+}
+
+.node-overlay {
+  opacity: 0.75;
 }
 </style>

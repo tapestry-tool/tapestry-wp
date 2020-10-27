@@ -21,6 +21,7 @@
       :dimensions="dimensions"
       :node="node"
       :read-only="readOnly"
+      :context="context"
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @change:dimensions="$emit('change:dimensions', $event)"
@@ -61,6 +62,10 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    context: {
+      type: String,
+      required: true,
     },
     autoplay: {
       type: Boolean,
