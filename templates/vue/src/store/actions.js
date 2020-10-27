@@ -126,13 +126,13 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
 export async function updateNodeCoordinates({ commit, dispatch }, { id, coordinates, originalCoordinates }) {
   try {
     await client.updateNodeCoordinates(id, coordinates)
-    commit("updateNode", { id, newNode: { coordinates } })
+    commit("updateNodeCoordinates", { id, coordinates })
   } catch (error) {
     if (originalCoordinates) {
-      let coordinates = originalCoordinates
-      commit("updateNode", { id, newNode: { coordinates } })
+      commit("updateNodeCoordinates", { id, coordinates: originalCoordinates})
     }
     dispatch("addApiError", error)
+    return Promise.reject()
   }
 }
 

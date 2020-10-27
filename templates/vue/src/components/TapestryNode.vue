@@ -309,8 +309,7 @@ export default {
                   x: this.coordinates[id].x,
                   y: this.coordinates[id].y
                 }
-              })
-                .then(() => {
+              }).then(() => {
                   this.$emit("dragend");
                 })
                 // .catch(() => {

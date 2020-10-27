@@ -206,12 +206,10 @@ export default {
       for (const node of Object.values(this.nodes)) {
         if (node.nodeType !== "") {
           const { x, y } = node.coordinates
-          console.log({x, y})
           box.x0 = Math.min(x, box.x0)
           box.y0 = Math.min(y, box.y0)
           box.x = Math.max(x, box.x)
           box.y = Math.max(y, box.y)
-          console.log(box)
           // if (x < box.x0) {
           //   box.x0 = x
           // }
