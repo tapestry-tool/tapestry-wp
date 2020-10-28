@@ -128,16 +128,10 @@
                 <span>Northeast bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.neLat"
-                  placeholder="90"
-                />
+                <b-form-input v-model="mapBounds.neLat" placeholder="90" />
               </b-col>
               <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.neLng"
-                  placeholder="180"
-                />
+                <b-form-input v-model="mapBounds.neLng" placeholder="180" />
               </b-col>
             </b-row>
             <b-row>
@@ -145,16 +139,10 @@
                 <span>Southwest bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.swLat"
-                  placeholder="-90"
-                />
+                <b-form-input v-model="mapBounds.swLat" placeholder="-90" />
               </b-col>
               <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.swLng"
-                  placeholder="-180"
-                />
+                <b-form-input v-model="mapBounds.swLng" placeholder="-180" />
               </b-col>
             </b-row>
           </div>
