@@ -15,7 +15,7 @@
         <tapestry-icon icon="copyright" />
       </button>
       <button
-        v-if="node.status !== 'publish'"
+        v-if="node.status !== 'publish' && node.status !== 'accept'"
         :class="['anchor-button', { active: active === 'review' }]"
         @click.stop="scrollToRef('review')"
       >
@@ -81,7 +81,11 @@
               v-html="license.description"
             ></div>
           </section>
-          <section v-if="node.status !== 'publish'" ref="review" data-name="review">
+          <section
+            v-if="node.status !== 'publish' && node.status !== 'accept'"
+            ref="review"
+            data-name="review"
+          >
             <h2 class="content-header">Review</h2>
             <div class="content-body">Status: {{ node.status }}</div>
             <h2 class="content-header">Comments</h2>
