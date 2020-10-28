@@ -485,4 +485,8 @@ class TapestryNode implements ITapestryNode
             ];
         }
     }
+
+    public function wasAccepted() {
+        return $this->status == "accept";
+    }
 }

@@ -143,8 +143,12 @@ export default class Helpers {
       return true
     }
 
-    // Check 2: User is the author of the node
-    if (node.author && wpData.currentUser.ID == parseInt(node.author.id)) {
+    // Check 2: User is the author of the node, if the node is not an accepted node
+    if (
+      node.author &&
+      wpData.currentUser.ID == parseInt(node.author.id) &&
+      node.status !== "accept"
+    ) {
       return true
     }
 
