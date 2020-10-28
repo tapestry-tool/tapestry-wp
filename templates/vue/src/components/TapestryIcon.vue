@@ -40,6 +40,27 @@ const aliases = {
   checklist: "tasks",
 }
 
+/**
+ * The `<tapestry-icon>` component is a wrapper around FontAwesome (FA) that
+ * allows use of FA icons within SVGs.
+ *
+ * It accepts an `icon` string and an optional `svg` flag. If the `svg`
+ * flag is `true`, this component assumes it's going to be embedded within
+ * an `svg` and returns the appropriate tag.
+ *
+ * If the `svg` flag is `false`, the `icon` string can be any valid FA free
+ * icon. See the following link for all available icons:
+ *  - https://fontawesome.com/icons?d=gallery&m=free
+ *
+ * If the `svg` flag is `true`, the `icon` string must be one of the keys in
+ * the `unicodes` object. If it's not there, the icon must first be added as
+ * a key that maps to its unicode value.
+ *
+ * One way of getting the unicode value is to open the FontAwesome css file:
+ *  - https://use.fontawesome.com/releases/v5.5.0/css/all.css
+ * Then doing a "Cmd + F" on the icon name. The unicode is the value of the
+ * "content" attribute of that icon.
+ */
 export default {
   name: "tapestry-icon",
   props: {
