@@ -10,6 +10,7 @@
         :options="comboboxFilterOptions"
         :input-style="inputStyles"
         size="sm"
+        :disableAutocomplete="true"
       >
         <template v-slot="slotProps">
           <p class="filter-value">
@@ -25,6 +26,7 @@
         :options="comboboxValueOptions"
         :input-style="inputStyles"
         size="sm"
+        :disableAutocomplete="true"
       >
         <template v-slot="slotProps">
           <p class="filter-value">

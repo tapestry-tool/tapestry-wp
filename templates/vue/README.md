@@ -38,6 +38,8 @@ You need to adjust your git config so the automatic linting process works correc
 git config core.hooksPath .githooks
 ```
 
+## Automated Testing
+
 ### End-to-End Testing
 
 Cypress is the framework we use for end-to-end (e2e) testing. For it to work, it needs to be configured with some environment variables. In the `cypress-sample.json` file, you should see something like:
