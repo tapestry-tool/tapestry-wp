@@ -1,4 +1,5 @@
 <template>
+<div>
   <div id="modal-behaviour">
     <b-form-group>
       <b-form-checkbox
@@ -9,15 +10,21 @@
     </b-form-group>
     <b-form-group v-if="isOnMap">
       <b-form-input
-        v-model="nodeLat"
+        v-model="node.latCoordinate"
+        :number="true"
         placeholder="enter latitude coordinate here"
       />
 
       <b-form-input
-        v-model="nodeLng"
+        v-model="node.lngCoordinate"
+        :number="true"
         placeholder="enter longitude coordinate here"
       />
     </b-form-group>
+  </div>
+  <div>
+    {{this.node}}
+  </div>
   </div>
 </template>
 
@@ -40,16 +47,18 @@ export default {
   },
   computed: {
     ...mapGetters(["getNode"]),
+    inputValid(){
+      this.isOnMap && this.nodeLat!="" && this.nodeLng!=""
+    }
   },
   watch: {
-    updateLat(nodeLat){
-      console.log(nodeLat)
+    nodeLat(){
       this.node.latCoordinate = this.nodeLat
     },
-    updateLng(nodeLng){
+    nodeLng(){
       this.node.lngCoordinate = this.nodeLng
     },
-    updateShow(isOnMap){
+    isOnMap(){
       this.node.isOnMap = this.isOnMap
     }
   },

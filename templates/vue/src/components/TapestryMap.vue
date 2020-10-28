@@ -1,30 +1,26 @@
 <template>
+<div>
   <div style="height: 800px; width: 100%">
-    <!--
-    <div style="height: 150px overflow: auto;">
-      <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
-      <p>The bounds are: {{ setBounds }}</p>
-      <p>Settings are: {{ settings }}</p>
-    </div>
-     :max-bounds="setBounds"
-    -->
-
     <l-map
       :options="mapOptions"
       :bounds="setBounds"
       style="height: 80%"
-      :zoom="zoom"
-      :center="center"
       @update:center="updateCenter"
       @update:zoom="updateZoom"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
-       <l-marker
-        :lat-lng="[47.41322, -1.209482]"
+      <l-marker 
+        v-for="marker in markers"
+        :key='marker.id' 
+        :lat-lng="[marker.lat, marker.lng]"
         :icon="icon"
       />
     </l-map>
   </div>
+  <div>
+      {{this.nodes}}
+  </div>
+</div>
 </template>
 
 <script>
@@ -43,8 +39,6 @@ export default {
   },
   data() {
     return {
-      zoom: 14,
-      center: latLng(49.262796, -123.252165),
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -52,16 +46,16 @@ export default {
         zoomSnap: 0.1,
         scrollWheelZoom: false,
       },
-      markerLatLng: latLng(47.412, -1.218),
       icon: icon({
         iconUrl: mapMarker,
         iconSize: [32, 33],
         iconAnchor: [16, 37]
       }),
+      markers: [],
     }
   },
   computed: {
-    ...mapState(["settings"]),
+    ...mapState(["settings", "nodes"]),
     setBounds() {
       const x = latLngBounds([
         [
@@ -76,15 +70,21 @@ export default {
       return x
     },
   },
+  created(){
+    for (const [key, value] of Object.entries(this.nodes)) {
+      console.log(key)
+      if(value.isOnMap) {
+        console.log(value)
+        this.markers.push({id: key, pos: latLng(value.latCoordinate, value.lngCoordinate)})
+      }
+    }
+  },
   methods: {
     updateZoom(zoom) {
       this.currentZoom = zoom
     },
     updateCenter(center) {
       this.currentCenter = center
-    },
-    showLongText() {
-      this.showParagraph = !this.showParagraph
     },
   },
 }
