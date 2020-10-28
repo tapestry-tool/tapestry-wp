@@ -59,12 +59,13 @@
             <tapestry-icon
               v-if="node.mediaType !== 'text'"
               :icon="icon"
+              svg
             ></tapestry-icon>
             <text
               v-else
               text-anchor="middle"
               dominant-baseline="middle"
-              color="white"
+              fill="white"
               font-size="24"
               font-weight="700"
             >
@@ -84,7 +85,7 @@
             :data-qa="`edit-node-${node.id}`"
             @click="editNode"
           >
-            <tapestry-icon icon="pen"></tapestry-icon>
+            <tapestry-icon icon="pen" svg></tapestry-icon>
           </node-button>
         </g>
       </g>

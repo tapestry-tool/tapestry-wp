@@ -12,12 +12,11 @@
     <node-button
       ref="addButton"
       :data-qa="`add-node-${node.id}`"
-      :icon="plus"
       :x="x"
       :y="y"
       @click="addNode"
     >
-      <tapestry-icon icon="plus"></tapestry-icon>
+      <tapestry-icon icon="plus" svg></tapestry-icon>
     </node-button>
   </g>
 </template>
@@ -27,11 +26,13 @@ import * as d3 from "d3"
 import { mapActions, mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
+import TapestryIcon from "../TapestryIcon"
 import NodeButton from "./NodeButton"
 
 export default {
   components: {
     NodeButton,
+    TapestryIcon,
   },
   props: {
     node: {
