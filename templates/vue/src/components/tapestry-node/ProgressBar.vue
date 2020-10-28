@@ -66,9 +66,11 @@ export default {
         case "draft":
           return "#999"
         case "submitted":
-          return "blue"
+          return "orange"
+        case "accept":
+          return "green"
         case "reject":
-          return "red"
+          return "#CC444B"
         default:
           return "currentColor"
       }

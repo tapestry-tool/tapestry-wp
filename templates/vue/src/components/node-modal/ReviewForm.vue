@@ -47,10 +47,7 @@ export default {
       this.handleSubmit()
     },
     handleAccept() {
-      const { id, name } = getCurrentUser()
-      this.node.author.id = id
-      this.node.author.name = name
-      this.node.status = "publish"
+      this.node.status = "accept"
       this.handleSubmit()
     },
     handleSubmit() {
