@@ -1,26 +1,24 @@
 <template>
-<div>
-  <div style="height: 800px; width: 100%">
-    <l-map
-      :options="mapOptions"
-      :bounds="setBounds"
-      style="height: 80%"
-      @update:center="updateCenter"
-      @update:zoom="updateZoom"
-    >
-      <l-tile-layer :url="url" :attribution="attribution" />
-      <l-marker 
-        v-for="marker in markers"
-        :key='marker.id' 
-        :lat-lng="[marker.lat, marker.lng]"
-        :icon="icon"
-      />
-    </l-map>
-  </div>
   <div>
-      {{this.nodes}}
+    <div style="height: 800px; width: 100%">
+      <l-map
+        :options="mapOptions"
+        :bounds="setBounds"
+        style="height: 80%"
+        @update:center="updateCenter"
+        @update:zoom="updateZoom"
+      >
+        <l-tile-layer :url="url" :attribution="attribution" />
+        <l-marker
+          v-for="marker in markers"
+          :key="marker.id"
+          :lat-lng="marker.pos"
+          :icon="icon"
+          @click="openNode(marker.id)"
+        />
+      </l-map>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -29,6 +27,7 @@ import mapMarker from "@/assets/map-marker.png"
 import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker } from "vue2-leaflet"
 import { mapState } from "vuex"
+import { names } from "@/config/routes"
 
 export default {
   name: "tapestry-map",
@@ -49,7 +48,7 @@ export default {
       icon: icon({
         iconUrl: mapMarker,
         iconSize: [32, 33],
-        iconAnchor: [16, 37]
+        iconAnchor: [16, 37],
       }),
       markers: [],
     }
@@ -70,12 +69,13 @@ export default {
       return x
     },
   },
-  created(){
+  created() {
     for (const [key, value] of Object.entries(this.nodes)) {
-      console.log(key)
-      if(value.isOnMap) {
-        console.log(value)
-        this.markers.push({id: key, pos: latLng(value.latCoordinate, value.lngCoordinate)})
+      if (this.hasMapCoordinates(value.mapCoordinates)) {
+        this.markers.push({
+          id: key,
+          pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
+        })
       }
     }
   },
@@ -85,6 +85,16 @@ export default {
     },
     updateCenter(center) {
       this.currentCenter = center
+    },
+    hasMapCoordinates(mapCoordinates) {
+      return mapCoordinates.lat != "" && mapCoordinates.lng != ""
+    },
+    openNode(id) {
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: id },
+        query: this.$route.query,
+      })
     },
   },
 }

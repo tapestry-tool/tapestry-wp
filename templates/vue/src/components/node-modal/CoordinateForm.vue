@@ -1,30 +1,25 @@
 <template>
-<div>
-  <div id="modal-behaviour">
-    <b-form-group>
-      <b-form-checkbox
-        v-model="isOnMap"
-      >
-          Show this node on map
-      </b-form-checkbox>
-    </b-form-group>
-    <b-form-group v-if="isOnMap">
-      <b-form-input
-        v-model="node.latCoordinate"
-        :number="true"
-        placeholder="enter latitude coordinate here"
-      />
-
-      <b-form-input
-        v-model="node.lngCoordinate"
-        :number="true"
-        placeholder="enter longitude coordinate here"
-      />
-    </b-form-group>
-  </div>
   <div>
-    {{this.node}}
-  </div>
+    <div id="modal-behaviour">
+      <b-form-group>
+        <b-form-checkbox v-model="isOnMap">
+          Show this node on map
+        </b-form-checkbox>
+      </b-form-group>
+      <b-form-group v-if="isOnMap">
+        <b-form-input
+          v-model="node.mapCoordinates.lat"
+          :number="true"
+          placeholder="enter latitude coordinate here"
+        />
+
+        <b-form-input
+          v-model="node.mapCoordinates.lng"
+          :number="true"
+          placeholder="enter longitude coordinate here"
+        />
+      </b-form-group>
+    </div>
   </div>
 </template>
 
@@ -40,32 +35,42 @@ export default {
   },
   data() {
     return {
-      nodeLat: null,
-      nodeLng: null,
-      isOnMap: false, 
+      isOnMap: false,
     }
   },
   computed: {
     ...mapGetters(["getNode"]),
-    inputValid(){
-      this.isOnMap && this.nodeLat!="" && this.nodeLng!=""
-    }
   },
   watch: {
+    /*
     nodeLat(){
-      this.node.latCoordinate = this.nodeLat
+      this.node.mapCoordinates.lat = this.nodeLat
     },
     nodeLng(){
-      this.node.lngCoordinate = this.nodeLng
+      this.node.mapCoordinates.lng = this.nodeLng
     },
-    isOnMap(){
-      this.node.isOnMap = this.isOnMap
-    }
+    */
+    isOnMap(isOnMap) {
+      if (!isOnMap) {
+        this.node.mapCoordinates.lat = ""
+        this.node.mapCoordinates.lng = ""
+      }
+    },
   },
   created() {
-    this.nodeLat = this.node.latCoordinate
-    this.nodeLng = this.node.lngCoordinate
-    this.isOnMap = this.node.isOnMap
+    /*
+    this.nodeLat = this.node.mapCoordinates.lat
+    this.nodeLng = this.node.mapCoordinates.lng
+    */
+    this.isOnMap =
+      Object.keys(this.node.mapCoordinates).length != 0 &&
+      this.node.mapCoordinates.lat != "" &&
+      this.node.mapCoordinates.lng != ""
+
+    if (!this.isOnMap) {
+      this.node.mapCoordinates.lat = ""
+      this.node.mapCoordinates.lng = ""
+    }
   },
 }
 </script>
