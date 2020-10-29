@@ -1,20 +1,20 @@
-import { setup as setupTapestry, cleanup } from "../../support/utils"
+import { setup as setupTapestry } from "../support/utils"
 
-describe("Node permissions", () => {
+describe("Node Permissions", () => {
   beforeEach(() => {
     cy.fixture("root.json").as("oneNode")
-    cy.fixture("two-nodes.json").as("twoNodes")
     setupTapestry("@oneNode")
   })
 
-  afterEach(cleanup)
-
   const setup = edits => {
-    setupTapestry("@oneNode")
     cy.getSelectedNode().editNode({ permissions: edits })
   }
 
-  it("Should hide node and associated links if user does not have read access", () => {
+  it(`
+    Given: A user without any read permissions
+    When: The Tapestry loads
+    Then: The empty Tapestry text should be shown
+  `, () => {
     setup({
       public: [],
     })
@@ -22,7 +22,11 @@ describe("Node permissions", () => {
     cy.contains(/is empty/i).should("exist")
   })
 
-  it("Should hide edit button if user does not have write access", () => {
+  it(`
+    Given: A node and a user without edit permission
+    When: The Tapestry loads
+    Then: The edit button should not exist
+  `, () => {
     setup({
       public: ["read"],
       authenticated: ["read", "edit"],
@@ -36,7 +40,11 @@ describe("Node permissions", () => {
     })
   })
 
-  it("Should hide add button if user does not have add access", () => {
+  it(`
+    Given: A node and a user without add permission
+    When: The Tapestry loads
+    Then: The add button should not exist
+  `, () => {
     setup({
       public: ["read"],
       authenticated: ["read", "add"],
