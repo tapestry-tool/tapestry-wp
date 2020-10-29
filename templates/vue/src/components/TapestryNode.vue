@@ -7,8 +7,7 @@
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
-        cursor:
-          node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed'
+        cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
@@ -113,38 +112,38 @@
 </template>
 
 <script>
-import * as d3 from "d3";
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
-import TapestryIcon from "@/components/TapestryIcon";
-import { names } from "@/config/routes";
-import { bus } from "@/utils/event-bus";
-import Helpers from "@/utils/Helpers";
-import { isLoggedIn } from "@/utils/wp";
-import AddChildButton from "./tapestry-node/AddChildButton";
-import ProgressBar from "./tapestry-node/ProgressBar";
-import DragSelectModular from "@/utils/dragSelectModular";
+import * as d3 from "d3"
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
+import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
+import { bus } from "@/utils/event-bus"
+import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/utils/wp"
+import AddChildButton from "./tapestry-node/AddChildButton"
+import ProgressBar from "./tapestry-node/ProgressBar"
+import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "tapestry-node",
   components: {
     AddChildButton,
     ProgressBar,
-    TapestryIcon
+    TapestryIcon,
   },
   props: {
     node: {
       type: Object,
-      required: true
+      required: true,
     },
     root: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      transitioning: false
-    };
+      transitioning: false,
+    }
   },
   computed: {
     ...mapState(["selection", "settings", "visibleNodes"]),
@@ -153,60 +152,60 @@ export default {
       "getDirectChildren",
       "isVisible",
       "getParent",
-      "isAccordionRow"
+      "isAccordionRow",
     ]),
     isLoggedIn() {
-      return isLoggedIn;
+      return isLoggedIn
     },
     isSubAccordionRow() {
-      const parent = this.getParent(this.node.id);
+      const parent = this.getParent(this.node.id)
       if (parent) {
-        return this.isAccordionRow(parent);
+        return this.isAccordionRow(parent)
       }
-      return false;
+      return false
     },
     icon() {
       if (!this.node.accessible) {
-        return "lock";
+        return "lock"
       }
       switch (this.node.mediaType) {
         case "h5p":
         case "video":
-          return "play";
+          return "play"
         case "text":
-          return "text";
+          return "text"
         case "activity":
         case "gravity-form":
-          return "tasks";
+          return "tasks"
         case "url-embed":
-          return "window-maximize";
+          return "window-maximize"
         case "accordion":
-          return "bars";
+          return "bars"
         case "wp-post":
-          return "post";
+          return "post"
         default:
-          return "exclamation";
+          return "exclamation"
       }
     },
     show() {
-      return this.isVisible(this.node.id);
+      return this.isVisible(this.node.id)
     },
     radius() {
       if (!this.show) {
-        return 0;
+        return 0
       }
       if (this.root) {
-        return 210;
+        return 210
       }
       if (this.node.nodeType === "grandchild") {
-        return 40;
+        return 40
       }
-      return 140;
+      return 140
     },
     fill() {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
-        : true;
+        : true
       if (
         !this.node.imageURL &&
         this.node.lockedImageURL &&
@@ -214,37 +213,37 @@ export default {
         showImages &&
         this.node.accessible
       ) {
-        return "#8396a1";
+        return "#8396a1"
       }
       if (
         (this.node.imageURL || this.node.lockedImageURL) &&
         this.node.nodeType !== "grandchild" &&
         showImages
       ) {
-        return `url(#node-image-${this.node.id})`;
+        return `url(#node-image-${this.node.id})`
       }
-      return "#8396a1";
+      return "#8396a1"
     },
     overlayFill() {
       if (this.selected) {
-        return "#11a6d8";
+        return "#11a6d8"
       } else if (!this.node.accessible) {
-        return "#8a8a8c";
+        return "#8a8a8c"
       }
-      return "transparent";
+      return "transparent"
     },
     selected() {
-      return this.selection.includes(this.node.id);
+      return this.selection.includes(this.node.id)
     },
     progress() {
       if (this.node.mediaType !== "accordion") {
-        return this.node.progress;
+        return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
         .map(this.getNode)
-        .filter(n => n.status !== "draft");
-      return rows.filter(row => row.completed).length / rows.length;
-    }
+        .filter(n => n.status !== "draft")
+      return rows.filter(row => row.completed).length / rows.length
+    },
   },
   watch: {
     radius(newRadius) {
@@ -253,18 +252,18 @@ export default {
         .duration(800)
         .ease(d3.easePolyOut)
         .on("start", () => {
-          this.transitioning = true;
+          this.transitioning = true
         })
         .on("end", () => {
-          this.transitioning = false;
+          this.transitioning = false
         })
-        .attr("r", newRadius);
-    }
+        .attr("r", newRadius)
+    },
   },
   mounted() {
-    DragSelectModular.updateSelectableNodes();
-    this.$refs.circle.setAttribute("r", this.radius);
-    const nodeRef = this.$refs.node;
+    DragSelectModular.updateSelectableNodes()
+    this.$refs.circle.setAttribute("r", this.radius)
+    const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
       d3
         .drag()
@@ -272,34 +271,40 @@ export default {
           this.coordinates = {}
           if (this.selection.length) {
             this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId);
+              const node = this.getNode(nodeId)
               coordinates[nodeId] = {
                 x: node.coordinates.x,
-                y: node.coordinates.y
-              };
-              return coordinates;
-            }, {});
+                y: node.coordinates.y,
+              }
+              return coordinates
+            }, {})
           } else {
-            this.coordinates[this.node.id] = {x: this.node.coordinates.x, y: this.node.coordinates.y}
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
           }
         })
         .on("drag", () => {
           for (const id of Object.keys(this.coordinates)) {
-            const node = this.getNode(id);
-            node.coordinates.x += d3.event.dx;
-            node.coordinates.y += d3.event.dy;
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
           }
         })
         .on("end", () => {
-           for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
-            const node = this.getNode(id);
-            node.coordinates.x += d3.event.dx;
-            node.coordinates.y += d3.event.dy;
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
             let coordinates = {
-                x: node.coordinates.x,
-                y: node.coordinates.y
-              };
-            if (originalCoordinates.x == coordinates.x && originalCoordinates.y == coordinates.y) {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
+            }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
               continue
             }
             this.updateNodeCoordinates({
@@ -307,11 +312,11 @@ export default {
               coordinates,
               originalCoordinates,
             }).then(() => {
-              this.$emit("dragend");
-            });
+              this.$emit("dragend")
+            })
           }
-       })
-    );
+        })
+    )
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
@@ -321,66 +326,64 @@ export default {
         this.$router.push({
           name: names.APP,
           params: { nodeId: this.node.id },
-          query: this.$route.query
-        });
-        this.updateSelectedNode(this.node.id);
+          query: this.$route.query,
+        })
+        this.updateSelectedNode(this.node.id)
       }
     },
     openNode() {
       this.$router.push({
         name: names.LIGHTBOX,
         params: { nodeId: this.node.id },
-        query: this.$route.query
-      });
+        query: this.$route.query,
+      })
     },
     editNode() {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "edit", tab: "content" },
-        query: this.$route.query
-      });
+        query: this.$route.query,
+      })
     },
     formatDuration() {
-      const seconds = this.node.mediaDuration;
-      const hours = Math.floor(seconds / 3600);
-      let minutes = Math.floor((seconds - hours * 3600) / 60);
-      let sec = seconds - hours * 3600 - minutes * 60;
+      const seconds = this.node.mediaDuration
+      const hours = Math.floor(seconds / 3600)
+      let minutes = Math.floor((seconds - hours * 3600) / 60)
+      let sec = seconds - hours * 3600 - minutes * 60
 
-      if (sec < 10) sec = "0" + sec;
+      if (sec < 10) sec = "0" + sec
 
-      if (hours > 0 && minutes < 10) minutes = "0" + minutes;
+      if (hours > 0 && minutes < 10) minutes = "0" + minutes
 
-      if (hours === 0) return minutes + ":" + sec;
+      if (hours === 0) return minutes + ":" + sec
 
-      return hours + ":" + minutes + ":" + sec;
+      return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
       if (this.node.accessible || this.hasPermission("edit")) {
-        this.openNode();
+        this.openNode()
       }
     },
     handleMouseover() {
       // Move node to end of svg document so it appears on top
-      const node = this.$refs.node;
-      node.parentNode.appendChild(node);
+      const node = this.$refs.node
+      node.parentNode.appendChild(node)
 
-      bus.$emit("mouseover", this.node.id);
-      this.$emit("mouseover");
+      bus.$emit("mouseover", this.node.id)
+      this.$emit("mouseover")
     },
     handleClick(evt) {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-        this.selected ? this.unselect(this.node.id) : this.select(this.node.id);
+        this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia
-          ? this.openNode()
-          : this.updateRootNode();
+        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
       }
     },
     hasPermission(action) {
-      return Helpers.hasPermission(this.node, action);
-    }
-  }
-};
+      return Helpers.hasPermission(this.node, action)
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>

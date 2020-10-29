@@ -123,13 +123,16 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
   }
 }
 
-export async function updateNodeCoordinates({ commit, dispatch }, { id, coordinates, originalCoordinates }) {
+export async function updateNodeCoordinates(
+  { commit, dispatch },
+  { id, coordinates, originalCoordinates }
+) {
   try {
     await client.updateNodeCoordinates(id, coordinates)
     commit("updateNodeCoordinates", { id, coordinates })
   } catch (error) {
     if (originalCoordinates) {
-      commit("updateNodeCoordinates", { id, coordinates: originalCoordinates})
+      commit("updateNodeCoordinates", { id, coordinates: originalCoordinates })
     }
     dispatch("addApiError", error)
     return Promise.reject()
@@ -139,7 +142,6 @@ export async function updateNodeCoordinates({ commit, dispatch }, { id, coordina
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   try {
-
     if (!wpData.wpUserId) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
@@ -230,7 +232,10 @@ export async function completeQuestion(
   }
 }
 
-export async function saveAudio({ commit, dispatch }, { audio, nodeId, questionId }) {
+export async function saveAudio(
+  { commit, dispatch },
+  { audio, nodeId, questionId }
+) {
   try {
     await client.saveAudio(audio, nodeId, questionId)
     commit("updateEntry", {
@@ -281,7 +286,10 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
   }
 }
 
-export async function refetchTapestryData({ commit, state, dispatch }, filterUserId = null) {
+export async function refetchTapestryData(
+  { commit, state, dispatch },
+  filterUserId = null
+) {
   try {
     const query = filterUserId === null ? {} : { filterUserId: filterUserId }
     const tapestry = await client.getTapestry(query)
