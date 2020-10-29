@@ -307,11 +307,12 @@ export default {
             ) {
               continue
             }
+            this.$emit("dragend")
             this.updateNodeCoordinates({
               id,
               coordinates,
               originalCoordinates,
-            }).then(() => {
+            }).catch(() => {
               this.$emit("dragend")
             })
           }
