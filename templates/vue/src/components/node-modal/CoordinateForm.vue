@@ -58,14 +58,8 @@ export default {
     },
   },
   created() {
-    /*
-    this.nodeLat = this.node.mapCoordinates.lat
-    this.nodeLng = this.node.mapCoordinates.lng
-    */
     this.isOnMap =
-      Object.keys(this.node.mapCoordinates).length != 0 &&
-      this.node.mapCoordinates.lat != "" &&
-      this.node.mapCoordinates.lng != ""
+      this.node.mapCoordinates.lat != "" && this.node.mapCoordinates.lng != ""
 
     if (!this.isOnMap) {
       this.node.mapCoordinates.lat = ""

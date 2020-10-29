@@ -28,6 +28,7 @@ import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker } from "vue2-leaflet"
 import { mapState } from "vuex"
 import { names } from "@/config/routes"
+import { bus } from "@/utils/event-bus"
 
 export default {
   name: "tapestry-map",
@@ -70,6 +71,10 @@ export default {
     },
   },
   created() {
+    bus.$on("nodeSubmitted", () => {
+      this.resetMarkers()
+      console.log("resetted")
+    })
     for (const [key, value] of Object.entries(this.nodes)) {
       if (this.hasMapCoordinates(value.mapCoordinates)) {
         this.markers.push({
@@ -95,6 +100,17 @@ export default {
         params: { nodeId: id },
         query: this.$route.query,
       })
+    },
+    resetMarkers() {
+      this.markers = []
+      for (const [key, value] of Object.entries(this.nodes)) {
+        if (this.hasMapCoordinates(value.mapCoordinates)) {
+          this.markers.push({
+            id: key,
+            pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
+          })
+        }
+      }
     },
   },
 }
