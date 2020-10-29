@@ -14,7 +14,6 @@ export default {
   },
   watch: {
     hasError() {
-      console.log("watch");
       if (this.apiError) {
         this.makeToast("Error", this.apiError.error, "danger");
       }

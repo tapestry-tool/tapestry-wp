@@ -312,6 +312,5 @@ export async function refetchTapestryData({ commit, state, dispatch }, filterUse
 
 export function addApiError({ commit }, error) {
   const message = ErrorHelper.getErrorMessage(error)
-  console.log("message")
   commit("addApiError", { error: message })
 }

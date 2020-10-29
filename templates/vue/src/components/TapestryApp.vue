@@ -210,18 +210,6 @@ export default {
           box.y0 = Math.min(y, box.y0)
           box.x = Math.max(x, box.x)
           box.y = Math.max(y, box.y)
-          // if (x < box.x0) {
-          //   box.x0 = x
-          // }
-          // if (y < box.y0) {
-          //   box.y0 = y
-          // }
-          // if (x > box.x) {
-          //   box.x = x
-          // }
-          // if (y > box.y) {
-          //   box.y = y
-          // }
         }
       }
 

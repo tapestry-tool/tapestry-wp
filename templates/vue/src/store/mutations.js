@@ -218,7 +218,5 @@ export function updateVisibleNodes(state, nodes) {
 }
 
 export function addApiError(state, error) {
-
-  console.log(state)
   state.apiError = error
 }
