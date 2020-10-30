@@ -1,6 +1,6 @@
 /**
  * List of props in the `wpData` object. These are defined in the
- * `single-tapestry.php` file in the root directory.
+ * `tapestry.php` file in the root directory.
  */
 const props = [
   "directory_uri",
