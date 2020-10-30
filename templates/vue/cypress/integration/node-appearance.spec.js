@@ -1,65 +1,32 @@
-import { setup } from "../support/utils"
-
 describe("Node Appearance", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
-    setup("@oneNode")
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
   })
 
-  const setupThenTest = (newNode, assertions) => {
+  it("should be able to edit a node's appearance using the node modal", () => {
     cy.getSelectedNode().then(node => {
-      cy.wrap(node).editNodeInStore(newNode)
-      cy.getByTestId(`node-${node.id}`).within(() => assertions(node))
-    })
-  }
+      cy.openModal("edit", node.id)
+      cy.contains(/appearance/i).click()
 
-  it(`
-    Given: A Tapestry node
-    When: An image is added then removed
-    Then: It should first show the image then hide it
-  `, () => {
-    const newNode = {
-      imageURL:
-        "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg",
-    }
-    setupThenTest(newNode, () => {
-      cy.get("image").should("have.attr", "href", newNode.imageURL)
-    })
-  })
+      cy.contains(/node title/i).click()
+      cy.contains(/media button/i).click()
+      cy.contains(/progress bar/i).click()
 
-  it(`
-    Given: A Tapestry node
-    When: Its title is hidden
-    Then: It should hide its title
-  `, () => {
-    const newNode = {
-      hideTitle: true,
-    }
-    setupThenTest(newNode, node => {
-      cy.getByTestId(`node-title-${node.id}`).should("not.exist")
-    })
-  })
+      cy.contains(/thumbnail/i).click()
 
-  it(`
-    Given: A Tapestry node
-    When: Its progress bar is hidden
-    Then: It should hide its progress bar
-  `, () => {
-    setupThenTest({ hideProgress: true }, node => {
-      cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
-    })
-  })
+      const url =
+        "https://upload.wikimedia.org/wikipedia/commons/2/2a/Hummingbird.jpg"
 
-  it(`
-    Given: A Tapestry node
-    When: Its media button is hidden
-    Then: It should hide its media button
-  `, () => {
-    const newNode = {
-      hideMedia: true,
-    }
-    setupThenTest(newNode, node => {
-      cy.getByTestId(`open-node-${node.id}`).should("not.exist")
+      cy.getByTestId(`node-appearance-thumbnail-url`).type(url)
+      cy.submitModal()
+
+      cy.getNodeById(node.id).within(() => {
+        cy.get("image").should("have.attr", "href", url)
+        cy.getByTestId(`node-title-${node.id}`).should("not.exist")
+        cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
+        cy.getByTestId(`open-node-${node.id}`).should("not.exist")
+      })
     })
   })
 })

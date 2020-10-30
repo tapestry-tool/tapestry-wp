@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="media-container accordion">
+  <div ref="container" class="media-container accordion" data-qa="accordion">
     <header class="header" :style="headerBackground">
       <h1 class="title">{{ node.title }}</h1>
       <img :src="node.imageURL" />
@@ -61,7 +61,11 @@
                 </a>
               </div>
             </div>
-            <div v-if="isVisible(row.node.id)" class="content">
+            <div
+              v-if="isVisible(row.node.id)"
+              class="content"
+              :data-qa="`row-content-${row.node.id}`"
+            >
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"

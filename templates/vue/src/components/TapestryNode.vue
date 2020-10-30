@@ -4,6 +4,7 @@
       v-show="show"
       ref="node"
       :data-qa="`node-${node.id}`"
+      :data-locked="!node.accessible"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
