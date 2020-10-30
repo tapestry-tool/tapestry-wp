@@ -166,6 +166,7 @@ import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
+import { data as wpData } from "@/services/wp"
 
 const defaultPermissions = Object.fromEntries(
   [

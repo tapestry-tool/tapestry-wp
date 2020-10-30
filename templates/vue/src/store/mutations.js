@@ -1,6 +1,7 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
+import * as wp from "../services/wp"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = setDatasetProgress(
@@ -11,7 +12,7 @@ export function init(state, { dataset, progress = {} }) {
 }
 
 function applyLocalProgress(progress) {
-  if (!wpData.wpUserId) {
+  if (!wp.isLoggedIn()) {
     const localProgress = localStorage.getItem("tapestry-progress")
     if (localProgress) {
       const userProgress = JSON.parse(localProgress)
@@ -28,14 +29,14 @@ function applyLocalProgress(progress) {
 }
 
 function setDatasetProgress(dataset, progress) {
-  if (!wpData.wpUserId) {
+  if (!wp.isLoggedIn()) {
     localStorage.setItem("tapestry-progress", JSON.stringify(progress))
   }
   for (const [id, nodeProgress] of Object.entries(progress)) {
     const node = dataset.nodes[id]
     if (node) {
       const willLock = node.unlocked && !nodeProgress.unlocked
-      if (willLock && !wpData.wpCanEditTapestry) {
+      if (willLock && !wp.canEditTapestry()) {
         node.quiz = []
         node.typeData = {}
       }

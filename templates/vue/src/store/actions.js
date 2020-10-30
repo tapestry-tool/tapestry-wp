@@ -1,4 +1,5 @@
 import client from "../services/TapestryAPI"
+import * as wp from "../services/wp"
 import Helpers from "../utils/Helpers"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
@@ -86,7 +87,7 @@ export async function updateLockedStatus({ commit, getters }) {
 export async function updateNodeProgress({ commit }, payload) {
   const { id, progress } = payload
 
-  if (!wpData.wpUserId) {
+  if (!wp.isLoggedIn()) {
     const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
     const nodeProgress = progressObj[id] || {}
     nodeProgress.progress = progress
@@ -106,7 +107,7 @@ export async function updateNodeCoordinates({ commit }, { id, coordinates }) {
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
 
-  if (!wpData.wpUserId) {
+  if (!wp.isLoggedIn()) {
     const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
     const nodeProgress = progressObj[nodeId] || {}
     nodeProgress.completed = true
