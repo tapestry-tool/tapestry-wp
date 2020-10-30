@@ -13,6 +13,7 @@
     "test:e2e": "cypress run --headless -b chrome",
     "test:e2e:open": "cypress open --config watchForFileChanges=false",
     "test:jest": "jest __tests__",
+    "jest": "jest",
     "test": "npm run test:jest && npm run test:e2e && npm run report:merge",
     "prereport:merge": "mv coverage-jest/coverage-final.json .nyc_output",
     "report:merge": "nyc merge .nyc_output coverage/coverage.json",

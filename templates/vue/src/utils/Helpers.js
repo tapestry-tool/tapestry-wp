@@ -187,4 +187,10 @@ export default class Helpers {
 
     return false
   }
+
+  /**
+   * A "no-op" - does nothing.
+   * Useful as a default value when passing functions as arguments.
+   */
+  static noop() {}
 }
