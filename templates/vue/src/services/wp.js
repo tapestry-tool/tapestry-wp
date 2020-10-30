@@ -16,7 +16,7 @@ export const data = {
 }
 
 export const getCurrentUser = () => ({
-  id: wpData.currentUser.data.ID,
+  id: wpData.currentUser.ID,
   name: wpData.currentUser.data.user_nicename,
   email: wpData.currentUser.data.user_email,
   roles: wpData.currentUser.roles,
