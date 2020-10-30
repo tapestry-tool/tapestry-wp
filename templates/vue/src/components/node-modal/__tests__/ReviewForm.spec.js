@@ -24,7 +24,7 @@ describe("ReviewForm", () => {
 
   it("should be able to reject a node", async () => {
     const [node, screen] = setup()
-    await fireEvent.click(screen.getByText("Reject Node"))
+    await fireEvent.click(screen.getByText("Reject"))
 
     expect(node.status).toEqual("reject")
     expect(node.comments.length).toEqual(0)
