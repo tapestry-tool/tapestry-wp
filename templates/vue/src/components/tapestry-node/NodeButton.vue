@@ -1,5 +1,5 @@
 <template>
-  <g :transform="`translate(${x}, ${y})`">
+  <g :transform="`translate(${x}, ${y})`" @click.stop="$emit('click')">
     <circle
       ref="addButton"
       r="27"
@@ -8,7 +8,6 @@
       stroke-width="3"
       :aria-disabled="disabled"
       :data-qa="dataQa"
-      @click.stop="$emit('click')"
     ></circle>
     <slot></slot>
   </g>
