@@ -13,5 +13,17 @@
     "@babel/plugin-syntax-import-meta",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-json-strings"
-  ]
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        [
+          "istanbul",
+          {
+            "extension": [".js", ".vue"]
+          }
+        ]
+      ]
+    }
+  }
 }
