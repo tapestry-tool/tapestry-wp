@@ -9,10 +9,10 @@
     </b-form-group>
     <div>
       <b-button size="sm" variant="danger" @click="handleReject">
-        Reject Node
+        Reject
       </b-button>
       <b-button size="sm" variant="primary" @click="handleAccept">
-        Accept Node
+        Accept and Add
       </b-button>
     </div>
   </div>
