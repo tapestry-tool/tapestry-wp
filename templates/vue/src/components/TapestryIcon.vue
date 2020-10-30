@@ -7,7 +7,9 @@
     dominant-baseline="middle"
     fill="white"
     font-weight="900"
-    font-size="24"
+    font-size="32"
+    :x="adjustX"
+    :y="2"
   >
     {{ unicodes[icon] }}
   </text>
@@ -33,6 +35,7 @@ const unicodes = {
   microphone: "\uf130",
   pen: "\uf304",
   plus: "\uf067",
+  play: "\uf04b",
 }
 
 const aliases = {
@@ -89,6 +92,9 @@ export default {
     },
     unicodes() {
       return unicodes
+    },
+    adjustX() {
+      return this.icon === "play" ? 2 : 0
     },
   },
 }
