@@ -32,7 +32,7 @@ describe("ReviewForm", () => {
 
   it("should be able to accept a node", async () => {
     const [node, screen] = setup()
-    await fireEvent.click(screen.getByText("Accept Node"))
+    await fireEvent.click(screen.getByText("Accept and Add"))
 
     expect(node.status).toEqual("accept")
     expect(node.comments.length).toEqual(0)
@@ -49,7 +49,7 @@ describe("ReviewForm", () => {
     const [node, screen] = setup()
     const originalAuthor = { ...node.author }
 
-    await fireEvent.click(screen.getByText("Accept Node"))
+    await fireEvent.click(screen.getByText("Accept and Add"))
 
     expect(node.author.id).toEqual(originalAuthor.id)
   })
