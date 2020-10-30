@@ -1,30 +1,23 @@
 <template>
-  <img v-if="isImage" :src="imageSource" />
   <text
-    v-else-if="svg"
-    :class="icon === 'post' ? 'brand' : 'free'"
+    v-if="svg"
+    :class="svgClass"
     text-anchor="middle"
     dominant-baseline="middle"
     fill="white"
     font-weight="900"
-    font-size="32"
+    :font-size="fontSize"
     :x="adjustX"
-    :y="2"
+    :y="adjustY"
   >
-    {{ unicodes[icon] }}
+    {{ textContent[icon] }}
   </text>
+  <i v-else-if="icon === 'text'" class="icon-plaintext">{{ textContent[icon] }}</i>
   <i v-else :class="iconClass"></i>
 </template>
 
 <script>
-import TextIcon from "@/assets/Aa.svg"
-import Helpers from "@/utils/Helpers"
-
-const images = {
-  text: TextIcon,
-}
-
-const unicodes = {
+const textContent = {
   lock: "\uf023",
   tasks: "\uf0ae",
   checklist: "\uf0ae",
@@ -36,6 +29,7 @@ const unicodes = {
   pen: "\uf304",
   plus: "\uf067",
   play: "\uf04b",
+  text: "Aa",
 }
 
 const aliases = {
@@ -56,7 +50,7 @@ const aliases = {
  *  - https://fontawesome.com/icons?d=gallery&m=free
  *
  * If the `svg` flag is `true`, the `icon` string must be one of the keys in
- * the `unicodes` object. If it's not there, the icon must first be added as
+ * the `textContent` object. If it's not there, the icon must first be added as
  * a key that maps to its unicode value.
  *
  * One way of getting the unicode value is to open the FontAwesome css file:
@@ -78,23 +72,29 @@ export default {
     },
   },
   computed: {
-    isImage() {
-      return images.hasOwnProperty(this.icon)
+    svgClass() {
+      switch (this.icon) {
+        case "text":
+          return "text"
+        case "post":
+          return "brand"
+      }
+      return "free"
     },
     iconClass() {
-      if (this.icon === "post") {
-        return "fab fa-wordpress-simple"
-      }
       return `fas fa-${aliases[this.icon] || this.icon} icon-fa`
     },
-    imageSource() {
-      return Helpers.getImagePath(images[this.icon])
-    },
-    unicodes() {
-      return unicodes
+    textContent() {
+      return textContent
     },
     adjustX() {
       return this.icon === "play" ? 2 : 0
+    },
+    adjustY() {
+      return this.icon === "post" ? 4 : 2
+    },
+    fontSize() {
+      return this.icon === "post" ? 46 : 32
     },
   },
 }

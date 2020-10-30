@@ -56,21 +56,7 @@
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
           >
-            <tapestry-icon
-              v-if="node.mediaType !== 'text'"
-              :icon="icon"
-              svg
-            ></tapestry-icon>
-            <text
-              v-else
-              text-anchor="middle"
-              dominant-baseline="middle"
-              fill="white"
-              font-size="24"
-              font-weight="700"
-            >
-              Aa
-            </text>
+            <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <add-child-button
             v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
