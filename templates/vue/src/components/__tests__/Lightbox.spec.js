@@ -6,7 +6,7 @@ describe("lightbox", () => {
   it("should render a text lightbox", async () => {
     const node = root.nodes[0]
 
-    const screen = render(Lightbox, root, { props: { nodeId: node.id } })
+    const screen = render(Lightbox, { fixture: root, props: { nodeId: node.id } })
     await screen.findByText(node.typeData.textContent)
   })
 })

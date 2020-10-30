@@ -19,7 +19,7 @@ describe("duplicate tapestry button", () => {
       Promise.resolve({ settings: { permalink: slug } })
     )
 
-    const screen = render(DuplicateTapestryButton, root)
+    const screen = render(DuplicateTapestryButton, { fixture: root })
     fireEvent.click(screen.getByText(/duplicate tapestry/i))
 
     expect(client.addTapestry).toHaveBeenCalledTimes(1)
