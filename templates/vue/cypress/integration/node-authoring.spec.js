@@ -1,6 +1,6 @@
 describe("Node Authoring", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")
   })
 

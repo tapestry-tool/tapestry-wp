@@ -1,6 +1,6 @@
 describe("Node Permissions", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
   })
 

@@ -1,6 +1,6 @@
 describe("Accordion", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.fixture("accordion.json").as("accordion")
   })
 

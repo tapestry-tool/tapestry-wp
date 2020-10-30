@@ -1,7 +1,7 @@
 describe("Link Authoring", () => {
   beforeEach(() => {
-    cy.fixture("stump.json").as("stump")
-    cy.setup("@stump")
+    cy.fixture("three-nodes.json").as("threeNodes")
+    cy.setup("@threeNodes")
   })
 
   it("should be able to delete a link between two leaf nodes", () => {
