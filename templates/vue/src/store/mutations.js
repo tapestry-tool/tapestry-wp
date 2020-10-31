@@ -121,7 +121,6 @@ export function updateRootNode(state, newNodeId) {
 
 // nodes
 export function addNode(state, node) {
-  console.log(state)
   Vue.set(state.nodes, node.id, node)
 }
 
