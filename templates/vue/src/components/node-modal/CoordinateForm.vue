@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="modal-behaviour">
+    <div id="modal-coordinate">
       <b-form-group>
         <b-form-checkbox v-model="isOnMap">
           Show this node on map
@@ -58,13 +58,14 @@ export default {
     },
   },
   created() {
-    this.isOnMap =
+    const isOnMap =
       this.node.mapCoordinates.lat != "" && this.node.mapCoordinates.lng != ""
 
-    if (!this.isOnMap) {
+    if (!isOnMap) {
       this.node.mapCoordinates.lat = ""
       this.node.mapCoordinates.lng = ""
     }
+    this.isOnMap = isOnMap
   },
 }
 </script>

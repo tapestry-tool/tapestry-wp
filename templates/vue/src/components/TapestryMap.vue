@@ -4,18 +4,27 @@
       <l-map
         :options="mapOptions"
         :bounds="setBounds"
+        :max-bounds="worldBounds"
         style="height: 80%"
         @update:center="updateCenter"
         @update:zoom="updateZoom"
       >
         <l-tile-layer :url="url" :attribution="attribution" />
         <l-marker
-          v-for="marker in markers"
+          v-for="marker in markerlocations"
           :key="marker.id"
           :lat-lng="marker.pos"
-          :icon="icon"
-          @click="openNode(marker.id)"
-        />
+          :icon="marker.access ? icon : inaccessibleIcon"
+        >
+          <l-popup>
+            <div v-if="marker.access" @click="openNode(marker.id)">
+              {{ marker.title }}
+            </div>
+            <div v-else>
+              {{ marker.title }}
+            </div>
+          </l-popup>
+        </l-marker>
       </l-map>
     </div>
   </div>
@@ -24,11 +33,11 @@
 <script>
 import "leaflet/dist/leaflet.css"
 import mapMarker from "@/assets/map-marker.png"
+import invalidMarker from "@/assets/map-marker-inaccessible.png"
 import { latLng, latLngBounds, icon } from "leaflet"
-import { LMap, LTileLayer, LMarker } from "vue2-leaflet"
+import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet"
 import { mapState } from "vuex"
 import { names } from "@/config/routes"
-import { bus } from "@/utils/event-bus"
 
 export default {
   name: "tapestry-map",
@@ -36,6 +45,7 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
+    LPopup,
   },
   data() {
     return {
@@ -49,9 +59,19 @@ export default {
       icon: icon({
         iconUrl: mapMarker,
         iconSize: [32, 33],
-        iconAnchor: [16, 37],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -20],
       }),
-      markers: [],
+      inaccessibleIcon: icon({
+        iconUrl: invalidMarker,
+        iconSize: [32, 33],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -20],
+      }),
+      worldBounds: latLngBounds([
+        [-90, -180],
+        [90, 180],
+      ]),
     }
   },
   computed: {
@@ -69,20 +89,20 @@ export default {
       ])
       return x
     },
-  },
-  created() {
-    bus.$on("nodeSubmitted", () => {
-      this.resetMarkers()
-      console.log("resetted")
-    })
-    for (const [key, value] of Object.entries(this.nodes)) {
-      if (this.hasMapCoordinates(value.mapCoordinates)) {
-        this.markers.push({
-          id: key,
-          pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
-        })
+    markerlocations() {
+      const markers = []
+      for (const [key, value] of Object.entries(this.nodes)) {
+        if (this.hasMapCoordinates(value.mapCoordinates)) {
+          markers.push({
+            id: key,
+            pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
+            title: value.title,
+            access: value.accessible,
+          })
+        }
       }
-    }
+      return markers
+    },
   },
   methods: {
     updateZoom(zoom) {
@@ -100,17 +120,6 @@ export default {
         params: { nodeId: id },
         query: this.$route.query,
       })
-    },
-    resetMarkers() {
-      this.markers = []
-      for (const [key, value] of Object.entries(this.nodes)) {
-        if (this.hasMapCoordinates(value.mapCoordinates)) {
-          this.markers.push({
-            id: key,
-            pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
-          })
-        }
-      }
     },
   },
 }

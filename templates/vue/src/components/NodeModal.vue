@@ -192,7 +192,6 @@ import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
-import { bus } from "@/utils/event-bus"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 
@@ -441,6 +440,9 @@ export default {
         case "ordering": {
           return this.node.mediaType === "accordion" || this.node.hasSubAccordion
         }
+        case "coordinate": {
+          return this.node.renderMap
+        }
       }
 
       return false
@@ -519,7 +521,6 @@ export default {
       }
     },
     async submitNode() {
-      bus.$emit("nodeSubmitted")
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
