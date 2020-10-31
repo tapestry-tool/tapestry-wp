@@ -83,6 +83,7 @@ export function setDataset(state, dataset) {
       Object.values(value).forEach(node => {
         // Has to call this so `state.nodes` is reactive
         Vue.set(state.nodes, node.id, node)
+        node.childOrdering = [...new Set(node.childOrdering)]
       })
     } else {
       state[key] = value
@@ -120,6 +121,7 @@ export function updateRootNode(state, newNodeId) {
 
 // nodes
 export function addNode(state, node) {
+  console.log(state)
   Vue.set(state.nodes, node.id, node)
 }
 
