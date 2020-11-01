@@ -662,6 +662,12 @@ export default {
 
       return errMsgs
     },
+    isValidVideo(typeData) {
+      return (
+        typeData.mediaURL !== "" &&
+        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+      )
+    },
     validateQuiz(quiz) {
       return quiz.every(question => {
         return Object.values(question.answers).some(
