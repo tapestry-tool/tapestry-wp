@@ -654,7 +654,7 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeId") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
       )
     },
     validateQuiz(quiz) {
