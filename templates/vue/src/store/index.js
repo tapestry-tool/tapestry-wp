@@ -21,6 +21,7 @@ export const store = {
     selectedModuleId: null,
     favourites: [],
     visibleNodes: [],
+    apiError: null,
   },
   getters,
   mutations,
