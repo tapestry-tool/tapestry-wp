@@ -258,7 +258,7 @@ export default {
     },
   },
   mounted() {
-    this.$emit("nodemounted")
+    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
