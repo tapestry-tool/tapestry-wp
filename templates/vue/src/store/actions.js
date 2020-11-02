@@ -23,7 +23,7 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit, dispatch, getters }, newNode) {
+export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
     const response = await client.addNode(JSON.stringify(newNode))
 
@@ -33,6 +33,7 @@ export async function addNode({ commit, dispatch, getters }, newNode) {
     nodeToAdd.author = response.data.author
 
     commit("addNode", nodeToAdd)
+    commit("updateVisibleNodes", [...state.visibleNodes, id])
     commit("updateNodeCoordinates", {
       id,
       coordinates: {
@@ -250,10 +251,18 @@ export async function saveAudio(
 }
 
 // links
-export async function addLink({ commit, dispatch }, newLink) {
+export async function addLink({ commit, dispatch, getters }, newLink) {
   try {
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)
+
+    const parent = getters.getNode(newLink.source)
+    commit("updateNode", {
+      id: newLink.source,
+      newNode: {
+        childOrdering: [...parent.childOrdering, newLink.target],
+      },
+    })
   } catch (error) {
     dispatch("addApiError", error)
   }
