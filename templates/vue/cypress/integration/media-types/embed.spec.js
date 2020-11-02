@@ -2,7 +2,7 @@ import { setup } from "../../support/utils"
 
 describe("External link", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     setup("@oneNode")
   })
 
