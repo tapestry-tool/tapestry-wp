@@ -25,6 +25,7 @@ import { mapState, mapGetters, mapMutations } from "vuex"
 import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
 import DragSelectModular from "@/utils/dragSelectModular"
+import Helpers from "@/utils/Helpers"
 
 export default {
   computed: {
@@ -87,10 +88,10 @@ export default {
       return this.levels.length
     },
     zoomInBg() {
-      return "url(" + ZoomIn + ")"
+      return "url(" + Helpers.getImagePath(ZoomIn) + ")"
     },
     zoomOutBg() {
-      return "url(" + ZoomOut + ")"
+      return "url(" + Helpers.getImagePath(ZoomOut) + ")"
     },
   },
   watch: {
