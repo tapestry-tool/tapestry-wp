@@ -2,7 +2,7 @@ import Vue from "vue"
 import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 
-import root from "@/fixtures/root.json"
+import oneNodeTapestry from "@/fixtures/one-node.json"
 import NodeModal from "@/components/NodeModal.vue"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import routes, { names } from "@/config/routes"
@@ -26,7 +26,7 @@ jest.mock("@/services/GravityFormsApi", () => {
   }
 })
 
-const node = root.nodes[0]
+const node = oneNodeTapestry.nodes[0]
 const route = {
   name: names.MODAL,
   path: `/nodes/${node.id}`,
@@ -46,7 +46,7 @@ describe("node modal: content - video", () => {
 
   beforeEach(async () => {
     GravityFormsApi.exists.mockImplementation(() => Promise.resolve(false))
-    screen = render(WrappedNodeModal, root, { mocks: mocks })
+    screen = render(WrappedNodeModal, oneNodeTapestry, { mocks: mocks })
     await fireEvent.click(screen.getByText("Modal Button"))
   })
 
