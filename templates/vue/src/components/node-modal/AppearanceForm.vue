@@ -11,7 +11,6 @@
         <file-upload
           v-model="node.imageURL"
           input-test-id="node-appearance-thumbnail-url"
-          placeholder="Enter the URL for the thumbnail"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
@@ -27,7 +26,6 @@
         <file-upload
           v-model="node.lockedImageURL"
           input-test-id="node-lockedImageURL"
-          placeholder="Enter the URL for the thumbnail"
           @isUploading="handleUploadChange"
         />
       </b-form-group>

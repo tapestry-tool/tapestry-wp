@@ -21,7 +21,7 @@
       </b-col>
     </b-row>
     <b-row v-if="!isUploading">
-      <b-col class="pr-0">
+      <b-col>
         <b-form-file
           ref="file"
           name="async-upload"
@@ -34,20 +34,6 @@
           @drop.prevent="uploadFile"
           @change="uploadFile"
         ></b-form-file>
-      </b-col>
-      <b-col sm="1" class="divider">
-        <h6 class="text-muted">OR</h6>
-      </b-col>
-      <b-col class="pl-0">
-        <b-form-input
-          name="text-input"
-          :placeholder="placeholder"
-          :value="value"
-          :data-qa="inputTestId"
-          :disabled="isUploading"
-          required
-          @input="$emit('input', $event)"
-        />
       </b-col>
     </b-row>
     <b-alert v-if="error" show variant="danger">
@@ -77,7 +63,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      required: true,
+      required: false,
     },
     value: {
       type: String,
@@ -147,6 +133,7 @@ export default {
           },
         })
         .then(response => {
+          console.log(response)
           setTimeout(() => {
             if (response.data.success) {
               this.$emit("input", response.data.data.url)
