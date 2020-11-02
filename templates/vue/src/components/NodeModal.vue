@@ -475,7 +475,10 @@ export default {
         this.updateNodeCoordinates()
         this.loading = true
 
-        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+        if (
+          (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
+          this.node.mediaFormat === "youtube"
+        ) {
           await this.setLinkData()
         }
 
@@ -492,7 +495,10 @@ export default {
         this.node.status = "draft"
         this.updateNodeCoordinates()
 
-        if (this.node.mediaType == "url-embed" && this.node.behaviour != "embed") {
+        if (
+          (this.node.mediaType == "url-embed" && this.node.behaviour != "embed") ||
+          this.node.mediaType == "youtube"
+        ) {
           await this.setLinkData()
         }
 
