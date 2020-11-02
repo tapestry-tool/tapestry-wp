@@ -52,14 +52,14 @@ describe("node modal: content - video", () => {
 
   async function testVideoSetup(screen, url) {
     await fireEvent.update(screen.getByPlaceholderText(/title/i), "Test Title")
-    await fireEvent.change(screen.getByTestId("node-mediaType"), {
+    await fireEvent.change(screen.getByTestId("node-media-type"), {
       target: { value: "video" },
     })
     expect(screen.queryByText("Video")).toBeInTheDocument()
     expect(screen.queryByText("Video URL")).toBeInTheDocument()
 
-    await fireEvent.update(screen.getByTestId("node-videoUrl"), url)
-    expect(screen.getByTestId("node-videoUrl").value).toMatch(url)
+    await fireEvent.update(screen.getByTestId("node-video-url"), url)
+    expect(screen.getByTestId("node-video-url").value).toMatch(url)
 
     await fireEvent.click(screen.getByText(/Publish/i))
   }
