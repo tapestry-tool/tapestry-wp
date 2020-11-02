@@ -41,7 +41,7 @@
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
-            @nodemounted="updateSelectableNodes"
+            @mounted="updateSelectableNodes"
           ></tapestry-node>
         </g>
         <locked-tooltip
