@@ -58,6 +58,12 @@ export default {
     },
   },
   created() {
+    if (!this.node.mapCoordinates) {
+      this.node.mapCoordinates = {
+        lat: "",
+        lng: "",
+      }
+    }
     const isOnMap =
       this.node.mapCoordinates.lat != "" && this.node.mapCoordinates.lng != ""
 
