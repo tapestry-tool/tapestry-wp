@@ -23,7 +23,7 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 }
 
 // nodes
-export async function addNode({ commit, dispatch, getters }, newNode) {
+export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
     const response = await client.addNode(JSON.stringify(newNode))
 
@@ -33,6 +33,7 @@ export async function addNode({ commit, dispatch, getters }, newNode) {
     nodeToAdd.author = response.data.author
 
     commit("addNode", nodeToAdd)
+    commit("updateVisibleNodes", [...state.visibleNodes, id])
     commit("updateNodeCoordinates", {
       id,
       coordinates: {
@@ -123,23 +124,25 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
   }
 }
 
-export async function updateNodeCoordinates({ commit, dispatch }, { id, coordinates, originalCoordinates }) {
+export async function updateNodeCoordinates(
+  { commit, dispatch },
+  { id, coordinates, originalCoordinates }
+) {
   try {
     await client.updateNodeCoordinates(id, coordinates)
-    commit("updateNode", { id, newNode: { coordinates } })
+    commit("updateNodeCoordinates", { id, coordinates })
   } catch (error) {
     if (originalCoordinates) {
-      let coordinates = originalCoordinates
-      commit("updateNode", { id, newNode: { coordinates } })
+      commit("updateNodeCoordinates", { id, coordinates: originalCoordinates })
     }
     dispatch("addApiError", error)
+    return Promise.reject()
   }
 }
 
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   try {
-
     if (!wpData.wpUserId) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
@@ -230,7 +233,10 @@ export async function completeQuestion(
   }
 }
 
-export async function saveAudio({ commit, dispatch }, { audio, nodeId, questionId }) {
+export async function saveAudio(
+  { commit, dispatch },
+  { audio, nodeId, questionId }
+) {
   try {
     await client.saveAudio(audio, nodeId, questionId)
     commit("updateEntry", {
@@ -245,10 +251,18 @@ export async function saveAudio({ commit, dispatch }, { audio, nodeId, questionI
 }
 
 // links
-export async function addLink({ commit, dispatch }, newLink) {
+export async function addLink({ commit, dispatch, getters }, newLink) {
   try {
     await client.addLink(JSON.stringify(newLink))
     commit("addLink", newLink)
+
+    const parent = getters.getNode(newLink.source)
+    commit("updateNode", {
+      id: newLink.source,
+      newNode: {
+        childOrdering: [...parent.childOrdering, newLink.target],
+      },
+    })
   } catch (error) {
     dispatch("addApiError", error)
   }
@@ -281,7 +295,10 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
   }
 }
 
-export async function refetchTapestryData({ commit, state, dispatch }, filterUserId = null) {
+export async function refetchTapestryData(
+  { commit, state, dispatch },
+  filterUserId = null
+) {
   try {
     const query = filterUserId === null ? {} : { filterUserId: filterUserId }
     const tapestry = await client.getTapestry(query)
@@ -312,6 +329,5 @@ export async function refetchTapestryData({ commit, state, dispatch }, filterUse
 
 export function addApiError({ commit }, error) {
   const message = ErrorHelper.getErrorMessage(error)
-  console.log("message")
   commit("addApiError", { error: message })
 }

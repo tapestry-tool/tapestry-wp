@@ -25,7 +25,7 @@ export default {
     NodeModal,
     TapestryApp,
     TapestrySidebar,
-    TapestryError
+    TapestryError,
   },
   data() {
     return {

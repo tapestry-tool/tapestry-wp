@@ -4,6 +4,7 @@
       v-show="show"
       ref="node"
       :data-qa="`node-${node.id}`"
+      :data-locked="!node.accessible"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{ opaque: !visibleNodes.includes(node.id) }"
       :style="{
@@ -269,73 +270,53 @@ export default {
       d3
         .drag()
         .on("start", () => {
+          this.coordinates = {}
           if (this.selection.length) {
             this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId);
+              const node = this.getNode(nodeId)
               coordinates[nodeId] = {
                 x: node.coordinates.x,
-                y: node.coordinates.y
-              };
-              return coordinates;
-            }, {});
+                y: node.coordinates.y,
+              }
+              return coordinates
+            }, {})
           } else {
-            this.originalX = this.node.coordinates.x;
-            this.originalY = this.node.coordinates.y;
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
           }
         })
         .on("drag", () => {
-          if (this.selection.length) {
-            this.selection.forEach(id => {
-              const node = this.getNode(id);
-              node.coordinates.x += d3.event.dx;
-              node.coordinates.y += d3.event.dy;
-            });
-          } else {
-            this.node.coordinates.x += d3.event.dx;
-            this.node.coordinates.y += d3.event.dy;
+          for (const id of Object.keys(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
           }
         })
         .on("end", () => {
-          if (this.selection.length) {
-            this.selection.forEach(id => {
-              const node = this.getNode(id);
-              this.updateNodeCoordinates({
-                id: node.id,
-                coordinates: {
-                  x: node.coordinates.x,
-                  y: node.coordinates.y
-                },
-                originalCoordinates: {
-                  x: this.coordinates[id].x,
-                  y: this.coordinates[id].y
-                }
-              })
-                .then(() => {
-                  this.$emit("dragend");
-                })
-                // .catch(() => {
-                //   node.coordinates.x = this.coordinates[id].x;
-                //   node.coordinates.y = this.coordinates[id].y;
-                // });
-            });
-          } else {
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+            let coordinates = {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
+            }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
+              continue
+            }
+            this.$emit("dragend")
             this.updateNodeCoordinates({
-              id: this.node.id,
-              coordinates: {
-                x: this.node.coordinates.x,
-                y: this.node.coordinates.y
-              },
-              originalCoordinates: {
-                x: this.originalX,
-                y: this.originalY,
-              }
-            }).then(() => {
-                this.$emit("dragend");
-              })
-              // .catch(() => {
-              //   this.node.coordinates.x = this.originalX;
-              //   this.node.coordinates.y = this.originalY;
-              // });
+              id,
+              coordinates,
+              originalCoordinates,
+            }).catch(() => {
+              this.$emit("dragend")
+            })
           }
         })
     );
