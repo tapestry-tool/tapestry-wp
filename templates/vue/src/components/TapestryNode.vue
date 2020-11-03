@@ -51,45 +51,31 @@
           </div>
         </foreignObject>
         <g v-show="!transitioning">
-          <foreignObject
+          <node-button
             v-if="!node.hideMedia"
-            class="node-button-wrapper"
-            x="-30"
-            :y="-radius - 30"
+            :x="0"
+            :y="-radius"
+            :data-qa="`open-node-${node.id}`"
+            :disabled="!node.accessible && !hasPermission('edit')"
+            @click="handleRequestOpen"
           >
-            <button
-              class="node-button"
-              :data-qa="`open-node-${node.id}`"
-              :disabled="!node.accessible && !hasPermission('edit')"
-              @click.stop="handleRequestOpen"
-            >
-              <tapestry-icon
-                v-if="node.mediaType !== 'text'"
-                :icon="icon"
-              ></tapestry-icon>
-              <span v-else>Aa</span>
-            </button>
-          </foreignObject>
+            <tapestry-icon :icon="icon" svg></tapestry-icon>
+          </node-button>
           <add-child-button
             v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
-            :x="-65"
-            :y="radius - 30"
+            :x="-35"
+            :y="radius"
           ></add-child-button>
-          <foreignObject
+          <node-button
             v-if="isLoggedIn && hasPermission('edit')"
-            class="node-button-wrapper"
-            x="5"
-            :y="radius - 30"
+            :x="35"
+            :y="radius"
+            :data-qa="`edit-node-${node.id}`"
+            @click="editNode"
           >
-            <button
-              :data-qa="`edit-node-${node.id}`"
-              class="node-button"
-              @click.stop="editNode"
-            >
-              <tapestry-icon icon="pen"></tapestry-icon>
-            </button>
-          </foreignObject>
+            <tapestry-icon icon="pen" svg></tapestry-icon>
+          </node-button>
         </g>
       </g>
       <defs v-if="imageUrl && imageUrl.length > 0">
@@ -149,6 +135,7 @@ import { tydeTypes } from "@/utils/constants"
 import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import NodeButton from "./tapestry-node/NodeButton"
 import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
@@ -157,6 +144,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    NodeButton,
   },
   props: {
     node: {
