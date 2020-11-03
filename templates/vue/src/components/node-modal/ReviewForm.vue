@@ -56,7 +56,7 @@ export default {
     handleSubmit() {
       const { name, email } = getCurrentUser()
       if (this.comment.length > 0) {
-        this.node.comments.push({
+        this.node.reviewComments.push({
           timestamp: moment().toISOString(),
           comment: this.comment,
           author_name: name,

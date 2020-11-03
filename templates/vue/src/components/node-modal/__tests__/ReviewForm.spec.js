@@ -17,7 +17,7 @@ describe("ReviewForm", () => {
         id: "1",
         name: "John",
       },
-      comments: [],
+      reviewComments: [],
     }
     return [node, render(ReviewForm, null, { props: { node } })]
   }
@@ -27,7 +27,7 @@ describe("ReviewForm", () => {
     await fireEvent.click(screen.getByText("Reject"))
 
     expect(node.status).toEqual("reject")
-    expect(node.comments.length).toEqual(0)
+    expect(node.reviewComments.length).toEqual(0)
   })
 
   it("should be able to accept a node", async () => {
@@ -35,7 +35,7 @@ describe("ReviewForm", () => {
     await fireEvent.click(screen.getByText("Accept and Add"))
 
     expect(node.status).toEqual("accept")
-    expect(node.comments.length).toEqual(0)
+    expect(node.reviewComments.length).toEqual(0)
   })
 
   it("should maintain the original author", async () => {

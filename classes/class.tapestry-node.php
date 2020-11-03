@@ -38,7 +38,7 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
-    private $comments;
+    private $reviewComments;
     private $license;
     private $references;
 
@@ -80,7 +80,7 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
-        $this->comments = [];
+        $this->reviewComments = [];
         $this->license = '';
         $this->references = '';
 
@@ -182,8 +182,8 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
         }
-        if (isset($node->comments) && is_array($node->comments)) {
-            $this->comments = $node->comments;
+        if (isset($node->reviewComments) && is_array($node->reviewComments)) {
+            $this->reviewComments = $node->reviewComments;
         }
         if (isset($node->license) && is_object($node->license)) {
             $this->license = $node->license;
@@ -422,7 +422,7 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
-            'comments' => $this->comments,
+            'reviewComments' => $this->reviewComments,
             'license' => $this->license,
             'references' => $this->references,
         ];
