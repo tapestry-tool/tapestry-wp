@@ -145,7 +145,9 @@
         @click="handleSubmit"
       >
         <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
+        <div data-qa="submit-node-modal" :style="canSubmit ? '' : 'opacity: 50%;'">
+          Publish
+        </div>
       </b-button>
       <b-form-invalid-feedback :state="canMakeDraft">
         {{ warningText }}
@@ -362,7 +364,7 @@ export default {
     this.node = this.createDefaultNode()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode", "updateVisibleNodes"]),
+    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -502,8 +504,10 @@ export default {
           return this.submitNode()
         }
       }
+      this.loading = false
     },
     async handleDraftSubmit() {
+      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.node.status = "draft"
@@ -519,6 +523,7 @@ export default {
           return this.submitNode()
         }
       }
+      this.loading = false
     },
     async submitNode() {
       if (this.type === "add") {
@@ -545,7 +550,6 @@ export default {
           this.updateRootNode(id)
           this.updateSelectedNode(id)
         }
-        this.updateVisibleNodes([...this.visibleNodes, id])
       } else {
         await this.updateNode({
           id: this.node.id,

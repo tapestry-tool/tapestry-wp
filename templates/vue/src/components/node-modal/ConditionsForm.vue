@@ -22,6 +22,7 @@
         <b-form-group label="Unlock this node">
           <b-form-select
             v-model="condition.type"
+            data-qa="condition-type"
             :options="conditionOptions"
           ></b-form-select>
         </b-form-group>
@@ -31,6 +32,7 @@
         >
           <b-form-select
             v-model="condition.nodeId"
+            data-qa="condition-id"
             :options="nodeOptions"
           ></b-form-select>
         </b-form-group>
@@ -44,6 +46,7 @@
             <b-form-group label="Date">
               <b-form-datepicker
                 v-model="condition.date"
+                data-qa="condition-date"
                 class="datepicker"
               ></b-form-datepicker>
             </b-form-group>
@@ -67,7 +70,7 @@
         </b-row>
       </b-card>
       <b-row class="mx-0 mb-3">
-        <b-button variant="primary" @click="addCondition">
+        <b-button data-qa="add-condition" variant="primary" @click="addCondition">
           <i class="fas fa-plus icon"></i>
           Add Condition
         </b-button>

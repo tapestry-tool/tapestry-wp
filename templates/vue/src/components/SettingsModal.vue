@@ -1,6 +1,7 @@
 <template>
   <b-modal
     id="settings-modal"
+    data-qa="settings-modal"
     :visible="show"
     size="lg"
     title="Tapestry Settings"
@@ -187,6 +188,7 @@
       </b-button>
       <b-button
         id="save-button"
+        data-qa="submit-button"
         size="sm"
         variant="primary"
         :disabled="
@@ -276,16 +278,17 @@ export default {
   },
   mounted() {
     this.getSettings()
-    DragSelectModular.removeDragSelectListener()
-
+    this.$root.$on("bv::modal::show", (_, modalId) => {
+      if (modalId === "settings-modal") {
+        DragSelectModular.removeDragSelectListener()
+      }
+    })
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
+        DragSelectModular.addDragSelectListener()
         this.$emit("close")
       }
     })
-  },
-  beforeDestroy() {
-    DragSelectModular.addDragSelectListener()
   },
   methods: {
     closeModal() {

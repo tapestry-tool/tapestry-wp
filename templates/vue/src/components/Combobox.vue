@@ -6,6 +6,7 @@
       :placeholder="placeholder"
       :size="size"
       :style="inputStyle"
+      :autocomplete="autocomplete"
       @blur="handleBlur"
       @focus="handleFocus"
     ></b-form-input>
@@ -73,6 +74,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    disableAutocomplete: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -115,6 +121,9 @@ export default {
           ? options.slice(0, MAX_OPTIONS_LENGTH)
           : options
         : this.options
+    },
+    autocomplete() {
+      return this.disableAutocomplete ? "off" : "on"
     },
   },
   watch: {
