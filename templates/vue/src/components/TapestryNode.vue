@@ -45,7 +45,9 @@
         >
           <div class="meta">
             <p class="title">{{ node.title }}</p>
-            <p v-if="node.mediaDuration" class="timecode">{{ formatDuration() }}</p>
+            <p v-if="node.mediaDuration" class="timecode">
+              {{ formatDuration() }}
+            </p>
           </div>
         </foreignObject>
         <g v-show="!transitioning">
@@ -255,60 +257,53 @@ export default {
       d3
         .drag()
         .on("start", () => {
+          this.coordinates = {}
           if (this.selection.length) {
             this.coordinates = this.selection.reduce((coordinates, nodeId) => {
               const node = this.getNode(nodeId)
-              coordinates[nodeId] = { x: node.coordinates.x, y: node.coordinates.y }
+              coordinates[nodeId] = {
+                x: node.coordinates.x,
+                y: node.coordinates.y,
+              }
               return coordinates
             }, {})
           } else {
-            this.originalX = this.node.coordinates.x
-            this.originalY = this.node.coordinates.y
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
           }
         })
         .on("drag", () => {
-          if (this.selection.length) {
-            this.selection.forEach(id => {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-            })
-          } else {
-            this.node.coordinates.x += d3.event.dx
-            this.node.coordinates.y += d3.event.dy
+          for (const id of Object.keys(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
           }
         })
         .on("end", () => {
-          this.$emit("dragend")
-          if (this.hasPermission("edit")) {
-            if (this.selection.length) {
-              this.selection.forEach(id => {
-                const node = this.getNode(id)
-                this.updateNodeCoordinates({
-                  id: node.id,
-                  coordinates: {
-                    x: node.coordinates.x,
-                    y: node.coordinates.y,
-                  },
-                }).catch(() => {
-                  alert("Failed to save coordinates.")
-                  node.coordinates.x = this.coordinates[id].x
-                  node.coordinates.y = this.coordinates[id].y
-                })
-              })
-            } else {
-              this.updateNodeCoordinates({
-                id: this.node.id,
-                coordinates: {
-                  x: this.node.coordinates.x,
-                  y: this.node.coordinates.y,
-                },
-              }).catch(() => {
-                alert("Failed to save coordinates.")
-                this.node.coordinates.x = this.originalFx
-                this.node.coordinates.y = this.originalFy
-              })
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+            let coordinates = {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
             }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
+              continue
+            }
+            this.$emit("dragend")
+            this.updateNodeCoordinates({
+              id,
+              coordinates,
+              originalCoordinates,
+            }).catch(() => {
+              this.$emit("dragend")
+            })
           }
         })
     )
