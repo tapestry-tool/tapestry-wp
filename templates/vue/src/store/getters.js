@@ -261,6 +261,20 @@ export function createDefaultNode({ settings }) {
   })
 }
 
+export function getNeighbouringLinks(state) {
+  return id => {
+    return state.links.filter(link => link.source == id || link.target == id)
+  }
+}
+
+export function getNeighbours(state) {
+  return id => {
+    return state.links
+      .filter(link => link.source == id || link.target == id)
+      .map(link => (link.source == id ? link.target : link.source))
+  }
+}
+
 // TYDE ONLY
 
 export function getModuleFavourites(_, { isFavourite, getNode, getDirectChildren }) {
@@ -381,14 +395,6 @@ export function getProfileActivities({ nodes, settings }) {
     }
   }
   return profileActivities
-}
-
-export function getNeighbours(state) {
-  return id => {
-    return state.links
-      .filter(link => link.source == id || link.target == id)
-      .map(link => (link.source == id ? link.target : link.source))
-  }
 }
 
 export function getTydeProgress(_, { getNode, getDirectChildren }) {
