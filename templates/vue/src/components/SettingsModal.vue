@@ -110,29 +110,31 @@
             </b-row>
           </b-form-group>
           <b-form-group
-            label="World map"
-            description="Replace Tapestry with a new authoring experience over a map of the Earth"
+            label="World Map"
+            description="Replace Tapestry with a map of Earth with placeholders for each node"
           >
             <b-form-checkbox v-model="renderMap" switch>
               {{ renderMap ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
           <div v-if="renderMap">
-            <p v-if="!latitudeRangeValid" class="error-message">
-              North coordinate must be greater than south coordinate
-            </p>
-            <p v-if="!longitudeRangeValid" class="error-message">
-              East coordinate must be greater than west coordinate
-            </p>
             <b-row>
               <b-col sm="3">
                 <span>Northeast bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input v-model="mapBounds.neLat" placeholder="90" />
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  placeholder="Latitude (90)"
+                  :state="latitudeRangeValid"
+                />
               </b-col>
               <b-col sm="3">
-                <b-form-input v-model="mapBounds.neLng" placeholder="180" />
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  placeholder="Longitude (180)"
+                  :state="longitudeRangeValid"
+                />
               </b-col>
             </b-row>
             <b-row>
@@ -140,10 +142,18 @@
                 <span>Southwest bound:</span>
               </b-col>
               <b-col sm="3">
-                <b-form-input v-model="mapBounds.swLat" placeholder="-90" />
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  placeholder="Latitude (-90)"
+                  :state="latitudeRangeValid"
+                />
               </b-col>
               <b-col sm="3">
-                <b-form-input v-model="mapBounds.swLng" placeholder="-180" />
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  placeholder="Longitude (-180)"
+                  :state="longitudeRangeValid"
+                />
               </b-col>
             </b-row>
           </div>

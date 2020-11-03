@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="modal-coordinate">
+    <div id="modal-coordinates">
       <b-form-group>
         <b-form-checkbox v-model="isOnMap">
           Show this node on map
@@ -10,13 +10,13 @@
         <b-form-input
           v-model="node.mapCoordinates.lat"
           :number="true"
-          placeholder="enter latitude coordinate here"
+          placeholder="Enter latitude"
         />
 
         <b-form-input
           v-model="node.mapCoordinates.lng"
           :number="true"
-          placeholder="enter longitude coordinate here"
+          placeholder="Enter longitude"
         />
       </b-form-group>
     </div>
@@ -42,14 +42,6 @@ export default {
     ...mapGetters(["getNode"]),
   },
   watch: {
-    /*
-    nodeLat(){
-      this.node.mapCoordinates.lat = this.nodeLat
-    },
-    nodeLng(){
-      this.node.mapCoordinates.lng = this.nodeLng
-    },
-    */
     isOnMap(isOnMap) {
       if (!isOnMap) {
         this.node.mapCoordinates.lat = ""

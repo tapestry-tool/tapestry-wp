@@ -99,12 +99,12 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="showMap"
-          title="Coordinate"
-          :active="tab === 'coordinate'"
-          @click="changeTab('coordinate')"
+          v-if="this.settings.renderMap"
+          title="Map"
+          :active="tab === 'coordinates'"
+          @click="changeTab('coordinates')"
         >
-          <coordinate-form :node="node" />
+          <coordinates-form :node="node" />
         </b-tab>
         <b-tab
           title="More Information"
@@ -186,7 +186,7 @@ import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
-import CoordinateForm from "./node-modal/CoordinateForm"
+import CoordinatesForm from "./node-modal/CoordinatesForm"
 import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -213,7 +213,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
-    CoordinateForm,
+    CoordinatesForm,
     MoreInformationForm,
     SlickItem,
     SlickList,
@@ -267,9 +267,6 @@ export default {
         : this.settings.showAccess
         ? true
         : wpData.wpCanEditTapestry !== ""
-    },
-    showMap() {
-      return this.settings.renderMap
     },
     canPublish() {
       if (this.loading) return false
@@ -422,7 +419,7 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information", "coordinate"]
+      const okTabs = ["content", "appearance", "more-information", "coordinates"]
       if (okTabs.includes(requestedTab)) {
         return true
       }
@@ -441,9 +438,6 @@ export default {
         }
         case "ordering": {
           return this.node.mediaType === "accordion" || this.node.hasSubAccordion
-        }
-        case "coordinate": {
-          return this.node.renderMap
         }
       }
 
