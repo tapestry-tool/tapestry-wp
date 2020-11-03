@@ -766,7 +766,7 @@ export default {
     },
     displaySubmissionError() {
       this.formErrors.push(
-        "An unexpected error occurred during submission - see messages for details"
+        "An unexpected error occurred and the node could not be submitted"
       )
     },
   },
