@@ -1,6 +1,7 @@
 <template>
   <b-modal
     id="settings-modal"
+    data-qa="settings-modal"
     :visible="show"
     size="lg"
     title="Tapestry Settings"
@@ -148,6 +149,7 @@
       </b-button>
       <b-button
         id="save-button"
+        data-qa="submit-button"
         size="sm"
         variant="primary"
         :disabled="fileUploading"

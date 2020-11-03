@@ -73,7 +73,7 @@ export function isVisible(_, { getNode, isAccordionRow }) {
 export function getActivities(state) {
   return (options = {}) => {
     const { exclude = [] } = options
-    return state.nodes
+    return Object.values(state.nodes)
       .filter(node => !exclude.includes(node.id) && Boolean(node.quiz))
       .flatMap(node => node.quiz)
   }
@@ -81,7 +81,7 @@ export function getActivities(state) {
 
 export function getQuestion(state) {
   return id => {
-    const node = state.nodes
+    const node = Object.values(state.nodes)
       .filter(node => node.quiz)
       .find(node => node.quiz.find(q => q.id == id))
     if (node) {
