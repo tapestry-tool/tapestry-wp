@@ -111,7 +111,7 @@
     </template>
     <template v-else slot="modal-footer">
       <div
-        v-if="!(tapestryEditor && node.status === 'submitted')"
+        v-if="!(canEditTapestry && node.status === 'submitted')"
         style="display: flex; width: 100%;"
         class="buttons-container"
       >
@@ -166,14 +166,19 @@
         </b-button>
       </div>
       <b-form-invalid-feedback
-        v-if="!(tapestryEditor && node.status === 'submitted')"
+        v-if="!(canEditTapestry && node.status === 'submitted')"
         :state="canMakeDraft"
       >
         {{ warningText }}
         <br v-if="warningText" />
         {{ deleteWarningText }}
       </b-form-invalid-feedback>
-      <review-form v-else :node="node" @submit="handleSubmit"></review-form>
+      <review-form
+        v-else
+        :node="node"
+        @submit="handleSubmit"
+        @close="close"
+      ></review-form>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -326,7 +331,7 @@ export default {
       }
       return this.hasDraftPermission(ID)
     },
-    tapestryEditor() {
+    canEditTapestry() {
       return wpData.wpCanEditTapestry == 1
     },
     canSubmit() {

@@ -8,6 +8,9 @@
       />
     </b-form-group>
     <div>
+      <b-button size="sm" variant="light" @click="close">
+        Cancel
+      </b-button>
       <b-button size="sm" variant="danger" @click="handleReject">
         Reject
       </b-button>
@@ -61,6 +64,9 @@ export default {
         })
       }
       this.$emit("submit")
+    },
+    close() {
+      this.$emit("close")
     },
   },
 }

@@ -37,7 +37,7 @@ export default {
       if (this.isDisabled) {
         return this.isRoot
           ? "Root node can only be deleted if there are no other nodes in the tapestry."
-          : "Only nodes with a single connection can be deleted or made into drafts."
+          : "Only nodes with a single connection can be deleted."
       }
       return null
     },
