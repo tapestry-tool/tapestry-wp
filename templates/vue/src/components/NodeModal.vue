@@ -513,8 +513,10 @@ export default {
           return this.submitNode()
         }
       }
+      this.loading = false
     },
     async handleDraftSubmit() {
+      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.node.status = "draft"
@@ -530,6 +532,7 @@ export default {
           return this.submitNode()
         }
       }
+      this.loading = false
     },
     async submitNode() {
       if (this.modalType === "add") {
