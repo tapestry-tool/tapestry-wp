@@ -7,7 +7,7 @@ import Helpers from "./Helpers"
 export function render(
   component,
   { fixture = null, ...options } = {},
-  callback = Helpers.noop
+  callback = () => {}
 ) {
   return r(
     component,
