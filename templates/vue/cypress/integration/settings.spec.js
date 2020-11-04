@@ -28,7 +28,13 @@ describe("Settings", () => {
       })
   })
 
-  it(`should be able to set a background image`, () => {
+  /**
+   * [CI FAIL] indicates that the test fails in Tapestry's CI environment. These
+   * tests are failing because of a Docker-WordPress permissions issue. See the
+   * following Asana task for details:
+   *  - https://app.asana.com/0/1126491658233864/1198968596220741
+   */
+  it(`[CI FAIL] should be able to set a background image`, () => {
     cy.server()
     cy.route("POST", "**/async-upload.php").as("upload")
 
