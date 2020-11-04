@@ -1,17 +1,25 @@
 <template>
   <div style="display: flex">
-    <div style="width: 15%;">
-      <p v-for="value in Object.values(this.nodes)" :key="value.id">
-        {{ value.title }}
-        <!--
-            <b-button v-if="value.accessible" @click="openNode(value.id)" size="sm">
-              view
-            </b-button>
-            <b-button v-if="isLoggedIn && hasPermission('edit')" @click="editNode(value.id)" size="sm" varient="light">
-              edit
-            </b-button>
-            -->
-      </p>
+    <div style="overflow-y: auto; width: 15%; margin-right: 20px">
+      <div
+        v-for="(node, id) in nodes"
+        :key="id"
+        style="padding: 5px; margin-bottom: 10px; border: 2px solid #007bff; border-radius: 5px"
+      >
+        <h6>{{ node.title }}</h6>
+        <b-button
+          v-if="isLoggedIn && hasPermission('edit') && !hasMapCoordinates(node)"
+          size="sm"
+          variant="light"
+          block
+          @click="editNodeCoordinates(id)"
+        >
+          Add node to map
+        </b-button>
+        <div v-else>
+          Lat: {{ node.mapCoordinates.lat }} Long: {{ node.mapCoordinates.lng }}
+        </div>
+      </div>
     </div>
     <div style="height: 900px; width: 80%">
       <l-map
@@ -34,6 +42,7 @@
             <b-button
               v-if="marker.accessible"
               size="sm"
+              variant="light"
               @click="openNode(marker.id)"
             >
               view
@@ -41,7 +50,7 @@
             <b-button
               v-if="isLoggedIn && hasPermission('edit')"
               size="sm"
-              varient="light"
+              variant="light"
               @click="editNode(marker.id)"
             >
               edit
@@ -119,13 +128,13 @@ export default {
     },
     markerlocations() {
       const markers = []
-      for (const [key, value] of Object.entries(this.nodes)) {
-        if (this.hasMapCoordinates(value.mapCoordinates)) {
+      for (const [id, node] of Object.entries(this.nodes)) {
+        if (this.hasMapCoordinates(node)) {
           markers.push({
-            id: key,
-            pos: latLng(value.mapCoordinates.lat, value.mapCoordinates.lng),
-            title: value.title,
-            accessible: value.accessible,
+            id: id,
+            pos: latLng(node.mapCoordinates.lat, node.mapCoordinates.lng),
+            title: node.title,
+            accessible: node.accessible,
           })
         }
       }
@@ -139,8 +148,12 @@ export default {
     updateCenter(center) {
       this.currentCenter = center
     },
-    hasMapCoordinates(mapCoordinates) {
-      return mapCoordinates.lat != "" && mapCoordinates.lng != ""
+    hasMapCoordinates(node) {
+      if (node.mapCoordinates) {
+        return node.mapCoordinates.lat != "" && node.mapCoordinates.lng != ""
+      } else {
+        return false
+      }
     },
     openNode(id) {
       this.$router.push({
@@ -153,6 +166,13 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
+    },
+    editNodeCoordinates(id) {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: id, type: "edit", tab: "coordinates" },
         query: this.$route.query,
       })
     },

@@ -50,7 +50,7 @@
         ></locked-tooltip>
       </svg>
     </main>
-    <div v-if="settings.renderMap" id="map-container">
+    <div v-if="settings.renderMap && !empty" id="map-container">
       <tapestry-map />
     </div>
   </div>

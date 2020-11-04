@@ -11,12 +11,14 @@
           v-model="node.mapCoordinates.lat"
           :number="true"
           placeholder="Enter latitude"
+          :state="isValidLat"
         />
 
         <b-form-input
           v-model="node.mapCoordinates.lng"
           :number="true"
           placeholder="Enter longitude"
+          :state="isValidLng"
         />
       </b-form-group>
     </div>
@@ -40,6 +42,14 @@ export default {
   },
   computed: {
     ...mapGetters(["getNode"]),
+    isValidLng() {
+      return (
+        this.node.mapCoordinates.lng < 180 && this.node.mapCoordinates.lng > -180
+      )
+    },
+    isValidLat() {
+      return this.node.mapCoordinates.lat < 90 && this.node.mapCoordinates.lat > -90
+    },
   },
   watch: {
     isOnMap(isOnMap) {

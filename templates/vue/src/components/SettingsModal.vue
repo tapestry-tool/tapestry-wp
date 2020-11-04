@@ -275,10 +275,18 @@ export default {
     ...mapState(["settings", "rootId"]),
     // the + before this.mapBounds changes type from string to int for correct comparison
     latitudeRangeValid() {
-      return (+this.mapBounds.neLat || 90) > (+this.mapBounds.swLat || -90)
+      return (
+        (+this.mapBounds.neLat || 90) > (+this.mapBounds.swLat || -90) &&
+        +this.mapBounds.neLat < 91 &&
+        +this.mapBounds.swLat > -91
+      )
     },
     longitudeRangeValid() {
-      return (+this.mapBounds.neLng || 180) > (+this.mapBounds.swLng || -180)
+      return (
+        (+this.mapBounds.neLng || 180) > (+this.mapBounds.swLng || -180) &&
+        +this.mapBounds.neLng < 181 &&
+        +this.mapBounds.swLng > -181
+      )
     },
   },
   created() {
