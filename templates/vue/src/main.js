@@ -23,5 +23,7 @@ if (window.Cypress) {
 
   // Hide admin bar as to not interfere with tests
   const adminBar = document.getElementById("wpadminbar")
-  adminBar.style.display = "none"
+  if (adminBar) {
+    adminBar.style.display = "none"
+  }
 }
