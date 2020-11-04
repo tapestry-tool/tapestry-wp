@@ -2,6 +2,7 @@
   <g
     :transform="`translate(${x}, ${y})`"
     :data-qa="dataQa"
+    :aria-disabled="disabled"
     @click.stop="$emit('click')"
   >
     <circle
@@ -10,7 +11,6 @@
       fill="#666"
       stroke="white"
       stroke-width="3"
-      :aria-disabled="disabled"
     ></circle>
     <slot></slot>
   </g>
