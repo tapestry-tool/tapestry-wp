@@ -20,4 +20,8 @@ const app = new Vue({
 // expose app to allow testing of Vuex store
 if (window.Cypress) {
   window.app = app
+
+  // Hide admin bar as to not interfere with tests
+  const adminBar = document.getElementById("wpadminbar")
+  adminBar.style.display = "none"
 }
