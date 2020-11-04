@@ -161,7 +161,7 @@ Cypress.Commands.add("submitModal", () => {
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   cy.getByTestId("submit-node-modal").click()
-  cy.wait("@editPermissions")
+  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
