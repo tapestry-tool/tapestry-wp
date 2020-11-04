@@ -1,6 +1,6 @@
 describe("Activity", () => {
   it("should be able to complete an activity with an audio-based answer", () => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {

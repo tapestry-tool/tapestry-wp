@@ -2,7 +2,7 @@ import { TEST_TAPESTRY_NAME } from "../support/constants"
 
 describe("Settings", () => {
   beforeEach(() => {
-    cy.fixture("stump.json").as("tapestry")
+    cy.fixture("three-nodes.json").as("tapestry")
     cy.setup("@tapestry")
     cy.getByTestId("settings-button").click()
   })

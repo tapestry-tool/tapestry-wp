@@ -10,7 +10,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint:fix": "npm run lint -- --fix",
-    "test:e2e": "cypress run --headless -b chrome --config watchForFileChanges=false",
+    "test:e2e": "cypress run --headless -b chrome",
     "test:e2e:open": "cypress open",
     "test:jest": "jest __tests__",
     "test": "npm run test:jest && npm run test:e2e && npm run report:merge",

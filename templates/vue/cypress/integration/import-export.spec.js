@@ -1,6 +1,6 @@
 describe("Import Export", () => {
   it("should be able to import a Tapestry using the file input", () => {
-    const tapestry = "root.json"
+    const tapestry = "one-node.json"
     cy.setup()
 
     cy.server()

@@ -1,6 +1,6 @@
 describe("Node Appearance", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
   })
 
@@ -16,7 +16,7 @@ describe("Node Appearance", () => {
       cy.contains(/thumbnail/i).click()
 
       const url =
-        "https://image.shutterstock.com/z/stock-photo-colorful-flower-on-dark-tropical-foliage-nature-background-721703848.jpg"
+        "https://upload.wikimedia.org/wikipedia/commons/2/2a/Hummingbird.jpg"
 
       cy.getByTestId(`node-appearance-thumbnail-url`).type(url)
       cy.submitModal()
