@@ -30,7 +30,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectReady">
+        <g v-if="dragSelectEnabled && dragSelectReady">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -108,6 +108,9 @@ export default {
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
+    dragSelectEnabled() {
+      return !this.settings.renderMap
+    },
   },
   watch: {
     background: {
@@ -135,7 +138,9 @@ export default {
     },
   },
   mounted() {
-    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    if (this.dragSelectEnabled) {
+      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    }
     this.updateViewBox()
     this.dragSelectReady = true
   },
@@ -145,7 +150,9 @@ export default {
       this.$root.$emit("add-node", null)
     },
     updateSelectableNodes() {
-      DragSelectModular.updateSelectableNodes()
+      if (this.dragSelectEnabled) {
+        DragSelectModular.updateSelectableNodes()
+      }
     },
     updateViewBox() {
       const MAX_RADIUS = 240
