@@ -2,6 +2,14 @@
   <div style="display: flex">
     <div style="overflow-y: auto; width: 15%; margin-right: 20px">
       <div
+        v-if="empty && canEdit"
+        style="padding: 5px; margin-bottom: 10px; border: 2px solid #007bff; border-radius: 5px"
+      >
+        <b-button size="sm" variant="light" block @click="addRootNode()">
+          Add root node
+        </b-button>
+      </div>
+      <div
         v-for="(node, id) in nodes"
         :key="id"
         style="padding: 5px; margin-bottom: 10px; border: 2px solid #007bff; border-radius: 5px"
@@ -19,6 +27,13 @@
         <div v-if="hasMapCoordinates(node)">
           Lat: {{ node.mapCoordinates.lat }} Long: {{ node.mapCoordinates.lng }}
         </div>
+      </div>
+      <div
+        style="padding: 5px; margin-bottom: 10px; border: 2px solid #007bff; border-radius: 5px"
+      >
+        <b-button size="sm" variant="light" block @click="addNewNode()">
+          Add new node
+        </b-button>
       </div>
     </div>
     <div style="height: 900px; width: 80%">
@@ -139,6 +154,12 @@ export default {
     isLoggedIn() {
       return isLoggedIn
     },
+    empty() {
+      return Object.keys(this.nodes).length === 0
+    },
+    canEdit() {
+      return wpData.wpCanEditTapestry === "1"
+    },
     markerlocations() {
       const markers = []
       for (const [id, node] of Object.entries(this.nodes)) {
@@ -182,6 +203,10 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
+    },
+    addNewNode() {},
+    addRootNode() {
+      this.$root.$emit("add-node", null)
     },
     editNodeCoordinates(id) {
       this.$router.push({
