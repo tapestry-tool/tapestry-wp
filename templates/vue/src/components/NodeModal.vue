@@ -536,6 +536,11 @@ export default {
       }
       await this.updateLockedStatus()
       this.updateSelectedNode(this.node.id)
+      this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
       this.close()
       this.loading = false
     },
