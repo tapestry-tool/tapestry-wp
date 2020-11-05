@@ -94,7 +94,12 @@ Cypress.Commands.add(
 
     cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
 
-    cy.wait("@saveProgress")
+    cy.store()
+      .its("state.nodes")
+      .should(nodes => {
+        const node = nodes[id]
+        expect(node.progress).to.equal(1)
+      })
   }
 )
 
