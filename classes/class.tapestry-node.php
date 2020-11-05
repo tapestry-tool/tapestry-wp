@@ -20,6 +20,7 @@ class TapestryNode implements ITapestryNode
     private $size;
     private $title;
     private $status;
+    private $reviewStatus;
     private $behaviour;
     private $typeData;
     private $imageURL;
@@ -61,6 +62,7 @@ class TapestryNode implements ITapestryNode
         $this->size = '';
         $this->title = '';
         $this->status = '';
+        $this->reviewStatus = '';
         $this->imageURL = '';
         $this->lockedImageURL = '';
         $this->mediaType = '';
@@ -124,6 +126,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->status) && is_string($node->status)) {
             $this->status = $node->status;
+        }
+        if (isset($node->reviewStatus) && is_string($node->reviewStatus)) {
+            $this->reviewStatus = $node->reviewStatus;
         }
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
@@ -403,6 +408,7 @@ class TapestryNode implements ITapestryNode
             'size' => $this->size,
             'title' => $this->title,
             'status' => $this->status,
+            'reviewStatus' => $this->reviewStatus,
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
