@@ -60,9 +60,8 @@ describe("Link Authoring", () => {
 
         cy.logout().visitTapestry()
 
-        const link = `link-${child1.id}-${child2.id}`
-        cy.getByTestId(link).click()
-        cy.getByTestId(link).should("exist")
+        cy.link(child1.id, child2.id).click()
+        cy.link(child1.id, child2.id).should("exist")
       })
   })
 

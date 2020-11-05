@@ -24,7 +24,7 @@ describe("Activity", () => {
       cy.server()
       cy.route("POST", "**/completed*").as("complete")
 
-      cy.updateNodeProgress(node.id, 1)
+      cy.updateNodeProgress(node.id, 0.98)
       cy.openLightbox(node.id)
       cy.wait("@complete")
 
