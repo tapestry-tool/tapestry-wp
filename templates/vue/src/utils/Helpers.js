@@ -1,3 +1,4 @@
+import { data } from "@/services/wp"
 /**
  * Helper Functions
  */
@@ -70,7 +71,7 @@ export default class Helpers {
   }
 
   static getImagePath(image) {
-    return `${wpData.vue_uri}/${image.split("dist")[1]}`
+    return `${data.vue_uri}/${image.split("dist")[1]}`
   }
 
   // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
@@ -152,17 +153,17 @@ export default class Helpers {
 
   static hasPermission(node, action) {
     // Check 1: Has edit permissions for Tapestry
-    if (wpData.wpCanEditTapestry === "1") {
+    if (data.wpCanEditTapestry === "1") {
       return true
     }
 
     // Check 2: User is the author of the node
-    if (node.author && wpData.currentUser.ID == parseInt(node.author.id)) {
+    if (node.author && data.currentUser.ID == parseInt(node.author.id)) {
       return true
     }
 
     // Check 3: User has a role with general edit permissions
-    const { ID, roles } = wpData.currentUser
+    const { ID, roles } = data.currentUser
     const allowedRoles = ["administrator", "editor", "author"]
     if (allowedRoles.some(role => roles.includes(role))) {
       return true
@@ -175,7 +176,7 @@ export default class Helpers {
     }
 
     // Check 5: Node has authenticated permissions
-    if (wpData.currentUser.ID && authenticated && authenticated.includes(action)) {
+    if (data.currentUser.ID && authenticated && authenticated.includes(action)) {
       return true
     }
 
