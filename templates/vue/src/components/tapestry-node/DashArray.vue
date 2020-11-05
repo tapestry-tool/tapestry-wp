@@ -1,12 +1,13 @@
 <template>
   <g>
     <circle
+      v-show="status !== 'publish'"
       ref="track"
       class="track"
       :stroke-width="width"
       :stroke="locked ? '#999' : strokeColor"
+      :stroke-dasharray="dasharraySize"
     ></circle>
-    <path v-show="!locked && progress > 0" ref="path" class="bar"></path>
   </g>
 </template>
 
@@ -19,10 +20,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    progress: {
-      type: Number,
-      required: true,
     },
     radius: {
       type: Number,
@@ -40,22 +37,27 @@ export default {
     },
   },
   computed: {
-    arc() {
-      return d3.arc()({
-        startAngle: 0,
-        endAngle: this.progress * 2 * Math.PI,
-        innerRadius: this.radius - this.width,
-        outerRadius: this.radius,
-      })
-    },
     width() {
-      return 20
+      return 5
     },
     dasharraySize() {
       return this.radius / 10
     },
     strokeColor() {
-      return "#11a6d8"
+      switch (this.status) {
+        case "publish":
+          return "currentColor"
+        case "draft":
+          return "#999"
+        case "submitted":
+          return "orange"
+        case "accept":
+          return "green"
+        case "reject":
+          return "#CC444B"
+        default:
+          return "currentColor"
+      }
     },
   },
   watch: {
@@ -83,38 +85,10 @@ export default {
           }
         })
     },
-    progress(progress, oldProgress) {
-      d3.select(this.$refs.path)
-        .transition()
-        .duration(750)
-        .ease(d3.easePolyOut)
-        .attrTween("d", () => {
-          const interpolate = d3.interpolate(oldProgress, progress)
-          return t => {
-            const currentProgress = interpolate(t)
-            return d3.arc()({
-              startAngle: 0,
-              endAngle: currentProgress * 2 * Math.PI,
-              innerRadius: this.radius - this.width,
-              outerRadius: this.radius,
-            })
-          }
-        })
-    },
   },
   mounted() {
     const track = this.$refs.track
     track.setAttribute("r", Math.max(this.radius - this.width / 2, 0))
-
-    this.$refs.path.setAttribute(
-      "d",
-      d3.arc()({
-        startAngle: 0,
-        endAngle: this.progress * 2 * Math.PI,
-        innerRadius: this.radius - this.width,
-        outerRadius: this.radius,
-      })
-    )
   },
 }
 </script>

@@ -28,12 +28,24 @@
         "
         :x="node.coordinates.x"
         :y="node.coordinates.y"
-        :radius="node.status === 'publish' ? radius : radius + 15"
+        :radius="radius"
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
         :locked="!node.accessible"
         :status="node.status"
       ></progress-bar>
+      <dash-array
+        v-if="
+          node.nodeType !== 'grandchild' &&
+            node.nodeType !== '' &&
+            !node.hideProgress
+        "
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius + 15"
+        :locked="!node.accessible"
+        :status="node.status"
+      ></dash-array>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
@@ -122,6 +134,7 @@ import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import DragSelectModular from "@/utils/dragSelectModular"
+import DashArray from "./tapestry-node/DashArray"
 
 export default {
   name: "tapestry-node",
@@ -129,6 +142,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    DashArray,
   },
   props: {
     node: {
