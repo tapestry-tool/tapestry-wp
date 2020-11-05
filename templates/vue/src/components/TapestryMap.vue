@@ -16,7 +16,7 @@
         >
           Add node to map
         </b-button>
-        <div v-else>
+        <div v-if="hasMapCoordinates(node)">
           Lat: {{ node.mapCoordinates.lat }} Long: {{ node.mapCoordinates.lng }}
         </div>
       </div>
@@ -35,7 +35,13 @@
           v-for="marker in markerlocations"
           :key="marker.id"
           :lat-lng="marker.pos"
-          :icon="marker.accessible ? icon : inaccessibleIcon"
+          :icon="
+            marker.status == 'draft'
+              ? draftIcon
+              : marker.accessible
+              ? icon
+              : inaccessibleIcon
+          "
         >
           <l-popup>
             <h5>{{ marker.title }}</h5>
@@ -66,6 +72,7 @@
 import "leaflet/dist/leaflet.css"
 import mapMarker from "@/assets/map-marker.png"
 import invalidMarker from "@/assets/map-marker-inaccessible.png"
+import draftMarker from "@/assets/map-marker-draft.png"
 import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet"
 import { mapState } from "vuex"
@@ -98,6 +105,12 @@ export default {
       }),
       inaccessibleIcon: icon({
         iconUrl: invalidMarker,
+        iconSize: [32, 33],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -20],
+      }),
+      draftIcon: icon({
+        iconUrl: draftMarker,
         iconSize: [32, 33],
         iconAnchor: [16, 32],
         popupAnchor: [0, -20],
@@ -135,6 +148,7 @@ export default {
             pos: latLng(node.mapCoordinates.lat, node.mapCoordinates.lng),
             title: node.title,
             accessible: node.accessible,
+            status: node.status,
           })
         }
       }
