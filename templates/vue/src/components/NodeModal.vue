@@ -186,7 +186,6 @@ import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
-import { data } from "@/services/wp"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -250,14 +249,14 @@ export default {
       return ""
     },
     isAuthenticated() {
-      return data.currentUser.ID !== 0
+      return wpData.currentUser.ID !== 0
     },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
         : this.settings.showAccess
         ? true
-        : data.wpCanEditTapestry !== ""
+        : wpData.wpCanEditTapestry !== ""
     },
     canPublish() {
       if (this.loading) return false
@@ -278,14 +277,14 @@ export default {
       }
     },
     authoredNode() {
-      const { ID } = data.currentUser
+      const { ID } = wpData.currentUser
       if (this.node.author) {
         return parseInt(this.node.author.id) === ID
       }
       return true
     },
     canMakeDraft() {
-      const { ID } = data.currentUser
+      const { ID } = wpData.currentUser
       if (this.node.status === "publish" && this.type === "edit") {
         return false
       }

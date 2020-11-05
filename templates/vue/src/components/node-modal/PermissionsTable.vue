@@ -42,12 +42,11 @@
 
 <script>
 import Helpers from "../../utils/Helpers"
-import { data } from "@/services/wp"
 
 const PERMISSIONS_ORDER = [
   "public",
   "authenticated",
-  ...Object.keys(data.roles).filter(
+  ...Object.keys(wpData.roles).filter(
     role => role !== "editor" && role !== "administrator" && role !== "author"
   ),
 ]

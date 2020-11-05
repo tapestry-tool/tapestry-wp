@@ -22,7 +22,6 @@ import hr from "../../../assets/icons/hr.svg"
 import undo from "../../../assets/icons/undo.svg"
 import redo from "../../../assets/icons/redo.svg"
 import remove from "../../../assets/icons/remove.svg"
-import { data } from "@/services/wp"
 
 export default {
   props: {
@@ -62,7 +61,7 @@ export default {
         remove,
       }
       let usedIcon = lookup[this.name]
-      return `${data.vue_uri}/${usedIcon.split("dist")[1]}`
+      return `${wpData.vue_uri}/${usedIcon.split("dist")[1]}`
     },
   },
 }
