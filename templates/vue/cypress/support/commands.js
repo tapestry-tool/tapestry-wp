@@ -187,7 +187,9 @@ Cypress.Commands.add("changeMediaType", type =>
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 
-Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))
+Cypress.Commands.add("getByTestId", (testId, ...args) =>
+  cy.get(`[data-qa="${testId}"]`, ...args)
+)
 
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
