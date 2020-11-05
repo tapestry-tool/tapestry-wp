@@ -136,7 +136,6 @@ import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import NodeButton from "./tapestry-node/NodeButton"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "tapestry-node",
@@ -307,7 +306,7 @@ export default {
     },
   },
   mounted() {
-    DragSelectModular.updateSelectableNodes()
+    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
