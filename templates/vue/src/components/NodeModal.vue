@@ -267,7 +267,7 @@ export default {
           (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
-        if (!this.getNeighbours(this.nodeId).length) {
+        if (this.node.id === this.rootId) {
           return true
         }
         return this.getNeighbours(this.nodeId).some(neighbourId => {
