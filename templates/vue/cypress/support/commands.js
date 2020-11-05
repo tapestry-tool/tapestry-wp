@@ -98,7 +98,7 @@ Cypress.Commands.add(
       .its("state.nodes")
       .should(nodes => {
         const node = nodes[id]
-        expect(node.progress).to.equal(1)
+        expect(node.progress).to.equal(progress)
       })
   }
 )
