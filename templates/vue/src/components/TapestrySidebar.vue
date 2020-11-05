@@ -1,9 +1,5 @@
 <template>
-  <div
-    ref="wrapper"
-    :class="['sidebar-container', { closed: closed }]"
-    @mousedown="pauseDragSelect"
-  >
+  <div ref="wrapper" :class="['sidebar-container', { closed: closed }]">
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
@@ -90,7 +86,6 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
@@ -186,9 +181,6 @@ export default {
     },
     toggle() {
       this.closed = !this.closed
-    },
-    pauseDragSelect() {
-      DragSelectModular.pauseDragSelect()
     },
   },
 }
