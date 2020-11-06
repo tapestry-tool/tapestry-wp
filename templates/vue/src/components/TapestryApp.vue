@@ -1,7 +1,10 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <div class="toolbar">
-      <tapestry-filter style="z-index: 10;" />
+    <div
+      v-if="canEdit || (maxDepth > 1 && settings.defaultDepth > 0)"
+      class="toolbar"
+    >
+      <tapestry-filter v-if="canEdit" style="z-index: 10;" />
       <div class="slider-wrapper">
         <settings-modal-button
           v-if="canEdit"
@@ -13,14 +16,15 @@
         ></tapestry-depth-slider>
       </div>
     </div>
-    <root-node-button
-      v-if="empty && canEdit"
-      @click="addRootNode"
-    ></root-node-button>
-    <div v-if="empty && !canEdit">
-      The requested Tapestry is empty.
-    </div>
-    <main v-if="!settings.renderMap" id="tapestry" ref="app" :style="background">
+    <tapestry-map v-if="settings.renderMap" :is-sidebar-open="isSidebarOpen" />
+    <main v-else id="tapestry" ref="app" :style="background">
+      <root-node-button
+        v-if="empty && canEdit"
+        @click="addRootNode"
+      ></root-node-button>
+      <div v-if="empty && !canEdit">
+        The requested Tapestry is empty.
+      </div>
       <svg id="vue-svg" :viewBox="viewBox">
         <g>
           <tapestry-link
@@ -51,9 +55,6 @@
         ></locked-tooltip>
       </svg>
     </main>
-    <div v-if="settings.renderMap && !empty" id="map-container">
-      <tapestry-map />
-    </div>
   </div>
 </template>
 
@@ -244,8 +245,10 @@ export default {
   z-index: 0;
 
   @media screen and (min-width: 500px) {
+    width: calc(100% - 2.5em);
+
     &.sidebar-open {
-      width: calc(100% - max(340px, 30%));
+      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
       padding-right: 0;
 
       .toolbar {
@@ -279,5 +282,8 @@ export default {
 <style lang="scss">
 #app {
   background-size: cover;
+}
+#app-container .btn-link {
+  background: transparent;
 }
 </style>

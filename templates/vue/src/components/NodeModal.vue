@@ -99,8 +99,8 @@
           </div>
         </b-tab>
         <b-tab
-          v-if="this.settings.renderMap"
-          title="Map"
+          v-if="settings.renderMap"
+          title="Geography"
           :active="tab === 'coordinates'"
           @click="changeTab('coordinates')"
         >
