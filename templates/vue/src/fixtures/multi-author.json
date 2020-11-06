@@ -1,0 +1,325 @@
+{
+  "nodes": [
+    {
+      "id": 479,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "qwe",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "video",
+      "mediaFormat": "mp4",
+      "mediaDuration": 15,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>qwe</p>"
+      },
+      "coordinates": {
+        "x": 3020.150390625,
+        "y": 2961.2490234375
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "accessible": true,
+      "unlocked": true,
+      "completed": true,
+      "progress": 1,
+      "nodeType": "child"
+    },
+    {
+      "id": 482,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "qwe",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>qwe</p>"
+      },
+      "coordinates": {
+        "x": 2528.102085619821,
+        "y": 2976.8561876123017
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read",
+          "add"
+        ],
+        "contributor": [
+          "read",
+          "add"
+        ],
+        "subscriber": [
+          "read",
+          "add"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    },
+    {
+      "id": 484,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "qwe",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>qwe</p>"
+      },
+      "coordinates": {
+        "x": 2769.706245639421,
+        "y": 3402.916134984411
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    },
+    {
+      "id": 731,
+      "author": {
+        "id": "2",
+        "name": "subscriber",
+        "email": "sub@foo.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "qwe",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>qwe</p>"
+      },
+      "coordinates": {
+        "x": 2165.5834364411016,
+        "y": 3133.405775208837
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    }
+  ],
+  "links": [
+    {
+      "source": 479,
+      "target": 482,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 479,
+      "target": 484,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 482,
+      "target": 484
+    },
+    {
+      "source": 482,
+      "target": 731,
+      "value": 1,
+      "type": ""
+    }
+  ],
+  "groups": [],
+  "site-url": "http://localhost:8000"
+}
