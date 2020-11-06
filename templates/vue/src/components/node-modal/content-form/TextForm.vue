@@ -2,7 +2,7 @@
   <rich-text-form
     id="node-text-content"
     v-model="node.typeData.textContent"
-    data-testid="node-textContent"
+    data-qa="node-text-content"
     placeholder="Enter text here"
   />
 </template>
