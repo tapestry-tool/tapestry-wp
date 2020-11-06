@@ -255,6 +255,12 @@ export default {
         ? true
         : wpData.wpCanEditTapestry !== ""
     },
+    linkHasThumbnailData() {
+      return (
+        (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
+        this.node.mediaFormat === "youtube"
+      )
+    },
     canPublish() {
       if (this.loading) return false
       if (this.type === "add") {
@@ -475,10 +481,7 @@ export default {
         this.updateNodeCoordinates()
         this.loading = true
 
-        if (
-          (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
-          this.node.mediaFormat === "youtube"
-        ) {
+        if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
 
@@ -495,10 +498,7 @@ export default {
         this.node.status = "draft"
         this.updateNodeCoordinates()
 
-        if (
-          (this.node.mediaType == "url-embed" && this.node.behaviour != "embed") ||
-          this.node.mediaType == "youtube"
-        ) {
+        if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
 
