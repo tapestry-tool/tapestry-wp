@@ -522,9 +522,10 @@ export default {
           }
           await this.addLink(newLink)
           if (this.node.status == "draft") {
-            this.updateRootNode(id)
             this.updateSelectedNode(id)
           }
+        } else {
+          this.updateRootNode(id)
         }
       } else {
         await this.updateNode({
