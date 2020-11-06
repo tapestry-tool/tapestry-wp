@@ -4,66 +4,50 @@
       <i class="fas fa-search"></i>
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
-      <combobox
-        v-model="filterOption"
-        class="filter-combobox"
-        :options="comboboxFilterOptions"
-        :input-style="inputStyles"
-        size="sm"
-        :disableAutocomplete="true"
-      >
-        <template v-slot="slotProps">
-          <p class="filter-value">
-            {{ slotProps.option }}
-          </p>
-        </template>
-      </combobox>
-      <combobox
+      <b-form-select v-model="type" :options="Object.values(types)"></b-form-select>
+      <v-select
+        v-if="type !== types.STATUS"
         v-model="filterValue"
-        class="filter-combobox"
-        item-text="name"
-        item-value="id"
-        :options="comboboxValueOptions"
-        :input-style="inputStyles"
-        size="sm"
-        :disableAutocomplete="true"
-      >
-        <template v-slot="slotProps">
-          <p class="filter-value">
-            <code>{{ slotProps.option.id }}</code>
-            {{ slotProps.option.name }}
-          </p>
-        </template>
-      </combobox>
+        label="name"
+        :loading="loading"
+        :placeholder="placeholder"
+        :options="filterOptions"
+      ></v-select>
+      <b-form-select
+        v-else
+        v-model="filterValue"
+        data-qa="status-select"
+        :options="statuses"
+      ></b-form-select>
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapMutations, mapState } from "vuex"
-import Combobox from "./Combobox"
 import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
+import { nodeStatus } from "@/utils/constants"
 
-const filterOptions = {
-  AUTHOR: "author",
+const filterTypes = {
+  AUTHOR: "Author",
+  TITLE: "Title",
+  STATUS: "Status",
 }
 
 export default {
   name: "tapestry-filter",
-  components: {
-    Combobox,
-  },
   data() {
     return {
       allContributors: null,
       isActive: false,
-      filterOption: "",
+      type: filterTypes.TITLE,
       filterValue: "",
+      loading: false,
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "settings"]),
     canSearch() {
       return wp.canEditTapestry()
     },
@@ -74,24 +58,44 @@ export default {
       }
     },
     isFilterSelected() {
-      return this.filterOption !== ""
+      return this.type !== ""
     },
-    comboboxFilterOptions() {
-      return Object.values(filterOptions)
+    types() {
+      return filterTypes
     },
-    comboboxValueOptions() {
-      switch (this.filterOption) {
-        case filterOptions.AUTHOR: {
-          return this.allContributors !== null
-            ? Object.values(this.allContributors)
-            : [
-                ...new Map(
-                  Object.values(this.nodes).map(node => [
-                    node.author.id,
-                    node.author,
-                  ])
-                ).values(),
-              ]
+    statuses() {
+      return Object.values(nodeStatus)
+    },
+    placeholder() {
+      switch (this.type) {
+        case filterTypes.AUTHOR:
+          return "Node author"
+        case filterTypes.TITLE:
+          return "Node title"
+        default:
+          return ""
+      }
+    },
+    filterOptions() {
+      switch (this.type) {
+        case filterTypes.AUTHOR: {
+          if (this.allContributors !== null) {
+            return Object.values(this.allContributors)
+          }
+          const authors = []
+          const seen = new Set()
+          Object.values(this.nodes)
+            .map(node => node.author)
+            .forEach(author => {
+              if (!seen.has(author.id)) {
+                authors.push(author)
+                seen.add(author.id)
+              }
+            })
+          return authors
+        }
+        case filterTypes.TITLE: {
+          return Object.values(this.nodes).map(node => node.title)
         }
         default:
           return []
@@ -100,8 +104,12 @@ export default {
   },
   watch: {
     async filterValue(next) {
-      await this.refetchTapestryData(Number(next))
-      this.updateVisibleNodes(this.getVisibleNodes())
+      if (!this.settings.superuserOverridePermissions) {
+        this.loading = true
+        await this.refetchTapestryData(Number(next))
+        this.updateVisibleNodes(this.getVisibleNodes())
+        this.loading = false
+      }
     },
     isActive(isActive) {
       if (isActive) {
@@ -109,6 +117,9 @@ export default {
       } else {
         this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
       }
+    },
+    type() {
+      this.filterValue = ""
     },
   },
   async created() {
@@ -121,15 +132,15 @@ export default {
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
-        this.filterOption = ""
+        this.type = ""
         this.filterValue = ""
       }
       this.isActive = !this.isActive
     },
     getVisibleNodes() {
-      if (this.isActive && this.filterOption && this.filterValue) {
-        switch (this.filterOption) {
-          case filterOptions.AUTHOR: {
+      if (this.isActive && this.type && this.filterValue) {
+        switch (this.type) {
+          case filterTypes.AUTHOR: {
             return Object.values(this.nodes)
               .filter(node => node.author.id == this.filterValue)
               .map(node => node.id)
