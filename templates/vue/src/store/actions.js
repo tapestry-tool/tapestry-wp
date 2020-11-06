@@ -1,4 +1,5 @@
 import client from "../services/TapestryAPI"
+import * as wp from "../services/wp"
 import Helpers from "../utils/Helpers"
 import ErrorHelper from "../utils/errorHelper"
 
@@ -109,7 +110,7 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
   try {
     const { id, progress } = payload
 
-    if (!wpData.wpUserId) {
+    if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[id] || {}
       nodeProgress.progress = progress
@@ -143,7 +144,7 @@ export async function updateNodeCoordinates(
 export async function completeNode(context, nodeId) {
   const { commit, dispatch, getters } = context
   try {
-    if (!wpData.wpUserId) {
+    if (!wp.isLoggedIn()) {
       const progressObj = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_ID))
       const nodeProgress = progressObj[nodeId] || {}
       nodeProgress.completed = true

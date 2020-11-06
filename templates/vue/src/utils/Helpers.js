@@ -1,4 +1,5 @@
-import { data } from "@/services/wp"
+import * as wp from "@/services/wp"
+
 /**
  * Helper Functions
  */
@@ -71,7 +72,7 @@ export default class Helpers {
   }
 
   static getImagePath(image) {
-    return `${data.vue_uri}/${image.split("dist")[1]}`
+    return `${wp.data.vue_uri}/${image.split("dist")[1]}`
   }
 
   // src: https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it?lq=1
@@ -152,18 +153,20 @@ export default class Helpers {
   }
 
   static hasPermission(node, action) {
+    const user = wp.getCurrentUser()
+
     // Check 1: Has edit permissions for Tapestry
-    if (data.wpCanEditTapestry === "1") {
+    if (wp.canEditTapestry()) {
       return true
     }
 
     // Check 2: User is the author of the node
-    if (node.author && data.currentUser.ID == parseInt(node.author.id)) {
+    if (node.author && user.id == parseInt(node.author.id)) {
       return true
     }
 
     // Check 3: User has a role with general edit permissions
-    const { ID, roles } = data.currentUser
+    const { id, roles } = user
     const allowedRoles = ["administrator", "editor", "author"]
     if (allowedRoles.some(role => roles.includes(role))) {
       return true
@@ -176,7 +179,7 @@ export default class Helpers {
     }
 
     // Check 5: Node has authenticated permissions
-    if (data.currentUser.ID && authenticated && authenticated.includes(action)) {
+    if (wp.isLoggedIn() && authenticated && authenticated.includes(action)) {
       return true
     }
 
@@ -190,7 +193,7 @@ export default class Helpers {
     }
 
     // Check 7: User has a permission associated with its ID
-    const userPermissions = node.permissions[`user-${ID}`]
+    const userPermissions = node.permissions[`user-${id}`]
     if (userPermissions) {
       return userPermissions.includes(action)
     }

@@ -3,81 +3,8 @@ import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
 
 export function init(state, { dataset, progress = {} }) {
-  const datasetWithProgress = setDatasetProgress(
-    parse(dataset),
-    applyLocalProgress(progress)
-  )
-  setDataset(state, datasetWithProgress)
-}
-
-function applyLocalProgress(progress) {
-  if (!wpData.wpUserId) {
-    const localProgress = localStorage.getItem("tapestry-progress")
-    if (localProgress) {
-      const userProgress = JSON.parse(localProgress)
-      Object.keys(progress)
-        .filter(nodeId => userProgress.hasOwnProperty(nodeId))
-        .forEach(nodeId => {
-          const nodeProgress = userProgress[nodeId]
-          const newProgress = progress[nodeId]
-          newProgress.progress = nodeProgress.progress
-        })
-    }
-  }
-  return progress
-}
-
-function setDatasetProgress(dataset, progress) {
-  if (!wpData.wpUserId) {
-    localStorage.setItem("tapestry-progress", JSON.stringify(progress))
-  }
-  for (const [id, nodeProgress] of Object.entries(progress)) {
-    const node = dataset.nodes[id]
-    if (node) {
-      const willLock = node.unlocked && !nodeProgress.unlocked
-      if (willLock && !wpData.wpCanEditTapestry) {
-        node.quiz = []
-        node.typeData = {}
-      }
-
-      node.unlocked = nodeProgress.unlocked
-      node.accessible = nodeProgress.accessible
-      node.conditions = nodeProgress.conditions
-      node.completed = nodeProgress.completed
-
-      const { content } = nodeProgress
-      if (content) {
-        node.quiz = content.quiz
-        node.typeData = content.typeData
-      }
-
-      if (node.mediaType !== "accordion") {
-        node.progress = nodeProgress.progress
-        const questions = node.quiz
-        if (nodeProgress.quiz) {
-          Object.entries(nodeProgress.quiz).forEach(
-            ([questionId, completionInfo]) => {
-              const question = questions.find(question => question.id === questionId)
-              if (question) {
-                question.completed = completionInfo.completed
-                question.entries = {}
-                Object.entries(completionInfo).forEach(([key, value]) => {
-                  if (key !== "completed") {
-                    question.entries[key] = value
-                  }
-                })
-              }
-            }
-          )
-        }
-      }
-    }
-  }
-  return dataset
-}
-
-export function setDataset(state, dataset) {
-  Object.entries(dataset).forEach(([key, value]) => {
+  const datasetWithProgress = parse(dataset, progress)
+  Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
       Object.values(value).forEach(node => {
