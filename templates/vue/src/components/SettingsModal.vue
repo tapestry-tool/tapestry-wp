@@ -396,7 +396,7 @@ export default {
       this.hasExported = true
     },
     isValidLat(coord) {
-      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -91
+      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
     },
     isValidLng(coord) {
       return this.getCoord(coord, 0) <= 180 && this.getCoord(coord, 0) >= -180
