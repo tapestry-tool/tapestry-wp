@@ -20,14 +20,11 @@
     </div>
     <tapestry-map v-if="settings.renderMap" :is-sidebar-open="isSidebarOpen" />
     <main v-else id="tapestry" ref="app" :style="background">
-      <root-node-button
-        v-if="empty && canEdit"
-        @click="addRootNode"
-      ></root-node-button>
-      <div v-if="empty && !canEdit">
-        The requested Tapestry is empty.
+      <div v-if="empty">
+        <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
+        <div v-else class="empty-message">The requested Tapestry is empty.</div>
       </div>
-      <svg id="vue-svg" :viewBox="viewBox">
+      <svg v-else id="vue-svg" :viewBox="viewBox">
         <g>
           <tapestry-link
             v-for="link in links"
@@ -258,8 +255,13 @@ export default {
       }
     }
   }
-  #tapestry svg {
-    position: relative;
+  #tapestry {
+    .empty-message {
+      margin: 30vh auto;
+    }
+    svg {
+      position: relative;
+    }
   }
 }
 .toolbar {
