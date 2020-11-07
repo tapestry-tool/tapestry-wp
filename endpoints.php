@@ -292,6 +292,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'GET_TAPESTRY_EXPORT' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestry',
+        ],
+    ],
 ];
 
 /*
@@ -308,6 +315,16 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function exportTapestry($request) {
+    $postId = $request['tapestryPostId'];
+    try {
+        $tapestry = new Tapestry($postId);
+        return $tapestry->getExportTapestry();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 function get_all_user_roles($request) {

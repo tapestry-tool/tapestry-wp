@@ -58,6 +58,12 @@ class TapestryApi {
     }
   }
 
+  async exportTapestry() {
+    var url = `${apiUrl}/tapestries/${this.postId}/export`
+    const response = await axios.get(url)
+    return response.data
+  }
+
   async getNode(id) {
     const data = await this.getTapestry()
     return data.nodes[Helpers.findNodeIndex(id, data)]

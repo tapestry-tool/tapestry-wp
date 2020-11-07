@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -241,6 +241,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions({exportTapestryStore: 'exportTapestry'}),
     closeModal() {
       this.$emit("close")
     },
@@ -281,15 +282,11 @@ export default {
     isUploading(status) {
       this.fileUploading = status
     },
-    exportTapestry() {
+    async exportTapestry() {
       this.isExporting = true
-      let filteredTapestry = this.tapestryJson
-      filteredTapestry.nodes = filteredTapestry.nodes.filter(
-        node => node.status === "publish"
-      )
-      const tapestry = filteredTapestry
-      tapestry["site-url"] = wpData.wpUrl
-      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+      const exportedTapestry = await this.exportTapestryStore()
+      console.log(exportedTapestry)
+      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
@@ -301,8 +298,27 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+      
       this.isExporting = false
       this.hasExported = true
+      // let filteredTapestry = this.tapestryJson
+      // filteredTapestry.nodes = filteredTapestry.nodes.filter(
+      //   node => node.status === "publish"
+      // )
+      // const tapestry = filteredTapestry
+      // tapestry["site-url"] = wpData.wpUrl
+      // const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+      //   type: "application/json",
+      // })
+      // const fileUrl = URL.createObjectURL(blob)
+      // const a = document.createElement("a")
+      // a.style.display = "none"
+      // a.href = fileUrl
+      // a.download = `${this.settings.title}.json`
+      // document.body.appendChild(a)
+      // a.click()
+      // URL.revokeObjectURL(fileUrl)
+      // document.body.removeChild(a)
     },
   },
 }

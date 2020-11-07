@@ -320,6 +320,35 @@ class Tapestry implements ITapestry
         ), SORT_REGULAR);
     }
 
+    /**
+     * Retrieve a Tapestry post for export.
+     *
+     * @return object $tapestry
+     */
+    public function getExportTapestry()
+    {
+        $nodes = [];
+        foreach ($this->nodes as $node) {
+            $temp = (new TapestryNode($this->postId, $node))->get();
+            if ('draft' == $temp->status) {
+                continue;
+            }
+            $nodes[] = $temp;
+        }
+        $groups = [];
+        foreach ($this->groups as $group) {
+            $groups[] = (new TapestryNode($this->postId, $$group))->get();
+        }
+
+        return (object) [
+            'nodes' => $nodes,
+            'groups' => $groups,
+            'links' => $this->links,
+            'settings' => $this->settings,
+            'rootId' => $this->rootId,
+        ];
+    }
+
     private function _setAccessibleStatus($nodes, $userId)
     {
         $newNodes = array_map(
