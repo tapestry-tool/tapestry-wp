@@ -2,6 +2,7 @@
   <transition name="fade">
     <line
       v-show="show"
+      :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
@@ -18,7 +19,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-link",
@@ -39,7 +40,7 @@ export default {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
   },
   methods: {

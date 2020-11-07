@@ -2,6 +2,7 @@
   <b-form-group label="Post Name">
     <combobox
       v-model="node.typeData.mediaURL"
+      data-qa="wp-combobox"
       item-text="title"
       item-value="id"
       :empty-message="emptyMessage"
