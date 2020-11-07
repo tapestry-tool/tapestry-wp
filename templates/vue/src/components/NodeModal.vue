@@ -63,7 +63,6 @@
           <h6 class="mt-4 mb-3">Lock Node</h6>
           <conditions-form :node="node" />
         </b-tab>
-
         <b-tab
           v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
           title="Activity"

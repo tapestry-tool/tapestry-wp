@@ -211,16 +211,7 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        :disabled="
-          fileUploading ||
-            (renderMap &&
-              (!latRangeValid ||
-                !lngRangeValid ||
-                !isValidLat(mapBounds.swLat) ||
-                !isValidLat(mapBounds.neLat) ||
-                !isValidLng(mapBounds.swLng) ||
-                !isValidLng(mapBounds.neLng)))
-        "
+        :disabled="fileUploading || !inputsValid"
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -300,6 +291,19 @@ export default {
         this.getCoord(this.mapBounds.neLng, 180) >
         this.getCoord(this.mapBounds.swLng, -180)
       )
+    },
+    inputsValid() {
+      if (this.renderMap) {
+        return (
+          this.latRangeValid &&
+          this.isValidLat(this.mapBounds.swLat) &&
+          this.isValidLat(this.mapBounds.neLat) &&
+          this.lngRangeValid &&
+          this.isValidLng(this.mapBounds.swLng) &&
+          this.isValidLng(this.mapBounds.neLng)
+        )
+      }
+      return true
     },
   },
   created() {
