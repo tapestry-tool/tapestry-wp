@@ -19,7 +19,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-link",
@@ -40,7 +40,7 @@ export default {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
   },
   methods: {
