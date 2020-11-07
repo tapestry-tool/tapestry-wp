@@ -48,6 +48,7 @@
 import SpeechBubble from "../SpeechBubble"
 import EndScreenBg from "../../assets/end-screen-bg.png"
 import client from "@/services/TapestryAPI"
+import { data } from "@/services/wp"
 
 export default {
   name: "end-screen",
@@ -69,7 +70,7 @@ export default {
       return allDone ? "Reanswer Question" : "Answer Question"
     },
     backgroundUrl() {
-      return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
+      return `url(${data.vue_uri}/${EndScreenBg.split("dist")[1]})`
     },
   },
   methods: {

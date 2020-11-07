@@ -27,9 +27,7 @@
 import TydeLog from "./TydeLog"
 import TydeTab from "./TydeTab"
 import Helpers from "@/utils/Helpers"
-import TapestryApi from "@/services/TapestryAPI"
-
-const TapestryApiClient = new TapestryApi(wpPostId)
+import TapestryApiClient from "@/services/TapestryAPI"
 
 export default {
   name: "tyde-menu-home",

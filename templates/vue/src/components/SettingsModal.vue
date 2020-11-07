@@ -247,6 +247,7 @@ import PermissionsTable from "./node-modal/PermissionsTable"
 import Combobox from "@/components/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
 import DragSelectModular from "@/utils/dragSelectModular"
+import { data as wpData } from "@/services/wp"
 
 const defaultPermissions = Object.fromEntries(
   [

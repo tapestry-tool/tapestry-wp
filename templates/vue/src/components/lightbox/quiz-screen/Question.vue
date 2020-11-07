@@ -98,6 +98,7 @@ import TapestryActivity from "@/components/TapestryActivity"
 import SpeechBubble from "@/components/SpeechBubble"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import * as wp from "@/services/wp"
 
 export default {
   name: "question",
@@ -144,7 +145,7 @@ export default {
       return this.getAnswers(this.question)
     },
     isLoggedIn() {
-      return Boolean(wpData.wpUserId)
+      return wp.isLoggedIn()
     },
     lastQuestion() {
       if (this.question.previousEntry) {
@@ -233,7 +234,7 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
-      if (!wpData.wpUserId) {
+      if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
       if (Helpers.canUserUpdateProgress(this.node)) {
@@ -254,7 +255,7 @@ export default {
     },
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
-      if (!wpData.wpUserId) {
+      if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
       this.loading = true

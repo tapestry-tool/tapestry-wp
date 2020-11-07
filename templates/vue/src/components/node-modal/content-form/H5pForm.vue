@@ -26,6 +26,7 @@
 import Combobox from "@/components/Combobox"
 import H5PApi from "@/services/H5PApi"
 import { tydeTypes } from "@/utils/constants"
+import { data } from "@/services/wp"
 
 export default {
   components: {
@@ -52,7 +53,7 @@ export default {
       return labels[this.node.tydeType] || "H5P Content"
     },
     mediaUrl() {
-      return `${wpData.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
+      return `${data.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
     },
     showVideoDescription() {
       return (

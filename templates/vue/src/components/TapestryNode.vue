@@ -132,7 +132,7 @@ import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import NodeButton from "./tapestry-node/NodeButton"
@@ -171,7 +171,7 @@ export default {
       "getTydeProgress",
     ]),
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)

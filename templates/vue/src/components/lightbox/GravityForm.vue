@@ -25,6 +25,7 @@ import Loading from "@/components/Loading"
 import TapestryActivity from "@/components/TapestryActivity"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import client from "@/services/TapestryAPI"
+import { data } from "@/services/wp"
 
 export default {
   name: "gravity-form",
@@ -83,7 +84,7 @@ export default {
 
     const entry = await GravityFormsApi.getFormEntry(
       this.id,
-      this.node.userType === "teen" ? wpData.wpTeenId : 0
+      this.node.userType === "teen" ? data.wpTeenId : 0
     )
     this.entry = entry
 
