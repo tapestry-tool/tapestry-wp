@@ -53,6 +53,7 @@
         <l-marker
           v-for="marker in markerlocations"
           :key="marker.id"
+          :ref="'marker-' + marker.id"
           :lat-lng="marker.pos"
           :icon="
             marker.status == 'draft'
@@ -188,6 +189,12 @@ export default {
       setTimeout(() => {
         this.$refs.map.mapObject.invalidateSize()
       }, 300)
+    },
+    selectedId(id) {
+      const marker = this.$refs["marker-" + id]
+      if (marker) {
+        marker[0].mapObject.fire("click")
+      }
     },
   },
   methods: {

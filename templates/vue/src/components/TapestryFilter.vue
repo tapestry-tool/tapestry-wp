@@ -1,6 +1,6 @@
 <template>
   <div class="filter">
-    <button v-if="canSearch" @click="toggleFilter">
+    <button v-if="canSearch && !settings.renderMap" @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
@@ -62,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "settings"]),
     canSearch() {
       return wpData.wpCanEditTapestry === "1"
     },
