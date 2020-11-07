@@ -17,6 +17,11 @@
         </ul>
       </b-alert>
     </div>
+    <div v-if="submissionError" class="modal-header-row">
+      <b-alert id="tapestry-modal-submit-error" variant="danger" show>
+        <p>{{ submissionError }}</p>
+      </b-alert>
+    </div>
     <b-container v-if="loading" class="spinner">
       <b-spinner variant="secondary"></b-spinner>
     </b-container>
@@ -158,6 +163,7 @@
         :src="node.typeData.mediaURL"
         style="display: none;"
         @loadeddata="setVideoDuration"
+        @error="handleVideoFrameError"
       ></video>
       <youtube
         v-if="node.mediaFormat === 'youtube'"
@@ -349,7 +355,8 @@ export default {
     },
     hasSubmissionApiError() {
       if (this.apiError) {
-        this.submissionError = this.apiError
+        this.submissionError =
+          "An unexpected error occurred and the node could not be submitted"
       }
     },
   },
@@ -407,7 +414,8 @@ export default {
       return isAllowed
     },
     initialize() {
-      this.formErrors = ""
+      this.formErrors = []
+      this.submissionError = null
       let copy = this.createDefaultNode()
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)
@@ -481,6 +489,7 @@ export default {
     },
     async handleSubmit() {
       this.loading = true
+      this.submissionError = null
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.node.status = "publish"
@@ -519,7 +528,6 @@ export default {
       this.loading = false
     },
     async submitNode() {
-      this.submissionError = null
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
@@ -547,8 +555,6 @@ export default {
       this.loading = false
       if (!this.submissionError) {
         this.close()
-      } else {
-        this.displaySubmissionError()
       }
     },
     getRandomNumber(min, max) {
@@ -771,10 +777,11 @@ export default {
 
       return true
     },
-    displaySubmissionError() {
-      this.formErrors.push(
-        "An unexpected error occurred and the node could not be submitted"
-      )
+    handleVideoFrameError() {
+      // TODO error remains in iframe after handle until good submission
+      console.log("iframe error")
+      this.submissionError =
+        "Invalid mp4 Video URL: please re-upload or check the URL"
     },
   },
 }
