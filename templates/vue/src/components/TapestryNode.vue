@@ -105,11 +105,10 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import NodeButton from "./tapestry-node/NodeButton"
-import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
   name: "tapestry-node",
@@ -144,7 +143,7 @@ export default {
       "isAccordionRow",
     ]),
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
@@ -256,7 +255,7 @@ export default {
     },
   },
   mounted() {
-    DragSelectModular.updateSelectableNodes()
+    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(

@@ -186,6 +186,7 @@ import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
+import * as wp from "@/services/wp"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -248,14 +249,14 @@ export default {
       return ""
     },
     isAuthenticated() {
-      return wpData.currentUser.ID !== 0
+      return wp.isLoggedIn()
     },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
         : this.settings.showAccess
         ? true
-        : wpData.wpCanEditTapestry !== ""
+        : wp.canEditTapestry()
     },
     canPublish() {
       if (this.loading) return false
@@ -276,18 +277,18 @@ export default {
       }
     },
     authoredNode() {
-      const { ID } = wpData.currentUser
+      const { id } = wp.getCurrentUser()
       if (this.node.author) {
-        return parseInt(this.node.author.id) === ID
+        return parseInt(this.node.author.id) === id
       }
       return true
     },
     canMakeDraft() {
-      const { ID } = wpData.currentUser
+      const { id } = wp.getCurrentUser()
       if (this.node.status === "publish" && this.type === "edit") {
         return false
       }
-      return this.hasDraftPermission(ID)
+      return this.hasDraftPermission(id)
     },
     canSubmit() {
       return !this.fileUploading
@@ -522,9 +523,10 @@ export default {
           }
           await this.addLink(newLink)
           if (this.node.status == "draft") {
-            this.updateRootNode(id)
             this.updateSelectedNode(id)
           }
+        } else {
+          this.updateRootNode(id)
         }
       } else {
         await this.updateNode({
