@@ -147,9 +147,7 @@ export function updateNodeProgress(state, payload) {
 
 export function updateNodeCoordinates(state, payload) {
   const node = getters.getNode(state)(payload.id)
-  Object.entries(payload.coordinates).forEach(([key, value]) => {
-    node[key] = value
-  })
+  Object.assign(node.coordinates, payload.coordinates)
 }
 
 export function fulfillNodeCondition(state, { id, condition }) {
@@ -218,4 +216,8 @@ export function updateOrdering(state, payload) {
 
 export function updateVisibleNodes(state, nodes) {
   state.visibleNodes = nodes
+}
+
+export function addApiError(state, error) {
+  state.apiError = error
 }

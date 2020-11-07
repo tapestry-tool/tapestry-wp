@@ -4,7 +4,7 @@
       <b-form-input
         id="node-title"
         v-model="node.title"
-        data-testid="node-title"
+        data-qa="node-title"
         placeholder="Enter title"
         autofocus
         required
@@ -14,7 +14,7 @@
       <rich-text-form
         id="node-description"
         v-model="node.description"
-        data-testid="node-description"
+        data-qa="node-description"
         placeholder="Enter description"
       />
     </b-form-group>
@@ -27,7 +27,7 @@
     <b-form-group label="Content Type">
       <b-form-select
         id="node-media-type"
-        data-testid="node-mediaType"
+        data-qa="node-media-type"
         :value="node.mediaType"
         :options="mediaTypes"
         @change="handleTypeChange"
