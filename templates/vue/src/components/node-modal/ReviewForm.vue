@@ -47,10 +47,12 @@ export default {
   methods: {
     handleReject() {
       this.node.status = "reject"
+      this.node.reviewStatus = "reject"
       this.handleSubmit()
     },
     handleAccept() {
       this.node.status = "accept"
+      this.node.reviewStatus = "accept"
       this.handleSubmit()
     },
     handleSubmit() {

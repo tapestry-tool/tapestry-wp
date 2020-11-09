@@ -111,7 +111,7 @@
     </template>
     <template v-else slot="modal-footer">
       <div
-        v-if="!(canEditTapestry && node.status === 'submitted')"
+        v-if="!(canEditTapestry && node.reviewStatus === 'submitted')"
         style="display: flex; width: 100%;"
         class="buttons-container"
       >
@@ -166,7 +166,7 @@
         </b-button>
       </div>
       <b-form-invalid-feedback
-        v-if="!(canEditTapestry && node.status === 'submitted')"
+        v-if="!(canEditTapestry && node.reviewStatus === 'submitted')"
         :state="canMakeDraft"
       >
         {{ warningText }}
@@ -545,6 +545,7 @@ export default {
     },
     async handleSubmitForReview() {
       this.node.status = "submitted"
+      this.node.reviewStatus = "submitted"
       this.handleSubmit()
     },
     async submitNode() {
