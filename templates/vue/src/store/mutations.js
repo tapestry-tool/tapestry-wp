@@ -1,7 +1,6 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
-import * as wp from "../services/wp"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = parse(dataset, progress)
