@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 
-import root from "@/fixtures/root.json"
+import oneNodeTapestry from "@/fixtures/one-node.json"
 import DuplicateTapestryButton from "@/components/settings-modal/DuplicateTapestryButton.vue"
 import client from "@/services/TapestryAPI"
 
@@ -19,7 +19,7 @@ describe("duplicate tapestry button", () => {
       Promise.resolve({ settings: { permalink: slug } })
     )
 
-    const screen = render(DuplicateTapestryButton, { fixture: root })
+    const screen = render(DuplicateTapestryButton, { fixture: oneNodeTapestry })
     fireEvent.click(screen.getByText(/duplicate tapestry/i))
 
     expect(client.addTapestry).toHaveBeenCalledTimes(1)

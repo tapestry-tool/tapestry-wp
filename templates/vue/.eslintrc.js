@@ -12,7 +12,6 @@ module.exports = {
     "plugin:prettier/recommended",
   ],
   rules: {
-    "cypress/no-unnecessary-waiting": "off",
     "vue/attribute-hyphenation": "off",
     "vue/component-name-in-template-casing": ["error", "kebab-case"],
     "vue/name-property-casing": ["error", "kebab-case"],

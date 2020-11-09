@@ -30,7 +30,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g>
+        <g v-if="dragSelectReady">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -41,6 +41,7 @@
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
+            @mounted="updateSelectableNodes"
           ></tapestry-node>
         </g>
         <locked-tooltip
@@ -83,6 +84,7 @@ export default {
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
       maxDepth: 0,
+      dragSelectReady: false,
     }
   },
   computed: {
@@ -128,16 +130,18 @@ export default {
       },
     },
   },
-  created() {
-    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
-  },
   mounted() {
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
     this.updateViewBox()
+    this.dragSelectReady = true
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
+    },
+    updateSelectableNodes() {
+      DragSelectModular.updateSelectableNodes()
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -203,22 +207,13 @@ export default {
         x: 0,
         y: 0,
       }
-
       for (const node of Object.values(this.nodes)) {
         if (node.nodeType !== "") {
           const { x, y } = node.coordinates
-          if (x < box.x0) {
-            box.x0 = x
-          }
-          if (y < box.y0) {
-            box.y0 = y
-          }
-          if (x > box.x) {
-            box.x = x
-          }
-          if (y > box.y) {
-            box.y = y
-          }
+          box.x0 = Math.min(x, box.x0)
+          box.y0 = Math.min(y, box.y0)
+          box.x = Math.max(x, box.x)
+          box.y = Math.max(y, box.y)
         }
       }
 
@@ -230,29 +225,33 @@ export default {
 
 <style lang="scss" scoped>
 #app-container {
+  position: relative;
   transform: scale(1);
   transform-origin: top left;
   transition: all 0.2s ease-out;
+  width: 100%;
   z-index: 0;
 
   @media screen and (min-width: 500px) {
     &.sidebar-open {
-      transform: scale(0.7);
+      width: calc(100% - max(340px, 30%));
+      padding-right: 0;
+
+      .toolbar {
+        padding-right: 1.5vw;
+      }
     }
   }
+  #tapestry svg {
+    position: relative;
+  }
 }
-
-main {
-  position: relative;
-  z-index: 0;
-}
-
 .toolbar {
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
+  transition: all 0.2s ease-out;
 }
-
 .slider-wrapper {
   background: #fbfbfb;
   box-shadow: 0 0 7px 0 #ddd;

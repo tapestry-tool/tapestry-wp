@@ -1,47 +1,30 @@
-import { setup } from "../support/utils"
-
 describe("Node Operations", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
-    setup("@oneNode")
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
   })
 
-  it(`
-    Given: A Tapestry node and its author
-    When: The tapestry loads
-    Then: Its add, edit, and media buttons should be visible
-  `)
+  it("should be able to see the add, edit, and media buttons on load", () => {
+    cy.getSelectedNode().then(({ id }) => {
+      cy.openModal("add", id)
+      cy.getByTestId("node-modal").should("be.visible")
+      cy.contains(/cancel/i).click()
 
-  it(`
-    Given: A Tapestry node
-    When: Its media button is clicked
-    Then: Its lightbox should be visible
-  `)
+      cy.openModal("edit", id)
+      cy.getByTestId("node-modal").should("be.visible")
+      cy.contains(/cancel/i).click()
 
-  it(`
-    Given: A Tapestry node and its author
-    When: Its add button is clicked
-    Then: The add node modal should be visible
-  `)
-
-  it(`
-    Given: A Tapestry node and its author
-    When: Its edit button is clicked
-    Then: The edit node modal should be visible
-  `)
-
-  it(`
-    Given: A Tapestry node that does not have a media button
-    When: The node is clicked
-    Then: Its lightbox should be visible
-  `, () => {
-    const newNode = {
-      hideMedia: true,
-    }
-    cy.getSelectedNode().then(node => {
-      cy.wrap(node).editNodeInStore(newNode)
-      cy.getByTestId(`node-${node.id}`).click()
+      cy.openLightbox(id).should("be.visible")
     })
-    cy.get("#lightbox").should("exist")
+  })
+
+  it("should show the lightbox when the node is clicked if the node doesn't have a media button", () => {
+    cy.getSelectedNode().then(node => {
+      cy.editNode(node.id, {
+        hideMedia: true,
+      })
+      cy.getNodeById(node.id).click()
+      cy.lightbox().should("be.visible")
+    })
   })
 })

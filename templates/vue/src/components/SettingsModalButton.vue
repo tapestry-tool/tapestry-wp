@@ -1,5 +1,9 @@
 <template>
-  <button class="settings-button" @click="settingsModalOpen = true">
+  <button
+    data-qa="settings-button"
+    class="settings-button"
+    @click="settingsModalOpen = true"
+  >
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"

@@ -1,32 +1,27 @@
-import { setup as setupTapestry } from "../support/utils"
-
 describe("Node Permissions", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
-    setupTapestry("@oneNode")
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+  })
+
+  it("should be able to edit node permissions using the node modal", () => {
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.contains(/access/i).click()
+
+      cy.getByTestId(`node-permissions-public-read`).uncheck()
+      cy.submitModal()
+
+      cy.logout().visitTapestry()
+      cy.contains(/is empty/i).should("exist")
+    })
   })
 
   const setup = edits => {
-    cy.getSelectedNode().editNode({ permissions: edits })
+    cy.getSelectedNode().then(node => cy.editNode(node.id, { permissions: edits }))
   }
 
-  it(`
-    Given: A user without any read permissions
-    When: The Tapestry loads
-    Then: The empty Tapestry text should be shown
-  `, () => {
-    setup({
-      public: [],
-    })
-    cy.logout().visitTapestry()
-    cy.contains(/is empty/i).should("exist")
-  })
-
-  it(`
-    Given: A node and a user without edit permission
-    When: The Tapestry loads
-    Then: The edit button should not exist
-  `, () => {
+  it("should not see the edit button if the user doesn't have edit permission", () => {
     setup({
       public: ["read"],
       authenticated: ["read", "edit"],
@@ -40,11 +35,7 @@ describe("Node Permissions", () => {
     })
   })
 
-  it(`
-    Given: A node and a user without add permission
-    When: The Tapestry loads
-    Then: The add button should not exist
-  `, () => {
+  it("should not see the add button if the user doesn't have add permission", () => {
     setup({
       public: ["read"],
       authenticated: ["read", "add"],
