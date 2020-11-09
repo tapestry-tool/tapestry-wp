@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" data-qa="play-screen">
     <button class="button-play" @click="$emit('play')">
       <i class="far fa-play-circle fa-4x"></i>
     </button>

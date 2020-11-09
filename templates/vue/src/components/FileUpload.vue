@@ -13,6 +13,7 @@
     <b-row v-if="isUploading">
       <b-col class="progress-wrapper">
         <b-progress
+          data-qa="progress"
           :value="uploadPercentage"
           :max="100"
           :animated="uploadPercentage < 100"
@@ -42,7 +43,7 @@
           name="text-input"
           :placeholder="placeholder"
           :value="value"
-          :data-testid="inputTestId"
+          :data-qa="inputTestId"
           :disabled="isUploading"
           required
           @input="$emit('input', $event)"
@@ -70,6 +71,7 @@
 
 <script>
 import axios from "axios"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "file-upload",
@@ -85,7 +87,7 @@ export default {
     inputTestId: {
       type: String,
       required: false,
-      default: "node-uploadInput",
+      default: "node-upload-input",
     },
   },
   data() {
