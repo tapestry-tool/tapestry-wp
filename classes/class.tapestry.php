@@ -344,8 +344,7 @@ class Tapestry implements ITapestry
             'nodes' => $nodes,
             'groups' => $groups,
             'links' => $this->links,
-            'settings' => $this->settings,
-            'rootId' => $this->rootId,
+            'site-url' => parse_url($this->settings->permalink, PHP_URL_HOST),
         ];
     }
 
