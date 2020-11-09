@@ -1,6 +1,6 @@
 import "cypress-file-upload"
 import roles from "./roles"
-import Helpers from "../../src/utils/Helpers"
+import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 
 Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
@@ -62,10 +62,7 @@ Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
   cy.server()
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
   cy.store().then(store => {
-    store.dispatch(
-      "addNode",
-      Helpers.deepMerge(store.getters.createDefaultNode(), node)
-    )
+    store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
     cy.wait("@editPermissions")
     cy.getNodeByTitle(node.title).then(({ id }) => {
       store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])

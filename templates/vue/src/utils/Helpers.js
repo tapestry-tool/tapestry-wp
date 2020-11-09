@@ -139,19 +139,6 @@ export default class Helpers {
     return outObject
   }
 
-  static deepMerge(source, other) {
-    const out = { ...source }
-    for (const key in other) {
-      const value = other[key]
-      if (value && typeof value === "object" && !Array.isArray(value)) {
-        out[key] = Helpers.deepMerge(out[key], value)
-      } else {
-        out[key] = value
-      }
-    }
-    return out
-  }
-
   static hasPermission(node, action) {
     const user = wp.getCurrentUser()
 
