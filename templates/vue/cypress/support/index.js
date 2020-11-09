@@ -16,6 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import "@cypress/code-coverage/support"
 import "./commands"
-import { cleanup } from "./utils"
 
-afterEach(cleanup)
+beforeEach(() => {
+  cy.deleteTapestry()
+})

@@ -1,6 +1,7 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
+import * as wp from "../services/wp"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = parse(dataset, progress)
@@ -73,9 +74,7 @@ export function updateNodeProgress(state, payload) {
 
 export function updateNodeCoordinates(state, payload) {
   const node = getters.getNode(state)(payload.id)
-  Object.entries(payload.coordinates).forEach(([key, value]) => {
-    node[key] = value
-  })
+  Object.assign(node.coordinates, payload.coordinates)
 }
 
 export function fulfillNodeCondition(state, { id, condition }) {
@@ -144,4 +143,8 @@ export function updateOrdering(state, payload) {
 
 export function updateVisibleNodes(state, nodes) {
   state.visibleNodes = nodes
+}
+
+export function addApiError(state, error) {
+  state.apiError = error
 }
