@@ -70,6 +70,7 @@ import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -97,7 +98,7 @@ export default {
       return this.settings.backgroundUrl
     },
     canEdit() {
-      return wpData.wpCanEditTapestry === "1"
+      return wp.canEditTapestry()
     },
     empty() {
       return Object.keys(this.nodes).length === 0

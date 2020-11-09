@@ -35,6 +35,7 @@
 import moment from "moment-timezone"
 import { mapGetters } from "vuex"
 import { conditionTypes } from "@/utils/constants"
+import * as wp from "@/services/wp"
 
 export default {
   props: {
@@ -135,7 +136,7 @@ export default {
       )
     },
     isLoggedIn() {
-      return Boolean(wpData.wpUserId)
+      return wp.isLoggedIn()
     },
   },
   methods: {
