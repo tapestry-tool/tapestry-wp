@@ -297,19 +297,12 @@ export default {
       if (this.loading) return false
       if (
         this.type === "add" ||
-        (this.type === "edit" && this.node.status === "draft")
+        (this.type === "edit" && this.node.status !== "publish")
       ) {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
           (!this.parent || this.parent.status !== "draft")
         )
-      } else if (this.node.status !== "draft" && this.type === "edit") {
-        return this.getNeighbours(this.nodeId).some(neighbourId => {
-          let neighbour = this.getNode(neighbourId)
-          return (
-            neighbour.status === "publish" && Helpers.hasPermission(neighbour, "add")
-          )
-        })
       } else {
         return Helpers.hasPermission(this.node, this.type)
       }
@@ -558,6 +551,7 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
+          // do not update parent's child ordering if the current node is a draft node
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
