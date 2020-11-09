@@ -110,75 +110,72 @@
       <b-spinner variant="secondary"></b-spinner>
     </template>
     <template v-else slot="modal-footer">
-      <div
-        v-if="!(canEditTapestry && node.reviewStatus === 'submitted')"
-        style="display: flex; width: 100%;"
-        class="buttons-container"
-      >
-        <delete-node-button
-          v-if="type === 'edit'"
-          :node-id="Number(nodeId)"
-          @submit="loading = true"
-          @message="setDisabledMessage"
-        ></delete-node-button>
-        <span style="flex-grow:1;"></span>
-        <b-button size="sm" variant="light" @click="close">
-          Cancel
-        </b-button>
-        <b-button
-          v-if="rootId !== 0 && canMakeDraft"
-          id="draft-button"
-          size="sm"
-          variant="secondary"
-          :disabled="!canSubmit"
-          @click="handleDraftSubmit"
-        >
-          <b-spinner v-if="!canSubmit" small></b-spinner>
-          <div :style="canSubmit ? '' : 'opacity: 50%;'">Save as Private Draft</div>
-        </b-button>
-        <b-button
-          v-if="canPublish"
-          id="submit-button"
-          size="sm"
-          variant="primary"
-          :disabled="!canSubmit"
-          @click="handlePublish"
-        >
-          <b-spinner v-if="!canSubmit" small></b-spinner>
-          <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
-        </b-button>
-        <b-button
-          v-else
-          size="sm"
-          variant="primary"
-          :disabled="!canMakeDraft || !canSubmit"
-          @click="handleSubmitForReview"
-        >
-          <b-spinner v-if="!canSubmit" small></b-spinner>
-          <div :style="canSubmit ? '' : 'opacity: 50%;'">
-            {{
-              node.status !== "publish" && node.status !== "draft"
-                ? "Re-submit"
-                : "Submit"
-            }}
-            to Administrators for Review
-          </div>
-        </b-button>
-      </div>
-      <b-form-invalid-feedback
-        v-if="!(canEditTapestry && node.reviewStatus === 'submitted')"
-        :state="canMakeDraft"
-      >
-        {{ warningText }}
-        <br v-if="warningText" />
-        {{ deleteWarningText }}
-      </b-form-invalid-feedback>
       <review-form
-        v-else
+        v-if="canEditTapestry && node.reviewStatus === 'submitted'"
         :node="node"
         @submit="handleSubmit"
         @close="close"
       ></review-form>
+      <template v-else>
+        <div style="display: flex; width: 100%;" class="buttons-container">
+          <delete-node-button
+            v-if="type === 'edit'"
+            :node-id="Number(nodeId)"
+            @submit="loading = true"
+            @message="setDisabledMessage"
+          ></delete-node-button>
+          <span style="flex-grow:1;"></span>
+          <b-button size="sm" variant="light" @click="close">
+            Cancel
+          </b-button>
+          <b-button
+            v-if="rootId !== 0 && canMakeDraft"
+            id="draft-button"
+            size="sm"
+            variant="secondary"
+            :disabled="!canSubmit"
+            @click="handleDraftSubmit"
+          >
+            <b-spinner v-if="!canSubmit" small></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">
+              Save as Private Draft
+            </div>
+          </b-button>
+          <b-button
+            v-if="canPublish"
+            id="submit-button"
+            size="sm"
+            variant="primary"
+            :disabled="!canSubmit"
+            @click="handlePublish"
+          >
+            <b-spinner v-if="!canSubmit" small></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
+          </b-button>
+          <b-button
+            v-else
+            size="sm"
+            variant="primary"
+            :disabled="!canMakeDraft || !canSubmit"
+            @click="handleSubmitForReview"
+          >
+            <b-spinner v-if="!canSubmit" small></b-spinner>
+            <div :style="canSubmit ? '' : 'opacity: 50%;'">
+              {{
+                node.status !== "publish" && node.status !== "draft"
+                  ? "Re-submit"
+                  : "Submit"
+              }}
+              to Administrators for Review
+            </div>
+          </b-button>
+        </div>
+        <b-form-invalid-feedback :state="canMakeDraft">
+          {{ warningText }}
+          <br v-if="warningText" />
+          {{ deleteWarningText }}
+        </b-form-invalid-feedback>
+      </template>
     </template>
     <div v-if="loadDuration">
       <iframe
