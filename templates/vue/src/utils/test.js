@@ -6,7 +6,7 @@ import Helpers from "./Helpers"
 
 export function render(
   component,
-  { fixture = null, ...options } = {},
+  { fixture = null, settings = {}, ...options } = {},
   callback = () => {}
 ) {
   return r(
@@ -16,7 +16,7 @@ export function render(
         ...store,
         state: {
           ...store.state,
-          ...parseFixture(fixture),
+          ...parseFixture(fixture, settings),
         },
       },
       routes,
@@ -30,7 +30,7 @@ export function render(
  * Mock settings object based off a real Tapestry. Make sure to update this whenever
  * changes are made to the Tapestry settings.
  */
-const settings = {
+const mockSettings = {
   tapestrySlug: "testing",
   title: "testing",
   status: "publish",
@@ -49,9 +49,9 @@ const settings = {
   permalink: "testing",
 }
 
-function parseFixture(fixture) {
+function parseFixture(fixture, settings) {
   const state = parse(fixture, makeMockProgress(fixture))
-  state.settings = Helpers.deepCopy(settings)
+  state.settings = { ...Helpers.deepCopy(mockSettings), ...settings }
   state.rootId = Object.keys(state.nodes)[0]
   state.favourites = fixture.favourites || []
   return state

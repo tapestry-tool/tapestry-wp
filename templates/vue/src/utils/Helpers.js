@@ -187,4 +187,22 @@ export default class Helpers {
 
     return false
   }
+
+  /**
+   * Given an array of objects, return an array of unique objects
+   * determined by the given label.
+   * @template T
+   * @param {T[]} objs
+   * @param {string} label
+   * @return {T[]}
+   */
+  static unique(objs, label) {
+    const uniques = new Map()
+    for (const obj of objs) {
+      if (!uniques.has(obj[label])) {
+        uniques.set(obj[label], obj)
+      }
+    }
+    return [...uniques.values()]
+  }
 }

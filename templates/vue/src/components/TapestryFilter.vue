@@ -9,7 +9,6 @@
         v-if="type !== types.STATUS"
         v-model="filterValue"
         label="name"
-        :loading="loading"
         :placeholder="placeholder"
         :options="filterOptions"
       ></v-select>
@@ -19,6 +18,7 @@
         data-qa="status-select"
         :options="statuses"
       ></b-form-select>
+      <b-spinner v-if="loading" data-qa="search-loading" label="Loading"></b-spinner>
     </div>
   </div>
 </template>
@@ -105,6 +105,7 @@ export default {
   watch: {
     async filterValue(next) {
       if (!this.settings.superuserOverridePermissions) {
+        console.log("here")
         this.loading = true
         await this.refetchTapestryData(Number(next))
         this.updateVisibleNodes(this.getVisibleNodes())

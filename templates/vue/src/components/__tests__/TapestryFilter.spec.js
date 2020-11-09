@@ -2,6 +2,7 @@ import { waitFor } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { render } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
+import Helpers from "@/utils/Helpers"
 import TapestryFilter from "@/components/TapestryFilter.vue"
 import multiAuthorTapestry from "@/fixtures/multi-author.json"
 import client from "@/services/TapestryAPI"
@@ -15,9 +16,10 @@ jest.mock("@/services/TapestryAPI", () => {
   }
 })
 
-const setup = () => {
+const setup = settings => {
   const screen = render(TapestryFilter, {
     fixture: multiAuthorTapestry,
+    settings,
   })
   userEvent.click(screen.getByLabelText("search"))
   return screen
@@ -50,7 +52,10 @@ describe("TapestryFilter", () => {
   })
 
   it("should show dropdown of authors if searching by author", async () => {
-    const authors = new Set(multiAuthorTapestry.nodes.map(node => node.author))
+    const authors = Helpers.unique(
+      multiAuthorTapestry.nodes.map(node => node.author),
+      "id"
+    )
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
@@ -84,7 +89,18 @@ describe("TapestryFilter", () => {
     expect(await screen.findByPlaceholderText("Node title")).toHaveValue("")
   })
 
-  it("should show loading indicator when superuser override is off", async () => {})
+  it("should show loading indicator when superuser override is off", async () => {
+    const screen = setup({ superuserOverridePermissions: false })
+
+    userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
+    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(await screen.findByText("admin"))
+
+    await screen.findByTestId("search-loading")
+    waitFor(() => {
+      expect(screen.findByTestId("search-loading")).toBeNull()
+    })
+  })
 
   it("should hide the search bar for unauthorized users", async () => {
     wp.canEditTapestry.mockReturnValueOnce(false)
