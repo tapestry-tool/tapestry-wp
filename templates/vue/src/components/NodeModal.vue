@@ -558,10 +558,7 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          if (
-            this.node.status !== "draft" &&
-            this.node.reviewStatus !== "submitted"
-          ) {
+          if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {

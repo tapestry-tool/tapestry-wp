@@ -147,8 +147,8 @@ export default class Helpers {
     if (
       node.author &&
       wpData.currentUser.ID == parseInt(node.author.id) &&
-      node.status !== "accept" &&
-      node.status !== "submitted"
+      node.reviewStatus !== "accept" &&
+      node.reviewStatus !== "submitted"
     ) {
       return true
     }
