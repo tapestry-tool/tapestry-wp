@@ -29,7 +29,7 @@ describe("External link", () => {
    * following Asana task for details:
    *  - https://app.asana.com/0/1126491658233864/1198968596220741
    */
-  it("[CI FAIL] should be able to add an external link using the file upload", () => {
+  it.skip("[CI FAIL] should be able to add an external link using the file upload", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("url-embed")

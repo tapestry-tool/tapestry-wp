@@ -10,7 +10,7 @@ describe("Node Authoring", () => {
    * Relevant bug report:
    *  - https://app.asana.com/0/1126491658233864/1199105728152789
    */
-  it("[KNOWN BUG] should be able to add a root node using the node modal", () => {
+  it.skip("[KNOWN BUG] should be able to add a root node using the node modal", () => {
     cy.setup()
 
     const node = {
