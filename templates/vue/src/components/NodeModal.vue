@@ -544,8 +544,8 @@ export default {
       this.handleSubmit()
     },
     async handleSubmitForReview() {
-      this.node.status = "submitted"
       this.node.reviewStatus = "submitted"
+      console.log(this.node.reviewStatus)
       this.handleSubmit()
     },
     async submitNode() {
@@ -561,7 +561,10 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          if (this.node.status !== "draft" && this.node.status !== "submitted") {
+          if (
+            this.node.status !== "draft" &&
+            this.node.reviewStatus !== "submitted"
+          ) {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {

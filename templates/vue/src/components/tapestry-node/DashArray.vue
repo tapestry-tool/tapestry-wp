@@ -1,7 +1,7 @@
 <template>
   <g>
     <circle
-      v-show="status !== 'publish'"
+      v-show="reviewStatus || status === 'draft'"
       ref="track"
       class="track"
       :stroke-width="width"
@@ -35,6 +35,11 @@ export default {
       required: false,
       default: "publish",
     },
+    reviewStatus: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     width() {
@@ -44,19 +49,27 @@ export default {
       return this.radius / 10
     },
     strokeColor() {
-      switch (this.status) {
-        case "publish":
-          return "currentColor"
-        case "draft":
-          return "#999"
-        case "submitted":
-          return "orange"
-        case "accept":
-          return "green"
-        case "reject":
-          return "#CC444B"
-        default:
-          return "currentColor"
+      if (this.reviewStatus) {
+        console.log(this.reviewStatus)
+        switch (this.reviewStatus) {
+          case "submitted":
+            return "orange"
+          case "accept":
+            return "green"
+          case "reject":
+            return "#CC444B"
+          default:
+            return "currentColor"
+        }
+      } else {
+        switch (this.status) {
+          case "publish":
+            return "currentColor"
+          case "draft":
+            return "#999"
+          default:
+            return "currentColor"
+        }
       }
     },
   },

@@ -227,6 +227,6 @@ class TapestryHelpers
     public static function nodeIsPrivate($nodeMetaId, $tapestryPostId)
     {
         $node = new TapestryNode($tapestryPostId, $nodeMetaId);
-        return $node->getMeta()->status == "draft" || $node->getMeta()->status == "submitted";
+        return $node->getMeta()->status == "draft" || $node->getMeta()->reviewStatus == "submitted";
     }
 }

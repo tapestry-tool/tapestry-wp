@@ -547,10 +547,10 @@ class Tapestry implements ITapestry
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
             $nodeMeta = $node->getMeta();
-            if (('draft' == $nodeMeta->status || 'reject' == $nodeMeta->status) && $nodeMeta->author->id != $currentUserId) {
+            if (('draft' == $nodeMeta->status || 'reject' == $nodeMeta->reviewStatus) && $nodeMeta->author->id != $currentUserId) {
                 continue;
             }
-            if ('submitted' == $nodeMeta->status && !$currentUserRoles->canEdit($this->postId) && $nodeMeta->author->id != $currentUserId) {
+            if ('submitted' == $nodeMeta->reviewStatus && !$currentUserRoles->canEdit($this->postId) && $nodeMeta->author->id != $currentUserId) {
                 continue;
             }
             array_push($nodesPermitted, $nodeId);

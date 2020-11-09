@@ -45,6 +45,7 @@
         :radius="radius + 15"
         :locked="!node.accessible"
         :status="node.status"
+        :reviewStatus="node.reviewStatus"
       ></dash-array>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
