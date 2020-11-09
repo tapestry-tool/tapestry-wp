@@ -143,14 +143,16 @@ export default class Helpers {
       return true
     }
 
-    // Check 2: User is the author of the node, if the node is not an accepted or submitted node
+    // Check 2: User is the author of the node, if the node is a draft
     if (
       node.author &&
       wpData.currentUser.ID == parseInt(node.author.id) &&
-      node.reviewStatus !== "accept" &&
-      node.reviewStatus !== "submitted"
+      node.status === "draft"
     ) {
-      return true
+      // once a node is submitted for review, it can no longer be edited by that user.
+      if (node.reviewStatus !== "submitted") {
+        return true
+      }
     }
 
     // Check 3: User has a role with general edit permissions

@@ -551,7 +551,7 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node
+          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
