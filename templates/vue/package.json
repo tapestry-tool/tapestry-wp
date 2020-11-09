@@ -54,6 +54,7 @@
     "@babel/plugin-syntax-import-meta": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@cypress/code-coverage": "^3.8.1",
+    "@testing-library/cypress": "^7.0.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/user-event": "^12.2.0",
     "@testing-library/vue": "^5.0.4",
