@@ -535,7 +535,7 @@ export default {
     },
     async handleSubmitForReview() {
       this.node.reviewStatus = "submitted"
-      console.log(this.node.reviewStatus)
+      this.node.status = "draft"
       this.handleSubmit()
     },
     async submitNode() {

@@ -46,12 +46,12 @@ export default {
   },
   methods: {
     handleReject() {
-      this.node.status = "reject"
+      this.node.status = "draft"
       this.node.reviewStatus = "reject"
       this.handleSubmit()
     },
     handleAccept() {
-      this.node.status = "accept"
+      this.node.status = "publish"
       this.node.reviewStatus = "accept"
       this.handleSubmit()
     },

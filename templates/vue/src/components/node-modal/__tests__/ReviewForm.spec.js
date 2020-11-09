@@ -34,7 +34,7 @@ describe("ReviewForm", () => {
     const [node, screen] = setup()
     await fireEvent.click(screen.getByText("Accept and Add"))
 
-    expect(node.status).toEqual("accept")
+    expect(node.reviewStatus).toEqual("accept")
     expect(node.reviewComments.length).toEqual(0)
   })
 
