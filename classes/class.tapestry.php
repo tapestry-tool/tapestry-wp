@@ -551,7 +551,7 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status && $nodeMeta->author->id != $currentUserId && $nodeMeta->reviewStatus != "submitted") {
                 continue;
             }
-            // for such submitted nodes, they should only be viewable by reviewers
+            // for such submitted nodes, they should only be viewable by reviewers or their author
             if ('submitted' == $nodeMeta->reviewStatus && !($currentUserRoles->canEdit($this->postId) || $nodeMeta->author->id == $currentUserId)) {
                 continue;
             }
