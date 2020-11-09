@@ -171,8 +171,8 @@ class TapestryHelpers
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $roles = new TapestryUserRoles($userId);
 
-        if (($roles->canEdit($tapestryPostId) && $superuser_override) || ($roles->isAuthorOfThePost($nodePostId) && $node->status == "draft")) {
-            if ($node->reviewStatus != "submitted") {
+        if (($roles->canEdit($tapestryPostId) && $superuser_override) || ($roles->isAuthorOfThePost($nodePostId) && $node->_getStatus() == "draft")) {
+            if ($node->_getReviewStatus() != "submitted") {
                 return true;
             }
         } else {

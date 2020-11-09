@@ -491,4 +491,12 @@ class TapestryNode implements ITapestryNode
             ];
         }
     }
+
+    public function _getStatus() {
+        return $this->status;
+    }
+
+    public function _getReviewStatus() {
+        return $this->reviewStatus;
+    }
 }
