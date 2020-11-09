@@ -5,7 +5,6 @@ import { nodeStatus } from "@/utils/constants"
 import Helpers from "@/utils/Helpers"
 import TapestryFilter from "@/components/TapestryFilter.vue"
 import multiAuthorTapestry from "@/fixtures/multi-author.json"
-import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
 
 jest.mock("@/services/TapestryAPI", () => {
@@ -65,6 +64,15 @@ describe("TapestryFilter", () => {
     })
   })
 
+  it("should be able to search for author by id", async () => {
+    const screen = setup()
+
+    userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
+    userEvent.type(await screen.findByPlaceholderText("Node author"), "1")
+
+    await screen.findByText("admin")
+  })
+
   it("should show simple select if searching by status", async () => {
     const statuses = Object.values(nodeStatus)
     const screen = setup()
@@ -77,8 +85,6 @@ describe("TapestryFilter", () => {
   })
 
   it("should reset value if search type is changed", async () => {
-    client.getTapestry.mockResolvedValue(multiAuthorTapestry)
-
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
@@ -87,6 +93,17 @@ describe("TapestryFilter", () => {
 
     userEvent.selectOptions(screen.getByDisplayValue("Author"), "Title")
     expect(await screen.findByPlaceholderText("Node title")).toHaveValue("")
+  })
+
+  it("should reset value to 'All' if search type is changed to status", async () => {
+    const screen = setup()
+
+    userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
+    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(await screen.findByText("admin"))
+
+    userEvent.selectOptions(screen.getByDisplayValue("Author"), "Status")
+    await screen.findByText("All")
   })
 
   it("should show loading indicator when superuser override is off", async () => {

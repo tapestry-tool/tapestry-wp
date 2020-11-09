@@ -11,6 +11,7 @@
         label="name"
         :placeholder="placeholder"
         :options="filterOptions"
+        @search="handleSearch"
       ></v-select>
       <b-form-select
         v-else
@@ -25,6 +26,7 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from "vuex"
+import { matchSorter } from "match-sorter"
 import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
 import { nodeStatus } from "@/utils/constants"
@@ -105,7 +107,6 @@ export default {
   watch: {
     async filterValue(next) {
       if (!this.settings.superuserOverridePermissions) {
-        console.log("here")
         this.loading = true
         await this.refetchTapestryData(Number(next))
         this.updateVisibleNodes(this.getVisibleNodes())
@@ -138,19 +139,32 @@ export default {
       }
       this.isActive = !this.isActive
     },
-    getVisibleNodes() {
-      if (this.isActive && this.type && this.filterValue) {
+    getVisibleNodes(value) {
+      const val = value || this.filterValue
+      let match = Object.values(this.nodes)
+      if (this.isActive && this.type) {
         switch (this.type) {
           case filterTypes.AUTHOR: {
-            return Object.values(this.nodes)
-              .filter(node => node.author.id == this.filterValue)
-              .map(node => node.id)
+            match = matchSorter(match, val, {
+              keys: ["author.name", "author.id"],
+            })
+            break
+          }
+          case filterTypes.TITLE: {
+            match = matchSorter(match, val, {
+              keys: ["title"],
+            })
+            break
           }
           default:
             break
         }
       }
-      return Object.keys(this.nodes).map(id => parseInt(id, 10))
+      return match.map(node => node.id)
+    },
+    handleSearch(val) {
+      const visibleNodes = this.getVisibleNodes(val)
+      this.updateVisibleNodes(visibleNodes)
     },
   },
 }

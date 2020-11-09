@@ -44,7 +44,10 @@ describe("Search bar", () => {
         expected = Object.values(nodes).filter(node => node.author.name === "admin")
         assertVisibleNodes(expected.map(node => node.id))
 
-        // By status
+        /**
+         * TODO: By status -- waiting for #680 to be merged in
+         *  - https://github.com/wynnset/tapestry-wp/pull/683
+         */
         cy.findByDisplayValue("Author").select("Status")
       })
   })
