@@ -118,7 +118,6 @@ export async function updateNodeProgress({ commit, dispatch }, payload) {
     } else {
       await client.updateUserProgress(id, progress)
     }
-
     commit("updateNodeProgress", { id, progress })
   } catch (error) {
     dispatch("addApiError", error)
@@ -152,7 +151,6 @@ export async function completeNode(context, nodeId) {
     } else {
       await client.completeNode(nodeId)
     }
-
     commit("updateNode", {
       id: nodeId,
       newNode: { completed: true },
