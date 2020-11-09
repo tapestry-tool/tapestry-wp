@@ -161,11 +161,7 @@
           >
             <b-spinner v-if="!canSubmit" small></b-spinner>
             <div :style="canSubmit ? '' : 'opacity: 50%;'">
-              {{
-                node.status !== "publish" && node.status !== "draft"
-                  ? "Re-submit"
-                  : "Submit"
-              }}
+              {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
               to Administrators for Review
             </div>
           </b-button>

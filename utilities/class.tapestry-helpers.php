@@ -172,9 +172,10 @@ class TapestryHelpers
         $roles = new TapestryUserRoles($userId);
 
         if (($roles->canEdit($tapestryPostId) && $superuser_override) || ($roles->isAuthorOfThePost($nodePostId) && $node->_getStatus() == "draft")) {
-            if ($node->_getReviewStatus() != "submitted") {
-                return true;
+            if ($node->_getReviewStatus() == "submitted") {
+                return ($roles->canEdit($tapestryPostId) && $superuser_override);
             }
+            return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (
@@ -229,6 +230,6 @@ class TapestryHelpers
     public static function nodeIsPrivate($nodeMetaId, $tapestryPostId)
     {
         $node = new TapestryNode($tapestryPostId, $nodeMetaId);
-        return $node->getMeta()->status == "draft" || $node->getMeta()->reviewStatus == "submitted";
+        return $node->getMeta()->status == "draft";
     }
 }
