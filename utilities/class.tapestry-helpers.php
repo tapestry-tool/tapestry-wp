@@ -163,7 +163,7 @@ class TapestryHelpers
        
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
-        $wasAccepted = $node->wasAccepted();
+
         $userId = $_userId;
         if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
@@ -171,8 +171,10 @@ class TapestryHelpers
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $roles = new TapestryUserRoles($userId);
 
-        if (($roles->canEdit($tapestryPostId) && $superuser_override) || ($roles->isAuthorOfThePost($nodePostId) && !$wasAccepted)) {
-            return true;
+        if (($roles->canEdit($tapestryPostId) && $superuser_override) || ($roles->isAuthorOfThePost($nodePostId) && $node->status == "draft")) {
+            if ($node->reviewStatus != "submitted") {
+                return true;
+            }
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (
