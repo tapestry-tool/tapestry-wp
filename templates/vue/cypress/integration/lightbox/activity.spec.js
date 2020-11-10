@@ -5,14 +5,10 @@ describe("Activity", () => {
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
-      cy.changeMediaType("video")
-      cy.getByTestId(`node-video-url`).type(
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-      )
+      cy.changeMediaType("activity")
 
       const question = `What's your name?`
 
-      cy.contains(/activity/i).click()
       cy.contains(/add question/i).click()
 
       cy.contains(/question text/i).click()
@@ -20,15 +16,8 @@ describe("Activity", () => {
       cy.contains(/audio/i).click()
 
       cy.submitModal()
-
-      cy.server()
-      cy.route("POST", "**/completed*").as("complete")
-
-      cy.updateNodeProgress(node.id, 1)
       cy.openLightbox(node.id)
-      cy.wait("@complete")
 
-      cy.contains(/question/i).click()
       cy.contains(/microphone access/i, { timeout: 10000 }).should("not.exist")
 
       cy.clock()
