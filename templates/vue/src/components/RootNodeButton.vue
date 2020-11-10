@@ -41,6 +41,7 @@
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import ImportChangelog from "./ImportChangelog"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "root-node-button",
