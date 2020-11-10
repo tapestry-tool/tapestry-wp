@@ -1,5 +1,9 @@
 <template>
-  <div class="end-screen" :style="{ backgroundImage: backgroundUrl }">
+  <div
+    data-qa="end-screen"
+    class="end-screen"
+    :style="{ backgroundImage: backgroundUrl }"
+  >
     <speech-bubble v-if="showQuizButton">
       <h3>
         We've got a question for you!
