@@ -1,6 +1,40 @@
 import { tydeTypes, DEFAULT_DEPTH } from "./constants"
+import * as wp from "@/services/wp"
 
-export function parse(dataset) {
+/**
+ * Parses the dataset to the expected VueX format. Specifically it converts the
+ * dataset to the VueX state format, then applies the current progress.
+ * @param {TapestryDataset} dataset
+ * @param {TapestryProgress} progress
+ */
+export function parse(dataset, progress) {
+  return setDatasetProgress(parseToStore(dataset), applyLocalProgress(progress))
+}
+
+export function makeMockProgress(dataset) {
+  const progress = {}
+
+  for (const node of dataset.nodes) {
+    progress[node.id] = {
+      progress: 0,
+      accessible: true,
+      conditions: [],
+      unlocked: true,
+      content: {
+        quiz: [...node.quiz],
+        typeData: { ...node.typeData },
+      },
+      completed: false,
+      quiz: {},
+    }
+  }
+
+  return progress
+}
+
+// --
+
+function parseToStore(dataset) {
   const store = {
     ...dataset,
   }
@@ -68,6 +102,72 @@ export function parse(dataset) {
   })
 
   return store
+}
+
+function applyLocalProgress(progress) {
+  if (!wp.isLoggedIn()) {
+    const localProgress = localStorage.getItem("tapestry-progress")
+    if (localProgress) {
+      const userProgress = JSON.parse(localProgress)
+      Object.keys(progress)
+        .filter(nodeId => userProgress.hasOwnProperty(nodeId))
+        .forEach(nodeId => {
+          const nodeProgress = userProgress[nodeId]
+          const newProgress = progress[nodeId]
+          newProgress.progress = nodeProgress.progress
+        })
+    }
+  }
+  return progress
+}
+
+function setDatasetProgress(dataset, progress) {
+  if (!wp.isLoggedIn()) {
+    localStorage.setItem("tapestry-progress", JSON.stringify(progress))
+  }
+  for (const [id, nodeProgress] of Object.entries(progress)) {
+    const node = dataset.nodes[id]
+    if (node) {
+      const willLock = node.unlocked && !nodeProgress.unlocked
+      if (willLock && !wp.canEditTapestry()) {
+        node.quiz = []
+        node.typeData = {}
+      }
+
+      node.unlocked = nodeProgress.unlocked
+      node.accessible = nodeProgress.accessible
+      node.conditions = nodeProgress.conditions
+      node.completed = nodeProgress.completed
+
+      const { content } = nodeProgress
+      if (content) {
+        node.quiz = content.quiz
+        node.typeData = content.typeData
+      }
+
+      if (node.mediaType !== "accordion") {
+        node.progress = nodeProgress.progress
+        const questions = node.quiz
+        if (nodeProgress.quiz) {
+          Object.entries(nodeProgress.quiz).forEach(
+            ([questionId, completionInfo]) => {
+              const question = questions.find(question => question.id === questionId)
+              if (question) {
+                question.completed = completionInfo.completed
+                question.entries = {}
+                Object.entries(completionInfo).forEach(([key, value]) => {
+                  if (key !== "completed") {
+                    question.entries[key] = value
+                  }
+                })
+              }
+            }
+          )
+        }
+      }
+    }
+  }
+  return dataset
 }
 
 function initializeOrdering(state, node) {
