@@ -1,0 +1,68 @@
+name: test
+
+on: push
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./templates/vue
+      - name: Run tests
+        run: npm run test:jest
+        working-directory: ./templates/vue
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      # when one test fails, DO NOT cancel the other
+      # containers, because this will kill Cypress processes
+      # leaving the Dashboard hanging ...
+      # https://github.com/cypress-io/github-action/issues/48
+      fail-fast: false
+      matrix:
+        # run 8 copies of the current job in parallel
+        containers: [1, 2, 3, 4, 5, 6, 7, 8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Launch containers
+        run: docker-compose up -d
+      - name: Wait for containers to be ready
+        env:
+          DOCKER_WP_INSTALL_DELAY: 60
+        run: bash ./bin/await-containers.sh
+      - name: Setup WP
+        run: sh ./bin/install.sh
+      - name: Setup link preview config
+        working-directory: templates/vue
+        env:
+          LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
+        run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
+      - name: Setup cypress.json
+        working-directory: templates/vue
+        run: cp cypress.gha.json cypress.json
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          config: defaultCommandTimeout=10000,requestTimeout=10000
+          start: npm start
+          # quote the url to be safe against YML parsing surprises
+          wait-on: "http://localhost:8080/dist/build.js"
+          working-directory: templates/vue
+          record: true
+          browser: chrome
+          headless: true
+          parallel: true
+          group: 'Tapestry GitHub Action'
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
