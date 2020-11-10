@@ -143,14 +143,11 @@ export default class Helpers {
       return true
     }
 
-    // Check 2: User is the author of the node, if the node is a draft
-    if (
-      node.author &&
-      wpData.currentUser.ID == parseInt(node.author.id) &&
-      node.status === "draft"
-    ) {
+    // Check 2: User is the author of the node
+    if (node.author && wpData.currentUser.ID == parseInt(node.author.id)) {
       // once a node is submitted for review, it can no longer be edited by that user.
-      if (node.reviewStatus !== "submitted") {
+      // accepted nodes should not automatically be editable by a user - we treat those like published nodes.
+      if (node.reviewStatus !== "submitted" && node.reviewStatus !== "accept") {
         return true
       }
     }
