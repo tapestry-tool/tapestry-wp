@@ -46,7 +46,6 @@ export default {
   },
   methods: {
     handleReject() {
-      this.node.status = "draft"
       this.node.reviewStatus = "reject"
       this.handleSubmit()
     },
