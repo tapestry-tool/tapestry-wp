@@ -59,21 +59,9 @@ describe("Link Authoring", () => {
         cy.addLink(child1.id, child2.id)
 
         cy.logout().visitTapestry()
-        const confirm = cy.stub()
-        confirm.onFirstCall().returns(true)
 
-        const alert = cy.stub()
-        cy.on("window:confirm", confirm)
-        cy.on("window:alert", alert)
-
-        const link = `link-${child1.id}-${child2.id}`
-        cy.getByTestId(link)
-          .click()
-          .then(() => {
-            expect(alert).to.be.called
-            expect(alert.getCall(0).lastArg).to.match(/cannot delete this link/i)
-          })
-        cy.getByTestId(link).should("exist")
+        cy.link(child1.id, child2.id).click()
+        cy.link(child1.id, child2.id).should("exist")
       })
   })
 

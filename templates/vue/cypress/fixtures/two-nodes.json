@@ -201,5 +201,6 @@
       "index": 0
     }
   ],
-  "groups": []
+  "groups": [],
+  "site-url": "http://localhost:8000"
 }
