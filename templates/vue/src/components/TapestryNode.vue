@@ -32,7 +32,6 @@
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
         :locked="!node.accessible"
-        :status="node.status"
       ></progress-bar>
       <dash-array
         v-if="

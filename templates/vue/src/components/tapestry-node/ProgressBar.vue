@@ -33,11 +33,6 @@ export default {
       required: false,
       default: false,
     },
-    status: {
-      type: String,
-      required: false,
-      default: "publish",
-    },
   },
   computed: {
     arc() {
