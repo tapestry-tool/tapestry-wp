@@ -55,13 +55,7 @@
           :key="marker.id"
           :ref="'marker-' + marker.id"
           :lat-lng="marker.pos"
-          :icon="
-            marker.status == 'draft'
-              ? draftIcon
-              : marker.accessible
-              ? icon
-              : inaccessibleIcon
-          "
+          :icon="getMarkerIcon(marker)"
           @click="selectNode(marker.id)"
         >
           <l-popup>
@@ -84,15 +78,15 @@
 
 <script>
 import "leaflet/dist/leaflet.css"
-import mapMarker from "@/assets/map-marker.png"
-import invalidMarker from "@/assets/map-marker-inaccessible.png"
-import draftMarker from "@/assets/map-marker-draft.png"
+import mapMarkerDefault from "@/assets/map-marker.png"
+import mapMarkerInaccessible from "@/assets/map-marker-inaccessible.png"
+import mapMarkerDraft from "@/assets/map-marker-draft.png"
 import { latLng, latLngBounds, icon } from "leaflet"
 import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet"
 import { mapState } from "vuex"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-map",
@@ -108,41 +102,26 @@ export default {
       required: false,
     },
   },
-  data() {
-    return {
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      attribution:
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      mapOptions: {
-        zoomSnap: 0.1,
-        scrollWheelZoom: false,
-      },
-      icon: icon({
-        iconUrl: mapMarker,
-        iconSize: [32, 33],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -20],
-      }),
-      inaccessibleIcon: icon({
-        iconUrl: invalidMarker,
-        iconSize: [32, 33],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -20],
-      }),
-      draftIcon: icon({
-        iconUrl: draftMarker,
-        iconSize: [32, 33],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -20],
-      }),
-      worldBounds: latLngBounds([
-        [-90, -180],
-        [90, 180],
-      ]),
-    }
-  },
   computed: {
     ...mapState(["settings", "nodes", "rootId"]),
+    url() {
+      return "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    },
+    attribution() {
+      return '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    },
+    mapOptions() {
+      return {
+        zoomSnap: 0.1,
+        scrollWheelZoom: false,
+      }
+    },
+    worldBounds() {
+      return latLngBounds([
+        [-90, -180],
+        [90, 180],
+      ])
+    },
     empty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -150,10 +129,10 @@ export default {
       return this.$route.params.nodeId
     },
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
     canEdit() {
-      return wpData.wpCanEditTapestry === "1"
+      return wp.canEditTapestry()
     },
     getBounds() {
       return latLngBounds([
@@ -200,6 +179,20 @@ export default {
   methods: {
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
+    },
+    getMarkerIcon(marker) {
+      const iconSettings = {
+        iconSize: [32, 33],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -30],
+      }
+      let mapMarker = mapMarkerDefault
+      if (marker.status === "draft") {
+        mapMarker = mapMarkerDraft
+      } else if (!marker.accessible) {
+        mapMarker = mapMarkerInaccessible
+      }
+      return icon({ ...iconSettings, iconUrl: Helpers.getImagePath(mapMarker) })
     },
     updateZoom(zoom) {
       this.currentZoom = zoom
