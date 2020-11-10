@@ -92,7 +92,12 @@ Cypress.Commands.add(
 
     cy.store().then(store => store.dispatch("updateNodeProgress", { id, progress }))
 
-    cy.wait("@saveProgress")
+    cy.store()
+      .its("state.nodes")
+      .should(nodes => {
+        const node = nodes[id]
+        expect(node.progress).to.equal(progress)
+      })
   }
 )
 
@@ -118,7 +123,7 @@ Cypress.Commands.add("getNodeById", id => cy.getByTestId(`node-${id}`))
 Cypress.Commands.add("lightbox", () => cy.getByTestId("lightbox"))
 
 Cypress.Commands.add("openLightbox", { prevSubject: "optional" }, (node, id) => {
-  cy.getByTestId(`open-node-${id || node.id}`).click({ force: true })
+  cy.getByTestId(`open-node-${id || node.id}`).click()
   return cy.lightbox()
 })
 
@@ -159,7 +164,7 @@ Cypress.Commands.add("submitModal", () => {
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   cy.getByTestId("submit-node-modal").click()
-  cy.wait("@editPermissions")
+  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
@@ -180,7 +185,9 @@ Cypress.Commands.add("changeMediaType", type =>
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 
-Cypress.Commands.add("getByTestId", testId => cy.get(`[data-qa="${testId}"]`))
+Cypress.Commands.add("getByTestId", (testId, ...args) =>
+  cy.get(`[data-qa="${testId}"]`, ...args)
+)
 
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
