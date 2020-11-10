@@ -14,9 +14,6 @@ describe("Video", () => {
       cy.getByTestId(`node-video-url`).type(url)
       cy.submitModal()
 
-      cy.server()
-      cy.route("POST", `**/users/progress`).as("saveProgress")
-
       cy.openLightbox(node.id).within(() => {
         cy.get("video").should("have.attr", "src", url)
 
@@ -33,6 +30,7 @@ describe("Video", () => {
       cy.updateNodeProgress(node.id, 1)
 
       cy.openLightbox(node.id).within(() => {
+        cy.getByTestId("end-screen").should("be.visible")
         cy.contains(/rewatch/i).should("be.visible")
         cy.contains(/close/i).click()
       })
