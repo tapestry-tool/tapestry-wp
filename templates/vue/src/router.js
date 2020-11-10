@@ -1,21 +1,23 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
 
-import routes, { names } from "./config/routes"
+import routeConfig, { names } from "./config/routes"
 import store from "./store"
 
 Vue.use(VueRouter)
 
+export const routes = [
+  routeConfig.app,
+  routeConfig.lightbox,
+  routeConfig.accordion,
+  routeConfig.subAccordion,
+  routeConfig.settings,
+  ...routeConfig.redirects,
+  routeConfig.modal,
+]
+
 const router = new VueRouter({
-  routes: [
-    routes.app,
-    routes.lightbox,
-    routes.accordion,
-    routes.subAccordion,
-    routes.settings,
-    ...routes.redirects,
-    routes.modal,
-  ],
+  routes,
 })
 
 router.beforeEach((to, from, next) => {
