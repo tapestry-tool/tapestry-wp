@@ -3,7 +3,7 @@ import TapestryApp from "@/components/TapestryApp.vue"
 import oneNodeTapestry from "@/fixtures/one-node.json"
 
 describe("TapestryApp", () => {
-  it("should render the whole app", () => {
+  it("should render the whole app", async () => {
     render(TapestryApp, { fixture: oneNodeTapestry })
   })
 })

@@ -1,22 +1,12 @@
-import Vue from "vue"
 import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 
 import oneNodeTapestry from "@/fixtures/one-node.json"
 import NodeModal from "@/components/NodeModal.vue"
 import GravityFormsApi from "@/services/GravityFormsApi"
-import routes, { names } from "@/config/routes"
+import { names } from "@/config/routes"
 
-// Wrapper to add button to trigger NodeModal, otherwise, does not render with visible
-const WrappedNodeModal = Vue.component("wrapped-node-modal", {
-  components: {
-    NodeModal,
-  },
-  template: `<div>
-    <b-button v-b-modal.node-modal>Modal Button</b-button>
-    <node-modal/>
-  </div>`,
-})
+const node = oneNodeTapestry.nodes[0]
 
 jest.mock("@/services/GravityFormsApi", () => {
   return {
@@ -26,28 +16,21 @@ jest.mock("@/services/GravityFormsApi", () => {
   }
 })
 
-const node = oneNodeTapestry.nodes[0]
-const route = {
-  name: names.MODAL,
-  path: `/nodes/${node.id}`,
-  params: {
-    nodeId: node.id,
-    type: "add",
-    tab: "content",
-  },
-}
-const mocks = {
-  $router: [routes.modal],
-  $route: route,
-}
-
 describe("node modal: content - video", () => {
   let screen
 
   beforeEach(async () => {
     GravityFormsApi.exists.mockImplementation(() => Promise.resolve(false))
-    screen = render(WrappedNodeModal, oneNodeTapestry, { mocks: mocks })
-    await fireEvent.click(screen.getByText("Modal Button"))
+    screen = render(
+      NodeModal,
+      { fixture: oneNodeTapestry },
+      (_vueInstance, _vuexStore, router) => {
+        router.push({
+          name: names.MODAL,
+          params: { nodeId: node.id, type: "add", tab: "content" },
+        })
+      }
+    )
   })
 
   async function testVideoSetup(screen, url) {

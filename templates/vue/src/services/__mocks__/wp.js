@@ -30,7 +30,15 @@ export const data = {
     ID: "1",
     roles: ["administrator"],
   },
-  roles: ["administrator", "subscriber", "editor"],
+  roles: [
+    {
+      administrator: "Administrator",
+      author: "Author",
+      contributor: "Contributor",
+      editor: "Editor",
+      subscriber: "Subscriber",
+    },
+  ],
 }
 
 export const getCurrentUser = jest.fn().mockReturnValue({
