@@ -86,17 +86,10 @@ export default {
           if (this.allContributors !== null) {
             return Object.values(this.allContributors)
           }
-          const authors = []
-          const seen = new Set()
-          Object.values(this.nodes)
-            .map(node => node.author)
-            .forEach(author => {
-              if (!seen.has(author.id)) {
-                authors.push(author)
-                seen.add(author.id)
-              }
-            })
-          return authors
+          return Helpers.unique(
+            Object.values(this.nodes).map(node => node.author),
+            "id"
+          )
         }
         case filterTypes.TITLE: {
           return Object.values(this.nodes).map(node => node.title)
