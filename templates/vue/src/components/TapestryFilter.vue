@@ -104,17 +104,15 @@ export default {
       if (!this.settings.superuserOverridePermissions) {
         this.loading = true
         await this.refetchTapestryData(Number(next))
-        this.updateVisibleNodes(this.getMatches())
         this.loading = false
-      } else {
-        this.handleSearch(next)
       }
+      this.handleSearch()
     },
     isActive(isActive) {
       if (isActive) {
         this.updateVisibleNodes([])
       } else {
-        this.updateVisibleNodes(Object.keys(this.nodes).map(id => parseInt(id, 10)))
+        this.updateVisibleNodes(Object.values(this.nodes).map(node => node.id))
       }
     },
     type() {
@@ -152,11 +150,12 @@ export default {
       }
     },
     getMatches(value) {
-      const val = value || this.filterValue
+      let val = value || this.filterValue
       let match = Object.values(this.nodes)
       if (this.isActive && this.type) {
         switch (this.type) {
           case filterTypes.AUTHOR: {
+            val = typeof val !== "string" ? val.id : val
             match = matchSorter(match, val, {
               keys: ["author.name", "author.id"],
             })
