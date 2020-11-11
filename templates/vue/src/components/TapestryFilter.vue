@@ -4,7 +4,11 @@
       <i class="fas fa-search"></i>
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
-      <b-form-select v-model="type" :options="Object.values(types)"></b-form-select>
+      <b-form-select
+        id="search-type"
+        v-model="type"
+        :options="Object.values(types)"
+      ></b-form-select>
       <v-select
         v-if="type !== types.STATUS"
         v-model="filterValue"
@@ -16,6 +20,7 @@
       ></v-select>
       <b-form-select
         v-else
+        id="status-select"
         v-model="filterValue"
         data-qa="status-select"
         :options="statuses"
@@ -116,8 +121,12 @@ export default {
         this.updateVisibleNodes(Object.values(this.nodes).map(node => node.id))
       }
     },
-    type() {
-      this.filterValue = ""
+    type(type) {
+      if (type !== filterTypes.STATUS) {
+        this.filterValue = ""
+      } else {
+        this.filterValue = nodeStatus.ALL
+      }
     },
   },
   async created() {
@@ -166,6 +175,14 @@ export default {
             match = matchSorter(match, val, {
               keys: ["title"],
             })
+            break
+          }
+          case filterTypes.STATUS: {
+            if (val !== nodeStatus.ALL) {
+              match = matchSorter(match, val, {
+                keys: ["status"],
+              })
+            }
             break
           }
           default:
@@ -229,10 +246,18 @@ export default {
 
 .custom-select {
   height: auto !important;
+}
+
+#search-type.custom-select {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   border-right: none !important;
   flex: 1;
+}
+
+#status-select.custom-select {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 .v-select {

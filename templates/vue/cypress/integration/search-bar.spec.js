@@ -55,6 +55,8 @@ describe("Search bar", () => {
          *  - https://github.com/wynnset/tapestry-wp/pull/683
          */
         cy.findByDisplayValue("Author").select("Status")
+        cy.findByDisplayValue("All").should("be.visible")
+        assertVisibleNodes(allNodes)
       })
   })
 })

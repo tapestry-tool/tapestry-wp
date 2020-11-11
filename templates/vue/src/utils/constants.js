@@ -31,9 +31,9 @@ export const licenses = {
 
 export const nodeStatus = {
   ALL: "All",
-  PUBLISHED: "Published",
-  SUBMITTED: "Submitted",
-  REJECTED: "Rejected",
+  PUBLISHED: "Publish",
+  SUBMITTED: "Submit",
+  REJECTED: "Reject",
   DRAFT: "Draft",
 }
 
