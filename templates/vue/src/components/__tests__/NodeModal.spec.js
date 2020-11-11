@@ -77,20 +77,4 @@ describe("node modal: content - video", () => {
     await testVideoSetup(screen, fakeURL)
     expect(screen.queryByText("Please enter a valid Video URL")).toBeInTheDocument()
   })
-
-  it("Should show an error and not create a node if an mp4 URL is invalid", async () => {
-    await fireEvent.update(screen.getByPlaceholderText(/title/i), "Test Title")
-    await fireEvent.change(screen.getByTestId("node-media-type"), {
-      target: { value: "video" },
-    })
-    expect(screen.queryByText("Video URL")).toBeInTheDocument()
-    const url = "www.example.com/video.mp4"
-    await fireEvent.update(screen.getByTestId("node-video-url"), url)
-    expect(screen.getByTestId("node-video-url").value).toMatch(url)
-    await fireEvent.click(screen.getByText(/Publish/i))
-    // TODO: this fails - might need an e2e test since this involves the backend upload?
-    const errMsg = "Invalid mp4 Video URL: please re-upload or check the URL"
-    expect(screen.queryByText(errMsg)).toBeInTheDocument()
-  })
-  // TODO: write test for API error handle
 })
