@@ -65,12 +65,13 @@ describe("TapestryFilter", () => {
   })
 
   it("should be able to search for author by id", async () => {
+    const { author } = multiAuthorTapestry.nodes[0]
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.type(await screen.findByPlaceholderText("Node author"), "1")
+    userEvent.type(await screen.findByPlaceholderText("Node author"), author.id)
 
-    await screen.findByText("admin")
+    await screen.findByText(author.name)
   })
 
   it("should show simple select if searching by status", async () => {

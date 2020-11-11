@@ -9,6 +9,7 @@
         v-if="type !== types.STATUS"
         v-model="filterValue"
         label="name"
+        :filter="getVisibleMatches"
         :placeholder="placeholder"
         :options="filterOptions"
         @search="handleSearch"
@@ -30,6 +31,7 @@ import { matchSorter } from "match-sorter"
 import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
 import { nodeStatus } from "@/utils/constants"
+import Helpers from "@/utils/Helpers"
 
 const filterTypes = {
   AUTHOR: "Author",
@@ -139,7 +141,22 @@ export default {
       }
       this.isActive = !this.isActive
     },
-    getVisibleNodes(value) {
+    getVisibleMatches(options, value) {
+      if (!value.length) {
+        return options
+      }
+      const matches = this.getMatches(value)
+      switch (this.type) {
+        case filterTypes.AUTHOR:
+          return Helpers.unique(
+            matches.map(node => node.author),
+            "id"
+          )
+        case filterTypes.TITLE:
+          return matches.map(node => node.id)
+      }
+    },
+    getMatches(value) {
       const val = value || this.filterValue
       let match = Object.values(this.nodes)
       if (this.isActive && this.type) {
@@ -160,11 +177,11 @@ export default {
             break
         }
       }
-      return match.map(node => node.id)
+      return match
     },
     handleSearch(val) {
-      const visibleNodes = this.getVisibleNodes(val)
-      this.updateVisibleNodes(visibleNodes)
+      const visibleNodes = this.getMatches(val)
+      this.updateVisibleNodes(visibleNodes.map(node => node.id))
     },
   },
 }
