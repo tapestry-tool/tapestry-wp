@@ -6,6 +6,7 @@ import Helpers from "@/utils/Helpers"
 import TapestryFilter from "@/components/TapestryFilter.vue"
 import multiAuthorTapestry from "@/fixtures/multi-author.json"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 jest.mock("@/services/TapestryAPI", () => {
   return {
@@ -59,6 +60,7 @@ describe("TapestryFilter", () => {
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
     userEvent.click(await screen.findByPlaceholderText("Node author"))
+
     waitFor(() => {
       authors.forEach(author => screen.getByText(author.name))
     })
@@ -108,6 +110,7 @@ describe("TapestryFilter", () => {
   })
 
   it("should show loading indicator when superuser override is off", async () => {
+    client.getTapestry.mockResolvedValue(multiAuthorTapestry)
     const screen = setup({ superuserOverridePermissions: false })
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")

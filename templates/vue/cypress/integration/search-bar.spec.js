@@ -1,4 +1,5 @@
 const assertVisibleNodes = visibleNodes => {
+  const expected = visibleNodes.map(node => node.id)
   cy.store()
     .its("state.nodes")
     .then(nodes => {
@@ -7,7 +8,7 @@ const assertVisibleNodes = visibleNodes => {
           .should("have.css", "opacity")
           .and(opacity => {
             const opacityAsNum = Number(opacity)
-            if (visibleNodes.includes(node.id)) {
+            if (expected.includes(node.id)) {
               expect(opacityAsNum).to.equal(1)
             } else {
               expect(opacityAsNum).to.be.lessThan(1)
@@ -28,21 +29,26 @@ describe("Search bar", () => {
       .its("state.nodes")
       .then(nodes => {
         const allNodes = Object.values(nodes)
-        assertVisibleNodes(allNodes.map(node => node.id))
+        assertVisibleNodes(allNodes)
 
         cy.get("[aria-label=search]").click()
         assertVisibleNodes([])
 
-        // By title
-        cy.findByPlaceholderText("Node title").type("first")
-        let expected = allNodes.filter(node => node.title.startsWith("first"))
-        assertVisibleNodes(expected.map(node => node.id))
+        // Should update while typing
+        cy.findByPlaceholderText("Node title").type("fir")
+        let expected = allNodes.filter(node => node.title.startsWith("fir"))
+        assertVisibleNodes(expected)
+
+        // Should be search by title
+        cy.findByPlaceholderText("Node title").type("st{enter}")
+        expected = allNodes.filter(node => node.title.startsWith("first"))
+        assertVisibleNodes(expected)
 
         // By author
         cy.findByDisplayValue("Title").select("Author")
-        cy.findByPlaceholderText("Node author").type("admin")
+        cy.findByPlaceholderText("Node author").type("admin{enter}")
         expected = Object.values(nodes).filter(node => node.author.name === "admin")
-        assertVisibleNodes(expected.map(node => node.id))
+        assertVisibleNodes(expected)
 
         /**
          * TODO: By status -- waiting for #680 to be merged in

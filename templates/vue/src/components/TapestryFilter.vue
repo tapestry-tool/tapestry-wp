@@ -1,5 +1,5 @@
 <template>
-  <div class="filter">
+  <div data-qa="tapestry-filter" class="filter">
     <button v-if="canSearch" aria-label="search" @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
@@ -104,8 +104,10 @@ export default {
       if (!this.settings.superuserOverridePermissions) {
         this.loading = true
         await this.refetchTapestryData(Number(next))
-        this.updateVisibleNodes(this.getVisibleNodes())
+        this.updateVisibleNodes(this.getMatches())
         this.loading = false
+      } else {
+        this.handleSearch(next)
       }
     },
     isActive(isActive) {
@@ -129,7 +131,7 @@ export default {
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
-        this.type = ""
+        this.type = filterTypes.TITLE
         this.filterValue = ""
       }
       this.isActive = !this.isActive
@@ -146,7 +148,7 @@ export default {
             "id"
           )
         case filterTypes.TITLE:
-          return matches.map(node => node.id)
+          return matches.map(node => node.title)
       }
     },
     getMatches(value) {
