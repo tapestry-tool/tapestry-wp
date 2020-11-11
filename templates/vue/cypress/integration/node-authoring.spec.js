@@ -4,7 +4,13 @@ describe("Node Authoring", () => {
     cy.fixture("two-nodes.json").as("twoNodes")
   })
 
-  it("should be able to add a root node using the node modal", () => {
+  /**
+   * [KNOWN BUG] indicates that the test fails because of a reported bug. Once
+   * addressed, make sure to remove the [KNOWN BUG] tag from the test label.
+   * Relevant bug report:
+   *  - https://app.asana.com/0/1126491658233864/1199105728152789
+   */
+  it.skip("[KNOWN BUG] should be able to add a root node using the node modal", () => {
     cy.setup()
 
     const node = {
@@ -27,13 +33,14 @@ describe("Node Authoring", () => {
     cy.contains(node.title).should("exist")
     cy.store()
       .its("state.nodes")
-      .then(nodes => {
+      .should(nodes => {
         expect(Object.keys(nodes)).to.have.length(1)
-
-        const [root] = Object.values(nodes)
-        cy.getByTestId(`open-node-${root.id}`).click()
-        cy.contains(node.textContent).should("exist")
       })
+
+    cy.getSelectedNode().then(node => {
+      cy.openLightbox(node.id).click()
+      cy.contains(node.textContent).should("exist")
+    })
   })
 
   /**

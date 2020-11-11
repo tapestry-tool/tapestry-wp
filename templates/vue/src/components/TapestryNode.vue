@@ -210,6 +210,12 @@ export default {
       ) {
         return `url(#node-image-${this.node.id})`
       }
+      if (this.selected) {
+        return "#11a6d8"
+      }
+      if (!this.node.accessible) {
+        return "#8a8a8c"
+      }
       return "#8396a1"
     },
     overlayFill() {
