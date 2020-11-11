@@ -52,4 +52,19 @@ describe("Video", () => {
       })
     })
   })
+
+  it("Should show an error and not create a node if an mp4 URL is invalid", () => {
+    cy.getSelectedNode().then(parent => {
+      cy.openModal("add", parent.id)
+      cy.getByTestId(`node-title`).type("Video 1")
+
+      cy.changeMediaType("video")
+      cy.getByTestId(`node-video-url`).type("www.example.com/video.mp4")
+
+      cy.submitModal()
+      cy.contains("Invalid mp4 Video URL: please re-upload or check the URL").should(
+        "exist"
+      )
+    })
+  })
 })
