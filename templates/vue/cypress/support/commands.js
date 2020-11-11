@@ -43,7 +43,7 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
 
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
-  cy.contains(/loading/i).should("not.be.visible")
+  cy.getByTestId("tapestry-loading").should("not.exist")
 })
 
 // -- Nodes --
