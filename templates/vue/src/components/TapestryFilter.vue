@@ -25,7 +25,13 @@
         data-qa="status-select"
         :options="statuses"
       ></b-form-select>
-      <b-spinner v-if="loading" data-qa="search-loading" label="Loading"></b-spinner>
+      <div class="spinner">
+        <b-spinner
+          v-if="loading"
+          data-qa="search-loading"
+          label="Loading"
+        ></b-spinner>
+      </div>
     </div>
   </div>
 </template>
@@ -240,6 +246,12 @@ export default {
     transform: translateX(0);
     pointer-events: all;
   }
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
 }
 
 // !important styles are necessary here to override bootstrap styles
