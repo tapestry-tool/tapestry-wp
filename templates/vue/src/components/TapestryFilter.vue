@@ -1,6 +1,6 @@
 <template>
   <div class="filter">
-    <button v-if="canSearch" @click="toggleFilter">
+    <button v-if="canSearch && !settings.renderMap" @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
     <div :class="['input-container', { 'input-container-show': isActive }]">
@@ -43,6 +43,7 @@
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
 import client from "../services/TapestryAPI"
+import * as wp from "../services/wp"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -62,9 +63,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes"]),
+    ...mapState(["nodes", "settings"]),
     canSearch() {
-      return wpData.wpCanEditTapestry === "1"
+      return wp.canEditTapestry()
     },
     inputStyles() {
       return {
@@ -111,7 +112,7 @@ export default {
     },
   },
   async created() {
-    if (wpData.wpCanEditTapestry === "1") {
+    if (this.canSearch) {
       this.allContributors = await client.getAllContributors()
     }
   },

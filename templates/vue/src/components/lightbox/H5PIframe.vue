@@ -18,7 +18,7 @@
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="scrollEnabled ? 'yes' : 'no'"
+      :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
       @load="handleLoad"
     ></iframe>
   </div>
@@ -61,16 +61,10 @@ export default {
       instance: null,
       frameHeight: 0,
       frameWidth: "100%",
-      library: null,
+      type: null,
       loading: true,
       requiresRefresh: false,
     }
-  },
-  computed: {
-    scrollEnabled() {
-      const noScrollLibraries = ["H5P.InteractiveVideo", "H5P.ThreeImage"]
-      return !noScrollLibraries.includes(this.library)
-    },
   },
   watch: {
     node(_, oldNode) {
@@ -237,9 +231,10 @@ export default {
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
 
-      this.library = h5pInstance.libraryInfo.machineName
+      const h5pLibraryName = h5pInstance.libraryInfo.machineName
+      this.type = h5pLibraryName
 
-      if (this.library !== "H5P.InteractiveVideo") {
+      if (h5pLibraryName !== "H5P.InteractiveVideo") {
         this.frameHeight = this.dimensions.height
       }
 
@@ -254,117 +249,98 @@ export default {
 
       const mediaProgress = this.node.progress
 
-      switch (this.library) {
-        case "H5P.InteractiveVideo":
-          {
-            const h5pVideo = h5pInstance.video
-            const h5pIframeComponent = this
+      if (h5pLibraryName === "H5P.InteractiveVideo") {
+        const h5pVideo = h5pInstance.video
+        const h5pIframeComponent = this
 
-            const handleH5pAfterLoad = () => {
-              h5pIframeComponent.instance = h5pVideo
+        const handleH5pAfterLoad = () => {
+          h5pIframeComponent.instance = h5pVideo
 
-              h5pIframeComponent.setFrameDimensions()
-              window.addEventListener(
-                "resize",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "fullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "webkitfullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "mozfullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
+          h5pIframeComponent.setFrameDimensions()
+          window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
+          document.addEventListener(
+            "fullscreenchange",
+            h5pIframeComponent.setFrameDimensions
+          )
+          document.addEventListener(
+            "webkitfullscreenchange",
+            h5pIframeComponent.setFrameDimensions
+          )
+          document.addEventListener(
+            "mozfullscreenchange",
+            h5pIframeComponent.setFrameDimensions
+          )
 
-              h5pIframeComponent.$emit("load", { el: h5pVideo })
+          h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-              let currentPlayedTime
+          let currentPlayedTime
 
-              const videoDuration = h5pVideo.getDuration()
-              h5pVideo.seek(mediaProgress * videoDuration)
+          const videoDuration = h5pVideo.getDuration()
+          h5pVideo.seek(mediaProgress * videoDuration)
 
-              const viewedAmount = mediaProgress * videoDuration
-              if (viewedAmount === videoDuration) {
-                h5pIframeComponent.$emit("show-end-screen")
-              }
+          const viewedAmount = mediaProgress * videoDuration
+          if (viewedAmount === videoDuration) {
+            h5pIframeComponent.$emit("show-end-screen")
+          }
 
-              h5pIframeComponent.applySettings(h5pVideo)
+          h5pIframeComponent.applySettings(h5pVideo)
 
-              h5pVideo.on("stateChange", event => {
-                switch (event.data) {
-                  case h5pObj.Video.PLAYING: {
-                    const updateVideoInterval = setInterval(() => {
-                      if (
-                        currentPlayedTime !== h5pVideo.getCurrentTime() &&
-                        h5pVideo.getCurrentTime() > 0
-                      ) {
-                        currentPlayedTime = h5pVideo.getCurrentTime()
-                        const amountViewed = currentPlayedTime / videoDuration
+          h5pVideo.on("stateChange", event => {
+            switch (event.data) {
+              case h5pObj.Video.PLAYING: {
+                const updateVideoInterval = setInterval(() => {
+                  if (
+                    currentPlayedTime !== h5pVideo.getCurrentTime() &&
+                    h5pVideo.getCurrentTime() > 0
+                  ) {
+                    currentPlayedTime = h5pVideo.getCurrentTime()
+                    const amountViewed = currentPlayedTime / videoDuration
 
-                        h5pIframeComponent.$emit("timeupdate", amountViewed)
+                    h5pIframeComponent.$emit("timeupdate", amountViewed)
 
-                        h5pIframeComponent.updateSettings(h5pVideo)
+                    h5pIframeComponent.updateSettings(h5pVideo)
 
-                        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-                          h5pIframeComponent.$emit("complete")
-                        }
+                    if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+                      h5pIframeComponent.$emit("complete")
+                    }
 
-                        if (amountViewed >= 1) {
-                          h5pIframeComponent.$emit("show-end-screen")
-                        }
-                      } else {
-                        clearInterval(updateVideoInterval)
-                      }
-                    }, 1000)
-                    h5pIframeComponent.handlePlay(h5pIframeComponent.node)
-                    break
+                    if (amountViewed >= 1) {
+                      h5pIframeComponent.$emit("show-end-screen")
+                    }
+                  } else {
+                    clearInterval(updateVideoInterval)
                   }
-                  case h5pObj.Video.PAUSED: {
-                    h5pIframeComponent.handlePause(h5pIframeComponent.node)
-                    break
-                  }
-                }
-              })
-
-              if (h5pIframeComponent.autoplay) {
-                setTimeout(() => {
-                  h5pVideo.play()
-                  client.recordAnalyticsEvent(
-                    "app",
-                    "auto-play",
-                    "h5p-video",
-                    h5pIframeComponent.node.id
-                  )
                 }, 1000)
+                h5pIframeComponent.handlePlay(h5pIframeComponent.node)
+                break
+              }
+
+              case h5pObj.Video.PAUSED: {
+                h5pIframeComponent.handlePause(h5pIframeComponent.node)
+                break
               }
             }
+          })
+          if (h5pIframeComponent.autoplay) {
+            setTimeout(() => {
+              h5pVideo.play()
+              client.recordAnalyticsEvent(
+                "app",
+                "auto-play",
+                "h5p-video",
+                h5pIframeComponent.node.id
+              )
+            }, 1000)
+          }
+        }
 
-            if (h5pVideo.getDuration() !== undefined) {
-              this.requiresRefresh = this.context === "accordion"
-              handleH5pAfterLoad()
-            } else {
-              h5pVideo.on("loaded", handleH5pAfterLoad)
-            }
-          }
-          break
-        case "H5P.ThreeImage":
-          {
-            // let threeSixtyLoadInterval = setInterval(()=>{
-            //   if (typeof h5pInstance.reDraw !== "undefined") {
-            //     clearInterval(threeSixtyLoadInterval)
-            //     h5pInstance.currentScene = h5pThreeSixtyScene
-            //     h5pInstance.reDraw()
-            //   }
-            // }, 500)
-          }
-          break
-      }
-      if (this.library !== "H5P.InteractiveVideo") {
+        if (h5pVideo.getDuration() !== undefined) {
+          this.requiresRefresh = this.context === "accordion"
+          handleH5pAfterLoad()
+        } else {
+          h5pVideo.on("loaded", handleH5pAfterLoad)
+        }
+      } else {
         this.loading = false
         this.$emit("is-loaded")
       }

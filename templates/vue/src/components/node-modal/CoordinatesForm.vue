@@ -1,27 +1,28 @@
 <template>
-  <div>
-    <div id="modal-coordinates">
-      <b-form-group>
-        <b-form-checkbox v-model="isOnMap">
-          Show this node on map
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group v-if="isOnMap">
+  <div id="modal-coordinates">
+    <b-form-group>
+      <b-form-checkbox v-model="isOnMap">
+        Show on Map
+      </b-form-checkbox>
+    </b-form-group>
+    <b-row v-if="isOnMap">
+      <b-col>
         <b-form-input
           v-model="node.mapCoordinates.lat"
           :number="true"
-          placeholder="Enter latitude"
-          :state="isValidLat"
+          :state="isValidLat ? null : false"
         />
-
+        <b-form-text>Latitude</b-form-text>
+      </b-col>
+      <b-col>
         <b-form-input
           v-model="node.mapCoordinates.lng"
           :number="true"
-          placeholder="Enter longitude"
-          :state="isValidLng"
+          :state="isValidLng ? null : false"
         />
-      </b-form-group>
-    </div>
+        <b-form-text>Longitude</b-form-text>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -67,7 +68,7 @@ export default {
       }
     }
     const isOnMap =
-      this.node.mapCoordinates.lat != "" && this.node.mapCoordinates.lng != ""
+      this.node.mapCoordinates.lat !== "" && this.node.mapCoordinates.lng !== ""
 
     if (!isOnMap) {
       this.node.mapCoordinates.lat = ""

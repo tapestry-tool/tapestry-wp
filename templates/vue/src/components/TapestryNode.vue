@@ -105,7 +105,7 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import NodeButton from "./tapestry-node/NodeButton"
@@ -143,7 +143,7 @@ export default {
       "isAccordionRow",
     ]),
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
@@ -209,6 +209,12 @@ export default {
         showImages
       ) {
         return `url(#node-image-${this.node.id})`
+      }
+      if (this.selected) {
+        return "#11a6d8"
+      }
+      if (!this.node.accessible) {
+        return "#8a8a8c"
       }
       return "#8396a1"
     },

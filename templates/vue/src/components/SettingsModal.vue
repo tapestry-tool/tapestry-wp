@@ -110,55 +110,6 @@
             </b-row>
           </b-form-group>
           <b-form-group
-            label="World Map"
-            description="Replace Tapestry with a map of Earth with placeholders for each node"
-          >
-            <b-form-checkbox v-model="renderMap" switch>
-              {{ renderMap ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
-          <div v-if="renderMap">
-            <b-row>
-              <b-col sm="3">
-                <span>Northeast bound:</span>
-              </b-col>
-              <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.neLat"
-                  placeholder="Latitude (90)"
-                  :state="latitudeRangeValid"
-                />
-              </b-col>
-              <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.neLng"
-                  placeholder="Longitude (180)"
-                  :state="longitudeRangeValid"
-                />
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col sm="3">
-                <span>Southwest bound:</span>
-              </b-col>
-              <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.swLat"
-                  placeholder="Latitude (-90)"
-                  :state="latitudeRangeValid"
-                />
-              </b-col>
-              <b-col sm="3">
-                <b-form-input
-                  v-model="mapBounds.swLng"
-                  placeholder="Longitude (-180)"
-                  :state="longitudeRangeValid"
-                />
-              </b-col>
-            </b-row>
-          </div>
-
-          <b-form-group
             class="mt-4"
             label="Show thumbnails"
             description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
@@ -166,6 +117,65 @@
             <b-form-checkbox v-model="renderImages" switch>
               {{ renderImages ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            label="Geography map"
+            :description="
+              'Replace Tapestry with a map of Earth with placeholders for each node.' +
+                (renderMap ? ' Set the default visible area below:' : '')
+            "
+          >
+            <b-form-checkbox v-model="renderMap" switch>
+              {{ renderMap ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="renderMap">
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  placeholder="90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                  "
+                />
+                <b-form-text>Northern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  placeholder="-180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                  "
+                />
+                <b-form-text>Western Longitudinal Bound</b-form-text>
+              </b-col>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  placeholder="180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                  "
+                />
+                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  placeholder="-90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                  "
+                />
+                <b-form-text>Southern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
           </b-form-group>
         </b-tab>
         <b-tab
@@ -201,10 +211,7 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        :disabled="
-          fileUploading ||
-            ((!latitudeRangeValid || !longitudeRangeValid) && renderMap)
-        "
+        :disabled="fileUploading || !inputsValid"
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -220,6 +227,7 @@ import FileUpload from "./FileUpload"
 import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
+import { data as wpData } from "@/services/wp"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -273,20 +281,30 @@ export default {
   computed: {
     ...mapGetters(["tapestryJson"]),
     ...mapState(["settings", "rootId"]),
-    // the + before this.mapBounds changes type from string to int for correct comparison
-    latitudeRangeValid() {
+    latRangeValid() {
       return (
-        (+this.mapBounds.neLat || 90) > (+this.mapBounds.swLat || -90) &&
-        +this.mapBounds.neLat < 91 &&
-        +this.mapBounds.swLat > -91
+        this.getCoord(this.mapBounds.neLat, 90) >
+        this.getCoord(this.mapBounds.swLat, -90)
       )
     },
-    longitudeRangeValid() {
+    lngRangeValid() {
       return (
-        (+this.mapBounds.neLng || 180) > (+this.mapBounds.swLng || -180) &&
-        +this.mapBounds.neLng < 181 &&
-        +this.mapBounds.swLng > -181
+        this.getCoord(this.mapBounds.neLng, 180) >
+        this.getCoord(this.mapBounds.swLng, -180)
       )
+    },
+    inputsValid() {
+      if (this.renderMap) {
+        return (
+          this.latRangeValid &&
+          this.isValidLat(this.mapBounds.swLat) &&
+          this.isValidLat(this.mapBounds.neLat) &&
+          this.lngRangeValid &&
+          this.isValidLng(this.mapBounds.swLng) &&
+          this.isValidLng(this.mapBounds.neLng)
+        )
+      }
+      return true
     },
   },
   created() {
@@ -377,6 +395,15 @@ export default {
       document.body.removeChild(a)
       this.isExporting = false
       this.hasExported = true
+    },
+    isValidLat(coord) {
+      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
+    },
+    isValidLng(coord) {
+      return this.getCoord(coord, 0) <= 180 && this.getCoord(coord, 0) >= -180
+    },
+    getCoord(coord, coordIfEmpty) {
+      return coord === "" ? coordIfEmpty : coord
     },
   },
 }
