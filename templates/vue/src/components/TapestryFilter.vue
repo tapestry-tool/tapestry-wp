@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import "vue-select/dist/vue-select.css"
 import { mapActions, mapMutations, mapState } from "vuex"
 import { matchSorter } from "match-sorter"
 import client from "../services/TapestryAPI"
@@ -184,7 +185,7 @@ export default {
 <style lang="scss" scoped>
 .filter {
   display: flex;
-  height: 32px;
+  height: 3rem;
 
   button {
     color: #999;
@@ -196,7 +197,6 @@ export default {
     height: 36px;
     border-radius: 8px;
     font-size: 0.8em;
-    transform: translateY(-4px);
 
     &:hover {
       color: #11a6d8;
@@ -223,5 +223,45 @@ export default {
     transform: translateX(0);
     pointer-events: all;
   }
+}
+
+// !important styles are necessary here to override bootstrap styles
+
+.custom-select {
+  height: auto !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+  flex: 1;
+}
+
+.v-select {
+  width: 12rem;
+}
+</style>
+
+<style lang="scss">
+.vs__dropdown-toggle {
+  height: 100%;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.vs__selected-options {
+  height: 100%;
+  padding: 0 !important;
+}
+
+.vs__search {
+  border: none !important;
+  margin: 0 !important;
+  height: 100%;
+}
+
+.vs__selected {
+  margin: 0;
+  padding: 0;
+  padding-left: 0.75rem;
 }
 </style>
