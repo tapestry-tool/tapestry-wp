@@ -61,7 +61,7 @@ describe("Video", () => {
       cy.changeMediaType("video")
       cy.getByTestId(`node-video-url`).type("www.example.com/video.mp4")
 
-      cy.submitModal()
+      cy.submitModalWithError()
       cy.contains("Invalid mp4 Video URL: please re-upload or check the URL").should(
         "exist"
       )
