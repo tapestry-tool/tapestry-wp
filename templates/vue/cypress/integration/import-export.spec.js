@@ -9,6 +9,9 @@ describe("Import Export", () => {
 
     cy.getByTestId("import-file-input").attachFile(tapestry)
     cy.wait("@import")
+
+    cy.contains(/import successful/i).should("be.visible")
+    cy.contains(/confirm/i).click()
     cy.wait("@load")
 
     cy.contains(/loading/i).should("not.exist")

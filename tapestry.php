@@ -193,7 +193,7 @@ function tapestry_enqueue_libraries()
             $GF_Image_Choices_Object = new GFImageChoices();
             wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
         }
-
+      
         wp_enqueue_script('es2015-test', $LIBS_FOLDER_URL.'es2015-test.js');
     }
 }
