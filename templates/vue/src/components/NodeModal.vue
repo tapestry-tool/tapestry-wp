@@ -291,14 +291,18 @@ export default {
     },
     canPublish() {
       if (this.loading) return false
-      if (
-        this.type === "add" ||
-        (this.type === "edit" && this.node.status !== "publish")
-      ) {
+      if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
           (!this.parent || this.parent.status !== "draft")
         )
+      } else if (this.node.status === "draft" && this.type === "edit") {
+        return this.getNeighbours(this.nodeId).some(neighbourId => {
+          let neighbour = this.getNode(neighbourId)
+          return (
+            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
+          )
+        })
       } else {
         return Helpers.hasPermission(this.node, this.type)
       }
@@ -775,14 +779,6 @@ export default {
         this.warningText = "You must be authenticated to create a draft node"
         return false
       }
-
-      if (this.type === "edit") {
-        if (!this.authoredNode) {
-          this.warningText = "You cannot make nodes you did not author into drafts"
-          return false
-        }
-      }
-
       return true
     },
   },
