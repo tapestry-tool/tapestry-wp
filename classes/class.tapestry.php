@@ -550,7 +550,7 @@ class Tapestry implements ITapestry
             // draft nodes should only be visible to node authors
             // the exception is that the node is submitted in which case it should also be viewable to reviewers
             if ('draft' == $nodeMeta->status) {
-                if ($nodeMeta->author->id === $currentUserId) {
+                if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
                 }
                 if ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
