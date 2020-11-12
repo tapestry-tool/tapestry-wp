@@ -43,9 +43,10 @@ export default {
   },
   computed: {
     width() {
-      return 5
+      return 7
     },
     dasharraySize() {
+      if (this.reviewStatus) return 0
       return this.radius / 10
     },
     strokeColor() {

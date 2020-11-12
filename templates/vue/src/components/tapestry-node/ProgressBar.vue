@@ -46,9 +46,6 @@ export default {
     width() {
       return 20
     },
-    dasharraySize() {
-      return this.radius / 10
-    },
     strokeColor() {
       return "#11a6d8"
     },

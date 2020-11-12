@@ -33,7 +33,7 @@
         :progress="progress"
         :locked="!node.accessible"
       ></progress-bar>
-      <dash-array
+      <status-bar
         v-if="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
@@ -45,7 +45,7 @@
         :locked="!node.accessible"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
-      ></dash-array>
+      ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
@@ -134,7 +134,7 @@ import { isLoggedIn } from "@/utils/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import DragSelectModular from "@/utils/dragSelectModular"
-import DashArray from "./tapestry-node/DashArray"
+import StatusBar from "./tapestry-node/StatusBar"
 
 export default {
   name: "tapestry-node",
@@ -142,7 +142,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
-    DashArray,
+    StatusBar,
   },
   props: {
     node: {
