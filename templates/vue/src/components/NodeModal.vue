@@ -317,7 +317,6 @@ export default {
     },
     canMakeDraft() {
       const { id } = wp.getCurrentUser()
-      console.log(this.node.status)
       if (this.node.status === "publish") {
         return false
       }
