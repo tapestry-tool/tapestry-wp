@@ -53,6 +53,8 @@ describe("Video", () => {
     })
   })
 
+  const videoErrorMsg = "Invalid mp4 Video URL: please re-upload or check the URL"
+
   it("Should show an error and not create a node if an mp4 URL is invalid", () => {
     cy.getSelectedNode().then(parent => {
       const nodeName = "Video 1"
@@ -64,12 +66,21 @@ describe("Video", () => {
       cy.getByTestId(`node-video-url`).type("www.example.com/video.mp4")
 
       cy.submitModalWithError()
-      cy.contains("Invalid mp4 Video URL: please re-upload or check the URL").should(
-        "exist"
-      )
+      cy.contains(videoErrorMsg).should("exist")
 
+      // check that error persists
+      cy.contains(/publish/i).click()
+      cy.contains(videoErrorMsg).should("exist")
+
+      // check that node is not created
       cy.contains(/cancel/i).click()
       cy.contains(`/${nodeName}/i`).should("not.exist")
+
+      // check that error does not persist to new creation
+      cy.openModal("add", parent.id)
+      cy.getByTestId(`node-title`).type(nodeName)
+      cy.changeMediaType("video")
+      cy.contains(videoErrorMsg).should("not.exist")
     })
   })
 })

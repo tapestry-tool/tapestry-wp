@@ -489,7 +489,6 @@ export default {
     },
     async handleSubmit() {
       this.loading = true
-      this.submissionError = null
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.node.status = "publish"
