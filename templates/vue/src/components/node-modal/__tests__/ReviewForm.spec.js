@@ -19,7 +19,7 @@ describe("ReviewForm", () => {
       },
       reviewComments: [],
     }
-    return [node, render(ReviewForm, null, { props: { node } })]
+    return [node, render(ReviewForm, { props: { node } })]
   }
 
   it("should be able to reject a node", async () => {

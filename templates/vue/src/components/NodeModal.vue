@@ -144,6 +144,7 @@
           <b-button
             v-if="canPublish"
             id="submit-button"
+            data-qa="submit-node-modal"
             size="sm"
             variant="primary"
             :disabled="!canSubmit"
@@ -154,6 +155,7 @@
           </b-button>
           <b-button
             v-else
+            data-qa="submit-node-modal"
             size="sm"
             variant="primary"
             :disabled="!canMakeDraft || !canSubmit"
