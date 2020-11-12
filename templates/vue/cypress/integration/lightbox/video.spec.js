@@ -80,6 +80,9 @@ describe("Video", () => {
       cy.openModal("add", parent.id)
       cy.changeMediaType("video")
       cy.getByTestId(`node-title`).type(nodeName)
+      cy.getByTestId(`node-video-url`).type(
+        "https://www.youtube.com/watch?v=nMhua5LJRWg"
+      )
       cy.getByTestId("modal-submit-error").should("not.exist")
     })
   })
