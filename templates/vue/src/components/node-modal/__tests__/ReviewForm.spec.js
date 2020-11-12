@@ -26,7 +26,7 @@ describe("ReviewForm", () => {
     const [node, screen] = setup()
     await fireEvent.click(screen.getByText("Reject"))
 
-    expect(node.status).toEqual("reject")
+    expect(node.reviewStatus).toEqual("reject")
     expect(node.reviewComments.length).toEqual(0)
   })
 
