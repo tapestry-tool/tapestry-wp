@@ -317,13 +317,14 @@ export default {
     },
     canMakeDraft() {
       const { id } = wp.getCurrentUser()
-      if (this.node.status === "publish" && this.type === "edit") {
+      console.log(this.node.status)
+      if (this.node.status === "publish") {
         return false
       }
       return this.hasDraftPermission(id)
     },
     canEditTapestry() {
-      return wp.wpCanEditTapestry == 1
+      return wp.canEditTapestry()
     },
     canSubmit() {
       return !this.fileUploading

@@ -148,7 +148,7 @@ export default class Helpers {
     }
 
     // Check 2: User is the author of the node
-    if (node.author && wp.id == parseInt(node.author.id)) {
+    if (node.author && wp.getCurrentUser().id == parseInt(node.author.id)) {
       // once a node is submitted for review, it can no longer be edited by that user.
       // accepted nodes should not automatically be editable by a user - we treat those like published nodes.
       if (node.reviewStatus !== "submitted" && node.reviewStatus !== "accept") {
