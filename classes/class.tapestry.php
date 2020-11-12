@@ -552,12 +552,10 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                }
-                if ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
+                } elseif ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
-            }
-            else {
+            } else {
                 array_push($nodesPermitted, $nodeId);
             }
         }

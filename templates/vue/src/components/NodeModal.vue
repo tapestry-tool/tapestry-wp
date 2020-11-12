@@ -17,163 +17,157 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="loading" class="spinner">
-      <b-spinner variant="secondary"></b-spinner>
-    </b-container>
-    <b-container v-else fluid class="px-0" data-qa="node-modal">
-      <b-tabs card>
-        <b-tab
-          title="Content"
-          :active="tab === 'content'"
-          style="overflow-x: hidden;"
-          @click="changeTab('content')"
-        >
-          <content-form
-            :node="node"
-            @load="videoLoaded = true"
-            @unload="videoLoaded = false"
-            @type-changed="handleTypeChange"
-          />
-        </b-tab>
-        <b-tab
-          title="Appearance"
-          :active="tab === 'appearance'"
-          @click="changeTab('appearance')"
-        >
-          <appearance-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
-          :active="tab === 'behaviour'"
-          title="Behaviour"
-          @click="changeTab('behaviour')"
-        >
-          <behaviour-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="viewAccess"
-          title="Access"
-          :active="tab === 'access'"
-          @click="changeTab('access')"
-        >
-          <h6 class="mb-3">Node Permissions</h6>
-          <b-card no-body>
-            <permissions-table v-model="node.permissions" />
-          </b-card>
-          <h6 class="mt-4 mb-3">Lock Node</h6>
-          <conditions-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
-          title="Activity"
-          :active="tab === 'activity'"
-          @click="changeTab('activity')"
-        >
-          <activity-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
-          title="Ordering"
-          :active="tab === 'ordering'"
-          @click="changeTab('ordering')"
-        >
-          <div>
-            <slick-list
-              :value="node.childOrdering"
-              lock-axis="y"
-              @input="updateOrderingArray"
-            >
-              <slick-item
-                v-for="(childId, index) in node.childOrdering"
-                :key="index"
-                class="slick-list-item"
-                :index="index"
-                style="z-index: 9999 !important;"
+    <b-container fluid class="px-0" data-qa="node-modal">
+      <b-overlay :show="loading">
+        <b-tabs card>
+          <b-tab
+            title="Content"
+            :active="tab === 'content'"
+            style="overflow-x: hidden;"
+            @click="changeTab('content')"
+          >
+            <content-form
+              :node="node"
+              @load="videoLoaded = true"
+              @unload="videoLoaded = false"
+              @type-changed="handleTypeChange"
+            />
+          </b-tab>
+          <b-tab
+            title="Appearance"
+            :active="tab === 'appearance'"
+            @click="changeTab('appearance')"
+          >
+            <appearance-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+            :active="tab === 'behaviour'"
+            title="Behaviour"
+            @click="changeTab('behaviour')"
+          >
+            <behaviour-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="viewAccess"
+            title="Access"
+            :active="tab === 'access'"
+            @click="changeTab('access')"
+          >
+            <h6 class="mb-3">Node Permissions</h6>
+            <b-card no-body>
+              <permissions-table v-model="node.permissions" />
+            </b-card>
+            <h6 class="mt-4 mb-3">Lock Node</h6>
+            <conditions-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+            title="Activity"
+            :active="tab === 'activity'"
+            @click="changeTab('activity')"
+          >
+            <activity-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
+            title="Ordering"
+            :active="tab === 'ordering'"
+            @click="changeTab('ordering')"
+          >
+            <div>
+              <slick-list
+                :value="node.childOrdering"
+                lock-axis="y"
+                @input="updateOrderingArray"
               >
-                <span class="fas fa-bars fa-xs"></span>
-                <span>{{ getNode(childId).title }}</span>
-                <span style="color: grey;">id: {{ childId }}</span>
-              </slick-item>
-            </slick-list>
-          </div>
-        </b-tab>
-        <b-tab
-          title="More Information"
-          :active="tab === 'more-information'"
-          @click="changeTab('more-information')"
-        >
-          <more-information-form :node="node" />
-        </b-tab>
-      </b-tabs>
+                <slick-item
+                  v-for="(childId, index) in node.childOrdering"
+                  :key="index"
+                  class="slick-list-item"
+                  :index="index"
+                  style="z-index: 9999 !important;"
+                >
+                  <span class="fas fa-bars fa-xs"></span>
+                  <span>{{ getNode(childId).title }}</span>
+                  <span style="color: grey;">id: {{ childId }}</span>
+                </slick-item>
+              </slick-list>
+            </div>
+          </b-tab>
+          <b-tab
+            title="More Information"
+            :active="tab === 'more-information'"
+            @click="changeTab('more-information')"
+          >
+            <more-information-form :node="node" />
+          </b-tab>
+        </b-tabs>
+      </b-overlay>
     </b-container>
-    <template v-if="loading" slot="modal-footer">
-      <b-spinner variant="secondary"></b-spinner>
-    </template>
-    <template v-else slot="modal-footer">
-      <review-form
-        v-if="canEditTapestry && node.reviewStatus === 'submitted'"
-        :node="node"
-        @submit="handleSubmit"
-        @close="close"
-      ></review-form>
-      <template v-else>
-        <div style="display: flex; width: 100%;" class="buttons-container">
-          <delete-node-button
-            v-if="type === 'edit'"
-            :node-id="Number(nodeId)"
-            @submit="loading = true"
-            @message="setDisabledMessage"
-          ></delete-node-button>
-          <span style="flex-grow:1;"></span>
-          <b-button size="sm" variant="light" @click="close">
-            Cancel
-          </b-button>
-          <b-button
-            v-if="rootId !== 0 && canMakeDraft"
-            id="draft-button"
-            size="sm"
-            variant="secondary"
-            :disabled="!canSubmit"
-            @click="handleDraftSubmit"
-          >
-            <b-spinner v-if="!canSubmit" small></b-spinner>
-            <div :style="canSubmit ? '' : 'opacity: 50%;'">
-              Save as Private Draft
-            </div>
-          </b-button>
-          <b-button
-            v-if="canPublish"
-            id="submit-button"
-            data-qa="submit-node-modal"
-            size="sm"
-            variant="primary"
-            :disabled="!canSubmit"
-            @click="handlePublish"
-          >
-            <b-spinner v-if="!canSubmit" small></b-spinner>
-            <div :style="canSubmit ? '' : 'opacity: 50%;'">Publish</div>
-          </b-button>
-          <b-button
-            v-else
-            data-qa="submit-node-modal"
-            size="sm"
-            variant="primary"
-            :disabled="!canMakeDraft || !canSubmit"
-            @click="handleSubmitForReview"
-          >
-            <b-spinner v-if="!canSubmit" small></b-spinner>
-            <div :style="canSubmit ? '' : 'opacity: 50%;'">
-              {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
-              to Administrators for Review
-            </div>
-          </b-button>
-        </div>
-        <b-form-invalid-feedback :state="canMakeDraft">
-          {{ warningText }}
-          <br v-if="warningText" />
-          {{ deleteWarningText }}
-        </b-form-invalid-feedback>
-      </template>
+    <template slot="modal-footer">
+      <b-overlay :show="loading" class="w-100">
+        <review-form
+          v-if="canEditTapestry && node.reviewStatus === 'submitted'"
+          :node="node"
+          @submit="handleSubmit"
+          @close="close"
+        ></review-form>
+        <template v-else>
+          <b-overlay :show="fileUploading" class="buttons-container d-flex w-100">
+            <delete-node-button
+              v-if="type === 'edit'"
+              :node-id="Number(nodeId)"
+              @submit="loading = true"
+              @message="setDisabledMessage"
+            ></delete-node-button>
+            <span style="flex-grow:1;"></span>
+            <b-button size="sm" variant="light" @click="close">
+              Cancel
+            </b-button>
+            <b-button
+              v-if="rootId !== 0 && canMakeDraft"
+              id="draft-button"
+              size="sm"
+              variant="secondary"
+              :disabled="fileUploading"
+              @click="handleDraftSubmit"
+            >
+              <span>Save as Private Draft</span>
+            </b-button>
+            <b-button
+              v-if="canPublish"
+              id="submit-button"
+              data-qa="submit-node-modal"
+              size="sm"
+              variant="primary"
+              :disabled="fileUploading"
+              @click="handlePublish"
+            >
+              <span>Publish</span>
+            </b-button>
+            <b-button
+              v-else
+              data-qa="submit-node-modal"
+              size="sm"
+              variant="primary"
+              :disabled="!canMakeDraft || fileUploading"
+              @click="handleSubmitForReview"
+            >
+              <span>
+                {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
+                to Administrators for Review
+              </span>
+            </b-button>
+          </b-overlay>
+          <b-form-invalid-feedback :state="canMakeDraft">
+            {{ warningText }}
+            <br v-if="warningText" />
+            {{ deleteWarningText }}
+          </b-form-invalid-feedback>
+        </template>
+        <template #overlay>...</template>
+      </b-overlay>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -326,9 +320,6 @@ export default {
     },
     canEditTapestry() {
       return wp.canEditTapestry()
-    },
-    canSubmit() {
-      return !this.fileUploading
     },
     nodeId() {
       const nodeId = this.$route.params.nodeId
@@ -849,16 +840,6 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#submit-button {
-  display: flex;
-  align-items: center;
-  flex-direction: row-reverse;
-
-  div {
-    margin-right: 4px;
-  }
 }
 
 #node-modal-container {

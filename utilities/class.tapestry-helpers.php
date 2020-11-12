@@ -171,9 +171,10 @@ class TapestryHelpers
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $roles = new TapestryUserRoles($userId);
 
-        // allow superusers for all actions, allow normal user for all actions if it's their own post
-        if (($roles->canEdit($tapestryPostId) && $superuser_override) || 
-        ($roles->isAuthorOfThePost($nodePostId) && $node->_getStatus() == "draft" && $node->_getReviewStatus() != "submitted")) {
+        if ($roles->canEdit($tapestryPostId) && $superuser_override) {
+            return true;
+        }
+        elseif ($roles->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
