@@ -547,15 +547,19 @@ class Tapestry implements ITapestry
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
             $nodeMeta = $node->getMeta();
-            // the only draft nodes that should be available to users other than their author are ones that have been submitted
-            if ('draft' == $nodeMeta->status && $nodeMeta->author->id != $currentUserId && $nodeMeta->reviewStatus != "submitted") {
-                continue;
+            // draft nodes should only be visible to node authors
+            // the exception is that the node is submitted in which case it should also be viewable to reviewers
+            if ('draft' == $nodeMeta->status) {
+                if ($nodeMeta->author->id === $currentUserId) {
+                    array_push($nodesPermitted, $nodeId);
+                }
+                if ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
+                    array_push($nodesPermitted, $nodeId);
+                }
             }
-            // for such submitted nodes, they should only be viewable by reviewers or their author
-            if ('submitted' == $nodeMeta->reviewStatus && !($currentUserRoles->canEdit($this->postId) || $nodeMeta->author->id == $currentUserId)) {
-                continue;
+            else {
+                array_push($nodesPermitted, $nodeId);
             }
-            array_push($nodesPermitted, $nodeId);
         }
 
         return $nodesPermitted;
