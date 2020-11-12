@@ -609,8 +609,8 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
-        if (TapestryHelpers::nodeIsPrivate($link->source, $postId) 
-            || TapestryHelpers::nodeIsPrivate($link->target, $postId)) {
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+            || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
             $tapestry = new Tapestry($postId);
             return $tapestry->addLink($link);
         }

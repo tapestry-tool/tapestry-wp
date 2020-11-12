@@ -226,7 +226,7 @@ class TapestryHelpers
      *
      * @return bool
      */
-    public static function nodeIsPrivate($nodeMetaId, $tapestryPostId)
+    public static function nodeIsDraft($nodeMetaId, $tapestryPostId)
     {
         $node = new TapestryNode($tapestryPostId, $nodeMetaId);
         return $node->getMeta()->status == "draft";
