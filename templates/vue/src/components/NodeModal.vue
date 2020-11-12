@@ -17,7 +17,11 @@
         </ul>
       </b-alert>
     </div>
-    <div v-if="submissionError" class="modal-header-row">
+    <div
+      v-if="submissionError"
+      class="modal-header-row"
+      data-qa="modal-submit-error"
+    >
       <b-alert id="tapestry-modal-submit-error" variant="danger" show>
         <p>{{ submissionError }}</p>
       </b-alert>
