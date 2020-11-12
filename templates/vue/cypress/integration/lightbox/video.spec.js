@@ -78,8 +78,8 @@ describe("Video", () => {
 
       // check that error does not persist to new creation
       cy.openModal("add", parent.id)
-      cy.getByTestId(`node-title`).type(nodeName)
       cy.changeMediaType("video")
+      cy.getByTestId(`node-title`).type(nodeName)
       cy.contains(videoErrorMsg).should("not.exist")
     })
   })
