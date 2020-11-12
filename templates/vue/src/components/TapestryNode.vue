@@ -3,6 +3,9 @@
     <g
       v-show="show"
       ref="node"
+      :data-qa="`node-${node.id}`"
+      :data-locked="!node.accessible"
+      :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
       :class="{
         opaque: !visibleNodes.includes(node.id),
         'has-thumbnail': node.accessible ? node.imageURL : node.lockedImageURL,
@@ -15,84 +18,71 @@
       @mouseover="handleMouseover"
       @mouseleave="$emit('mouseleave')"
     >
+      <circle ref="circle" :fill="fill"></circle>
       <circle
-        ref="circle"
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
-        :fill="fill"
-      ></circle>
-      <circle
-        :cx="node.coordinates.x"
-        :cy="node.coordinates.y"
         :r="radius"
         :fill="overlayFill"
         class="node-overlay"
         :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
       ></circle>
       <progress-bar
-        v-show="
+        v-if="
           node.nodeType !== 'grandchild' &&
             node.nodeType !== '' &&
             !node.hideProgress
         "
-        :x="node.coordinates.x"
-        :y="node.coordinates.y"
-        :radius="radius"
+        :data-qa="`node-progress-${node.id}`"
+        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
+        :draft="node.status === 'draft'"
       ></progress-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
+          :data-qa="`node-title-${node.id}`"
           class="metaWrapper"
           :width="(140 * 2 * 5) / 6"
           :height="(140 * 2 * 5) / 6"
-          :x="node.coordinates.x - (140 * 5) / 6"
-          :y="node.coordinates.y - (140 * 5) / 6"
+          :x="-(140 * 5) / 6"
+          :y="-(140 * 5) / 6"
         >
           <div class="meta">
             <p class="title">{{ node.title }}</p>
-            <p v-if="node.mediaDuration" class="timecode">{{ formatDuration() }}</p>
+            <p v-if="node.mediaDuration" class="timecode">
+              {{ formatDuration() }}
+            </p>
           </div>
         </foreignObject>
         <g v-show="!transitioning">
-          <foreignObject
+          <node-button
             v-if="!node.hideMedia"
-            class="node-button-wrapper"
-            :x="node.coordinates.x - 30"
-            :y="node.coordinates.y - radius - 30"
+            :x="0"
+            :y="-radius"
+            :data-qa="`open-node-${node.id}`"
+            :disabled="!node.accessible && !hasPermission('edit')"
+            @click="handleRequestOpen"
           >
-            <button
-              class="node-button"
-              :disabled="!node.accessible && !hasPermission('edit')"
-              @click="handleRequestOpen"
-            >
-              <tapestry-icon
-                v-if="node.mediaType !== 'text'"
-                :icon="icon"
-              ></tapestry-icon>
-              <span v-else>Aa</span>
-            </button>
-          </foreignObject>
+            <tapestry-icon :icon="icon" svg></tapestry-icon>
+          </node-button>
           <add-child-button
-            v-if="hasPermission('add') && !isSubAccordionRow"
+            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
-            :x="node.coordinates.x - 65"
-            :y="node.coordinates.y + radius - 30"
+            :x="-35"
+            :y="radius"
           ></add-child-button>
-          <foreignObject
-            v-if="hasPermission('edit')"
-            class="node-button-wrapper"
-            :x="node.coordinates.x + 5"
-            :y="node.coordinates.y + radius - 30"
+          <node-button
+            v-if="isLoggedIn && hasPermission('edit')"
+            :x="35"
+            :y="radius"
+            :data-qa="`edit-node-${node.id}`"
+            @click="editNode"
           >
-            <button class="node-button" @click.stop="editNode">
-              <tapestry-icon icon="pen"></tapestry-icon>
-            </button>
-          </foreignObject>
+            <tapestry-icon icon="pen" svg></tapestry-icon>
+          </node-button>
         </g>
       </g>
-      <defs v-if="node.imageURL">
+      <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
@@ -116,10 +106,13 @@
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
+import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import NodeButton from "./tapestry-node/NodeButton"
 
 export default {
   name: "tapestry-node",
@@ -127,6 +120,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    NodeButton,
   },
   props: {
     node: {
@@ -152,6 +146,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
@@ -201,7 +198,20 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (this.node.imageURL && this.node.nodeType !== "grandchild" && showImages) {
+      if (
+        !this.node.imageURL &&
+        this.node.lockedImageURL &&
+        this.node.nodeType !== "grandchild" &&
+        showImages &&
+        this.node.accessible
+      ) {
+        return "#8396a1"
+      }
+      if (
+        (this.node.imageURL || this.node.lockedImageURL) &&
+        this.node.nodeType !== "grandchild" &&
+        showImages
+      ) {
         return `url(#node-image-${this.node.id})`
       }
       return "#8396a1"
@@ -222,7 +232,9 @@ export default {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
-      return rows.map(this.getNode).filter(row => row.completed).length / rows.length
+        .map(this.getNode)
+        .filter(n => n.status !== "draft")
+      return rows.filter(row => row.completed).length / rows.length
     },
   },
   watch: {
@@ -241,66 +253,60 @@ export default {
     },
   },
   mounted() {
+    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(
       d3
         .drag()
         .on("start", () => {
+          this.coordinates = {}
           if (this.selection.length) {
             this.coordinates = this.selection.reduce((coordinates, nodeId) => {
               const node = this.getNode(nodeId)
-              coordinates[nodeId] = { x: node.coordinates.x, y: node.coordinates.y }
+              coordinates[nodeId] = {
+                x: node.coordinates.x,
+                y: node.coordinates.y,
+              }
               return coordinates
             }, {})
           } else {
-            this.originalX = this.node.coordinates.x
-            this.originalY = this.node.coordinates.y
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
           }
         })
         .on("drag", () => {
-          if (this.selection.length) {
-            this.selection.forEach(id => {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-            })
-          } else {
-            this.node.coordinates.x += d3.event.dx
-            this.node.coordinates.y += d3.event.dy
+          for (const id of Object.keys(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
           }
         })
         .on("end", () => {
-          this.$emit("dragend")
-          if (this.hasPermission("edit")) {
-            if (this.selection.length) {
-              this.selection.forEach(id => {
-                const node = this.getNode(id)
-                this.updateNodeCoordinates({
-                  id: node.id,
-                  coordinates: {
-                    x: node.coordinates.x,
-                    y: node.coordinates.y,
-                  },
-                }).catch(() => {
-                  alert("Failed to save coordinates.")
-                  node.coordinates.x = this.coordinates[id].x
-                  node.coordinates.y = this.coordinates[id].y
-                })
-              })
-            } else {
-              this.updateNodeCoordinates({
-                id: this.node.id,
-                coordinates: {
-                  x: this.node.coordinates.x,
-                  y: this.node.coordinates.y,
-                },
-              }).catch(() => {
-                alert("Failed to save coordinates.")
-                this.node.coordinates.x = this.originalFx
-                this.node.coordinates.y = this.originalFy
-              })
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+            let coordinates = {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
             }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
+              continue
+            }
+            this.$emit("dragend")
+            this.updateNodeCoordinates({
+              id,
+              coordinates,
+              originalCoordinates,
+            }).catch(() => {
+              this.$emit("dragend")
+            })
           }
         })
     )
@@ -308,11 +314,29 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
     ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    updateRootNode() {
+      if (!this.root) {
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
+        this.updateSelectedNode(this.node.id)
+      }
+    },
     openNode() {
-      this.$router.push(`/nodes/${this.node.id}`)
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
     editNode() {
-      this.$root.$emit("edit-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -345,9 +369,7 @@ export default {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia
-          ? this.openNode()
-          : this.updateSelectedNode(this.node.id)
+        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
       }
     },
     hasPermission(action) {
@@ -407,7 +429,6 @@ export default {
 }
 
 .meta {
-  transition: opacity 0.2s;
   .title {
     text-shadow: 0 0 5px #000;
     font-weight: bold;

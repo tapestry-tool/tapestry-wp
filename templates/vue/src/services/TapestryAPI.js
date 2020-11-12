@@ -1,5 +1,8 @@
 import axios from "axios"
 import Helpers from "../utils/Helpers"
+import { data } from "./wp"
+
+const { apiUrl, nonce, postId } = data
 
 class TapestryApi {
   /**
@@ -7,7 +10,7 @@ class TapestryApi {
    * @param {Number} postId
    */
   constructor(postId) {
-    axios.defaults.headers.common["X-WP-Nonce"] = wpData.nonce
+    axios.defaults.headers.common["X-WP-Nonce"] = nonce
     this.postId = postId
   }
 
@@ -31,10 +34,28 @@ class TapestryApi {
     return response.data
   }
 
+  async getAllRoles() {
+    const usersRequest = await axios.get(`${apiUrl}/roles`)
+    const users = usersRequest.data
+    let wp_roles = new Set()
+    //defaults
+    wp_roles.add("public")
+    wp_roles.add("authenticated")
+    for (let role of Object.keys(users)) {
+      wp_roles.add(role)
+    }
+    wp_roles.delete("administrator")
+    return wp_roles
+  }
+
   async importTapestry(data) {
     const url = `${apiUrl}/tapestries/${this.postId}`
-    const response = await axios.put(url, data)
-    return response.data
+    try {
+      const response = await axios.put(url, data)
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   async getNode(id) {
@@ -74,13 +95,12 @@ class TapestryApi {
    */
   async addLink(link) {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
-    const response = await axios.post(url, link)
-    return response
+    return await axios.post(url, link)
   }
 
-  async deleteLink(linkIndex) {
+  async deleteLink(link) {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
-    return await axios.delete(url, { data: linkIndex })
+    return await axios.delete(url, { data: link })
   }
 
   /**
@@ -253,4 +273,4 @@ class TapestryApi {
   }
 }
 
-export default new TapestryApi(wpPostId)
+export default new TapestryApi(postId)

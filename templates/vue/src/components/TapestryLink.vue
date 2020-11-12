@@ -2,9 +2,11 @@
   <transition name="fade">
     <line
       v-show="show"
+      :data-qa="`link-${source.id}-${target.id}`"
       :class="{
         opaque:
           !visibleNodes.includes(source.id) || !visibleNodes.includes(target.id),
+        disabled: !isLoggedIn,
       }"
       :x1="source.coordinates.x"
       :x2="target.coordinates.x"
@@ -17,6 +19,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-link",
@@ -36,19 +39,45 @@ export default {
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
+    isLoggedIn() {
+      return wp.isLoggedIn()
+    },
   },
   methods: {
     ...mapActions(["deleteLink"]),
+    isConnectedToRoot(source, target) {
+      let queue = []
+      let visited = new Set()
+      queue.push(source)
+      visited.add(source)
+      while (queue.length > 0) {
+        const node = queue.shift()
+        if (node == this.rootId) {
+          return true
+        }
+        const neighbours = this.getNeighbours(node)
+        for (const neighbour of neighbours) {
+          if (
+            !visited.has(neighbour) &&
+            !(node === source && neighbour === target)
+          ) {
+            visited.add(neighbour)
+            queue.push(neighbour)
+          }
+        }
+      }
+      return false
+    },
     canDelete() {
-      const sourceNeighbours = this.getNeighbours(this.source.id).filter(
-        id => id !== this.target.id
+      return (
+        this.isConnectedToRoot(this.source.id, this.target.id) &&
+        this.isConnectedToRoot(this.target.id, this.source.id)
       )
-      const targetNeighbours = this.getNeighbours(this.target.id).filter(
-        id => id !== this.source.id
-      )
-      return sourceNeighbours.length > 0 && targetNeighbours.length > 0
     },
     async remove() {
+      if (event.target.classList.contains("disabled")) {
+        return
+      }
       const userConfirmDelete = confirm(
         `Are you sure you want to delete the link between ${this.source.title} and ${this.target.title}?`
       )

@@ -4,7 +4,12 @@
     <transition name="modal">
       <div v-if="load" class="content" :style="contentContainerStyle">
         <div class="buttons-container">
-          <modal-button v-if="allowClose" icon="times" @clicked="$emit('close')" />
+          <modal-button
+            v-if="allowClose"
+            data-qa="close-lightbox"
+            icon="times"
+            @clicked="$emit('close')"
+          />
           <modal-button
             icon="heart"
             icon-size="sm"
@@ -114,7 +119,6 @@ export default {
       position: absolute;
       display: flex;
       flex-direction: row-reverse;
-      width: 100%;
       top: -20px;
       right: -20px;
       z-index: 1000;

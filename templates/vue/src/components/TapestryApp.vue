@@ -1,10 +1,16 @@
 <template>
-  <div id="app-container">
+  <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <div class="toolbar">
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <settings-modal-button v-if="canEdit"></settings-modal-button>
-        <tapestry-depth-slider @change="updateViewBox"></tapestry-depth-slider>
+        <settings-modal-button
+          v-if="canEdit"
+          :max-depth="maxDepth"
+        ></settings-modal-button>
+        <tapestry-depth-slider
+          @change="updateViewBox"
+          @change:max-depth="maxDepth = $event"
+        ></tapestry-depth-slider>
       </div>
     </div>
     <root-node-button
@@ -24,17 +30,18 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g class="nodes">
+        <g v-if="dragSelectReady" class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
             :node="node"
             class="node"
             :data-id="id"
-            :root="id == selectedNodeId"
+            :root="id == selectedId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
+            @mounted="updateSelectableNodes"
           ></tapestry-node>
         </g>
         <locked-tooltip
@@ -48,7 +55,7 @@
 </template>
 
 <script>
-import DragSelect from "dragselect"
+import DragSelectModular from "@/utils/dragSelectModular"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryLink from "@/components/TapestryLink"
@@ -58,6 +65,8 @@ import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
+import { names } from "@/config/routes"
+import * as wp from "@/services/wp"
 
 export default {
   components: {
@@ -74,18 +83,26 @@ export default {
       loading: true,
       viewBox: "2200 2700 1600 1100",
       activeNode: null,
+      maxDepth: 0,
+      dragSelectReady: false,
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selectedNodeId", "selection", "settings"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     background() {
       return this.settings.backgroundUrl
     },
     canEdit() {
-      return wpData.wpCanEditTapestry === "1"
+      return wp.canEditTapestry()
     },
     empty() {
       return Object.keys(this.nodes).length === 0
+    },
+    selectedId() {
+      return Number(this.$route.params.nodeId)
+    },
+    isSidebarOpen() {
+      return Boolean(this.$route.query.sidebar)
     },
   },
   watch: {
@@ -96,39 +113,35 @@ export default {
         app.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
+    selectedId: {
+      immediate: true,
+      handler(nodeId) {
+        if (this.$route.name === names.APP && !this.nodes.hasOwnProperty(nodeId)) {
+          this.$router.replace(
+            Object.keys(this.nodes).length === 0
+              ? { path: "/", query: this.$route.query }
+              : {
+                  name: names.APP,
+                  params: { nodeId: this.rootId },
+                  query: this.$route.query,
+                }
+          )
+        }
+      },
+    },
   },
   mounted() {
-    this.initializeDragSelect()
+    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    this.updateViewBox()
+    this.dragSelectReady = true
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    initializeDragSelect() {
-      document.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-          this.clearSelection()
-        }
-
-        if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-          evt.preventDefault()
-          Object.values(this.nodes).forEach(node => this.select(node.id))
-        }
-      })
-
-      new DragSelect({
-        selectables: document.querySelectorAll(".node"),
-        area: this.$refs.app,
-        onDragStart: evt => {
-          if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-            return
-          }
-          this.clearSelection()
-        },
-        onElementSelect: el => this.select(el.dataset.id),
-        onElementUnselect: el => this.unselect(el.dataset.id),
-      })
+    updateSelectableNodes() {
+      DragSelectModular.updateSelectableNodes()
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -194,22 +207,13 @@ export default {
         x: 0,
         y: 0,
       }
-
       for (const node of Object.values(this.nodes)) {
         if (node.nodeType !== "") {
           const { x, y } = node.coordinates
-          if (x < box.x0) {
-            box.x0 = x
-          }
-          if (y < box.y0) {
-            box.y0 = y
-          }
-          if (x > box.x) {
-            box.x = x
-          }
-          if (y > box.y) {
-            box.y = y
-          }
+          box.x0 = Math.min(x, box.x0)
+          box.y0 = Math.min(y, box.y0)
+          box.x = Math.max(x, box.x)
+          box.y = Math.max(y, box.y)
         }
       }
 
@@ -221,29 +225,33 @@ export default {
 
 <style lang="scss" scoped>
 #app-container {
+  position: relative;
   transform: scale(1);
   transform-origin: top left;
   transition: all 0.2s ease-out;
+  width: 100%;
   z-index: 0;
 
   @media screen and (min-width: 500px) {
     &.sidebar-open {
-      transform: scale(0.7);
+      width: calc(100% - max(340px, 30%));
+      padding-right: 0;
+
+      .toolbar {
+        padding-right: 1.5vw;
+      }
     }
   }
+  #tapestry svg {
+    position: relative;
+  }
 }
-
-main {
-  position: relative;
-  z-index: 0;
-}
-
 .toolbar {
   display: flex;
   justify-content: space-between;
   padding: 0 5vw;
+  transition: all 0.2s ease-out;
 }
-
 .slider-wrapper {
   background: #fbfbfb;
   box-shadow: 0 0 7px 0 #ddd;

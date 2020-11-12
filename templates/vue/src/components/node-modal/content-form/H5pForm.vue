@@ -22,6 +22,7 @@
 <script>
 import Combobox from "@/components/Combobox"
 import H5PApi from "@/services/H5PApi"
+import { data } from "@/services/wp"
 
 export default {
   components: {
@@ -41,7 +42,7 @@ export default {
   },
   computed: {
     mediaUrl() {
-      return `${wpData.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
+      return `${data.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
     },
   },
   watch: {

@@ -76,6 +76,7 @@ import AudioRecorder from "@/components/AudioRecorder"
 import GravityForm from "../GravityForm"
 import Loading from "../../Loading"
 import TapestryActivity from "@/components/TapestryActivity"
+import * as wp from "@/services/wp"
 
 export default {
   name: "question",
@@ -108,7 +109,7 @@ export default {
   computed: {
     ...mapGetters(["getEntry", "getQuestion"]),
     isLoggedIn() {
-      return Boolean(wpData.wpUserId)
+      return wp.isLoggedIn()
     },
     lastQuestion() {
       if (this.question.previousEntry) {
@@ -171,7 +172,7 @@ export default {
     },
     async handleFormSubmit() {
       this.formOpened = false
-      if (!wpData.wpUserId) {
+      if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
       this.loading = true
@@ -186,7 +187,7 @@ export default {
     },
     async handleAudioSubmit(audioFile) {
       this.recorderOpened = false
-      if (!wpData.wpUserId) {
+      if (!this.isLoggedIn) {
         return this.$emit("submit")
       }
       this.loading = true

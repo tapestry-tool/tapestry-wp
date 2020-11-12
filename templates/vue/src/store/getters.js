@@ -27,22 +27,33 @@ export function getParent(state) {
 export function isAccordion(_, { getNode, getParent }) {
   return id => {
     const node = getNode(id)
+
+    // Check 1: Node itself is an accordion
     if (node.mediaType === "accordion") {
       return true
     }
+
+    // Check 2: Node is a subaccordion
     const parent = getParent(node.id)
     if (parent) {
       const parentNode = getNode(parent)
       return parentNode.mediaType === "accordion"
     }
+
     return false
   }
 }
 
 export function isAccordionRow(_, { getParent, isAccordion }) {
-  return id => {
+  return (id, accordion) => {
     const parent = getParent(id)
-    return parent ? isAccordion(parent) : false
+    if (!parent) {
+      return false
+    }
+    if (accordion !== undefined) {
+      return parent === accordion
+    }
+    return isAccordion(parent)
   }
 }
 
@@ -62,7 +73,7 @@ export function isVisible(_, { getNode, isAccordionRow }) {
 export function getActivities(state) {
   return (options = {}) => {
     const { exclude = [] } = options
-    return state.nodes
+    return Object.values(state.nodes)
       .filter(node => !exclude.includes(node.id) && Boolean(node.quiz))
       .flatMap(node => node.quiz)
   }
@@ -70,7 +81,7 @@ export function getActivities(state) {
 
 export function getQuestion(state) {
   return id => {
-    const node = state.nodes
+    const node = Object.values(state.nodes)
       .filter(node => node.quiz)
       .find(node => node.quiz.find(q => q.id == id))
     if (node) {
@@ -220,7 +231,7 @@ export function createDefaultNode({ settings }) {
 
 export function tapestryJson(state) {
   const exportedTapestry = {
-    nodes: state.nodes.map(node => {
+    nodes: Object.values(state.nodes).map(node => {
       const newNode = { ...node }
       if (newNode.quiz) {
         newNode.quiz = newNode.quiz.map(question => {
@@ -240,5 +251,11 @@ export function getNeighbours(state) {
     return state.links
       .filter(link => link.source == id || link.target == id)
       .map(link => (link.source == id ? link.target : link.source))
+  }
+}
+
+export function getNeighbouringLinks(state) {
+  return id => {
+    return state.links.filter(link => link.source == id || link.target == id)
   }
 }

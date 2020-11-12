@@ -4,12 +4,12 @@
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.32.0-beta
+ * Version: 2.35.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.32.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.35.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -45,9 +45,6 @@ function create_tapestry_type()
         'show_in_nav_menus' => true,
         'exclude_from_search' => false,
         'capability_type' => 'post',
-        'capabilities' => [
-            'create_posts' => 'administrator',
-        ],
         'map_meta_cap' => true,
         'hierarchical' => false,
         'rewrite' => ['with_front' => true],
@@ -143,6 +140,7 @@ function tapestry_enqueue_vue_app()
                 'directory_uri' => plugin_dir_url(__FILE__).'templates/vue/dist', // child theme directory path.
                 'vue_uri' => $vueUrl, // path to vue
                 'rest_url' => untrailingslashit(esc_url_raw(rest_url())), // URL to the REST endpoint.
+                'wpUrl' => get_bloginfo('url'),
                 'app_path' => $post->post_name, // page where the custom page template is loaded.
                 'post_categories' => get_terms([
                     'taxonomy' => 'category', // default post categories.
@@ -228,51 +226,57 @@ add_filter('single_template', 'load_tapestry_template');
 
 function create_new_tapestry()
 {
+    if (!current_user_can('edit_posts')) {
+        return "";
+    }
+
     $prefix = get_rest_url(null, 'tapestry-tool/v1');
 
     return "
-        <script src='".plugin_dir_url(__FILE__)."templates/libs/jquery.min.js' type='application/javascript'></script>
-        <button id='new_tapestry_button'>
+        <button onclick='promptAddNewTapestry()'>
             Add Tapestry
         </button>
         <script type='text/javascript'>
-        var apiUrl = '{$prefix}';
-            $('#new_tapestry_button').click(function() {
+            function promptAddNewTapestry() {
                 let name = prompt(`Enter a name`);
-                let payload = {};
-                payload[`nodes`] = [];
-                payload[`groups`] = [];
-                payload[`links`] = [];
-                payload[`title`] = name;
-                return new Promise((fulfill, reject) => {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', apiUrl + '/tapestries');
-                    xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
-                    xhr.onload = () => {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            fulfill(xhr.response);
-                        } else {
+                if (name !== null) {
+                    var apiUrl = '{$prefix}';
+                    let payload = {};
+                    payload[`nodes`] = [];
+                    payload[`groups`] = [];
+                    payload[`links`] = [];
+                    payload[`title`] = name;
+                    return new Promise((fulfill, reject) => {
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', apiUrl + '/tapestries');
+                        xhr.setRequestHeader(`Content-Type`, `application/json;charset=UTF-8`);
+                        xhr.setRequestHeader(`X-WP-Nonce`, `".wp_create_nonce('wp_rest')."`);
+                        xhr.onload = () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                fulfill(xhr.response);
+                            } else {
+                                reject({
+                                    status: xhr.status,
+                                    statusText: xhr.statusText
+                                });
+                            }
+                        };
+                        xhr.onerror = () => {
                             reject({
                                 status: xhr.status,
                                 statusText: xhr.statusText
                             });
-                        }
-                    };
-                    xhr.onerror = () => {
-                        reject({
-                            status: xhr.status,
-                            statusText: xhr.statusText
-                        });
-                    };
-                    xhr.send(JSON.stringify(payload));
-                }).then(data => {
-                    let res = JSON.parse(data);
-                    window.location.href = res.settings.permalink;
-                }).catch(err => {
-                    console.log(err);
-                    alert(`Error occured while creating tapestry, please try again`);
-                })
-            })
+                        };
+                        xhr.send(JSON.stringify(payload));
+                    }).then(data => {
+                        let res = JSON.parse(data);
+                        window.location.href = res.settings.permalink;
+                    }).catch(err => {
+                        console.log(err);
+                        alert(`Error occured while creating tapestry, please try again`);
+                    })
+                }
+            }
         </script>
     ";
 }

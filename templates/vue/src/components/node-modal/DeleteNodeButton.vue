@@ -11,6 +11,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { names } from "@/config/routes"
 
 export default {
   props: {
@@ -20,20 +21,22 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDirectParents", "getNode", "getNeighbours"]),
+    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
     ...mapState(["nodes", "rootId"]),
-    parent() {
-      const parents = this.getDirectParents(this.nodeId)
-      return parents && parents[0] ? this.getNode(parents[0]) : null
+    neighbourLink() {
+      return this.getNeighbouringLinks(this.nodeId)[0]
+    },
+    neighbour() {
+      return this.getNode(this.getNeighbours(this.nodeId)[0])
     },
     isRoot() {
-      return this.parent === null
+      return this.nodeId === this.rootId
     },
     isDisabled() {
       if (this.isRoot) {
         return Object.keys(this.nodes).length > 1
       } else {
-        return this.getNeighbours(this.nodeId).length > 1
+        return this.getNeighbouringLinks(this.nodeId).length > 1
       }
     },
     disabledMessage() {
@@ -49,21 +52,30 @@ export default {
     ...mapActions(["deleteNode", "deleteLink"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     removeNode() {
+      this.$emit("submit")
       this.updateSelectedNode(this.rootId)
-      if (this.parent) {
-        this.deleteLink({ source: this.parent.id, target: this.nodeId })
+      if (!this.isRoot) {
+        this.deleteLink({
+          source: this.neighbourLink.source,
+          target: this.neighbourLink.target,
+        })
         this.updateNode({
-          id: this.parent.id,
+          id: this.neighbour.id,
           newNode: {
-            childOrdering: this.parent.childOrdering.filter(
+            childOrdering: this.neighbour.childOrdering.filter(
               id => id !== this.nodeId
             ),
           },
         })
+        this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.neighbour.id },
+          query: this.$route.query,
+        })
+      } else {
+        this.$router.push({ path: "/", query: this.$route.query })
       }
-      this.deleteNode(this.nodeId).then(() => {
-        this.$emit("submit")
-      })
+      this.deleteNode(this.nodeId)
     },
   },
 }

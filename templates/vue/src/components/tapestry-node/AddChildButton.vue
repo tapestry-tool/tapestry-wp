@@ -1,30 +1,37 @@
 <template>
   <g>
-    <foreignObject class="node-button-wrapper" :x="x" :y="y">
-      <button ref="addButton" class="node-button" @click.stop="addNode">
-        <tapestry-icon icon="plus"></tapestry-icon>
-      </button>
-    </foreignObject>
     <line
       v-if="linkDragging"
-      :x1="x + 30"
+      :x1="x"
       :x2="linkX"
-      :y1="y + 30"
+      :y1="y"
       :y2="linkY"
       stroke="currentColor"
       stroke-width="6"
     ></line>
+    <node-button
+      ref="addButton"
+      :data-qa="`add-node-${node.id}`"
+      :x="x"
+      :y="y"
+      @click="addNode"
+    >
+      <tapestry-icon icon="plus" svg></tapestry-icon>
+    </node-button>
   </g>
 </template>
 
 <script>
 import * as d3 from "d3"
 import { mapActions, mapGetters, mapState } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
+import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
+import TapestryIcon from "../TapestryIcon"
+import NodeButton from "./NodeButton"
 
 export default {
   components: {
+    NodeButton,
     TapestryIcon,
   },
   props: {
@@ -57,7 +64,7 @@ export default {
       this.target = id
     })
 
-    const addButtonRef = this.$refs.addButton
+    const addButtonRef = this.$refs.addButton.$el
     d3.select(addButtonRef).call(
       d3
         .drag()
@@ -129,7 +136,11 @@ export default {
   methods: {
     ...mapActions(["addLink"]),
     addNode() {
-      this.$root.$emit("add-node", this.node.id)
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "add", tab: "content" },
+        query: this.$route.query,
+      })
     },
   },
 }

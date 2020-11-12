@@ -33,8 +33,9 @@
 
 <script>
 import moment from "moment-timezone"
-import { mapGetters, mapState } from "vuex"
+import { mapGetters } from "vuex"
 import { conditionTypes } from "@/utils/constants"
+import * as wp from "@/services/wp"
 
 export default {
   props: {
@@ -49,7 +50,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectParents", "getNode"]),
-    ...mapState(["selectedNodeId"]),
+    selectedNodeId() {
+      return this.$route.params.nodeId
+    },
     radius() {
       if (this.node.nodeType === "") {
         return 0
@@ -133,7 +136,7 @@ export default {
       )
     },
     isLoggedIn() {
-      return Boolean(wpData.wpUserId)
+      return wp.isLoggedIn()
     },
   },
   methods: {
