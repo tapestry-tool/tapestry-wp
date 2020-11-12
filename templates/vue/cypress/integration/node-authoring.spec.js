@@ -1,142 +1,139 @@
-import { setup } from "../support/utils"
-
 describe("Node Authoring", () => {
   beforeEach(() => {
-    cy.fixture("root.json").as("oneNode")
+    cy.fixture("one-node.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")
   })
 
-  it(`
-    Given: An empty Tapestry
-    When: A user adds a root node
-    Then: The root node should be added
-  `, () => {
-    setup()
+  /**
+   * [KNOWN BUG] indicates that the test fails because of a reported bug. Once
+   * addressed, make sure to remove the [KNOWN BUG] tag from the test label.
+   * Relevant bug report:
+   *  - https://app.asana.com/0/1126491658233864/1199105728152789
+   */
+  it.skip("[KNOWN BUG] should be able to add a root node using the node modal", () => {
+    cy.setup()
+
     const node = {
       title: "Root",
       description: "I am a root node",
       mediaType: "text",
-      typeData: {
-        textContent: "Abcd",
-      },
+      textContent: "Abcd",
     }
-    cy.addNode(node)
+
+    cy.getByTestId(`root-node-button`).click()
+    cy.getByTestId(`node-title`).type(node.title)
+    cy.contains(/add description/i).click()
+    cy.getEditable(`node-description`).type(node.description)
+
+    cy.getByTestId(`node-media-type`).select(node.mediaType)
+    cy.getEditable(`node-text-content`).type(node.textContent)
+
+    cy.submitModal()
+
     cy.contains(node.title).should("exist")
-  })
+    cy.store()
+      .its("state.nodes")
+      .should(nodes => {
+        expect(Object.keys(nodes)).to.have.length(1)
+      })
 
-  it(`
-    Given: A node with one attached link
-    When: A user tries to delete the node
-    Then: The node should be deleted
-  `, () => {
-    setup("@twoNodes")
-
-    cy.get("@twoNodes").then(tapestry => {
-      const leaf = tapestry.nodes[1]
-      cy.getNodeByTitle(leaf.title).deleteNode()
-      cy.getNodeByTitle(leaf.title).should("be.null")
+    cy.getSelectedNode().then(node => {
+      cy.openLightbox(node.id).click()
+      cy.contains(node.textContent).should("exist")
     })
   })
 
-  it(`
-    Given: A node with several attached links
-    When: A user tries to delete the node
-    Then: The delete button should be disabled and a warning shown
-  `)
+  /**
+   * A "leaf" node is a node with exactly 1 link connected to it.
+   */
+  it("should be able to delete a leaf node", () => {
+    cy.setup("@twoNodes")
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const leaf = Object.values(nodes)[1]
+        cy.openModal("edit", leaf.id)
+        cy.deleteNode()
+
+        cy.getNodeById(leaf.id).should("not.exist")
+        cy.store()
+          .its("state.nodes")
+          .then(nodes => {
+            expect(Object.keys(nodes)).to.have.length(1)
+          })
+      })
+  })
+
+  it("should not be able to delete a non-leaf node", () => {
+    cy.setup("@twoNodes")
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const [root, child] = Object.values(nodes)
+
+        cy.addNode(root.id, {
+          title: "child 2",
+          typeData: {
+            textContent: "abcd",
+          },
+        })
+
+        cy.getNodeByTitle("child 2").then(({ id }) => {
+          cy.addLink(id, child.id)
+
+          cy.openModal("edit", id)
+          cy.contains(/delete node/i).should("be.disabled")
+        })
+      })
+  })
 
   describe("Non-empty", () => {
     beforeEach(() => {
-      setup("@oneNode")
+      cy.setup("@oneNode")
     })
 
-    it(`
-      Given: A Tapestry with one node
-      When: A user adds two child nodes
-      Then: The child nodes should be added
-    `, () => {
-      cy.get("@oneNode").then(tapestry => {
-        const rootNode = tapestry.nodes[0]
-        const nodes = [
-          {
-            title: "Child 1",
-            description: "I am a child 1",
-            mediaType: "text",
-            typeData: {
-              textContent: "Abcd",
-            },
+    it("should be able to add a child node using the node modal", () => {
+      cy.getSelectedNode().then(parent => {
+        const child = {
+          title: "Child 1",
+          description: "I am a child 1",
+          mediaType: "text",
+          typeData: {
+            textContent: "Abcd",
           },
-          {
-            title: "Child 2",
-            description: "I am a child 2",
-            mediaType: "text",
-            typeData: {
-              textContent: "Abcd",
-            },
-          },
-        ]
-
-        for (const node of nodes) {
-          cy.getNodeByTitle(rootNode.title).addNode(node)
-          cy.contains(node.title).should("exist")
-          cy.get("#node-modal").should("not.exist")
         }
+
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(child.title)
+        cy.contains(/add description/i).click()
+        cy.getEditable(`node-description`).type(child.description)
+
+        cy.changeMediaType(child.mediaType)
+        cy.getEditable(`node-text-content`).type(child.typeData.textContent)
+
+        cy.submitModal()
+        cy.contains(child.title).should("exist")
       })
     })
 
-    it(`
-      Given: A Tapestry node
-      When: Its title is changed
-      Then: It should show its new title
-    `, () => {
+    it("should be able to edit a node's title using the node modal", () => {
       cy.getSelectedNode().then(node => {
         const oldTitle = node.title
         cy.contains(oldTitle).should("exist")
 
-        cy.getNodeByTitle(oldTitle).editNode({
-          title: "new title",
-        })
+        cy.openModal("edit", node.id)
+        cy.getByTestId(`node-title`)
+          .clear()
+          .type("new title")
+        cy.submitModal()
 
-        cy.contains(oldTitle).should("not.exist")
-        cy.contains("new title").should("exist")
+        cy.getNodeById(node.id).within(() => {
+          cy.contains(oldTitle).should("not.exist")
+          cy.contains("new title").should("exist")
+        })
       })
-    })
-
-    it(`
-      Given: A Tapestry node
-      When: It's changed to a text node and opened
-      Then: It should show the corresponding text
-    `, () => {
-      const newNode = {
-        mediaType: "text",
-        typeData: {
-          textContent: "Hello world!",
-        },
-      }
-      cy.getSelectedNode()
-        .editNode(newNode)
-        .openLightbox()
-        .contains(newNode.typeData.textContent)
-        .should("exist")
-    })
-
-    it(`
-      Given: A Tapestry node
-      When: It's changed to a video node and opened
-      Then: It should show the corresponding video
-    `, () => {
-      const newNode = {
-        mediaType: "video",
-        typeData: {
-          url:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        },
-      }
-      cy.getSelectedNode()
-        .editNode(newNode)
-        .openLightbox()
-        .within(() => {
-          cy.get("video").should("have.attr", "src", newNode.typeData.url)
-        })
     })
   })
 })

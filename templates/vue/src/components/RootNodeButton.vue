@@ -20,11 +20,13 @@
     </div>
     <input
       ref="fileInput"
+      data-qa="import-file-input"
       type="file"
       style="display: none;"
       @change="handleFileChange"
     />
     <div
+      data-qa="import-file-drop"
       :class="['dropbox', { 'drag-over': isDragover }]"
       @dragenter="handleDragStart"
       @dragover="handleDragStart"
@@ -39,6 +41,7 @@
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import ImportChangelog from "./ImportChangelog"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "root-node-button",

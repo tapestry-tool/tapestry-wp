@@ -1,7 +1,35 @@
-import { render as r, prettyDOM } from "@testing-library/vue"
+import { render as r } from "@testing-library/vue"
 import { store } from "@/store"
-import { parse } from "./dataset"
+import { routes } from "@/router"
+import { parse, makeMockProgress } from "./dataset"
+import Helpers from "./Helpers"
 
+export function render(
+  component,
+  { fixture = null, ...options } = {},
+  callback = () => {}
+) {
+  return r(
+    component,
+    {
+      store: {
+        ...store,
+        state: {
+          ...store.state,
+          ...parseFixture(fixture),
+        },
+      },
+      routes,
+      ...options,
+    },
+    callback
+  )
+}
+
+/**
+ * Mock settings object based off a real Tapestry. Make sure to update this whenever
+ * changes are made to the Tapestry settings.
+ */
 const settings = {
   tapestrySlug: "testing",
   title: "testing",
@@ -21,28 +49,10 @@ const settings = {
   permalink: "testing",
 }
 
-export function parseFixture(fixture) {
-  const state = parse(fixture)
-  state.settings = settings
+function parseFixture(fixture) {
+  const state = parse(fixture, makeMockProgress(fixture))
+  state.settings = Helpers.deepCopy(settings)
   state.rootId = Object.keys(state.nodes)[0]
   state.favourites = fixture.favourites || []
   return state
-}
-
-export function render(component, fixture = null, options = {}) {
-  const defaultStore = { ...store }
-
-  if (fixture) {
-    const state = parseFixture(fixture)
-    defaultStore.state = state
-  }
-
-  return r(component, {
-    store: defaultStore,
-    ...options,
-  })
-}
-
-export function debug(el) {
-  console.log(prettyDOM(el))
 }
