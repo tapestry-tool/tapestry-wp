@@ -43,20 +43,22 @@ export default {
   },
   computed: {
     width() {
-      return 7
+      return 10
+    },
+    spacing() {
+      return 5
     },
     dasharraySize() {
       if (this.reviewStatus) return 0
-      return this.radius / 10
+      return 22.2
     },
     strokeColor() {
       if (this.reviewStatus) {
-        console.log(this.reviewStatus)
         switch (this.reviewStatus) {
           case "submitted":
-            return "orange"
+            return "#FFC107"
           case "accept":
-            return "green"
+            return "#5CE601"
           case "reject":
             return "#CC444B"
           default:
@@ -80,7 +82,7 @@ export default {
         .transition()
         .duration(750)
         .ease(d3.easePolyOut)
-        .attr("r", Math.max(radius - this.width / 2, 0))
+        .attr("r", Math.max(radius + this.spacing + this.width / 2, 0))
 
       d3.select(this.$refs.path)
         .transition()
@@ -93,8 +95,8 @@ export default {
             return d3.arc()({
               startAngle: 0,
               endAngle: this.progress * 2 * Math.PI,
-              innerRadius: Math.max(rad - this.width, 0),
-              outerRadius: rad,
+              innerRadius: Math.max(rad + this.spacing, 0),
+              outerRadius: rad + this.spacing + this.width,
             })
           }
         })
@@ -102,7 +104,7 @@ export default {
   },
   mounted() {
     const track = this.$refs.track
-    track.setAttribute("r", Math.max(this.radius - this.width / 2, 0))
+    track.setAttribute("r", Math.max(this.radius + this.spacing + this.width / 2, 0))
   },
 }
 </script>

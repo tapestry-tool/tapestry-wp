@@ -42,7 +42,7 @@
         "
         :x="node.coordinates.x"
         :y="node.coordinates.y"
-        :radius="radius + 15"
+        :radius="radius"
         :locked="!node.accessible"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
@@ -76,14 +76,14 @@
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <add-child-button
-            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
+            v-if="isLoggedIn && !isSubAccordionRow"
             :node="node"
-            :x="-35"
+            :x="hasPermission('edit') ? -35 : 0"
             :y="radius"
           ></add-child-button>
           <node-button
             v-if="isLoggedIn && hasPermission('edit')"
-            :x="35"
+            :x="isSubAccordionRow ? 0 : 35"
             :y="radius"
             :data-qa="`edit-node-${node.id}`"
             @click="editNode"

@@ -142,15 +142,13 @@ export default class Helpers {
   static hasPermission(node, action) {
     const user = wp.getCurrentUser()
 
-    // Check 1: Has edit permissions for Tapestry
+    // Check 1: User has edit permissions for Tapestry
     if (wp.canEditTapestry()) {
       return true
     }
 
-    // Check 2: User is the author of the node
-    if (node.author && wp.getCurrentUser().id == parseInt(node.author.id)) {
-      // once a node is submitted for review, it can no longer be edited by that user.
-      // accepted nodes should not automatically be editable by a user - we treat those like published nodes.
+    // Check 2: User is the author of a non-submitted node
+    if (node.author && user.id == parseInt(node.author.id)) {
       if (node.reviewStatus !== "submitted" && node.reviewStatus !== "accept") {
         return true
       }
