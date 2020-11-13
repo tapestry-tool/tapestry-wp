@@ -110,10 +110,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.bar {
-  stroke: #11a6d8;
-}
-
 .track {
   fill-opacity: 0;
   pointer-events: none;
