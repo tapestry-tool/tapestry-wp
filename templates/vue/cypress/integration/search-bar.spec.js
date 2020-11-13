@@ -59,4 +59,25 @@ describe("Search bar", () => {
         assertVisibleNodes(allNodes)
       })
   })
+
+  it("should be able to visit a url and see search results", () => {
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        cy.app().then(app => {
+          app.$router.push({
+            path: app.$route.path,
+            query: {
+              search: "Title",
+              q: "first node",
+            },
+          })
+        })
+
+        const expected = Object.values(nodes).filter(
+          node => node.title === "first node"
+        )
+        assertVisibleNodes(expected)
+      })
+  })
 })

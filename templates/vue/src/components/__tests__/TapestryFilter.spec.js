@@ -1,12 +1,13 @@
-import { waitFor } from "@testing-library/vue"
+import { waitFor, within } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
-import { render } from "@/utils/test"
+import { render as r } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
 import Helpers from "@/utils/Helpers"
 import TapestryFilter from "@/components/TapestryFilter.vue"
 import multiAuthorTapestry from "@/fixtures/multi-author.json"
 import * as wp from "@/services/wp"
 import client from "@/services/TapestryAPI"
+import { names } from "@/config/routes"
 
 jest.mock("@/services/TapestryAPI", () => {
   return {
@@ -16,11 +17,25 @@ jest.mock("@/services/TapestryAPI", () => {
   }
 })
 
+const render = (settings = {}, query = {}) => {
+  return r(
+    TapestryFilter,
+    {
+      fixture: multiAuthorTapestry,
+      settings,
+    },
+    (_vm, _store, router) => {
+      router.push({
+        name: names.APP,
+        params: { nodeId: multiAuthorTapestry.nodes[0].id },
+        query,
+      })
+    }
+  )
+}
+
 const setup = settings => {
-  const screen = render(TapestryFilter, {
-    fixture: multiAuthorTapestry,
-    settings,
-  })
+  const screen = render(settings)
   userEvent.click(screen.getByLabelText("search"))
   return screen
 }
@@ -125,9 +140,25 @@ describe("TapestryFilter", () => {
 
   it("should hide the search bar for unauthorized users", async () => {
     wp.canEditTapestry.mockReturnValueOnce(false)
-    const screen = render(TapestryFilter, {
-      fixture: multiAuthorTapestry,
-    })
+    const screen = render()
+    expect(screen.queryByLabelText("search")).toBeNull()
+  })
+
+  it("should show the search bar with the correct type if the user visits the url", async () => {
+    const screen = render({}, { search: "Title" })
+    expect(await screen.findByDisplayValue("Title")).toBeVisible()
+  })
+
+  it("should populate the value with the query in the url", async () => {
+    const { author } = multiAuthorTapestry.nodes[0]
+    const screen = render({}, { search: "Author", q: author.name })
+    const filter = within(screen.getByTestId("tapestry-filter"))
+    expect(await filter.findByText(author.name)).toBeVisible()
+  })
+
+  it("should not show the search bar if an unauthorized user visits the url", async () => {
+    wp.canEditTapestry.mockReturnValueOnce(false)
+    const screen = render({}, { search: "Author" })
     expect(screen.queryByLabelText("search")).toBeNull()
   })
 })

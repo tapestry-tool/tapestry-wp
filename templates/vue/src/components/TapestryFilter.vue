@@ -3,7 +3,10 @@
     <button v-if="canSearch" aria-label="search" @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
-    <div :class="['input-container', { 'input-container-show': isActive }]">
+    <div
+      :class="['input-container', { 'input-container-show': isActive }]"
+      :hidden="!isActive"
+    >
       <b-form-select
         id="search-type"
         v-model="type"
@@ -12,7 +15,6 @@
       <v-select
         v-if="type !== types.STATUS"
         v-model="filterValue"
-        label="name"
         :filter="getVisibleMatches"
         :placeholder="placeholder"
         :options="filterOptions"
@@ -56,25 +58,65 @@ export default {
   data() {
     return {
       allContributors: null,
-      isActive: false,
-      type: filterTypes.TITLE,
-      filterValue: "",
       loading: false,
     }
   },
   computed: {
     ...mapState(["nodes", "settings"]),
+    type: {
+      get() {
+        const search = this.$route.query.search
+        if (search) {
+          return this.capitalize(search)
+        }
+        return search
+      },
+      set(type) {
+        if (type && type !== this.type) {
+          this.$router.replace({
+            path: this.$route.path,
+            query: {
+              ...this.$route.query,
+              search: type,
+              q: type === filterTypes.STATUS ? nodeStatus.ALL : "",
+            },
+          })
+        }
+      },
+    },
+    filterValue: {
+      get() {
+        return this.$route.query.q
+      },
+      set(val) {
+        if (val !== this.filterValue) {
+          this.$router.replace({
+            path: this.$route.path,
+            query: { ...this.$route.query, q: val },
+          })
+        }
+      },
+    },
+    isActive: {
+      get() {
+        return Boolean(this.type)
+      },
+      set(isActive) {
+        if (isActive) {
+          this.$router.replace({
+            path: this.$route.path,
+            query: { ...this.$route.query, search: filterTypes.TITLE },
+          })
+        } else {
+          this.$router.replace({
+            path: this.$route.path,
+            query: Helpers.omit(this.$route.query, ["search", "q"]),
+          })
+        }
+      },
+    },
     canSearch() {
       return wp.canEditTapestry()
-    },
-    inputStyles() {
-      return {
-        borderRadius: "4px",
-        width: "60%",
-      }
-    },
-    isFilterSelected() {
-      return this.type !== ""
     },
     types() {
       return filterTypes
@@ -95,13 +137,14 @@ export default {
     filterOptions() {
       switch (this.type) {
         case filterTypes.AUTHOR: {
-          if (this.allContributors !== null) {
-            return Object.values(this.allContributors)
-          }
-          return Helpers.unique(
+          let authors = Helpers.unique(
             Object.values(this.nodes).map(node => node.author),
             "id"
           )
+          if (this.allContributors !== null) {
+            authors = Object.values(this.allContributors)
+          }
+          return authors.map(author => author.name)
         }
         case filterTypes.TITLE: {
           return Object.values(this.nodes).map(node => node.title)
@@ -113,26 +156,30 @@ export default {
   },
   watch: {
     async filterValue(next) {
-      if (!this.settings.superuserOverridePermissions) {
+      if (
+        next &&
+        !this.settings.superuserOverridePermissions &&
+        this.type === filterTypes.AUTHOR
+      ) {
         this.loading = true
-        await this.refetchTapestryData(Number(next))
+        await this.refetchTapestryData(Number(next.id))
         this.loading = false
       }
-      this.handleSearch()
     },
-    isActive(isActive) {
-      if (isActive) {
-        this.updateVisibleNodes([])
-      } else {
-        this.updateVisibleNodes(Object.values(this.nodes).map(node => node.id))
-      }
-    },
-    type(type) {
-      if (type !== filterTypes.STATUS) {
-        this.filterValue = ""
-      } else {
-        this.filterValue = nodeStatus.ALL
-      }
+    $route: {
+      immediate: true,
+      handler(route) {
+        const { search, q } = route.query
+        if (search) {
+          if (!q) {
+            this.updateVisibleNodes([])
+          } else {
+            this.handleSearch(q)
+          }
+        } else {
+          this.updateVisibleNodes(Object.values(this.nodes).map(node => node.id))
+        }
+      },
     },
   },
   async created() {
@@ -145,8 +192,7 @@ export default {
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
-        this.type = filterTypes.TITLE
-        this.filterValue = ""
+        this.filterValue = undefined
       }
       this.isActive = !this.isActive
     },
@@ -160,13 +206,13 @@ export default {
           return Helpers.unique(
             matches.map(node => node.author),
             "id"
-          )
+          ).map(author => author.name)
         case filterTypes.TITLE:
           return matches.map(node => node.title)
       }
     },
     getMatches(value) {
-      let val = value || this.filterValue
+      let val = value
       let match = Object.values(this.nodes)
       if (this.isActive && this.type) {
         switch (this.type) {
@@ -200,6 +246,9 @@ export default {
     handleSearch(val) {
       const visibleNodes = this.getMatches(val)
       this.updateVisibleNodes(visibleNodes.map(node => node.id))
+    },
+    capitalize(str) {
+      return str[0].toUpperCase() + str.slice(1)
     },
   },
 }

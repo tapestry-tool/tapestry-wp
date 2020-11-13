@@ -205,4 +205,19 @@ export default class Helpers {
     }
     return [...uniques.values()]
   }
+
+  /**
+   * @template T
+   * @param {T} obj
+   * @param {(keyof T)[]} keys
+   */
+  static omit(obj, keys) {
+    const partial = {}
+    for (const key in obj) {
+      if (!keys.includes(key)) {
+        partial[key] = obj[key]
+      }
+    }
+    return partial
+  }
 }
