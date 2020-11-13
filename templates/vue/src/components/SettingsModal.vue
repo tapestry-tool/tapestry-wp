@@ -125,7 +125,7 @@
                 (renderMap ? ' Set the default visible area below:' : '')
             "
           >
-            <b-form-checkbox v-model="renderMap" switch>
+            <b-form-checkbox v-model="renderMap" switch data-qa="map-checkbox">
               {{ renderMap ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>

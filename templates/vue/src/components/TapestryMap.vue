@@ -122,9 +122,6 @@ export default {
         [90, 180],
       ])
     },
-    empty() {
-      return Object.keys(this.nodes).length === 0
-    },
     selectedId() {
       return this.$route.params.nodeId
     },
@@ -146,11 +143,8 @@ export default {
         ],
       ])
     },
-    empty() {
+    isEmpty() {
       return Object.keys(this.nodes).length === 0
-    },
-    canEdit() {
-      return wpData.wpCanEditTapestry === "1"
     },
     markerlocations() {
       const markers = []
@@ -240,7 +234,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: {
-          nodeId: this.empty ? 0 : this.rootId,
+          nodeId: this.isEmpty ? 0 : this.rootId,
           type: "add",
           tab: "content",
         },

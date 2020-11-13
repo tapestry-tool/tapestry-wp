@@ -9,6 +9,7 @@
       <b-col>
         <b-form-input
           v-model="node.mapCoordinates.lat"
+          data-qa="node-lat-input"
           :number="true"
           :state="isValidLat ? null : false"
         />
@@ -17,6 +18,7 @@
       <b-col>
         <b-form-input
           v-model="node.mapCoordinates.lng"
+          data-qa="node-lng-input"
           :number="true"
           :state="isValidLng ? null : false"
         />

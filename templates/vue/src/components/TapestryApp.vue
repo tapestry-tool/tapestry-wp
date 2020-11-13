@@ -18,7 +18,11 @@
         ></tapestry-depth-slider>
       </div>
     </div>
-    <tapestry-map v-if="settings.renderMap" :is-sidebar-open="isSidebarOpen" />
+    <tapestry-map
+      v-if="settings.renderMap"
+      :is-sidebar-open="isSidebarOpen"
+      data-qa="tapestry-map"
+    />
     <main v-else id="tapestry" ref="app" :style="background">
       <div v-if="empty">
         <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
