@@ -5,16 +5,27 @@
         id="node-description"
         v-model="comment"
         placeholder="Enter a comment"
+        :disabled="disabled"
       />
     </b-form-group>
     <div>
-      <b-button size="sm" variant="light" @click="close">
+      <b-button size="sm" variant="light" :disabled="disabled" @click="close">
         Cancel
       </b-button>
-      <b-button size="sm" variant="danger" @click="handleReject">
+      <b-button
+        size="sm"
+        variant="danger"
+        :disabled="disabled"
+        @click="handleReject"
+      >
         Reject
       </b-button>
-      <b-button size="sm" variant="primary" @click="handleAccept">
+      <b-button
+        size="sm"
+        variant="primary"
+        :disabled="disabled"
+        @click="handleAccept"
+      >
         Accept and Add
       </b-button>
     </div>
@@ -34,6 +45,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

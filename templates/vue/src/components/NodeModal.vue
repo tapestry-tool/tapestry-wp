@@ -18,7 +18,7 @@
       </b-alert>
     </div>
     <b-container fluid class="px-0" data-qa="node-modal">
-      <b-overlay :show="loading">
+      <b-overlay :show="loading" variant="white">
         <b-tabs card>
           <b-tab
             title="Content"
@@ -106,23 +106,30 @@
       </b-overlay>
     </b-container>
     <template slot="modal-footer">
-      <b-overlay :show="loading" class="w-100">
+      <b-overlay :show="loading || fileUploading" variant="white" class="w-100">
         <review-form
           v-if="canEditTapestry && node.reviewStatus === 'submitted'"
           :node="node"
+          :disabled="loading || fileUploading"
           @submit="handleSubmit"
           @close="close"
         ></review-form>
         <template v-else>
-          <b-overlay :show="fileUploading" class="buttons-container d-flex w-100">
+          <div class="buttons-container d-flex w-100">
             <delete-node-button
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
+              :disabled="loading || fileUploading"
               @submit="loading = true"
               @message="setDisabledMessage"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
-            <b-button size="sm" variant="light" @click="close">
+            <b-button
+              size="sm"
+              variant="light"
+              :disabled="loading || fileUploading"
+              @click="close"
+            >
               Cancel
             </b-button>
             <b-button
@@ -130,7 +137,7 @@
               id="draft-button"
               size="sm"
               variant="secondary"
-              :disabled="fileUploading"
+              :disabled="loading || fileUploading"
               @click="handleDraftSubmit"
             >
               <span>Save as Private Draft</span>
@@ -141,7 +148,7 @@
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
-              :disabled="fileUploading"
+              :disabled="loading || fileUploading"
               @click="handlePublish"
             >
               <span>Publish</span>
@@ -151,7 +158,7 @@
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
-              :disabled="!canMakeDraft || fileUploading"
+              :disabled="!canMakeDraft || loading || fileUploading"
               @click="handleSubmitForReview"
             >
               <span>
@@ -159,14 +166,24 @@
                 to Administrators for Review
               </span>
             </b-button>
-          </b-overlay>
+          </div>
           <b-form-invalid-feedback :state="canMakeDraft">
             {{ warningText }}
             <br v-if="warningText" />
             {{ deleteWarningText }}
           </b-form-invalid-feedback>
         </template>
-        <template #overlay>...</template>
+        <template #overlay>
+          <span
+            :title="
+              loading
+                ? 'Loading... Please wait.'
+                : 'Please wait for the file to upload.'
+            "
+          >
+            ...
+          </span>
+        </template>
       </b-overlay>
     </template>
     <div v-if="loadDuration">
@@ -287,7 +304,6 @@ export default {
         : wp.canEditTapestry()
     },
     canPublish() {
-      if (this.loading) return false
       if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
@@ -305,9 +321,8 @@ export default {
       }
     },
     authoredNode() {
-      const { id } = wp.getCurrentUser()
       if (this.node.author) {
-        return parseInt(this.node.author.id) === id
+        return wp.isCurrentUser(this.node.author.id)
       }
       return true
     },
@@ -380,13 +395,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
-    ...mapActions([
-      "addNode",
-      "addLink",
-      "updateNode",
-      "updateNodePermissions",
-      "updateLockedStatus",
-    ]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateLockedStatus"]),
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -501,34 +510,34 @@ export default {
         }
       }
     },
-    async handleSubmit() {
+    handleSubmit() {
       this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.updateNodeCoordinates()
-        this.loading = true
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
-          await this.setLinkData()
+          ;(async () => await this.setLinkData())()
         }
 
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
-          return this.submitNode()
+          return (async () => await this.submitNode())()
         }
+      } else {
+        this.loading = false
       }
-      this.loading = false
     },
-    async handlePublish() {
+    handlePublish() {
       this.node.status = "publish"
       this.handleSubmit()
     },
-    async handleDraftSubmit() {
+    handleDraftSubmit() {
       this.node.status = "draft"
       this.handleSubmit()
     },
-    async handleSubmitForReview() {
+    handleSubmitForReview() {
       this.node.reviewStatus = "submitted"
       this.node.status = "draft"
       this.handleSubmit()

@@ -16,6 +16,11 @@ export default {
       type: Number,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
@@ -30,7 +35,9 @@ export default {
       return this.nodeId === this.rootId
     },
     isDisabled() {
-      if (this.isRoot) {
+      if (this.disabled) {
+        return true
+      } else if (this.isRoot) {
         return Object.keys(this.nodes).length > 1
       } else {
         return this.getNeighbouringLinks(this.nodeId).length > 1
