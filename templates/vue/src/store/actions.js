@@ -216,9 +216,8 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
-export async function exportTapestry({dispatch}) {
+export async function exportTapestry({ dispatch }) {
   try {
-    console.log("export actions")
     return await client.exportTapestry()
   } catch (error) {
     dispatch("addApiError", error)

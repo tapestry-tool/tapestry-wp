@@ -91,7 +91,7 @@ class Tapestry implements ITapestry
             $this->links = $tapestry->links;
         }
         if (isset($tapestry->settings) && is_object($tapestry->settings)) {
-            $this->settings = $tapestry->settings;
+            $this->settings = array_replace((array) $this->settings, (array) $tapestry->settings);
         }
     }
 
@@ -325,7 +325,7 @@ class Tapestry implements ITapestry
      *
      * @return object $tapestry
      */
-    public function getExportTapestry()
+    public function export()
     {
         $nodes = [];
         foreach ($this->nodes as $node) {
@@ -339,12 +339,18 @@ class Tapestry implements ITapestry
         foreach ($this->groups as $group) {
             $groups[] = (new TapestryNode($this->postId, $$group))->get();
         }
+        $parsedUrl = parse_url($this->settings->permalink);
+        unset($this->settings->permalink);
+        unset($this->settings->tapestrySlug);
+        unset($this->settings->title);
+        unset($this->settings->status);
 
         return (object) [
             'nodes' => $nodes,
             'groups' => $groups,
             'links' => $this->links,
-            'site-url' => parse_url($this->settings->permalink, PHP_URL_HOST),
+            'settings' => $this->settings,
+            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
         ];
     }
 

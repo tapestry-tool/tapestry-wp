@@ -321,7 +321,7 @@ function exportTapestry($request) {
     $postId = $request['tapestryPostId'];
     try {
         $tapestry = new Tapestry($postId);
-        return $tapestry->getExportTapestry();
+        return $tapestry->export();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -487,7 +487,12 @@ function importTapestry($postId, $tapestryData)
     }
 
     $data = new stdClass();
-    $data->groups = $tapestryData->groups;
+    if (isset($tapestryData->groups)) {
+        $data->groups = $tapestryData->groups;
+    }
+    if (isset($tapestryData->settings)) {
+        $data->settings = $tapestryData->settings;
+    }
     $tapestry->set($data);
 
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {

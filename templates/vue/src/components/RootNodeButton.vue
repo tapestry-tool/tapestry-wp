@@ -148,18 +148,33 @@ export default {
             this.changes.permissions.add(key)
           }
         }
-        if (node.permissionsOrder) {
-          node.permissionsOrder = node.permissionsOrder.filter(role =>
-            wp_roles.has(role)
-          )
-        }
         if (this.changes.permissions.size > 0) {
           this.changes.noChange = false
         }
       }
+      let originalDefaultPerms = data.settings.defaultPermissions
+      data.settings.defaultPermissions = Object.keys(
+        data.settings.defaultPermissions
+      )
+        .filter(key => wp_roles.has(key))
+        .reduce((obj, key) => {
+          return {
+            ...obj,
+            [key]: data.settings.defaultPermissions[key],
+          }
+        }, {})
+      const keys = Object.keys(data.settings.defaultPermissions)
+      for (let key in originalDefaultPerms) {
+        if (!keys.includes(key)) {
+          this.changes.permissions.add(key)
+        }
+      }
+      if (this.changes.permissions.size > 0) {
+        this.changes.noChange = false
+      }
     },
     validateTapestryJSON(upload) {
-      const properties = ["nodes", "links", "groups", "site-url"]
+      const properties = ["nodes", "links", "groups", "settings", "site-url"]
       properties.forEach(property => {
         if (!upload.hasOwnProperty(property)) {
           throw new Error(`Invalid Tapestry JSON: Missing property ${property}`)
