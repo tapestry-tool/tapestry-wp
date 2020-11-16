@@ -21,7 +21,7 @@
       </b-col>
     </b-row>
     <b-row v-if="!isUploading">
-      <b-col>
+      <b-col :class="{ 'pr-0': !hideUrlUpload }">
         <b-form-file
           ref="file"
           name="async-upload"
@@ -35,6 +35,22 @@
           @change="uploadFile"
         ></b-form-file>
       </b-col>
+      <template v-if="!hideUrlUpload">
+        <b-col sm="1" class="divider">
+          <h6 class="text-muted">OR</h6>
+        </b-col>
+        <b-col class="pl-0">
+          <b-form-input
+            name="text-input"
+            :placeholder="placeholder"
+            :value="value"
+            :data-qa="inputTestId"
+            :disabled="isUploading"
+            required
+            @input="$emit('input', $event)"
+          />
+        </b-col>
+      </template>
     </b-row>
     <b-alert v-if="error" show variant="danger">
       File upload failed: {{ error.message || error.data.message }}
@@ -73,6 +89,11 @@ export default {
       type: String,
       required: false,
       default: "node-upload-input",
+    },
+    hideUrlUpload: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -133,7 +154,6 @@ export default {
           },
         })
         .then(response => {
-          console.log(response)
           setTimeout(() => {
             if (response.data.success) {
               this.$emit("input", response.data.data.url)
