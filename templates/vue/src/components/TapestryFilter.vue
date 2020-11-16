@@ -18,7 +18,7 @@
         :filter="getVisibleMatches"
         :placeholder="placeholder"
         :options="filterOptions"
-        @search="handleSearch"
+        @search="val => (search = val)"
       ></v-select>
       <b-form-select
         v-else
@@ -59,6 +59,7 @@ export default {
     return {
       allContributors: null,
       loading: false,
+      search: "",
     }
   },
   computed: {
@@ -77,7 +78,7 @@ export default {
             path: this.$route.path,
             query: {
               ...this.$route.query,
-              search: type,
+              search: type.toLowerCase(),
               q: type === filterTypes.STATUS ? nodeStatus.ALL : "",
             },
           })
@@ -103,12 +104,12 @@ export default {
       },
       set(isActive) {
         if (isActive) {
-          this.$router.replace({
+          this.$router.push({
             path: this.$route.path,
             query: { ...this.$route.query, search: filterTypes.TITLE },
           })
         } else {
-          this.$router.replace({
+          this.$router.push({
             path: this.$route.path,
             query: Helpers.omit(this.$route.query, ["search", "q"]),
           })
@@ -153,6 +154,16 @@ export default {
           return []
       }
     },
+    visibleNodes() {
+      if (this.isActive) {
+        if (!this.filterValue && !this.search) {
+          return []
+        }
+        const matches = this.getMatches(this.search || this.filterValue)
+        return matches.map(node => node.id)
+      }
+      return Object.values(this.nodes).map(node => node.id)
+    },
   },
   watch: {
     async filterValue(next) {
@@ -166,19 +177,10 @@ export default {
         this.loading = false
       }
     },
-    $route: {
+    visibleNodes: {
       immediate: true,
-      handler(route) {
-        const { search, q } = route.query
-        if (search) {
-          if (!q) {
-            this.updateVisibleNodes([])
-          } else {
-            this.handleSearch(q)
-          }
-        } else {
-          this.updateVisibleNodes(Object.values(this.nodes).map(node => node.id))
-        }
+      handler(nodes) {
+        this.updateVisibleNodes(nodes)
       },
     },
   },
@@ -242,10 +244,6 @@ export default {
         }
       }
       return match
-    },
-    handleSearch(val) {
-      const visibleNodes = this.getMatches(val)
-      this.updateVisibleNodes(visibleNodes.map(node => node.id))
     },
     capitalize(str) {
       return str[0].toUpperCase() + str.slice(1)
