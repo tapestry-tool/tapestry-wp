@@ -13,6 +13,7 @@
 
 <script>
 import TextIcon from "../../../assets/Aa.svg"
+import { data } from "@/services/wp"
 
 export default {
   name: "answer-button",
@@ -38,7 +39,7 @@ export default {
       return this.icon === "tasks" || this.icon === "microphone"
     },
     textIcon() {
-      return `${wpData.vue_uri}/${TextIcon.split("dist")[1]}`
+      return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
     },
   },
 }

@@ -73,6 +73,7 @@
 
 <script>
 import axios from "axios"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "file-upload",

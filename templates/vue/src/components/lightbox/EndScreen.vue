@@ -1,5 +1,5 @@
 <template>
-  <div class="end-screen">
+  <div data-qa="end-screen" class="end-screen">
     <button v-if="showQuizButton" @click="$emit('show-quiz')">
       <i class="fas fa-question-circle fa-4x"></i>
       <p>{{ buttonText }}</p>

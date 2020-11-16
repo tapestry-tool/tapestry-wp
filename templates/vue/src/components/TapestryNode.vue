@@ -51,45 +51,31 @@
           </div>
         </foreignObject>
         <g v-show="!transitioning">
-          <foreignObject
+          <node-button
             v-if="!node.hideMedia"
-            class="node-button-wrapper"
-            x="-30"
-            :y="-radius - 30"
+            :x="0"
+            :y="-radius"
+            :data-qa="`open-node-${node.id}`"
+            :disabled="!node.accessible && !hasPermission('edit')"
+            @click="handleRequestOpen"
           >
-            <button
-              class="node-button"
-              :data-qa="`open-node-${node.id}`"
-              :disabled="!node.accessible && !hasPermission('edit')"
-              @click.stop="handleRequestOpen"
-            >
-              <tapestry-icon
-                v-if="node.mediaType !== 'text'"
-                :icon="icon"
-              ></tapestry-icon>
-              <span v-else>Aa</span>
-            </button>
-          </foreignObject>
+            <tapestry-icon :icon="icon" svg></tapestry-icon>
+          </node-button>
           <add-child-button
             v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
             :node="node"
-            :x="-65"
-            :y="radius - 30"
+            :x="-35"
+            :y="radius"
           ></add-child-button>
-          <foreignObject
+          <node-button
             v-if="isLoggedIn && hasPermission('edit')"
-            class="node-button-wrapper"
-            x="5"
-            :y="radius - 30"
+            :x="35"
+            :y="radius"
+            :data-qa="`edit-node-${node.id}`"
+            @click="editNode"
           >
-            <button
-              :data-qa="`edit-node-${node.id}`"
-              class="node-button"
-              @click.stop="editNode"
-            >
-              <tapestry-icon icon="pen"></tapestry-icon>
-            </button>
-          </foreignObject>
+            <tapestry-icon icon="pen" svg></tapestry-icon>
+          </node-button>
         </g>
       </g>
       <defs>
@@ -119,10 +105,10 @@ import TapestryIcon from "@/components/TapestryIcon"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
-import { isLoggedIn } from "@/utils/wp"
+import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
-import DragSelectModular from "@/utils/dragSelectModular"
+import NodeButton from "./tapestry-node/NodeButton"
 
 export default {
   name: "tapestry-node",
@@ -130,6 +116,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    NodeButton,
   },
   props: {
     node: {
@@ -156,7 +143,7 @@ export default {
       "isAccordionRow",
     ]),
     isLoggedIn() {
-      return isLoggedIn
+      return wp.isLoggedIn()
     },
     isSubAccordionRow() {
       const parent = this.getParent(this.node.id)
@@ -223,6 +210,12 @@ export default {
       ) {
         return `url(#node-image-${this.node.id})`
       }
+      if (this.selected) {
+        return "#11a6d8"
+      }
+      if (!this.node.accessible) {
+        return "#8a8a8c"
+      }
       return "#8396a1"
     },
     overlayFill() {
@@ -262,7 +255,7 @@ export default {
     },
   },
   mounted() {
-    DragSelectModular.updateSelectableNodes()
+    this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
     d3.select(nodeRef).call(

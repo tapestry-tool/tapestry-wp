@@ -35,10 +35,4 @@ module.exports = {
   parserOptions: {
     parser: "babel-eslint",
   },
-  globals: {
-    adminAjaxUrl: "readonly",
-    wpData: "readonly",
-    wpPostId: "readonly",
-    apiUrl: "readonly",
-  },
 }

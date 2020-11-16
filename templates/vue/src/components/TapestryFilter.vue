@@ -43,6 +43,7 @@
 import { mapActions, mapMutations, mapState } from "vuex"
 import Combobox from "./Combobox"
 import client from "../services/TapestryAPI"
+import * as wp from "../services/wp"
 
 const filterOptions = {
   AUTHOR: "author",
@@ -64,7 +65,7 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     canSearch() {
-      return wpData.wpCanEditTapestry === "1"
+      return wp.canEditTapestry()
     },
     inputStyles() {
       return {
@@ -111,7 +112,7 @@ export default {
     },
   },
   async created() {
-    if (wpData.wpCanEditTapestry === "1") {
+    if (this.canSearch) {
       this.allContributors = await client.getAllContributors()
     }
   },

@@ -27,10 +27,13 @@ describe("Locked Nodes", () => {
 
         cy.submitModal()
 
-        cy.getByTestId(`open-node-${child.id}`).should("not.be.disabled")
+        cy.getByTestId(`open-node-${child.id}`).should(
+          "not.have.attr",
+          "aria-disabled"
+        )
 
         cy.login("subscriber").visitTapestry()
-        cy.getByTestId(`open-node-${child.id}`).should("be.disabled")
+        cy.getByTestId(`open-node-${child.id}`).should("have.attr", "aria-disabled")
 
         cy.getNodeById(child.id).click()
         cy.contains(/this node will be unlocked/i).should("be.visible")
@@ -43,7 +46,10 @@ describe("Locked Nodes", () => {
 
         cy.wait("@complete")
 
-        cy.getByTestId(`open-node-${child.id}`).should("not.be.disabled")
+        cy.getByTestId(`open-node-${child.id}`).should(
+          "not.have.attr",
+          "aria-disabled"
+        )
       })
   })
 })
