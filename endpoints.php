@@ -992,6 +992,29 @@ function updateTapestryNodeLockedImageURL($request)
     }
 }
 
+function updateTapestryNodeThumbnail($request)
+{
+    $nodeMetaId = $request['nodeMetaId'];
+    $thumbnailId = json_decode($request->get_body());
+
+    try {
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
+        $nodePostId = $nodeMetadata->meta_value->post_id;
+        set_post_thumbnail($nodePostId,$thumbnailId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 /**
  * Update Tapestry Node Type Data.
  *

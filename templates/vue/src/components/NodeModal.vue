@@ -187,6 +187,7 @@ import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -347,6 +348,10 @@ export default {
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
+    })
+    this.$root.$on("fileID", fileId => {
+      console.log(fileId)
+      client.updateNodeThumbnail(this.node.id, fileId)
     })
     this.node = this.createDefaultNode()
   },

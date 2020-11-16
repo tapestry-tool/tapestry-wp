@@ -158,6 +158,7 @@ export default {
           setTimeout(() => {
             if (response.data.success) {
               this.$emit("input", response.data.data.url)
+              this.$root.$emit("fileID", response.data.data.id)
             } else {
               this.handleError(response.data)
             }
