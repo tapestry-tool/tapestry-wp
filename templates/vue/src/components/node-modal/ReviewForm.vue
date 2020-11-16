@@ -2,8 +2,8 @@
   <div class="review-form">
     <b-form-group label="Reviewer's Comment">
       <rich-text-form
-        id="node-description"
         v-model="comment"
+        data-qa="review-comment"
         placeholder="Enter a comment"
         :disabled="disabled"
       />
