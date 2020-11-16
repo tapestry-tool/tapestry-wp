@@ -137,6 +137,7 @@ describe("Node Authoring", () => {
     })
 
     const videoErrorMsg = "Invalid mp4 Video URL: please re-upload or check the URL"
+    const nexistVideoURL = "www.example.com/video.mp4"
 
     it("Should show an error and not create a node if an mp4 URL is invalid", () => {
       cy.getSelectedNode().then(parent => {
@@ -146,7 +147,7 @@ describe("Node Authoring", () => {
         cy.getByTestId(`node-title`).type(nodeName)
 
         cy.changeMediaType("video")
-        cy.getByTestId(`node-video-url`).type("www.example.com/video.mp4")
+        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
 
         cy.submitModalWithError()
         cy.contains(videoErrorMsg).should("exist")
@@ -167,6 +168,29 @@ describe("Node Authoring", () => {
           "https://www.youtube.com/watch?v=nMhua5LJRWg"
         )
         cy.getByTestId("modal-submit-error").should("not.exist")
+      })
+    })
+
+    const existVideoURL =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+
+    it("Should close modal with a good video url even after an error has occurred", () => {
+      cy.getSelectedNode().then(parent => {
+        const nodeName = "Video 2"
+
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(nodeName)
+
+        cy.changeMediaType("video")
+        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
+
+        cy.submitModalWithError()
+        cy.contains(videoErrorMsg).should("exist")
+
+        cy.getByTestId(`node-video-url`)
+          .clear()
+          .type(existVideoURL)
+        cy.submitModal()
       })
     })
   })

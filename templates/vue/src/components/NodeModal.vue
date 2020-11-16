@@ -492,6 +492,7 @@ export default {
       }
     },
     async handleSubmit() {
+      this.submissionError = null
       this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
