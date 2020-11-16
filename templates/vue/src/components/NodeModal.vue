@@ -782,10 +782,9 @@ export default {
       return true
     },
     handleVideoFrameError() {
-      // TODO error remains in iframe after handle until good submission
-      console.log("iframe error")
       this.submissionError =
         "Invalid mp4 Video URL: please re-upload or check the URL"
+      this.loadDuration = false
     },
   },
 }
