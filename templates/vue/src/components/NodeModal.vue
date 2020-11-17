@@ -510,23 +510,21 @@ export default {
         }
       }
     },
-    handleSubmit() {
-      this.loading = true
+    async handleSubmit() {
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
+        this.loading = true
         this.updateNodeCoordinates()
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
-          ;(async () => await this.setLinkData())()
+          await this.setLinkData()
         }
 
         if (this.shouldReloadDuration()) {
           this.loadDuration = true
         } else {
-          return (async () => await this.submitNode())()
+          return this.submitNode()
         }
-      } else {
-        this.loading = false
       }
     },
     handlePublish() {
