@@ -50,9 +50,12 @@ const settings = {
 }
 
 function parseFixture(fixture) {
-  const state = parse(fixture, makeMockProgress(fixture))
-  state.settings = Helpers.deepCopy(settings)
-  state.rootId = Object.keys(state.nodes)[0]
-  state.favourites = fixture.favourites || []
-  return state
+  if (fixture) {
+    const state = parse(fixture, makeMockProgress(fixture))
+    state.settings = Helpers.deepCopy(settings)
+    state.rootId = Object.keys(state.nodes)[0]
+    state.favourites = fixture.favourites || []
+    return state
+  }
+  return {}
 }
