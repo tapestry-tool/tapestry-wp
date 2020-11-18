@@ -427,7 +427,7 @@ export default {
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
-      } else if (this.modalType === "add") {
+      } else if (this.type === "add") {
         copy.tydeType = this.getInitialTydeType(this.parent)
       }
       copy.hasSubAccordion = this.hasSubAccordion(copy)
@@ -536,7 +536,7 @@ export default {
       this.loading = false
     },
     async submitNode() {
-      if (this.modalType === "add") {
+      if (this.type === "add") {
         const id = await this.addNode({
           newNode: this.node,
           parentId: this.parent && this.parent.id,
