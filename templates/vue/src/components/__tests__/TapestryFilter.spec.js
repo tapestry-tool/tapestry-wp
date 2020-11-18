@@ -61,7 +61,7 @@ describe("TapestryFilter", () => {
     const screen = setup()
 
     userEvent.click(await screen.findByPlaceholderText("Node title"))
-    waitFor(() => {
+    await waitFor(() => {
       titles.forEach(title => screen.getByText(title))
     })
   })
@@ -76,7 +76,7 @@ describe("TapestryFilter", () => {
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
     userEvent.click(await screen.findByPlaceholderText("Node author"))
 
-    waitFor(() => {
+    await waitFor(() => {
       authors.forEach(author => screen.getByText(author.name))
     })
   })
@@ -133,8 +133,8 @@ describe("TapestryFilter", () => {
     userEvent.click(await screen.findByText("admin"))
 
     await screen.findByTestId("search-loading")
-    waitFor(() => {
-      expect(screen.findByTestId("search-loading")).toBeNull()
+    await waitFor(() => {
+      expect(screen.queryByTestId("search-loading")).toBeNull()
     })
   })
 
@@ -159,6 +159,8 @@ describe("TapestryFilter", () => {
   it("should not show the search bar if an unauthorized user visits the url", async () => {
     wp.canEditTapestry.mockReturnValueOnce(false)
     const screen = render({}, { search: "Author" })
+
     expect(screen.queryByLabelText("search")).toBeNull()
+    expect(screen.queryByDisplayValue("Author")).toBeNull()
   })
 })

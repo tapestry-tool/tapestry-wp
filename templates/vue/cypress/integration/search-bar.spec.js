@@ -21,10 +21,11 @@ const assertVisibleNodes = visibleNodes => {
 describe("Search bar", () => {
   beforeEach(() => {
     cy.fixture("multi-author.json").as("tapestry")
-    cy.setup("@tapestry")
   })
 
   it("should be able to search nodes via different attributes", () => {
+    cy.setup("@tapestry")
+
     cy.store()
       .its("state.nodes")
       .then(nodes => {
@@ -61,6 +62,8 @@ describe("Search bar", () => {
   })
 
   it("should be able to visit a url and see search results", () => {
+    cy.setup("@tapestry")
+
     cy.store()
       .its("state.nodes")
       .then(nodes => {
@@ -79,5 +82,25 @@ describe("Search bar", () => {
         )
         assertVisibleNodes(expected)
       })
+  })
+
+  it("should not be able to visit the url if not authorized", () => {
+    cy.setup("@tapestry", "subscriber")
+
+    cy.app().then(app => {
+      const { path } = app.$route
+      app.$router.push({
+        path,
+        query: {
+          search: "Title",
+          q: "first node",
+        },
+      })
+
+      cy.url().should("be.equal", path)
+      cy.contains(
+        `You don't have access to the search bar for this Tapestry.`
+      ).should("be.visible")
+    })
   })
 })

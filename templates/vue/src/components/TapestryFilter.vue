@@ -106,7 +106,7 @@ export default {
         if (isActive) {
           this.$router.push({
             path: this.$route.path,
-            query: { ...this.$route.query, search: filterTypes.TITLE },
+            query: { ...this.$route.query, search: filterTypes.TITLE.toLowerCase() },
           })
         } else {
           this.$router.push({
@@ -164,14 +164,32 @@ export default {
       }
       return Object.values(this.nodes).map(node => node.id)
     },
+    /**
+     * "Lazy" here means there are more nodes in the Tapestry that are not currently
+     * visible by the user. Currently this is only possible if the superuser override
+     * permission is false.
+     */
+    lazy() {
+      return !this.settings.superuserOverridePermissions
+    },
   },
   watch: {
+    isActive: {
+      immediate: true,
+      handler(isActive) {
+        if (isActive && !this.canSearch) {
+          this.$router.replace({
+            path: this.$route.path,
+            query: Helpers.omit(this.$route.query, ["search", "q"]),
+          })
+          this.addApiError({
+            error: `You don't have access to the search bar for this Tapestry.`,
+          })
+        }
+      },
+    },
     async filterValue(next) {
-      if (
-        next &&
-        !this.settings.superuserOverridePermissions &&
-        this.type === filterTypes.AUTHOR
-      ) {
+      if (next && this.lazy && this.type === filterTypes.AUTHOR) {
         this.loading = true
         await this.refetchTapestryData(Number(next.id))
         this.loading = false
@@ -185,12 +203,12 @@ export default {
     },
   },
   async created() {
-    if (this.canSearch) {
+    if (this.canSearch && this.lazy) {
       this.allContributors = await client.getAllContributors()
     }
   },
   methods: {
-    ...mapMutations(["updateVisibleNodes"]),
+    ...mapMutations(["updateVisibleNodes", "addApiError"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
