@@ -10,6 +10,16 @@ describe("External link", () => {
       url:
         "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
     }
+
+    cy.server()
+
+    // Stub out external API call
+    cy.route(/api.linkpreview.net/, {
+      title: newNode.title,
+      image: "",
+      description: "hello world",
+    })
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("url-embed")
