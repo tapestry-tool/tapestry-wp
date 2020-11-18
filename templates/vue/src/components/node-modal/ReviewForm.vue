@@ -22,7 +22,7 @@
       </b-button>
       <b-button
         size="sm"
-        variant="primary"
+        variant="success"
         :disabled="disabled"
         @click="handleAccept"
       >

@@ -159,9 +159,11 @@ export default class Helpers {
       return true
     }
 
-    // Check 2: User is the author of the node
+    // Check 2: User is the author of the node (unless node was submitted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
-      return true
+      if (node.reviewStatus !== "accept") {
+        return true
+      }
     }
 
     // Check 3: User has a role with general edit permissions
