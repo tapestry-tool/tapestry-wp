@@ -97,7 +97,7 @@ describe("Search bar", () => {
         },
       })
 
-      cy.url().should("be.equal", path)
+      cy.url().should(url => expect(url.endsWith(path)).to.be.true)
       cy.contains(
         `You don't have access to the search bar for this Tapestry.`
       ).should("be.visible")
