@@ -381,7 +381,7 @@ export default {
           ? tydeTypes.QUESTION_SET
           : tydeTypes.REGULAR
       }
-      return null
+      return tydeTypes.REGULAR
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
@@ -427,9 +427,8 @@ export default {
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
-      } else if (this.type === "add") {
-        copy.tydeType = this.getInitialTydeType(this.parent)
       }
+      copy.tydeType = copy.tydeType || this.getInitialTydeType(this.parent)
       copy.hasSubAccordion = this.hasSubAccordion(copy)
       this.node = copy
     },

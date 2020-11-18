@@ -247,7 +247,7 @@ export function createDefaultNode({ settings }) {
     hideMedia: false,
     skippable: true,
     fullscreen: false,
-    tydeType: "Regular",
+    tydeType: tydeTypes.REGULAR,
     coordinates: {
       x: 3000,
       y: 3000,
