@@ -17,141 +17,183 @@
         </ul>
       </b-alert>
     </div>
-    <b-container v-if="loading" class="spinner">
-      <b-spinner variant="secondary"></b-spinner>
-    </b-container>
     <b-container v-else fluid class="px-0" data-qa="node-modal">
-      <b-tabs card>
-        <b-tab
-          title="Content"
-          :active="tab === 'content'"
-          style="overflow-x: hidden;"
-          @click="changeTab('content')"
-        >
-          <content-form
-            :node="node"
-            :parent="parent"
-            @load="videoLoaded = true"
-            @unload="videoLoaded = false"
-            @type-changed="handleTypeChange"
-          />
-        </b-tab>
-        <b-tab
-          title="Appearance"
-          :active="tab === 'appearance'"
-          @click="changeTab('appearance')"
-        >
-          <appearance-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
-          :active="tab === 'behaviour'"
-          title="Behaviour"
-          @click="changeTab('behaviour')"
-        >
-          <behaviour-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="viewAccess"
-          title="Access"
-          :active="tab === 'access'"
-          @click="changeTab('access')"
-        >
-          <h6 class="mb-3">Node Permissions</h6>
-          <b-card no-body>
-            <permissions-table v-model="node.permissions" />
-          </b-card>
-          <h6 class="mt-4 mb-3">Lock Node</h6>
-          <conditions-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
-          title="Activity"
-          :active="tab === 'activity'"
-          @click="changeTab('activity')"
-        >
-          <activity-form :node="node" />
-        </b-tab>
-        <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
-          <spaceship-part-form :node="node" />
-        </b-tab>
-        <b-tab
-          v-if="
-            node.tydeType === tydeTypes.MODULE ||
-              node.mediaType === 'accordion' ||
-              node.hasSubAccordion ||
-              node.tydeType === tydeTypes.STAGE
-          "
-          title="Ordering"
-          :active="tab === 'ordering'"
-          @click="changeTab('ordering')"
-        >
-          <div>
-            <slick-list
-              :value="node.childOrdering"
-              lock-axis="y"
-              @input="updateOrderingArray"
-            >
-              <slick-item
-                v-for="(childId, index) in node.childOrdering"
-                :key="index"
-                class="slick-list-item"
-                :index="index"
-                style="z-index: 9999 !important;"
+      <b-overlay :show="loading" variant="white">
+        <b-tabs card>
+          <b-tab
+            title="Content"
+            :active="tab === 'content'"
+            style="overflow-x: hidden;"
+            @click="changeTab('content')"
+          >
+            <content-form
+              :node="node"
+              :parent="parent"
+              @load="videoLoaded = true"
+              @unload="videoLoaded = false"
+              @type-changed="handleTypeChange"
+            />
+          </b-tab>
+          <b-tab
+            title="Appearance"
+            :active="tab === 'appearance'"
+            @click="changeTab('appearance')"
+          >
+            <appearance-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+            :active="tab === 'behaviour'"
+            title="Behaviour"
+            @click="changeTab('behaviour')"
+          >
+            <behaviour-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="viewAccess"
+            title="Access"
+            :active="tab === 'access'"
+            @click="changeTab('access')"
+          >
+            <h6 class="mb-3">Node Permissions</h6>
+            <b-card no-body>
+              <permissions-table v-model="node.permissions" />
+            </b-card>
+            <h6 class="mt-4 mb-3">Lock Node</h6>
+            <conditions-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
+            title="Activity"
+            :active="tab === 'activity'"
+            @click="changeTab('activity')"
+          >
+            <activity-form :node="node" />
+          </b-tab>
+          <b-tab v-if="node.tydeType === tydeTypes.MODULE" title="Spaceship Part">
+            <spaceship-part-form :node="node" />
+          </b-tab>
+          <b-tab
+            v-if="
+              node.tydeType === tydeTypes.MODULE ||
+                node.mediaType === 'accordion' ||
+                node.hasSubAccordion ||
+                node.tydeType === tydeTypes.STAGE
+            "
+            title="Ordering"
+            :active="tab === 'ordering'"
+            @click="changeTab('ordering')"
+          >
+            <div>
+              <slick-list
+                :value="node.childOrdering"
+                lock-axis="y"
+                @input="updateOrderingArray"
               >
-                <span class="fas fa-bars fa-xs"></span>
-                <span>{{ getNode(childId).title }}</span>
-                <span style="color: grey;">id: {{ childId }}</span>
-              </slick-item>
-            </slick-list>
-          </div>
-        </b-tab>
-        <b-tab
-          title="More Information"
-          :active="tab === 'more-information'"
-          @click="changeTab('more-information')"
-        >
-          <more-information-form :node="node" />
-        </b-tab>
-      </b-tabs>
+                <slick-item
+                  v-for="(childId, index) in node.childOrdering"
+                  :key="index"
+                  class="slick-list-item"
+                  :index="index"
+                  style="z-index: 9999 !important;"
+                >
+                  <span class="fas fa-bars fa-xs"></span>
+                  <span>{{ getNode(childId).title }}</span>
+                  <span style="color: grey;">id: {{ childId }}</span>
+                </slick-item>
+              </slick-list>
+            </div>
+          </b-tab>
+          <b-tab
+            title="More Information"
+            :active="tab === 'more-information'"
+            @click="changeTab('more-information')"
+          >
+            <more-information-form :node="node" />
+          </b-tab>
+        </b-tabs>
+      </b-overlay>
     </b-container>
     <template slot="modal-footer">
-      <delete-node-button
-        v-if="type === 'edit'"
-        :node-id="Number(nodeId)"
-        @submit="loading = true"
-      ></delete-node-button>
-      <span style="flex-grow:1;"></span>
-      <b-button size="sm" variant="light" @click="close">
-        Cancel
-      </b-button>
-      <b-button
-        v-if="rootId !== 0 && canMakeDraft"
-        id="draft-button"
-        size="sm"
-        variant="secondary"
-        :disabled="!canSubmit"
-        @click="handleDraftSubmit"
-      >
-        <b-spinner v-if="!canSubmit"></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Save as Private Draft</div>
-      </b-button>
-      <b-button
-        v-if="canPublish"
-        id="submit-button"
-        size="sm"
-        variant="primary"
-        :disabled="!canSubmit"
-        @click="handleSubmit"
-      >
-        <b-spinner v-if="!canSubmit" small></b-spinner>
-        <div data-qa="submit-node-modal" :style="canSubmit ? '' : 'opacity: 50%;'">
-          Publish
-        </div>
-      </b-button>
-      <b-form-invalid-feedback :state="canMakeDraft">
-        {{ warningText }}
-      </b-form-invalid-feedback>
+      <b-overlay :show="loading || fileUploading" variant="white" class="w-100">
+        <review-form
+          v-if="canEditTapestry && node.reviewStatus === 'submitted'"
+          :node="node"
+          :disabled="loading || fileUploading"
+          @submit="handleSubmit"
+          @close="close"
+        ></review-form>
+        <template v-else>
+          <div class="buttons-container d-flex w-100">
+            <delete-node-button
+              v-if="type === 'edit'"
+              :node-id="Number(nodeId)"
+              :disabled="loading || fileUploading"
+              @submit="loading = true"
+              @message="setDisabledMessage"
+            ></delete-node-button>
+            <span style="flex-grow:1;"></span>
+            <b-button
+              size="sm"
+              variant="light"
+              :disabled="loading || fileUploading"
+              @click="close"
+            >
+              Cancel
+            </b-button>
+            <b-button
+              v-if="rootId !== 0 && canMakeDraft"
+              id="draft-button"
+              size="sm"
+              variant="secondary"
+              :disabled="loading || fileUploading"
+              @click="handleDraftSubmit"
+            >
+              <span>Save as Private Draft</span>
+            </b-button>
+            <b-button
+              v-if="canPublish"
+              id="submit-button"
+              data-qa="submit-node-modal"
+              size="sm"
+              variant="primary"
+              :disabled="loading || fileUploading"
+              @click="handlePublish"
+            >
+              <span>Publish</span>
+            </b-button>
+            <b-button
+              v-else
+              data-qa="submit-node-modal"
+              size="sm"
+              variant="primary"
+              :disabled="!canMakeDraft || loading || fileUploading"
+              @click="handleSubmitForReview"
+            >
+              <span>
+                {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
+                to Administrators for Review
+              </span>
+            </b-button>
+          </div>
+          <b-form-invalid-feedback :state="canMakeDraft">
+            {{ warningText }}
+            <br v-if="warningText" />
+            {{ deleteWarningText }}
+          </b-form-invalid-feedback>
+        </template>
+        <template #overlay>
+          <span
+            :title="
+              loading
+                ? 'Loading... Please wait.'
+                : 'Please wait for the file to upload.'
+            "
+          >
+            ...
+          </span>
+        </template>
+      </b-overlay>
     </template>
     <div v-if="loadDuration">
       <iframe
@@ -196,6 +238,7 @@ import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
+import ReviewForm from "./node-modal/ReviewForm"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
 
@@ -221,6 +264,7 @@ export default {
     PermissionsTable,
     SpaceshipPartForm,
     DeleteNodeButton,
+    ReviewForm,
   },
   data() {
     return {
@@ -234,6 +278,7 @@ export default {
       fileUploading: false,
       loadDuration: false,
       warningText: "",
+      deleteWarningText: "",
     }
   },
   computed: {
@@ -272,7 +317,6 @@ export default {
         : wp.canEditTapestry()
     },
     canPublish() {
-      if (this.loading) return false
       if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
@@ -290,9 +334,8 @@ export default {
       }
     },
     authoredNode() {
-      const { id } = wp.getCurrentUser()
       if (this.node.author) {
-        return parseInt(this.node.author.id) === id
+        return wp.isCurrentUser(this.node.author.id)
       }
       return true
     },
@@ -303,8 +346,8 @@ export default {
       }
       return this.hasDraftPermission(id)
     },
-    canSubmit() {
-      return !this.fileUploading
+    canEditTapestry() {
+      return wp.canEditTapestry()
     },
     nodeId() {
       const nodeId = this.$route.params.nodeId
@@ -365,13 +408,7 @@ export default {
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
-    ...mapActions([
-      "addNode",
-      "addLink",
-      "updateNode",
-      "updateNodePermissions",
-      "updateLockedStatus",
-    ]),
+    ...mapActions(["addNode", "addLink", "updateNode", "updateLockedStatus"]),
     getInitialTydeType(parent) {
       if (this.parent) {
         const parentType = parent.tydeType
@@ -465,6 +502,9 @@ export default {
       }
       return false
     },
+    setDisabledMessage(msg) {
+      this.deleteWarningText = msg
+    },
     changeTab(tab) {
       // Prevent multiple clicks
       if (tab !== this.tab) {
@@ -496,12 +536,10 @@ export default {
       }
     },
     async handleSubmit() {
-      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
-        this.node.status = "publish"
-        this.updateNodeCoordinates()
         this.loading = true
+        this.updateNodeCoordinates()
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -513,26 +551,19 @@ export default {
           return this.submitNode()
         }
       }
-      this.loading = false
     },
-    async handleDraftSubmit() {
-      this.loading = true
-      this.formErrors = this.validateNode()
-      if (!this.formErrors.length) {
-        this.node.status = "draft"
-        this.updateNodeCoordinates()
-
-        if (this.node.mediaType == "url-embed" && this.node.behaviour != "embed") {
-          await this.setLinkData()
-        }
-
-        if (this.shouldReloadDuration()) {
-          this.loadDuration = true
-        } else {
-          return this.submitNode()
-        }
-      }
-      this.loading = false
+    handlePublish() {
+      this.node.status = "publish"
+      this.handleSubmit()
+    },
+    handleDraftSubmit() {
+      this.node.status = "draft"
+      this.handleSubmit()
+    },
+    handleSubmitForReview() {
+      this.node.reviewStatus = "submitted"
+      this.node.status = "draft"
+      this.handleSubmit()
     },
     async submitNode() {
       if (this.type === "add") {
@@ -550,6 +581,15 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
+          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
+          if (this.node.status !== "draft") {
+            this.$store.commit("updateNode", {
+              id: this.parent.id,
+              newNode: {
+                childOrdering: [...this.parent.childOrdering, id],
+              },
+            })
+          }
           if (this.node.status == "draft") {
             this.updateSelectedNode(id)
           }
@@ -770,14 +810,6 @@ export default {
         this.warningText = "You must be authenticated to create a draft node"
         return false
       }
-
-      if (this.type === "edit") {
-        if (!this.authoredNode) {
-          this.warningText = "You cannot make nodes you did not author into drafts"
-          return false
-        }
-      }
-
       return true
     },
   },
@@ -843,16 +875,6 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#submit-button {
-  display: flex;
-  align-items: center;
-  flex-direction: row-reverse;
-
-  div {
-    margin-right: 4px;
-  }
 }
 
 #node-modal-container {
@@ -923,5 +945,9 @@ table {
 
 button:disabled {
   cursor: not-allowed;
+}
+
+.buttons-container > * {
+  margin: 0.25rem !important;
 }
 </style>

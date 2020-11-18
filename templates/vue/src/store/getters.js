@@ -64,6 +64,9 @@ export function isVisible(_, { getNode, isAccordionRow }) {
     if (node.nodeType === "") {
       return false
     }
+    if (!Helpers.hasPermission(node, "read")) {
+      return false
+    }
     if (!Helpers.hasPermission(node, "edit")) {
       return !isAccordionRow(node.id)
     }

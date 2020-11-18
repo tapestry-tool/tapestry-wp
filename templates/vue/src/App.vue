@@ -99,6 +99,15 @@ html {
     button:focus {
       outline: none;
     }
+
+    .btn {
+      &:disabled,
+      &.disabled {
+        * {
+          opacity: 50%;
+        }
+      }
+    }
   }
 }
 </style>

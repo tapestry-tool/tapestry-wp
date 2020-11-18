@@ -45,7 +45,6 @@ export async function addNode(
         [getters.yOrFy]: nodeToAdd.coordinates.y,
       },
     })
-    dispatch("updateNodePermissions", { id, permissions: nodeToAdd.permissions })
     return id
   } catch (error) {
     dispatch("addApiError", error)
@@ -74,9 +73,6 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
           [getters.yOrFy]: newNode.coordinates.y,
         },
       })
-    }
-    if (newNode.permissions) {
-      dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
     }
     return id
   } catch (error) {
@@ -197,14 +193,6 @@ async function unlockNodes({ commit, getters, dispatch }) {
         commit("updateNode", { id, newNode })
       }
     }
-  } catch (error) {
-    dispatch("addApiError", error)
-  }
-}
-
-export function updateNodePermissions({ dispatch }, payload) {
-  try {
-    client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
   } catch (error) {
     dispatch("addApiError", error)
   }
