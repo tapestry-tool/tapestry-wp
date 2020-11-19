@@ -4,7 +4,6 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueYouTubeEmbed from "vue-youtube-embed"
 import vSelect from "vue-select"
-import { configure } from "@testing-library/vue"
 
 /**
  * JSDom, the "fake" DOM used by the Jest tests, doesn't have a script tag

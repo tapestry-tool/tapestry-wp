@@ -49,7 +49,7 @@ const mockSettings = {
   permalink: "testing",
 }
 
-function parseFixture(fixture) {
+function parseFixture(fixture, settings) {
   if (fixture) {
     const state = parse(fixture, makeMockProgress(fixture))
     state.settings = { ...Helpers.deepCopy(mockSettings), ...settings }
