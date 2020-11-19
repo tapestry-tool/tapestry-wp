@@ -60,10 +60,10 @@ Cypress.Commands.add("getSelectedNode", () =>
 
 Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
   cy.server()
-  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
+  cy.route("POST", `**/nodes`).as("addNode")
   cy.store().then(store => {
     store.dispatch("addNode", deepMerge(store.getters.createDefaultNode(), node))
-    cy.wait("@editPermissions")
+    cy.wait("@addNode")
     cy.getNodeByTitle(node.title).then(({ id }) => {
       store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
       if (parent) {
