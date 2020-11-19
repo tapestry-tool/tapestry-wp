@@ -31,12 +31,26 @@
             node.nodeType !== '' &&
             !node.hideProgress
         "
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius"
         :data-qa="`node-progress-${node.id}`"
-        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
-        :draft="node.status === 'draft'"
       ></progress-bar>
+      <status-bar
+        v-if="
+          node.nodeType !== 'grandchild' &&
+            node.nodeType !== '' &&
+            !node.hideProgress
+        "
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius"
+        :locked="!node.accessible"
+        :status="node.status"
+        :reviewStatus="node.reviewStatus"
+      ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
@@ -66,14 +80,14 @@
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <add-child-button
-            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
+            v-if="isLoggedIn && !isSubAccordionRow"
             :node="node"
-            :x="-35"
+            :x="hasPermission('edit') ? -35 : 0"
             :y="radius"
           ></add-child-button>
           <node-button
             v-if="isLoggedIn && hasPermission('edit')"
-            :x="35"
+            :x="isSubAccordionRow ? 0 : 35"
             :y="radius"
             :data-qa="`edit-node-${node.id}`"
             @click="editNode"
@@ -112,6 +126,7 @@ import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import StatusBar from "./tapestry-node/StatusBar"
 import NodeButton from "./tapestry-node/NodeButton"
 
 export default {
@@ -120,6 +135,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    StatusBar,
     NodeButton,
   },
   props: {
