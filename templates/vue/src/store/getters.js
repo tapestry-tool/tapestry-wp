@@ -189,8 +189,8 @@ export function tapestryJson(state) {
     }),
     links: state.links.map(link => ({
       ...link,
-      source: link.source.id,
-      target: link.target.id,
+      source: link.source,
+      target: link.target,
     })),
     groups: state.groups,
   }
