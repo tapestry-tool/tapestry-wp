@@ -10,7 +10,7 @@
       @input="changeRow"
     >
       <template v-slot="{ isVisible, hasNext, next, toggle }">
-        <div class="rows">
+        <div class="rows" data-qa="accordion-rows">
           <div
             v-for="(row, index) in rows"
             :key="row.node.id"

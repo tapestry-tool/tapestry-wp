@@ -666,7 +666,7 @@ class Tapestry implements ITapestry
     {
         $tydeType = $node->tydeType;
 
-        if (!isset($tydeType) || !is_string($tydeType)) {
+        if (!isset($tydeType) || !is_string($tydeType) || '' === $tydeType) {
             return true; // for backwards compatibility
         }
 
@@ -675,7 +675,7 @@ class Tapestry implements ITapestry
         }
 
         $parentType = $parent->tydeType;
-        if (!isset($parentType) || '' == $parentType) {
+        if (!isset($parentType) || !is_string($parentType) || '' === $parentType) {
             return true;
         }
 

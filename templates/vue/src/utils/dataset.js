@@ -53,6 +53,10 @@ function parseToStore(dataset) {
     if (mediaURL && typeof mediaURL === "string") {
       node.typeData.mediaURL = mediaURL.replace(/(http(s?)):\/\//gi, "//")
     }
+
+    if (!node.tydeType) {
+      node.tydeType = tydeTypes.REGULAR
+    }
   }
 
   for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
