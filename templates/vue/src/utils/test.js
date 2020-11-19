@@ -49,10 +49,13 @@ const mockSettings = {
   permalink: "testing",
 }
 
-function parseFixture(fixture, settings) {
-  const state = parse(fixture, makeMockProgress(fixture))
-  state.settings = { ...Helpers.deepCopy(mockSettings), ...settings }
-  state.rootId = Object.keys(state.nodes)[0]
-  state.favourites = fixture.favourites || []
-  return state
+function parseFixture(fixture) {
+  if (fixture) {
+    const state = parse(fixture, makeMockProgress(fixture))
+    state.settings = { ...Helpers.deepCopy(mockSettings), ...settings }
+    state.rootId = Object.keys(state.nodes)[0]
+    state.favourites = fixture.favourites || []
+    return state
+  }
+  return {}
 }
