@@ -31,7 +31,7 @@ describe("Video", () => {
 
       cy.openLightbox(node.id).within(() => {
         cy.getByTestId("end-screen").should("be.visible")
-        cy.contains(/rewatch/i).should("be.visible")
+        cy.contains(/replay/i).should("be.visible")
         cy.contains(/continue/i).click()
       })
       cy.lightbox().should("not.exist")
