@@ -16,7 +16,7 @@
           :items="[node.mapCoordinates]"
         ></b-table>
         <b-button
-          v-if="isLoggedIn && hasPermission('edit')"
+          v-if="isLoggedIn && canEditNode(node)"
           size="sm"
           class="text-small"
           variant="secondary"
@@ -25,7 +25,7 @@
           Edit
         </b-button>
         <b-button
-          v-if="isLoggedIn && hasPermission('edit') && !hasMapCoordinates(node)"
+          v-if="isLoggedIn && canEditNode(node) && !hasMapCoordinates(node)"
           size="sm"
           class="text-small"
           variant="success"
@@ -248,8 +248,8 @@ export default {
         query: this.$route.query,
       })
     },
-    hasPermission(action) {
-      return Helpers.hasPermission(this.node, action)
+    canEditNode(node) {
+      return Helpers.hasPermission(node, "edit")
     },
   },
 }

@@ -495,8 +495,6 @@ class Tapestry implements ITapestry
 
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
-
-            return $tapestry;
         } else {
             $tapestry->nodes = array_intersect($tapestry->nodes,
                 $this->_filterNodeMetaIdsByPermissions(
@@ -543,11 +541,21 @@ class Tapestry implements ITapestry
 
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)
     {
+        $currentUserRoles = new TapestryUserRoles();
         $currentUserId = wp_get_current_user()->ID;
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
-            if ($node->isAvailableToUser()) {
+            $nodeMeta = $node->getMeta();
+            // draft nodes should only be visible to node authors
+            // the exception is that the node is submitted in which case it should also be viewable to reviewers
+            if ('draft' == $nodeMeta->status) {
+                if ($nodeMeta->author->id == $currentUserId) {
+                    array_push($nodesPermitted, $nodeId);
+                } elseif ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
+                    array_push($nodesPermitted, $nodeId);
+                }
+            } else {
                 array_push($nodesPermitted, $nodeId);
             }
         }
