@@ -75,31 +75,25 @@
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
           >
-            <slick-list
-              :value="node.childOrdering"
-              lock-axis="y"
-              @input="updateOrderingArray"
-            >
-              <slick-item
-                v-for="(childId, index) in node.childOrdering"
-                :key="index"
-                class="slick-list-item"
-                :index="index"
-                style="z-index: 9999 !important;"
+            <div>
+              <slick-list
+                :value="node.childOrdering"
+                lock-axis="y"
+                @input="updateOrderingArray"
               >
-                <span class="fas fa-bars fa-xs"></span>
-                <span>{{ getNode(childId).title }}</span>
-                <span style="color: grey;">id: {{ childId }}</span>
-              </slick-item>
-            </slick-list>
-          </b-tab>
-          <b-tab
-            v-if="settings.renderMap"
-            title="Geography"
-            :active="tab === 'coordinates'"
-            @click="changeTab('coordinates')"
-          >
-            <coordinates-form :node="node" />
+                <slick-item
+                  v-for="(childId, index) in node.childOrdering"
+                  :key="index"
+                  class="slick-list-item"
+                  :index="index"
+                  style="z-index: 9999 !important;"
+                >
+                  <span class="fas fa-bars fa-xs"></span>
+                  <span>{{ getNode(childId).title }}</span>
+                  <span style="color: grey;">id: {{ childId }}</span>
+                </slick-item>
+              </slick-list>
+            </div>
           </b-tab>
           <b-tab
             v-if="settings.renderMap"
