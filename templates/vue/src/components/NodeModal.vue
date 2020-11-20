@@ -303,6 +303,12 @@ export default {
         ? true
         : wp.canEditTapestry()
     },
+    linkHasThumbnailData() {
+      return (
+        (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
+        this.node.mediaFormat === "youtube"
+      )
+    },
     canPublish() {
       if (this.type === "add") {
         return (
@@ -516,7 +522,7 @@ export default {
         this.loading = true
         this.updateNodeCoordinates()
 
-        if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
+        if (this.linkHasThumbnailData) {
           await this.setLinkData()
         }
 
