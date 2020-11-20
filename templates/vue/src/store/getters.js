@@ -24,22 +24,20 @@ export function getParent(state) {
   }
 }
 
-export function isAccordion(_, { getNode, getParent }) {
+export function isAccordion(_, { getNode, isSubAccordion }) {
   return id => {
     const node = getNode(id)
+    return node.mediaType === "accordion" || isSubAccordion(id)
+  }
+}
 
-    // Check 1: Node itself is an accordion
-    if (node.mediaType === "accordion") {
-      return true
-    }
-
-    // Check 2: Node is a subaccordion
-    const parent = getParent(node.id)
+export function isSubAccordion(_, { getNode, getParent }) {
+  return id => {
+    const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
       return parentNode.mediaType === "accordion"
     }
-
     return false
   }
 }
