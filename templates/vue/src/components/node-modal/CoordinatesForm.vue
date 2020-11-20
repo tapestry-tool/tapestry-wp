@@ -47,11 +47,11 @@ export default {
     ...mapGetters(["getNode"]),
     isValidLng() {
       return (
-        this.node.mapCoordinates.lng < 180 && this.node.mapCoordinates.lng > -180
+        this.node.mapCoordinates.lng < 181 && this.node.mapCoordinates.lng > -181
       )
     },
     isValidLat() {
-      return this.node.mapCoordinates.lat < 90 && this.node.mapCoordinates.lat > -90
+      return this.node.mapCoordinates.lat < 91 && this.node.mapCoordinates.lat > -91
     },
   },
   watch: {

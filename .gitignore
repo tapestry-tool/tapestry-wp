@@ -7,3 +7,4 @@ cypress.json
 
 data/
 bin/config.sh
+templates/vue/debug.log

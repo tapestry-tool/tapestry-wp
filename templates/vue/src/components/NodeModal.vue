@@ -145,7 +145,7 @@
               id="draft-button"
               size="sm"
               variant="secondary"
-              :disabled="loading || fileUploading"
+              :disabled="loading || fileUploading || !validMapCoordinates"
               @click="handleDraftSubmit"
             >
               <span>Save as Private Draft</span>
@@ -156,7 +156,7 @@
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
-              :disabled="loading || fileUploading"
+              :disabled="loading || fileUploading || !validMapCoordinates"
               @click="handlePublish"
             >
               <span>Publish</span>
@@ -346,6 +346,27 @@ export default {
     canEditTapestry() {
       return wp.canEditTapestry()
     },
+    validMapCoordinates() {
+      if (!this.node.mapCoordinates) {
+        return "no map coordinates atm"
+      } else {
+        if (
+          this.node.mapCoordinates.lat == "" &&
+          this.node.mapCoordinates.lng == ""
+        ) {
+          return true
+        } else {
+          return (
+            this.node.mapCoordinates.lat < 91 &&
+            this.node.mapCoordinates.lat > -91 &&
+            this.node.mapCoordinates.lng < 181 &&
+            this.node.mapCoordinates.lng > -181 &&
+            this.node.mapCoordinates.lng != "" &&
+            this.node.mapCoordinates.lat != ""
+          )
+        }
+      }
+    },
     nodeId() {
       const nodeId = this.$route.params.nodeId
       return nodeId || Number(nodeId)
@@ -402,6 +423,13 @@ export default {
       this.fileUploading = isUploading
     })
     this.node = this.createDefaultNode()
+
+    if (!this.node.mapCoordinates) {
+      this.node.mapCoordinates = {
+        lat: "",
+        lng: "",
+      }
+    }
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
