@@ -7,4 +7,3 @@ cypress.json
 
 data/
 bin/config.sh
-*/debug.log

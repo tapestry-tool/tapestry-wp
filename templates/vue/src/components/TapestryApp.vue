@@ -29,7 +29,7 @@
         <div v-else class="empty-message">The requested Tapestry is empty.</div>
       </div>
       <svg v-else id="vue-svg" :viewBox="viewBox">
-        <g>
+        <g class="links">
           <tapestry-link
             v-for="link in links"
             :key="`${link.source}-${link.target}`"
@@ -37,7 +37,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectEnabled && dragSelectReady">
+        <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
