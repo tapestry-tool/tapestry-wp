@@ -46,7 +46,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$root.$emit('edit-node', nodeId)">
+          <b-button v-if="canEdit" @click="editNode">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -108,21 +108,33 @@ export default {
   components: {
     TapestryIcon,
   },
-  data() {
-    return {
-      active: null,
-    }
-  },
   computed: {
     ...mapGetters(["getNode"]),
+    active: {
+      get() {
+        return this.$route.query.section
+      },
+      set(section) {
+        if (section !== this.active && !this.closed) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, section },
+          })
+        }
+      },
+    },
     closed: {
       get() {
         return !this.$route.query.sidebar
       },
       set(closed) {
-        // eslint-disable-next-line no-unused-vars
-        const { sidebar: _, ...rest } = this.$route.query
-        const newQuery = closed ? rest : { ...this.$route.query, sidebar: true }
+        const newQuery = closed
+          ? Helpers.omit(this.$route.query, ["sidebar", "section"])
+          : {
+              ...this.$route.query,
+              sidebar: true,
+              section: this.$route.query.section || "info",
+            }
         this.$router.push({ ...this.$route, query: newQuery })
       },
     },
@@ -190,6 +202,13 @@ export default {
       this.$router.push({
         name: names.LIGHTBOX,
         params: { nodeId: this.nodeId },
+        query: this.$route.query,
+      })
+    },
+    editNode() {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
     },

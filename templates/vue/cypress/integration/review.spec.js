@@ -101,25 +101,4 @@ describe("Review Nodes", () => {
       cy.contains(/resubmit/i).should("be.visible")
     })
   })
-
-  it("should be able to open the sidebar by visiting the url", () => {
-    cy.app().then(app => {
-      const { path } = app.$route
-      app.$router.push({
-        path,
-        query: {
-          sidebar: true,
-          section: "copyright",
-        },
-      })
-    })
-    cy.getByTestId("sidebar-content")
-      .should("be.visible")
-      .within(() => {
-        cy.findByLabelText("edit node").click()
-        cy.getByTestId("node-modal").should("be.visible")
-        cy.contains(/cancel/i).click()
-      })
-    cy.findByLabelText("copyright").should("have.css", "opacity", "1")
-  })
 })
