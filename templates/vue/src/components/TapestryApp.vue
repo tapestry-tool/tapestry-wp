@@ -22,7 +22,7 @@
     </div>
     <main id="tapestry" ref="app" :style="background">
       <svg id="vue-svg" :viewBox="viewBox">
-        <g>
+        <g class="links">
           <tapestry-link
             v-for="link in links"
             :key="`${link.source}-${link.target}`"
@@ -30,7 +30,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectReady">
+        <g v-if="dragSelectReady" class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
