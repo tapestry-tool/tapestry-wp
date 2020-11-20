@@ -20,13 +20,13 @@
         :options="filterOptions"
         @search="val => (search = val)"
       ></v-select>
-      <b-form-select
+      <v-select
         v-else
         id="status-select"
         v-model="filterValue"
         data-qa="status-select"
         :options="statuses"
-      ></b-form-select>
+      ></v-select>
       <div class="spinner">
         <b-spinner
           v-if="loading"

@@ -35,6 +35,7 @@ export const nodeStatus = {
   SUBMITTED: "Submit",
   REJECTED: "Reject",
   DRAFT: "Draft",
+  ACCEPTED: "Accept",
 }
 
 export const DEFAULT_DEPTH = 3
