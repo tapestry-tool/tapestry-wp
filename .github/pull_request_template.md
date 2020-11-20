@@ -5,9 +5,11 @@
 * Delete this section after completing the above steps and before creating the PR
 ## Changes
 * Write down exactly what changes this PR makes to the base branch. This will be used as the commit message once your PR is merged in. Note that all of your commit messages will be deleted when merging this PR. Please delete this line
+## Screenshot
+* This is a space to include a screenshot or GIF if this is a frontend change. Delete this section if this is not a frontend change.
 ## Issue Linkage
-* Include a [closing keyword](https://docs.github.com/en/enterprise/2.16/user/github/managing-your-work-on-github/closing-issues-using-keywords) here so that the issue automatically closes when this PR gets merged in. E.g. `Fixes #582`. Please delete this line
+Closes (issue #)
 ## PR Dependency
-* If your PR is dependent on another PR, put that PR # in the description. E.g. `Depends on: #708`. If no dependency, just enter `N/A`. Please delete this line.
+Depends on: (PR # or N/A)
 ## Automated Testing
 * Please enter what automated testing you have added so that testers will know what they should NOT test
