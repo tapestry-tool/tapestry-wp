@@ -55,7 +55,20 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
   }
 }
 
-export function isVisible(_, { getNode, isAccordionRow }) {
+export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
+  return id => {
+    let nodeId = id
+    while (nodeId) {
+      let parent = getParent(nodeId)
+      if (!parent) return false
+      if (isSubAccordion(nodeId)) return true
+      nodeId = parent
+    }
+    return false
+  }
+}
+
+export function isVisible(_, { getNode, hasAccordionAncestor }) {
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
@@ -65,7 +78,7 @@ export function isVisible(_, { getNode, isAccordionRow }) {
       return false
     }
     if (!Helpers.hasPermission(node, "edit")) {
-      return !isAccordionRow(node.id)
+      return !hasAccordionAncestor(node.id)
     }
     return true
   }
