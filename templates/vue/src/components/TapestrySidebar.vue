@@ -8,7 +8,7 @@
       <button
         :class="['anchor-button', { active: active === 'info' }]"
         aria-label="information"
-        @click.stop="scrollToRef('info')"
+        @click.stop="active = 'info'"
       >
         <tapestry-icon icon="info-circle" />
       </button>
@@ -16,20 +16,20 @@
         v-if="node.license || node.references"
         :class="['anchor-button', { active: active === 'copyright' }]"
         aria-label="copyright"
-        @click.stop="scrollToRef('copyright')"
+        @click.stop="active = 'copyright'"
       >
         <tapestry-icon icon="copyright" />
       </button>
       <button
         :aria-label="closed ? 'open sidebar' : 'close sidebar'"
         :class="['toggle-button', { closed: closed }]"
-        @click.stop="toggle"
+        @click.stop="active = closed ? 'info' : undefined"
       >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
         :class="['anchor-button', 'close-button-mobile', { closed: closed }]"
-        @click.stop="toggle"
+        @click.stop="active = undefined"
       >
         <tapestry-icon icon="times" />
       </button>
@@ -112,31 +112,19 @@ export default {
     ...mapGetters(["getNode"]),
     active: {
       get() {
-        return this.$route.query.section
+        return this.$route.query.sidebar
       },
       set(section) {
-        if (section !== this.active && !this.closed) {
+        if (section !== this.active) {
           this.$router.push({
             ...this.$route,
-            query: { ...this.$route.query, section },
+            query: { ...this.$route.query, sidebar: section },
           })
         }
       },
     },
-    closed: {
-      get() {
-        return !this.$route.query.sidebar
-      },
-      set(closed) {
-        const newQuery = closed
-          ? Helpers.omit(this.$route.query, ["sidebar", "section"])
-          : {
-              ...this.$route.query,
-              sidebar: true,
-              section: this.$route.query.section || "info",
-            }
-        this.$router.push({ ...this.$route, query: newQuery })
-      },
+    closed() {
+      return this.active === undefined
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -158,15 +146,13 @@ export default {
     },
   },
   watch: {
-    closed(closed) {
-      if (closed) {
-        this.active = null
-      }
-    },
     nodeId() {
       if (!this.closed) {
         this.active = "info"
       }
+    },
+    active(section) {
+      this.scrollToRef(section)
     },
   },
   mounted() {
@@ -189,14 +175,12 @@ export default {
       }
     },
     scrollToRef(refName) {
-      if (this.closed) {
-        this.toggle()
+      if (refName) {
+        this.$nextTick(() => {
+          const el = this.$refs[refName]
+          this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+        })
       }
-      this.$nextTick(() => {
-        const el = this.$refs[refName]
-        this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
-        this.active = refName
-      })
     },
     viewNode() {
       this.$router.push({
@@ -211,9 +195,6 @@ export default {
         params: { nodeId: this.node.id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
-    },
-    toggle() {
-      this.closed = !this.closed
     },
   },
 }

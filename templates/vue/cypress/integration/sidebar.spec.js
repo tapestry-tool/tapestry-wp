@@ -49,8 +49,7 @@ describe("Sidebar", () => {
       app.$router.push({
         path,
         query: {
-          sidebar: true,
-          section: "copyright",
+          sidebar: "copyright",
         },
       })
     })
