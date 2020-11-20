@@ -223,22 +223,40 @@ export default {
     if (this.canSearch && this.lazy) {
       this.allContributors = await client.getAllContributors()
     }
-    this.allStatuses = new Map()
-    for (let status of Object.values(nodeStatus)) {
-      this.allStatuses.set(status.toLowerCase(), 0)
-    }
-    for (let node of Object.values(this.nodes)) {
-      this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
-    }
+    this.initStatusMap()
+    this.$store.subscribe(mutation => {
+      if (mutation.type == "updateNode") {
+        this.initStatusMap()
+      }
+    })
   },
   methods: {
-    ...mapMutations(["updateVisibleNodes", "addApiError"]),
+    ...mapMutations(["updateVisibleNodes", "addApiError", "updateNode"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
         this.filterValue = undefined
       }
       this.isActive = !this.isActive
+    },
+    initStatusMap() {
+      this.allStatuses = new Map()
+      for (let status of Object.values(nodeStatus)) {
+        this.allStatuses.set(status.toLowerCase(), 0)
+      }
+      for (let node of Object.values(this.nodes)) {
+        if (node.reviewStatus) {
+          console.log("found a reviewstatus")
+          this.allStatuses.set(
+            node.reviewStatus,
+            this.allStatuses.get(node.reviewStatus) + 1
+          )
+        } else {
+          console.log("didn't find a reviewstatus")
+
+          this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
+        }
+      }
     },
     getVisibleMatches(options, value) {
       if (!value.length) {
