@@ -26,6 +26,7 @@
         v-model="filterValue"
         data-qa="status-select"
         :options="statuses"
+        :selectable="option => option.count > 0"
       ></v-select>
       <div class="spinner">
         <b-spinner
@@ -60,6 +61,7 @@ export default {
       allContributors: null,
       loading: false,
       search: "",
+      allStatuses: null,
     }
   },
   computed: {
@@ -90,6 +92,7 @@ export default {
         return this.$route.query.q
       },
       set(val) {
+        if (typeof val == "object") val = val.value
         if (val !== this.filterValue) {
           this.$router.replace({
             path: this.$route.path,
@@ -123,7 +126,21 @@ export default {
       return filterTypes
     },
     statuses() {
-      return Object.values(nodeStatus)
+      let res = []
+      let total = 0
+      for (let status of Object.values(nodeStatus)) {
+        let obj = {}
+        obj.value = status
+        obj.count = this.allStatuses.get(status.toLowerCase())
+        total += obj.count
+        res.push(obj)
+      }
+      // set total for All
+      res[0].count = total
+      for (let obj in res) {
+        res[obj].label = res[obj].value + ": " + res[obj].count
+      }
+      return res
     },
     placeholder() {
       switch (this.type) {
@@ -132,7 +149,7 @@ export default {
         case filterTypes.TITLE:
           return "Node title"
         default:
-          return ""
+          return "Node status"
       }
     },
     filterOptions() {
@@ -205,6 +222,13 @@ export default {
   async created() {
     if (this.canSearch && this.lazy) {
       this.allContributors = await client.getAllContributors()
+    }
+    this.allStatuses = new Map()
+    for (let status of Object.values(nodeStatus)) {
+      this.allStatuses.set(status.toLowerCase(), 0)
+    }
+    for (let node of Object.values(this.nodes)) {
+      this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
     }
   },
   methods: {
