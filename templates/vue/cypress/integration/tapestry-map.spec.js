@@ -13,6 +13,30 @@ describe("Map Tapestry", ()=>{
         
     })
 
+    it("if logged in as non-admin, should NOT see list of nodes", ()=>{
+        cy.logout().visitTapestry()
+        cy.get(".nodes-list").should("not.be.visible")
+        cy.get('.vue2leaflet-map').should('be.visible')
+    })
+
+    it('if logged in as non-admin, should see map markers', ()=>{
+        cy.get('.card-body').eq(1).contains('Add to map').click()
+        cy.contains("Show on Map").click({force: true})
+        
+        cy.getByTestId('node-lat-input').clear().type("49")
+        cy.getByTestId('node-lng-input').clear().type("-123")
+        cy.getByTestId("submit-node-modal").should('not.be.disabled')
+        cy.submitModal()
+
+        cy.logout().visitTapestry()
+        cy.get('.leaflet-marker-icon').should('be.visible')
+        cy.get('.leaflet-marker-icon').click()
+        cy.get('.vue2leaflet-map').get('.btn > h6').click({force:true})
+        cy.lightbox().should("be.visible")
+        cy.closeLightbox()
+
+    })
+
     
     it("admin can add to map, view from marker, and delete from sidebar", ()=>{
      
@@ -44,6 +68,22 @@ describe("Map Tapestry", ()=>{
         cy.lightbox().should("be.visible")
         cy.closeLightbox()
 
+        /* passes test but doesn't work
+        cy.store()
+            .its("state.nodes")
+            .then(nodes => {
+                const listofnodes = Object.values(nodes)
+                listofnodes.forEach(child => {
+                    if(child.mapCoordinates && child.mapCoordinates.lat != ""){
+                        console.log(`marker-${child.id}`, child.title)
+                        cy.getByTestId(`marker-${child.id}`).should('be.visible')
+                        cy.getByTestId(`marker-${child.id}`).click()
+                    }
+                }
+            )           
+        })
+        */
+
         // can delete
         cy.get('.card-body').eq(1).contains('Edit').click()
         cy.contains('Delete Node').click()
@@ -57,24 +97,6 @@ describe("Map Tapestry", ()=>{
         .should(nodes => {
           expect(Object.keys(nodes)).to.have.length(1)
         })
-
-
-
-        /* passes test but doesn't work
-        cy.store()
-            .its("state.nodes")
-            .then(nodes => {
-                const listofnodes = Object.values(nodes)
-                listofnodes.forEach(child => {
-                    if(child.mapCoordinates && child.mapCoordinates.lat != ""){
-                        console.log(`marker-${child.id}`)
-                        cy.getByTestId(`marker-${child.id}`).click({force:true})
-                    }
-                }
-            )           
-        })
-        */
-
     })
 
 
@@ -104,11 +126,9 @@ describe("Map Tapestry", ()=>{
 
     })
 
-    it("if logged in as non-admin, should NOT see list of nodes", ()=>{
-        cy.logout().visitTapestry()
-        cy.get(".nodes-list").should("not.be.visible")
-        cy.get('.vue2leaflet-map').should('b.visible')
-    })
+    
+
+ 
 
   
 })
