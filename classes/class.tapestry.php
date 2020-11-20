@@ -543,7 +543,6 @@ class Tapestry implements ITapestry
         if (!isset($tapestry->settings->superuserOverridePermissions)) {
             $tapestry->settings->superuserOverridePermissions = true;
         }
-
         $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
 
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
@@ -551,10 +550,13 @@ class Tapestry implements ITapestry
 
             return $tapestry;
         } else {
-            $tapestry->nodes = $this->_filterNodeMetaIdsByPermissions(
-                $tapestry->rootId,
-                $tapestry->settings->superuserOverridePermissions,
-                $filterUserId
+            $tapestry->nodes = array_intersect(
+                $tapestry->nodes,
+                $this->_filterNodeMetaIdsByPermissions(
+                    $tapestry->rootId,
+                    $tapestry->settings->superuserOverridePermissions,
+                    $filterUserId
+                )
             );
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
@@ -664,7 +666,7 @@ class Tapestry implements ITapestry
     {
         $tydeType = $node->tydeType;
 
-        if (!isset($tydeType) || !is_string($tydeType)) {
+        if (!isset($tydeType) || !is_string($tydeType) || '' === $tydeType) {
             return true; // for backwards compatibility
         }
 
@@ -673,7 +675,7 @@ class Tapestry implements ITapestry
         }
 
         $parentType = $parent->tydeType;
-        if (!isset($parentType) || '' == $parentType) {
+        if (!isset($parentType) || !is_string($parentType) || '' === $parentType) {
             return true;
         }
 

@@ -7,7 +7,7 @@ import * as getters from "./getters"
 
 Vue.use(Vuex)
 
-const store = new Vuex.Store({
+export const store = {
   state: {
     groups: [],
     links: [],
@@ -21,10 +21,11 @@ const store = new Vuex.Store({
     selectedModuleId: null,
     favourites: [],
     visibleNodes: [],
+    apiError: null,
   },
   getters,
   mutations,
   actions,
-})
+}
 
-export default store
+export default new Vuex.Store(store)

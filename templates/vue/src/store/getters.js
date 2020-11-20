@@ -74,7 +74,7 @@ export function isVisible(_, { getNode, isAccordionRow }) {
 export function getActivities(state) {
   return (options = {}) => {
     const { exclude = [] } = options
-    return state.nodes
+    return Object.values(state.nodes)
       .filter(node => !exclude.includes(node.id) && Boolean(node.quiz))
       .flatMap(node => node.quiz)
   }
@@ -82,7 +82,7 @@ export function getActivities(state) {
 
 export function getQuestion(state) {
   return id => {
-    const node = state.nodes
+    const node = Object.values(state.nodes)
       .filter(node => node.quiz)
       .find(node => node.quiz.find(q => q.id == id))
     if (node) {
@@ -189,8 +189,8 @@ export function tapestryJson(state) {
     }),
     links: state.links.map(link => ({
       ...link,
-      source: link.source.id,
-      target: link.target.id,
+      source: link.source,
+      target: link.target,
     })),
     groups: state.groups,
   }
@@ -247,7 +247,7 @@ export function createDefaultNode({ settings }) {
     hideMedia: false,
     skippable: true,
     fullscreen: false,
-    tydeType: "Regular",
+    tydeType: tydeTypes.REGULAR,
     coordinates: {
       x: 3000,
       y: 3000,
@@ -259,6 +259,20 @@ export function createDefaultNode({ settings }) {
     unlocked: true,
     accessible: true,
   })
+}
+
+export function getNeighbouringLinks(state) {
+  return id => {
+    return state.links.filter(link => link.source == id || link.target == id)
+  }
+}
+
+export function getNeighbours(state) {
+  return id => {
+    return state.links
+      .filter(link => link.source == id || link.target == id)
+      .map(link => (link.source == id ? link.target : link.source))
+  }
 }
 
 // TYDE ONLY
@@ -381,14 +395,6 @@ export function getProfileActivities({ nodes, settings }) {
     }
   }
   return profileActivities
-}
-
-export function getNeighbours(state) {
-  return id => {
-    return state.links
-      .filter(link => link.source == id || link.target == id)
-      .map(link => (link.source == id ? link.target : link.source))
-  }
 }
 
 export function getTydeProgress(_, { getNode, getDirectChildren }) {

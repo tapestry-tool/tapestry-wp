@@ -1,7 +1,7 @@
 <template>
   <div id="root-node-button">
     <import-changelog :changes="changes" />
-    <div data-testid="root-node-button" @click="addRootNode">
+    <div data-qa="root-node-button" @click="addRootNode">
       <i class="fas fa-plus-circle fa-5x"></i>
       <div>Add Root Node</div>
     </div>
@@ -20,11 +20,13 @@
     </div>
     <input
       ref="fileInput"
+      data-qa="import-file-input"
       type="file"
       style="display: none;"
       @change="handleFileChange"
     />
     <div
+      data-qa="import-file-drop"
       :class="['dropbox', { 'drag-over': isDragover }]"
       @dragenter="handleDragStart"
       @dragover="handleDragStart"
@@ -39,6 +41,7 @@
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 import ImportChangelog from "./ImportChangelog"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "root-node-button",

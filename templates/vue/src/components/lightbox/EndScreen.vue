@@ -1,5 +1,9 @@
 <template>
-  <div class="end-screen" :style="{ backgroundImage: backgroundUrl }">
+  <div
+    data-qa="end-screen"
+    class="end-screen"
+    :style="{ backgroundImage: backgroundUrl }"
+  >
     <speech-bubble v-if="showQuizButton">
       <h3>
         We've got a question for you!
@@ -48,6 +52,7 @@
 import SpeechBubble from "../SpeechBubble"
 import EndScreenBg from "../../assets/end-screen-bg.png"
 import client from "@/services/TapestryAPI"
+import { data } from "@/services/wp"
 
 export default {
   name: "end-screen",
@@ -69,7 +74,7 @@ export default {
       return allDone ? "Reanswer Question" : "Answer Question"
     },
     backgroundUrl() {
-      return `url(${wpData.vue_uri}/${EndScreenBg.split("dist")[1]})`
+      return `url(${data.vue_uri}/${EndScreenBg.split("dist")[1]})`
     },
   },
   methods: {

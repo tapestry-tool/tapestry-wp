@@ -1,4 +1,7 @@
 import axios from "axios"
+import { data } from "./wp"
+
+const { apiUrl, adminAjaxUrl } = data
 
 const BASE_URL = `${apiUrl}/gf`
 

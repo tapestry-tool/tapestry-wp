@@ -1,5 +1,8 @@
 import axios from "axios"
 import Helpers from "../utils/Helpers"
+import { data } from "./wp"
+
+const { apiUrl, nonce, postId } = data
 
 class TapestryApi {
   /**
@@ -7,7 +10,7 @@ class TapestryApi {
    * @param {Number} postId
    */
   constructor(postId) {
-    axios.defaults.headers.common["X-WP-Nonce"] = wpData.nonce
+    axios.defaults.headers.common["X-WP-Nonce"] = nonce
     this.postId = postId
   }
 
@@ -94,8 +97,7 @@ class TapestryApi {
    */
   async addLink(link) {
     const url = `${apiUrl}/tapestries/${this.postId}/links`
-    const response = await axios.post(url, link)
-    return response
+    return await axios.post(url, link)
   }
 
   async deleteLink(link) {
@@ -273,4 +275,4 @@ class TapestryApi {
   }
 }
 
-export default new TapestryApi(wpPostId)
+export default new TapestryApi(postId)

@@ -1,6 +1,7 @@
 <template>
   <tapestry-modal
     id="lightbox"
+    data-qa="lightbox"
     :class="{
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',

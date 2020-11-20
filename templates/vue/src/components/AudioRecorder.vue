@@ -12,9 +12,17 @@
   <div v-else-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
+  <div v-else-if="state === states.WAIT">
+    Please provide microphone access to record your answer.
+  </div>
   <div v-else class="recorder">
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
-    <button v-else class="main-button my-2" @click="toggleRecording">
+    <button
+      v-else
+      class="main-button my-2"
+      data-qa="record"
+      @click="toggleRecording"
+    >
       <i
         :class="'fas fa-' + (state === states.RECORDING ? 'pause' : 'microphone')"
       ></i>
@@ -112,6 +120,7 @@ export default {
     },
     states() {
       return {
+        WAIT: "wait",
         DONE: "done",
         NOT_SUPPORTED: "not-supported",
         PAUSED: "paused",
@@ -129,7 +138,7 @@ export default {
       this.state =
         this.node.userType === "teen" ? this.states.READ_ONLY : this.states.DONE
     } else {
-      this.state = this.states.READY
+      this.state = this.states.WAIT
       this.initialize()
     }
   },
@@ -161,6 +170,7 @@ export default {
         })
 
         this.recorder = recorder
+        this.state = this.states.READY
       })
     },
     startDurationCount() {

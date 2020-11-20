@@ -16,7 +16,7 @@
             <b-form-checkbox
               :checked="permissionsList.includes(type)"
               :disabled="isPermissionOverridden(rowName, type)"
-              :data-testid="`node-permissions-${rowName}-${type}`"
+              :data-qa="`node-permissions-${rowName}-${type}`"
               @change="updatePermissions($event, rowName, type)"
             ></b-form-checkbox>
           </b-td>
@@ -42,11 +42,12 @@
 
 <script>
 import Helpers from "../../utils/Helpers"
+import { data } from "@/services/wp"
 
 const PERMISSIONS_ORDER = [
   "public",
   "authenticated",
-  ...Object.keys(wpData.roles).filter(
+  ...Object.keys(data.roles).filter(
     role => role !== "editor" && role !== "administrator" && role !== "author"
   ),
 ]

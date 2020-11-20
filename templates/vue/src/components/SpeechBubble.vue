@@ -7,12 +7,13 @@
 
 <script>
 import SpeechBubble from "../assets/speech-bubble-end.png"
+import { data } from "@/services/wp"
 
 export default {
   name: "speech-bubble",
   computed: {
     bubbleImage() {
-      return `url(${wpData.vue_uri}/${SpeechBubble.split("dist")[1]})`
+      return `url(${data.vue_uri}/${SpeechBubble.split("dist")[1]})`
     },
   },
 }

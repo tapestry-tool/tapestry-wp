@@ -23,7 +23,6 @@
     <video
       ref="video"
       controls
-      :autoplay="autoplay"
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       @loadeddata="handleLoad"
@@ -198,6 +197,9 @@ export default {
       }
       this.updateDimensions()
       this.seek()
+      if (this.autoplay && !this.showEndScreen) {
+        this.play()
+      }
     },
     seek() {
       const video = this.$refs.video

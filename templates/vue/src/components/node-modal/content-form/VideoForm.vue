@@ -4,7 +4,7 @@
       <file-upload
         id="node-video-media-url"
         v-model="node.typeData.mediaURL"
-        input-test-id="node-videoUrl"
+        input-test-id="node-video-url"
         placeholder="Enter URL for MP4 or YouTube video"
         required
         @isUploading="handleUploadChange"

@@ -1,8 +1,10 @@
 import axios from "axios"
 import Helpers from "@/utils/Helpers"
 
+import { data } from "./wp"
+
 async function getAllContent() {
-  const url = `${apiUrl}/h5p`
+  const url = `${data.apiUrl}/h5p`
   const response = await axios.get(url)
   return parse(response.data)
 }

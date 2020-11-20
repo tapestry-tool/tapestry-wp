@@ -5,6 +5,7 @@
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
     <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
+    <tapestry-error></tapestry-error>
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import NodeModal from "@/components/NodeModal"
 import TapestrySidebar from "@/components/TapestrySidebar"
 import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
+import TapestryError from "./components/TapestryError"
 
 export default {
   name: "app",
@@ -23,6 +25,7 @@ export default {
     NodeModal,
     Loading,
     TapestrySidebar,
+    TapestryError,
   },
   data() {
     return {
