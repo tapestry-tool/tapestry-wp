@@ -47,7 +47,7 @@ export default {
       return 20
     },
     strokeColor() {
-      return "#11a6d8"
+      return "#2c3e50"
     },
   },
   watch: {
