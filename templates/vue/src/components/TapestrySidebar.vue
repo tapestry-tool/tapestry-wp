@@ -1,8 +1,13 @@
 <template>
-  <div ref="wrapper" :class="['sidebar-container', { closed: closed }]">
+  <div
+    ref="wrapper"
+    data-qa="sidebar"
+    :class="['sidebar-container', { closed: closed }]"
+  >
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
+        aria-label="information"
         @click.stop="scrollToRef('info')"
       >
         <tapestry-icon icon="info-circle" />
@@ -10,11 +15,16 @@
       <button
         v-if="node.license || node.references"
         :class="['anchor-button', { active: active === 'copyright' }]"
+        aria-label="copyright"
         @click.stop="scrollToRef('copyright')"
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button :class="['toggle-button', { closed: closed }]" @click.stop="toggle">
+      <button
+        :aria-label="closed ? 'open sidebar' : 'close sidebar'"
+        :class="['toggle-button', { closed: closed }]"
+        @click.stop="toggle"
+      >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
@@ -24,7 +34,11 @@
         <tapestry-icon icon="times" />
       </button>
     </div>
-    <aside ref="content" :class="['sidebar', { closed: closed }]">
+    <aside
+      ref="content"
+      data-qa="sidebar-content"
+      :class="['sidebar', { closed: closed }]"
+    >
       <header class="sidebar-header">
         <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
         <div class="button-container">

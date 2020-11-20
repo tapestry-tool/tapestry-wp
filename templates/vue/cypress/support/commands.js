@@ -1,4 +1,5 @@
 import "cypress-file-upload"
+import "@testing-library/cypress/add-commands"
 import roles from "./roles"
 import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
@@ -181,6 +182,10 @@ Cypress.Commands.add("changeMediaType", type =>
 )
 
 // -- Utils --
+
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
+Cypress.Commands.add("app", () => cy.window().its("app"))
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 

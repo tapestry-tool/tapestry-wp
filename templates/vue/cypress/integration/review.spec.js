@@ -32,13 +32,27 @@ describe("Review Nodes", () => {
     cy.login(roles.ADMIN).visitTapestry()
 
     cy.getNodeByTitle(node.title).then(node => {
-      cy.openModal("edit", node.id)
-      cy.contains(/accept/i).click()
-      cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
+      cy.getByTestId(`review-node-${node.id}`).click()
+      cy.getByTestId("sidebar-content")
+        .should("be.visible")
+        .within(() => {
+          cy.findByLabelText("view node").click()
+          cy.lightbox()
+            .should("be.visible")
+            .closeLightbox()
+          cy.findByLabelText("edit node").should("not.exist")
+
+          cy.contains(/accept/i).click()
+          cy.contains(/submitting review/i).should("be.visible")
+          cy.contains(/admin accepted this node/i).should("be.visible")
+        })
     })
 
     cy.logout().visitTapestry()
-    cy.getNodeByTitle(node.title).should("not.be.null")
+    cy.contains(node.title)
+      .should("be.visible")
+      .click()
+    cy.findByLabelText("review node").should("not.exist")
   })
 
   it("should be able to reject a node with a comment", () => {
@@ -58,17 +72,54 @@ describe("Review Nodes", () => {
 
     cy.login(roles.ADMIN).visitTapestry()
 
+    const comment = "Looks terrible!"
+
     cy.getNodeByTitle(node.title).then(node => {
-      cy.openModal("edit", node.id)
-
-      cy.getEditable("review-comment").type("Looks terrible!")
-
-      cy.contains(/reject/i).click()
-      cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
+      cy.getByTestId(`review-node-${node.id}`).click()
+      cy.getByTestId("sidebar-content")
+        .should("be.visible")
+        .within(() => {
+          cy.getEditable("review-comment").type(comment)
+          cy.contains(/reject/i).click()
+          cy.contains(/submitting review/i).should("be.visible")
+          cy.contains(/review submitted/i).should("be.visible")
+        })
 
       cy.getNodeById(node.id).should("not.be.visible")
     })
 
-    // TODO: Add checks for comment (waiting on #712)
+    cy.logout().visitTapestry()
+
+    cy.getNodeByTitle(node.title).should("be.null")
+
+    cy.login(roles.SUBSCRIBER).visitTapestry()
+    cy.getNodeByTitle(node.title).then(node => {
+      cy.getNodeById(node.id).click()
+      cy.findByLabelText("review node").click()
+      cy.contains(/admin rejected this node/i).should("be.visible")
+      cy.contains(comment).should("be.visible")
+      cy.contains(/resubmit/i).should("be.visible")
+    })
+  })
+
+  it("should be able to open the sidebar by visiting the url", () => {
+    cy.app().then(app => {
+      const { path } = app.$route
+      app.$router.push({
+        path,
+        query: {
+          sidebar: true,
+          section: "copyright",
+        },
+      })
+    })
+    cy.getByTestId("sidebar-content")
+      .should("be.visible")
+      .within(() => {
+        cy.findByLabelText("edit node").click()
+        cy.getByTestId("node-modal").should("be.visible")
+        cy.contains(/cancel/i).click()
+      })
+    cy.findByLabelText("copyright").should("have.css", "opacity", "1")
   })
 })
