@@ -71,6 +71,7 @@ describe("Map Tapestry", ()=>{
                 const listofnodes = Object.values(nodes)
                 listofnodes.forEach(child => {
                     if(child.mapCoordinates && child.mapCoordinates.lat != ""){
+                        cy.getByTestId(`marker-${child.id}`).invoke('attr', 'style', 'display: block !important')
                         cy.getByTestId(`marker-${child.id}`).should('be.visible')
                         cy.getByTestId(`marker-${child.id}`).click()
                     }

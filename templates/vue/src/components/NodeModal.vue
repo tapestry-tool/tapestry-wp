@@ -145,7 +145,7 @@
               id="draft-button"
               size="sm"
               variant="secondary"
-              :disabled="loading || fileUploading || !validMapCoordinates"
+              :disabled="loading || fileUploading || fieldsInvalid"
               @click="handleDraftSubmit"
             >
               <span>Save as Private Draft</span>
@@ -156,7 +156,7 @@
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
-              :disabled="loading || fileUploading || !validMapCoordinates"
+              :disabled="loading || fileUploading || fieldsInvalid"
               @click="handlePublish"
             >
               <span>Publish</span>
@@ -352,26 +352,21 @@ export default {
     canEditTapestry() {
       return wp.canEditTapestry()
     },
-    validMapCoordinates() {
-      if (!this.node.mapCoordinates) {
-        return "no map coordinates atm"
-      } else {
-        if (
-          this.node.mapCoordinates.lat == "" &&
-          this.node.mapCoordinates.lng == ""
-        ) {
-          return true
-        } else {
-          return (
-            this.node.mapCoordinates.lat < 91 &&
-            this.node.mapCoordinates.lat > -91 &&
-            this.node.mapCoordinates.lng < 181 &&
-            this.node.mapCoordinates.lng > -181 &&
-            this.node.mapCoordinates.lng != "" &&
-            this.node.mapCoordinates.lat != ""
-          )
-        }
+    fieldsInvalid() {
+      if (
+        this.node.mapCoordinates &&
+        (this.node.mapCoordinates.lng !== "" || this.node.mapCoordinates.lat !== "")
+      ) {
+        return (
+          this.node.mapCoordinates.lat > 90 ||
+          this.node.mapCoordinates.lat < -90 ||
+          this.node.mapCoordinates.lng > 180 ||
+          this.node.mapCoordinates.lng < -180 ||
+          this.node.mapCoordinates.lng === "" ||
+          this.node.mapCoordinates.lat === ""
+        )
       }
+      return false
     },
     nodeId() {
       const nodeId = this.$route.params.nodeId
