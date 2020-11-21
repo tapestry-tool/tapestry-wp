@@ -246,14 +246,11 @@ export default {
       }
       for (let node of Object.values(this.nodes)) {
         if (node.reviewStatus) {
-          console.log("found a reviewstatus")
           this.allStatuses.set(
             node.reviewStatus,
             this.allStatuses.get(node.reviewStatus) + 1
           )
         } else {
-          console.log("didn't find a reviewstatus")
-
           this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
         }
       }
@@ -291,11 +288,20 @@ export default {
             })
             break
           }
+          // status filtering
           case filterTypes.STATUS: {
             if (val !== nodeStatus.ALL) {
-              match = matchSorter(match, val, {
-                keys: ["status"],
-              })
+              if (val === nodeStatus.SUBMITTED || val === nodeStatus.ACCEPTED) {
+                match = matchSorter(match, val, {
+                  keys: ["reviewStatus"],
+                })
+              } else {
+                match = matchSorter(match, val, {
+                  keys: ["status"],
+                })
+                // get rid of any that have a reviewStatus
+                match = match.filter(node => !node.reviewStatus)
+              }
             }
             break
           }
