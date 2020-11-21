@@ -21,7 +21,7 @@
       <circle ref="circle" :fill="fill"></circle>
       <transition name="fade">
         <circle
-          v-show="!isHovered || !node.accessible || selected"
+          v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
           :r="radius"
           :fill="overlayFill"
           class="node-overlay"
