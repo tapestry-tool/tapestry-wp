@@ -34,10 +34,8 @@ describe("Map Tapestry", ()=>{
         cy.get('.vue2leaflet-map').get('.btn > h6').click({force:true})
         cy.lightbox().should("be.visible")
         cy.closeLightbox()
-
     })
 
-    
     it("admin can add to map, view from marker, and delete from sidebar", ()=>{
      
         cy.get('.card-body').eq(1).contains('Add to map').click()
@@ -48,7 +46,6 @@ describe("Map Tapestry", ()=>{
         cy.getByTestId("submit-node-modal").should('be.disabled')
         cy.getByTestId('node-lng-input').type("-123")
         cy.getByTestId("submit-node-modal").should('be.disabled')
-
 
         cy.getByTestId('node-lat-input').clear().type("49")
         cy.getByTestId('node-lng-input').clear().type("-123")
@@ -68,21 +65,18 @@ describe("Map Tapestry", ()=>{
         cy.lightbox().should("be.visible")
         cy.closeLightbox()
 
-        /* passes test but doesn't work
         cy.store()
             .its("state.nodes")
             .then(nodes => {
                 const listofnodes = Object.values(nodes)
                 listofnodes.forEach(child => {
                     if(child.mapCoordinates && child.mapCoordinates.lat != ""){
-                        console.log(`marker-${child.id}`, child.title)
                         cy.getByTestId(`marker-${child.id}`).should('be.visible')
                         cy.getByTestId(`marker-${child.id}`).click()
                     }
                 }
             )           
         })
-        */
 
         // can delete
         cy.get('.card-body').eq(1).contains('Edit').click()
@@ -123,12 +117,5 @@ describe("Map Tapestry", ()=>{
         })
 
         cy.get('.nodes-list').contains(child.title).should("be.visible")
-
     })
-
-    
-
- 
-
-  
 })

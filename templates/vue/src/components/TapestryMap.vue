@@ -53,7 +53,7 @@
         <l-marker
           v-for="marker in markerlocations"
           :key="marker.id"
-          :ref="'marker-' + marker.id"
+          :ref="`marker-${marker.id}`"
           :data-qa="`marker-${marker.id}`"
           :lat-lng="marker.pos"
           :icon="getMarkerIcon(marker)"
