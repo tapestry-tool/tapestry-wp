@@ -422,6 +422,7 @@ class Tapestry implements ITapestry
         $settings->autoLayout = false;
         $settings->nodeDraggable = true;
         $settings->showAccess = true;
+        $settings->showRejected = true;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
@@ -506,6 +507,7 @@ class Tapestry implements ITapestry
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
+        error_log(json_encode($tapestry->nodes));
 
         return $tapestry;
     }
@@ -541,6 +543,9 @@ class Tapestry implements ITapestry
 
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)
     {
+        if (!isset($this->settings->showRejected)) {
+            $this->settings->showRejected = true;
+        }
         $currentUserRoles = new TapestryUserRoles();
         $currentUserId = wp_get_current_user()->ID;
         $nodesPermitted = [];
@@ -552,14 +557,13 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                } elseif ('submitted' == $nodeMeta->reviewStatus && $currentUserRoles->canEdit($this->postId)) {
+                } elseif (('submitted' == $nodeMeta->reviewStatus || ('reject' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUserRoles->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {
                 array_push($nodesPermitted, $nodeId);
             }
         }
-
         return $nodesPermitted;
     }
 

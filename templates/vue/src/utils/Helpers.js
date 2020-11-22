@@ -139,9 +139,13 @@ export default class Helpers {
     return outObject
   }
 
-  static hasPermission(node, action) {
+  static hasPermission(node, action, showRejected) {
     if (node.status === "draft") {
-      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
+      if (
+        wp.canEditTapestry() &&
+        (node.reviewStatus === "submitted" ||
+          (showRejected && node.reviewStatus === "reject"))
+      ) {
         return true
       } else if (node.author && wp.isCurrentUser(node.author.id)) {
         // authors cannot edit their submitted draft nodes

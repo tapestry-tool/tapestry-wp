@@ -58,15 +58,16 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
 }
 
 export function isVisible(_, { getNode, isAccordionRow }) {
+  let showRejected = arguments[0].settings.showRejected
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
       return false
     }
-    if (!Helpers.hasPermission(node, "read")) {
+    if (!Helpers.hasPermission(node, "read", showRejected)) {
       return false
     }
-    if (!Helpers.hasPermission(node, "edit")) {
+    if (!Helpers.hasPermission(node, "edit", showRejected)) {
       return !isAccordionRow(node.id)
     }
     return true
