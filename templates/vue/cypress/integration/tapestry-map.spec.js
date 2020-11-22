@@ -60,8 +60,8 @@ describe("Map Tapestry", () => {
 
         cy.get('.leaflet-marker-icon').should('be.visible')
         cy.get('.leaflet-marker-icon').click()
-        cy.get('.leaflet-popup-content > div > button').should('be.visible')
-        cy.get('.leaflet-popup-content > div > button').click({force:true})
+        cy.get('.vue2leaflet-map').get('.btn > h6').should('be.visible')
+        cy.get('.vue2leaflet-map').get('.btn > h6').click({force:true})
         cy.lightbox().should("be.visible")
         cy.closeLightbox()
     })
@@ -82,7 +82,7 @@ describe("Map Tapestry", () => {
                     if(node.mapCoordinates && node.mapCoordinates.lat != ""){
                         cy.getByTestId(`nodes-list-item-${node.id}`).should('be.visible')
                         cy.getByTestId(`nodes-list-item-${node.id}`).click()
-                        cy.get('.leaflet-popup-content > div > button').click({force:true})
+                        cy.get('.vue2leaflet-map').get('.btn > h6').click({force:true})
                         cy.lightbox().should("be.visible")
                         cy.closeLightbox()
                     }
