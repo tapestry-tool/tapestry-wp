@@ -422,7 +422,7 @@ class Tapestry implements ITapestry
         $settings->autoLayout = false;
         $settings->nodeDraggable = true;
         $settings->showAccess = true;
-        $settings->showRejected = true;
+        $settings->showRejected = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
@@ -544,7 +544,7 @@ class Tapestry implements ITapestry
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)
     {
         if (!isset($this->settings->showRejected)) {
-            $this->settings->showRejected = true;
+            $this->settings->showRejected = false;
         }
         $currentUserRoles = new TapestryUserRoles();
         $currentUserId = wp_get_current_user()->ID;
