@@ -58,6 +58,7 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
 }
 
 export function isVisible(_, { getNode, isAccordionRow }) {
+  // 0th argument is the json for the tapestry
   let showRejected = arguments[0].settings.showRejected
   return id => {
     const node = getNode(id)

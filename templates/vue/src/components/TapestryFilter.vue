@@ -291,7 +291,12 @@ export default {
           // status filtering
           case filterTypes.STATUS: {
             if (val !== nodeStatus.ALL) {
-              if (val === nodeStatus.SUBMITTED || val === nodeStatus.ACCEPTED) {
+              // for these three, we need to look at the reviewStatus first
+              if (
+                val === nodeStatus.SUBMITTED ||
+                val === nodeStatus.ACCEPTED ||
+                val === nodeStatus.REJECTED
+              ) {
                 match = matchSorter(match, val, {
                   keys: ["reviewStatus"],
                 })
