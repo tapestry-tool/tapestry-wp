@@ -17,6 +17,15 @@
         </ul>
       </b-alert>
     </div>
+    <div
+      v-if="submissionError"
+      class="modal-header-row"
+      data-qa="modal-submit-error"
+    >
+      <b-alert id="tapestry-modal-submit-error" variant="danger" show>
+        <p>{{ submissionError }}</p>
+      </b-alert>
+    </div>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
         <b-tabs card>
@@ -360,6 +369,9 @@ export default {
     hasSubmissionApiError() {
       return this.apiError
     },
+    hasSubmissionError() {
+      return this.submissionError
+    },
   },
   watch: {
     nodeId: {
@@ -401,6 +413,11 @@ export default {
       if (this.apiError) {
         this.submissionError =
           "An unexpected error occurred and the node could not be submitted"
+      }
+    },
+    hasSubmissionError() {
+      if (this.submissionError) {
+        this.loading = false
       }
     },
   },
@@ -530,7 +547,6 @@ export default {
     },
     async handleSubmit() {
       this.submissionError = null
-      this.loading = true
       this.formErrors = this.validateNode()
       if (!this.formErrors.length) {
         this.loading = true
