@@ -49,7 +49,7 @@ jobs:
         run: ls -l data/wp
       - name: Change content directory ownership
         working-directory: data/wp
-        run: whoami
+        run: sudo chown www-data:www-data wp-content
       - name: Check content directory II
         run: ls -l data/wp
       - name: Setup cypress.json
