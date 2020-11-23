@@ -45,6 +45,8 @@ jobs:
         env:
           LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
         run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
+      - name: Check directory
+        run: ls -l data/wp/wp-content
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
