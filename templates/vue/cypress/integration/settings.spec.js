@@ -34,7 +34,7 @@ describe("Settings", () => {
    * following Asana task for details:
    *  - https://app.asana.com/0/1126491658233864/1198968596220741
    */
-  it.skip(`[CI FAIL] should be able to set a background image`, () => {
+  it(`[CI FAIL] should be able to set a background image`, () => {
     cy.server()
     cy.route("POST", "**/async-upload.php").as("upload")
 
