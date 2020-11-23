@@ -194,7 +194,7 @@ export function createDefaultNode({ settings }) {
     description: "",
     conditions: [],
     behaviour: "new-window",
-    status: "publish",
+    status: "published",
     nodeType: "child",
     title: "",
     imageURL: "",

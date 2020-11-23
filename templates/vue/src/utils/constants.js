@@ -33,8 +33,8 @@ export const nodeStatus = {
   ALL: "All",
   DRAFT: "Draft",
   SUBMITTED: "Submitted",
-  REJECTED: "Reject",
-  ACCEPTED: "Accept",
+  REJECTED: "Rejected",
+  ACCEPTED: "Accepted",
   PUBLISHED: "Publish",
 }
 

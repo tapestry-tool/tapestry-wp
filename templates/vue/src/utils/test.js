@@ -33,7 +33,7 @@ export function render(
 const mockSettings = {
   tapestrySlug: "testing",
   title: "testing",
-  status: "publish",
+  status: "published",
   backgroundUrl: "",
   autoLayout: false,
   nodeDraggable: true,

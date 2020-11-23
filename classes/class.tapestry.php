@@ -557,7 +557,7 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                } elseif (('submitted' == $nodeMeta->reviewStatus || ('reject' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUserRoles->canEdit($this->postId)) {
+                } elseif (('submitted' == $nodeMeta->reviewStatus || ('rejected' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUserRoles->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {

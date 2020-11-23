@@ -33,7 +33,7 @@ export default {
     status: {
       type: String,
       required: false,
-      default: "publish",
+      default: "published",
     },
     reviewStatus: {
       type: String,
@@ -57,16 +57,16 @@ export default {
         switch (this.reviewStatus) {
           case "submitted":
             return "#FFC107"
-          case "accept":
+          case "accepted":
             return "#5CE601"
-          case "reject":
+          case "rejected":
             return "#CC444B"
           default:
             return "currentColor"
         }
       } else {
         switch (this.status) {
-          case "publish":
+          case "published":
             return "currentColor"
           case "draft":
             return "#999"

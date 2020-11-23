@@ -144,7 +144,7 @@ export default class Helpers {
       if (
         wp.canEditTapestry() &&
         (node.reviewStatus === "submitted" ||
-          (showRejected && node.reviewStatus === "reject"))
+          (showRejected && node.reviewStatus === "rejected"))
       ) {
         return true
       } else if (node.author && wp.isCurrentUser(node.author.id)) {
@@ -165,7 +165,7 @@ export default class Helpers {
 
     // Check 2: User is the author of the node (unless node was submitted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
-      if (node.reviewStatus !== "accept") {
+      if (node.reviewStatus !== "accepted") {
         return true
       }
     }

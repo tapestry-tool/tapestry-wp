@@ -162,7 +162,7 @@
               @click="handleSubmitForReview"
             >
               <span>
-                {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
+                {{ node.reviewStatus === "rejected" ? "Re-submit" : "Submit" }}
                 to Administrators for Review
               </span>
             </b-button>
@@ -334,7 +334,7 @@ export default {
     },
     canMakeDraft() {
       const { id } = wp.getCurrentUser()
-      if (this.node.status === "publish" && this.type === "edit") {
+      if (this.node.status === "published" && this.type === "edit") {
         return false
       }
       return this.hasDraftPermission(id)
@@ -534,7 +534,7 @@ export default {
       }
     },
     handlePublish() {
-      this.node.status = "publish"
+      this.node.status = "published"
       this.handleSubmit()
     },
     handleDraftSubmit() {

@@ -62,12 +62,12 @@ export default {
   },
   methods: {
     handleReject() {
-      this.node.reviewStatus = "reject"
+      this.node.reviewStatus = "rejected"
       this.handleSubmit()
     },
     handleAccept() {
-      this.node.status = "publish"
-      this.node.reviewStatus = "accept"
+      this.node.status = "published"
+      this.node.reviewStatus = "accepted"
       this.handleSubmit()
     },
     handleSubmit() {
