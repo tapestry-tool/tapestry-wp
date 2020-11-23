@@ -42,6 +42,7 @@ class TapestryNode implements ITapestryNode
     private $reviewComments;
     private $license;
     private $references;
+    private $mapCoordinates;
     private $tydeType;
     private $showInBackpack;
 
@@ -89,6 +90,10 @@ class TapestryNode implements ITapestryNode
         $this->references = '';
         $this->tydeType = '';
         $this->showInBackpack = true;
+        $this->mapCoordinates = (object) [
+            'lat' => '',
+            'lng' => '',
+        ];
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -205,6 +210,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->showInBackpack) && is_bool($node->showInBackpack)) {
             $this->showInBackpack = $node->showInBackpack;
+        }
+        if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
+            $this->mapCoordinates = $node->mapCoordinates;
         }
     }
 
@@ -453,6 +461,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'tydeType' => $this->tydeType,
             'showInBackpack' => $this->showInBackpack,
+            'mapCoordinates' => $this->mapCoordinates,
         ];
     }
 
