@@ -31,11 +31,11 @@ export const licenses = {
 
 export const nodeStatus = {
   ALL: "All",
-  PUBLISHED: "Publish",
+  DRAFT: "Draft",
   SUBMITTED: "Submitted",
   REJECTED: "Reject",
-  DRAFT: "Draft",
   ACCEPTED: "Accept",
+  PUBLISHED: "Publish",
 }
 
 export const DEFAULT_DEPTH = 3
