@@ -5,6 +5,7 @@
         id="node-title"
         v-model="node.title"
         data-qa="node-title"
+        data-testid="node-title"
         placeholder="Enter title"
         autofocus
         required
@@ -28,6 +29,7 @@
       <b-form-select
         id="node-media-type"
         data-qa="node-media-type"
+        data-testid="node-media-type"
         :value="node.mediaType"
         :options="mediaTypes"
         @change="handleTypeChange"

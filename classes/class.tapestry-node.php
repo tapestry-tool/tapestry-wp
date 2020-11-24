@@ -20,6 +20,7 @@ class TapestryNode implements ITapestryNode
     private $size;
     private $title;
     private $status;
+    private $reviewStatus;
     private $behaviour;
     private $typeData;
     private $imageURL;
@@ -38,8 +39,10 @@ class TapestryNode implements ITapestryNode
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
+    private $reviewComments;
     private $license;
     private $references;
+    private $mapCoordinates;
 
     /**
      * Constructor.
@@ -60,6 +63,7 @@ class TapestryNode implements ITapestryNode
         $this->size = '';
         $this->title = '';
         $this->status = '';
+        $this->reviewStatus = '';
         $this->imageURL = '';
         $this->lockedImageURL = '';
         $this->mediaType = '';
@@ -79,8 +83,13 @@ class TapestryNode implements ITapestryNode
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
+        $this->reviewComments = [];
         $this->license = '';
         $this->references = '';
+        $this->mapCoordinates = (object) [
+            'lat' => '',
+            'lng' => '',
+        ];
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -122,6 +131,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->status) && is_string($node->status)) {
             $this->status = $node->status;
+        }
+        if (isset($node->reviewStatus) && is_string($node->reviewStatus)) {
+            $this->reviewStatus = $node->reviewStatus;
         }
         if (isset($node->behaviour) && is_string($node->behaviour)) {
             $this->behaviour = $node->behaviour;
@@ -180,11 +192,17 @@ class TapestryNode implements ITapestryNode
         if (isset($node->fitWindow) && is_bool($node->fitWindow)) {
             $this->fitWindow = $node->fitWindow;
         }
+        if (isset($node->reviewComments) && is_array($node->reviewComments)) {
+            $this->reviewComments = $node->reviewComments;
+        }
         if (isset($node->license) && is_object($node->license)) {
             $this->license = $node->license;
         }
         if (isset($node->references) && is_string($node->references)) {
             $this->references = $node->references;
+        }
+        if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
+            $this->mapCoordinates = $node->mapCoordinates;
         }
     }
 
@@ -398,6 +416,7 @@ class TapestryNode implements ITapestryNode
             'size' => $this->size,
             'title' => $this->title,
             'status' => $this->status,
+            'reviewStatus' => $this->reviewStatus,
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
@@ -417,8 +436,10 @@ class TapestryNode implements ITapestryNode
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,
             'fitWindow' => $this->fitWindow,
+            'reviewComments' => $this->reviewComments,
             'license' => $this->license,
             'references' => $this->references,
+            'mapCoordinates' => $this->mapCoordinates,
         ];
     }
 

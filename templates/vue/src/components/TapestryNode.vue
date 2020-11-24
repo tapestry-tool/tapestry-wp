@@ -6,7 +6,11 @@
       :data-qa="`node-${node.id}`"
       :data-locked="!node.accessible"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
-      :class="{ opaque: !visibleNodes.includes(node.id) }"
+      :class="{
+        opaque: !visibleNodes.includes(node.id),
+        'has-thumbnail': node.accessible ? node.imageURL : node.lockedImageURL,
+        'has-title': !node.hideTitle,
+      }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
       }"
@@ -16,10 +20,10 @@
     >
       <circle ref="circle" :fill="fill"></circle>
       <circle
-        v-if="selected || !node.accessible"
         :r="radius"
         :fill="overlayFill"
         class="node-overlay"
+        :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
       ></circle>
       <progress-bar
         v-if="
@@ -27,12 +31,26 @@
             node.nodeType !== '' &&
             !node.hideProgress
         "
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius"
         :data-qa="`node-progress-${node.id}`"
-        :radius="node.status === 'draft' ? radius + 15 : radius"
         :progress="progress"
         :locked="!node.accessible"
-        :draft="node.status === 'draft'"
       ></progress-bar>
+      <status-bar
+        v-if="
+          node.nodeType !== 'grandchild' &&
+            node.nodeType !== '' &&
+            !node.hideProgress
+        "
+        :x="node.coordinates.x"
+        :y="node.coordinates.y"
+        :radius="radius"
+        :locked="!node.accessible"
+        :status="node.status"
+        :reviewStatus="node.reviewStatus"
+      ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <foreignObject
           v-if="!node.hideTitle"
@@ -62,14 +80,14 @@
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <add-child-button
-            v-if="(hasPermission('add') || isLoggedIn) && !isSubAccordionRow"
+            v-if="isLoggedIn && !isSubAccordionRow"
             :node="node"
-            :x="-35"
+            :x="hasPermission('edit') ? -35 : 0"
             :y="radius"
           ></add-child-button>
           <node-button
             v-if="isLoggedIn && hasPermission('edit')"
-            :x="35"
+            :x="isSubAccordionRow ? 0 : 35"
             :y="radius"
             :data-qa="`edit-node-${node.id}`"
             @click="editNode"
@@ -108,6 +126,7 @@ import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
+import StatusBar from "./tapestry-node/StatusBar"
 import NodeButton from "./tapestry-node/NodeButton"
 
 export default {
@@ -116,6 +135,7 @@ export default {
     AddChildButton,
     ProgressBar,
     TapestryIcon,
+    StatusBar,
     NodeButton,
   },
   props: {
@@ -224,7 +244,7 @@ export default {
       } else if (!this.node.accessible) {
         return "#8a8a8c"
       }
-      return "transparent"
+      return this.node.imageURL ? "#333" : "transparent"
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -430,7 +450,22 @@ export default {
   }
 }
 
+.meta {
+  .title {
+    text-shadow: 0 0 5px #000;
+    font-weight: bold;
+  }
+}
 .node-overlay {
   opacity: 0.75;
+  transition: opacity 0.2s;
+  &.normal {
+    opacity: 0.5;
+  }
+}
+.node:hover .node-overlay.normal,
+.node:not(.has-title) .node-overlay.normal,
+.node.has-thumbnail:hover .meta {
+  opacity: 0;
 }
 </style>
