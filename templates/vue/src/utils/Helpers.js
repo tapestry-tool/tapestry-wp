@@ -140,17 +140,19 @@ export default class Helpers {
   }
 
   static hasPermission(node, action) {
-    if (node.status === "draft") {
-      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
-        return true
-      } else if (node.author && wp.isCurrentUser(node.author.id)) {
-        // authors cannot edit their submitted draft nodes
-        if (action == "edit" && node.reviewStatus === "submitted") {
+    if (node !== null) {
+      if (node.status === "draft") {
+        if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
+          return true
+        } else if (node.author && wp.isCurrentUser(node.author.id)) {
+          // authors cannot edit their submitted draft nodes
+          if (action == "edit" && node.reviewStatus === "submitted") {
+            return false
+          }
+          return true
+        } else {
           return false
         }
-        return true
-      } else {
-        return false
       }
     }
 
