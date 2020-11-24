@@ -140,19 +140,23 @@ export default class Helpers {
   }
 
   static hasPermission(node, action) {
-    if (node !== null) {
-      if (node.status === "draft") {
-        if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
-          return true
-        } else if (node.author && wp.isCurrentUser(node.author.id)) {
-          // authors cannot edit their submitted draft nodes
-          if (action == "edit" && node.reviewStatus === "submitted") {
-            return false
-          }
-          return true
-        } else {
+    // Check 0: node is null case - this should only apply to creating the root node.
+    if (node === null) {
+      return wp.canEditTapestry()
+    }
+
+    // Checks related to draft nodes
+    if (node.status === "draft") {
+      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
+        return true
+      } else if (node.author && wp.isCurrentUser(node.author.id)) {
+        // authors cannot edit their submitted draft nodes
+        if (action == "edit" && node.reviewStatus === "submitted") {
           return false
         }
+        return true
+      } else {
+        return false
       }
     }
 
@@ -161,7 +165,7 @@ export default class Helpers {
       return true
     }
 
-    // Check 2: User is the author of the node (unless node was submitted)
+    // Check 2: User is the author of the node (unless node was submitted, then accepted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
       if (node.reviewStatus !== "accept") {
         return true
