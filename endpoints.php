@@ -108,13 +108,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNodeSize',
         ],
     ],
-    'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'updateTapestryNodePermissions',
-        ],
-    ],
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/description',
         'ARGUMENTS' => [
@@ -821,46 +814,7 @@ function updateTapestryNodeSize($request)
 }
 
 /**
- * Update Tapestry Node Permissions.
- *
- * @param object $request HTTP request
- *
- * @return object $response   HTTP response
- */
-function updateTapestryNodePermissions($request)
-{
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $permissions = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    // make sure the permissions body exists and not null
-    try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-            throw new TapestryError('INVALID_CHILD_NODE');
-        }
-
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
-
-        $node->set((object) ['permissions' => $permissions]);
-
-        return $node->save();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Update Tapestry Node Permissions.
+ * Update Tapestry Node Description.
  *
  * @param object $request HTTP request
  *
