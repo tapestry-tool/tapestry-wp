@@ -84,6 +84,7 @@ class TapestryNode implements ITapestryNode
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
+            // set thumbnail here?
             $this->set($node);
             $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
         }

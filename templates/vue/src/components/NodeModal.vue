@@ -187,7 +187,6 @@ import { sizes } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
-import client from "@/services/TapestryAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -350,8 +349,7 @@ export default {
       this.fileUploading = isUploading
     })
     this.$root.$on("fileID", fileId => {
-      console.log(fileId)
-      client.updateNodeThumbnail(this.node.id, fileId)
+      this.node.thumbnailFileId = fileId
     })
     this.node = this.createDefaultNode()
   },
@@ -515,6 +513,7 @@ export default {
       this.loading = false
     },
     async submitNode() {
+      console.log(this.node.thumbnailFileId)
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id

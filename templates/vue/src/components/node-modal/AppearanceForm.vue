@@ -11,7 +11,7 @@
         <file-upload
           v-model="node.imageURL"
           input-test-id="node-appearance-thumbnail-url"
-          hideUrlUpload="true"
+          :hideUrlUpload="true"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
@@ -24,12 +24,9 @@
         </b-form-checkbox>
       </b-form-group>
       <b-form-group v-if="addLockedThumbnail">
-        <file-upload
-          v-model="node.lockedImageURL"
-          input-test-id="node-lockedImageURL"
-          hideUrlUpload="true"
-          @isUploading="handleUploadChange"
-        />
+        <file-upload v-model="node.lockedImageURL"
+        input-test-id="node-lockedImageURL" :="true"
+        @isUploading="handleUploadChange" />
       </b-form-group>
       <b-form-group>
         <b-form-checkbox v-model="node.hideTitle" data-qa="node-appearance-title">
