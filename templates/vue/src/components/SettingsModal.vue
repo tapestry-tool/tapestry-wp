@@ -301,7 +301,7 @@ export default {
       this.isExporting = true
       let filteredTapestry = this.tapestryJson
       filteredTapestry.nodes = filteredTapestry.nodes.filter(
-        node => node.status === "published"
+        node => node.status === "publish"
       )
       const tapestry = filteredTapestry
       tapestry["site-url"] = wpData.wpUrl

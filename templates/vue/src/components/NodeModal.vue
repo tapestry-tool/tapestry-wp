@@ -334,7 +334,7 @@ export default {
     },
     canMakeDraft() {
       const { id } = wp.getCurrentUser()
-      if (this.node.status === "published" && this.type === "edit") {
+      if (this.node.status === "publish" && this.type === "edit") {
         return false
       }
       return this.hasDraftPermission(id)
@@ -534,7 +534,7 @@ export default {
       }
     },
     handlePublish() {
-      this.node.status = "published"
+      this.node.status = "publish"
       this.handleSubmit()
     },
     handleDraftSubmit() {

@@ -138,8 +138,13 @@ export default {
       // set total for All
       res[0].count = total
       for (let obj in res) {
-        res[obj].label = res[obj].value + ": " + res[obj].count
+        if (res[obj].value === "Publish") {
+          res[obj].label = "Published: " + res[obj].count
+        } else {
+          res[obj].label = res[obj].value + ": " + res[obj].count
+        }
       }
+
       return res
     },
     placeholder() {
