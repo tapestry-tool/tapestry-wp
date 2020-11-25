@@ -36,12 +36,7 @@ describe("Review Nodes", () => {
       cy.getByTestId("sidebar-content")
         .should("be.visible")
         .within(() => {
-          cy.findByLabelText("view node").click()
-          cy.lightbox()
-            .should("be.visible")
-            .closeLightbox()
           cy.findByLabelText("edit node").should("not.exist")
-
           cy.contains(/accept/i).click()
           cy.contains(/submitting review/i).should("be.visible")
           cy.contains(/admin accepted this node/i).should("be.visible")

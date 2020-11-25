@@ -75,21 +75,32 @@
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
-          <add-child-button
-            v-if="isLoggedIn && !isSubAccordionRow"
-            :node="node"
-            :x="hasPermission('edit') ? -35 : 0"
-            :y="radius"
-          ></add-child-button>
-          <node-button
-            v-if="isLoggedIn && hasPermission('edit')"
-            :x="isSubAccordionRow ? 0 : 35"
-            :y="radius"
-            :data-qa="`edit-node-${node.id}`"
-            @click="editNode"
-          >
-            <tapestry-icon icon="pen" svg></tapestry-icon>
-          </node-button>
+          <template v-if="isLoggedIn">
+            <add-child-button
+              v-if="!isSubAccordionRow"
+              :node="node"
+              :x="hasPermission('edit') ? -35 : 0"
+              :y="radius"
+            ></add-child-button>
+            <node-button
+              v-if="canReview"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`review-node-${node.id}`"
+              @click="reviewNode"
+            >
+              <tapestry-icon icon="plus" svg></tapestry-icon>
+            </node-button>
+            <node-button
+              v-else-if="hasPermission('edit')"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`edit-node-${node.id}`"
+              @click="editNode"
+            >
+              <tapestry-icon icon="pen" svg></tapestry-icon>
+            </node-button>
+          </template>
         </g>
       </g>
       <defs>
@@ -158,6 +169,13 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    canReview() {
+      return (
+        this.node.status === "draft" &&
+        this.node.reviewStatus === "submitted" &&
+        wp.canEditTapestry()
+      )
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -354,6 +372,13 @@ export default {
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "edit", tab: "content" },
         query: this.$route.query,
+      })
+    },
+    reviewNode() {
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId: this.node.id },
+        query: { ...this.$route.query, sidebar: "review" },
       })
     },
     formatDuration() {

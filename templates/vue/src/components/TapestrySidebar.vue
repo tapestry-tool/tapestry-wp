@@ -39,8 +39,8 @@
       data-qa="sidebar-content"
       :class="['sidebar', { closed: closed }]"
     >
-      <header class="sidebar-header">
-        <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
+      <header ref="info" data-name="info" class="sidebar-header">
+        <h1 class="content-title">{{ node.title }}</h1>
         <div class="button-container">
           <b-button v-if="node.accessible || canEdit" @click="viewNode">
             <tapestry-icon icon="eye" />
@@ -88,6 +88,9 @@
             <h2 class="content-header">References</h2>
             <div class="content-body" v-html="node.references"></div>
           </section>
+        </section>
+        <section ref="review" data-name="review">
+          <h1>Review</h1>
         </section>
       </div>
     </aside>
@@ -146,11 +149,6 @@ export default {
     },
   },
   watch: {
-    nodeId() {
-      if (!this.closed) {
-        this.active = "info"
-      }
-    },
     active(section) {
       this.scrollToRef(section)
     },
@@ -159,19 +157,21 @@ export default {
     const observer = new IntersectionObserver(this.handleObserve, {
       threshold: INTERSECTION_THRESHOLD,
     })
-    observer.observe(this.$refs.info)
+    const sections = Helpers.omit(this.$refs, ["content", "wrapper"])
+    for (const ref in sections) {
+      observer.observe(this.$refs[ref])
+    }
   },
   methods: {
     handleObserve(entries) {
       if (this.closed) {
         return
       }
-
-      const entry = entries[0]
-      if (entry.intersectionRatio > INTERSECTION_THRESHOLD) {
-        this.active = "info"
-      } else {
-        this.active = "copyright"
+      const matched = entries
+        .filter(entry => entry.intersectionRatio > INTERSECTION_THRESHOLD)
+        .map(entry => entry.target.dataset.name)
+      if (!matched.includes(this.active)) {
+        this.active = matched[0]
       }
     },
     scrollToRef(refName) {
