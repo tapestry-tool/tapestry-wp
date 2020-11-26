@@ -1,6 +1,6 @@
 import { waitFor, within } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
-import { render as r } from "@/utils/test"
+import { render as r, addNode } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
 import Helpers from "@/utils/Helpers"
 import TapestryFilter from "@/components/TapestryFilter.vue"
@@ -17,11 +17,15 @@ jest.mock("@/services/TapestryAPI", () => {
   }
 })
 
-const render = (settings = {}, query = {}) => {
+const render = ({
+  settings = {},
+  query = {},
+  fixture = multiAuthorTapestry,
+} = {}) => {
   return r(
     TapestryFilter,
     {
-      fixture: multiAuthorTapestry,
+      fixture,
       settings,
     },
     (_vm, _store, router) => {
@@ -34,8 +38,8 @@ const render = (settings = {}, query = {}) => {
   )
 }
 
-const setup = settings => {
-  const screen = render(settings)
+const setup = opts => {
+  const screen = render(opts)
   userEvent.click(screen.getByLabelText("search"))
   return {
     ...screen,
@@ -127,7 +131,7 @@ describe("TapestryFilter", () => {
 
   it("should show loading indicator when superuser override is off", async () => {
     client.getTapestry.mockResolvedValue(multiAuthorTapestry)
-    const screen = setup({ superuserOverridePermissions: false })
+    const screen = setup({ settings: { superuserOverridePermissions: false } })
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
     userEvent.click(screen.combobox)
@@ -146,22 +150,33 @@ describe("TapestryFilter", () => {
   })
 
   it("should show the search bar with the correct type if the user visits the url", async () => {
-    const screen = render({}, { search: "Title" })
+    const screen = render({ query: { search: "Title" } })
     expect(await screen.findByDisplayValue("Title")).toBeVisible()
   })
 
   it("should populate the value with the query in the url", async () => {
     const { author } = multiAuthorTapestry.nodes[0]
-    const screen = render({}, { search: "Author", q: author.name })
+    const screen = render({ query: { search: "Author", q: author.name } })
     const filter = within(screen.getByTestId("tapestry-filter"))
     expect(await filter.findByText(author.name)).toBeVisible()
   })
 
   it("should not show the search bar if an unauthorized user visits the url", async () => {
     wp.canEditTapestry.mockReturnValueOnce(false)
-    const screen = render({}, { search: "Author" })
+    const screen = render({ query: { search: "Author" } })
 
     expect(screen.queryByLabelText("search")).toBeNull()
     expect(screen.queryByDisplayValue("Author")).toBeNull()
+  })
+
+  it("should be able to search for nodes with non-unique titles", async () => {
+    const { title, id } = multiAuthorTapestry.nodes[0]
+    const fixture = addNode(multiAuthorTapestry, id, { title })
+
+    const screen = setup({ fixture })
+    userEvent.type(screen.combobox, title)
+    await waitFor(() => {
+      expect(screen.getAllByText(title)).toHaveLength(2)
+    })
   })
 })

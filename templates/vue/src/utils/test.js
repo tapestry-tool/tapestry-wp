@@ -4,6 +4,10 @@ import { routes } from "@/router"
 import { parse, makeMockProgress } from "./dataset"
 import Helpers from "./Helpers"
 
+/**
+ * An extension over @testing-library's `render` function that accepts additional
+ * Tapestry specific options and parses them into the global state format.
+ */
 export function render(
   component,
   { fixture = null, settings = {}, ...options } = {},
@@ -24,6 +28,27 @@ export function render(
     },
     callback
   )
+}
+
+export function addNode(tapestry, parentId, partialNode) {
+  const copy = Helpers.deepCopy(tapestry)
+
+  if (copy.nodes.length > 0 && !parentId) {
+    throw new Error(`Cannot add a root node to a non-empty Tapestry.`)
+  }
+
+  if (parentId && !copy.nodes.find(node => node.id == parentId)) {
+    throw new Error(`Invalid parent node. Cannot find a node with id ${parentId}.`)
+  }
+
+  const node = Helpers.createDefaultNode(partialNode)
+  node.id = parentId ? parentId + 1 : 1
+  copy.nodes.push(node)
+
+  if (parentId) {
+    copy.links.push({ source: parentId, target: node.id })
+  }
+  return copy
 }
 
 /**
