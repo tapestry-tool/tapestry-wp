@@ -19,6 +19,7 @@
         :filter="getVisibleMatches"
         :options="filterOptions"
         :clear-search-on-select="false"
+        :label="type === types.AUTHOR ? 'name' : 'title'"
         @search="val => (search = val)"
       ></v-select>
       <select
@@ -110,11 +111,16 @@ export default {
         return this.$route.query.q
       },
       set(val) {
-        if (typeof val == "object") val = val.value
+        let serializedVal = val
+
+        if (typeof val === "object") {
+          serializedVal = this.type === filterTypes.AUTHOR ? val.name : val.title
+        }
+
         if (val !== this.filterValue) {
           this.$router.replace({
             path: this.$route.path,
-            query: { ...this.$route.query, q: val },
+            query: { ...this.$route.query, q: serializedVal },
           })
         }
       },
@@ -168,17 +174,14 @@ export default {
     filterOptions() {
       switch (this.type) {
         case filterTypes.AUTHOR: {
-          let authors = Helpers.unique(
-            Object.values(this.nodes).map(node => node.author),
-            "id"
-          )
+          let authors = Object.values(this.nodes).map(node => node.author)
           if (this.allContributors !== null) {
             authors = Object.values(this.allContributors)
           }
-          return authors.map(author => author.name)
+          return Helpers.unique(authors, "id")
         }
         case filterTypes.TITLE: {
-          return Object.values(this.nodes).map(node => node.title)
+          return Object.values(this.nodes)
         }
         default:
           return []
@@ -189,7 +192,11 @@ export default {
         if (!this.filterValue && !this.search) {
           return []
         }
-        const matches = this.getMatches(this.search || this.filterValue)
+        const matches = this.getMatches(
+          this.type === filterTypes.STATUS
+            ? this.filterValue
+            : this.search || this.filterValue
+        )
         return matches.map(node => node.id)
       }
       return Object.values(this.nodes).map(node => node.id)
@@ -219,7 +226,7 @@ export default {
       },
     },
     async filterValue(next) {
-      if (next && this.lazy && this.type === filterTypes.AUTHOR) {
+      if (next && this.canSearch && this.lazy && this.type === filterTypes.AUTHOR) {
         this.loading = true
         await this.refetchTapestryData(Number(next.id))
         this.loading = false
@@ -256,9 +263,9 @@ export default {
           return Helpers.unique(
             matches.map(node => node.author),
             "id"
-          ).map(author => author.name)
+          )
         case filterTypes.TITLE:
-          return matches.map(node => node.title)
+          return matches
       }
     },
     getMatches(value, type = this.type) {

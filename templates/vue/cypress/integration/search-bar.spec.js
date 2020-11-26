@@ -36,18 +36,27 @@ describe("Search bar", () => {
         assertVisibleNodes([])
 
         // Should update while typing
-        cy.findByPlaceholderText("Node title").type("fir")
+        cy.getByTestId("search-input")
+          .findByRole("combobox")
+          .type("fir")
         let expected = allNodes.filter(node => node.title.startsWith("fir"))
         assertVisibleNodes(expected)
 
         // Should be search by title
-        cy.findByPlaceholderText("Node title").type("st{enter}")
+        cy.getByTestId("search-input")
+          .findByRole("combobox")
+          .type("st{enter}")
         expected = allNodes.filter(node => node.title.startsWith("first"))
         assertVisibleNodes(expected)
 
         // By author
         cy.findByDisplayValue("Title").select("Author")
-        cy.findByPlaceholderText("Node author").type("admin{enter}")
+        cy.getByTestId("search-input")
+          .findByRole("combobox")
+          .click()
+        cy.focused()
+          .clear()
+          .type("admin{enter}")
         expected = Object.values(nodes).filter(node => node.author.name === "admin")
         assertVisibleNodes(expected)
 
@@ -56,7 +65,7 @@ describe("Search bar", () => {
          *  - https://github.com/wynnset/tapestry-wp/pull/683
          */
         cy.findByDisplayValue("Author").select("Status")
-        cy.findByDisplayValue("All").should("be.visible")
+        cy.findByDisplayValue(/all/i).should("be.visible")
         assertVisibleNodes(allNodes)
       })
   })
