@@ -96,6 +96,14 @@
             </div>
           </b-tab>
           <b-tab
+            v-if="settings.renderMap"
+            title="Geography"
+            :active="tab === 'coordinates'"
+            @click="changeTab('coordinates')"
+          >
+            <coordinates-form :node="node" />
+          </b-tab>
+          <b-tab
             title="More Information"
             :active="tab === 'more-information'"
             @click="changeTab('more-information')"
@@ -137,7 +145,7 @@
               id="draft-button"
               size="sm"
               variant="secondary"
-              :disabled="loading || fileUploading"
+              :disabled="loading || fileUploading || fieldsInvalid"
               @click="handleDraftSubmit"
             >
               <span>Save as Private Draft</span>
@@ -148,7 +156,7 @@
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
-              :disabled="loading || fileUploading"
+              :disabled="loading || fileUploading || fieldsInvalid"
               @click="handlePublish"
             >
               <span>Publish</span>
@@ -219,6 +227,7 @@ import ActivityForm from "./node-modal/content-form/ActivityForm"
 import AppearanceForm from "./node-modal/AppearanceForm"
 import BehaviourForm from "./node-modal/BehaviourForm"
 import ConditionsForm from "./node-modal/ConditionsForm"
+import CoordinatesForm from "./node-modal/CoordinatesForm"
 import ContentForm from "./node-modal/ContentForm"
 import MoreInformationForm from "./node-modal/MoreInformationForm"
 import PermissionsTable from "./node-modal/PermissionsTable"
@@ -247,6 +256,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    CoordinatesForm,
     MoreInformationForm,
     SlickItem,
     SlickList,
@@ -342,6 +352,22 @@ export default {
     canEditTapestry() {
       return wp.canEditTapestry()
     },
+    fieldsInvalid() {
+      if (
+        this.node.mapCoordinates &&
+        (this.node.mapCoordinates.lng !== "" || this.node.mapCoordinates.lat !== "")
+      ) {
+        return (
+          this.node.mapCoordinates.lat > 90 ||
+          this.node.mapCoordinates.lat < -90 ||
+          this.node.mapCoordinates.lng > 180 ||
+          this.node.mapCoordinates.lng < -180 ||
+          this.node.mapCoordinates.lng === "" ||
+          this.node.mapCoordinates.lat === ""
+        )
+      }
+      return false
+    },
     nodeId() {
       const nodeId = this.$route.params.nodeId
       return nodeId || Number(nodeId)
@@ -398,6 +424,13 @@ export default {
       this.fileUploading = isUploading
     })
     this.node = this.createDefaultNode()
+
+    if (!this.node.mapCoordinates) {
+      this.node.mapCoordinates = {
+        lat: "",
+        lng: "",
+      }
+    }
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
@@ -452,7 +485,7 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information"]
+      const okTabs = ["content", "appearance", "more-information", "coordinates"]
       if (okTabs.includes(requestedTab)) {
         return true
       }

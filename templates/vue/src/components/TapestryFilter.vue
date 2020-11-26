@@ -1,6 +1,6 @@
 <template>
   <div data-qa="tapestry-filter" class="filter">
-    <button v-if="canSearch" aria-label="search" @click="toggleFilter">
+    <button v-if="canSearch && !settings.renderMap" aria-label="search" @click="toggleFilter">
       <i class="fas fa-search"></i>
     </button>
     <div
