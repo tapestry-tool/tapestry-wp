@@ -2,6 +2,7 @@ describe("Accordion", () => {
   beforeEach(() => {
     cy.fixture("one-node.json").as("oneNode")
     cy.fixture("accordion.json").as("accordion")
+    cy.fixture("deep-accordion.json").as("deep-accordion")
   })
 
   it("should be able to make a node an accordion", () => {
@@ -142,6 +143,43 @@ describe("Accordion", () => {
             cy.contains(row.typeData.textContent).should("be.visible")
           })
         })
+      })
+  })
+
+  // Structure: Accordion > Row > Sub-Row > Node
+  it("should not be able to add a node to subaccordion row if accordion row is not an accordion", () => {
+    cy.setup("@deep-accordion")
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const [root, child, grandchild] = Object.values(nodes)
+        cy.getByTestId(`add-node-${grandchild.id}`).should("not.exist")
+      })
+  })
+
+  it("should not show descendants to subscriber", () => {
+    cy.setup("@accordion")
+
+    const grandchild = {
+      title: "grandchild",
+      typeData: {
+        textContent: "hello world",
+      }
+    }
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const [accordion, child] = Object.values(nodes)
+        cy.addNode(child.id, grandchild)
+
+        cy.logout().visitTapestry()
+        cy.login("subscriber").visitTapestry()
+
+        cy.contains(accordion.title).should("be.visible")
+        cy.contains(child.title).should("not.be.visible")
+        cy.contains(grandchild.title).should("not.be.visible")
       })
   })
 })
