@@ -22,6 +22,7 @@ class TapestryNode implements ITapestryNode
     private $status;
     private $behaviour;
     private $typeData;
+    private $thumbnailFileId;
     private $imageURL;
     private $lockedImageURL;
     private $mediaType;
@@ -60,6 +61,7 @@ class TapestryNode implements ITapestryNode
         $this->size = '';
         $this->title = '';
         $this->status = '';
+        $this->thumbnailFileId = '';
         $this->imageURL = '';
         $this->lockedImageURL = '';
         $this->mediaType = '';
@@ -84,7 +86,6 @@ class TapestryNode implements ITapestryNode
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
-            // set thumbnail here?
             $this->set($node);
             $this->author = $this->_getAuthorInfo(get_post_field('post_author', $this->nodePostId));
         }
@@ -129,6 +130,14 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
+        }
+        if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
+            $this->thumbnailFileId = $node->thumbnailFileId;
+            set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
+            error_log("testing post thumbnail set");
+            error_log(json_encode(get_the_post_thumbnail($this->nodePostId)));
+            // error_log(json_encode($this->nodePostId));
+            // error_log(json_encode($this->thumbnailFileId));
         }
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
@@ -399,6 +408,7 @@ class TapestryNode implements ITapestryNode
             'size' => $this->size,
             'title' => $this->title,
             'status' => $this->status,
+            'thumbnailFileId' => $this->thumbnailFileId,
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
@@ -453,6 +463,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->typeData)) {
             $nodeData->typeData = $nodeMetadata->meta_value->typeData;
+        }
+        if (isset($nodeMetadata->meta_value->thumbnailFileId)) {
+            $nodeData->thumbnailFileId = $nodeMetadata->meta_value->thumbnailFileId;
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;

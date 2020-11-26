@@ -126,6 +126,7 @@ class TapestryApi {
    * @return  {Object}
    */
   async updateNode(nodeMetaId, node) {
+    // deal with thumbnailid here
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
     const response = await axios.put(url, node)
     return response
