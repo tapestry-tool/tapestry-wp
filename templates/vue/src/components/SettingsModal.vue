@@ -118,6 +118,65 @@
               {{ renderImages ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Geography map"
+            :description="
+              'Replace Tapestry with a map of Earth with placeholders for each node.' +
+                (renderMap ? ' Set the default visible area below:' : '')
+            "
+          >
+            <b-form-checkbox v-model="renderMap" switch data-qa="map-checkbox">
+              {{ renderMap ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="renderMap">
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  placeholder="90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                  "
+                />
+                <b-form-text>Northern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  placeholder="-180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                  "
+                />
+                <b-form-text>Western Longitudinal Bound</b-form-text>
+              </b-col>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  placeholder="180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                  "
+                />
+                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  placeholder="-90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                  "
+                />
+                <b-form-text>Southern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -152,7 +211,7 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading"
+        :disabled="fileUploading || !inputsValid"
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -214,12 +273,39 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      renderMap: false,
+      mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
     }
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
     ...mapState(["settings", "rootId"]),
+    latRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLat, 90) >
+        this.getCoord(this.mapBounds.swLat, -90)
+      )
+    },
+    lngRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLng, 180) >
+        this.getCoord(this.mapBounds.swLng, -180)
+      )
+    },
+    inputsValid() {
+      if (this.renderMap) {
+        return (
+          this.latRangeValid &&
+          this.isValidLat(this.mapBounds.swLat) &&
+          this.isValidLat(this.mapBounds.neLat) &&
+          this.lngRangeValid &&
+          this.isValidLng(this.mapBounds.swLng) &&
+          this.isValidLng(this.mapBounds.neLng)
+        )
+      }
+      return true
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -254,6 +340,8 @@ export default {
         superuserOverridePermissions = true,
         defaultDepth = 3,
         renderImages = true,
+        renderMap = false,
+        mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
@@ -263,6 +351,8 @@ export default {
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
+      this.renderMap = renderMap
+      this.mapBounds = mapBounds
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
@@ -274,6 +364,8 @@ export default {
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
+        renderMap: this.renderMap,
+        mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
@@ -303,6 +395,15 @@ export default {
       document.body.removeChild(a)
       this.isExporting = false
       this.hasExported = true
+    },
+    isValidLat(coord) {
+      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
+    },
+    isValidLng(coord) {
+      return this.getCoord(coord, 0) <= 180 && this.getCoord(coord, 0) >= -180
+    },
+    getCoord(coord, coordIfEmpty) {
+      return coord === "" ? coordIfEmpty : coord
     },
   },
 }
