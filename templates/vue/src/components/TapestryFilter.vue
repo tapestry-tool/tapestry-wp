@@ -15,19 +15,28 @@
       <v-select
         v-if="type !== types.STATUS"
         v-model="filterValue"
+        data-qa="search-input"
         :filter="getVisibleMatches"
-        :placeholder="placeholder"
         :options="filterOptions"
+        :clear-search-on-select="false"
         @search="val => (search = val)"
       ></v-select>
-      <v-select
+      <select
         v-else
         id="status-select"
         v-model="filterValue"
+        class="custom-select"
         data-qa="status-select"
-        :options="statuses"
-        :selectable="option => option.count > 0"
-      ></v-select>
+      >
+        <option
+          v-for="option in statuses"
+          :key="option.value"
+          :value="option.value"
+          :disabled="option.count === 0"
+        >
+          {{ option.label }}
+        </option>
+      </select>
       <div class="spinner">
         <b-spinner
           v-if="loading"
@@ -52,6 +61,15 @@ const filterTypes = {
   AUTHOR: "Author",
   TITLE: "Title",
   STATUS: "Status",
+}
+
+const statusMap = {
+  [nodeStatus.ALL]: "All",
+  [nodeStatus.DRAFT]: "Draft",
+  [nodeStatus.SUBMITTED]: "Submitted",
+  [nodeStatus.REJECTED]: "Rejected",
+  [nodeStatus.ACCEPTED]: "Accepted",
+  [nodeStatus.PUBLISHED]: "Published",
 }
 
 export default {
@@ -126,35 +144,25 @@ export default {
       return filterTypes
     },
     statuses() {
-      let res = []
-      let total = 0
-      for (let status of Object.values(nodeStatus)) {
-        let obj = {}
-        obj.value = status
-        obj.count = this.allStatuses.get(status.toLowerCase())
-        total += obj.count
-        res.push(obj)
+      const statuses = []
+      for (const status of Object.keys(statusMap)) {
+        const matches = this.getMatches(status, filterTypes.STATUS)
+        statuses.push({
+          value: status,
+          count: matches.length,
+          label: `${statusMap[status]}: ${matches.length}`,
+        })
       }
-      // set total for All
-      res[0].count = total
-      for (let obj in res) {
-        if (res[obj].value === "Publish") {
-          res[obj].label = "Published: " + res[obj].count
-        } else {
-          res[obj].label = res[obj].value + ": " + res[obj].count
-        }
-      }
-
-      return res
+      return statuses
     },
-    placeholder() {
+    label() {
       switch (this.type) {
         case filterTypes.AUTHOR:
-          return "Node author"
+          return "Search by author"
         case filterTypes.TITLE:
-          return "Node title"
+          return "Search by title"
         default:
-          return "Node status"
+          return "Search by status"
       }
     },
     filterOptions() {
@@ -228,37 +236,15 @@ export default {
     if (this.canSearch && this.lazy) {
       this.allContributors = await client.getAllContributors()
     }
-    this.initStatusMap()
-    this.$store.subscribe(mutation => {
-      if (mutation.type == "updateNode") {
-        this.initStatusMap()
-      }
-    })
   },
   methods: {
-    ...mapMutations(["updateVisibleNodes", "addApiError", "updateNode"]),
+    ...mapMutations(["updateVisibleNodes", "addApiError"]),
     ...mapActions(["refetchTapestryData"]),
     toggleFilter() {
       if (this.isActive) {
         this.filterValue = undefined
       }
       this.isActive = !this.isActive
-    },
-    initStatusMap() {
-      this.allStatuses = new Map()
-      for (let status of Object.values(nodeStatus)) {
-        this.allStatuses.set(status.toLowerCase(), 0)
-      }
-      for (let node of Object.values(this.nodes)) {
-        if (node.reviewStatus) {
-          this.allStatuses.set(
-            node.reviewStatus,
-            this.allStatuses.get(node.reviewStatus) + 1
-          )
-        } else {
-          this.allStatuses.set(node.status, this.allStatuses.get(node.status) + 1)
-        }
-      }
     },
     getVisibleMatches(options, value) {
       if (!value.length) {
@@ -275,11 +261,11 @@ export default {
           return matches.map(node => node.title)
       }
     },
-    getMatches(value) {
+    getMatches(value, type = this.type) {
       let val = value
       let match = Object.values(this.nodes)
       if (this.isActive && this.type) {
-        switch (this.type) {
+        switch (type) {
           case filterTypes.AUTHOR: {
             val = typeof val !== "string" ? val.id : val
             match = matchSorter(match, val, {
@@ -293,7 +279,6 @@ export default {
             })
             break
           }
-          // status filtering
           case filterTypes.STATUS: {
             if (val !== nodeStatus.ALL) {
               // for these three, we need to look at the reviewStatus first

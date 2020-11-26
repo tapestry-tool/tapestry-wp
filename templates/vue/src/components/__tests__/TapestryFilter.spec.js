@@ -37,30 +37,31 @@ const render = (settings = {}, query = {}) => {
 const setup = settings => {
   const screen = render(settings)
   userEvent.click(screen.getByLabelText("search"))
-  return screen
+  return {
+    ...screen,
+    combobox: within(screen.getByTestId("search-input")).getByRole("combobox", {
+      hidden: true,
+    }),
+  }
 }
 
 describe("TapestryFilter", () => {
   it("should be able to change the filter type and have the text placeholder update", async () => {
     const screen = setup()
-
-    await screen.findByPlaceholderText("Node title")
-
-    const select = screen.getByDisplayValue("Title")
-    userEvent.click(select)
+    userEvent.click(await screen.findByDisplayValue("Title"))
 
     const options = ["Title", "Author", "Status"]
     options.forEach(option => screen.getByText(option))
 
     userEvent.selectOptions(screen.getByDisplayValue("Title"), "Author")
-    await screen.findByPlaceholderText("Node author")
+    await screen.findByTestId("search-input")
   })
 
   it("should show dropdown of node titles if searching by title", async () => {
     const titles = multiAuthorTapestry.nodes.map(node => node.title)
     const screen = setup()
 
-    userEvent.click(await screen.findByPlaceholderText("Node title"))
+    userEvent.click(screen.combobox)
     await waitFor(() => {
       titles.forEach(title => screen.getByText(title))
     })
@@ -74,7 +75,7 @@ describe("TapestryFilter", () => {
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(screen.combobox)
 
     await waitFor(() => {
       authors.forEach(author => screen.getByText(author.name))
@@ -86,7 +87,7 @@ describe("TapestryFilter", () => {
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.type(await screen.findByPlaceholderText("Node author"), author.id)
+    userEvent.type(screen.combobox, author.id)
 
     await screen.findByText(author.name)
   })
@@ -98,30 +99,30 @@ describe("TapestryFilter", () => {
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Status")
     await screen.findByTestId("status-select")
 
-    userEvent.click(screen.getByText("All"))
-    statuses.forEach(status => screen.getByText(status))
+    userEvent.click(screen.getByText(/all/i))
+    statuses.forEach(status => screen.getByText(new RegExp(status, "i")))
   })
 
   it("should reset value if search type is changed", async () => {
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(screen.combobox)
     userEvent.click(await screen.findByText("admin"))
 
     userEvent.selectOptions(screen.getByDisplayValue("Author"), "Title")
-    expect(await screen.findByPlaceholderText("Node title")).toHaveValue("")
+    await screen.findByDisplayValue("")
   })
 
   it("should reset value to 'All' if search type is changed to status", async () => {
     const screen = setup()
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(screen.combobox)
     userEvent.click(await screen.findByText("admin"))
 
     userEvent.selectOptions(screen.getByDisplayValue("Author"), "Status")
-    await screen.findByText("All")
+    await screen.findByText(/all/i)
   })
 
   it("should show loading indicator when superuser override is off", async () => {
@@ -129,7 +130,7 @@ describe("TapestryFilter", () => {
     const screen = setup({ superuserOverridePermissions: false })
 
     userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Author")
-    userEvent.click(await screen.findByPlaceholderText("Node author"))
+    userEvent.click(screen.combobox)
     userEvent.click(await screen.findByText("admin"))
 
     await screen.findByTestId("search-loading")
