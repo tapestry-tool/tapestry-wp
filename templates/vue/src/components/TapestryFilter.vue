@@ -3,6 +3,7 @@
     <button
       v-if="canSearch && !settings.renderMap"
       aria-label="search"
+      :style="isActive && 'margin-right: 12px;'"
       @click="toggleFilter"
     >
       <i class="fas fa-search"></i>
@@ -332,18 +333,21 @@ export default {
 <style lang="scss" scoped>
 .filter {
   display: flex;
-  height: 3rem;
+  height: 3.5rem;
+  background: #fbfbfb;
+  box-shadow: 0 0 7px 0 #ddd;
+  padding: 0.5rem;
+  border-radius: 8px;
 
   button {
     color: #999;
     padding: 0;
-    margin-right: 12px;
-    background: #fbfbfb;
-    box-shadow: 0 0 7px 0 #ddd;
+    background: none;
     width: 36px;
-    height: 36px;
-    border-radius: 8px;
     font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       color: #11a6d8;
