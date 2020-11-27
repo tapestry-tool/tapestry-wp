@@ -155,7 +155,7 @@ function tapestry_enqueue_vue_app()
                 'file_upload_nonce' => wp_create_nonce('media-form'),
                 'upload_url' => admin_url('async-upload.php'),
                 'roles' => $wp_roles->get_names(),
-                'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()) || is_super_admin(),
+                'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => wp_get_current_user(),
             ]
         );
@@ -226,7 +226,7 @@ add_filter('single_template', 'load_tapestry_template');
 
 function create_new_tapestry()
 {
-    if (!current_user_can('edit_posts' && !is_super_admin())) {
+    if (!current_user_can('edit_posts')) {
         return "";
     }
 

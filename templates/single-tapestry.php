@@ -13,7 +13,7 @@ get_header();
 ?>
 
 <div id="primary" class="content-area col-md-12">
-    <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) || is_super_admin() ? 'is-editor' : ''; ?>" role="main">
+    <main id="main" class="site-main post-wrap <?php echo current_user_can('edit_post', get_the_ID()) ? 'is-editor' : ''; ?>" role="main">
 
 <?php
 
