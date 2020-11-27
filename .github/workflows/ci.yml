@@ -45,6 +45,9 @@ jobs:
         env:
           LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
         run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
+      - name: Change content directory ownership
+        working-directory: data/wp
+        run: sudo chown www-data:www-data wp-content
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
