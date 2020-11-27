@@ -51,6 +51,7 @@
             </p>
           </b-form-group>
           <b-form-group
+            data-qa="superuser-override"
             label="Show me all nodes by default"
             description="If enabled, editors of this tapestry would be able to view all nodes even if they have
             the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes,

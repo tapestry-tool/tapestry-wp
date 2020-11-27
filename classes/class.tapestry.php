@@ -310,14 +310,15 @@ class Tapestry implements ITapestry
 
     public function getAllContributors()
     {
-        return array_unique(array_map(
-            function ($node) {
-                $node = new TapestryNode($this->postId, $node);
+        $authors = [];
+        foreach ($this->nodes as $node) {
+            $node = new TapestryNode($this->postId, $node);
+            if ($node->isAvailableToUser()) {
+                array_push($authors, $node->get()->author);
+            }
+        }
 
-                return $node->get()->author;
-            },
-            $this->nodes
-        ), SORT_REGULAR);
+        return array_unique($authors, SORT_REGULAR);
     }
 
     private function _setAccessibleStatus($nodes, $userId)
@@ -497,7 +498,8 @@ class Tapestry implements ITapestry
         if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
         } else {
-            $tapestry->nodes = array_intersect($tapestry->nodes,
+            $tapestry->nodes = array_intersect(
+                $tapestry->nodes,
                 $this->_filterNodeMetaIdsByPermissions(
                     $tapestry->rootId,
                     $tapestry->settings->superuserOverridePermissions,

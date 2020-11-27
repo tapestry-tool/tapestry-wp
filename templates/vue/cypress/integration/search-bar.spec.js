@@ -1,5 +1,8 @@
+import { roles } from "../support/roles"
+
 describe("Search bar", () => {
   beforeEach(() => {
+    cy.fixture("one-node.json").as("oneNode")
     cy.fixture("multi-author.json").as("tapestry")
   })
 
@@ -22,7 +25,7 @@ describe("Search bar", () => {
         let expected = allNodes.filter(node => node.title.startsWith("fir"))
         assertVisibleNodes(expected)
 
-        // Should be search by title
+        // Search by title
         cy.getByTestId("search-input")
           .findByRole("combobox")
           .type("st{enter}")
@@ -46,7 +49,34 @@ describe("Search bar", () => {
       })
   })
 
-  it.skip("should be able to search nodes via node status")
+  it("should be able to search nodes via node status", () => {
+    cy.setup("@tapestry")
+
+    const node = {
+      title: "For Review",
+      mediaType: "text",
+      typeData: {
+        textContent: "Abcd",
+      },
+      status: "draft",
+    }
+
+    cy.getSelectedNode().then(root => {
+      cy.addNode(root.id, node)
+    })
+
+    cy.get("[aria-label=search]").click()
+    cy.findByDisplayValue("Title").select("Status")
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        cy.findByDisplayValue(`All: ${Object.keys(nodes).length}`).select("Draft: 1")
+        assertVisibleNodes(
+          Object.values(nodes).filter(node => node.status === "draft")
+        )
+      })
+  })
 
   it("should be able to visit a url and see search results", () => {
     cy.setup("@tapestry")
@@ -72,7 +102,7 @@ describe("Search bar", () => {
   })
 
   it("should not be able to visit the url if not authorized", () => {
-    cy.setup("@tapestry", "subscriber")
+    cy.setup("@tapestry", roles.SUBSCRIBER)
 
     cy.app().then(app => {
       const { path } = app.$route
@@ -91,7 +121,38 @@ describe("Search bar", () => {
     })
   })
 
-  it.skip("should only show authors of public contributions")
+  it.only("should only show authors of public contributions", () => {
+    cy.setup("@oneNode", roles.SUBSCRIBER)
+
+    const node = {
+      title: "For Review",
+      mediaType: "text",
+      typeData: {
+        textContent: "Abcd",
+      },
+      status: "draft",
+    }
+
+    cy.getSelectedNode().then(root => {
+      cy.addNode(root.id, node)
+    })
+    cy.contains(node.title).should("exist")
+
+    cy.login(roles.ADMIN).visitTapestry()
+    cy.openModal("settings")
+    cy.getByTestId("superuser-override")
+      .contains(/enabled/i)
+      .click()
+    cy.submitSettingsModal()
+
+    cy.visitTapestry()
+    cy.get("[aria-label=search]").click()
+    cy.findByDisplayValue("Title").select("Author")
+    cy.getByTestId("search-input")
+      .click()
+      .contains(roles.SUBSCRIBER)
+      .should("not.be.visible")
+  })
 })
 
 const assertVisibleNodes = visibleNodes => {
