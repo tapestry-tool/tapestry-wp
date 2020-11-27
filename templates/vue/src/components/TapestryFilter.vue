@@ -154,8 +154,13 @@ export default {
       return filterTypes
     },
     statuses() {
+      let statusTypes = Object.keys(statusMap)
+      if (!this.settings.showRejected) {
+        statusTypes = statusTypes.filter(type => type !== nodeStatus.REJECTED)
+      }
+
       const statuses = []
-      for (const status of Object.keys(statusMap)) {
+      for (const status of statusTypes) {
         const matches = this.getMatches(status, filterTypes.STATUS)
         statuses.push({
           value: status,

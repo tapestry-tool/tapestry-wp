@@ -104,7 +104,12 @@ describe("TapestryFilter", () => {
     await screen.findByTestId("status-select")
 
     userEvent.click(screen.getByText(/all/i))
-    statuses.forEach(status => screen.getByText(new RegExp(status, "i")))
+    statuses.forEach(status => {
+      if (status !== nodeStatus.REJECTED) {
+        screen.getByText(new RegExp(status, "i"))
+      }
+    })
+    expect(screen.queryByText(new RegExp(nodeStatus.REJECTED, "i"))).toBeNull()
   })
 
   it("should reset value if search type is changed", async () => {
@@ -180,5 +185,13 @@ describe("TapestryFilter", () => {
     })
   })
 
-  it("should hide the rejected option if the show rejected setting is false", async () => {})
+  it("should show the rejected option if the show rejected setting is true", async () => {
+    const screen = setup({ settings: { showRejected: true } })
+
+    userEvent.selectOptions(await screen.findByDisplayValue("Title"), "Status")
+    await screen.findByTestId("status-select")
+
+    userEvent.click(screen.getByText(/all/i))
+    screen.getByText(new RegExp(nodeStatus.REJECTED, "i"))
+  })
 })

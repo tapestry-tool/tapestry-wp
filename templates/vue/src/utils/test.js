@@ -72,6 +72,7 @@ const mockSettings = {
   },
   superuserOverridePermissions: true,
   permalink: "testing",
+  showRejected: false,
 }
 
 function parseFixture(fixture, settings) {
