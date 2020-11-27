@@ -1,6 +1,11 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <div class="toolbar">
+    <div
+      v-if="
+        canEdit || (!settings.renderMap && maxDepth > 1 && settings.defaultDepth > 0)
+      "
+      class="toolbar"
+    >
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
         <settings-modal-button
@@ -13,15 +18,17 @@
         ></tapestry-depth-slider>
       </div>
     </div>
-    <root-node-button
-      v-if="empty && canEdit"
-      @click="addRootNode"
-    ></root-node-button>
-    <div v-if="empty && !canEdit">
-      The requested Tapestry is empty.
-    </div>
-    <main id="tapestry" ref="app" :style="background">
-      <svg id="vue-svg" :viewBox="viewBox">
+    <tapestry-map
+      v-if="settings.renderMap"
+      :is-sidebar-open="isSidebarOpen"
+      data-qa="tapestry-map"
+    />
+    <main v-else id="tapestry" ref="app" :style="background">
+      <div v-if="empty">
+        <root-node-button v-if="canEdit" @click="addRootNode"></root-node-button>
+        <div v-else class="empty-message">The requested Tapestry is empty.</div>
+      </div>
+      <svg v-else id="vue-svg" :viewBox="viewBox">
         <g class="links">
           <tapestry-link
             v-for="link in links"
@@ -30,7 +37,7 @@
             :target="nodes[link.target]"
           ></tapestry-link>
         </g>
-        <g v-if="dragSelectReady" class="nodes">
+        <g v-if="dragSelectEnabled && dragSelectReady" class="nodes">
           <tapestry-node
             v-for="(node, id) in nodes"
             :key="id"
@@ -58,6 +65,7 @@
 import DragSelectModular from "@/utils/dragSelectModular"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
+import TapestryMap from "@/components/TapestryMap"
 import TapestryLink from "@/components/TapestryLink"
 import TapestryDepthSlider from "@/components/TapestryDepthSlider"
 import SettingsModalButton from "@/components/SettingsModalButton"
@@ -71,6 +79,7 @@ import * as wp from "@/services/wp"
 export default {
   components: {
     TapestryNode,
+    TapestryMap,
     TapestryLink,
     TapestryDepthSlider,
     TapestryFilter,
@@ -104,6 +113,9 @@ export default {
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
+    dragSelectEnabled() {
+      return !this.settings.renderMap
+    },
   },
   watch: {
     background: {
@@ -131,7 +143,9 @@ export default {
     },
   },
   mounted() {
-    DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    if (this.dragSelectEnabled) {
+      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    }
     this.updateViewBox()
     this.dragSelectReady = true
   },
@@ -141,7 +155,9 @@ export default {
       this.$root.$emit("add-node", null)
     },
     updateSelectableNodes() {
-      DragSelectModular.updateSelectableNodes()
+      if (this.dragSelectEnabled) {
+        DragSelectModular.updateSelectableNodes()
+      }
     },
     updateViewBox() {
       const MAX_RADIUS = 240
@@ -233,8 +249,10 @@ export default {
   z-index: 0;
 
   @media screen and (min-width: 500px) {
+    width: calc(100% - 2.5em);
+
     &.sidebar-open {
-      width: calc(100% - max(340px, 30%));
+      width: calc(100% - min(400px, max(300px, 25vw)) - 2.5em);
       padding-right: 0;
 
       .toolbar {
@@ -242,8 +260,13 @@ export default {
       }
     }
   }
-  #tapestry svg {
-    position: relative;
+  #tapestry {
+    .empty-message {
+      margin: 30vh auto;
+    }
+    svg {
+      position: relative;
+    }
   }
 }
 .toolbar {
@@ -268,5 +291,8 @@ export default {
 <style lang="scss">
 #app {
   background-size: cover;
+}
+#app-container .btn-link {
+  background: transparent;
 }
 </style>
