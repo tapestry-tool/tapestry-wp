@@ -26,7 +26,8 @@ class TapestryUserRoles
     {
         return $this->isEditor()
         || $this->isAdministrator()
-        || $this->isAuthorOfThePost($postId);
+        || $this->isAuthorOfThePost($postId)
+        || is_super_admin();
     }
 
     /**
