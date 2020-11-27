@@ -564,6 +564,7 @@ class Tapestry implements ITapestry
                 array_push($nodesPermitted, $nodeId);
             }
         }
+
         return $nodesPermitted;
     }
 

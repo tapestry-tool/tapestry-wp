@@ -179,4 +179,6 @@ describe("TapestryFilter", () => {
       expect(screen.getAllByText(title)).toHaveLength(2)
     })
   })
+
+  it("should hide the rejected option if the show rejected setting is false", async () => {})
 })

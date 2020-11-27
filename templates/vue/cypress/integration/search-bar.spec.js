@@ -1,23 +1,3 @@
-const assertVisibleNodes = visibleNodes => {
-  const expected = visibleNodes.map(node => node.id)
-  cy.store()
-    .its("state.nodes")
-    .then(nodes => {
-      for (const node of Object.values(nodes)) {
-        cy.getNodeById(node.id)
-          .should("have.css", "opacity")
-          .and(opacity => {
-            const opacityAsNum = Number(opacity)
-            if (expected.includes(node.id)) {
-              expect(opacityAsNum).to.equal(1)
-            } else {
-              expect(opacityAsNum).to.be.lessThan(1)
-            }
-          })
-      }
-    })
-}
-
 describe("Search bar", () => {
   beforeEach(() => {
     cy.fixture("multi-author.json").as("tapestry")
@@ -60,15 +40,13 @@ describe("Search bar", () => {
         expected = Object.values(nodes).filter(node => node.author.name === "admin")
         assertVisibleNodes(expected)
 
-        /**
-         * TODO: By status -- waiting for #680 to be merged in
-         *  - https://github.com/wynnset/tapestry-wp/pull/683
-         */
         cy.findByDisplayValue("Author").select("Status")
         cy.findByDisplayValue(/all/i).should("be.visible")
         assertVisibleNodes(allNodes)
       })
   })
+
+  it.skip("should be able to search nodes via node status")
 
   it("should be able to visit a url and see search results", () => {
     cy.setup("@tapestry")
@@ -112,4 +90,26 @@ describe("Search bar", () => {
       ).should("be.visible")
     })
   })
+
+  it.skip("should only show authors of public contributions")
 })
+
+const assertVisibleNodes = visibleNodes => {
+  const expected = visibleNodes.map(node => node.id)
+  cy.store()
+    .its("state.nodes")
+    .then(nodes => {
+      for (const node of Object.values(nodes)) {
+        cy.getNodeById(node.id)
+          .should("have.css", "opacity")
+          .and(opacity => {
+            const opacityAsNum = Number(opacity)
+            if (expected.includes(node.id)) {
+              expect(opacityAsNum).to.equal(1)
+            } else {
+              expect(opacityAsNum).to.be.lessThan(1)
+            }
+          })
+      }
+    })
+}
