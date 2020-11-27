@@ -118,6 +118,25 @@
               {{ renderImages ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Thumbnail optimization"
+            description="This will convert all existing thumbnails into optimized thumbnails"
+          >
+            <b-button
+              id="export-button"
+              block
+              variant="light"
+              :class="isExporting ? 'disabled' : ''"
+              :disabled="isExporting"
+              @click="exportTapestry"
+            >
+              <b-spinner v-if="isExporting" small></b-spinner>
+              <div :style="isExporting ? 'opacity: 50%;' : ''">
+                Optimize All Thumbnails
+              </div>
+            </b-button>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
