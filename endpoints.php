@@ -292,6 +292,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'OPTIMIZE_THUMBNAILS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'optimizeTapestryNodeThumbnail',
+        ],
+    ],
 ];
 
 /*
@@ -996,49 +1003,77 @@ function updateTapestryNodeLockedImageURL($request)
 function optimizeTapestryNodeThumbnail($request)
 {
     $nodePostId = $request['nodePostId'];
-    $url = $request['url'];
+    $imageurl = $request['url'];
+    // if ( ! function_exists( 'download_url' ) ) {
+    //     require_once ABSPATH . 'wp-admin/includes/file.php';
+    // }
+    // $temp_file = download_url( $url, 3);
 
-    $temp_file = download_url( $url, 10);
+    // if ( !is_wp_error( $temp_file ) ) {
+    
+    //     // Array based on $_FILE as seen in PHP file uploads
+    //     $file = array(
+    //         'name'     => basename($url), // ex: wp-header-logo.png
+    //         'type'     => 'image/png',
+    //         'tmp_name' => $temp_file,
+    //         'error'    => 0,
+    //         'size'     => filesize($temp_file),
+    //     );
+    
+    //     $overrides = array(
+    //         // Tells WordPress to not look for the POST form
+    //         // fields that would normally be present as
+    //         // we downloaded the file from a remote server, so there
+    //         // will be no form fields
+    //         // Default is true
+    //         'test_form' => false,
+    
+    //         // Setting this to false lets WordPress allow empty files, not recommended
+    //         // Default is true
+    //         'test_size' => true,
+    //     );
+    
+    //     // Move the temporary file into the uploads directory
+    //     $results = wp_handle_sideload( $file, $overrides );
+    
+    //     if ( !empty( $results['error'] ) ) {
+    //         throw new WP_Error("Errored in thumbnail optimization update");
+    //     } else {
+    //         $filename  = $results['file']; // Full path to the file
+    //         $local_url = $results['url'];  // URL to the file in the uploads dir
+    //         $attachment_id = attachment_url_to_postid( $local_url );
+    //         // set_post_thumbnail($nodePostId,);
+    //     }
+    
+    // }
+    include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-    if ( !is_wp_error( $temp_file ) ) {
-    
-        // Array based on $_FILE as seen in PHP file uploads
-        $file = array(
-            'name'     => basename($url), // ex: wp-header-logo.png
-            'type'     => 'image/png',
-            'tmp_name' => $temp_file,
-            'error'    => 0,
-            'size'     => filesize($temp_file),
-        );
-    
-        $overrides = array(
-            // Tells WordPress to not look for the POST form
-            // fields that would normally be present as
-            // we downloaded the file from a remote server, so there
-            // will be no form fields
-            // Default is true
-            'test_form' => false,
-    
-            // Setting this to false lets WordPress allow empty files, not recommended
-            // Default is true
-            'test_size' => true,
-        );
-    
-        // Move the temporary file into the uploads directory
-        $results = wp_handle_sideload( $file, $overrides );
-    
-        if ( !empty( $results['error'] ) ) {
-            // Insert any error handling here
-        } else {
-    
-            $filename  = $results['file']; // Full path to the file
-            $local_url = $results['url'];  // URL to the file in the uploads dir
-            $type      = $results['type']; // MIME type of the file
-    
-            set_post_thumbnail($nodePostId,);
-        }
-    
-    }
+$imagetype = end(explode('/', getimagesize($imageurl)['mime']));
+$uniq_name = date('dmY').''.(int) microtime(true); 
+$filename = $uniq_name.'.'.$imagetype;
+
+$uploaddir = wp_upload_dir();
+$uploadfile = $uploaddir['path'] . '/' . $filename;
+$contents= file_get_contents($imageurl);
+$savefile = fopen($uploadfile, 'w');
+fwrite($savefile, $contents);
+fclose($savefile);
+
+$wp_filetype = wp_check_filetype(basename($filename), null );
+$attachment = array(
+    'post_mime_type' => $wp_filetype['type'],
+    'post_title' => $filename,
+    'post_content' => '',
+    'post_status' => 'inherit'
+);
+
+$attach_id = wp_insert_attachment( $attachment, $uploadfile );
+$imagenew = get_post( $attach_id );
+$fullsizepath = get_attached_file( $imagenew->ID );
+$attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
+wp_update_attachment_metadata( $attach_id, $attach_data ); 
+
+return $attach_id;
 }
 
 /**
