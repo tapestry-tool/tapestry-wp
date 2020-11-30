@@ -5,19 +5,16 @@ describe("Import Export", () => {
     cy.server()
     cy.route("GET", "**/tapestries/**/export").as("export")
 
+    cy.get('.settings-button').click()
+    cy.contains(/advanced/i).click()
+    cy.get('#export-button').click()
+
     cy.wait('@export')
     .then((xhr) => {
         assert.isNotNull(xhr.response.body, "response body not null")
     })
-  })
-
-  it("export button should succesfully export", () => {
-    cy.setup()
-    cy.get('.settings-button').click()
-    cy.contains(/advanced/i).click()
-    cy.get('#export-button', {timeout: 15000}).click()
-
-    cy.contains(/exported/i).should('be.visible')    
+    
+    cy.contains(/exported/i).should('be.visible') 
   })
 
   it("should be able to import a Tapestry using file input", () => {
