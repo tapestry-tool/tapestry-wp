@@ -149,11 +149,11 @@ describe("Node Authoring", () => {
         cy.changeMediaType("video")
         cy.getByTestId(`node-video-url`).type(nexistVideoURL)
 
-        cy.submitModalWithError()
-        cy.contains(videoErrorMsg).should("exist")
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
         // check that error persists
-        cy.contains(/publish/i).click()
+        cy.getByTestId("submit-node-modal").click()
         cy.contains(videoErrorMsg).should("exist")
 
         // check that node is not created
@@ -184,8 +184,8 @@ describe("Node Authoring", () => {
         cy.changeMediaType("video")
         cy.getByTestId(`node-video-url`).type(nexistVideoURL)
 
-        cy.submitModalWithError()
-        cy.contains(videoErrorMsg).should("exist")
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
         cy.getByTestId(`node-video-url`)
           .clear()
