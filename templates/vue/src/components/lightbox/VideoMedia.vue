@@ -117,6 +117,9 @@ export default {
     },
     play() {
       if (this.$refs.video) {
+        client.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.$refs.video.play()
       }
     },
@@ -125,6 +128,9 @@ export default {
       this.showEndScreen = false
       if (this.$refs.video) {
         this.$refs.video.currentTime = 0
+        client.recordAnalyticsEvent("app", "play", "video", this.node.id, {
+          time: 0,
+        })
         this.$refs.video.play()
       }
     },
@@ -135,6 +141,9 @@ export default {
     close() {
       if (this.$refs.video) {
         this.$refs.video.pause()
+        client.recordAnalyticsEvent("app", "pause", "video", this.node.id, {
+          time: this.$refs.video.currentTime,
+        })
         this.updateVideoProgress()
       }
       this.$emit("close")

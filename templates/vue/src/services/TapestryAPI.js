@@ -2,7 +2,7 @@ import axios from "axios"
 import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
-const { apiUrl, nonce, postId } = data
+const { apiUrl, nonce, postId, adminAjaxUrl } = data
 
 class TapestryApi {
   /**
@@ -233,7 +233,7 @@ class TapestryApi {
   }
 
   async recordAnalyticsEvent(actor, action, object, objectID, details = {}) {
-    const analyticsAJAXUrl = "" // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
+    const analyticsAJAXUrl = adminAjaxUrl // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
     const analyticsAJAXAction = "tapestry_tool_log_event" // Analytics
 
     if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length) {
@@ -242,20 +242,18 @@ class TapestryApi {
 
     // TODO: Also need to save the tapestry slug or ID in the events
 
-    details["user-ip"] = document.getElementById("user-ip").innerText
-
-    const data = {
-      action: analyticsAJAXAction,
-      actor: actor,
-      action2: action,
-      object: object,
-      user_guid: Helpers.createUUID(),
-      object_id: objectID,
-      details: JSON.stringify(details),
-    }
+    // details["user-ip"] = document.getElementById("user-ip").innerText
+    var params = new URLSearchParams()
+    params.append("action", analyticsAJAXAction)
+    params.append("actor", actor)
+    params.append("action2", action)
+    params.append("object", object)
+    params.append("user_guid", Helpers.createUUID())
+    params.append("object_id", objectID)
+    params.append("details", JSON.stringify(details))
 
     // Send the event to an AJAX URL to be saved
-    await axios.post(analyticsAJAXUrl, data)
+    axios.post(analyticsAJAXUrl, params)
   }
 }
 

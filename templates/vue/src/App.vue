@@ -58,8 +58,8 @@ export default {
   methods: {
     ...mapMutations(["init"]),
     recordAnalytics(evt) {
-      const x = evt.clientX + window.scrollLeft
-      const y = evt.clientY + window.scrollTop
+      const x = evt.clientX + window.pageXOffset
+      const y = evt.clientY + window.pageYOffset
       client.recordAnalyticsEvent("user", "click", "screen", null, {
         x: x,
         y: y,

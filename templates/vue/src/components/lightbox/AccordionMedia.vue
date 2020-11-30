@@ -76,16 +76,16 @@
       v-if="showCompletion"
       :node-id="node.id"
       :allow-close="false"
-      @close="showCompletion = false"
+      @close="handleCancel"
     >
       <h1>{{ node.typeData.confirmationTitleText }}</h1>
       <p>{{ node.typeData.confirmationBodyText }}</p>
       <div class="button-container">
-        <button class="button-completion" @click="$emit('close')">
+        <button class="button-completion" @click="handleClose">
           <i class="far fa-arrow-alt-circle-right fa-4x"></i>
           <p>{{ node.typeData.continueButtonText }}</p>
         </button>
-        <button class="button-completion" @click="showCompletion = false">
+        <button class="button-completion" @click="handleCancel">
           <i class="far fa-times-circle fa-4x"></i>
           <p>{{ node.typeData.cancelLinkText }}</p>
         </button>
@@ -96,6 +96,7 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
+import client from "../../services/TapestryAPI"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import TapestryAccordion from "../TapestryAccordion"
@@ -170,11 +171,46 @@ export default {
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex < 0) {
+          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: 0,
+          })
           this.$refs.container.scrollTop = 0
         } else {
+          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+            to: el.offsetTop - 12,
+          })
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
+    },
+    scrollToTop() {
+      const el = this.$refs.container
+      if (el) {
+        client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
+          to: 0,
+        })
+        el.scrollTop = 0
+      }
+    },
+    handleClose(evt) {
+      client.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit("close")
+    },
+    handleCancel(evt) {
+      client.recordAnalyticsEvent(
+        "user",
+        "close",
+        "accordion-completion-screen",
+        this.node.id,
+        {
+          x: evt.clientX,
+          y: evt.clientY,
+        }
+      )
+      this.showCompletion = false
     },
     disableRow(index) {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom

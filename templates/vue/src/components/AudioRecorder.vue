@@ -48,6 +48,7 @@
 
 <script>
 import AudioRecoder from "audio-recorder-polyfill"
+import client from "../services/TapestryAPI"
 import { mapGetters } from "vuex"
 
 // Polyfill for Safari and Edge
@@ -162,25 +163,30 @@ export default {
       clearInterval(this.durationInterval)
     },
     startRecording() {
+      client.recordAnalyticsEvent("user", "start", "audio-recorder", this.id)
       this.recorder.start()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     pauseRecording() {
+      client.recordAnalyticsEvent("user", "pause", "audio-recorder", this.id)
       this.recorder.pause()
       this.stopDurationCount()
       this.state = this.states.PAUSED
     },
     resumeRecording() {
+      client.recordAnalyticsEvent("user", "resume", "audio-recorder", this.id)
       this.recorder.resume()
       this.startDurationCount()
       this.state = this.states.RECORDING
     },
     stopRecording() {
+      client.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
     },
     resetRecording() {
+      client.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
     },
@@ -198,6 +204,7 @@ export default {
       }
     },
     handleSubmit() {
+      client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
       this.$emit("submit", this.audio)
     },
   },

@@ -27,13 +27,14 @@
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
       @show-play-screen="showPlayScreen = $event"
-      @update-settings="updateH5pSettings"
+      @update-settings="updateSettings"
     />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex"
+import client from "../../services/TapestryAPI"
 import Loading from "../Loading"
 import EndScreen from "./EndScreen"
 import H5PIframe from "./H5PIframe"
@@ -99,6 +100,16 @@ export default {
     handleLoad() {
       this.isLoading = false
       this.$emit("load")
+    },
+    updateSettings(settings) {
+      client.recordAnalyticsEvent(
+        "user",
+        "update-settings",
+        "h5p-video",
+        this.node.id,
+        { from: this.h5pSettings, to: settings }
+      )
+      this.updateH5pSettings(settings)
     },
   },
 }

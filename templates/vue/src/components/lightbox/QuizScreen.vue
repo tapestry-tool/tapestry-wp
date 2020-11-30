@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
-      <button v-else class="button-completion" @click="$emit('close')">
+      <button v-else class="button-completion" @click="close">
         <i class="far fa-times-circle fa-4x"></i>
         <p>Done</p>
       </button>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import client from "../../services/TapestryAPI.js"
 import Question from "./quiz-screen/Question"
 import CompletionScreen from "./quiz-screen/CompletionScreen"
 import { mapGetters } from "vuex"
@@ -80,11 +81,23 @@ export default {
     },
     next() {
       this.showCompletionScreen = false
+      client.recordAnalyticsEvent("user", "next", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+        to: this.activeQuestionIndex + 1,
+      })
       this.activeQuestionIndex++
     },
     prev() {
       this.showCompletionScreen = false
+      client.recordAnalyticsEvent("user", "prev", "activity", this.node.id, {
+        from: this.activeQuestionIndex,
+        to: this.activeQuestionIndex - 1,
+      })
       this.activeQuestionIndex--
+    },
+    close() {
+      client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
+      this.$emit("close")
     },
   },
 }
