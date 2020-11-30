@@ -33,13 +33,7 @@ describe("External link", () => {
     })
   })
 
-  /**
-   * [CI FAIL] indicates that the test fails in Tapestry's CI environment. These
-   * tests are failing because of a Docker-WordPress permissions issue. See the
-   * following Asana task for details:
-   *  - https://app.asana.com/0/1126491658233864/1198968596220741
-   */
-  it.skip("[CI FAIL] should be able to add an external link using the file upload", () => {
+  it("should be able to add an external link using the file upload", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("url-embed")

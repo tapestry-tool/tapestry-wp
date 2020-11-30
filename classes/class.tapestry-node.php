@@ -42,6 +42,7 @@ class TapestryNode implements ITapestryNode
     private $reviewComments;
     private $license;
     private $references;
+    private $mapCoordinates;
 
     /**
      * Constructor.
@@ -85,6 +86,10 @@ class TapestryNode implements ITapestryNode
         $this->reviewComments = [];
         $this->license = '';
         $this->references = '';
+        $this->mapCoordinates = (object) [
+            'lat' => '',
+            'lng' => '',
+        ];
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -195,6 +200,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->references) && is_string($node->references)) {
             $this->references = $node->references;
+        }
+        if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
+            $this->mapCoordinates = $node->mapCoordinates;
         }
     }
 
@@ -431,6 +439,7 @@ class TapestryNode implements ITapestryNode
             'reviewComments' => $this->reviewComments,
             'license' => $this->license,
             'references' => $this->references,
+            'mapCoordinates' => $this->mapCoordinates,
         ];
     }
 

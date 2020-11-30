@@ -6,21 +6,28 @@
       :data-qa="`node-${node.id}`"
       :data-locked="!node.accessible"
       :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`"
-      :class="{ opaque: !visibleNodes.includes(node.id) }"
+      :class="{
+        opaque: !visibleNodes.includes(node.id),
+        'has-thumbnail': node.thumbnailURL,
+        'has-title': !node.hideTitle,
+      }"
       :style="{
         cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
-      @mouseleave="$emit('mouseleave')"
+      @mouseleave="handleMouseleave"
     >
       <circle ref="circle" :fill="fill"></circle>
-      <circle
-        v-if="selected || !node.accessible"
-        :r="radius"
-        :fill="overlayFill"
-        class="node-overlay"
-      ></circle>
+      <transition name="fade">
+        <circle
+          v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
+          :r="radius"
+          :fill="overlayFill"
+          class="node-overlay"
+          :class="selected ? 'selected' : !node.accessible ? 'locked' : 'normal'"
+        ></circle>
+      </transition>
       <progress-bar
         v-if="
           node.nodeType !== 'grandchild' &&
@@ -48,22 +55,25 @@
         :reviewStatus="node.reviewStatus"
       ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
-        <foreignObject
-          v-if="!node.hideTitle"
-          :data-qa="`node-title-${node.id}`"
-          class="metaWrapper"
-          :width="(140 * 2 * 5) / 6"
-          :height="(140 * 2 * 5) / 6"
-          :x="-(140 * 5) / 6"
-          :y="-(140 * 5) / 6"
-        >
-          <div class="meta">
-            <p class="title">{{ node.title }}</p>
-            <p v-if="node.mediaDuration" class="timecode">
-              {{ formatDuration() }}
-            </p>
-          </div>
-        </foreignObject>
+        <transition name="fade">
+          <foreignObject
+            v-if="!node.hideTitle"
+            v-show="!isHovered || !thumbnailURL || selected || !node.accessible"
+            :data-qa="`node-title-${node.id}`"
+            class="metaWrapper"
+            :width="(140 * 2 * 5) / 6"
+            :height="(140 * 2 * 5) / 6"
+            :x="-(140 * 5) / 6"
+            :y="-(140 * 5) / 6"
+          >
+            <div class="meta">
+              <p class="title">{{ node.title }}</p>
+              <p v-if="node.mediaDuration" class="timecode">
+                {{ formatDuration() }}
+              </p>
+            </div>
+          </foreignObject>
+        </transition>
         <g v-show="!transitioning">
           <node-button
             v-if="!node.hideMedia"
@@ -96,11 +106,7 @@
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
             preserveAspectRatio="xMidYMid slice"
-            :href="
-              node.lockedImageURL && !node.accessible
-                ? node.lockedImageURL
-                : node.imageURL
-            "
+            :href="thumbnailURL"
             x="0"
             y="0"
             :width="radius * 2"
@@ -147,6 +153,7 @@ export default {
   data() {
     return {
       transitioning: false,
+      isHovered: false,
     }
   },
   computed: {
@@ -210,37 +217,33 @@ export default {
       const showImages = this.settings.hasOwnProperty("renderImages")
         ? this.settings.renderImages
         : true
-      if (
-        !this.node.imageURL &&
-        this.node.lockedImageURL &&
-        this.node.nodeType !== "grandchild" &&
-        showImages &&
-        this.node.accessible
-      ) {
+
+      if (this.node.nodeType !== "grandchild") {
+        if (showImages && this.thumbnailURL) {
+          return `url(#node-image-${this.node.id})`
+        } else if (!this.node.accessible) {
+          return "#8a8a8c"
+        } else {
+          return "#8396a1"
+        }
+      } else if (this.selected) {
+        return "#11a6d8"
+      } else {
         return "#8396a1"
       }
-      if (
-        (this.node.imageURL || this.node.lockedImageURL) &&
-        this.node.nodeType !== "grandchild" &&
-        showImages
-      ) {
-        return `url(#node-image-${this.node.id})`
-      }
-      if (this.selected) {
-        return "#11a6d8"
-      }
-      if (!this.node.accessible) {
-        return "#8a8a8c"
-      }
-      return "#8396a1"
     },
     overlayFill() {
       if (this.selected) {
-        return "#11a6d8"
+        return "#11a6d88a"
       } else if (!this.node.accessible) {
-        return "#8a8a8c"
+        return "#8a8a8cb3"
       }
-      return "transparent"
+      return this.thumbnailURL ? "#33333366" : "transparent"
+    },
+    thumbnailURL() {
+      return !this.node.accessible && this.node.lockedImageURL
+        ? this.node.lockedImageURL
+        : this.node.imageURL
     },
     selected() {
       return this.selection.includes(this.node.id)
@@ -376,12 +379,18 @@ export default {
       }
     },
     handleMouseover() {
+      this.isHovered = true
+
       // Move node to end of svg document so it appears on top
       const node = this.$refs.node
       node.parentNode.appendChild(node)
 
       bus.$emit("mouseover", this.node.id)
       this.$emit("mouseover")
+    },
+    handleMouseleave() {
+      this.isHovered = false
+      this.$emit("mouseleave")
     },
     handleClick(evt) {
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
@@ -446,7 +455,10 @@ export default {
   }
 }
 
-.node-overlay {
-  opacity: 0.75;
+.meta {
+  .title {
+    text-shadow: 0 0 5px #000;
+    font-weight: bold;
+  }
 }
 </style>
