@@ -124,15 +124,15 @@
             description="This will convert all existing thumbnails into optimized thumbnails"
           >
             <b-button
-              id="export-button"
+              id="optimize-thumbnails-button"
               block
               variant="light"
-              :class="isExporting ? 'disabled' : ''"
-              :disabled="isExporting"
-              @click="exportTapestry"
+              :class="isOptimizing ? 'disabled' : ''"
+              :disabled="isOptimizing"
+              @click="optimizeThumbnails"
             >
-              <b-spinner v-if="isExporting" small></b-spinner>
-              <div :style="isExporting ? 'opacity: 50%;' : ''">
+              <b-spinner v-if="isOptimizing" small></b-spinner>
+              <div :style="isOptimizing ? 'opacity: 50%;' : ''">
                 Optimize All Thumbnails
               </div>
             </b-button>
@@ -234,11 +234,12 @@ export default {
       isExporting: false,
       renderImages: true,
       hasExported: false,
+      isOptimizing: false,
     }
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId"]),
+    ...mapState(["settings", "rootId", "nodes"]),
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -323,6 +324,13 @@ export default {
       this.isExporting = false
       this.hasExported = true
     },
+    optimizeThumbnails() {
+      console.log("should call client here")
+      for (let node of Object.values(this.nodes)) {
+        console.log(node)
+        console.log(node.imageURL)
+      }
+    },
   },
 }
 </script>
@@ -347,6 +355,19 @@ export default {
 }
 
 #export-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+  }
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+#optimize-thumbnails-button {
   position: relative;
   > span {
     position: absolute;
