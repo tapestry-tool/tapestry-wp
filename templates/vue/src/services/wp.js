@@ -27,3 +27,6 @@ export const isCurrentUser = id => parseInt(id) === wpData.currentUser.ID
 export const isLoggedIn = () => Boolean(wpData.currentUser.ID)
 
 export const canEditTapestry = () => wpData.wpCanEditTapestry === "1"
+
+export const canReview = node =>
+  node.status === "draft" && node.reviewStatus === "submitted" && canEditTapestry()

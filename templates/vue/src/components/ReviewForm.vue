@@ -1,31 +1,11 @@
 <template>
   <div class="review-form">
-    <b-form-group label="Reviewer's Comment">
-      <rich-text-form
-        v-model="comment"
-        data-qa="review-comment"
-        placeholder="Enter a comment"
-        :disabled="disabled"
-      />
-    </b-form-group>
-    <div>
-      <b-button size="sm" variant="light" :disabled="disabled" @click="close">
-        Cancel
-      </b-button>
-      <b-button
-        size="sm"
-        variant="danger"
-        :disabled="disabled"
-        @click="handleReject"
-      >
+    <input type="text" />
+    <div class="review-buttons">
+      <b-button size="sm" variant="danger" @click="handleReject">
         Reject
       </b-button>
-      <b-button
-        size="sm"
-        variant="success"
-        :disabled="disabled"
-        @click="handleAccept"
-      >
+      <b-button size="sm" variant="success" @click="handleAccept">
         Accept and Add
       </b-button>
     </div>
@@ -35,21 +15,13 @@
 <script>
 import moment from "moment-timezone"
 import { getCurrentUser } from "@/services/wp"
-import RichTextForm from "./content-form/RichTextForm"
+//import RichTextForm from "./node-modal/content-form/RichTextForm"
 
 export default {
-  components: {
-    RichTextForm,
-  },
   props: {
     node: {
       type: Object,
       required: true,
-    },
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
   },
   data() {
@@ -92,11 +64,14 @@ export default {
 <style lang="scss" scoped>
 .review-form {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+}
 
-  > div {
-    text-align: right;
+.review-buttons {
+  display: flex;
+
+  button {
+    display: block;
+    flex: 1;
   }
 }
 </style>

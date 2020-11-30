@@ -89,8 +89,9 @@
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
-        <section ref="review" data-name="review">
-          <h1>Review</h1>
+        <section ref="comments" data-name="comments">
+          <h1>Comment Log</h1>
+          <review-form v-if="canReview" :node="node"></review-form>
         </section>
       </div>
     </aside>
@@ -100,15 +101,18 @@
 <script>
 import { mapGetters } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
+import ReviewForm from "@/components/ReviewForm"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
+import * as wp from "@/services/wp"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
 
 export default {
   components: {
+    ReviewForm,
     TapestryIcon,
   },
   computed: {
@@ -137,6 +141,9 @@ export default {
     },
     canEdit() {
       return Helpers.hasPermission(this.node, "edit")
+    },
+    canReview() {
+      return wp.canReview(this.node)
     },
     licenseTypes() {
       return licenseTypes
@@ -373,6 +380,7 @@ export default {
     }
 
     .sidebar-content {
+      text-align: left;
       section {
         margin-bottom: 2em;
         &:last-child {
@@ -382,7 +390,6 @@ export default {
         .content-header {
           margin: 1em 0 0.2em;
           position: relative;
-          text-align: left;
           border-bottom: solid 2px #6b747d;
           padding: 0.2em 0;
         }

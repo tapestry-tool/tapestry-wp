@@ -177,11 +177,7 @@ export default {
       "isAccordionRow",
     ]),
     canReview() {
-      return (
-        this.node.status === "draft" &&
-        this.node.reviewStatus === "submitted" &&
-        wp.canEditTapestry()
-      )
+      return wp.canReview(this.node)
     },
     isLoggedIn() {
       return wp.isLoggedIn()

@@ -96,4 +96,30 @@ describe("Review Nodes", () => {
       cy.contains(/resubmit/i).should("be.visible")
     })
   })
+
+  it("should show a confirmation when rejecting a node without a comment", () => {
+    const node = {
+      title: "For Review",
+      mediaType: "text",
+      typeData: {
+        textContent: "Abcd",
+      },
+      status: "draft",
+      reviewStatus: "submitted",
+    }
+
+    cy.getSelectedNode().then(root => {
+      cy.addNode(root.id, node)
+    })
+
+    cy.login(roles.ADMIN).visitTapestry()
+
+    cy.getNodeByTitle(node.title).then(node => {
+      cy.getByTestId(`review-node-${node.id}`).click()
+      cy.getByTestId("sidebar-content").within(() => {
+        cy.contains(/reject/i).click()
+      })
+      cy.contains(/without a comment/i).should("be.visible")
+    })
+  })
 })
