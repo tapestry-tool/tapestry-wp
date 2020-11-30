@@ -992,26 +992,52 @@ function updateTapestryNodeLockedImageURL($request)
     }
 }
 
-function updateTapestryNodeThumbnail($request)
+// takes a old thumbnail and optimizes it
+function optimizeTapestryNodeThumbnail($request)
 {
-    $nodeMetaId = $request['nodeMetaId'];
-    $thumbnailId = json_decode($request->get_body());
+    $nodePostId = $request['nodePostId'];
+    $url = $request['url'];
 
-    try {
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
+    $temp_file = download_url( $url, 10);
+
+    if ( !is_wp_error( $temp_file ) ) {
+    
+        // Array based on $_FILE as seen in PHP file uploads
+        $file = array(
+            'name'     => basename($url), // ex: wp-header-logo.png
+            'type'     => 'image/png',
+            'tmp_name' => $temp_file,
+            'error'    => 0,
+            'size'     => filesize($temp_file),
+        );
+    
+        $overrides = array(
+            // Tells WordPress to not look for the POST form
+            // fields that would normally be present as
+            // we downloaded the file from a remote server, so there
+            // will be no form fields
+            // Default is true
+            'test_form' => false,
+    
+            // Setting this to false lets WordPress allow empty files, not recommended
+            // Default is true
+            'test_size' => true,
+        );
+    
+        // Move the temporary file into the uploads directory
+        $results = wp_handle_sideload( $file, $overrides );
+    
+        if ( !empty( $results['error'] ) ) {
+            // Insert any error handling here
+        } else {
+    
+            $filename  = $results['file']; // Full path to the file
+            $local_url = $results['url'];  // URL to the file in the uploads dir
+            $type      = $results['type']; // MIME type of the file
+    
+            set_post_thumbnail($nodePostId,);
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-            throw new TapestryError('INVALID_CHILD_NODE');
-        }
-        $nodeMetadata = get_metadata_by_mid('post', $nodeMetaId);
-        $nodePostId = $nodeMetadata->meta_value->post_id;
-        set_post_thumbnail($nodePostId,$thumbnailId);
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    
     }
 }
 
@@ -1361,3 +1387,4 @@ function getTapestryContributors($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
