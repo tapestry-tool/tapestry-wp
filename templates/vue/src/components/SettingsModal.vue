@@ -29,15 +29,7 @@
               @isUploading="isUploading"
             />
           </b-form-group>
-          <b-form-group
-            label="Users can move nodes"
-            description="If enabled, you allow users to move nodes to different positions on the screen.
-              However, changes made by the users won't be saved."
-          >
-            <b-form-checkbox v-model="nodeDraggable" switch>
-              {{ nodeDraggable ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
+
           <b-form-group
             label="Show me all nodes by default"
             description="If enabled, editors of this tapestry would be able to view all nodes even if they have
@@ -346,7 +338,6 @@ export default {
   data() {
     return {
       backgroundUrl: "",
-      nodeDraggable: true,
       userId: "",
       showAccess: true,
       defaultPermissions,
@@ -423,7 +414,6 @@ export default {
       const {
         backgroundUrl = "",
         autoLayout = false,
-        nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
         spaceshipBackgroundUrl = "",
@@ -436,7 +426,6 @@ export default {
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
-      this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
@@ -451,7 +440,6 @@ export default {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
-        nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
