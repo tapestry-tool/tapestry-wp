@@ -420,7 +420,7 @@ class Tapestry implements ITapestry
         $settings->status = $post->post_status;
         $settings->backgroundUrl = '';
         $settings->autoLayout = false;
-        $settings->nodeDraggable = true;
+
         $settings->showAccess = true;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
