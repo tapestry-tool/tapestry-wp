@@ -169,12 +169,12 @@ class TapestryHelpers
             $userId = wp_get_current_user()->ID;
         }
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
-        $roles = new TapestryUserRoles($userId);
+        $user = new TapestryUser($userId);
 
-        if ($roles->canEdit($tapestryPostId) && $superuser_override) {
+        if ($user->canEdit($tapestryPostId) && $superuser_override) {
             return true;
         }
-        elseif ($roles->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
