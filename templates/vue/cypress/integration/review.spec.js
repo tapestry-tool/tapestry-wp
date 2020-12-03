@@ -21,7 +21,7 @@ describe("Review Nodes", () => {
     })
 
     cy.getNodeByTitle(node.title).then(node => {
-      cy.getNodeById(node.id).click()
+      cy.getNodeById(node.id).should("exist")
       cy.getByTestId(`edit-node-${node.id}`).should("not.exist")
     })
 
