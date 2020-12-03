@@ -1002,78 +1002,75 @@ function updateTapestryNodeLockedImageURL($request)
 // takes a old thumbnail and optimizes it
 function optimizeTapestryNodeThumbnail($request)
 {
-    $nodePostId = $request['nodePostId'];
-    $imageurl = $request['url'];
-    // if ( ! function_exists( 'download_url' ) ) {
-    //     require_once ABSPATH . 'wp-admin/includes/file.php';
-    // }
-    // $temp_file = download_url( $url, 3);
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
 
-    // if ( !is_wp_error( $temp_file ) ) {
-    
-    //     // Array based on $_FILE as seen in PHP file uploads
-    //     $file = array(
-    //         'name'     => basename($url), // ex: wp-header-logo.png
-    //         'type'     => 'image/png',
-    //         'tmp_name' => $temp_file,
-    //         'error'    => 0,
-    //         'size'     => filesize($temp_file),
-    //     );
-    
-    //     $overrides = array(
-    //         // Tells WordPress to not look for the POST form
-    //         // fields that would normally be present as
-    //         // we downloaded the file from a remote server, so there
-    //         // will be no form fields
-    //         // Default is true
-    //         'test_form' => false,
-    
-    //         // Setting this to false lets WordPress allow empty files, not recommended
-    //         // Default is true
-    //         'test_size' => true,
-    //     );
-    
-    //     // Move the temporary file into the uploads directory
-    //     $results = wp_handle_sideload( $file, $overrides );
-    
-    //     if ( !empty( $results['error'] ) ) {
-    //         throw new WP_Error("Errored in thumbnail optimization update");
-    //     } else {
-    //         $filename  = $results['file']; // Full path to the file
-    //         $local_url = $results['url'];  // URL to the file in the uploads dir
-    //         $attachment_id = attachment_url_to_postid( $local_url );
-    //         // set_post_thumbnail($nodePostId,);
-    //     }
-    
-    // }
-    include_once( ABSPATH . 'wp-admin/includes/image.php' );
+    // TODO: JSON validations should happen here
+    // make sure the permissions body exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
 
-$imagetype = end(explode('/', getimagesize($imageurl)['mime']));
-$uniq_name = date('dmY').''.(int) microtime(true); 
-$filename = $uniq_name.'.'.$imagetype;
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
 
-$uploaddir = wp_upload_dir();
-$uploadfile = $uploaddir['path'] . '/' . $filename;
-$contents= file_get_contents($imageurl);
-$savefile = fopen($uploadfile, 'w');
-fwrite($savefile, $contents);
-fclose($savefile);
+        $nodePostId = $request['nodePostId'];
+        $imageurl = $request['url'];
+    
+        // is this already an image in our gallery?
+        $wpGalleryId = attachment_url_to_postid( $imageurl);
+        if ($wpGalleryId) {
+            $node->set((object) ['thumbnailFileId' => $wpGalleryId]);
+            set_post_thumbnail($wpGalleryId,$nodePostId);
+            return $node;
+        } 
 
-$wp_filetype = wp_check_filetype(basename($filename), null );
-$attachment = array(
-    'post_mime_type' => $wp_filetype['type'],
-    'post_title' => $filename,
-    'post_content' => '',
-    'post_status' => 'inherit'
-);
 
-$attach_id = wp_insert_attachment( $attachment, $uploadfile );
-$imagenew = get_post( $attach_id );
-$fullsizepath = get_attached_file( $imagenew->ID );
-$attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
-wp_update_attachment_metadata( $attach_id, $attach_data ); 
+        // not an image in our gallery. let's upload it.
+        include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-return $attach_id;
+        $imagetype = end(explode('/', getimagesize($imageurl)['mime']));
+        $uniq_name = date('dmY').''.(int) microtime(true); 
+        $filename = $uniq_name.'.'.$imagetype;
+
+        $uploaddir = wp_upload_dir();
+        $uploadfile = $uploaddir['path'] . '/' . $filename;
+        $contents= file_get_contents($imageurl);
+        $savefile = fopen($uploadfile, 'w');
+        fwrite($savefile, $contents);
+        fclose($savefile);
+
+        $wp_filetype = wp_check_filetype(basename($filename), null );
+        $attachment = array(
+            'post_mime_type' => $wp_filetype['type'],
+            'post_title' => $filename,
+            'post_content' => '',
+            'post_status' => 'inherit'
+        );
+
+        $attach_id = wp_insert_attachment( $attachment, $uploadfile );
+        $imagenew = get_post( $attach_id );
+        $fullsizepath = get_attached_file( $imagenew->ID );
+        $attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
+        wp_update_attachment_metadata( $attach_id, $attach_data ); 
+
+        // return $attach_id;
+        $node->set((object) ['thumbnailFileId' => $attach_id]);
+        set_post_thumbnail($attach_id,$nodePostId);
+        return $node;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }    
 }
 
 /**

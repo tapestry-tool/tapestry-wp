@@ -188,6 +188,7 @@ import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -325,10 +326,10 @@ export default {
       this.hasExported = true
     },
     optimizeThumbnails() {
-      console.log("should call client here")
       for (let node of Object.values(this.nodes)) {
-        console.log(node)
+        console.log(node.id)
         console.log(node.imageURL)
+        client.optimizeNodeThumbnail(node)
       }
     },
   },
