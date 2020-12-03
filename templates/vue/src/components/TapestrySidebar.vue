@@ -89,11 +89,7 @@
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
-        <section ref="review" data-name="review">
-          <h2 class="content-header">Review</h2>
-          <review-log :events="events"></review-log>
-          <review-form class="comment-form" :node="node"></review-form>
-        </section>
+        <node-review ref="review" :node="node"></node-review>
       </div>
     </aside>
   </div>
@@ -101,9 +97,8 @@
 
 <script>
 import { mapGetters } from "vuex"
-import ReviewLog from "@/components/ReviewLog"
 import TapestryIcon from "@/components/TapestryIcon"
-import ReviewForm from "@/components/ReviewForm"
+import NodeReview from "@/components/NodeReview"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
@@ -112,27 +107,9 @@ import * as wp from "@/services/wp"
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
 
-const mockEvents = [
-  {
-    timestamp: "Dec 1 2020",
-    type: "StatusChange",
-    from: "submitted",
-    to: "rejected",
-    author: wp.getCurrentUser(),
-  },
-  {
-    timestamp: "Dec 2 2020",
-    type: "Comment",
-    comment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
-    author: wp.getCurrentUser(),
-  },
-]
-
 export default {
   components: {
-    ReviewLog,
-    ReviewForm,
+    NodeReview,
     TapestryIcon,
   },
   computed: {
@@ -174,9 +151,6 @@ export default {
         ...licenses[this.node.license.type],
       }
     },
-    events() {
-      return mockEvents
-    },
   },
   watch: {
     active(section) {
@@ -207,7 +181,10 @@ export default {
     scrollToRef(refName) {
       if (refName) {
         this.$nextTick(() => {
-          const el = this.$refs[refName]
+          let el = this.$refs[refName]
+          if (el.hasOwnProperty("$el")) {
+            el = el.$el
+          }
           this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
         })
       }
@@ -440,12 +417,5 @@ export default {
       }
     }
   }
-}
-
-.comment-form {
-  background: var(--gray);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  margin: 0 -0.5rem;
 }
 </style>

@@ -18,16 +18,9 @@
 </template>
 
 <script>
-import moment from "moment-timezone"
-import { getCurrentUser } from "@/services/wp"
+import * as Comment from "@/utils/comments"
 
 export default {
-  props: {
-    node: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       comment: "",
@@ -42,26 +35,37 @@ export default {
         )
       }
       if (confirm) {
-        this.node.reviewStatus = "reject"
-        this.handleSubmit()
+        const updates = {}
+        updates.reviewStatus = "reject"
+        updates.reviewComments = [
+          Comment.createComment(Comment.types.STATUS_CHANGE, {
+            from: "submit",
+            to: "reject",
+          }),
+        ]
+        this.handleSubmit(updates)
       }
     },
     handleAccept() {
-      this.node.status = "publish"
-      this.node.reviewStatus = "accept"
-      this.handleSubmit()
+      const updates = {}
+      updates.status = "publish"
+      updates.reviewStatus = "accept"
+      updates.reviewComments = [
+        Comment.createComment(Comment.types.STATUS_CHANGE, {
+          from: "submit",
+          to: "accept",
+        }),
+      ]
+      this.handleSubmit(updates)
     },
-    handleSubmit() {
-      const { name, email } = getCurrentUser()
+    handleSubmit(updates) {
       if (this.comment.length > 0) {
-        this.node.reviewComments.push({
-          timestamp: moment().toISOString(),
-          comment: this.comment,
-          author_name: name,
-          author_email: email,
-        })
+        updates.reviewComments.push(
+          Comment.createComment(Comment.types.COMMENT, { comment: this.comment })
+        )
       }
-      this.$emit("submit")
+      this.comment = ""
+      this.$emit("submit", updates)
     },
   },
 }

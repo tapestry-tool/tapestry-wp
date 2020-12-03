@@ -8,9 +8,9 @@
 
 <script>
 /**
- * The EventLog component displays a list of events "Asana-style". It receives an
- * array of events as props, where each event has, at minimum, the following
- * three properties:
+ * The ReviewLog component displays a list of review events "Asana-style". It
+ * receives an array of events as props, where each event has, at minimum, the
+ * following three properties:
  *
  * - `timestamp` the time the event was created in ISO8601 format
  * - `author` an object representing the author of the event
@@ -22,6 +22,8 @@ import moment from "moment"
 
 import CommentEvent from "./review-log/CommentEvent"
 import StatusChangeEvent from "./review-log/StatusChangeEvent"
+
+import * as Comment from "@/utils/comments"
 
 export default {
   components: {
@@ -37,8 +39,8 @@ export default {
   computed: {
     eventWithComponents() {
       const eventComponents = {
-        Comment: CommentEvent,
-        StatusChange: StatusChangeEvent,
+        [Comment.types.COMMENT]: CommentEvent,
+        [Comment.types.STATUS_CHANGE]: StatusChangeEvent,
       }
       return this.events.map(event => ({
         ...event,

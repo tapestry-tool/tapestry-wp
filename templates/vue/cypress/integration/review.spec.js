@@ -97,7 +97,7 @@ describe("Review Nodes", () => {
     })
   })
 
-  it("should show a confirmation when rejecting a node without a comment", () => {
+  it.only("should only show review form to review participants", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
@@ -112,14 +112,9 @@ describe("Review Nodes", () => {
       cy.addNode(root.id, node)
     })
 
-    cy.login(roles.ADMIN).visitTapestry()
-
-    cy.getNodeByTitle(node.title).then(node => {
-      cy.getByTestId(`review-node-${node.id}`).click()
-      cy.getByTestId("sidebar-content").within(() => {
-        cy.contains(/reject/i).click()
-      })
-      cy.contains(/without a comment/i).should("be.visible")
+    cy.findByLabelText("open sidebar").click()
+    cy.sidebar().within(() => {
+      cy.findByText(/pending review/i).should("be.visible")
     })
   })
 })
