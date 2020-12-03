@@ -1,6 +1,11 @@
 <template>
-  <div class="review-form">
-    <input type="text" />
+  <div>
+    <textarea
+      v-model="comment"
+      aria-label="comment"
+      placeholder="Leave a comment..."
+      @keydown.stop
+    />
     <div class="review-buttons">
       <b-button size="sm" variant="danger" @click="handleReject">
         Reject
@@ -15,7 +20,6 @@
 <script>
 import moment from "moment-timezone"
 import { getCurrentUser } from "@/services/wp"
-//import RichTextForm from "./node-modal/content-form/RichTextForm"
 
 export default {
   props: {
@@ -29,13 +33,18 @@ export default {
       comment: "",
     }
   },
-  mounted() {
-    moment.tz.setDefault("America/Vancouver")
-  },
   methods: {
-    handleReject() {
-      this.node.reviewStatus = "reject"
-      this.handleSubmit()
+    async handleReject() {
+      let confirm = true
+      if (this.comment.length === 0) {
+        confirm = await this.$bvModal.msgBoxConfirm(
+          "Are you sure you want to reject this node without a comment?"
+        )
+      }
+      if (confirm) {
+        this.node.reviewStatus = "reject"
+        this.handleSubmit()
+      }
     },
     handleAccept() {
       this.node.status = "publish"
@@ -54,16 +63,16 @@ export default {
       }
       this.$emit("submit")
     },
-    close() {
-      this.$emit("close")
-    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.review-form {
+textarea {
+  display: block;
+  border-radius: 0.25rem;
   width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .review-buttons {
@@ -72,6 +81,14 @@ export default {
   button {
     display: block;
     flex: 1;
+
+    &:first-child {
+      margin-right: 0.25rem;
+    }
+
+    &:last-child {
+      margin-left: 0.25rem;
+    }
   }
 }
 </style>

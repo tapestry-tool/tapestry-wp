@@ -89,9 +89,10 @@
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
-        <section ref="comments" data-name="comments">
-          <h1>Comment Log</h1>
-          <review-form v-if="canReview" :node="node"></review-form>
+        <section ref="review" data-name="review">
+          <h2 class="content-header">Review</h2>
+          <review-log :events="events"></review-log>
+          <review-form class="comment-form" :node="node"></review-form>
         </section>
       </div>
     </aside>
@@ -100,6 +101,7 @@
 
 <script>
 import { mapGetters } from "vuex"
+import ReviewLog from "@/components/ReviewLog"
 import TapestryIcon from "@/components/TapestryIcon"
 import ReviewForm from "@/components/ReviewForm"
 import { names } from "@/config/routes"
@@ -110,8 +112,26 @@ import * as wp from "@/services/wp"
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
 
+const mockEvents = [
+  {
+    timestamp: "Dec 1 2020",
+    type: "StatusChange",
+    from: "submitted",
+    to: "rejected",
+    author: wp.getCurrentUser(),
+  },
+  {
+    timestamp: "Dec 2 2020",
+    type: "Comment",
+    comment:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+    author: wp.getCurrentUser(),
+  },
+]
+
 export default {
   components: {
+    ReviewLog,
     ReviewForm,
     TapestryIcon,
   },
@@ -154,6 +174,9 @@ export default {
         ...licenses[this.node.license.type],
       }
     },
+    events() {
+      return mockEvents
+    },
   },
   watch: {
     active(section) {
@@ -177,7 +200,7 @@ export default {
       const matched = entries
         .filter(entry => entry.intersectionRatio > INTERSECTION_THRESHOLD)
         .map(entry => entry.target.dataset.name)
-      if (!matched.includes(this.active)) {
+      if (!matched.includes(this.active) && matched.length > 0) {
         this.active = matched[0]
       }
     },
@@ -325,10 +348,11 @@ export default {
   }
 
   .sidebar {
+    position: relative;
     background: #5d656c;
     color: white;
     height: 100vh;
-    padding: 2.2rem 1rem;
+    padding: 2.2rem 1.5rem;
     transform: translateY(0);
     transition: all 0.2s ease-out;
     width: 100vw;
@@ -381,6 +405,7 @@ export default {
 
     .sidebar-content {
       text-align: left;
+
       section {
         margin-bottom: 2em;
         &:last-child {
@@ -415,5 +440,12 @@ export default {
       }
     }
   }
+}
+
+.comment-form {
+  background: var(--gray);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin: 0 -0.5rem;
 }
 </style>

@@ -80,6 +80,10 @@ html {
     text-align: center;
     color: #2c3e50;
 
+    li {
+      line-height: initial;
+    }
+
     h1,
     h2,
     h3,
@@ -88,10 +92,6 @@ html {
       &::before {
         display: none;
       }
-    }
-
-    p {
-      padding: 0;
     }
 
     button:focus {
