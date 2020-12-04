@@ -327,9 +327,10 @@ export default {
     },
     optimizeThumbnails() {
       for (let node of Object.values(this.nodes)) {
-        console.log(node.id)
-        console.log(node.imageURL)
-        client.optimizeNodeThumbnail(node)
+        // console.log(node)
+        // console.log(node.imageURL)
+        // console.log(node.thumbnailFileId)
+        client.optimizeNodeThumbnail(node.id, node.imageURL)
       }
     },
   },

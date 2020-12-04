@@ -134,12 +134,12 @@ class TapestryNode implements ITapestryNode
         if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
             $this->thumbnailFileId = $node->thumbnailFileId;
             set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
+            $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'small');
         }
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
             if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
                 $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'small');
-                error_log(json_encode($this->imageURL));
             }
         }
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
@@ -403,6 +403,7 @@ class TapestryNode implements ITapestryNode
     {
         return (object) [
             'id' => $this->nodeMetaId,
+            'postId' => $this->nodePostId,
             'author' => $this->author,
             'type' => $this->type,
             'size' => $this->size,

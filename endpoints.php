@@ -293,7 +293,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'OPTIMIZE_THUMBNAILS' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'optimizeTapestryNodeThumbnail',
@@ -1005,6 +1005,10 @@ function optimizeTapestryNodeThumbnail($request)
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
 
+    $imageURL = $request['imageURL'];
+    if (!$imageURL) return;
+    $imageURL = "http:" . $imageURL;
+    // return $imageURL;
     // TODO: JSON validations should happen here
     // make sure the permissions body exists and not null
     try {
@@ -1023,29 +1027,27 @@ function optimizeTapestryNodeThumbnail($request)
 
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
-
-        $nodePostId = $request['nodePostId'];
-        $imageurl = $request['url'];
-    
+        $nodePostId = $node->get()->postId;
+        // return $nodePostId;
         // is this already an image in our gallery?
-        $wpGalleryId = attachment_url_to_postid( $imageurl);
+        $wpGalleryId = attachment_url_to_postid( $imageURL);
         if ($wpGalleryId) {
             $node->set((object) ['thumbnailFileId' => $wpGalleryId]);
-            set_post_thumbnail($wpGalleryId,$nodePostId);
-            return $node;
+            $node->save();
+            return $node->get()->imageURL;
         } 
 
 
         // not an image in our gallery. let's upload it.
         include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-        $imagetype = end(explode('/', getimagesize($imageurl)['mime']));
+        $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
         $uniq_name = date('dmY').''.(int) microtime(true); 
         $filename = $uniq_name.'.'.$imagetype;
 
         $uploaddir = wp_upload_dir();
         $uploadfile = $uploaddir['path'] . '/' . $filename;
-        $contents= file_get_contents($imageurl);
+        $contents= file_get_contents($imageURL);
         $savefile = fopen($uploadfile, 'w');
         fwrite($savefile, $contents);
         fclose($savefile);
@@ -1064,10 +1066,9 @@ function optimizeTapestryNodeThumbnail($request)
         $attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
         wp_update_attachment_metadata( $attach_id, $attach_data ); 
 
-        // return $attach_id;
         $node->set((object) ['thumbnailFileId' => $attach_id]);
-        set_post_thumbnail($attach_id,$nodePostId);
-        return $node;
+        $node->save();
+        return $node->get()->imageURL;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }    
