@@ -227,7 +227,8 @@ import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { sizes } from "@/utils/constants"
+import * as Comment from "@/utils/comments"
+import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
@@ -558,16 +559,24 @@ export default {
       }
     },
     handlePublish() {
-      this.node.status = "publish"
+      this.node.status = nodeStatus.PUBLISH
       this.handleSubmit()
     },
     handleDraftSubmit() {
-      this.node.status = "draft"
+      this.node.status = nodeStatus.DRAFT
       this.handleSubmit()
     },
     handleSubmitForReview() {
-      this.node.reviewStatus = "submitted"
-      this.node.status = "draft"
+      this.node.reviewStatus = nodeStatus.SUBMIT
+      this.node.status = nodeStatus.DRAFT
+
+      this.node.reviewComments.push(
+        Comment.createComment(Comment.types.STATUS_CHANGE, {
+          from: null,
+          to: nodeStatus.SUBMIT,
+        })
+      )
+
       this.handleSubmit()
     },
     async submitNode() {

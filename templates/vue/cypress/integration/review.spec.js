@@ -21,8 +21,14 @@ describe("Review Nodes", () => {
     })
 
     cy.getNodeByTitle(node.title).then(node => {
-      cy.getNodeById(node.id).click()
+      cy.getNodeById(node.id).click({ force: true })
       cy.getByTestId(`edit-node-${node.id}`).should("not.exist")
+    })
+
+    cy.findByLabelText("open sidebar").click()
+    cy.sidebar().within(() => {
+      // TODO: Change copy
+      cy.findByText(/changed status/i).should("be.visible")
     })
 
     cy.logout().visitTapestry()
@@ -38,16 +44,14 @@ describe("Review Nodes", () => {
         .within(() => {
           cy.findByLabelText("edit node").should("not.exist")
           cy.contains(/accept/i).click()
-          cy.contains(/submitting review/i).should("be.visible")
-          cy.contains(/admin accepted this node/i).should("be.visible")
+          cy.contains(/accept/i).should("be.hidden")
+          // TODO: Change copy
+          cy.contains(/to accept/i).should("be.visible")
         })
     })
 
     cy.logout().visitTapestry()
-    cy.contains(node.title)
-      .should("be.visible")
-      .click()
-    cy.findByLabelText("review node").should("not.exist")
+    cy.contains(node.title).should("exist")
   })
 
   it("should be able to reject a node with a comment", () => {
@@ -74,12 +78,12 @@ describe("Review Nodes", () => {
       cy.getByTestId("sidebar-content")
         .should("be.visible")
         .within(() => {
-          cy.getEditable("review-comment").type(comment)
+          cy.findByRole("textbox", { name: /comment/i }).type(comment)
           cy.contains(/reject/i).click()
-          cy.contains(/submitting review/i).should("be.visible")
-          cy.contains(/review submitted/i).should("be.visible")
+          cy.contains(/reject/i).should("be.hidden")
+          cy.contains(/to reject/i).should("be.visible")
+          cy.contains(comment).should("be.visible")
         })
-
       cy.getNodeById(node.id).should("not.be.visible")
     })
 
@@ -90,31 +94,11 @@ describe("Review Nodes", () => {
     cy.login(roles.SUBSCRIBER).visitTapestry()
     cy.getNodeByTitle(node.title).then(node => {
       cy.getNodeById(node.id).click()
-      cy.findByLabelText("review node").click()
-      cy.contains(/admin rejected this node/i).should("be.visible")
-      cy.contains(comment).should("be.visible")
-      cy.contains(/resubmit/i).should("be.visible")
-    })
-  })
-
-  it.only("should only show review form to review participants", () => {
-    const node = {
-      title: "For Review",
-      mediaType: "text",
-      typeData: {
-        textContent: "Abcd",
-      },
-      status: "draft",
-      reviewStatus: "submitted",
-    }
-
-    cy.getSelectedNode().then(root => {
-      cy.addNode(root.id, node)
-    })
-
-    cy.findByLabelText("open sidebar").click()
-    cy.sidebar().within(() => {
-      cy.findByText(/pending review/i).should("be.visible")
+      cy.findByLabelText("open sidebar").click()
+      cy.sidebar().within(() => {
+        cy.contains(/edit/i).click()
+      })
+      cy.contains(/re-submit/i).should("be.visible")
     })
   })
 })

@@ -240,6 +240,7 @@ export function createDefaultNode({ settings }) {
     references: "",
     unlocked: true,
     accessible: true,
+    reviewComments: [],
   })
 }
 

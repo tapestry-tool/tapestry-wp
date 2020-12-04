@@ -29,4 +29,12 @@ export const licenses = {
   },
 }
 
+export const nodeStatus = {
+  PUBLISH: "publish",
+  DRAFT: "draft",
+  SUBMIT: "submitted",
+  REJECT: "reject",
+  ACCEPT: "accept",
+}
+
 export const DEFAULT_DEPTH = 3
