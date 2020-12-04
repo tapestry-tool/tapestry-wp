@@ -52,7 +52,7 @@ describe("Node Authoring", () => {
     cy.getByTestId(`root-node-button`).click()
     cy.contains(/add description/i).click()
     cy.getEditable(`node-description`).type(node.description)
-    cy.submitModal()
+    cy.getByTestId(`submit-node-modal`).click()
 
     cy.contains("Please limit your description").should("not.exist")
   })
