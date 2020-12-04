@@ -126,7 +126,6 @@ class TapestryApi {
    * @return  {Object}
    */
   async updateNode(nodeMetaId, node) {
-    // deal with thumbnailid here
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
     const response = await axios.put(url, node)
     return response
@@ -140,7 +139,6 @@ class TapestryApi {
   async optimizeNodeThumbnail(id, imageURL) {
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/optimize_thumbnails`
     let response = await axios.post(url, { imageURL: imageURL })
-    console.log(response.data)
     return response
   }
 

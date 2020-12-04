@@ -513,7 +513,6 @@ export default {
       this.loading = false
     },
     async submitNode() {
-      console.log(this.node.thumbnailFileId)
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
