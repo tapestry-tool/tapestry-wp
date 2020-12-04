@@ -325,10 +325,13 @@ export default {
       this.isExporting = false
       this.hasExported = true
     },
-    optimizeThumbnails() {
+    async optimizeThumbnails() {
+      this.isOptimizing = true
+      let promises = []
       for (let node of Object.values(this.nodes)) {
-        client.optimizeNodeThumbnail(node.id, node.imageURL)
+        promises.push(client.optimizeNodeThumbnail(node.id, node.imageURL))
       }
+      await Promise.all(promises).then(() => (this.isOptimizing = false))
     },
   },
 }
