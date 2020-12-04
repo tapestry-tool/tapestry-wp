@@ -31,6 +31,7 @@
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
+              :maxDescriptionLength="maxDescriptionLength"
             />
           </b-tab>
           <b-tab

@@ -104,6 +104,9 @@
       </div>
     </editor-menu-bar>
     <editor-content class="editor__content" :editor="editor" />
+    <span v-if="maxLength" class="editor__char_count">
+      {{ value.length }}/{{ maxLength }}
+    </span>
   </div>
 </template>
 
@@ -146,6 +149,10 @@ export default {
     placeholder: {
       type: String,
       required: true,
+    },
+    maxLength: {
+      type: Number,
+      default: null,
     },
   },
   data() {
@@ -360,4 +367,9 @@ h2:before {
   height: 0;
   font-style: italic;
 }
+
+.editor__char_count {
+  float: right;
+}
+
 </style>
