@@ -269,7 +269,7 @@ export default {
       loading: false,
       userId: null,
       formErrors: [],
-      maxDescriptionLength: 250,
+      maxDescriptionLength: 2000,
       node: null,
       videoLoaded: false,
       fileUploading: false,
