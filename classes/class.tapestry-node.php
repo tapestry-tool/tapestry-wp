@@ -131,17 +131,22 @@ class TapestryNode implements ITapestryNode
         if (isset($node->typeData) && is_object($node->typeData)) {
             $this->typeData = $node->typeData;
         }
+        if (isset($node->imageURL) && is_string($node->imageURL)) {
+            $this->imageURL = $node->imageURL;
+            // should be this->thumbnailfileId?
+            // if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
+            //     set_post_thumbnail($this->nodePostId, $node->thumbnailFileId);
+            //     $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'thumbnail');
+            // }
+        }
         if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
             $this->thumbnailFileId = $node->thumbnailFileId;
             set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'small');
-        }
-        if (isset($node->imageURL) && is_string($node->imageURL)) {
-            $this->imageURL = $node->imageURL;
-            if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
-                $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'small');
+            if (get_the_post_thumbnail_url($this->nodePostId,'thumbnail')) {
+                $this->imageURL = get_the_post_thumbnail_url($this->nodePostId,'thumbnail');
             }
         }
+
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
             $this->lockedImageURL = $node->lockedImageURL;
         }
