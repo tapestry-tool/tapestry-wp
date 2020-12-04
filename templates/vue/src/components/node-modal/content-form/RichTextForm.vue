@@ -105,7 +105,7 @@
     </editor-menu-bar>
     <editor-content class="editor__content" :editor="editor" />
     <span v-if="maxLength" class="editor__char_count">
-      {{ value.length }}/{{ maxLength }}
+      {{ contentLength }}/{{ maxLength }}
     </span>
   </div>
 </template>
@@ -168,6 +168,18 @@ export default {
       },
       editorChange: false,
     }
+  },
+  computed: {
+    contentLength() {
+      const strippedHtml = this.value.replace(/<[^>]+>/g, "")
+      const decodedStrippedHtml = strippedHtml.replace(/&#(\d+);/g, function(
+        match,
+        dec
+      ) {
+        return String.fromCharCode(dec)
+      })
+      return decodedStrippedHtml.length
+    },
   },
   watch: {
     value(val) {
@@ -371,5 +383,4 @@ h2:before {
 .editor__char_count {
   float: right;
 }
-
 </style>

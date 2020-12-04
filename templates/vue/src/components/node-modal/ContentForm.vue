@@ -88,7 +88,7 @@ export default {
     maxDescriptionLength: {
       type: Number,
       required: false,
-    }
+    },
   },
   data() {
     return {

@@ -28,10 +28,10 @@
           >
             <content-form
               :node="node"
+              :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
-              :maxDescriptionLength="maxDescriptionLength"
             />
           </b-tab>
           <b-tab
