@@ -15,26 +15,28 @@ jest.mock("@/services/TapestryAPI", () => {
 })
 
 describe("NodeReview", () => {
+  const reviewNode = {
+    id: 123,
+    status: nodeStatus.DRAFT,
+    reviewStatus: nodeStatus.SUBMIT,
+    reviewComments: [],
+    author: {
+      id: "2",
+      name: "subscriber",
+      email: "foo@bar.com",
+    },
+  }
+
   const setup = () => {
-    const node = {
-      id: 123,
-      status: nodeStatus.DRAFT,
-      reviewStatus: nodeStatus.SUBMIT,
-      reviewComments: [],
-      author: {
-        id: "1",
-        name: "admin",
-        email: "foo@bar.com",
-      },
-    }
-    client.updateNode.mockResolvedValue({ data: node })
-    return render(NodeReview, { props: { node } })
+    client.updateNode.mockResolvedValue({ data: reviewNode })
+    return render(NodeReview, { props: { node: reviewNode } })
   }
 
   const getUpdatedNode = () => JSON.parse(client.updateNode.mock.calls[0][1])
 
   beforeEach(() => {
     client.updateNode.mockReset()
+    jest.restoreAllMocks()
   })
 
   it("should be able to reject a node with a comment", async () => {
@@ -72,21 +74,24 @@ describe("NodeReview", () => {
     expect(node.reviewComments.length).toEqual(1)
   })
 
-  it("should show confirmation when rejecting a node without a comment", async () => {
-    const screen = setup()
-    await fireEvent.click(screen.getByText("Reject"))
+  it("should be able to submit a comment as the submitter", async () => {
+    wp.canEditTapestry.mockReturnValue(false)
+    wp.getCurrentUser.mockReturnValue({ ...reviewNode.author })
 
-    screen.getByText(/reject this node without a comment/i)
-    await fireEvent.click(screen.getByText(/ok/i))
+    const screen = setup()
+    expect(screen.queryByText(/accept/i)).toBeNull()
+
+    const comment = "Pls look at my node"
+    userEvent.type(screen.getByRole("textbox", { name: "comment" }), comment)
+    await fireEvent.click(screen.getByText(/submit/i))
 
     const node = getUpdatedNode()
-    expect(node.reviewStatus).toEqual("reject")
-    expect(node.reviewComments.length).toEqual(1)
+    expect(node.reviewComments[0].comment).toEqual(comment)
   })
 
   it("should be hidden for non-participants", async () => {
-    wp.canEditTapestry.mockReturnValueOnce(false)
-    wp.getCurrentUser.mockReturnValueOnce({
+    wp.canEditTapestry.mockReturnValue(false)
+    wp.getCurrentUser.mockReturnValue({
       id: "3",
       name: "not-the-author",
       email: "bar@foo.com",

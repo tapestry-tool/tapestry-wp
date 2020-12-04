@@ -1,9 +1,9 @@
 <template>
-  <section v-if="isReviewParticipant" data-name="review">
+  <section v-if="visible" data-name="review">
     <h2 class="content-header">Review</h2>
     <b-overlay class="loading" bg-color="#5d656c" :show="loading">
       <review-log :events="events" :aria-hidden="loading"></review-log>
-      <div class="comment-form" :aria-hidden="loading">
+      <div v-if="reviewable" class="comment-form" :aria-hidden="loading">
         <textarea
           v-model="comment"
           aria-label="comment"
@@ -12,10 +12,20 @@
         />
         <review-buttons
           v-if="canReview"
+          class="review-buttons"
           :aria-hidden="loading"
           @accept="submitReview"
           @reject="handleReject"
         ></review-buttons>
+        <b-button
+          v-else
+          class="submit-button"
+          variant="info"
+          :aria-hidden="loading"
+          @click="submitReview({ reviewComments: [] })"
+        >
+          Submit
+        </b-button>
       </div>
     </b-overlay>
   </section>
@@ -23,9 +33,10 @@
 
 <script>
 import { mapActions } from "vuex"
-import * as wp from "@/services/wp"
+
 import { nodeStatus } from "@/utils/constants"
 import * as Comment from "@/utils/comments"
+import * as wp from "@/services/wp"
 
 import ReviewLog from "./node-review/ReviewLog"
 import ReviewButtons from "./node-review/ReviewButtons"
@@ -51,15 +62,23 @@ export default {
     events() {
       return this.node.reviewComments
     },
+    visible() {
+      if (!this.isReviewParticipant) {
+        return false
+      }
+      return this.node.status === nodeStatus.DRAFT
+        ? this.node.reviewStatus !== undefined
+        : this.node.reviewStatus === nodeStatus.ACCEPT
+    },
+    reviewable() {
+      return this.node.status === nodeStatus.DRAFT && this.node.reviewStatus
+    },
     canReview() {
-      const reviewable =
-        this.node.status === nodeStatus.DRAFT &&
-        this.node.reviewStatus === nodeStatus.SUBMIT
-      return reviewable && wp.canEditTapestry()
+      return this.reviewable && wp.canEditTapestry()
     },
     isReviewParticipant() {
       const { id } = wp.getCurrentUser()
-      return this.canReview || this.node.author.id == id
+      return wp.canEditTapestry() || this.node.author.id == id
     },
   },
   methods: {
@@ -86,7 +105,9 @@ export default {
         id: this.node.id,
         newNode: {
           ...updates,
-          reviewComments: this.node.reviewComments.concat(updates.reviewComments),
+          reviewComments: this.node.reviewComments.concat(
+            updates.reviewComments || []
+          ),
         },
       })
       this.comment = ""
@@ -101,7 +122,6 @@ textarea {
   display: block;
   border-radius: 0.25rem;
   width: 100%;
-  margin-bottom: 0.5rem;
 }
 
 .comment-form {
@@ -111,8 +131,18 @@ textarea {
   margin: 0 -0.5rem;
 }
 
+.review-buttons {
+  margin-top: 0.5rem;
+}
+
 .loading {
   margin: 0 -0.5rem;
   padding: 0 0.5rem;
+}
+
+.submit-button {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
 }
 </style>
