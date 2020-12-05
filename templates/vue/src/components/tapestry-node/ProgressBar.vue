@@ -4,10 +4,9 @@
       ref="track"
       class="track"
       :stroke-width="width"
-      :stroke="locked || draft ? '#999' : 'currentColor'"
-      :stroke-dasharray="draft ? dasharraySize : 0"
+      :stroke="locked ? '#999' : strokeColor"
     ></circle>
-    <path v-show="!locked && progress > 0 && !draft" ref="path" class="bar"></path>
+    <path v-show="!locked && progress > 0" ref="path" class="bar"></path>
   </g>
 </template>
 
@@ -45,10 +44,10 @@ export default {
       })
     },
     width() {
-      return this.draft ? 5 : 20
+      return 20
     },
-    dasharraySize() {
-      return this.radius / 10
+    strokeColor() {
+      return "#2c3e50"
     },
   },
   watch: {

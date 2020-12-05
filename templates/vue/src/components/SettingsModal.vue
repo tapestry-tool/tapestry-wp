@@ -29,15 +29,7 @@
               @isUploading="isUploading"
             />
           </b-form-group>
-          <b-form-group
-            label="Users can move nodes"
-            description="If enabled, you allow users to move nodes to different positions on the screen.
-              However, changes made by the users won't be saved."
-          >
-            <b-form-checkbox v-model="nodeDraggable" switch>
-              {{ nodeDraggable ? "Enabled" : "Disabled" }}
-            </b-form-checkbox>
-          </b-form-group>
+
           <b-form-group
             label="Show me all nodes by default"
             description="If enabled, editors of this tapestry would be able to view all nodes even if they have
@@ -137,6 +129,65 @@
               </div>
             </b-button>
           </b-form-group>
+          <b-form-group
+            label="Geography map"
+            :description="
+              'Replace Tapestry with a map of Earth with placeholders for each node.' +
+                (renderMap ? ' Set the default visible area below:' : '')
+            "
+          >
+            <b-form-checkbox v-model="renderMap" switch data-qa="map-checkbox">
+              {{ renderMap ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="renderMap">
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  placeholder="90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                  "
+                />
+                <b-form-text>Northern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  placeholder="-180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                  "
+                />
+                <b-form-text>Western Longitudinal Bound</b-form-text>
+              </b-col>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  placeholder="180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                  "
+                />
+                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  placeholder="-90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                  "
+                />
+                <b-form-text>Southern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -171,7 +222,7 @@
         data-qa="submit-button"
         size="sm"
         variant="primary"
-        :disabled="fileUploading"
+        :disabled="fileUploading || !inputsValid"
         @click="updateSettings"
       >
         <b-spinner v-if="fileUploading"></b-spinner>
@@ -225,7 +276,6 @@ export default {
   data() {
     return {
       backgroundUrl: "",
-      nodeDraggable: true,
       userId: "",
       showAccess: true,
       defaultPermissions,
@@ -234,6 +284,8 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      renderMap: false,
+      mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
       isOptimizing: false,
     }
@@ -241,6 +293,31 @@ export default {
   computed: {
     ...mapGetters(["tapestryJson"]),
     ...mapState(["settings", "rootId", "nodes"]),
+    latRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLat, 90) >
+        this.getCoord(this.mapBounds.swLat, -90)
+      )
+    },
+    lngRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLng, 180) >
+        this.getCoord(this.mapBounds.swLng, -180)
+      )
+    },
+    inputsValid() {
+      if (this.renderMap) {
+        return (
+          this.latRangeValid &&
+          this.isValidLat(this.mapBounds.swLat) &&
+          this.isValidLat(this.mapBounds.neLat) &&
+          this.lngRangeValid &&
+          this.isValidLng(this.mapBounds.swLng) &&
+          this.isValidLng(this.mapBounds.neLng)
+        )
+      }
+      return true
+    },
   },
   created() {
     if (this.settings.defaultPermissions) {
@@ -269,32 +346,35 @@ export default {
       const {
         backgroundUrl = "",
         autoLayout = false,
-        nodeDraggable = true,
         defaultPermissions = this.defaultPermissions,
         showAccess = true,
         superuserOverridePermissions = true,
         defaultDepth = 3,
         renderImages = true,
+        renderMap = false,
+        mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
       this.autoLayout = autoLayout
-      this.nodeDraggable = nodeDraggable
       this.defaultPermissions = defaultPermissions
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
+      this.renderMap = renderMap
+      this.mapBounds = mapBounds
     },
     async updateSettings() {
       const settings = Object.assign(this.settings, {
         backgroundUrl: this.backgroundUrl,
         autoLayout: this.autoLayout,
-        nodeDraggable: this.nodeDraggable,
         defaultPermissions: this.defaultPermissions,
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
+        renderMap: this.renderMap,
+        mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
       this.closeModal()
@@ -332,6 +412,15 @@ export default {
         promises.push(client.optimizeNodeThumbnail(node.id, node.imageURL))
       }
       await Promise.all(promises).then(() => (this.isOptimizing = false))
+    },
+    isValidLat(coord) {
+      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
+    },
+    isValidLng(coord) {
+      return this.getCoord(coord, 0) <= 180 && this.getCoord(coord, 0) >= -180
+    },
+    getCoord(coord, coordIfEmpty) {
+      return coord === "" ? coordIfEmpty : coord
     },
   },
 }

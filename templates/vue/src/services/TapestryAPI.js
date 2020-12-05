@@ -104,20 +104,6 @@ class TapestryApi {
   }
 
   /**
-   * Add permissions
-   *
-   * @param   {Number}    nodeMetaId
-   * @param   {Object}    permissions
-   *
-   * @return  {Object}
-   */
-  async updatePermissions(nodeMetaId, permissions) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}/permissions`
-    const response = await axios.put(url, permissions)
-    return response
-  }
-
-  /**
    * Update node
    *
    * @param   {Number}    nodeMetaId

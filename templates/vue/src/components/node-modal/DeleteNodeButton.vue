@@ -3,9 +3,6 @@
     <b-button :disabled="isDisabled" size="sm" variant="danger" @click="removeNode">
       Delete Node
     </b-button>
-    <b-form-invalid-feedback :state="!isDisabled">
-      {{ disabledMessage }}
-    </b-form-invalid-feedback>
   </div>
 </template>
 
@@ -18,6 +15,11 @@ export default {
     nodeId: {
       type: Number,
       required: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -33,7 +35,9 @@ export default {
       return this.nodeId === this.rootId
     },
     isDisabled() {
-      if (this.isRoot) {
+      if (this.disabled) {
+        return true
+      } else if (this.isRoot) {
         return Object.keys(this.nodes).length > 1
       } else {
         return this.getNeighbouringLinks(this.nodeId).length > 1
@@ -47,6 +51,9 @@ export default {
       }
       return null
     },
+  },
+  mounted() {
+    this.$emit("message", this.disabledMessage)
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),

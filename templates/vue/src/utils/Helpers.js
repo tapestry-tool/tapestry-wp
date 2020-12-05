@@ -140,20 +140,40 @@ export default class Helpers {
   }
 
   static hasPermission(node, action) {
-    const user = wp.getCurrentUser()
+    // Check 0: node is null case - this should only apply to creating the root node.
+    if (node === null) {
+      return wp.canEditTapestry()
+    }
 
-    // Check 1: Has edit permissions for Tapestry
+    // Checks related to draft nodes
+    if (node.status === "draft") {
+      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
+        return true
+      } else if (node.author && wp.isCurrentUser(node.author.id)) {
+        // authors cannot edit their submitted draft nodes
+        if (action == "edit" && node.reviewStatus === "submitted") {
+          return false
+        }
+        return true
+      } else {
+        return false
+      }
+    }
+
+    // Check 1: User has edit permissions for Tapestry
     if (wp.canEditTapestry()) {
       return true
     }
 
-    // Check 2: User is the author of the node
-    if (node.author && user.id == parseInt(node.author.id)) {
-      return true
+    // Check 2: User is the author of the node (unless node was submitted, then accepted)
+    if (node.author && wp.isCurrentUser(node.author.id)) {
+      if (node.reviewStatus !== "accept") {
+        return true
+      }
     }
 
     // Check 3: User has a role with general edit permissions
-    const { id, roles } = user
+    const { id, roles } = wp.getCurrentUser()
     const allowedRoles = ["administrator", "editor", "author"]
     if (allowedRoles.some(role => roles.includes(role))) {
       return true

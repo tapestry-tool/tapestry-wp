@@ -122,7 +122,6 @@ export default {
                 alert(
                   `${data.target.title} will be added as a row of ${data.source.title}`
                 )
-                data.source.childOrdering.push(data.target.id)
               }
               await this.addLink({ source: data.source.id, target: data.target.id })
             }

@@ -1,9 +1,13 @@
-# get the pid of the running vue application
-app_proc=$(lsof -t -i:8080)
+# get processes running on the dev server port
+proc=$(lsof -t -i:8080)
 
-# kill the process
-if [ -z "$app_proc" ]; then
-    echo "Application not running! No action taken"
-else
-    kill "$app_proc"
-fi
+# kill any instances of node
+while dat= read -r pid; do
+    name=$(ps -p $pid -o comm=)
+    if [[ "$name" == "node" ]]; then
+        echo "killing $name"
+        kill $pid
+    else
+        echo "skipping $name"
+    fi
+done <<< "$proc"

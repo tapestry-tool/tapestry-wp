@@ -160,18 +160,24 @@ class TapestryHelpers
     {
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
+       
+        $tapestry = new Tapestry($tapestryPostId);
+        $node = $tapestry->getNode($nodeMetaId);
+
         $userId = $_userId;
         if (is_null($userId)) {
             $userId = wp_get_current_user()->ID;
         }
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
-        $roles = new TapestryUserRoles($userId);
+        $user = new TapestryUser($userId);
 
-        if (($roles->canEdit($tapestryPostId) && $superuser_override) || $roles->isAuthorOfThePost($nodePostId)) {
+        if ($user->canEdit($tapestryPostId) && $superuser_override) {
+            return true;
+        }
+        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
-
             if (
                 property_exists($nodePermissions, 'user-'.$userId) &&
                 in_array($options[$action], $nodePermissions->{'user-'.$userId})

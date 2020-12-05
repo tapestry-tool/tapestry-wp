@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom"
+import { configure } from "@testing-library/vue"
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueYouTubeEmbed from "vue-youtube-embed"
@@ -13,3 +14,7 @@ Vue.use(VueYouTubeEmbed)
 Vue.use(BootstrapVue)
 
 jest.mock("@/services/wp")
+
+configure({
+  testIdAttribute: "data-qa",
+})

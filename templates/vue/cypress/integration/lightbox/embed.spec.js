@@ -10,6 +10,16 @@ describe("External link", () => {
       url:
         "https://levelup.gitconnected.com/5-javascript-tricks-that-are-good-to-know-78045dea6678",
     }
+
+    cy.server()
+
+    // Stub out external API call
+    cy.route(/api.linkpreview.net/, {
+      title: newNode.title,
+      image: "",
+      description: "hello world",
+    })
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("url-embed")
@@ -23,13 +33,7 @@ describe("External link", () => {
     })
   })
 
-  /**
-   * [CI FAIL] indicates that the test fails in Tapestry's CI environment. These
-   * tests are failing because of a Docker-WordPress permissions issue. See the
-   * following Asana task for details:
-   *  - https://app.asana.com/0/1126491658233864/1198968596220741
-   */
-  it.skip("[CI FAIL] should be able to add an external link using the file upload", () => {
+  it("should be able to add an external link using the file upload", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.changeMediaType("url-embed")
