@@ -3,12 +3,14 @@
     <h6 class="mb-3 text-muted">Planet View Icon</h6>
     <b-form-group label="Not earned">
       <file-upload
+        input-test-id="tyde-planet-not-earned-icon"
         v-model="node.typeData.planetViewNotEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />
     </b-form-group>
     <b-form-group label="Earned">
       <file-upload
+        input-test-id="tyde-planet-earned-icon"
         v-model="node.typeData.planetViewEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />

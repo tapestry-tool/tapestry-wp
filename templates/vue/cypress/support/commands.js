@@ -194,3 +194,7 @@ Cypress.Commands.add("getByTestId", (testId, ...args) =>
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
 )
+
+Cypress.Commands.add("getBySrc", (srcURL, ...args) =>
+  cy.get(`[src="${srcURL}"]`, ...args)
+)
