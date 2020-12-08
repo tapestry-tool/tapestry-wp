@@ -374,6 +374,8 @@ class TapestryNode implements ITapestryNode
             array_push($this->reviewComments, $comment);
         }
 
+        $this->save();
+
         return (object) [
             'status' => $this->status,
             'reviewStatus' => $this->reviewStatus,

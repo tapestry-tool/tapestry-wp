@@ -84,6 +84,7 @@ describe("Review Nodes", () => {
           cy.contains(/reject/i).should("be.hidden")
           cy.contains(/rejected this node/i).should("be.visible")
           cy.contains(comment).should("be.visible")
+          cy.findByRole("textbox", { name: /comment/i }).should("not.be.visible")
         })
       cy.getNodeById(node.id).should("not.be.visible")
     })

@@ -28,12 +28,12 @@ describe("NodeReview", () => {
     },
   }
 
-  const setup = () => {
+  const setup = (overrides = {}) => {
     const { status, reviewStatus, reviewComments } = reviewNode
     client.reviewNode.mockResolvedValue({
       data: { status, reviewStatus, reviewComments },
     })
-    return render(NodeReview, { props: { node: reviewNode } })
+    return render(NodeReview, { props: { node: { ...reviewNode, ...overrides } } })
   }
 
   const getComments = () => client.reviewNode.mock.calls[0][1]
@@ -102,7 +102,7 @@ describe("NodeReview", () => {
     )
   })
 
-  it("should be hidden for non-participants", async () => {
+  it("should be hidden for non-participants", () => {
     wp.canEditTapestry.mockReturnValue(false)
     wp.getCurrentUser.mockReturnValue({
       id: "3",
@@ -111,5 +111,27 @@ describe("NodeReview", () => {
     })
     const screen = setup()
     expect(screen.queryByText("Review")).toBeNull()
+  })
+
+  it("should only show review log if accepted", () => {
+    wp.canEditTapestry.mockReturnValue(true)
+    const screen = setup({
+      status: nodeStatus.PUBLISH,
+      reviewStatus: nodeStatus.ACCEPT,
+      reviewComments: [
+        Comment.createComment(Comment.types.STATUS_CHANGE, {
+          from: nodeStatus.SUBMIT,
+          to: nodeStatus.ACCEPT,
+        }),
+      ],
+    })
+    expect(screen.queryByRole("textbox", { name: "comment" })).toBeNull()
+    screen.getByText(/accepted this node/i)
+  })
+
+  it("should hide form for reviewers if rejected", () => {
+    wp.canEditTapestry.mockReturnValue(true)
+    const screen = setup({ reviewStatus: nodeStatus.REJECT })
+    expect(screen.queryByRole("textbox", { name: "comment" })).toBeNull()
   })
 })

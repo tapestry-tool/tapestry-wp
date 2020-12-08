@@ -1,9 +1,9 @@
 <template>
-  <section v-if="visible" data-name="review">
+  <section v-if="isReviewer || isAuthor" data-name="review">
     <h2 class="content-header">Review</h2>
     <b-overlay class="loading" bg-color="#5d656c" :show="loading">
       <review-log :events="events" :aria-hidden="loading"></review-log>
-      <div v-if="reviewable" class="comment-form" :aria-hidden="loading">
+      <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
         <textarea
           v-model="comment"
           aria-label="comment"
@@ -11,7 +11,7 @@
           @keydown.stop
         />
         <review-buttons
-          v-if="canReview"
+          v-if="isReviewer"
           class="review-buttons"
           :aria-hidden="loading"
           @accept="submitReview"
@@ -62,23 +62,34 @@ export default {
     events() {
       return this.node.reviewComments
     },
-    visible() {
-      if (!this.isReviewParticipant) {
-        return false
+    /**
+     * Whether the node is currently in the review process. The review process
+     * starts when a node gets submitted for review, and stops when it is accepted.
+     */
+    inReviewProcess() {
+      return (
+        this.node.status === nodeStatus.DRAFT && this.node.reviewStatus !== undefined
+      )
+    },
+    /**
+     * Whether the review form is visible. For authors, the form is visible as long
+     * as the node is in the review process. For reviewers, the form is only visible
+     * if the node is submitted for review (i.e. it's not rejected).
+     */
+    isReviewFormVisible() {
+      if (this.isReviewer) {
+        return this.node.reviewStatus === nodeStatus.SUBMIT
       }
-      return this.node.status === nodeStatus.DRAFT
-        ? this.node.reviewStatus !== undefined
-        : this.node.reviewStatus === nodeStatus.ACCEPT
+      return this.inReviewProcess
     },
-    reviewable() {
-      return this.node.status === nodeStatus.DRAFT && this.node.reviewStatus
+    /**
+     * A reviewer is anyone who has edit access to the Tapestry.
+     */
+    isReviewer() {
+      return wp.canEditTapestry()
     },
-    canReview() {
-      return this.reviewable && wp.canEditTapestry()
-    },
-    isReviewParticipant() {
-      const { id } = wp.getCurrentUser()
-      return wp.canEditTapestry() || this.node.author.id == id
+    isAuthor() {
+      return this.node.author.id == wp.getCurrentUser().id
     },
   },
   methods: {
