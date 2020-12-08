@@ -89,7 +89,7 @@
             <add-child-button
               v-if="!isSubAccordionRow"
               :node="node"
-              :x="hasPermission('edit') ? -35 : 0"
+              :x="-35"
               :y="radius"
             ></add-child-button>
             <node-button
