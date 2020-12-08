@@ -89,7 +89,7 @@ export default {
       return wp.canEditTapestry()
     },
     isAuthor() {
-      return this.node.author.id == wp.getCurrentUser().id
+      return wp.isCurrentUser(this.node.author.id)
     },
   },
   methods: {

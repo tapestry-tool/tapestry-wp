@@ -102,7 +102,6 @@ import NodeReview from "@/components/NodeReview"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
-import * as wp from "@/services/wp"
 
 const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
@@ -138,9 +137,6 @@ export default {
     },
     canEdit() {
       return Helpers.hasPermission(this.node, "edit")
-    },
-    canReview() {
-      return wp.canReview(this.node)
     },
     licenseTypes() {
       return licenseTypes

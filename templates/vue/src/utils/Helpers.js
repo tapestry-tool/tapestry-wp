@@ -1,4 +1,5 @@
 import * as wp from "@/services/wp"
+import { nodeStatus } from "./constants"
 
 /**
  * Helper Functions
@@ -145,19 +146,15 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
-    // Checks related to draft nodes
-    if (node.status === "draft") {
-      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
-        return true
-      } else if (node.author && wp.isCurrentUser(node.author.id)) {
-        // authors cannot edit their submitted draft nodes
-        if (action == "edit" && node.reviewStatus === "submitted") {
-          return false
-        }
-        return true
-      } else {
-        return false
-      }
+    /**
+     * If node is a draft, only allow edits for the original author and only if
+     * the node is NOT submitted for review.
+     */
+    if (node.status === nodeStatus.DRAFT) {
+      return (
+        action === "read" ||
+        (node.reviewStatus !== nodeStatus.SUBMIT && wp.isCurrentUser(node.author.id))
+      )
     }
 
     // Check 1: User has edit permissions for Tapestry
@@ -167,7 +164,7 @@ export default class Helpers {
 
     // Check 2: User is the author of the node (unless node was submitted, then accepted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
-      if (node.reviewStatus !== "accept") {
+      if (node.reviewStatus !== nodeStatus.ACCEPT) {
         return true
       }
     }
