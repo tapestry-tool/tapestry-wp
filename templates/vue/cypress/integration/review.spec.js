@@ -103,7 +103,7 @@ describe("Review Nodes", () => {
     })
   })
 
-  it.only("should be able to leave comments as the submitter", () => {
+  it("should be able to leave comments as the submitter", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
