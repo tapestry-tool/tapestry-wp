@@ -2,6 +2,7 @@ import { fireEvent, waitFor } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { render } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
+import * as Comment from "@/utils/comments"
 import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
 
@@ -10,7 +11,7 @@ import NodeReview from "@/components/NodeReview.vue"
 jest.mock("@/services/TapestryAPI", () => {
   return {
     ...jest.requireActual("@/services/TapestryAPI"),
-    updateNode: jest.fn(),
+    reviewNode: jest.fn(),
   }
 })
 
@@ -28,15 +29,17 @@ describe("NodeReview", () => {
   }
 
   const setup = () => {
-    client.updateNode.mockResolvedValue({ data: reviewNode })
+    const { status, reviewStatus, reviewComments } = reviewNode
+    client.reviewNode.mockResolvedValue({
+      data: { status, reviewStatus, reviewComments },
+    })
     return render(NodeReview, { props: { node: reviewNode } })
   }
 
-  const getUpdatedNode = () => JSON.parse(client.updateNode.mock.calls[0][1])
+  const getComments = () => client.reviewNode.mock.calls[0][1]
 
   beforeEach(() => {
-    client.updateNode.mockReset()
-    jest.restoreAllMocks()
+    client.reviewNode.mockReset()
   })
 
   it("should be able to reject a node with a comment", async () => {
@@ -51,11 +54,10 @@ describe("NodeReview", () => {
       screen.getByRole("textbox", { name: "comment" })
     })
 
-    const node = getUpdatedNode()
-    expect(node.reviewStatus).toEqual(nodeStatus.REJECT)
-    expect(node.reviewComments.length).toEqual(2)
+    const comments = getComments()
+    expect(comments).toHaveLength(2)
 
-    const [statusChange, commentEvent] = node.reviewComments
+    const [statusChange, commentEvent] = comments
     expect(statusChange).toEqual(
       expect.objectContaining({
         from: nodeStatus.SUBMIT,
@@ -69,9 +71,14 @@ describe("NodeReview", () => {
     const screen = setup()
     await fireEvent.click(screen.getByText("Accept and Add"))
 
-    const node = getUpdatedNode()
-    expect(node.reviewStatus).toEqual("accept")
-    expect(node.reviewComments.length).toEqual(1)
+    const comments = getComments()
+    expect(comments).toHaveLength(1)
+    expect(comments[0]).toEqual(
+      expect.objectContaining({
+        from: nodeStatus.SUBMIT,
+        to: nodeStatus.ACCEPT,
+      })
+    )
   })
 
   it("should be able to submit a comment as the submitter", async () => {
@@ -85,8 +92,14 @@ describe("NodeReview", () => {
     userEvent.type(screen.getByRole("textbox", { name: "comment" }), comment)
     await fireEvent.click(screen.getByText(/submit/i))
 
-    const node = getUpdatedNode()
-    expect(node.reviewComments[0].comment).toEqual(comment)
+    const comments = getComments()
+    expect(comments).toHaveLength(1)
+    expect(comments[0]).toEqual(
+      expect.objectContaining({
+        type: Comment.types.COMMENT,
+        comment,
+      })
+    )
   })
 
   it("should be hidden for non-participants", async () => {
