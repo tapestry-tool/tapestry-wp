@@ -11,6 +11,7 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
+require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -26,6 +27,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'addTapestryNode',
+        ],
+    ],
+    'POST_TAPESTRY_NODE_REVIEW' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/review',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryNodeReview',
         ],
     ],
     'POST_TAPESTRY' => (object) [
@@ -303,12 +311,13 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function get_all_user_roles($request) {
+function get_all_user_roles($request)
+{
     global $wp_roles;
-	
-	$roles = $wp_roles->roles;
-	
-	return $roles;
+    
+    $roles = $wp_roles->roles;
+    
+    return $roles;
 }
   
 
@@ -554,6 +563,58 @@ function addTapestryNode($request)
 }
 
 /**
+ * Add a review to a Tapestry node. A review is either a comment or a change of
+ * node status.
+ *
+ * Request Body
+ * --
+ * Accepts a review object in the request body, of shape:
+ * ```
+ * {
+ *  type: COMMENT | STATUS_CHANGE
+ *  timestamp: string // current datetime in ISO8601 format
+ *  ...data // varies by type of review
+ * }
+ * ```
+ *
+ * Access
+ * --
+ * - If the current user has Tapestry edit privileges, any review type is allowed.
+ * - If the current user is the author of the node, only comments are allowed.
+ * - Otherwise, the user is not allowed to review this node.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object HTTP response
+ */
+function addTapestryNodeReview($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $review = json_decode($request->get_body());
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!isset($review->comments) || !is_array($review->comments)) {
+            throw new TapestryError('INVALID_REVIEW', 'A review should have an array of comments', 400);
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+        return $node->addReview($review->comments);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
  * Add a Tapestry Group.
  *
  * @param object $request HTTP request
@@ -602,7 +663,7 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
-        if (TapestryHelpers::nodeIsDraft($link->source, $postId) 
+        if (TapestryHelpers::nodeIsDraft($link->source, $postId)
             || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
             $tapestry = new Tapestry($postId);
             return $tapestry->addLink($link);
@@ -635,7 +696,7 @@ function deleteTapestryLink($request)
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
-        } 
+        }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
             if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
@@ -643,7 +704,7 @@ function deleteTapestryLink($request)
             if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
-        }        
+        }
         $tapestry = new Tapestry($postId);
 
         return $tapestry->removeLink($link);

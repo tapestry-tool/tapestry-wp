@@ -22,7 +22,7 @@
           class="submit-button"
           variant="info"
           :aria-hidden="loading"
-          @click="submitReview({ reviewComments: [] })"
+          @click="submitReview"
         >
           Submit
         </b-button>
@@ -82,7 +82,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateNode"]),
+    ...mapActions(["reviewNode"]),
     async handleReject(updates) {
       let confirm = true
       if (this.comment.length === 0) {
@@ -94,21 +94,20 @@ export default {
         this.submitReview(updates)
       }
     },
-    async submitReview(updates) {
+    async submitReview(comments) {
+      if (!Array.isArray(comments)) {
+        comments = []
+      }
+
       this.loading = true
       if (this.comment.length > 0) {
-        updates.reviewComments.push(
+        comments.push(
           Comment.createComment(Comment.types.COMMENT, { comment: this.comment })
         )
       }
-      await this.updateNode({
+      await this.reviewNode({
         id: this.node.id,
-        newNode: {
-          ...updates,
-          reviewComments: this.node.reviewComments.concat(
-            updates.reviewComments || []
-          ),
-        },
+        comments,
       })
       this.comment = ""
       this.loading = false

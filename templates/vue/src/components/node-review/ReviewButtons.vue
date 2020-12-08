@@ -18,25 +18,23 @@ export default {
     handleReject() {
       const updates = {}
       updates.reviewStatus = nodeStatus.REJECT
-      updates.reviewComments = [
+      this.$emit("reject", [
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: nodeStatus.SUBMIT,
           to: nodeStatus.REJECT,
         }),
-      ]
-      this.$emit("reject", updates)
+      ])
     },
     handleAccept() {
       const updates = {}
       updates.status = nodeStatus.PUBLISH
       updates.reviewStatus = nodeStatus.ACCEPT
-      updates.reviewComments = [
+      this.$emit("accept", [
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: nodeStatus.SUBMIT,
           to: nodeStatus.ACCEPT,
         }),
-      ]
-      this.$emit("accept", updates)
+      ])
     },
   },
 }

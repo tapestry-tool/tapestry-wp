@@ -10,7 +10,12 @@ class TapestryApi {
    * @param {Number} postId
    */
   constructor(postId) {
-    axios.defaults.headers.common["X-WP-Nonce"] = nonce
+    this.client = axios.create({
+      baseURL: apiUrl,
+      headers: {
+        "X-WP-Nonce": nonce,
+      },
+    })
     this.postId = postId
   }
 
@@ -20,22 +25,22 @@ class TapestryApi {
    * @return  {Object}
    */
   async getTapestry(data = {}) {
-    var url = `${apiUrl}/tapestries/${this.postId}`
+    var url = `/tapestries/${this.postId}`
     if (data.filterUserId && data.filterUserId !== undefined) {
       url += "?filter_user_id=" + data.filterUserId
     }
-    const response = await axios.get(url)
+    const response = await this.client.get(url)
     return response.data
   }
 
   async addTapestry(data = {}) {
-    const url = `${apiUrl}/tapestries`
-    const response = await axios.post(url, data)
+    const url = `/tapestries`
+    const response = await this.client.post(url, data)
     return response.data
   }
 
   async getAllRoles() {
-    const usersRequest = await axios.get(`${apiUrl}/roles`)
+    const usersRequest = await this.client.get(`/roles`)
     const users = usersRequest.data
     let wp_roles = new Set()
     //defaults
@@ -49,9 +54,9 @@ class TapestryApi {
   }
 
   async importTapestry(data) {
-    const url = `${apiUrl}/tapestries/${this.postId}`
+    const url = `/tapestries/${this.postId}`
     try {
-      const response = await axios.put(url, data)
+      const response = await this.client.put(url, data)
       return response.data
     } catch (err) {
       console.log(err)
@@ -76,14 +81,14 @@ class TapestryApi {
    * @return  {Object}
    */
   async addNode(node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes`
-    const response = await axios.post(url, node)
+    const url = `/tapestries/${this.postId}/nodes`
+    const response = await this.client.post(url, node)
     return response
   }
 
   async deleteNode(id) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}`
-    return await axios.delete(url)
+    const url = `/tapestries/${this.postId}/nodes/${id}`
+    return await this.client.delete(url)
   }
 
   /**
@@ -94,13 +99,13 @@ class TapestryApi {
    * @return  {Object}
    */
   async addLink(link) {
-    const url = `${apiUrl}/tapestries/${this.postId}/links`
-    return await axios.post(url, link)
+    const url = `/tapestries/${this.postId}/links`
+    return await this.client.post(url, link)
   }
 
   async deleteLink(link) {
-    const url = `${apiUrl}/tapestries/${this.postId}/links`
-    return await axios.delete(url, { data: link })
+    const url = `/tapestries/${this.postId}/links`
+    return await this.client.delete(url, { data: link })
   }
 
   /**
@@ -112,25 +117,25 @@ class TapestryApi {
    * @return  {Object}
    */
   async updateNode(nodeMetaId, node) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeMetaId}`
-    const response = await axios.put(url, node)
+    const url = `/tapestries/${this.postId}/nodes/${nodeMetaId}`
+    const response = await this.client.put(url, node)
     return response
   }
 
   async updateNodeCoordinates(id, coordinates) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/coordinates`
-    return await axios.put(url, coordinates)
+    const url = `/tapestries/${this.postId}/nodes/${id}/coordinates`
+    return await this.client.put(url, coordinates)
   }
 
   async getUserProgress() {
-    const url = `${apiUrl}/users/progress?post_id=${this.postId}`
-    const response = await axios.get(url)
+    const url = `/users/progress?post_id=${this.postId}`
+    const response = await this.client.get(url)
     return response.data
   }
 
   async updateUserProgress(id, progressValue) {
-    const url = `${apiUrl}/users/progress`
-    const response = await axios.post(url, {
+    const url = `/users/progress`
+    const response = await this.client.post(url, {
       post_id: this.postId,
       node_id: id,
       progress_value: progressValue,
@@ -139,8 +144,8 @@ class TapestryApi {
   }
 
   async getUserEntry(formId = 0) {
-    const url = `${apiUrl}/users/entries`
-    const response = await axios.get(url, {
+    const url = `/users/entries`
+    const response = await this.client.get(url, {
       params: {
         post_id: this.postId,
         form_id: formId,
@@ -155,8 +160,8 @@ class TapestryApi {
   }
 
   async updateSettings(settings) {
-    const url = `${apiUrl}/tapestries/${this.postId}/settings`
-    const response = await axios.put(url, settings)
+    const url = `/tapestries/${this.postId}/settings`
+    const response = await this.client.put(url, settings)
     return response
   }
 
@@ -169,8 +174,8 @@ class TapestryApi {
    * @return  {Object}
    */
   async saveAudio(audio, nodeId, questionId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio`
-    const response = await axios.post(url, { audio, questionId })
+    const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio`
+    const response = await this.client.post(url, { audio, questionId })
     return response
   }
 
@@ -182,44 +187,44 @@ class TapestryApi {
    * @return  {String}    audio       base64 data string
    */
   async getAudio(nodeId, questionId) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
-    const response = await axios.get(url)
+    const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
+    const response = await this.client.get(url)
     return response.data
   }
 
   async completeNode(nodeId) {
-    const url = `${apiUrl}/users/completed?post_id=${this.postId}&node_id=${nodeId}`
-    const response = await axios.post(url)
+    const url = `/users/completed?post_id=${this.postId}&node_id=${nodeId}`
+    const response = await this.client.post(url)
     return response
   }
 
   async completeQuestion(nodeId, questionId) {
-    const url = `${apiUrl}/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
-    const response = await axios.post(url)
+    const url = `/users/quiz?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
+    const response = await this.client.post(url)
     return response
   }
 
   async getH5pSettings() {
-    const url = `${apiUrl}/users/h5pSettings?post_id=${this.postId}`
-    const response = await axios.get(url)
+    const url = `/users/h5pSettings?post_id=${this.postId}`
+    const response = await this.client.get(url)
     return response
   }
 
   async updateH5pSettings(settings) {
-    const url = `${apiUrl}/users/h5pSettings/${this.postId}`
-    const response = await axios.post(url, settings)
+    const url = `/users/h5pSettings/${this.postId}`
+    const response = await this.client.post(url, settings)
     return response
   }
 
   async getUserFavourites() {
-    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
-    const response = await axios.get(url)
+    const url = `/users/favourites?post_id=${this.postId}`
+    const response = await this.client.get(url)
     return response.data
   }
 
   async updateUserFavourites(favourites) {
-    const url = `${apiUrl}/users/favourites?post_id=${this.postId}`
-    const response = await axios.post(url, {
+    const url = `/users/favourites?post_id=${this.postId}`
+    const response = await this.client.post(url, {
       post_id: this.postId,
       favourites: favourites,
     })
@@ -227,8 +232,8 @@ class TapestryApi {
   }
 
   async getAllContributors() {
-    const url = `${apiUrl}/tapestries/${this.postId}/contributors`
-    const response = await axios.get(url)
+    const url = `/tapestries/${this.postId}/contributors`
+    const response = await this.client.get(url)
     return response.data
   }
 
@@ -255,7 +260,13 @@ class TapestryApi {
     }
 
     // Send the event to an AJAX URL to be saved
-    await axios.post(analyticsAJAXUrl, data)
+    await this.client.post(analyticsAJAXUrl, data)
+  }
+
+  async reviewNode(id, comments) {
+    return this.client.post(`/tapestries/${this.postId}/nodes/${id}/review`, {
+      comments,
+    })
   }
 }
 
