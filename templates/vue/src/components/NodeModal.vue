@@ -29,6 +29,7 @@
             <content-form
               :node="node"
               :parent="parent"
+              :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
@@ -281,8 +282,8 @@ export default {
       loading: false,
       userId: null,
       formErrors: [],
-      maxDescriptionLength: 250,
       tydeTypes: tydeTypes,
+      maxDescriptionLength: 2000,
       node: null,
       videoLoaded: false,
       fileUploading: false,
