@@ -438,13 +438,13 @@ export default {
       this.fileUploading = isUploading
     })
     this.node = this.createDefaultNode()
-
     if (!this.node.mapCoordinates) {
       this.node.mapCoordinates = {
         lat: "",
         lng: "",
       }
     }
+    this.initialize()
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
