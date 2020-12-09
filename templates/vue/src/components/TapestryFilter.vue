@@ -401,12 +401,13 @@ export default {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   border-right: none !important;
-  flex: 1;
+  width: 6rem;
 }
 
 #status-select.custom-select {
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
+  width: 12rem;
 }
 
 .v-select {
