@@ -39,6 +39,24 @@ describe("Node Authoring", () => {
     cy.contains(node.textContent).should("exist")
   })
 
+  it("should not show error when adding node with long description", () => {
+    cy.setup()
+
+    const node = {
+      title: "Root",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      mediaType: "text",
+      textContent: "dummy content",
+    }
+
+    cy.getByTestId(`root-node-button`).click()
+    cy.contains(/add description/i).click()
+    cy.getEditable(`node-description`).type(node.description)
+    cy.getByTestId(`submit-node-modal`).click()
+
+    cy.contains("Please limit your description").should("not.exist")
+  })
+
   /**
    * A "leaf" node is a node with exactly 1 link connected to it.
    */
