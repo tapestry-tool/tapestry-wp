@@ -1,5 +1,6 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
+
 import routeConfig, { names } from "./config/routes"
 import store from "./store"
 
