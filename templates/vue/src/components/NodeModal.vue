@@ -12,10 +12,7 @@
   >
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <div
-          v-if="submissionError || formErrors.length"
-          class="error-wrapper text-danger"
-        >
+        <div v-if="submissionError || formErrors.length" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
             <li v-for="error in formErrors" :key="error">{{ error }}</li>
@@ -967,6 +964,7 @@ table {
 
 .error-wrapper {
   background: #f8d7da;
+  color: #721c24;
   padding: 1em 1em 1px 2em;
 }
 
