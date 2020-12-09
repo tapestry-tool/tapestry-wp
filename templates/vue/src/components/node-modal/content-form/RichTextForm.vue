@@ -104,8 +104,14 @@
       </div>
     </editor-menu-bar>
     <editor-content class="editor__content" :editor="editor" />
-    <span v-if="maxLength" class="editor__char_count">
-      {{ contentLength }}/{{ maxLength }}
+    <span
+      v-if="maxLength"
+      class="editor__char_count mt-1 mb-n3 text-muted small float-right"
+    >
+      <span :class="{ 'text-danger': contentLength > maxLength }">
+        {{ contentLength }}
+      </span>
+      / {{ maxLength }}
     </span>
   </div>
 </template>
@@ -378,9 +384,5 @@ h2:before {
   pointer-events: none;
   height: 0;
   font-style: italic;
-}
-
-.editor__char_count {
-  float: right;
 }
 </style>
