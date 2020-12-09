@@ -104,6 +104,15 @@
       </div>
     </editor-menu-bar>
     <editor-content class="editor__content" :editor="editor" />
+    <span
+      v-if="maxLength"
+      class="editor__char_count mt-1 mb-n3 text-muted small float-right"
+    >
+      <span :class="{ 'text-danger': contentLength > maxLength }">
+        {{ contentLength }}
+      </span>
+      / {{ maxLength }}
+    </span>
   </div>
 </template>
 
@@ -147,6 +156,10 @@ export default {
       type: String,
       required: true,
     },
+    maxLength: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -161,6 +174,18 @@ export default {
       },
       editorChange: false,
     }
+  },
+  computed: {
+    contentLength() {
+      const strippedHtml = this.value.replace(/<[^>]+>/g, "")
+      const decodedStrippedHtml = strippedHtml.replace(/&#(\d+);/g, function(
+        match,
+        dec
+      ) {
+        return String.fromCharCode(dec)
+      })
+      return decodedStrippedHtml.length
+    },
   },
   watch: {
     value(val) {
