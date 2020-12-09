@@ -32,7 +32,7 @@
 
           <b-form-group
             label="Show me rejected nodes"
-            description="If enabled, you will be able to see all submitted nodes that have previously been rejected. Mind the decreased performance"
+            description="If enabled, you will be able to see all submitted nodes that have previously been rejected. This may slightly hinder performance."
           >
             <b-form-checkbox v-model="showRejected" switch>
               {{ showRejected ? "Enabled" : "Disabled" }}
