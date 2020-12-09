@@ -337,61 +337,65 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
-    const nodeRef = this.$refs.node
-    d3.select(nodeRef).call(
-      d3
-        .drag()
-        .on("start", () => {
-          this.coordinates = {}
-          if (this.selection.length) {
-            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-              const node = this.getNode(nodeId)
-              coordinates[nodeId] = {
+    if (this.hasPermission("edit")) {
+      const nodeRef = this.$refs.node
+      d3.select(nodeRef).call(
+        d3
+          .drag()
+          .on("start", () => {
+            this.coordinates = {}
+            if (this.selection.length) {
+              this.coordinates = this.selection.reduce((coordinates, nodeId) => {
+                const node = this.getNode(nodeId)
+                coordinates[nodeId] = {
+                  x: node.coordinates.x,
+                  y: node.coordinates.y,
+                }
+                return coordinates
+              }, {})
+            } else {
+              this.coordinates[this.node.id] = {
+                x: this.node.coordinates.x,
+                y: this.node.coordinates.y,
+              }
+            }
+          })
+          .on("drag", () => {
+            for (const id of Object.keys(this.coordinates)) {
+              const node = this.getNode(id)
+              node.coordinates.x += d3.event.dx
+              node.coordinates.y += d3.event.dy
+            }
+          })
+          .on("end", () => {
+            for (const [id, originalCoordinates] of Object.entries(
+              this.coordinates
+            )) {
+              const node = this.getNode(id)
+              node.coordinates.x += d3.event.dx
+              node.coordinates.y += d3.event.dy
+              let coordinates = {
                 x: node.coordinates.x,
                 y: node.coordinates.y,
               }
-              return coordinates
-            }, {})
-          } else {
-            this.coordinates[this.node.id] = {
-              x: this.node.coordinates.x,
-              y: this.node.coordinates.y,
-            }
-          }
-        })
-        .on("drag", () => {
-          for (const id of Object.keys(this.coordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
-          }
-        })
-        .on("end", () => {
-          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
-            const node = this.getNode(id)
-            node.coordinates.x += d3.event.dx
-            node.coordinates.y += d3.event.dy
-            let coordinates = {
-              x: node.coordinates.x,
-              y: node.coordinates.y,
-            }
-            if (
-              originalCoordinates.x == coordinates.x &&
-              originalCoordinates.y == coordinates.y
-            ) {
-              continue
-            }
-            this.$emit("dragend")
-            this.updateNodeCoordinates({
-              id,
-              coordinates,
-              originalCoordinates,
-            }).catch(() => {
+              if (
+                originalCoordinates.x == coordinates.x &&
+                originalCoordinates.y == coordinates.y
+              ) {
+                continue
+              }
               this.$emit("dragend")
-            })
-          }
-        })
-    )
+              this.updateNodeCoordinates({
+                id,
+                coordinates,
+                originalCoordinates,
+              }).catch(() => {
+                this.$emit("dragend")
+              })
+            }
+          })
+      )
+    }
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
@@ -459,7 +463,10 @@ export default {
       this.$emit("mouseleave")
     },
     handleClick(evt) {
-      if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+      if (
+        this.hasPermission("edit") &&
+        (evt.ctrlKey || evt.metaKey || evt.shiftKey)
+      ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
         this.root && this.node.hideMedia
