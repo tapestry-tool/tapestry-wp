@@ -101,37 +101,4 @@ describe("NodeReview", () => {
       })
     )
   })
-
-  it("should be hidden for non-participants", () => {
-    wp.canEditTapestry.mockReturnValue(false)
-    wp.getCurrentUser.mockReturnValue({
-      id: "3",
-      name: "not-the-author",
-      email: "bar@foo.com",
-    })
-    const screen = setup()
-    expect(screen.queryByText("Review")).toBeNull()
-  })
-
-  it("should only show review log if accepted", () => {
-    wp.canEditTapestry.mockReturnValue(true)
-    const screen = setup({
-      status: nodeStatus.PUBLISH,
-      reviewStatus: nodeStatus.ACCEPT,
-      reviewComments: [
-        Comment.createComment(Comment.types.STATUS_CHANGE, {
-          from: nodeStatus.SUBMIT,
-          to: nodeStatus.ACCEPT,
-        }),
-      ],
-    })
-    expect(screen.queryByRole("textbox", { name: "comment" })).toBeNull()
-    screen.getByText(/accepted this node/i)
-  })
-
-  it("should hide form for reviewers if rejected", () => {
-    wp.canEditTapestry.mockReturnValue(true)
-    const screen = setup({ reviewStatus: nodeStatus.REJECT })
-    expect(screen.queryByRole("textbox", { name: "comment" })).toBeNull()
-  })
 })

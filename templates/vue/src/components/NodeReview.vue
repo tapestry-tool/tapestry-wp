@@ -1,34 +1,31 @@
 <template>
-  <section v-if="isReviewer || isAuthor" data-name="review">
-    <h2 class="content-header">Review</h2>
-    <b-overlay class="loading" bg-color="#5d656c" :show="loading">
-      <review-log :events="events" :aria-hidden="loading"></review-log>
-      <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
-        <textarea
-          v-model="comment"
-          aria-label="comment"
-          placeholder="Leave a comment..."
-          @keydown.stop
-        />
-        <review-buttons
-          v-if="isReviewer"
-          class="review-buttons"
-          :aria-hidden="loading"
-          @accept="submitReview"
-          @reject="handleReject"
-        ></review-buttons>
-        <b-button
-          v-else
-          class="submit-button"
-          variant="info"
-          :aria-hidden="loading"
-          @click="submitReview"
-        >
-          Submit
-        </b-button>
-      </div>
-    </b-overlay>
-  </section>
+  <b-overlay class="loading" bg-color="#5d656c" :show="loading">
+    <review-log :events="events" :aria-hidden="loading"></review-log>
+    <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
+      <textarea
+        v-model="comment"
+        aria-label="comment"
+        placeholder="Leave a comment..."
+        @keydown.stop
+      />
+      <review-buttons
+        v-if="isReviewer"
+        class="review-buttons"
+        :aria-hidden="loading"
+        @accept="submitReview"
+        @reject="handleReject"
+      ></review-buttons>
+      <b-button
+        v-else
+        class="submit-button"
+        variant="info"
+        :aria-hidden="loading"
+        @click="submitReview"
+      >
+        Submit
+      </b-button>
+    </div>
+  </b-overlay>
 </template>
 
 <script>
@@ -87,9 +84,6 @@ export default {
      */
     isReviewer() {
       return wp.canEditTapestry()
-    },
-    isAuthor() {
-      return wp.isCurrentUser(this.node.author.id)
     },
   },
   methods: {

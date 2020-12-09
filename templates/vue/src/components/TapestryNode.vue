@@ -99,7 +99,7 @@
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
             >
-              <tapestry-icon icon="plus" svg></tapestry-icon>
+              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
             </node-button>
             <node-button
               v-else-if="hasPermission('edit')"
@@ -137,6 +137,7 @@ import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
+import { nodeStatus } from "@/utils/constants"
 import AddChildButton from "./tapestry-node/AddChildButton"
 import ProgressBar from "./tapestry-node/ProgressBar"
 import StatusBar from "./tapestry-node/StatusBar"
@@ -177,7 +178,7 @@ export default {
       "isAccordionRow",
     ]),
     canReview() {
-      return wp.canReview(this.node)
+      return wp.canEditTapestry() && this.node.reviewStatus === nodeStatus.SUBMIT
     },
     isLoggedIn() {
       return wp.isLoggedIn()

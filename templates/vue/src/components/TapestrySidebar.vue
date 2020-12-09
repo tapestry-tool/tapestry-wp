@@ -8,7 +8,7 @@
       <button
         :class="['anchor-button', { active: active === 'info' }]"
         aria-label="information"
-        @click.stop="active = 'info'"
+        @click.stop="scrollToRef('info')"
       >
         <tapestry-icon icon="info-circle" />
       </button>
@@ -16,9 +16,17 @@
         v-if="node.license || node.references"
         :class="['anchor-button', { active: active === 'copyright' }]"
         aria-label="copyright"
-        @click.stop="active = 'copyright'"
+        @click.stop="scrollToRef('copyright')"
       >
         <tapestry-icon icon="copyright" />
+      </button>
+      <button
+        v-if="isReviewParticipant"
+        :class="['anchor-button', { active: active === 'review' }]"
+        aria-label="review"
+        @click.stop="scrollToRef('review')"
+      >
+        <tapestry-icon icon="comment-dots" />
       </button>
       <button
         :aria-label="closed ? 'open sidebar' : 'close sidebar'"
@@ -39,7 +47,7 @@
       data-qa="sidebar-content"
       :class="['sidebar', { closed: closed }]"
     >
-      <header ref="info" data-name="info" class="sidebar-header">
+      <header ref="info" class="sidebar-header" data-name="info">
         <h1 class="content-title">{{ node.title }}</h1>
         <div class="button-container">
           <b-button v-if="node.accessible || canEdit" @click="viewNode">
@@ -59,7 +67,9 @@
         </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
-            <h2 class="content-header">License</h2>
+            <h2 class="content-header">
+              License
+            </h2>
             <p class="content-body" style="margin-bottom: 0.5em;">
               <a
                 v-if="license.type === licenseTypes.CUSTOM && license.link"
@@ -89,7 +99,10 @@
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
-        <node-review ref="review" :node="node"></node-review>
+        <section v-if="isReviewParticipant" ref="review" data-name="review">
+          <h2 class="content-header">Review</h2>
+          <node-review :node="node"></node-review>
+        </section>
       </div>
     </aside>
   </div>
@@ -102,9 +115,11 @@ import NodeReview from "@/components/NodeReview"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
+import * as wp from "@/services/wp"
 
-const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
+
+const tabOrder = ["info", "copyright", "review"]
 
 export default {
   components: {
@@ -147,15 +162,26 @@ export default {
         ...licenses[this.node.license.type],
       }
     },
+    isReviewParticipant() {
+      return (
+        this.node.reviewStatus &&
+        (wp.canEditTapestry() || wp.isCurrentUser(this.node.author.id))
+      )
+    },
   },
   watch: {
-    active(section) {
-      this.scrollToRef(section)
+    closed: {
+      immediate: true,
+      handler(closed) {
+        if (!closed) {
+          this.scrollToRef(this.active)
+        }
+      },
     },
   },
   mounted() {
     const observer = new IntersectionObserver(this.handleObserve, {
-      threshold: INTERSECTION_THRESHOLD,
+      threshold: [0.4, 0.8],
     })
     const sections = Helpers.omit(this.$refs, ["content", "wrapper"])
     for (const ref in sections) {
@@ -163,19 +189,37 @@ export default {
     }
   },
   methods: {
+    /**
+     * This callback is called whenever any section cross 20% and 80% visibility.
+     *  - If a section crosses 80% visibility, make that the current active section.
+     *  - If a section goes below 40% visibility without another section going above
+     *    80%, go to the _next_ section.
+     */
     handleObserve(entries) {
       if (this.closed) {
         return
       }
-      const matched = entries
-        .filter(entry => entry.intersectionRatio > INTERSECTION_THRESHOLD)
-        .map(entry => entry.target.dataset.name)
-      if (!matched.includes(this.active) && matched.length > 0) {
-        this.active = matched[0]
+      const inactive = entries.find(entry => !entry.isIntersecting)
+      const nextActive = entries.find(entry => entry.intersectionRatio > 0.8)
+      if (nextActive) {
+        this.active = nextActive.target.dataset.name
+      } else if (inactive) {
+        const { name } = inactive.target.dataset
+        if (name === this.active) {
+          this.active = this.nextTab()
+        }
       }
+    },
+    nextTab() {
+      const nextTabIndex = tabOrder.indexOf(this.active)
+      if (nextTabIndex >= 0 && nextTabIndex < tabOrder.length - 1) {
+        return tabOrder[nextTabIndex + 1]
+      }
+      return this.active
     },
     scrollToRef(refName) {
       if (refName) {
+        this.active = refName
         this.$nextTick(() => {
           let el = this.$refs[refName]
           if (el.hasOwnProperty("$el")) {
