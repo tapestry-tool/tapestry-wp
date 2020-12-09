@@ -78,26 +78,6 @@ describe("Search bar", () => {
       })
   })
 
-  it("should not be able to visit the url if not authorized", () => {
-    cy.setup("@tapestry", roles.SUBSCRIBER)
-
-    cy.app().then(app => {
-      const { path } = app.$route
-      app.$router.push({
-        path,
-        query: {
-          search: "Title",
-          q: "first node",
-        },
-      })
-
-      cy.url().should(url => expect(url.endsWith(path)).to.be.true)
-      cy.contains(
-        `You don't have access to the search bar for this Tapestry.`
-      ).should("be.visible")
-    })
-  })
-
   it("should only show authors of public contributions", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
 
