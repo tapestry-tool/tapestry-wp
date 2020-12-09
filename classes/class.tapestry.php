@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
 
@@ -296,8 +296,8 @@ class Tapestry implements ITapestry
         return array_map(
             function ($nodeData) {
                 $node = new TapestryNode($this->postId, $nodeData->id);
-                $roles = new TapestryUserRoles();
-                $data = $roles->canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
+                $user = new TapestryUser();
+                $data = $user->canEdit($this->postId) || $nodeData->accessible ? $node->get() : $node->getMeta();
                 $data->accessible = $nodeData->accessible;
                 $data->conditions = $nodeData->conditions;
                 $data->unlocked = $nodeData->unlocked;
@@ -421,7 +421,7 @@ class Tapestry implements ITapestry
         $settings->status = $post->post_status;
         $settings->backgroundUrl = '';
         $settings->autoLayout = false;
-        $settings->nodeDraggable = true;
+
         $settings->showAccess = true;
         $settings->showRejected = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
@@ -488,14 +488,14 @@ class Tapestry implements ITapestry
 
     private function _filterTapestry($tapestry, $filterUserId)
     {
-        $roles = new TapestryUserRoles();
+        $user = new TapestryUser();
 
         if (!isset($tapestry->settings->superuserOverridePermissions)) {
             $tapestry->settings->superuserOverridePermissions = true;
         }
         $tapestry->nodes = $this->_filterNodesMetaIdsByStatus($tapestry->nodes);
 
-        if ($tapestry->settings->superuserOverridePermissions && $roles->canEdit($this->postId)) {
+        if ($tapestry->settings->superuserOverridePermissions && $user->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
         } else {
             $tapestry->nodes = array_intersect(
@@ -548,7 +548,7 @@ class Tapestry implements ITapestry
         if (!isset($this->settings->showRejected)) {
             $this->settings->showRejected = false;
         }
-        $currentUserRoles = new TapestryUserRoles();
+        $currentUser = new TapestryUser();
         $currentUserId = wp_get_current_user()->ID;
         $nodesPermitted = [];
         foreach ($nodeMetaIds as $nodeId) {
@@ -559,7 +559,7 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                } elseif (('submitted' == $nodeMeta->reviewStatus || ('rejected' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUserRoles->canEdit($this->postId)) {
+                } elseif ('submitted' == $nodeMeta->reviewStatus && $currentUser->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {

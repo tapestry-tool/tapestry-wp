@@ -61,7 +61,6 @@ const mockSettings = {
   status: "publish",
   backgroundUrl: "",
   autoLayout: false,
-  nodeDraggable: true,
   showAccess: true,
   defaultPermissions: {
     public: ["read"],

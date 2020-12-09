@@ -38,12 +38,17 @@
             :key="id"
             :node="node"
             class="node"
+            :class="{ selectable: nodeIsEditable(node) }"
             :data-id="id"
             :root="id == selectedId"
             @dragend="updateViewBox"
             @mouseover="handleMouseover(id)"
             @mouseleave="activeNode = null"
-            @mounted="updateSelectableNodes"
+            @mounted="
+              dragSelectEnabled && nodeIsEditable(node)
+                ? updateSelectableNodes(node)
+                : null
+            "
           ></tapestry-node>
         </g>
         <locked-tooltip
@@ -111,6 +116,11 @@ export default {
     dragSelectEnabled() {
       return !this.settings.renderMap
     },
+    editableNodes() {
+      return this.nodes.length
+        ? this.nodes.filter(node => this.nodeIsEditable(node))
+        : this.nodes
+    },
   },
   watch: {
     background: {
@@ -150,9 +160,10 @@ export default {
       this.$root.$emit("add-node", null)
     },
     updateSelectableNodes() {
-      if (this.dragSelectEnabled) {
-        DragSelectModular.updateSelectableNodes()
-      }
+      DragSelectModular.updateSelectableNodes()
+    },
+    nodeIsEditable(node) {
+      return wp.isLoggedIn() && Helpers.hasPermission(node, "edit")
     },
     updateViewBox() {
       const MAX_RADIUS = 240

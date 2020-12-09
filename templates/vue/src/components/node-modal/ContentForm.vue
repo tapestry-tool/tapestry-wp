@@ -17,6 +17,7 @@
         v-model="node.description"
         data-qa="node-description"
         placeholder="Enter description"
+        :maxLength="maxDescriptionLength"
       />
     </b-form-group>
     <div v-else class="text-right mt-n3 mb-n2">
@@ -83,6 +84,10 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    maxDescriptionLength: {
+      type: Number,
+      required: false,
     },
   },
   data() {
