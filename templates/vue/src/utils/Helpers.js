@@ -1,5 +1,5 @@
 import * as wp from "@/services/wp"
-import { nodeStatus } from "./constants"
+import { nodeStatus, userActions } from "./constants"
 
 /**
  * Helper Functions
@@ -147,14 +147,19 @@ export default class Helpers {
     }
 
     /**
-     * If node is a draft, only allow edits for the original author and only if
-     * the node is NOT submitted for review.
+     * If node is a draft:
+     *  - Allow all actions for original author EXCEPT if the node is submitted for
+     *    review
+     *  - Allow "read" to reviewers only if the node is submitted for review
      */
     if (node.status === nodeStatus.DRAFT) {
-      return (
-        action === "read" ||
-        (node.reviewStatus !== nodeStatus.SUBMIT && wp.isCurrentUser(node.author.id))
-      )
+      if (wp.isCurrentUser(node.author.id)) {
+        return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
+      }
+      if (wp.canEditTapestry()) {
+        return action === userActions.READ && node.reviewStatus === nodeStatus.SUBMIT
+      }
+      return false
     }
 
     // Check 1: User has edit permissions for Tapestry

@@ -178,10 +178,32 @@ export default {
         }
       },
     },
+    nodeId: {
+      immediate: true,
+      handler() {
+        if (!this.closed) {
+          /**
+           * If the new node doesn't have a particular section, change to the "info"
+           * section (guaranteed on all nodes).
+           */
+          this.$nextTick(() => {
+            if (!this.$refs[this.active]) {
+              this.$router.replace({
+                path: this.$route.path,
+                query: {
+                  ...this.$route.query,
+                  sidebar: "info",
+                },
+              })
+            }
+          })
+        }
+      },
+    },
   },
   mounted() {
     const observer = new IntersectionObserver(this.handleObserve, {
-      threshold: [0.4, 0.8],
+      threshold: [0.5, 0.8],
     })
     const sections = Helpers.omit(this.$refs, ["content", "wrapper"])
     for (const ref in sections) {
@@ -190,9 +212,9 @@ export default {
   },
   methods: {
     /**
-     * This callback is called whenever any section cross 20% and 80% visibility.
+     * This callback is called whenever any section cross 50% and 80% visibility.
      *  - If a section crosses 80% visibility, make that the current active section.
-     *  - If a section goes below 40% visibility without another section going above
+     *  - If a section goes below 50% visibility without another section going above
      *    80%, go to the _next_ section.
      */
     handleObserve(entries) {
