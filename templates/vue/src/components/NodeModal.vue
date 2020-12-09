@@ -10,25 +10,21 @@
     body-class="p-0"
     @hidden="close"
   >
-    <div v-if="formErrors.length" class="modal-header-row">
-      <b-alert id="tapestry-modal-form-errors" variant="danger" show>
-        <ul>
-          <li v-for="error in formErrors" :key="error">{{ error }}</li>
-        </ul>
-      </b-alert>
-    </div>
-    <div
-      v-if="submissionError"
-      class="modal-header-row"
-      data-qa="modal-submit-error"
-    >
-      <b-alert id="tapestry-modal-submit-error" variant="danger" show>
-        <p>{{ submissionError }}</p>
-      </b-alert>
-    </div>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <b-tabs card>
+        <div
+          v-if="submissionError || formErrors.length"
+          class="error-wrapper text-danger"
+        >
+          <h5>Node cannot be saved due to the following error(s):</h5>
+          <ul>
+            <li v-for="error in formErrors" :key="error">{{ error }}</li>
+            <li v-if="submissionError" data-qa="modal-submit-error">
+              {{ submissionError }}
+            </li>
+          </ul>
+        </div>
+        <b-tabs card :class="{ 'has-errors': submissionError || formErrors.length }">
           <b-tab
             title="Content"
             :active="tab === 'content'"
@@ -913,6 +909,10 @@ table {
   }
 }
 
+.has-errors > .card-header {
+  background: #f8d7da;
+}
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -963,6 +963,11 @@ table {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.error-wrapper {
+  background: #f8d7da;
+  padding: 1em 1em 1px 2em;
 }
 
 .slick-list-item {
