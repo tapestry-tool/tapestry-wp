@@ -1,4 +1,4 @@
-import { waitFor, within } from "@testing-library/vue"
+import { fireEvent, waitFor, within } from "@testing-library/vue"
 import userEvent from "@testing-library/user-event"
 import { render as r, addNode } from "@/utils/test"
 import { nodeStatus } from "@/utils/constants"
@@ -50,6 +50,10 @@ const setup = opts => {
 }
 
 describe("TapestryFilter", () => {
+  beforeEach(() => {
+    wp.canEditTapestry.mockReturnValue(true)
+  })
+
   it("should be able to change the filter type and have the text placeholder update", async () => {
     const screen = setup()
     userEvent.click(await screen.findByDisplayValue("Title"))
@@ -105,11 +109,11 @@ describe("TapestryFilter", () => {
 
     userEvent.click(screen.getByText(/all/i))
     statuses.forEach(status => {
-      if (status !== nodeStatus.REJECTED) {
+      if (status !== nodeStatus.REJECT) {
         screen.getByText(new RegExp(status, "i"))
       }
     })
-    expect(screen.queryByText(new RegExp(nodeStatus.REJECTED, "i"))).toBeNull()
+    expect(screen.queryByText(new RegExp(nodeStatus.REJECT, "i"))).toBeNull()
   })
 
   it("should reset value if search type is changed", async () => {
@@ -148,10 +152,12 @@ describe("TapestryFilter", () => {
     })
   })
 
-  it("should hide the search bar for unauthorized users", async () => {
-    wp.canEditTapestry.mockReturnValueOnce(false)
-    const screen = render()
-    expect(screen.queryByLabelText("search")).toBeNull()
+  it("should hide the author option for unauthorized users", async () => {
+    wp.canEditTapestry.mockReturnValue(false)
+    const screen = setup()
+
+    await fireEvent.click(await screen.findByDisplayValue("Title"))
+    expect(screen.queryByRole("option", { name: /author/i })).toBeNull()
   })
 
   it("should show the search bar with the correct type if the user visits the url", async () => {
@@ -161,17 +167,15 @@ describe("TapestryFilter", () => {
 
   it("should populate the value with the query in the url", async () => {
     const { author } = multiAuthorTapestry.nodes[0]
-    const screen = render({ query: { search: "Author", q: author.name } })
+    const screen = render({ query: { search: "Author", query: author.name } })
     const filter = within(screen.getByTestId("tapestry-filter"))
     expect(await filter.findByText(author.name)).toBeVisible()
   })
 
-  it("should not show the search bar if an unauthorized user visits the url", async () => {
-    wp.canEditTapestry.mockReturnValueOnce(false)
+  it("should not show the author option if an unauthorized user visits the url", async () => {
+    wp.canEditTapestry.mockReturnValue(false)
     const screen = render({ query: { search: "Author" } })
-
-    expect(screen.queryByLabelText("search")).toBeNull()
-    expect(screen.queryByDisplayValue("Author")).toBeNull()
+    screen.getByDisplayValue("Title")
   })
 
   it("should be able to search for nodes with non-unique titles", async () => {
@@ -192,6 +196,6 @@ describe("TapestryFilter", () => {
     await screen.findByTestId("status-select")
 
     userEvent.click(screen.getByText(/all/i))
-    screen.getByText(new RegExp(nodeStatus.REJECTED, "i"))
+    screen.getByText(new RegExp(nodeStatus.REJECT, "i"))
   })
 })

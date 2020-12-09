@@ -1,7 +1,7 @@
 <template>
   <div data-qa="tapestry-filter" class="filter">
     <button
-      v-if="canSearch && !settings.renderMap"
+      v-if="!settings.renderMap"
       aria-label="search"
       :style="isActive && 'margin-right: 12px;'"
       @click="toggleFilter"
@@ -15,7 +15,7 @@
       <b-form-select
         id="search-type"
         v-model="type"
-        :options="Object.values(types)"
+        :options="typeOptions"
       ></b-form-select>
       <v-select
         v-if="type !== types.STATUS"
@@ -23,7 +23,7 @@
         data-qa="search-input"
         :filter="getVisibleMatches"
         :options="filterOptions"
-        :clear-search-on-select="false"
+        :clear-search-on-blur="() => false"
         :label="type === types.AUTHOR ? 'name' : 'title'"
         @search="val => (search = val)"
       ></v-select>
@@ -70,12 +70,12 @@ const filterTypes = {
 }
 
 const statusMap = {
-  [nodeStatus.ALL]: "All",
+  all: "All",
   [nodeStatus.DRAFT]: "Draft",
-  [nodeStatus.SUBMITTED]: "Submitted",
-  [nodeStatus.REJECTED]: "Rejected",
-  [nodeStatus.ACCEPTED]: "Accepted",
-  [nodeStatus.PUBLISHED]: "Published",
+  [nodeStatus.SUBMIT]: "Submitted",
+  [nodeStatus.REJECT]: "Rejected",
+  [nodeStatus.ACCEPT]: "Accepted",
+  [nodeStatus.PUBLISH]: "Published",
 }
 
 export default {
@@ -105,7 +105,7 @@ export default {
             query: {
               ...this.$route.query,
               search: type.toLowerCase(),
-              q: type === filterTypes.STATUS ? nodeStatus.ALL : "",
+              query: type === filterTypes.STATUS ? "all" : "",
             },
           })
         }
@@ -113,7 +113,7 @@ export default {
     },
     filterValue: {
       get() {
-        return this.$route.query.q
+        return this.$route.query.query
       },
       set(val) {
         let serializedVal = val
@@ -125,7 +125,7 @@ export default {
         if (val !== this.filterValue) {
           this.$router.replace({
             path: this.$route.path,
-            query: { ...this.$route.query, q: serializedVal },
+            query: { ...this.$route.query, query: serializedVal },
           })
         }
       },
@@ -143,21 +143,23 @@ export default {
         } else {
           this.$router.push({
             path: this.$route.path,
-            query: Helpers.omit(this.$route.query, ["search", "q"]),
+            query: Helpers.omit(this.$route.query, ["search", "query"]),
           })
         }
       },
     },
-    canSearch() {
-      return wp.canEditTapestry()
-    },
     types() {
       return filterTypes
+    },
+    typeOptions() {
+      return Object.values(this.types).filter(
+        type => wp.canEditTapestry() || type !== filterTypes.AUTHOR
+      )
     },
     statuses() {
       let statusTypes = Object.keys(statusMap)
       if (!this.settings.showRejected) {
-        statusTypes = statusTypes.filter(type => type !== nodeStatus.REJECTED)
+        statusTypes = statusTypes.filter(type => type !== nodeStatus.REJECT)
       }
 
       const statuses = []
@@ -165,21 +167,11 @@ export default {
         const matches = this.getMatches(status, filterTypes.STATUS)
         statuses.push({
           value: status,
-          count: matches.length,
+          count: matches.filter(node => Helpers.hasPermission(node, "read")).length,
           label: `${statusMap[status]}: ${matches.length}`,
         })
       }
       return statuses
-    },
-    label() {
-      switch (this.type) {
-        case filterTypes.AUTHOR:
-          return "Search by author"
-        case filterTypes.TITLE:
-          return "Search by title"
-        default:
-          return "Search by status"
-      }
     },
     filterOptions() {
       switch (this.type) {
@@ -221,22 +213,13 @@ export default {
     },
   },
   watch: {
-    isActive: {
-      immediate: true,
-      handler(isActive) {
-        if (isActive && !this.canSearch) {
-          this.$router.replace({
-            path: this.$route.path,
-            query: Helpers.omit(this.$route.query, ["search", "q"]),
-          })
-          this.addApiError({
-            error: `You don't have access to the search bar for this Tapestry.`,
-          })
-        }
-      },
-    },
     async filterValue(next) {
-      if (next && this.canSearch && this.lazy && this.type === filterTypes.AUTHOR) {
+      if (
+        next &&
+        wp.canEditTapestry() &&
+        this.lazy &&
+        this.type === filterTypes.AUTHOR
+      ) {
         this.loading = true
         await this.refetchTapestryData(Number(next.id))
         this.loading = false
@@ -248,9 +231,26 @@ export default {
         this.updateVisibleNodes(nodes)
       },
     },
+    type: {
+      immediate: true,
+      handler(type, oldType) {
+        if (type !== oldType) {
+          const isValidType = Object.values(filterTypes).some(
+            validType => validType === type
+          )
+          if (!isValidType) {
+            this.resetSearch()
+            this.addApiError({ error: `Unknown search type: ${type}` })
+          } else if (type === filterTypes.AUTHOR && !wp.canEditTapestry()) {
+            this.resetSearch()
+            this.addApiError({ error: `You're not allowed to search by author.` })
+          }
+        }
+      },
+    },
   },
   async created() {
-    if (this.canSearch && this.lazy) {
+    if (wp.canEditTapestry() && this.lazy) {
       this.allContributors = await client.getAllContributors()
     }
   },
@@ -297,12 +297,12 @@ export default {
             break
           }
           case filterTypes.STATUS: {
-            if (val !== nodeStatus.ALL) {
+            if (val !== "all") {
               // for these three, we need to look at the reviewStatus first
               if (
-                val === nodeStatus.SUBMITTED ||
-                val === nodeStatus.ACCEPTED ||
-                val === nodeStatus.REJECTED
+                val === nodeStatus.SUBMIT ||
+                val === nodeStatus.ACCEPT ||
+                val === nodeStatus.REJECT
               ) {
                 match = matchSorter(match, val, {
                   keys: ["reviewStatus"],
@@ -325,6 +325,15 @@ export default {
     },
     capitalize(str) {
       return str[0].toUpperCase() + str.slice(1)
+    },
+    resetSearch() {
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...this.$route.query,
+          search: filterTypes.TITLE.toLowerCase(),
+        },
+      })
     },
   },
 }

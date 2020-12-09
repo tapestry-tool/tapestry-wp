@@ -78,29 +78,6 @@ describe("Search bar", () => {
       })
   })
 
-  it("should be able to visit a url and see search results", () => {
-    cy.setup("@tapestry")
-
-    cy.store()
-      .its("state.nodes")
-      .then(nodes => {
-        cy.app().then(app => {
-          app.$router.push({
-            path: app.$route.path,
-            query: {
-              search: "Title",
-              q: "first node",
-            },
-          })
-        })
-
-        const expected = Object.values(nodes).filter(
-          node => node.title === "first node"
-        )
-        assertVisibleNodes(expected)
-      })
-  })
-
   it("should not be able to visit the url if not authorized", () => {
     cy.setup("@tapestry", roles.SUBSCRIBER)
 
