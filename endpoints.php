@@ -12,7 +12,7 @@ require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
-require_once __DIR__.'/utilities/class.tapestry-user-roles.php';
+require_once __DIR__.'/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -550,8 +550,8 @@ function addTapestryNode($request)
         $tapestry = new Tapestry($postId);
 
         if ($tapestry->isEmpty()) {
-            $roles = new TapestryUserRoles();
-            if (!$roles->canEdit($postId)) {
+            $user = new TapestryUser();
+            if (!$user->canEdit($postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
         }
@@ -1340,10 +1340,10 @@ function updateUserFavourites($request)
 function getTapestryContributors($request)
 {
     $postId = $request['tapestryPostId'];
-    $roles = new TapestryUserRoles();
+    $user = new TapestryUser();
 
     try {
-        if (!$roles->canEdit($postId)) {
+        if (!$user->canEdit($postId)) {
             throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
