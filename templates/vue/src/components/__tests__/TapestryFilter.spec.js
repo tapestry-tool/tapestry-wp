@@ -116,6 +116,13 @@ describe("TapestryFilter", () => {
     expect(screen.queryByText(new RegExp(nodeStatus.REJECT, "i"))).toBeNull()
   })
 
+  it("should close the search bar when pressing the search button", async () => {
+    const screen = setup()
+    await waitFor(() => expect(screen.combobox).toBeVisible())
+    await fireEvent.click(screen.getByLabelText("search"))
+    expect(screen.combobox).not.toBeVisible()
+  })
+
   it("should reset value if search type is changed", async () => {
     const screen = setup()
 

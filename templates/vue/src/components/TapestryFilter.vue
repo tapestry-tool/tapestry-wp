@@ -234,7 +234,7 @@ export default {
     type: {
       immediate: true,
       handler(type, oldType) {
-        if (type !== oldType) {
+        if (type && type !== oldType) {
           const isValidType = Object.values(filterTypes).some(
             validType => validType === type
           )
@@ -438,5 +438,9 @@ export default {
   margin: 0;
   padding: 0;
   padding-left: 0.75rem;
+}
+
+.vs__clear {
+  display: none;
 }
 </style>
