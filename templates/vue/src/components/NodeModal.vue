@@ -857,7 +857,7 @@ export default {
     },
     handleVideoFrameError() {
       this.submissionError =
-        "Invalid mp4 Video URL: please re-upload or check the URL"
+        "The video could not be found! Please re-upload or check the URL"
       this.loadDuration = false
     },
   },
