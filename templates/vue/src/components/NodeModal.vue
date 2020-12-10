@@ -431,8 +431,7 @@ export default {
     },
     hasSubmissionApiError() {
       if (this.apiError) {
-        this.submissionError =
-          "An unexpected error occurred and the node could not be submitted"
+        this.submissionError = this.apiError.error
       }
     },
     hasSubmissionError() {
