@@ -207,5 +207,32 @@ describe("Node Authoring", () => {
         cy.submitModal()
       })
     })
+
+    it("should display API errors in the modal if they occur during submission", () => {
+      const nodeName = "Test Node"
+
+      cy.getSelectedNode().then(parent => {
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(nodeName)
+
+        cy.changeMediaType("text")
+        cy.getEditable(`node-text-content`).type("Test content")
+
+        // check login state as one example of an error
+        cy.logout()
+        const someApiErrorContents = "log in to edit"
+
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(someApiErrorContents, { timeout: 10000 }).should("exist")
+
+        // check that error persists
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(someApiErrorContents).should("exist")
+
+        // check that node is not created
+        cy.contains(/cancel/i).click()
+        cy.contains(`/${nodeName}/i`).should("not.exist")
+      })
+    })
   })
 })
