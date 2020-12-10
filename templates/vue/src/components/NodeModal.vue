@@ -30,6 +30,7 @@
           >
             <content-form
               :node="node"
+              :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
@@ -272,7 +273,7 @@ export default {
       loading: false,
       userId: null,
       formErrors: [],
-      maxDescriptionLength: 250,
+      maxDescriptionLength: 2000,
       node: null,
       videoLoaded: false,
       fileUploading: false,
@@ -445,13 +446,13 @@ export default {
       this.fileUploading = isUploading
     })
     this.node = this.createDefaultNode()
-
     if (!this.node.mapCoordinates) {
       this.node.mapCoordinates = {
         lat: "",
         lng: "",
       }
     }
+    this.initialize()
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
