@@ -455,7 +455,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateLockedStatus"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateLockedStatus",
+      "setTapestryErrorReporting",
+    ]),
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -504,6 +510,7 @@ export default {
       }
       copy.hasSubAccordion = this.hasSubAccordion(copy)
       this.node = copy
+      this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
@@ -570,6 +577,7 @@ export default {
           })
         }
       }
+      this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
       this.submissionError = null
