@@ -150,9 +150,10 @@ describe("Node Authoring", () => {
       })
     })
 
-    const videoErrorMsg = "The video could not be found! Please re-upload or check the URL"
+    const videoErrorMsg =
+      "The video could not be found! Please re-upload or check the URL"
     const nexistVideoURL = "www.example.com/video.mp4"
-	const validYouTubeURL = "https://www.youtube.com/watch?v=nMhua5LJRWg"
+    const validYouTubeURL = "https://www.youtube.com/watch?v=nMhua5LJRWg"
 
     it("Should show an error and not create a node if an mp4 URL is invalid", () => {
       cy.getSelectedNode().then(parent => {
