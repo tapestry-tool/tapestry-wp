@@ -15,13 +15,12 @@ describe("Node Appearance", () => {
 
       cy.contains(/thumbnail/i).click()
 
-      //TODO: adjust this test to use drag drop instead
       cy.getByTestId("import-file-input").attachFile("reddit.png")
-
+      cy.wait(1000)
       cy.submitModal()
 
       cy.getNodeById(node.id).within(() => {
-        cy.get("image").should("not.be.empty")
+        cy.get("image").should("have.attr", "href").and("contain", "/wp-content/uploads/").and("contain","reddit")
         cy.getByTestId(`node-title-${node.id}`).should("not.exist")
         cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
         cy.getByTestId(`open-node-${node.id}`).should("not.exist")
