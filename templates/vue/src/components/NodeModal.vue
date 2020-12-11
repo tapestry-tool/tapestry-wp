@@ -12,16 +12,13 @@
   >
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <div v-if="submissionError || formErrors.length" class="error-wrapper">
+        <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
-            <li v-for="error in formErrors" :key="error">{{ error }}</li>
-            <li v-if="submissionError" data-qa="modal-submit-error">
-              {{ submissionError }}
-            </li>
+            <li v-for="error in errors" :key="error">{{ error }}</li>
           </ul>
         </div>
-        <b-tabs card :class="{ 'has-errors': submissionError || formErrors.length }">
+        <b-tabs card :class="{ 'has-errors': hasSubmissionError }">
           <b-tab
             title="Content"
             :active="tab === 'content'"
@@ -272,14 +269,13 @@ export default {
     return {
       loading: false,
       userId: null,
-      formErrors: [],
+      errors: [],
       maxDescriptionLength: 2000,
       node: null,
       videoLoaded: false,
       fileUploading: false,
       loadDuration: false,
       warningText: "",
-      submissionError: null,
       deleteWarningText: "",
     }
   },
@@ -390,7 +386,7 @@ export default {
       return this.apiError
     },
     hasSubmissionError() {
-      return this.submissionError
+      return this.errors.length
     },
   },
   watch: {
@@ -431,11 +427,11 @@ export default {
     },
     hasSubmissionApiError() {
       if (this.apiError) {
-        this.submissionError = this.apiError.error
+        this.errors.push(this.apiError.error)
       }
     },
     hasSubmissionError() {
-      if (this.submissionError) {
+      if (this.hasSubmissionError) {
         this.loading = false
       }
     },
@@ -501,8 +497,7 @@ export default {
       return isAllowed
     },
     initialize() {
-      this.formErrors = []
-      this.submissionError = null
+      this.errors = []
       let copy = this.createDefaultNode()
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)
@@ -580,9 +575,8 @@ export default {
       this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
-      this.submissionError = null
-      this.formErrors = this.validateNode()
-      if (!this.formErrors.length) {
+      this.errors = this.validateNode()
+      if (!this.hasSubmissionError) {
         this.loading = true
         this.updateNodeCoordinates()
 
@@ -646,7 +640,7 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
-      if (!this.submissionError) {
+      if (!this.hasSubmissionError) {
         this.close()
       }
     },
@@ -863,8 +857,9 @@ export default {
       return true
     },
     handleVideoFrameError() {
-      this.submissionError =
+      this.errors.push(
         "The video could not be found! Please re-upload or check the URL"
+      )
       this.loadDuration = false
     },
   },
