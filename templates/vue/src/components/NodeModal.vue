@@ -277,6 +277,7 @@ export default {
       loadDuration: false,
       warningText: "",
       deleteWarningText: "",
+      formUpdated: false,
     }
   },
   computed: {
@@ -532,9 +533,10 @@ export default {
     },
     handleClose(event) {
       if (
-        event.trigger == "backdrop" ||
-        event.trigger == "headerclose" ||
-        event.trigger == "esc"
+        this.formUpdated &&
+        (event.trigger == "backdrop" ||
+          event.trigger == "headerclose" ||
+          event.trigger == "esc")
       ) {
         event.preventDefault()
         this.$bvModal
@@ -545,6 +547,8 @@ export default {
             }
           })
           .catch(err => console.log(err))
+      } else {
+        this.close()
       }
     },
     close() {
