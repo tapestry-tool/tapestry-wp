@@ -8,9 +8,7 @@
     class="text-muted"
     scrollable
     body-class="p-0"
-    no-close-on-esc
-    no-close-on-backdrop
-    @close="handleClose"
+    @hide="handleClose"
   >
     <div v-if="formErrors.length" class="modal-header-row">
       <b-alert id="tapestry-modal-form-errors" variant="danger" show>
@@ -533,16 +531,21 @@ export default {
       }
     },
     handleClose(event) {
-      event.preventDefault()
-      this.$bvModal
-        .msgBoxConfirm("Are you sure?")
-        .then(close => {
-          if (close) {
-            this.close()
-            return true
-          }
-        })
-        .catch(err => console.log(err))
+      if (
+        event.trigger == "backdrop" ||
+        event.trigger == "headerclose" ||
+        event.trigger == "esc"
+      ) {
+        event.preventDefault()
+        this.$bvModal
+          .msgBoxConfirm("Are you sure?")
+          .then(close => {
+            if (close) {
+              this.close()
+            }
+          })
+          .catch(err => console.log(err))
+      }
     },
     close() {
       if (this.show) {
