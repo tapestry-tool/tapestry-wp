@@ -1,4 +1,6 @@
 import DragSelect from "dragselect"
+import Helpers from "@/utils/Helpers"
+import * as wp from "@/services/wp"
 
 export default class DragSelectModular {
   app
@@ -10,7 +12,7 @@ export default class DragSelectModular {
     this.app = app
     this.nodes = nodes
     this.dragSelect = new DragSelect({
-      selectables: document.querySelectorAll(".node"),
+      selectables: document.querySelectorAll(".node.selectable"),
       area: area,
       onDragStart: evt => {
         if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
@@ -24,15 +26,19 @@ export default class DragSelectModular {
   }
 
   static dragSelectListener(evt) {
-    if (evt.key === "Escape") {
-      DragSelectModular.app.clearSelection()
-    }
+    if (DragSelectModular.app) {
+      if (evt.key === "Escape") {
+        DragSelectModular.app.clearSelection()
+      }
 
-    if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
-      evt.preventDefault()
-      Object.values(DragSelectModular.nodes).forEach(node =>
-        DragSelectModular.app.select(node.id)
-      )
+      if (evt.key === "a" && (evt.metaKey || evt.ctrlKey || evt.shiftKey)) {
+        evt.preventDefault()
+        Object.values(DragSelectModular.nodes).forEach(node => {
+          if (wp.isLoggedIn() && Helpers.hasPermission(node, "edit")) {
+            DragSelectModular.app.select(node.id)
+          }
+        })
+      }
     }
   }
 
@@ -45,10 +51,16 @@ export default class DragSelectModular {
   }
 
   static updateSelectableNodes() {
-    DragSelectModular.dragSelect.addSelectables(document.querySelectorAll(".node"))
+    if (DragSelectModular.dragSelect) {
+      DragSelectModular.dragSelect.addSelectables(
+        document.querySelectorAll(".node.selectable")
+      )
+    }
   }
 
   static pauseDragSelect() {
-    DragSelectModular.dragSelect.break()
+    if (DragSelectModular.dragSelect) {
+      DragSelectModular.dragSelect.break()
+    }
   }
 }
