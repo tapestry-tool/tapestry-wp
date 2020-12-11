@@ -18,7 +18,9 @@ describe("Node Appearance", () => {
       const url =
         "https://upload.wikimedia.org/wikipedia/commons/2/2a/Hummingbird.jpg"
 
-      cy.getByTestId(`node-appearance-thumbnail-url`).type(url)
+      //TODO: adjust this test to use drag drop instead
+      cy.getByTestId("import-file-input").attachFile("reddit.png")
+
       cy.submitModal()
 
       cy.getNodeById(node.id).within(() => {

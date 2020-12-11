@@ -30,6 +30,7 @@
           drop-placeholder="Drop file here..."
           :disabled="isUploading"
           required
+          data-qa="import-file-input"
           @dragover.prevent
           @drop.prevent="uploadFile"
           @change="uploadFile"
