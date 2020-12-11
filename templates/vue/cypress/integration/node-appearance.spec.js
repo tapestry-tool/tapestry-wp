@@ -15,16 +15,13 @@ describe("Node Appearance", () => {
 
       cy.contains(/thumbnail/i).click()
 
-      const url =
-        "https://upload.wikimedia.org/wikipedia/commons/2/2a/Hummingbird.jpg"
-
       //TODO: adjust this test to use drag drop instead
       cy.getByTestId("import-file-input").attachFile("reddit.png")
 
       cy.submitModal()
 
       cy.getNodeById(node.id).within(() => {
-        cy.get("image").should("have.attr", "href", url)
+        cy.get("image").should("not.be.empty")
         cy.getByTestId(`node-title-${node.id}`).should("not.exist")
         cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
         cy.getByTestId(`open-node-${node.id}`).should("not.exist")
