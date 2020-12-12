@@ -115,7 +115,7 @@ export default class Helpers {
   }
 
   /**
-   * Deeply checks if two nodes are different from one another
+   * Checks if two nodes are equal to each other
    * - Allows missing property as long as loosely equals null
    * Source: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
    * @param {Object} src
@@ -139,9 +139,28 @@ export default class Helpers {
         }
       }
       return true
+    } else if (Array.isArray(src) && Array.isArray(other)) {
+      return Helpers.arraysEqual(src, other)
     } else {
       return false
     }
+  }
+
+  /**
+   * Checks if two arrays are equal to each other
+   * Source: https://stackoverflow.com/questions/3115982/how-to-check-if-two-arrays-are-equal-with-javascript
+   * @param {Object} a
+   * @param {Object} b
+   */
+  static arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
 
   /**
