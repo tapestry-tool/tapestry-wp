@@ -277,7 +277,6 @@ export default {
       loadDuration: false,
       warningText: "",
       deleteWarningText: "",
-      formUpdated: false,
     }
   },
   computed: {
@@ -532,8 +531,9 @@ export default {
       }
     },
     handleClose(event) {
+      const oldNode = this.getNode(this.nodeId)
       if (
-        this.formUpdated &&
+        !Helpers.nodeEqual(oldNode, this.node) &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc")
