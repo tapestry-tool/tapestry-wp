@@ -117,48 +117,41 @@ export default class Helpers {
   /**
    * Checks if two nodes are equal to each other
    * - Allows missing property as long as loosely equals null
-   * Source: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
+   * Reference: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
    * @param {Object} src
    * @param {Object} other
+   * @param {Array} ignoreProps
    */
-  static nodeEqual(src, other) {
+  static nodeEqual(src, other, ignoreProps = []) {
     if (src === other) {
       return true
     } else if (Array.isArray(src) && Array.isArray(other)) {
-      return Helpers.arraysEqual(src, other)
+      if (src.length !== other.length) return false
+
+      for (let i = 0; i < src.length; i++) {
+        if (!Helpers.nodeEqual(src[i], other[i])) return false
+      }
     } else if (
       typeof src == "object" &&
       src != null &&
       typeof other == "object" &&
       other != null
     ) {
-      for (var prop in src) {
+      for (let prop in src) {
+        if (ignoreProps.includes(prop)) continue
         if (other.hasOwnProperty(prop)) {
-          if (!Helpers.nodeEqual(src[prop], other[prop])) return false
+          if (!Helpers.nodeEqual(src[prop], other[prop])) {
+            return false
+          }
         } else {
           // If property does not exist, check if null or false
-          if (src[prop] != 0) return false
+          if (src[prop] != 0) {
+            return false
+          }
         }
       }
-      return true
     } else {
       return false
-    }
-  }
-
-  /**
-   * Checks if two arrays are equal to each other
-   * Source: https://stackoverflow.com/questions/3115982/how-to-check-if-two-arrays-are-equal-with-javascript
-   * @param {Object} a
-   * @param {Object} b
-   */
-  static arraysEqual(a, b) {
-    if (a === b) return true
-    if (a == null || b == null) return false
-    if (a.length !== b.length) return false
-
-    for (var i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false
     }
     return true
   }
