@@ -13,6 +13,7 @@ describe("Node Operations", () => {
       cy.openModal("add", id)
       cy.getByTestId("node-modal").should("be.visible")
       cy.contains(/cancel/i).click()
+      cy.contains(/close/i).click()
       cy.getByTestId("node-modal").should("not.be.visible")
 
       cy.openModal("edit", id)
@@ -35,36 +36,27 @@ describe("Node Operations", () => {
   })
 
   it("should prompt user if closing modal with changes", () => {
-
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
-      cy.getByTestId("node-modal").should("be.visible")
+      cy.getByTestId("node-modal").should("exist")
 
       cy.getByTestId("node-title").type(node.title)
 
       clickOutsideModal()
-      cy.getByTestId("node-modal").should("be.visible")
-      cy.getByTestId("node-modal-confirmation").should("be.visible")
+      cy.getByTestId("node-modal").should("exist")
+      cy.get(".node-modal-confirmation").should("be.visible")
 
-      cy.getByTestId("node-modal-confirmation-yes").click()
+      cy.get(".node-modal-confirmation").contains("Cancel").click()
       cy.getByTestId("node-modal").should("be.visible")
-      cy.getByTestId("node-modal-confirmation").should("not.be.visible")
+      cy.get(".node-modal-confirmation").should("not.be.visible")
 
       cy.get(".close").click()
-      cy.getByTestId("node-modal").should("be.visible")
-      cy.getByTestId("node-modal-confirmation").should("be.visible")
+      cy.getByTestId("node-modal").should("exist")
+      cy.get(".node-modal-confirmation").should("be.visible")
 
-      cy.getByTestId("node-modal-confirmation-no").click()
+      cy.get(".node-modal-confirmation").contains("Close").click()
       cy.getByTestId("node-modal").should("not.be.visible")
-      cy.getByTestId("node-modal-confirmation").should("not.be.visible")
-    })
-
-    cy.getSelectedNode().then(node => {
-      cy.openModal("edit", node.id)
-      cy.getByTestId("node-modal").should("be.visible")
-
-      clickOutsideModal()
-      cy.getByTestId("node-modal").should("not.be.visible")
+      cy.get(".node-modal-confirmation").should("not.be.visible")
     })
   })
 
