@@ -541,7 +541,10 @@ export default {
       ) {
         event.preventDefault()
         this.$bvModal
-          .msgBoxConfirm("Are you sure?")
+          .msgBoxConfirm("All unsaved changes will be lost.", {
+            title: "Are you sure you want to continue?",
+            okTitle: "Close",
+          })
           .then(close => {
             if (close) {
               this.close()
