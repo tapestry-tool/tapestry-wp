@@ -137,7 +137,7 @@
               size="sm"
               variant="light"
               :disabled="loading || fileUploading"
-              @click="close"
+              @click="handleClose"
             >
               Cancel
             </b-button>
@@ -536,7 +536,8 @@ export default {
         !Helpers.nodeEqual(oldNode, this.node) &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
-          event.trigger == "esc")
+          event.trigger == "esc" ||
+          event instanceof MouseEvent) // cancel
       ) {
         event.preventDefault()
         this.$bvModal
