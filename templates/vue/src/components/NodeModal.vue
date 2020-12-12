@@ -533,15 +533,17 @@ export default {
     handleClose(event) {
       const oldNode = this.getNode(this.nodeId)
       if (
-        !Helpers.nodeEqual(oldNode, this.node) &&
+        (this.type === "add" ||
+          !Helpers.nodeEqual(oldNode, this.node, ["license", "permissions"])) &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc" ||
-          event instanceof MouseEvent) // cancel
+          event instanceof MouseEvent) // cancel triggered
       ) {
         event.preventDefault()
         this.$bvModal
           .msgBoxConfirm("All unsaved changes will be lost.", {
+            modalClass: "node-modal-confirmation",
             title: "Are you sure you want to continue?",
             okTitle: "Close",
           })
