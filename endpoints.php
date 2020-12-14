@@ -520,7 +520,8 @@ function importTapestry($postId, $tapestryData)
         // Construct ID map and add nodes to new Tapestry
         foreach ($tapestryData->nodes as $node) {
             $oldNodeId = $node->id;
-            $newNode = $tapestry->addNode($node);
+            $parentId = $node->import_parent_id;
+            $newNode = $tapestry->addNode($node, $parentId);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
         }
