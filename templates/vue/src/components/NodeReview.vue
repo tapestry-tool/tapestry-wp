@@ -24,6 +24,11 @@
       >
         Submit
       </b-button>
+      <p v-if="showDisclaimer" class="disclaimer">
+        <small>
+          Note your comments won't be visible until you submit the node for review.
+        </small>
+      </p>
     </div>
   </b-overlay>
 </template>
@@ -84,6 +89,13 @@ export default {
      */
     isReviewer() {
       return wp.canEditTapestry()
+    },
+    /**
+     * The disclaimer text should only be shown for submitters and only if the node
+     * isn't submitted.
+     */
+    showDisclaimer() {
+      return !this.isReviewer && this.node.reviewStatus !== nodeStatus.SUBMIT
     },
   },
   methods: {
@@ -148,5 +160,11 @@ textarea {
   display: block;
   width: 100%;
   margin-top: 0.5rem;
+}
+
+.disclaimer {
+  margin: 0.5rem 0;
+  text-align: center;
+  line-height: 1.2;
 }
 </style>
