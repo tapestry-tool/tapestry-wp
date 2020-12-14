@@ -73,8 +73,8 @@ describe("TYDE", () => {
     })
 
     it("Should allow creation of a regular node from a question set", () => {
-      cy.fixture("one-question-set.json").as("oneQuestionSet")
-      cy.setup("@oneNode")
+      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneQuestionSet")
       cy.getSelectedNode().then(node => {
         cy.openModal("add", node.id)
         cy.getByTestId(`node-title`).type("Question 1")
