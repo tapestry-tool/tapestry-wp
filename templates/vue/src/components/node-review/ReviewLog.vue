@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <li v-for="event in eventWithComponents" :key="event.timestamp">
+    <li v-for="(event, index) in eventWithComponents" :key="event.timestamp + index">
       <component :is="event.component" :event="event"></component>
     </li>
   </ul>
