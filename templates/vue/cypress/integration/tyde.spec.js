@@ -43,7 +43,6 @@ describe("TYDE", () => {
       })
     })
 
-    // TODO fix INVALID_NODE_TYPE
     it("Should allow creation of a question set from a stage", () => {
       cy.fixture("tyde/one-stage.json").as("oneStage")
       cy.setup("@oneStage")
