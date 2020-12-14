@@ -8,6 +8,7 @@
     >
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
+        <notification-bar v-if="canEdit" class="notification-bar" />
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
@@ -77,6 +78,7 @@ import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
+import NotificationBar from "@/components/NotificationBar"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
@@ -91,6 +93,7 @@ export default {
     SettingsModalButton,
     RootNodeButton,
     LockedTooltip,
+    NotificationBar,
   },
   data() {
     return {
@@ -296,6 +299,11 @@ export default {
   border-bottom-left-radius: 0;
   padding: 8px 0 8px 12px;
   position: relative;
+}
+
+.notification-bar {
+  background: none;
+  margin-right: 0.5rem;
 }
 </style>
 
