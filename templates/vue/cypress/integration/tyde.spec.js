@@ -64,10 +64,26 @@ describe("TYDE", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {
+        // Use viewing the question set as a proxy for node completion
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
         cy.getBySrc(earnedIcon).should("exist")
         cy.getBySrc(notEarnedIcon).should("not.exist")
+      })
+    })
+
+    it("Should allow creation of a regular node from a question set", () => {
+      cy.fixture("one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneNode")
+      cy.getSelectedNode().then(node => {
+        cy.openModal("add", node.id)
+        cy.getByTestId(`node-title`).type("Question 1")
+        cy.getByTestId(`node-media-type`).select("text")
+        cy.getByTestId(`tyde-node-type`).select("Regular")
+        cy.getEditable(`node-text-content`).type("This is an example of a question.")
+        cy.submitModal()
+        cy.getBySrc(earnedIcon).should("not.exist")
+        cy.getBySrc(notEarnedIcon).should("exist")
       })
     })
   })
