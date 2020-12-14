@@ -44,21 +44,21 @@ describe("TYDE", () => {
     })
 
     // TODO fix INVALID_NODE_TYPE
-    // it("Should allow creation of a question set from a stage", () => {
-    //   cy.fixture("tyde/one-stage.json").as("oneStage")
-    //   cy.setup("@oneStage")
-    //   cy.getNodeByTitle("Stage 1").then(node => {
-    //     cy.openModal("add", node.id)
-    //     cy.getByTestId(`node-title`).type("Question Set 1")
-    //     cy.getByTestId(`node-media-type`).select("text")
-    //     cy.getByTestId(`tyde-node-type`).select("Question set")
-    //     cy.getEditable(`node-text-content`).type(
-    //       "This is the first question set for module 1 stage 1."
-    //     )
-    //     cy.submitModal()
-    //     cy.getBySrc(earnedIcon).should("exist")
-    //     cy.getBySrc(notEarnedIcon).should("not.exist")
-    //   })
-    // })
+    it("Should allow creation of a question set from a stage", () => {
+      cy.fixture("tyde/one-stage.json").as("oneStage")
+      cy.setup("@oneStage")
+      cy.getNodeByTitle("Stage 1").then(node => {
+        cy.openModal("add", node.id)
+        cy.getByTestId(`node-title`).type("Question Set 1")
+        cy.getByTestId(`node-media-type`).select("text")
+        cy.getByTestId(`tyde-node-type`).select("Question set")
+        cy.getEditable(`node-text-content`).type(
+          "This is the first question set for module 1 stage 1."
+        )
+        cy.submitModal()
+        cy.getBySrc(earnedIcon).should("exist")
+        cy.getBySrc(notEarnedIcon).should("not.exist")
+      })
+    })
   })
 })
