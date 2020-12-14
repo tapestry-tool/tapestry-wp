@@ -509,7 +509,6 @@ class Tapestry implements ITapestry
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
         }
-        error_log(json_encode($tapestry->nodes));
 
         return $tapestry;
     }

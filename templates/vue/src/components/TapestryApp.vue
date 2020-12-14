@@ -2,7 +2,7 @@
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <div v-if="!settings.renderMap" class="toolbar">
       <tapestry-filter style="z-index: 10;" />
-      <div class="slider-wrapper">
+      <div v-if="maxDepth > 1 && settings.defaultDepth > 0" class="slider-wrapper">
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
