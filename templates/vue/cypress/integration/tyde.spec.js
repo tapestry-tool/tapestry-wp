@@ -55,6 +55,17 @@ describe("TYDE", () => {
           "This is the first question set for module 1 stage 1."
         )
         cy.submitModal()
+        cy.getBySrc(earnedIcon).should("not.exist")
+        cy.getBySrc(notEarnedIcon).should("exist")
+      })
+    })
+
+    it("Should update show module earned part when all question sets are complete", () => {
+      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneQuestionSet")
+      cy.getNodeByTitle("Question Set 1").then(node => {
+        cy.getNodeById(node.id).click()
+        cy.openLightbox(node.id)
         cy.getBySrc(earnedIcon).should("exist")
         cy.getBySrc(notEarnedIcon).should("not.exist")
       })
