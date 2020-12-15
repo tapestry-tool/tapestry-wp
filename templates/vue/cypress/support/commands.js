@@ -198,3 +198,13 @@ Cypress.Commands.add("getEditable", testId =>
 Cypress.Commands.add("getBySrc", (srcURL, ...args) =>
   cy.get(`[src="${srcURL}"]`, ...args)
 )
+
+Cypress.Commands.add("openSpaceship", () => {
+  cy.getByTestId("tyde-spaceship-icon").click()
+  cy.getByTestId("tyde-map-button").should("be.visible")
+})
+
+Cypress.Commands.add("closeSpaceship", () => {
+  cy.getByTestId("tyde-map-button").click()
+  cy.getByTestId("tyde-map-button").should("not.be.visible")
+})

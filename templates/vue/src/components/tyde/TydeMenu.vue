@@ -9,6 +9,7 @@
       <tyde-button
         icon="globe-asia"
         label="Map"
+        data-qa="tyde-map-button"
         @click="$emit('return-to-map')"
       ></tyde-button>
       <tyde-button

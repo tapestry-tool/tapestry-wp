@@ -1,5 +1,5 @@
 describe("TYDE", () => {
-  describe("Modules and Stages", () => {
+  describe("Modules, Stages and Question Sets", () => {
     const notEarnedIcon =
       "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
       "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg"
@@ -85,6 +85,13 @@ describe("TYDE", () => {
         cy.getBySrc(earnedIcon).should("not.exist")
         cy.getBySrc(notEarnedIcon).should("exist")
       })
+    })
+  })
+
+  describe("Spaceship", () => {
+    it("Should navigate from map to spaceship and back", () => {
+      cy.openSpaceship()
+      cy.closeSpaceship()
     })
   })
 })
