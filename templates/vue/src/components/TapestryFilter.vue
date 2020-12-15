@@ -23,6 +23,8 @@
         data-qa="search-input"
         :filter="getVisibleMatches"
         :options="filterOptions"
+        :reduce="option => getOptionLabel(option)"
+        :clear-search-on-select="false"
         :clear-search-on-blur="() => false"
         :label="type === types.AUTHOR ? 'name' : 'title'"
         @search="val => (search = val)"
@@ -100,14 +102,16 @@ export default {
       },
       set(type) {
         if (type && type !== this.type) {
-          this.$router.replace({
-            path: this.$route.path,
-            query: {
-              ...this.$route.query,
-              search: type.toLowerCase(),
-              query: type === filterTypes.STATUS ? "all" : "",
-            },
-          })
+          this.$router
+            .replace({
+              path: this.$route.path,
+              query: {
+                ...this.$route.query,
+                search: type.toLowerCase(),
+                query: type === filterTypes.STATUS ? "all" : "",
+              },
+            })
+            .catch(() => {})
         }
       },
     },
@@ -116,17 +120,17 @@ export default {
         return this.$route.query.query
       },
       set(val) {
-        let serializedVal = val
-
-        if (typeof val === "object") {
-          serializedVal = this.type === filterTypes.AUTHOR ? val.name : val.title
-        }
-
-        if (val !== this.filterValue) {
-          this.$router.replace({
-            path: this.$route.path,
-            query: { ...this.$route.query, query: serializedVal },
-          })
+        if (val) {
+          val = this.getOptionLabel(val)
+          this.search = val
+          if (val !== this.filterValue) {
+            this.$router
+              .replace({
+                path: this.$route.path,
+                query: { ...this.$route.query, query: val },
+              })
+              .catch(() => {})
+          }
         }
       },
     },
@@ -136,15 +140,22 @@ export default {
       },
       set(isActive) {
         if (isActive) {
-          this.$router.push({
-            path: this.$route.path,
-            query: { ...this.$route.query, search: filterTypes.TITLE.toLowerCase() },
-          })
+          this.$router
+            .push({
+              path: this.$route.path,
+              query: {
+                ...this.$route.query,
+                search: filterTypes.TITLE.toLowerCase(),
+              },
+            })
+            .catch(() => {})
         } else {
-          this.$router.push({
-            path: this.$route.path,
-            query: Helpers.omit(this.$route.query, ["search", "query"]),
-          })
+          this.$router
+            .push({
+              path: this.$route.path,
+              query: Helpers.omit(this.$route.query, ["search", "query"]),
+            })
+            .catch(() => {})
         }
       },
     },
@@ -191,14 +202,10 @@ export default {
     },
     visibleNodes() {
       if (this.isActive) {
-        if (!this.filterValue && !this.search) {
+        if (!this.filterValue) {
           return []
         }
-        const matches = this.getMatches(
-          this.type === filterTypes.STATUS
-            ? this.filterValue
-            : this.search || this.filterValue
-        )
+        const matches = this.getMatches(this.filterValue)
         return matches.map(node => node.id)
       }
       return Object.values(this.nodes).map(node => node.id)
@@ -224,6 +231,9 @@ export default {
         await this.refetchTapestryData(Number(next.id))
         this.loading = false
       }
+    },
+    search(val) {
+      this.filterValue = val
     },
     visibleNodes: {
       immediate: true,
@@ -323,17 +333,26 @@ export default {
       }
       return match
     },
+    getOptionLabel(option) {
+      let label = option
+      if (typeof option === "object") {
+        label = this.type === filterTypes.AUTHOR ? option.name : option.title
+      }
+      return label
+    },
     capitalize(str) {
       return str[0].toUpperCase() + str.slice(1)
     },
     resetSearch() {
-      this.$router.replace({
-        path: this.$route.path,
-        query: {
-          ...this.$route.query,
-          search: filterTypes.TITLE.toLowerCase(),
-        },
-      })
+      this.$router
+        .replace({
+          path: this.$route.path,
+          query: {
+            ...this.$route.query,
+            search: filterTypes.TITLE.toLowerCase(),
+          },
+        })
+        .catch(() => {})
     },
   },
 }
@@ -395,6 +414,9 @@ export default {
 
 .custom-select {
   height: auto !important;
+  &:focus {
+    box-shadow: none;
+  }
 }
 
 #search-type.custom-select {
@@ -407,11 +429,13 @@ export default {
 #status-select.custom-select {
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
-  width: 12rem;
+  min-width: 12rem;
+  max-width: 50vw;
 }
 
 .v-select {
-  width: 12rem;
+  min-width: 12rem;
+  max-width: 50vw;
 }
 </style>
 
@@ -426,18 +450,30 @@ export default {
 .vs__selected-options {
   height: 100%;
   padding: 0 !important;
+  overflow: hidden;
 }
 
 .vs__search {
   border: none !important;
-  margin: 0 !important;
+  margin: 1px 0 !important;
+  padding-left: 0.8rem !important;
   height: 100%;
+}
+.vs--single:not(.vs--open) .vs__search {
+  opacity: 0 !important;
+}
+.vs--single.vs--searching:not(.vs--open) .vs__selected {
+  display: block !important;
 }
 
 .vs__selected {
-  margin: 0;
+  margin: 0.5em 0;
   padding: 0;
   padding-left: 0.75rem;
+  flex: none;
+}
+.vs--single.vs--open .vs__selected {
+  display: none;
 }
 
 .vs__clear {
