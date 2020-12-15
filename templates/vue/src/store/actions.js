@@ -321,3 +321,7 @@ export function addApiError({ commit }, error) {
   const message = ErrorHelper.getErrorMessage(error)
   commit("addApiError", { error: message })
 }
+
+export function setTapestryErrorReporting({ commit }, isEnabled) {
+  commit("setTapestryErrorReporting", isEnabled)
+}
