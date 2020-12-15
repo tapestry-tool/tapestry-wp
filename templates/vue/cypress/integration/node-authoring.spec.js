@@ -149,5 +149,90 @@ describe("Node Authoring", () => {
         })
       })
     })
+
+    const videoErrorMsg =
+      "The video could not be found! Please re-upload or check the URL"
+    const nexistVideoURL = "www.example.com/video.mp4"
+    const validYouTubeURL = "https://www.youtube.com/watch?v=nMhua5LJRWg"
+
+    it("Should show an error and not create a node if an mp4 URL is invalid", () => {
+      cy.getSelectedNode().then(parent => {
+        const nodeName = "Video 1"
+
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(nodeName)
+
+        cy.changeMediaType("video")
+        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
+
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
+
+        // check that error persists
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(videoErrorMsg).should("exist")
+
+        // check that node is not created
+        cy.contains(/cancel/i).click()
+        cy.contains(`/${nodeName}/i`).should("not.exist")
+
+        // check that error does not persist to new creation
+        cy.openModal("add", parent.id)
+        cy.changeMediaType("video")
+        cy.getByTestId(`node-title`).type(nodeName)
+        cy.getByTestId(`node-video-url`).type(validYouTubeURL)
+        cy.getByTestId("modal-submit-error").should("not.exist")
+      })
+    })
+
+    const existVideoURL =
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+
+    it("Should close modal with a good video url even after an error has occurred", () => {
+      cy.getSelectedNode().then(parent => {
+        const nodeName = "Video 2"
+
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(nodeName)
+
+        cy.changeMediaType("video")
+        cy.getByTestId(`node-video-url`).type(nexistVideoURL)
+
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
+
+        cy.getByTestId(`node-video-url`)
+          .clear()
+          .type(existVideoURL)
+        cy.submitModal()
+      })
+    })
+
+    it("should display API errors in the modal if they occur during submission", () => {
+      const nodeName = "Test Node"
+
+      cy.getSelectedNode().then(parent => {
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(nodeName)
+
+        cy.changeMediaType("text")
+        cy.getEditable(`node-text-content`).type("Test content")
+
+        // check login state as one example of an error
+        cy.logout()
+        const someApiErrorContents = "log in to edit"
+
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(someApiErrorContents, { timeout: 10000 }).should("exist")
+
+        // check that error persists
+        cy.getByTestId("submit-node-modal").click()
+        cy.contains(someApiErrorContents).should("exist")
+
+        // check that node is not created
+        cy.contains(/cancel/i).click()
+        cy.contains(`/${nodeName}/i`).should("not.exist")
+      })
+    })
   })
 })
