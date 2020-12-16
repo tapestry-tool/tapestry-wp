@@ -10,16 +10,15 @@
     body-class="p-0"
     @hidden="close"
   >
-    <div v-if="formErrors.length" class="modal-header-row">
-      <b-alert id="tapestry-modal-form-errors" variant="danger" show>
-        <ul>
-          <li v-for="error in formErrors" :key="error">{{ error }}</li>
-        </ul>
-      </b-alert>
-    </div>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <b-tabs card>
+        <div v-if="hasSubmissionError" class="error-wrapper">
+          <h5>Node cannot be saved due to the following error(s):</h5>
+          <ul>
+            <li v-for="error in errors" :key="error">{{ error }}</li>
+          </ul>
+        </div>
+        <b-tabs card :class="{ 'has-errors': hasSubmissionError }">
           <b-tab
             title="Content"
             :active="tab === 'content'"
@@ -209,6 +208,7 @@
         :src="node.typeData.mediaURL"
         style="display: none;"
         @loadeddata="setVideoDuration"
+        @error="handleVideoFrameError"
       ></video>
       <youtube
         v-if="node.mediaFormat === 'youtube'"
@@ -269,7 +269,7 @@ export default {
     return {
       loading: false,
       userId: null,
-      formErrors: [],
+      errors: [],
       maxDescriptionLength: 2000,
       node: null,
       videoLoaded: false,
@@ -287,7 +287,7 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -382,6 +382,12 @@ export default {
     type() {
       return this.$route.params.type || ""
     },
+    hasSubmissionApiError() {
+      return this.apiError
+    },
+    hasSubmissionError() {
+      return this.errors.length
+    },
   },
   watch: {
     nodeId: {
@@ -419,6 +425,16 @@ export default {
         }
       },
     },
+    hasSubmissionApiError() {
+      if (this.apiError) {
+        this.errors.push(this.apiError.error)
+      }
+    },
+    hasSubmissionError() {
+      if (this.hasSubmissionError) {
+        this.loading = false
+      }
+    },
   },
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
@@ -438,7 +454,13 @@ export default {
   },
   methods: {
     ...mapMutations(["updateSelectedNode", "updateRootNode"]),
-    ...mapActions(["addNode", "addLink", "updateNode", "updateLockedStatus"]),
+    ...mapActions([
+      "addNode",
+      "addLink",
+      "updateNode",
+      "updateLockedStatus",
+      "setTapestryErrorReporting",
+    ]),
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -478,7 +500,7 @@ export default {
       return isAllowed
     },
     initialize() {
-      this.formErrors = ""
+      this.errors = []
       let copy = this.createDefaultNode()
       if (this.type === "edit") {
         const node = this.getNode(this.nodeId)
@@ -486,6 +508,7 @@ export default {
       }
       copy.hasSubAccordion = this.hasSubAccordion(copy)
       this.node = copy
+      this.setTapestryErrorReporting(false)
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
@@ -552,10 +575,11 @@ export default {
           })
         }
       }
+      this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
-      this.formErrors = this.validateNode()
-      if (!this.formErrors.length) {
+      this.errors = this.validateNode()
+      if (!this.hasSubmissionError) {
         this.loading = true
         this.updateNodeCoordinates()
 
@@ -618,8 +642,10 @@ export default {
         })
       }
       await this.updateLockedStatus()
-      this.close()
       this.loading = false
+      if (!this.hasSubmissionError) {
+        this.close()
+      }
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
@@ -833,6 +859,12 @@ export default {
       }
       return true
     },
+    handleVideoFrameError() {
+      this.errors.push(
+        "The video could not be found! Please re-upload or check the URL"
+      )
+      this.loadDuration = false
+    },
   },
 }
 </script>
@@ -878,6 +910,10 @@ table {
       outline: none;
     }
   }
+}
+
+.has-errors > .card-header {
+  background: #f8d7da;
 }
 
 .modal-title {
@@ -930,6 +966,12 @@ table {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.error-wrapper {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1em 1em 1px 2em;
 }
 
 .slick-list-item {
