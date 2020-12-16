@@ -36,6 +36,7 @@
 import moment from "moment-timezone"
 import { getCurrentUser } from "@/services/wp"
 import RichTextForm from "./content-form/RichTextForm"
+import { nodeStatus } from "@/utils/constants"
 
 export default {
   components: {
@@ -62,12 +63,12 @@ export default {
   },
   methods: {
     handleReject() {
-      this.node.reviewStatus = "rejected"
+      this.node.reviewStatus = nodeStatus.REJECT
       this.handleSubmit()
     },
     handleAccept() {
-      this.node.status = "publish"
-      this.node.reviewStatus = "accepted"
+      this.node.status = nodeStatus.PUBLISH
+      this.node.reviewStatus = nodeStatus.ACCEPT
       this.handleSubmit()
     },
     handleSubmit() {
