@@ -20,15 +20,10 @@
         class="submit-button"
         variant="info"
         :aria-hidden="loading"
-        @click="submitReview"
+        @click="handleAuthorSubmit"
       >
-        Submit
+        {{ submitText }}
       </b-button>
-      <p v-if="showDisclaimer" class="disclaimer">
-        <small>
-          Note your comments won't be visible until you submit the node for review.
-        </small>
-      </p>
     </div>
   </b-overlay>
 </template>
@@ -65,15 +60,6 @@ export default {
       return this.node.reviewComments
     },
     /**
-     * Whether the node is currently in the review process. The review process
-     * starts when a node gets submitted for review, and stops when it is accepted.
-     */
-    inReviewProcess() {
-      return (
-        this.node.status === nodeStatus.DRAFT && this.node.reviewStatus !== undefined
-      )
-    },
-    /**
      * Whether the review form is visible. For authors, the form is visible as long
      * as the node is in the review process. For reviewers, the form is only visible
      * if the node is submitted for review (i.e. it's not rejected).
@@ -82,7 +68,7 @@ export default {
       if (this.isReviewer) {
         return this.node.reviewStatus === nodeStatus.SUBMIT
       }
-      return this.inReviewProcess
+      return this.node.status === nodeStatus.DRAFT
     },
     /**
      * A reviewer is anyone who has edit access to the Tapestry.
@@ -90,16 +76,29 @@ export default {
     isReviewer() {
       return wp.canEditTapestry()
     },
-    /**
-     * The disclaimer text should only be shown for submitters and only if the node
-     * isn't submitted.
-     */
-    showDisclaimer() {
-      return !this.isReviewer && this.node.reviewStatus !== nodeStatus.SUBMIT
+    submitText() {
+      if (this.node.reviewStatus === nodeStatus.REJECT) {
+        return `Resubmit for review`
+      }
+      if (this.node.reviewStatus === nodeStatus.SUBMIT) {
+        return `Add comment`
+      }
+      return `Submit for review`
     },
   },
   methods: {
     ...mapActions(["reviewNode"]),
+    handleAuthorSubmit() {
+      if (this.node.reviewStatus !== nodeStatus.SUBMIT) {
+        return this.submitReview([
+          Comment.createComment(Comment.types.STATUS_CHANGE, {
+            from: null,
+            to: nodeStatus.SUBMIT,
+          }),
+        ])
+      }
+      return this.submitReview()
+    },
     async handleReject(updates) {
       let confirm = true
       if (this.comment.length === 0) {
