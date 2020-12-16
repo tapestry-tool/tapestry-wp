@@ -556,8 +556,7 @@ export default {
     handleClose(event) {
       const oldNode = this.getNode(this.nodeId)
       if (
-        (this.type === "add" ||
-          !Helpers.nodeEqual(oldNode, this.node, ["license", "permissions"])) &&
+        (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
         (event.trigger == "backdrop" ||
           event.trigger == "headerclose" ||
           event.trigger == "esc" ||
