@@ -1,11 +1,13 @@
 <template>
-  <loading v-if="loading" style="height: 75vh;"></loading>
-  <div v-else id="app">
-    <tapestry-app></tapestry-app>
-    <router-view name="lightbox"></router-view>
-    <node-modal></node-modal>
-    <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
-    <tapestry-error></tapestry-error>
+  <div>
+    <loading v-if="loading" style="height: 75vh;"></loading>
+    <div v-else id="app">
+      <tapestry-app></tapestry-app>
+      <router-view name="lightbox"></router-view>
+      <node-modal></node-modal>
+      <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
+      <tapestry-error></tapestry-error>
+    </div>
   </div>
 </template>
 
