@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="vue-app">
     <loading v-if="loading" style="height: 75vh;"></loading>
     <div v-else id="app">
       <tapestry-app></tapestry-app>
