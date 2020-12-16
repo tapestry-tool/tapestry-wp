@@ -64,9 +64,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -87,8 +84,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 0,
       "x": 1075.8989562988281,
@@ -177,9 +173,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -210,8 +203,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 1,
       "x": 1332.3216552734375,
@@ -281,9 +273,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -304,8 +293,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 2,
       "x": 488.66986083984375,
@@ -373,9 +361,6 @@
           "read"
         ],
         "subscriber": [
-          "read"
-        ],
-        "copilot": [
           "read"
         ]
       },
@@ -686,8 +671,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 3,
       "x": 301.1390256881714,
@@ -756,9 +740,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -815,8 +796,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 4,
       "x": 728.9745178222656,
@@ -885,9 +865,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -908,8 +885,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 5,
       "x": 862.9227905273438,
@@ -983,9 +959,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1006,8 +979,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 6,
       "x": 257.38909912109375,
@@ -1077,9 +1049,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1101,8 +1070,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 7,
       "x": 1802.8187255859375,
@@ -1172,9 +1140,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1196,8 +1161,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 8,
       "x": 1642.0430908203125,
@@ -1266,9 +1230,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1290,8 +1251,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 9,
       "x": 1324.94287109375,
@@ -1361,9 +1321,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1385,8 +1342,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 10,
       "x": 1790.173095703125,
@@ -1454,9 +1410,6 @@
           "read"
         ],
         "subscriber": [
-          "read"
-        ],
-        "copilot": [
           "read"
         ]
       },
@@ -1710,8 +1663,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 11,
       "x": 1042.5700073242188,
@@ -1781,9 +1733,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1804,8 +1753,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 12,
       "x": 520.9402160644531,
@@ -1877,9 +1825,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1900,8 +1845,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 13,
       "x": 799.778564453125,
@@ -1971,9 +1915,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -1994,8 +1935,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 14,
       "x": 1534.2563171386719,
@@ -2061,9 +2001,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -2084,8 +2021,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 15,
       "x": 2007.7608337402344,
