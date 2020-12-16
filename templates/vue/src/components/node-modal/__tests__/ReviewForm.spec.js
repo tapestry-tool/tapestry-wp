@@ -2,6 +2,7 @@ import { fireEvent } from "@testing-library/vue"
 import { render } from "@/utils/test"
 import ReviewForm from "@/components/node-modal/ReviewForm.vue"
 import { getCurrentUser } from "@/services/wp"
+import { nodeStatus } from "@/utils/constants"
 
 /**
  * Have to skip comment tests here because there's no way to edit `contenteditable`
@@ -26,7 +27,7 @@ describe("ReviewForm", () => {
     const [node, screen] = setup()
     await fireEvent.click(screen.getByText("Reject"))
 
-    expect(node.reviewStatus).toEqual("rejected")
+    expect(node.reviewStatus).toEqual(nodeStatus.REJECT)
     expect(node.reviewComments.length).toEqual(0)
   })
 
@@ -34,7 +35,7 @@ describe("ReviewForm", () => {
     const [node, screen] = setup()
     await fireEvent.click(screen.getByText("Accept and Add"))
 
-    expect(node.reviewStatus).toEqual("accepted")
+    expect(node.reviewStatus).toEqual(nodeStatus.ACCEPT)
     expect(node.reviewComments.length).toEqual(0)
   })
 

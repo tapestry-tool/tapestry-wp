@@ -192,7 +192,7 @@ describe("TapestryFilter", () => {
     const screen = setup({ fixture })
     userEvent.type(screen.combobox, title)
     await waitFor(() => {
-      expect(screen.getAllByText(title)).toHaveLength(2)
+      expect(screen.getAllByRole("option", { name: title })).toHaveLength(2)
     })
   })
 
