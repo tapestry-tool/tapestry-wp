@@ -69,7 +69,7 @@ export default {
         switch (this.status) {
           case nodeStatus.PUBLISH:
             return "currentColor"
-          case nodeStatus.REJECT:
+          case nodeStatus.DRAFT:
             return "#999"
           default:
             return "currentColor"
