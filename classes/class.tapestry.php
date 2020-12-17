@@ -553,14 +553,12 @@ class Tapestry implements ITapestry
         foreach ($nodeMetaIds as $nodeId) {
             $node = new TapestryNode($this->postId, $nodeId);
             $nodeMeta = $node->getMeta();
-            error_log($nodeMeta->reviewStatus);
             // draft nodes should only be visible to node authors
             // the exception is that the node is submitted in which case it should also be viewable to reviewers
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
                 } elseif (('submitted' == $nodeMeta->reviewStatus || ('reject' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUser->canEdit($this->postId)) {
-                    
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {
