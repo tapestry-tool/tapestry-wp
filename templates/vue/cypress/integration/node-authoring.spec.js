@@ -1,7 +1,10 @@
+import { roles } from "../support/roles"
+
 describe("Node Authoring", () => {
   beforeEach(() => {
     cy.fixture("one-node.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")
+    cy.fixture("subscriber-node.json").as("subscriberNode")
   })
 
   it("should be able to add a root node using the node modal", () => {
@@ -232,6 +235,34 @@ describe("Node Authoring", () => {
         // check that node is not created
         cy.contains(/cancel/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
+      })
+    })
+  })
+
+  describe("As subscriber:", () => {
+    beforeEach(() => {
+      cy.setup("@subscriberNode", roles.SUBSCRIBER)
+    })
+
+    it("should be able to add a child node using the node modal", () => {
+      cy.getSelectedNode().then(parent => {
+        const child = {
+          title: "Child 1",
+          mediaType: "text",
+          typeData: {
+            textContent: "Abcd",
+          },
+        }
+
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(child.title)
+
+        cy.changeMediaType(child.mediaType)
+        cy.getEditable(`node-text-content`).type(child.typeData.textContent)
+
+        cy.submitModal()
+        cy.contains(child.title).should("exist")
+        cy.get(".links").children().should("exist")
       })
     })
   })
