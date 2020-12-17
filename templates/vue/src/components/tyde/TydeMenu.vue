@@ -1,5 +1,5 @@
 <template>
-  <div id="tyde-menu">
+  <div id="tyde-menu" data-qa="tyde-menu">
     <div class="buttons">
       <!--tyde-button
         icon="cog"

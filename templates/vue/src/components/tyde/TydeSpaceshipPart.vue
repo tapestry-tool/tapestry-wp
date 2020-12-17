@@ -1,6 +1,7 @@
 <template>
   <div
     id="tyde-spaceship-part"
+    data-qa="tyde-spaceship-part"
     :style="style"
     @mouseover="state = 'hover'"
     @mouseleave="state = 'normal'"

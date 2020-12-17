@@ -88,10 +88,43 @@ describe("TYDE", () => {
     })
   })
 
+  const notEarnedCockpitIcon =
+    "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.clipartmax.com%2Fpng%2Fmiddle%2F10-106819_question-mark-pics-blue-question-mark-clip-art.png"
+
+  const earnedCockpitIcon =
+    "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg.favpng.com%2F0%2F2%2F17%2Fgold-star-clip-art-png-favpng-HUwn8a7HfgvBr4pkhzq1vz64M.jpg"
+
+  const hoverCockpitIcon =
+    "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fclipartix.com%2Fwp-content%2Fuploads%2F2017%2F12%2FWorld-map-clip-art-at-vector-clip-art.png"
+
   describe("Spaceship", () => {
     it("Should navigate from map to spaceship and back", () => {
       cy.openSpaceship()
       cy.closeSpaceship()
+      cy.openSpaceship()
+      // Close using the escape key
+      // FIXME
+      //cy.window().trigger("keydown", { keycode: 27 })
+      //cy.getByTestId("tyde-map-button").should("not.be.visible")
+    })
+
+    it("Should show spaceship parts in the cockpit", () => {
+      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneQuestionSet")
+      cy.getNodeByTitle("Module 1").then(node => {
+        cy.openModal("edit", node.id)
+        cy.contains(/spaceship part/i).click()
+        cy.getByTestId(`tyde-cockpit-not-earned-icon`).type(notEarnedCockpitIcon)
+        cy.getByTestId(`tyde-cockpit-earned-icon`).type(earnedCockpitIcon)
+        cy.getByTestId(`tyde-cockpit-hover-icon`).type(hoverCockpitIcon)
+        cy.getByTestId("node-spaceship-part-x").type("40")
+        cy.getByTestId("node-spaceship-part-y").type("40")
+        cy.getByTestId("node-spaceship-part-width").type("20")
+        cy.getByTestId("node-spaceship-part-height").type("20")
+        cy.submitModal()
+        cy.openSpaceship()
+        cy.getByTestId("tyde-spaceship-part").should("be.visible")
+      })
     })
   })
 })
