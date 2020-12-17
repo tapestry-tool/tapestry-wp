@@ -57,7 +57,7 @@ export default {
       return Object.values(this.nodes)
         .filter(node => node.reviewStatus === nodeStatus.SUBMIT)
         .map(node => {
-          const submitTime = node.reviewComments
+          const lastSubmit = node.reviewComments
             .reverse()
             .find(evt => evt.type === Comment.types.STATUS_CHANGE)
           return {
@@ -72,7 +72,7 @@ export default {
                 sidebar: "review",
               },
             },
-            submitTime: moment(submitTime.timestamp).fromNow(),
+            submitTime: moment(lastSubmit.timestamp).fromNow(),
           }
         })
     },
