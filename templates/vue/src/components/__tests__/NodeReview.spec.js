@@ -90,7 +90,7 @@ describe("NodeReview", () => {
 
     const comment = "Pls look at my node"
     userEvent.type(screen.getByRole("textbox", { name: "comment" }), comment)
-    await fireEvent.click(screen.getByText(/submit/i))
+    await fireEvent.click(screen.getByText(/add comment/i))
 
     const comments = getComments()
     expect(comments).toHaveLength(1)

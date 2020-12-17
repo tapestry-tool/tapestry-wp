@@ -16,8 +16,6 @@ import { nodeStatus } from "@/utils/constants"
 export default {
   methods: {
     handleReject() {
-      const updates = {}
-      updates.reviewStatus = nodeStatus.REJECT
       this.$emit("reject", [
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: nodeStatus.SUBMIT,
@@ -26,9 +24,6 @@ export default {
       ])
     },
     handleAccept() {
-      const updates = {}
-      updates.status = nodeStatus.PUBLISH
-      updates.reviewStatus = nodeStatus.ACCEPT
       this.$emit("accept", [
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: nodeStatus.SUBMIT,

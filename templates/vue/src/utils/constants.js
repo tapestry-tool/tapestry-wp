@@ -33,8 +33,8 @@ export const nodeStatus = {
   PUBLISH: "publish",
   DRAFT: "draft",
   SUBMIT: "submitted",
-  REJECT: "reject",
-  ACCEPT: "accept",
+  REJECT: "rejected",
+  ACCEPT: "accepted",
 }
 
 export const userActions = {

@@ -13,6 +13,7 @@
 
 <script>
 import * as d3 from "d3"
+import { nodeStatus } from "@/utils/constants"
 
 export default {
   props: {
@@ -55,20 +56,20 @@ export default {
     strokeColor() {
       if (this.reviewStatus) {
         switch (this.reviewStatus) {
-          case "submitted":
+          case nodeStatus.SUBMIT:
             return "#FFC107"
-          case "accept":
+          case nodeStatus.ACCEPT:
             return "#5CE601"
-          case "reject":
+          case nodeStatus.REJECT:
             return "#CC444B"
           default:
             return "currentColor"
         }
       } else {
         switch (this.status) {
-          case "publish":
+          case nodeStatus.PUBLISH:
             return "currentColor"
-          case "draft":
+          case nodeStatus.DRAFT:
             return "#999"
           default:
             return "currentColor"

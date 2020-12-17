@@ -114,6 +114,7 @@ import TapestryIcon from "@/components/TapestryIcon"
 import NodeReview from "@/components/NodeReview"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
+import { nodeStatus } from "@/utils/constants"
 import { licenseTypes, licenses } from "@/utils/constants"
 import * as wp from "@/services/wp"
 
@@ -163,10 +164,13 @@ export default {
       }
     },
     isReviewParticipant() {
-      return (
-        this.node.reviewStatus &&
-        (wp.canEditTapestry() || wp.isCurrentUser(this.node.author.id))
-      )
+      if (wp.canEditTapestry()) {
+        return this.node.reviewStatus
+      }
+      if (wp.isCurrentUser(this.node.author.id)) {
+        return this.node.reviewStatus || this.node.status === nodeStatus.DRAFT
+      }
+      return false
     },
   },
   watch: {

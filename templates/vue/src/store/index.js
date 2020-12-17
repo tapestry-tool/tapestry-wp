@@ -21,6 +21,7 @@ export const store = {
     favourites: [],
     visibleNodes: [],
     apiError: null,
+    displayErrors: false,
   },
   getters,
   mutations,

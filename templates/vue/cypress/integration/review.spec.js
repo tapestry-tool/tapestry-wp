@@ -98,9 +98,8 @@ describe("Review Nodes", () => {
       cy.getNodeById(node.id).click()
       cy.findByLabelText("open sidebar").click()
       cy.sidebar().within(() => {
-        cy.contains(/edit/i).click()
+        cy.contains(/resubmit/i).should("be.visible")
       })
-      cy.contains(/re-submit/i).should("be.visible")
     })
   })
 
@@ -127,7 +126,7 @@ describe("Review Nodes", () => {
     cy.findByLabelText("open sidebar").click()
     cy.findByRole("textbox", { name: /comment/i }).type(comment)
     cy.sidebar()
-      .contains(/submit/i)
+      .contains(/add comment/i)
       .click()
 
     cy.findByRole("textbox", { name: /comment/i }).should("be.hidden")

@@ -12,8 +12,8 @@ class NodeStatus
     const PUBLISH = 'publish';
     const DRAFT = 'draft';
     const SUBMIT = 'submitted';
-    const REJECT = 'reject';
-    const ACCEPT = 'accept';
+    const REJECT = 'rejected';
+    const ACCEPT = 'accepted';
 }
 
 class CommentTypes
