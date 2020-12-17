@@ -244,7 +244,7 @@ describe("Node Authoring", () => {
       cy.setup("@subscriberNode", roles.SUBSCRIBER)
     })
 
-    it("should be able to add a child node using the node modal", () => {
+    it("should be able to add a child node using the node modal as subscriber", () => {
       cy.getSelectedNode().then(parent => {
         const child = {
           title: "Child 1",
