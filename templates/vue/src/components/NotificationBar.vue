@@ -11,23 +11,25 @@
         <span v-show="!isEmpty" class="count">{{ nodesPendingReview.length }}</span>
       </span>
     </button>
-    <ul v-show="showMenu">
-      <p v-if="isEmpty">
-        There are no nodes awaiting review.
-      </p>
-      <h1 v-else class="menu-title">
-        Nodes awaiting review
-      </h1>
-      <li v-for="node in nodesPendingReview" :key="node.id">
-        <router-link class="link" :to="node.link">
-          <div>
-            <h1>{{ node.title }}</h1>
-            <p>Submitted {{ node.submitTime }}</p>
-          </div>
-          <tapestry-icon icon="arrow-right" />
-        </router-link>
-      </li>
-    </ul>
+    <div v-show="showMenu" class="menu">
+      <ul>
+        <p v-if="isEmpty">
+          There are no nodes awaiting review.
+        </p>
+        <h1 v-else class="menu-title">
+          Nodes awaiting review
+        </h1>
+        <li v-for="node in nodesPendingReview" :key="node.id">
+          <router-link class="link" :to="node.link">
+            <div>
+              <h1>{{ node.title }}</h1>
+              <p>Submitted {{ node.submitTime }}</p>
+            </div>
+            <tapestry-icon icon="arrow-right" />
+          </router-link>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -91,17 +93,45 @@ div {
   position: relative;
 }
 
-ul {
+p {
+  margin-bottom: 0;
+}
+
+.menu {
+  --background: #fbfbfb;
+  --border-radius: 8px;
+
   position: absolute;
   z-index: 10;
-  background: #fbfbfb;
+  border-radius: var(--border-radius);
   box-shadow: 0 0 7px 0 #ddd;
   left: 50%;
   transform: translateX(-50%);
-  padding: 1rem;
-  border-radius: 4px;
-  list-style: none;
   min-width: 15rem;
+
+  &:before {
+    --size: 0.8rem;
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    background: var(--background);
+    box-shadow: 0 0 7px 0 #ddd;
+    top: calc(var(--size) / 2 * -1);
+    transform: translateX(-50%) rotate(45deg);
+    z-index: 10;
+  }
+}
+
+ul {
+  border-radius: var(--border-radius);
+  position: relative;
+  list-style: none;
+  background: var(--background);
+  z-index: 20;
+  padding: 1rem;
+  margin: 0;
 }
 
 button {
@@ -164,7 +194,7 @@ h1 {
     text-decoration: none;
 
     i {
-      transform: translateX(4px);
+      transform: translateX(6px);
     }
   }
 
