@@ -171,10 +171,11 @@ describe("Node Authoring", () => {
 
         // check that error persists
         cy.getByTestId("submit-node-modal").click()
-        cy.contains(videoErrorMsg).should("exist")
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
         // check that node is not created
         cy.contains(/cancel/i).click()
+        cy.contains(/close/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
 
         // check that error does not persist to new creation
@@ -232,6 +233,7 @@ describe("Node Authoring", () => {
 
         // check that node is not created
         cy.contains(/cancel/i).click()
+        cy.contains(/close/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
       })
     })
