@@ -23,7 +23,7 @@
           <router-link class="link" :to="node.link">
             <div>
               <h1>{{ node.title }}</h1>
-              <p>Submitted {{ node.submitTime }}</p>
+              <p>Submitted {{ node.submitTime }} by {{ node.author.name }}</p>
             </div>
             <tapestry-icon icon="arrow-right" />
           </router-link>
@@ -107,7 +107,7 @@ p {
   box-shadow: 0 0 7px 0 #ddd;
   left: 50%;
   transform: translateX(-50%);
-  min-width: 15rem;
+  min-width: 18rem;
 
   &:before {
     --size: 0.8rem;
@@ -125,13 +125,23 @@ p {
 }
 
 ul {
+  --padding: 1rem;
+
+  display: flow-root;
   border-radius: var(--border-radius);
   position: relative;
   list-style: none;
   background: var(--background);
   z-index: 20;
-  padding: 1rem;
+  padding: var(--padding);
+  padding-bottom: 0;
   margin: 0;
+  max-height: 32rem;
+  overflow-y: scroll;
+
+  li:last-child {
+    margin-bottom: var(--padding);
+  }
 }
 
 button {
