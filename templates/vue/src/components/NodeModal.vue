@@ -626,9 +626,6 @@ export default {
               },
             })
           }
-          if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
-          }
         } else {
           this.updateRootNode(id)
         }
@@ -643,6 +640,12 @@ export default {
       if (!this.hasSubmissionError) {
         this.close()
       }
+      this.updateSelectedNode(this.node.id)
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId: this.node.id },
+        query: this.$route.query,
+      })
     },
     getRandomNumber(min, max) {
       return Math.random() * (max - min) + min
