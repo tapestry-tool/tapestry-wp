@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="notification-bar">
     <button
       ref="toggle"
       aria-label="toggle pending nodes"
@@ -80,10 +80,16 @@ export default {
       return this.nodesPendingReview.length === 0
     },
   },
-  methods: {
-    handleClickLink() {
-      console.log("clicked!")
-    },
+  mounted() {
+    const handleClick = evt => {
+      if (!evt.target.closest("#notification-bar")) {
+        this.showMenu = false
+      }
+    }
+    document.addEventListener("click", handleClick)
+    this.$once("hook:destroyed", () => {
+      document.removeEventListener("click", handleClick)
+    })
   },
 }
 </script>
@@ -91,10 +97,6 @@ export default {
 <style lang="scss" scoped>
 div {
   position: relative;
-}
-
-p {
-  margin-bottom: 0;
 }
 
 .menu {
