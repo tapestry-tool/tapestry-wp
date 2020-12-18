@@ -1,18 +1,14 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <div
-      v-if="
-        canEdit || (!settings.renderMap && maxDepth > 1 && settings.defaultDepth > 0)
-      "
-      class="toolbar"
-    >
-      <tapestry-filter style="z-index: 10;" />
+    <div class="toolbar">
+      <tapestry-filter v-if="!settings.renderMap" style="z-index: 10;" />
       <div class="slider-wrapper">
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
         ></settings-modal-button>
         <tapestry-depth-slider
+          v-show="!settings.renderMap && maxDepth > 1 && settings.defaultDepth > 0"
           @change="updateViewBox"
           @change:max-depth="maxDepth = $event"
         ></tapestry-depth-slider>
