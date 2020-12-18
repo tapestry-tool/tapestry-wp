@@ -53,12 +53,7 @@ function create_tapestry_type()
     ];
     register_post_type('tapestry', $args);
 }
-add_action('init', 'init_Actions');
-
-function init_Actions() {
-    create_tapestry_type();
-    create_analytics_schema();
-}
+add_action('init', 'create_tapestry_type');
 
 /**
  * Register Tapestry Node type on initialization.
@@ -362,6 +357,7 @@ function prefix_title_entity_decode($response)
 
 // Analytics
 
+add_action('init', 'create_tapestry_analytics_schema');
 add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
 
 function tapestry_tool_log_event() {
@@ -373,14 +369,12 @@ function tapestry_tool_log_event() {
     $user_guid = $_POST['user_guid'];
     $object_id = $_POST['object_id'];
     $details = $_POST['details'];
-    $timestamp = date('Y-m-d H:i:s');
 
     $table_name = $wpdb->prefix.'tapestry_analytics_events';
 
     $success = $wpdb->insert(
         $table_name,
         [
-            'timestamp' => $timestamp,
             'actor' => $actor,
             'action' => $action,
             'object' => $object,
@@ -391,15 +385,9 @@ function tapestry_tool_log_event() {
     );
 
     wp_die();
-
-    if (!$success) {
-        return new WP_Error('fail_add_analytics', 'Failed to save analytics data', ['status' => 500]);
-    }
-
-    return new WP_REST_Response(null, 201);
 }
 
-function create_analytics_schema()
+function create_tapestry_analytics_schema()
 {
     global $wpdb;
 
@@ -410,7 +398,7 @@ function create_analytics_schema()
     $charset_collate = $wpdb->get_charset_collate();
     $sql = "CREATE TABLE IF NOT EXISTS $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT,
-                timestamp timestamp,
+                timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 actor tinytext NOT NULL,
                 action tinytext NOT NULL,
                 object text NOT NULL,

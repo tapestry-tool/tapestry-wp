@@ -169,6 +169,15 @@
               </b-col>
             </b-row>
           </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Enable analytics"
+            description="When enabled, analytics such as mouse clicks will be saved."
+          >
+            <b-form-checkbox v-model="enableAnalytics" switch>
+              {{ enableAnalytics ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -220,6 +229,7 @@ import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
+import client from "../services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -264,6 +274,7 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      enableAnalytics: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -298,6 +309,11 @@ export default {
       return true
     },
   },
+  watch: {
+    enableAnalytics() {
+      this.updateEnableAnalytics()
+    },
+  },
   created() {
     if (this.settings.defaultPermissions) {
       this.defaultPermissions = this.settings.defaultPermissions
@@ -310,6 +326,7 @@ export default {
         DragSelectModular.removeDragSelectListener()
       }
     })
+    this.updateEnableAnalytics()
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
         DragSelectModular.addDragSelectListener()
@@ -331,6 +348,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        enableAnalytics = true,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -341,6 +359,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.enableAnalytics = enableAnalytics
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -353,6 +372,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        enableAnalytics: this.enableAnalytics,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -392,6 +412,9 @@ export default {
     },
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
+    },
+    updateEnableAnalytics() {
+      client.enableAnalytics(this.enableAnalytics)
     },
   },
 }

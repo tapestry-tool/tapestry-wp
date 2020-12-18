@@ -3,6 +3,7 @@ import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
 const { apiUrl, nonce, postId, adminAjaxUrl } = data
+var analyticsEnabled
 
 class TapestryApi {
   /**
@@ -232,7 +233,14 @@ class TapestryApi {
     return response.data
   }
 
+  enableAnalytics(enable) {
+    analyticsEnabled = enable
+  }
+
   async recordAnalyticsEvent(actor, action, object, objectID, details = {}) {
+    if (!analyticsEnabled) {
+      return
+    }
     const analyticsAJAXUrl = adminAjaxUrl // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
     const analyticsAJAXAction = "tapestry_tool_log_event" // Analytics
 
