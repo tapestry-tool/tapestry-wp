@@ -59,9 +59,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -82,8 +79,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 0,
       "x": 2939.49951171875,
