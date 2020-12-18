@@ -147,3 +147,7 @@ export function updateVisibleNodes(state, nodes) {
 export function addApiError(state, error) {
   state.apiError = error
 }
+
+export function setTapestryErrorReporting(state, isEnabled) {
+  state.displayErrors = isEnabled
+}
