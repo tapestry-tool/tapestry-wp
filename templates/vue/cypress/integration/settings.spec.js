@@ -61,7 +61,9 @@ describe("Settings", () => {
 
     cy.contains(/loading/i).should("not.exist")
     cy.get("@tapestry").then(({ nodes }) => {
-      nodes.forEach(node => cy.contains(node.title).should("be.visible"))
+      cy.get("#tapestry").within(() => {
+        nodes.forEach(node => cy.contains(node.title).should("be.visible"))
+      })
     })
     cy.deleteTapestry(`${TEST_TAPESTRY_NAME} (1)`)
   })
