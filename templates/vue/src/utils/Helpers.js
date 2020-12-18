@@ -157,6 +157,48 @@ export default class Helpers {
   }
 
   /**
+   * Checks if two nodes are equal to each other
+   * - Allows missing property as long as loosely equals null
+   * Reference: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
+   * @param {Object} src
+   * @param {Object} other
+   * @param {Array} ignoreProps
+   */
+  static nodeEqual(src, other, ignoreProps = []) {
+    if (src === other) {
+      return true
+    } else if (Array.isArray(src) && Array.isArray(other)) {
+      if (src.length !== other.length) return false
+
+      for (let i = 0; i < src.length; i++) {
+        if (!Helpers.nodeEqual(src[i], other[i])) return false
+      }
+    } else if (
+      typeof src == "object" &&
+      src != null &&
+      typeof other == "object" &&
+      other != null
+    ) {
+      for (let prop in src) {
+        if (ignoreProps.includes(prop)) continue
+        if (other.hasOwnProperty(prop)) {
+          if (!Helpers.nodeEqual(src[prop], other[prop])) {
+            return false
+          }
+        } else {
+          // If property does not exist, check if null or false
+          if (src[prop] != 0) {
+            return false
+          }
+        }
+      }
+    } else {
+      return false
+    }
+    return true
+  }
+
+  /**
    * Returns a deep copy of a given object.
    * Source: https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
    * @param {Object | Array} obj

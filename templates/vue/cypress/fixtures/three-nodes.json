@@ -59,9 +59,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -139,9 +136,6 @@
           "read"
         ],
         "subscriber": [
-          "read"
-        ],
-        "copilot": [
           "read"
         ]
       },
