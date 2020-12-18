@@ -2,6 +2,7 @@ import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
 import Helpers from "../utils/Helpers"
 import ErrorHelper from "../utils/errorHelper"
+import { tydeTypes } from "@/utils/constants"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
@@ -177,13 +178,24 @@ async function unlockNodes({ commit, getters, dispatch }) {
     const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
+
+      if (
+        currentNode.hasOwnProperty("tydeType") &&
+        currentNode.tydeType == tydeTypes.MODULE
+      ) {
+        if (getters.getTydeProgress(id) >= 1) {
+          client.completeNode(id)
+          commit("updateNode", {
+            id,
+            newNode: { completed: true, progress: getters.getTydeProgress(id) },
+          })
+        }
+      }
+
       if (
         currentNode &&
         Helpers.isDifferent(
-          {
-            accessible: nodeProgress.accessible,
-            unlocked: nodeProgress.unlocked,
-          },
+          { accessible: nodeProgress.accessible, unlocked: nodeProgress.unlocked },
           { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
         )
       ) {

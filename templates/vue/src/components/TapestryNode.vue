@@ -430,6 +430,7 @@ export default {
       this.$emit("mouseover")
     },
     handleClick(evt) {
+      console.log(this.node)
       if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
