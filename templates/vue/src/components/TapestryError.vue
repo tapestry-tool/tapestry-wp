@@ -7,14 +7,17 @@ import { mapState } from "vuex"
 export default {
   name: "tapestry-error",
   computed: {
-    ...mapState(["apiError"]),
+    ...mapState(["apiError", "displayErrors"]),
     hasError() {
       return this.apiError
+    },
+    shouldShowErrors() {
+      return this.displayErrors
     },
   },
   watch: {
     hasError() {
-      if (this.apiError) {
+      if (this.apiError && this.shouldShowErrors) {
         this.makeToast("Error", this.apiError.error, "danger")
       }
     },
