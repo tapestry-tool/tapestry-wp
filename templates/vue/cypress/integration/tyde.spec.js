@@ -97,7 +97,7 @@ describe("TYDE", () => {
   const hoverCockpitIcon =
     "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fclipartix.com%2Fwp-content%2Fuploads%2F2017%2F12%2FWorld-map-clip-art-at-vector-clip-art.png"
 
-  describe("Spaceship", () => {
+  describe("Spaceship/Cockpit", () => {
     it("Should navigate from map to spaceship and back", () => {
       cy.openSpaceship()
       cy.closeSpaceship()
@@ -124,6 +124,20 @@ describe("TYDE", () => {
         cy.submitModal()
         cy.openSpaceship()
         cy.getByTestId("tyde-spaceship-part").should("be.visible")
+      })
+    })
+
+    it("Should show favourite items in the cockpit", () => {
+      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneQuestionSet")
+      cy.getNodeByTitle("Question Set 1").then(node => {
+        cy.getNodeById(node.id).click()
+        cy.openLightbox(node.id)
+        cy.getByTestId("favourite-button").click()
+        cy.closeLightbox()
+        cy.openSpaceship()
+        cy.getByTestId("tyde-favourites-button").click()
+        cy.contains(/Question Set 1/i).should("exist")
       })
     })
   })

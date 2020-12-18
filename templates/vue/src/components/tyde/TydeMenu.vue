@@ -25,6 +25,7 @@
       <tyde-button
         icon="user-circle"
         label="Favourites"
+        data-qa="tyde-favourites-button"
         @click="setActivePage('favourites')"
       ></tyde-button>
       <tyde-button
