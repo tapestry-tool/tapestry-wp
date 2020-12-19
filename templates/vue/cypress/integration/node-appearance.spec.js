@@ -27,7 +27,4 @@ describe("Node Appearance", () => {
       })
     })
   })
-
- 
-
 })
