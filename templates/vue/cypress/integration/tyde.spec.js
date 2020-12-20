@@ -130,6 +130,12 @@ describe("TYDE", () => {
     it("Should show favourite items in the cockpit", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
+      cy.openSpaceship()
+      cy.getByTestId("tyde-favourites-button").click()
+      cy.contains(/You have not added any items to your favourites./i).should(
+        "exist"
+      )
+      cy.closeSpaceship()
       cy.getNodeByTitle("Question Set 1").then(node => {
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
