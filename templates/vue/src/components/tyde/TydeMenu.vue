@@ -15,6 +15,7 @@
       <tyde-button
         icon="question"
         label="Help"
+        data-qa="tyde-help-button"
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button

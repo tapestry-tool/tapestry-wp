@@ -181,5 +181,13 @@ describe("TYDE", () => {
         cy.contains(/Question Set 1/i).should("exist")
       })
     })
+
+    it("Should show help info in the cockpit", () => {
+      cy.fixture("one-node.json").as("oneNode")
+      cy.setup("@oneNode")
+      cy.openSpaceship()
+      cy.getByTestId("tyde-help-button").click()
+      cy.contains(/ask@tyde.ca/i).should("exist")
+    })
   })
 })
