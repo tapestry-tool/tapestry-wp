@@ -7,8 +7,8 @@ describe("TYDE", () => {
     "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
     "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg"
 
-  describe("Modules etc.", () => {
-    it("Should allow creation of a module from the root node", () => {
+  describe("Module Creation", () => {
+    it("Should allow creation of a Module from the root node", () => {
       cy.fixture("one-node.json").as("oneNode")
       cy.setup("@oneNode")
       cy.getSelectedNode().then(node => {
@@ -26,7 +26,7 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should allow creation of a stage node from a module", () => {
+    it("Should allow creation of a Stage node from a module", () => {
       cy.fixture("tyde/one-module.json").as("oneModule")
       cy.setup("@oneModule")
       cy.getNodeByTitle("Module 1").then(node => {
@@ -43,7 +43,7 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should allow creation of a question set from a stage", () => {
+    it("Should allow creation of a Question Set from a stage", () => {
       cy.fixture("tyde/one-stage.json").as("oneStage")
       cy.setup("@oneStage")
       cy.getNodeByTitle("Stage 1").then(node => {
@@ -60,7 +60,7 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should allow creation of a regular node from a question set", () => {
+    it("Should allow creation of a regular node (subtopic) from a question set", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.getSelectedNode().then(node => {
@@ -80,12 +80,41 @@ describe("TYDE", () => {
     it("Should update show module earned part when all question sets are complete", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
+      cy.getBySrc(earnedIcon).should("not.exist")
+      cy.getBySrc(notEarnedIcon).should("exist")
       cy.getNodeByTitle("Question Set 1").then(node => {
         // Use viewing the question set as a proxy for node completion
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
         cy.getBySrc(earnedIcon).should("exist")
         cy.getBySrc(notEarnedIcon).should("not.exist")
+      })
+    })
+
+    it("Should show stage progress in the module content", () => {
+      cy.fixture("tyde/two-stages.json").as("mixedProgress")
+      cy.setup("@mixedProgress")
+      cy.getNodeByTitle("Module 1").then(node => {
+        cy.getNodeById(node.id).click()
+        cy.getByTestId(`open-node-${node.id}`).click()
+        cy.getBySrc(notEarnedIcon).should("be.visible")
+        cy.contains(/Stage 1/i).should("be.visible")
+        cy.contains(/Question Set 1/i).should("be.visible")
+        cy.contains(/0\/1/i).should("exist")
+        cy.getByTestId("tyde-stage-close-button").click()
+        cy.getNodeByTitle("Stage 1").then(node => cy.getNodeById(node.id).click())
+        cy.getNodeByTitle("Question Set 1").then(node => {
+          cy.getNodeById(node.id).click()
+          cy.openLightbox(node.id)
+          cy.closeLightbox()
+        })
+        cy.getByTestId(`open-node-${node.id}`).click()
+        cy.getByTestId("tyde-stage-star").should("exist")
+        cy.getByTestId("tyde-stage-next-button").click()
+        cy.contains(/Stage 2/i).should("be.visible")
+        cy.contains(/Question Set 1/i).should("be.visible")
+        cy.contains(/Question Set 2/i).should("be.visible")
+        cy.contains(/0\/2/i).should("exist")
       })
     })
   })

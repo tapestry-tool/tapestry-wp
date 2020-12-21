@@ -3,7 +3,7 @@
     <div>
       <div class="stage-header">
         <tyde-progress-bar :node-id="selectedModuleId" />
-        <div class="stage-star">
+        <div class="stage-star" data-qa="tyde-stage-star">
           <img :src="done ? activeStarSrc : inactiveStarSrc" />
           <div v-if="!done">{{ numComplete }}/{{ topics.length }}</div>
         </div>
@@ -11,6 +11,7 @@
         <tyde-button
           class="close-button"
           icon="times"
+          data-qa="tyde-stage-close-button"
           @click="handleClick($event, 'close')"
         ></tyde-button>
       </div>
@@ -34,6 +35,7 @@
         <tyde-button
           :disabled="!done"
           label="Next"
+          data-qa="tyde-stage-next-button"
           @click="handleClick($event, 'next')"
         ></tyde-button>
       </footer>

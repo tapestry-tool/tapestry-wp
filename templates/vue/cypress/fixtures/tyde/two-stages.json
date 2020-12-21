@@ -1,0 +1,656 @@
+{
+    "nodes": [
+        {
+            "id": 1401,
+            "author": {
+                "id": "1",
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            },
+            "type": "tapestry_node",
+            "size": "",
+            "title": "Root",
+            "status": "publish",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "description": "qwe",
+            "behaviour": "embed",
+            "typeData": {
+                "linkMetadata": null,
+                "progress": [
+                    {
+                        "group": "viewed",
+                        "value": 0,
+                        "extra": {
+                            "nodeType": "root",
+                            "unlocked": true
+                        }
+                    },
+                    {
+                        "group": "unviewed",
+                        "value": 1,
+                        "extra": {
+                            "nodeType": "root",
+                            "unlocked": true
+                        }
+                    }
+                ],
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "textContent": "qwe"
+            },
+            "coordinates": {
+                "x": 2939.49951171875,
+                "y": 3116.346923828125
+            },
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ],
+                "copilot": [
+                    "read"
+                ]
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "quiz": [],
+            "fullscreen": false,
+            "conditions": [],
+            "childOrdering": [],
+            "fitWindow": true,
+            "license": "",
+            "references": "",
+            "tydeType": "Regular",
+            "showInBackpack": true,
+            "accessible": true,
+            "unlocked": true,
+            "completed": false,
+            "progress": 0,
+            "nodeType": "child"
+        },
+        {
+            "id": 1404,
+            "import_parent_id": 1401,
+            "author": {
+                "id": "1",
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            },
+            "type": "tapestry_node",
+            "size": "",
+            "title": "Module 1",
+            "status": "publish",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "description": "",
+            "behaviour": "new-window",
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg",
+                "planetViewEarnedIconUrl": "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>This is the main module.</p>"
+            },
+            "coordinates": {
+                "x": 2229.8275930160144,
+                "y": 3368.796895238747
+            },
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ]
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "quiz": [],
+            "fullscreen": false,
+            "conditions": [],
+            "childOrdering": [
+                1406,
+                1410
+            ],
+            "fitWindow": true,
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "tydeType": "Module",
+            "showInBackpack": true,
+            "accessible": true,
+            "unlocked": true,
+            "completed": false,
+            "progress": 0,
+            "nodeType": "child"
+        },
+        {
+            "id": 1406,
+            "import_parent_id": 1404,
+            "author": {
+                "id": "1",
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            },
+            "type": "tapestry_node",
+            "size": "",
+            "title": "Stage 1",
+            "status": "publish",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "description": "",
+            "behaviour": "new-window",
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "",
+                "planetViewEarnedIconUrl": "",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>This is the first stage for module 1.</p>"
+            },
+            "coordinates": {
+                "x": 1824.2230186335137,
+                "y": 3766.6109064586835
+            },
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ]
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "quiz": [],
+            "fullscreen": false,
+            "conditions": [],
+            "childOrdering": [
+                1408
+            ],
+            "fitWindow": true,
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "tydeType": "Stage",
+            "showInBackpack": true,
+            "accessible": true,
+            "unlocked": true,
+            "completed": false,
+            "progress": 0,
+            "nodeType": "child"
+        },
+        {
+            "id": 1408,
+            "import_parent_id": 1406,
+            "author": {
+                "id": "1",
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            },
+            "type": "tapestry_node",
+            "size": "",
+            "title": "Question Set 1",
+            "status": "publish",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "description": "",
+            "behaviour": "new-window",
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "",
+                "planetViewEarnedIconUrl": "",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>This is the first question set for Stage 1</p>"
+            },
+            "coordinates": {
+                "x": 1653.942710023563,
+                "y": 4272.728997814431,
+                "fx": 2287.078452211063,
+                "fy": 3326.6904235956804
+            },
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ]
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "quiz": [],
+            "fullscreen": false,
+            "conditions": [],
+            "childOrdering": [],
+            "fitWindow": true,
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "tydeType": "Question set",
+            "showInBackpack": true,
+            "accessible": true,
+            "unlocked": true,
+            "completed": false,
+            "progress": 0,
+            "nodeType": "grandchild"
+        },
+        {
+            "id": 1410,
+            "import_parent_id": 1404,
+            "type": "tapestry_node",
+            "description": "",
+            "conditions": [],
+            "behaviour": "new-window",
+            "status": "publish",
+            "nodeType": "child",
+            "title": "Stage 2",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "typeId": 1,
+            "group": 1,
+            "progress": 0,
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ],
+                "copilot": [
+                    "read"
+                ]
+            },
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "",
+                "planetViewEarnedIconUrl": "",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>Hello</p>"
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "fullscreen": false,
+            "tydeType": "Stage",
+            "coordinates": {
+                "x": 2684.5877392131288,
+                "y": 3790.0896099122997,
+                "fx": 1940.127656205316,
+                "fy": 3786.7360942872997
+            },
+            "childOrdering": [
+                1412,
+                1414
+            ],
+            "quiz": [],
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "unlocked": true,
+            "accessible": true,
+            "hasSubAccordion": false,
+            "author": {
+                "id": 1,
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            }
+        },
+        {
+            "id": 1412,
+            "import_parent_id": 1410,
+            "type": "tapestry_node",
+            "description": "",
+            "conditions": [],
+            "behaviour": "new-window",
+            "status": "publish",
+            "nodeType": "child",
+            "title": "Question Set 1",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "typeId": 1,
+            "group": 1,
+            "progress": 0,
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ],
+                "copilot": [
+                    "read"
+                ]
+            },
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "",
+                "planetViewEarnedIconUrl": "",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>Hello</p>"
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "fullscreen": false,
+            "tydeType": "Question set",
+            "coordinates": {
+                "x": 2454.8278438136576,
+                "y": 4229.9564049908495,
+                "fx": 2283.4137813136576,
+                "fy": 3689.909285850224
+            },
+            "childOrdering": [],
+            "quiz": [],
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "unlocked": true,
+            "accessible": true,
+            "hasSubAccordion": false,
+            "author": {
+                "id": 1,
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            }
+        },
+        {
+            "id": 1414,
+            "import_parent_id": 1410,
+            "type": "tapestry_node",
+            "description": "",
+            "conditions": [],
+            "behaviour": "new-window",
+            "status": "publish",
+            "nodeType": "child",
+            "title": "Question Set 2",
+            "imageURL": "",
+            "lockedImageURL": "",
+            "mediaType": "text",
+            "mediaFormat": "",
+            "mediaDuration": 0,
+            "typeId": 1,
+            "group": 1,
+            "progress": 0,
+            "permissions": {
+                "public": [
+                    "read"
+                ],
+                "authenticated": [
+                    "read"
+                ],
+                "contributor": [
+                    "read"
+                ],
+                "subscriber": [
+                    "read"
+                ],
+                "copilot": [
+                    "read"
+                ]
+            },
+            "typeData": {
+                "linkMetadata": null,
+                "mediaURL": "",
+                "mediaWidth": 960,
+                "mediaHeight": 600,
+                "subAccordionText": "More content:",
+                "planetViewNotEarnedIconUrl": "",
+                "planetViewEarnedIconUrl": "",
+                "spaceshipPartNotEarnedIconUrl": "",
+                "spaceshipPartEarnedIconUrl": "",
+                "spaceshipPartHoverIconUrl": "",
+                "spaceshipPartX": 0,
+                "spaceshipPartY": 0,
+                "spaceshipPartWidth": 0,
+                "spaceshipPartHeight": 0,
+                "textContent": "<p>Hello again</p>"
+            },
+            "hideTitle": false,
+            "hideProgress": false,
+            "hideMedia": false,
+            "skippable": true,
+            "fullscreen": false,
+            "tydeType": "Question set",
+            "coordinates": {
+                "x": 2958.5280629130857,
+                "y": 4242.640435452975,
+                "fx": 3068.8251820537107,
+                "fy": 3372.081841702975
+            },
+            "childOrdering": [],
+            "quiz": [],
+            "license": {
+                "name": "CC-BY-SA",
+                "icons": [
+                    "fab fa-creative-commons",
+                    "fab fa-creative-commons-by",
+                    "fab fa-creative-commons-sa"
+                ],
+                "type": "cc",
+                "link": "",
+                "description": ""
+            },
+            "references": "",
+            "unlocked": true,
+            "accessible": true,
+            "hasSubAccordion": false,
+            "author": {
+                "id": 1,
+                "name": "admin",
+                "email": "foo@bar.com",
+                "original_author_name": "",
+                "original_author_email": ""
+            }
+        }
+    ],
+    "links": [
+        {
+            "source": 1401,
+            "target": 1404
+        },
+        {
+            "source": 1404,
+            "target": 1406
+        },
+        {
+            "source": 1406,
+            "target": 1408
+        },
+        {
+            "source": 1404,
+            "target": 1410,
+            "value": 1,
+            "type": ""
+        },
+        {
+            "source": 1410,
+            "target": 1412,
+            "value": 1,
+            "type": ""
+        },
+        {
+            "source": 1410,
+            "target": 1414,
+            "value": 1,
+            "type": ""
+        }
+    ],
+    "groups": [],
+    "site-url": "http://localhost:8000"
+}
