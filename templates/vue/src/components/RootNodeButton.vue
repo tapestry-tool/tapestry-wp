@@ -218,15 +218,16 @@ export default {
 }
 
 .dropbox {
-  width: 90vw;
-  height: 90vh;
+  width: 100%;
+  height: 85%;
   border: 3px dashed black;
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   opacity: 0;
   z-index: 0;
+  bottom: 0;
 
   &.drag-over {
     opacity: 1;

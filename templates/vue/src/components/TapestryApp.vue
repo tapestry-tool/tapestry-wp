@@ -297,7 +297,7 @@ export default {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 8px 0 8px 12px;
+  padding: 8px;
   position: relative;
 }
 

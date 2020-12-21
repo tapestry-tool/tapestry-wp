@@ -12,7 +12,7 @@
       </span>
     </button>
     <div v-show="showMenu" class="menu">
-      <ul>
+      <ul :class="{ empty: showMenu }">
         <p v-if="isEmpty">
           There are no nodes awaiting review.
         </p>
@@ -143,6 +143,10 @@ ul {
 
   li:last-child {
     margin-bottom: var(--padding);
+  }
+
+  &.empty {
+    overflow: hidden;
   }
 }
 

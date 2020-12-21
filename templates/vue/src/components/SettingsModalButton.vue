@@ -80,7 +80,7 @@ export default {
 <style lang="scss" scoped>
 .settings-button,
 .settings-button:focus {
-  padding: 0;
+  padding: 0.5rem;
   background: none;
   color: #999;
   font-size: 1.2em;
