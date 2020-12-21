@@ -32,7 +32,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$root.$emit('edit-node', nodeId)">
+          <b-button v-if="canEdit" @click="editNode">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -176,6 +176,13 @@ export default {
       this.$router.push({
         name: names.LIGHTBOX,
         params: { nodeId: this.nodeId },
+        query: this.$route.query,
+      })
+    },
+    editNode() {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
     },
