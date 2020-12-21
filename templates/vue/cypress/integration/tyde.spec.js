@@ -1,13 +1,13 @@
 describe("TYDE", () => {
-  describe("Modules, Stages and Question Sets", () => {
-    const notEarnedIcon =
-      "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
-      "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg"
+  const notEarnedIcon =
+    "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
+    "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg"
 
-    const earnedIcon =
-      "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
-      "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg"
+  const earnedIcon =
+    "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
+    "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg"
 
+  describe("Modules etc.", () => {
     it("Should allow creation of a module from the root node", () => {
       cy.fixture("one-node.json").as("oneNode")
       cy.setup("@oneNode")
@@ -60,18 +60,6 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should update show module earned part when all question sets are complete", () => {
-      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
-      cy.setup("@oneQuestionSet")
-      cy.getNodeByTitle("Question Set 1").then(node => {
-        // Use viewing the question set as a proxy for node completion
-        cy.getNodeById(node.id).click()
-        cy.openLightbox(node.id)
-        cy.getBySrc(earnedIcon).should("exist")
-        cy.getBySrc(notEarnedIcon).should("not.exist")
-      })
-    })
-
     it("Should allow creation of a regular node from a question set", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
@@ -88,6 +76,20 @@ describe("TYDE", () => {
     })
   })
 
+  describe("Progress and Completion", () => {
+    it("Should update show module earned part when all question sets are complete", () => {
+      cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
+      cy.setup("@oneQuestionSet")
+      cy.getNodeByTitle("Question Set 1").then(node => {
+        // Use viewing the question set as a proxy for node completion
+        cy.getNodeById(node.id).click()
+        cy.openLightbox(node.id)
+        cy.getBySrc(earnedIcon).should("exist")
+        cy.getBySrc(notEarnedIcon).should("not.exist")
+      })
+    })
+  })
+
   const notEarnedCockpitIcon =
     "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.clipartmax.com%2Fpng%2Fmiddle%2F10-106819_question-mark-pics-blue-question-mark-clip-art.png"
 
@@ -99,6 +101,8 @@ describe("TYDE", () => {
 
   describe("Spaceship/Cockpit", () => {
     it("Should navigate from map to spaceship and back", () => {
+      cy.fixture("one-node.json").as("oneNode")
+      cy.setup("@oneNode")
       cy.openSpaceship()
       cy.closeSpaceship()
       cy.openSpaceship()
@@ -124,6 +128,8 @@ describe("TYDE", () => {
         cy.submitModal()
         cy.openSpaceship()
         cy.getByTestId("tyde-spaceship-part").should("be.visible")
+        // TODO: check for correct image. Could not figure out how to do this
+        // in cypress given that it is a styled background image.
       })
     })
 
