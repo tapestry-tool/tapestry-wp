@@ -770,13 +770,6 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
         }
-      } else if (this.node.mediaType === "text") {
-        if (
-          !this.node.typeData.textContent ||
-          !this.node.typeData.textContent.length
-        ) {
-          errMsgs.push("Please enter Text Content for this node")
-        }
       }
 
       return errMsgs
