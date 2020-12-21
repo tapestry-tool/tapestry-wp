@@ -1,14 +1,14 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <div class="toolbar">
-      <tapestry-filter v-if="!settings.renderMap" style="z-index: 10;" />
-      <div class="slider-wrapper">
+      <tapestry-filter v-if="!showMap" style="z-index: 10;" />
+      <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
         ></settings-modal-button>
         <tapestry-depth-slider
-          v-show="!settings.renderMap && maxDepth > 1 && settings.defaultDepth > 0"
+          v-show="!showMap && hasDepth"
           @change="updateViewBox"
           @change:max-depth="maxDepth = $event"
         ></tapestry-depth-slider>
@@ -104,6 +104,12 @@ export default {
     },
     canEdit() {
       return wp.canEditTapestry()
+    },
+    hasDepth() {
+      return this.maxDepth > 1 && this.settings.defaultDepth > 0
+    },
+    showMap() {
+      return this.settings.renderMap
     },
     empty() {
       return Object.keys(this.nodes).length === 0
