@@ -131,8 +131,7 @@ export default {
     background: {
       immediate: true,
       handler(background) {
-        const app = this.$root.$el
-        app.style.backgroundImage = background ? `url(${background})` : ""
+        document.body.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
     selectedId: {
