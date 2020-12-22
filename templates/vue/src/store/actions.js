@@ -198,7 +198,6 @@ async function unlockNodes({ commit, getters, dispatch }) {
           { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
         )
       ) {
-        console.log(id, nodeProgress.unlocked, currentNode.unlocked)
         const { accessible, unlocked, content, conditions } = nodeProgress
         const newNode = { accessible, unlocked, conditions }
         if (accessible) {
