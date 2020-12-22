@@ -89,9 +89,21 @@
       "nodeType": "root",
       "unlocked": true,
       "depth": 0,
-      "accessible": true
+      "accessible": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      }
     }
   ],
   "links": [],
-  "groups": []
+  "groups": [],
+  "site-url": "http://localhost:8000"
 }
