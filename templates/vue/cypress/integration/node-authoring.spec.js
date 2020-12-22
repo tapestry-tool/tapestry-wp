@@ -262,7 +262,9 @@ describe("Node Authoring", () => {
 
         cy.submitModal()
         cy.contains(child.title).should("exist")
-        cy.get(".links").children().should("exist")
+        cy.getNodeByTitle(child.title).its("id").then(childId => {
+          cy.link(parent.id, childId).should("exist")
+        })
       })
     })
   })
