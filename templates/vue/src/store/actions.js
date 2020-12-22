@@ -160,6 +160,17 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
+    const userProgress = await client.getUserProgress()
+    for (const [nodeId, progress] of Object.entries(userProgress)) {
+      if (getters.getTydeProgress(nodeId) >= 1) {
+        await client.completeNode(nodeId)
+        commit("updateNode", {
+          id: nodeId,
+          newNode: { completed: true }, 
+        })
+      }
+    }
+    
     const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
@@ -167,6 +178,7 @@ export async function completeNode(context, nodeId) {
         progress: 1,
       })
     }
+
     return unlockNodes(context)
   } catch (error) {
     dispatch("addApiError", error)
@@ -178,20 +190,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
     const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
-
-      if (
-        currentNode.hasOwnProperty("tydeType") &&
-        currentNode.tydeType == tydeTypes.MODULE
-      ) {
-        if (getters.getTydeProgress(id) >= 1) {
-          client.completeNode(id)
-          commit("updateNode", {
-            id,
-            newNode: { completed: true, progress: getters.getTydeProgress(id) },
-          })
-        }
-      }
-
+      
       if (
         currentNode &&
         Helpers.isDifferent(
@@ -199,6 +198,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
           { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
         )
       ) {
+        console.log(id, nodeProgress.unlocked, currentNode.unlocked)
         const { accessible, unlocked, content, conditions } = nodeProgress
         const newNode = { accessible, unlocked, conditions }
         if (accessible) {

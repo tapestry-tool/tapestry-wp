@@ -153,3 +153,12 @@ export function addApiError(state, error) {
 export function updateSelectedModule(state, moduleId) {
   state.selectedModuleId = moduleId
 }
+
+export function completeTydeModule(state, payload){
+  const node = getters.getNode(state)(payload.id)
+  state.nodes[payload.id] = {
+    ...node,
+    progress: getters.getTydeProgress(payload.id),
+    completed: true,
+  }
+}
