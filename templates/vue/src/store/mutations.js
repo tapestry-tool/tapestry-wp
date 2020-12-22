@@ -154,4 +154,4 @@ export function updateSelectedModule(state, moduleId) {
   state.selectedModuleId = moduleId
 }
 
-}
+
