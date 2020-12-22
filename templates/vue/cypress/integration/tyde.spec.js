@@ -94,27 +94,66 @@ describe("TYDE", () => {
     it("Should show stage progress in the module content", () => {
       cy.fixture("tyde/two-stages.json").as("mixedProgress")
       cy.setup("@mixedProgress")
-      cy.getNodeByTitle("Module 1").then(node => {
-        cy.getNodeById(node.id).click()
-        cy.getByTestId(`open-node-${node.id}`).click()
+
+      cy.getNodeByTitle("Module 1").then(module => {
+        // Should show when a single stage is completed
+        cy.getNodeByTitle("Stage 1").then(stage1 =>
+          cy.getNodeById(stage1.id).click()
+        )
+        cy.getNodeByTitle("Question Set 1").then(node => {
+          cy.getNodeById(node.id).click()
+          cy.openLightbox(node.id)
+          cy.closeLightbox()
+          cy.getByTestId(`open-node-${module.id}`).click()
+          cy.getByTestId("tyde-stage-star").should("exist")
+
+          // Next button should go to next stage
+          cy.getByTestId("tyde-stage-next-button").click()
+          cy.contains(/Stage 2/i).should("be.visible")
+          cy.contains(/Question Set 2/i).should("be.visible")
+          cy.contains(/Question Set 3/i).should("be.visible")
+          cy.contains(/0\/2/i).should("exist")
+
+          // Prev button should go to the previous stage
+          cy.getByTestId("tyde-stage-prev-button").click()
+          cy.contains(/Stage 1/i).should("be.visible")
+          cy.getByTestId("tyde-stage-close-button").click()
+
+          // Next button should progress past stage 2 once it's complete
+          cy.getNodeByTitle("Stage 2").then(stage2 => {
+            cy.getNodeById(stage2.id).scrollIntoView()
+            cy.getNodeById(stage2.id).click()
+            cy.getNodeByTitle("Question Set 2").then(node => {
+              cy.getNodeById(node.id).click()
+              cy.openLightbox(node.id)
+              cy.closeLightbox()
+              cy.getNodeByTitle("Question Set 3").then(node => {
+                cy.getNodeById(node.id).click()
+                cy.openLightbox(node.id)
+                cy.closeLightbox()
+                cy.getNodeById(node.id).click()
+                cy.getByTestId(`open-node-${module.id}`).click()
+                cy.getByTestId("tyde-stage-next-button").click()
+                cy.getByTestId("tyde-stage-next-button").click()
+                cy.getNodeById(node.id).should("be.visible")
+              })
+            })
+          })
+        })
+      })
+    })
+
+    it("Should show correct progress for an uncompleted stage", () => {
+      cy.fixture("tyde/two-stages.json").as("mixedProgress")
+      cy.setup("@mixedProgress")
+      cy.getNodeByTitle("Module 1").then(module => {
+        cy.getNodeById(module.id).click()
+        cy.getByTestId(`open-node-${module.id}`).click()
         cy.getBySrc(notEarnedIcon).should("be.visible")
         cy.contains(/Stage 1/i).should("be.visible")
         cy.contains(/Question Set 1/i).should("be.visible")
         cy.contains(/0\/1/i).should("exist")
         cy.getByTestId("tyde-stage-close-button").click()
-        cy.getNodeByTitle("Stage 1").then(node => cy.getNodeById(node.id).click())
-        cy.getNodeByTitle("Question Set 1").then(node => {
-          cy.getNodeById(node.id).click()
-          cy.openLightbox(node.id)
-          cy.closeLightbox()
-        })
-        cy.getByTestId(`open-node-${node.id}`).click()
-        cy.getByTestId("tyde-stage-star").should("exist")
-        cy.getByTestId("tyde-stage-next-button").click()
-        cy.contains(/Stage 2/i).should("be.visible")
-        cy.contains(/Question Set 1/i).should("be.visible")
-        cy.contains(/Question Set 2/i).should("be.visible")
-        cy.contains(/0\/2/i).should("exist")
       })
     })
   })
@@ -181,7 +220,9 @@ describe("TYDE", () => {
         cy.contains(/Question Set 1/i).should("exist")
         cy.getByTestId("tyde-unfavourite").click()
         cy.contains(/Yes/i).click()
-        cy.contains(/You have not added any items to your favourites/i).should("exist")
+        cy.contains(/You have not added any items to your favourites/i).should(
+          "exist"
+        )
       })
     })
 

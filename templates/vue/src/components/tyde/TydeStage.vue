@@ -30,6 +30,7 @@
         <tyde-button
           :disabled="!stageIndex"
           label="Prev"
+          data-qa="tyde-stage-prev-button"
           @click="handleClick($event, 'prev')"
         ></tyde-button>
         <tyde-button
