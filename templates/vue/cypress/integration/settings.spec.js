@@ -38,7 +38,7 @@ describe("Settings", () => {
       .then(url => {
         cy.getByTestId("node-upload-input").should("have.value", url)
         cy.submitSettingsModal()
-        cy.get("#vue-app").should("have.css", "background-image", `url("${url}")`)
+        cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
   })
 
