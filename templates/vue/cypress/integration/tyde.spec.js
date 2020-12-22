@@ -7,6 +7,15 @@ describe("TYDE", () => {
     "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
     "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg"
 
+  const notEarnedCockpitIcon =
+    "https://lh3.googleusercontent.com/proxy/EfGXb_q2dzJt5VBgQuXuNjJGwLWO0tlSdVz5gTalgRNzkiso3HtplzRhGOpyYsaS4-4kZuda4SUewK0UcnhJPfYmuDzIp1Ohyg"
+
+  const earnedCockpitIcon =
+    "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip-art-clipart-2-wikiclipart-wikiclipart-transparent-background-earth-clipart.png"
+
+  const hoverCockpitIcon =
+    "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip-art-clipart-2-wikiclipart-wikiclipart-transparent-background-earth-clipart.png"
+
   describe("Module Creation", () => {
     it("Should allow creation of a Module from the root node", () => {
       cy.fixture("one-node.json").as("oneNode")
@@ -157,15 +166,6 @@ describe("TYDE", () => {
       })
     })
   })
-
-  const notEarnedCockpitIcon =
-    "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.clipartmax.com%2Fpng%2Fmiddle%2F10-106819_question-mark-pics-blue-question-mark-clip-art.png"
-
-  const earnedCockpitIcon =
-    "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg.favpng.com%2F0%2F2%2F17%2Fgold-star-clip-art-png-favpng-HUwn8a7HfgvBr4pkhzq1vz64M.jpg"
-
-  const hoverCockpitIcon =
-    "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fclipartix.com%2Fwp-content%2Fuploads%2F2017%2F12%2FWorld-map-clip-art-at-vector-clip-art.png"
 
   describe("Spaceship/Cockpit", () => {
     it("Should navigate from map to spaceship and back", () => {
