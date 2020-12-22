@@ -10,7 +10,7 @@
           <p class="button-row-description">{{ node.description }}</p>
         </div>
       </button>
-      <a style="margin-right: 16px;" @click="$emit('unfavourite', node.id)">
+      <a style="margin-right: 16px;" @click="$emit('unfavourite', node.id)" data-qa="tyde-unfavourite">
         <i class="fas fa-heart fa-lg" style="color:red;"></i>
       </a>
     </div>

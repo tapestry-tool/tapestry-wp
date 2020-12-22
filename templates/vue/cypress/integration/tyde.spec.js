@@ -162,7 +162,7 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should show favourite items in the cockpit", () => {
+    it.only("Should show favourite items in the cockpit and allow removal", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.openSpaceship()
@@ -179,6 +179,9 @@ describe("TYDE", () => {
         cy.openSpaceship()
         cy.getByTestId("tyde-favourites-button").click()
         cy.contains(/Question Set 1/i).should("exist")
+        cy.getByTestId("tyde-unfavourite").click()
+        cy.contains(/Yes/i).click()
+        cy.contains(/You have not added any items to your favourites/i).should("exist")
       })
     })
 
