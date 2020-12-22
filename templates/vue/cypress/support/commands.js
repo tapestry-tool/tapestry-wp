@@ -199,6 +199,10 @@ Cypress.Commands.add("getBySrc", (srcURL, ...args) =>
   cy.get(`[src="${srcURL}"]`, ...args)
 )
 
+Cypress.Commands.add("getByBackground", (imageURL, ...args) =>
+  cy.get(`[style^='background-image: url("${imageURL}")']`, ...args)
+)
+
 Cypress.Commands.add("openSpaceship", () => {
   cy.getByTestId("tyde-spaceship-icon").click()
   cy.getByTestId("tyde-map-button").should("be.visible")

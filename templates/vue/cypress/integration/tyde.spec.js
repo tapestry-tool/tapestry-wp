@@ -200,9 +200,7 @@ describe("TYDE", () => {
         cy.getByTestId("node-spaceship-part-height").type("20")
         cy.submitModal()
         cy.openSpaceship()
-        cy.getByTestId("tyde-spaceship-part").should("be.visible")
-        // TODO: check for correct image. Could not figure out how to do this
-        // in cypress given that it is a styled background image.
+        cy.getByBackground(notEarnedCockpitIcon).should("be.visible")
       })
     })
 
@@ -239,7 +237,7 @@ describe("TYDE", () => {
       cy.contains(/ask@tyde.ca/i).should("exist")
     })
 
-    it("Should navigate to the summary view when clicking a completed module", () => {
+    it.only("Should navigate to the summary view when clicking a completed module", () => {
       cy.fixture("tyde/one-question-set-part-images.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {
@@ -249,7 +247,7 @@ describe("TYDE", () => {
         cy.closeLightbox()
       })
       cy.openSpaceship()
-      cy.getByTestId("tyde-spaceship-part").click()
+      cy.getByBackground(earnedCockpitIcon).click()
       cy.getBySrc(earnedIcon).should("exist")
       cy.contains(/Module 1/i).should("be.visible")
       cy.contains(/Stage 1/i).should("be.visible")
