@@ -174,10 +174,15 @@ describe("TYDE", () => {
       cy.openSpaceship()
       cy.closeSpaceship()
       cy.openSpaceship()
-      // Close using the escape key
-      // FIXME
-      //cy.window().trigger("keydown", { keycode: 27 })
-      //cy.getByTestId("tyde-map-button").should("not.be.visible")
+    })
+
+    it("Should use the escape key for navigation", () => {
+      cy.fixture("one-node.json").as("oneNode")
+      cy.setup("@oneNode")
+      cy.get("[id=tyde]").trigger("keydown", { code: "Escape" })
+      cy.getByTestId("tyde-map-button").should("be.visible")
+      cy.get("[id=tyde]").trigger("keydown", { code: "Escape" })
+      cy.getByTestId("tyde-map-button").should("not.be.visible")
     })
 
     it("Should show spaceship parts in the cockpit", () => {
