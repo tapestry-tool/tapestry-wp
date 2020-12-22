@@ -162,7 +162,7 @@ describe("TYDE", () => {
       })
     })
 
-    it.only("Should show favourite items in the cockpit and allow removal", () => {
+    it("Should show favourite items in the cockpit and allow removal", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.openSpaceship()
