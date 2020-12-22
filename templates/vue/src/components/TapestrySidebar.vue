@@ -14,7 +14,11 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button :class="['toggle-button', { closed: closed }]" @click.stop="toggle">
+      <button
+        data-qa="sidebar-toggle"
+        :class="['toggle-button', { closed: closed }]"
+        @click.stop="toggle"
+      >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
@@ -28,11 +32,15 @@
       <header class="sidebar-header">
         <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
         <div class="button-container">
-          <b-button v-if="node.accessible || canEdit" @click="viewNode">
+          <b-button
+            v-if="node.accessible || canEdit"
+            data-qa="sidebar-view-btn"
+            @click="viewNode"
+          >
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="editNode">
+          <b-button v-if="canEdit" data-qa="sidebar-edit-btn" @click="editNode">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
