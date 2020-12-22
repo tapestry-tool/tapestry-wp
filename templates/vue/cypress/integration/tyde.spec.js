@@ -237,7 +237,7 @@ describe("TYDE", () => {
       cy.contains(/ask@tyde.ca/i).should("exist")
     })
 
-    it.only("Should navigate to the summary view when clicking a completed module", () => {
+    it("Should navigate to the summary view when clicking a completed module", () => {
       cy.fixture("tyde/one-question-set-part-images.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {
@@ -253,7 +253,6 @@ describe("TYDE", () => {
       cy.contains(/Stage 1/i).should("be.visible")
       cy.contains(/Question Set 1/i).should("be.visible")
       cy.contains(/Activities/i).click()
-      // TODO: fix activity add bug and test for activities
       cy.contains(/Favourites/i).click()
       cy.contains(/Question Set 1/).should("be.visible")
     })
