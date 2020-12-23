@@ -766,7 +766,7 @@ function updateTapestryNode($request)
             throw new TapestryError('INVALID_CHILD_NODE');
         }
         if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
-            !TapestryHelpers::nodeParentIsPublished($nodeMetaId, $postId)) {
+            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
             throw new TapestryError('NODE_APPROVAL_DENIED');
         }
 
