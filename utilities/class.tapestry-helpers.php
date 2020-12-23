@@ -234,19 +234,19 @@ class TapestryHelpers
     }
 
     /**
-     * Check if parent node is published
+     * Check if neighbour node is published
      *
      * @param Number $nodeMetaId     node meta ID
      * @param Number $tapestryPostId post ID
      *
      * @return bool
      */
-    public static function nodeParentIsPublished($nodeMetaId, $tapestryPostId)
+    public static function nodeNeighbourIsPublished($nodeMetaId, $tapestryPostId)
     {
         $tapestry = new Tapestry($tapestryPostId);
         foreach ($tapestry->getLinks() as $link) {
-            if ($link->target == $nodeMetaId &&
-                !TapestryHelpers::nodeIsDraft($link->source, $tapestryPostId))
+            if (($link->target == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->source, $tapestryPostId))||
+                ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId)))
             {
                 return true;
             }
