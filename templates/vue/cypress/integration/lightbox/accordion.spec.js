@@ -153,7 +153,7 @@ describe("Accordion", () => {
     cy.store()
       .its("state.nodes")
       .then(nodes => {
-        const [root, child, grandchild] = Object.values(nodes)
+        const [, , grandchild] = Object.values(nodes)
         cy.getByTestId(`add-node-${grandchild.id}`).should("not.exist")
       })
   })
@@ -165,7 +165,7 @@ describe("Accordion", () => {
       title: "grandchild",
       typeData: {
         textContent: "hello world",
-      }
+      },
     }
 
     cy.store()

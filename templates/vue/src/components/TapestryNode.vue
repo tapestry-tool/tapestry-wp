@@ -429,7 +429,7 @@ export default {
       }
     },
     hasPermission(action) {
-      return Helpers.hasPermission(this.node, action)
+      return Helpers.hasPermission(this.node, action, this.settings.showRejected)
     },
   },
 }
