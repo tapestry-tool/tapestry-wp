@@ -1,19 +1,15 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <div
-      v-if="
-        canEdit || (!settings.renderMap && maxDepth > 1 && settings.defaultDepth > 0)
-      "
-      class="toolbar"
-    >
-      <tapestry-filter style="z-index: 10;" />
-      <div class="slider-wrapper">
+    <div class="toolbar">
+      <tapestry-filter v-if="!showMap" style="z-index: 10;" />
+      <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
         <review-notifications v-if="canEdit" class="review-notifications" />
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
         ></settings-modal-button>
         <tapestry-depth-slider
+          v-show="!showMap && hasDepth"
           @change="updateViewBox"
           @change:max-depth="maxDepth = $event"
         ></tapestry-depth-slider>
@@ -112,6 +108,12 @@ export default {
     canEdit() {
       return wp.canEditTapestry()
     },
+    hasDepth() {
+      return this.maxDepth > 1 && this.settings.defaultDepth > 0
+    },
+    showMap() {
+      return this.settings.renderMap
+    },
     empty() {
       return Object.keys(this.nodes).length === 0
     },
@@ -134,8 +136,7 @@ export default {
     background: {
       immediate: true,
       handler(background) {
-        const app = this.$root.$el
-        app.style.backgroundImage = background ? `url(${background})` : ""
+        document.body.style.backgroundImage = background ? `url(${background})` : ""
       },
     },
     selectedId: {

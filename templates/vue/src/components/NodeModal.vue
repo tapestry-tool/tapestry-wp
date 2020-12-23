@@ -8,7 +8,7 @@
     class="text-muted"
     scrollable
     body-class="p-0"
-    @hidden="close"
+    @hide="handleClose"
   >
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
@@ -129,7 +129,7 @@
               size="sm"
               variant="light"
               :disabled="loading || fileUploading"
-              @click="close"
+              @click="handleClose"
             >
               Cancel
             </b-button>
@@ -163,7 +163,7 @@
               @click="handleSubmitForReview"
             >
               <span>
-                {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
+                {{ wasRejected ? "Re-submit" : "Submit" }}
                 to Administrators for Review
               </span>
             </b-button>
@@ -295,6 +295,9 @@ export default {
         return `Edit node: ${this.node.title}`
       }
       return ""
+    },
+    wasRejected() {
+      return this.node.reviewStatus === nodeStatus.REJECT
     },
     isAuthenticated() {
       return wp.isLoggedIn()
@@ -543,6 +546,32 @@ export default {
           params: { nodeId: this.nodeId, type: this.type, tab },
           query: this.$route.query,
         })
+      }
+    },
+    handleClose(event) {
+      const oldNode = this.getNode(this.nodeId)
+      if (
+        (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
+        (event.trigger == "backdrop" ||
+          event.trigger == "headerclose" ||
+          event.trigger == "esc" ||
+          event instanceof MouseEvent) // cancel triggered
+      ) {
+        event.preventDefault()
+        this.$bvModal
+          .msgBoxConfirm("All unsaved changes will be lost.", {
+            modalClass: "node-modal-confirmation",
+            title: "Are you sure you want to continue?",
+            okTitle: "Close",
+          })
+          .then(close => {
+            if (close) {
+              this.close()
+            }
+          })
+          .catch(err => console.log(err))
+      } else {
+        this.close()
       }
     },
     close() {
