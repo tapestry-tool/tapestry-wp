@@ -59,7 +59,7 @@ describe("Settings", () => {
         cy.visit(href)
       })
 
-    cy.contains(/loading/i).should("not.exist")
+    cy.getByTestId("tapestry-loading").should("not.exist")
     cy.get("@tapestry").then(({ nodes }) => {
       nodes.forEach(node => cy.contains(node.title).should("be.visible"))
     })
