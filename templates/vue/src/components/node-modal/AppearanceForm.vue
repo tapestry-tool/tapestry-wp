@@ -11,7 +11,9 @@
         <file-upload
           v-model="node.imageURL"
           input-test-id="node-appearance-thumbnail-url"
-          :hideUrlUpload="true"
+          :show-url-upload="false"
+          :show-image-preview="true"
+          file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
@@ -26,7 +28,9 @@
       <b-form-group v-if="addLockedThumbnail">
         <file-upload
           v-model="node.lockedImageURL"
-          input-test-id="node-lockedImageURL := true"
+          input-test-id="node-appearance-lockedThumbnail-url"
+          :show-image-preview="true"
+          file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>

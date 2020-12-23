@@ -15,12 +15,21 @@ describe("Node Appearance", () => {
 
       cy.contains(/thumbnail/i).click()
 
+      cy.server()
+      cy.route("POST", "**/async-upload.php").as("upload")
+
       cy.getByTestId("import-file-input").attachFile("reddit.png")
-      cy.wait(1000)
-      cy.submitModal()
+      cy.wait("@upload")
+        .its("response.body.data.url")
+        .then(() => {
+          cy.submitModal()
+        })
 
       cy.getNodeById(node.id).within(() => {
-        cy.get("image").should("have.attr", "href").and("contain", "/wp-content/uploads/").and("contain","reddit")
+        cy.get("image")
+          .should("have.attr", "href")
+          .and("contain", "/wp-content/uploads/")
+          .and("contain", "reddit")
         cy.getByTestId(`node-title-${node.id}`).should("not.exist")
         cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
         cy.getByTestId(`open-node-${node.id}`).should("not.exist")
