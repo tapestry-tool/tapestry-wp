@@ -74,6 +74,10 @@ class TapestryError extends Error
             'MESSAGE' => 'You are not permitted to edit this tapestry',
             'STATUS' => ['status' => 403],
         ],
+        'NODE_APPROVAL_DENIED' => [
+            'MESSAGE' => 'You are not permitted to approve this node',
+            'STATUS' => ['status' => 403],
+        ],
         'POST_ID_ALREADY_SET' => [
             'MESSAGE' => 'PostID should not be passed in when creating a new Tapestry',
             'STATUS' => ['status' => 500],

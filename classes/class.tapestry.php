@@ -280,6 +280,14 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get the links in the Tapestry.
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
      * Returns true if the tapestry is empty.
      *
      * @return bool true if there is no root node, false otherwise
