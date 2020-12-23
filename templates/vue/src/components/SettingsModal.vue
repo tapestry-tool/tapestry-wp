@@ -31,6 +31,19 @@
           </b-form-group>
 
           <b-form-group
+            label="Show me rejected nodes"
+            description="If enabled, you will be able to see all submitted nodes that have previously been rejected. This may slightly hinder performance."
+          >
+            <b-form-checkbox v-model="showRejected" switch>
+              {{ showRejected ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
+          </b-form-group>
+          <b-form-group
+            data-qa="superuser-override"
             label="Show me all nodes by default"
             description="If enabled, editors of this tapestry would be able to view all nodes even if they have
             the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes,
@@ -345,6 +358,7 @@ export default {
       profileActivities: [],
       fileUploading: false,
       superuserOverridePermissions: true,
+      showRejected: false,
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
@@ -419,6 +433,7 @@ export default {
         spaceshipBackgroundUrl = "",
         profileActivities = [],
         superuserOverridePermissions = true,
+        showRejected = false,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
@@ -431,6 +446,7 @@ export default {
       this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
       this.profileActivities = profileActivities
       this.superuserOverridePermissions = superuserOverridePermissions
+      this.showRejected = showRejected
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
@@ -445,6 +461,7 @@ export default {
         spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
         profileActivities: this.profileActivities,
         superuserOverridePermissions: this.superuserOverridePermissions,
+        showRejected: this.showRejected,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,

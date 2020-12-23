@@ -17,7 +17,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: ["vue-style-loader", "css-loader"],
-        exclude: /node_modules\/(?!(bootstrap-vue|bootstrap|leaflet)\/).*/,
+        exclude: /node_modules\/(?!(bootstrap-vue|bootstrap|leaflet|vue-select)\/).*/,
       },
       {
         test: /\.scss$/,

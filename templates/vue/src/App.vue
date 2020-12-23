@@ -1,5 +1,5 @@
 <template>
-  <loading v-if="loading" style="height: 75vh;"></loading>
+  <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tyde />
     <router-view name="lightbox"></router-view>
