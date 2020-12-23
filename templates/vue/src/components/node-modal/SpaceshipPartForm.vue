@@ -3,14 +3,14 @@
     <h6 class="mb-3 text-muted">Planet View Icon</h6>
     <b-form-group label="Not earned">
       <file-upload
-        data-qa="tyde-planet-not-earned-icon"
+        input-test-id="tyde-planet-not-earned-icon"
         v-model="node.typeData.planetViewNotEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />
     </b-form-group>
     <b-form-group label="Earned">
       <file-upload
-        data-qa="tyde-planet-earned-icon"
+        input-test-id="tyde-planet-earned-icon"
         v-model="node.typeData.planetViewEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />
@@ -18,21 +18,21 @@
     <h6 class="mb-3 text-muted">Spaceship Cockpit Image</h6>
     <b-form-group label="Not earned">
       <file-upload
-        data-qa="tyde-cockpit-not-earned-icon"
+        input-test-id="tyde-cockpit-not-earned-icon"
         v-model="node.typeData.spaceshipPartNotEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />
     </b-form-group>
     <b-form-group label="Earned">
       <file-upload
-        data-qa="tyde-cockpit-earned-icon"
+        input-test-id="tyde-cockpit-earned-icon"
         v-model="node.typeData.spaceshipPartEarnedIconUrl"
         placeholder="Enter link (starting with http)"
       />
     </b-form-group>
     <b-form-group label="Hover">
       <file-upload
-        data-qa="tyde-cockpit-hover-icon"
+        input-test-id="tyde-cockpit-hover-icon"
         v-model="node.typeData.spaceshipPartHoverIconUrl"
         placeholder="Enter link (starting with http)"
       />
