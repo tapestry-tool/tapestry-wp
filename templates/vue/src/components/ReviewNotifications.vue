@@ -1,5 +1,5 @@
 <template>
-  <div id="notification-bar">
+  <div id="review-notifications">
     <button
       ref="toggle"
       aria-label="toggle pending nodes"
@@ -82,7 +82,7 @@ export default {
   },
   mounted() {
     const handleClick = evt => {
-      if (!evt.target.closest("#notification-bar")) {
+      if (!evt.target.closest("#review-notifications")) {
         this.showMenu = false
       }
     }

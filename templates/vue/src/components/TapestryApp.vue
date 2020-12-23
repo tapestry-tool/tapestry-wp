@@ -8,7 +8,7 @@
     >
       <tapestry-filter style="z-index: 10;" />
       <div class="slider-wrapper">
-        <notification-bar v-if="canEdit" class="notification-bar" />
+        <review-notifications v-if="canEdit" class="review-notifications" />
         <settings-modal-button
           v-if="canEdit"
           :max-depth="maxDepth"
@@ -78,7 +78,7 @@ import SettingsModalButton from "@/components/SettingsModalButton"
 import RootNodeButton from "@/components/RootNodeButton"
 import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
-import NotificationBar from "@/components/NotificationBar"
+import ReviewNotifications from "@/components/ReviewNotifications"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
@@ -93,7 +93,7 @@ export default {
     SettingsModalButton,
     RootNodeButton,
     LockedTooltip,
-    NotificationBar,
+    ReviewNotifications,
   },
   data() {
     return {
@@ -301,7 +301,7 @@ export default {
   position: relative;
 }
 
-.notification-bar {
+.review-notifications {
   background: none;
   margin-right: 0.5rem;
 }
