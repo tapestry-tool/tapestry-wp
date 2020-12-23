@@ -68,16 +68,17 @@ export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
   }
 }
 
-export function isVisible(_, { getNode, hasAccordionAncestor }) {
+export function isVisible(state, { getNode, hasAccordionAncestor }) {
+  const { showRejected } = state.settings
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
       return false
     }
-    if (!Helpers.hasPermission(node, "read")) {
+    if (!Helpers.hasPermission(node, "read", showRejected)) {
       return false
     }
-    if (!Helpers.hasPermission(node, "edit")) {
+    if (!Helpers.hasPermission(node, "edit", showRejected)) {
       return !hasAccordionAncestor(node.id)
     }
     return true
@@ -198,49 +199,7 @@ export function yOrFy({ settings }) {
 }
 
 export function createDefaultNode({ settings }) {
-  return () => ({
-    type: "tapestry_node",
-    description: "",
-    conditions: [],
-    behaviour: "new-window",
-    status: "publish",
-    nodeType: "child",
-    title: "",
-    imageURL: "",
-    lockedImageURL: "",
-    mediaType: "text",
-    mediaFormat: "",
-    mediaDuration: 0,
-    typeId: 1,
-    group: 1,
-    progress: 0,
-    permissions: settings.defaultPermissions || {
-      public: ["read"],
-      authenticated: ["read"],
-    },
-    typeData: {
-      linkMetadata: null,
-      mediaURL: "",
-      mediaWidth: 960, //TODO: This needs to be flexible with H5P
-      mediaHeight: 600,
-      subAccordionText: "More content:",
-    },
-    hideTitle: false,
-    hideProgress: false,
-    hideMedia: false,
-    skippable: true,
-    fullscreen: false,
-    coordinates: {
-      x: 3000,
-      y: 3000,
-    },
-    childOrdering: [],
-    quiz: [],
-    license: "",
-    references: "",
-    unlocked: true,
-    accessible: true,
-  })
+  return () => Helpers.createDefaultNode({ settings })
 }
 
 export function tapestryJson(state) {
