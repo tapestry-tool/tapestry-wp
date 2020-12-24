@@ -72,7 +72,8 @@ describe("TYDE", () => {
     it("Should allow creation of a regular node (subtopic) from a question set", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
-      cy.getSelectedNode().then(node => {
+      cy.getNodeByTitle("Question Set 1").then(node => {
+        cy.getNodeById(node.id).click()
         cy.openModal("add", node.id)
         cy.getByTestId(`node-title`).type("Question 1")
         cy.getByTestId(`node-media-type`).select("text")
