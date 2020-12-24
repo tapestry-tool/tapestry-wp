@@ -512,9 +512,10 @@ class TapestryNode implements ITapestryNode
     private function _addAuthorEditPermissions($permissions)
     {
         $userId = wp_get_current_user()->ID;
+        $userId = 'user-'.$userId;
         $authorPermissions = ['read', 'edit'];
         if (property_exists($permissions, $userId)) {
-            foreach($authorPermissions as $permission) {
+            foreach ($authorPermissions as $permission) {
                 if (!in_array($permission, $permissions->$userId)) {
                     array_push($permissions->$userId, $permission);
                 }
