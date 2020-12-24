@@ -171,9 +171,9 @@ describe("TYDE", () => {
     it("Should navigate from map to spaceship and back", () => {
       cy.fixture("one-node.json").as("oneNode")
       cy.setup("@oneNode")
-      cy.openSpaceship()
-      cy.closeSpaceship()
-      cy.openSpaceship()
+      cy.openTydeMenu()
+      cy.closeTydeMenu()
+      cy.openTydeMenu()
     })
 
     it("Should use the escape key for navigation", () => {
@@ -199,7 +199,7 @@ describe("TYDE", () => {
         cy.getByTestId("node-spaceship-part-width").type("20")
         cy.getByTestId("node-spaceship-part-height").type("20")
         cy.submitModal()
-        cy.openSpaceship()
+        cy.openTydeMenu()
         cy.getByBackground(notEarnedCockpitIcon).should("be.visible")
       })
     })
@@ -207,18 +207,18 @@ describe("TYDE", () => {
     it("Should show favourite items in the cockpit and allow removal", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
-      cy.openSpaceship()
+      cy.openTydeMenu()
       cy.getByTestId("tyde-favourites-button").click()
       cy.contains(/You have not added any items to your favourites./i).should(
         "exist"
       )
-      cy.closeSpaceship()
+      cy.closeTydeMenu()
       cy.getNodeByTitle("Question Set 1").then(node => {
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
         cy.getByTestId("favourite-button").click()
         cy.closeLightbox()
-        cy.openSpaceship()
+        cy.openTydeMenu()
         cy.getByTestId("tyde-favourites-button").click()
         cy.contains(/Question Set 1/i).should("exist")
         cy.getByTestId("tyde-unfavourite").click()
@@ -232,7 +232,7 @@ describe("TYDE", () => {
     it("Should show help info in the cockpit", () => {
       cy.fixture("one-node.json").as("oneNode")
       cy.setup("@oneNode")
-      cy.openSpaceship()
+      cy.openTydeMenu()
       cy.getByTestId("tyde-help-button").click()
       cy.contains(/ask@tyde.ca/i).should("exist")
     })
@@ -246,7 +246,7 @@ describe("TYDE", () => {
         cy.getByTestId("favourite-button").click()
         cy.closeLightbox()
       })
-      cy.openSpaceship()
+      cy.openTydeMenu()
       cy.getByBackground(earnedCockpitIcon).click()
       cy.getBySrc(earnedIcon).should("exist")
       cy.contains(/Module 1/i).should("be.visible")
