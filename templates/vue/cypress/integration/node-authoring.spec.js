@@ -247,16 +247,16 @@ describe("Node Authoring", () => {
       cy.setup("@subscriberNode", roles.SUBSCRIBER)
     })
 
-    it("should be able to add a child node using the node modal as subscriber", () => {
-      cy.getSelectedNode().then(parent => {
-        const child = {
-          title: "Child 1",
-          mediaType: "text",
-          typeData: {
-            textContent: "Abcd",
-          },
-        }
+    it("should be able to add a child node using the node modal and edit as subscriber", () => {
+      const child = {
+        title: "Child 1",
+        mediaType: "text",
+        typeData: {
+          textContent: "Abcd",
+        },
+      }
 
+      cy.getSelectedNode().then(parent => {
         cy.openModal("add", parent.id)
         cy.getByTestId(`node-title`).type(child.title)
 
@@ -265,9 +265,15 @@ describe("Node Authoring", () => {
 
         cy.submitModal()
         cy.contains(child.title).should("exist")
-        cy.getNodeByTitle(child.title).its("id").then(childId => {
-          cy.link(parent.id, childId).should("exist")
-        })
+        cy.getNodeByTitle(child.title)
+          .its("id")
+          .then(childId => {
+            cy.link(parent.id, childId).should("exist")
+            cy.getByTestId(`edit-node-${childId}`).click({ force: true })
+            cy.getByTestId("node-modal").should("be.visible")
+            cy.submitModal()
+            cy.getByTestId("node-modal").should("not.be.visible")
+          })
       })
     })
   })

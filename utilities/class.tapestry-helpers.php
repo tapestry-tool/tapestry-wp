@@ -176,9 +176,6 @@ class TapestryHelpers
         }
         elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
-        }
-        else if ($action === "EDIT" && $user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "") {
-            return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (

@@ -133,8 +133,12 @@ class Tapestry implements ITapestry
     public function addNode($node)
     {
         $tapestryNode = new TapestryNode($this->postId);
-        $tapestryNode->set($node);
 
+        // If user is author and node is not in review process, grant author edit permissions
+        $userId = wp_get_current_user()->ID;
+        $isAuthor = $userId === $tapestryNode->getAuthor()->id;
+        $inReview = isset($node->reviewStatus);
+        $tapestryNode->set($node, $isAuthor && !$inReview);
         $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);
