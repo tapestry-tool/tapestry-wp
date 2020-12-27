@@ -212,13 +212,20 @@ export default class Helpers {
       return true
     }
 
+     // Check 2: User submitted node, can't edit, but can move
+    if (node.author && wp.isCurrentUser(node.author.id) && action == 'move') {
+      if (node.reviewStatus !== nodeStatus.ACCEPT) {
+        return true
+      }
+    }
+
     // Check 2: User is the author of the node (unless node was submitted, then accepted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
       if (node.reviewStatus !== nodeStatus.ACCEPT) {
         return true
       }
     }
-
+    
     // Check 3: User has a role with general edit permissions
     const { id, roles } = wp.getCurrentUser()
     const allowedRoles = ["administrator", "editor", "author"]

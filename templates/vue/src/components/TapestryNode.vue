@@ -12,7 +12,7 @@
         'has-title': !node.hideTitle,
       }"
       :style="{
-        cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
+        cursor: node.accessible || hasPermission('edit') || hasPermission('move') ? 'pointer' : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
@@ -276,7 +276,7 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
-    if (this.hasPermission("edit")) {
+    if (this.hasPermission("edit") || this.hasPermission('move')) {
       const nodeRef = this.$refs.node
       d3.select(nodeRef).call(
         d3
