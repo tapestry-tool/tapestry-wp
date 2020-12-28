@@ -310,14 +310,15 @@ class Tapestry implements ITapestry
 
     public function getAllContributors()
     {
-        return array_unique(array_map(
-            function ($node) {
-                $node = new TapestryNode($this->postId, $node);
+        $authors = [];
+        foreach ($this->nodes as $node) {
+            $node = new TapestryNode($this->postId, $node);
+            if ($node->isAvailableToUser()) {
+                array_push($authors, $node->get()->author);
+            }
+        }
 
-                return $node->get()->author;
-            },
-            $this->nodes
-        ), SORT_REGULAR);
+        return array_unique($authors, SORT_REGULAR);
     }
 
     private function _setAccessibleStatus($nodes, $userId)
@@ -422,6 +423,7 @@ class Tapestry implements ITapestry
         $settings->autoLayout = false;
 
         $settings->showAccess = true;
+        $settings->showRejected = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
@@ -496,7 +498,8 @@ class Tapestry implements ITapestry
         if ($tapestry->settings->superuserOverridePermissions && $user->canEdit($this->postId)) {
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
         } else {
-            $tapestry->nodes = array_intersect($tapestry->nodes,
+            $tapestry->nodes = array_intersect(
+                $tapestry->nodes,
                 $this->_filterNodeMetaIdsByPermissions(
                     $tapestry->rootId,
                     $tapestry->settings->superuserOverridePermissions,
@@ -541,6 +544,9 @@ class Tapestry implements ITapestry
 
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)
     {
+        if (!isset($this->settings->showRejected)) {
+            $this->settings->showRejected = false;
+        }
         $currentUser = new TapestryUser();
         $currentUserId = wp_get_current_user()->ID;
         $nodesPermitted = [];
@@ -552,14 +558,13 @@ class Tapestry implements ITapestry
             if ('draft' == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                } elseif ('submitted' == $nodeMeta->reviewStatus && $currentUser->canEdit($this->postId)) {
+                } elseif (('submitted' == $nodeMeta->reviewStatus || ('reject' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUser->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {
                 array_push($nodesPermitted, $nodeId);
             }
         }
-
         return $nodesPermitted;
     }
 
