@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <h1 class="title">
+  <div :class="{ 'pull-up': event.hideAuthor }">
+    <h3 v-if="!event.hideAuthor" class="title">
       {{ event.author.name }}
-      <span class="timestamp">{{ event.time }}</span>
-    </h1>
+      <span class="timestamp" :title="event.timestamp">{{ event.time }}</span>
+    </h3>
     <p class="comment">{{ event.comment }}</p>
   </div>
 </template>
@@ -25,10 +25,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.pull-up {
+  margin-top: -0.5rem;
+}
+
 .title {
+  color: var(--light-gray);
   font-family: "Avenir", sans-serif;
-  font-size: 1.2rem;
+  font-size: 1em;
   font-weight: bold;
   margin: 0;
   margin-bottom: 0.25rem;
@@ -39,9 +44,11 @@ export default {
 }
 
 .comment {
-  background: var(--gray);
-  margin: 0 -0.5rem;
+  color: #333;
+  background: var(--light-gray);
+  margin: 0;
   padding: 0.5rem;
   border-radius: 0.5rem;
+  border-top-left-radius: 0;
 }
 </style>

@@ -2,6 +2,7 @@
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <review-log :events="events" :aria-hidden="loading"></review-log>
     <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
+      <p class="commenter-name">{{ username }}</p>
       <textarea
         v-model="comment"
         aria-label="comment"
@@ -76,6 +77,9 @@ export default {
     isReviewer() {
       return wp.canEditTapestry()
     },
+    username() {
+      return wp.getCurrentUser().name
+    },
     submitText() {
       if (this.node.reviewStatus === nodeStatus.REJECT) {
         return `Resubmit for review`
@@ -132,16 +136,27 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+::v-deep {
+  --light-gray: #dce4ea;
+}
+
+.commenter-name {
+  color: var(--light-gray);
+  font-weight: bold;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
 textarea {
   display: block;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
+  border-top-left-radius: 0;
   width: 100%;
 }
 
 .comment-form {
-  background: var(--gray);
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   border-radius: 0.5rem;
   margin: 0 -0.5rem;
 }

@@ -42,21 +42,39 @@ export default {
         [Comment.types.COMMENT]: CommentEvent,
         [Comment.types.STATUS_CHANGE]: StatusChangeEvent,
       }
-      return this.events.map(event => ({
+      let filteredEvents = []
+      let currentUser = null
+      let currentTime = null
+      this.events.forEach(event => {
+        const timeDiff = currentTime
+          ? moment(event.timestamp).diff(moment(currentTime))
+          : null
+        const hoursDiff = currentTime ? moment.duration(timeDiff).asHours() : 1000
+        event.hideAuthor =
+          event.type === Comment.types.COMMENT &&
+          event.author.id === currentUser &&
+          hoursDiff <= 1
+        filteredEvents.push(event)
+        currentUser = event.author.id
+        currentTime = event.timestamp
+      })
+      return filteredEvents.map(event => ({
         ...event,
         component: eventComponents[event.type],
         time: moment(event.timestamp).fromNow(),
+        timestamp: moment(event.timestamp).format("MMMM DD, YYYY h:mm:ss a"),
       }))
     },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 ul {
   line-height: 1.5;
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 li {

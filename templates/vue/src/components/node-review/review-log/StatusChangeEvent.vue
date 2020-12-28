@@ -1,8 +1,8 @@
 <template>
   <p>
-    <span>{{ event.author.name }}</span>
-    {{ text }}
-    <span class="timestamp">{{ event.time }}</span>
+    <span class="commenter-name">{{ event.author.name }}</span>
+    <span class="event-text" :style="'color:' + color">{{ text }}</span>
+    <span class="timestamp" :title="event.timestamp">{{ event.time }}</span>
   </p>
 </template>
 
@@ -29,26 +29,42 @@ export default {
     text() {
       switch (this.event.to) {
         case nodeStatus.SUBMIT:
-          return "submitted this node for review."
+          return "submitted"
         case nodeStatus.REJECT:
-          return "rejected this node."
+          return "rejected"
         case nodeStatus.ACCEPT:
-          return "accepted this node."
+          return "accepted"
         default:
-          return `changed status from ${this.event.from} to ${this.event.to}.`
+          return `changed status from ${this.event.from} to ${this.event.to}`
+      }
+    },
+    color() {
+      switch (this.event.to) {
+        case nodeStatus.SUBMIT:
+          return "#FFC107"
+        case nodeStatus.ACCEPT:
+          return "#5CE601"
+        case nodeStatus.REJECT:
+          return "#FF7171"
+        default:
+          return "var(--light-gray)"
       }
     },
   },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 p {
-  font-size: 0.9rem;
+  color: var(--light-gray);
 }
 
 span {
   font-weight: bold;
+}
+
+.event-text {
+  font-style: italic;
 }
 
 .timestamp {
