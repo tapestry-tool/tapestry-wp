@@ -35,12 +35,16 @@
           <b-button
             v-if="node.accessible || canEdit"
             data-qa="sidebar-view-btn"
-            @click="viewNode"
+            @click="$root.$emit('open-node', nodeId)"
           >
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" data-qa="sidebar-edit-btn" @click="editNode">
+          <b-button
+            v-if="canEdit"
+            data-qa="sidebar-edit-btn"
+            @click="$root.$emit('edit-node', nodeId)"
+          >
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -91,7 +95,6 @@
 <script>
 import { mapGetters } from "vuex"
 import TapestryIcon from "@/components/TapestryIcon"
-import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
 
@@ -178,20 +181,6 @@ export default {
         const el = this.$refs[refName]
         this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
         this.active = refName
-      })
-    },
-    viewNode() {
-      this.$router.push({
-        name: names.LIGHTBOX,
-        params: { nodeId: this.nodeId },
-        query: this.$route.query,
-      })
-    },
-    editNode() {
-      this.$router.push({
-        name: names.MODAL,
-        params: { nodeId: this.node.id, type: "edit", tab: "content" },
-        query: this.$route.query,
       })
     },
     toggle() {

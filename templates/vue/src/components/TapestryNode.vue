@@ -96,7 +96,7 @@
             :x="isSubAccordionRow ? 0 : 35"
             :y="radius"
             :data-qa="`edit-node-${node.id}`"
-            @click="editNode"
+            @click="editNode(node.id)"
           >
             <tapestry-icon icon="pen" svg></tapestry-icon>
           </node-button>
@@ -349,19 +349,11 @@ export default {
         this.updateSelectedNode(this.node.id)
       }
     },
-    openNode() {
-      this.$router.push({
-        name: names.LIGHTBOX,
-        params: { nodeId: this.node.id },
-        query: this.$route.query,
-      })
+    openNode(id) {
+      this.$root.$emit("open-node", id)
     },
-    editNode() {
-      this.$router.push({
-        name: names.MODAL,
-        params: { nodeId: this.node.id, type: "edit", tab: "content" },
-        query: this.$route.query,
-      })
+    editNode(id) {
+      this.$root.$emit("edit-node", id)
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -379,7 +371,7 @@ export default {
     },
     handleRequestOpen() {
       if (this.node.accessible || this.hasPermission("edit")) {
-        this.openNode()
+        this.openNode(this.node.id)
       }
     },
     handleMouseover() {
@@ -403,7 +395,9 @@ export default {
       ) {
         this.selected ? this.unselect(this.node.id) : this.select(this.node.id)
       } else if (this.node.accessible || this.hasPermission("edit")) {
-        this.root && this.node.hideMedia ? this.openNode() : this.updateRootNode()
+        this.root && this.node.hideMedia
+          ? this.openNode(this.node.id)
+          : this.updateRootNode()
       }
     },
     hasPermission(action) {
