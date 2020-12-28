@@ -38,7 +38,7 @@ describe("Settings", () => {
       .then(url => {
         cy.getByTestId("node-upload-input").should("have.value", url)
         cy.submitSettingsModal()
-        cy.get("#app").should("have.css", "background-image", `url("${url}")`)
+        cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
   })
 
@@ -59,7 +59,7 @@ describe("Settings", () => {
         cy.visit(href)
       })
 
-    cy.contains(/loading/i).should("not.exist")
+    cy.getByTestId("tapestry-loading").should("not.exist")
     cy.get("@tapestry").then(({ nodes }) => {
       nodes.forEach(node => cy.contains(node.title).should("be.visible"))
     })
