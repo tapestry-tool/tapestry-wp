@@ -12,7 +12,7 @@ Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin", 
           if (node.hasOwnProperty("permissions") && !node.permissions.hasOwnProperty("copilot")) {
             node.permissions.copilot = ["read"]
           }
-          if (node.hasOwnProperty("permissionsOrder") && !node.permissionsOrder.contains("copilot")) {
+          if (node.hasOwnProperty("permissionsOrder") && !node.permissionsOrder.includes("copilot")) {
             node.permissionsOrder.push("copilot")
           }
         }
