@@ -218,12 +218,12 @@ Cypress.Commands.add("getByBackground", (imageURL, ...args) =>
   cy.get(`[style^='background-image: url("${imageURL}")']`, ...args)
 )
 
-Cypress.Commands.add("openSpaceship", () => {
+Cypress.Commands.add("openTydeMenu", () => {
   cy.getByTestId("tyde-spaceship-icon").click()
   cy.getByTestId("tyde-map-button").should("be.visible")
 })
 
-Cypress.Commands.add("closeSpaceship", () => {
+Cypress.Commands.add("closeTydeMenu", () => {
   cy.getByTestId("tyde-map-button").click()
   cy.getByTestId("tyde-map-button").should("not.be.visible")
 })
