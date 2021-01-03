@@ -105,6 +105,7 @@
       <defs>
         <pattern :id="`node-image-${node.id}`" width="1" height="1">
           <image
+            data-qa="nodeImage"
             preserveAspectRatio="xMidYMid slice"
             :href="thumbnailURL"
             x="0"

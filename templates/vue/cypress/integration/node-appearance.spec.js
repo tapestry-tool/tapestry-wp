@@ -26,7 +26,7 @@ describe("Node Appearance", () => {
         })
 
       cy.getNodeById(node.id).within(() => {
-        cy.get("image")
+        cy.getByTestId("nodeImage")
           .should("have.attr", "href")
           .and("contain", "/wp-content/uploads/")
           .and("contain", "reddit")
