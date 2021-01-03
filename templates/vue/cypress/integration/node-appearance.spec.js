@@ -25,6 +25,8 @@ describe("Node Appearance", () => {
           cy.submitModal()
         })
 
+      cy.wait("10000")
+
       cy.getNodeById(node.id).within(() => {
         cy.getByTestId("nodeImage")
           .should("have.attr", "href")
