@@ -18,7 +18,7 @@ describe("Node Appearance", () => {
       cy.server()
       cy.route("POST", "**/async-upload.php").as("upload")
 
-      cy.getByTestId("[name=async-upload]").attachFile("reddit.png")
+      cy.getByTestId("import-file-input").attachFile("reddit.png")
       cy.wait("@upload")
         .its("response.body.data.url")
         .then(url => {
