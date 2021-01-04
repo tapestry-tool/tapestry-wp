@@ -193,8 +193,10 @@ function tapestry_enqueue_libraries()
             $GF_Image_Choices_Object = new GFImageChoices();
             wp_enqueue_script('gf-img-choices', $GF_Image_Choices_Object->get_base_url().'/js/gf_image_choices.js', ['jquery-min']);
         }
+        wp_enqueue_script( 'heartbeat' );
       
         wp_enqueue_script('es2015-test', $LIBS_FOLDER_URL.'es2015-test.js');
+
     }
 }
 
@@ -354,3 +356,11 @@ function prefix_title_entity_decode($response)
 
     return $response;
 }
+
+function wpse125952_redirect_to_request( $redirect_to, $request, $user ){
+    // instead of using $redirect_to we're redirecting back to $request
+    return $request;
+}
+add_filter('login_redirect', 'wpse125952_redirect_to_request', 10, 3);
+
+?>
