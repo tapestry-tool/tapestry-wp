@@ -427,6 +427,7 @@ export default {
       let promises = []
       for (let node of Object.values(this.nodes)) {
         promises.push(client.optimizeNodeThumbnail(node.id, node.imageURL))
+        promises.push(client.optimizeNodeThumbnail(node.id, node.lockedImageURL))
       }
       await Promise.all(promises).then(() => (this.isOptimizing = false))
     },
