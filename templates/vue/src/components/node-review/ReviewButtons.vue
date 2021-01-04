@@ -3,7 +3,12 @@
     <b-button size="sm" variant="danger" @click="handleReject">
       Reject
     </b-button>
-    <b-button size="sm" variant="success" @click="handleAccept">
+    <b-button
+      size="sm"
+      variant="success"
+      :disabled="disableAccept"
+      @click="handleAccept"
+    >
       Accept and Add
     </b-button>
   </div>
@@ -14,6 +19,11 @@ import * as Comment from "@/utils/comments"
 import { nodeStatus } from "@/utils/constants"
 
 export default {
+  props: {
+    disableAccept: {
+      type: Boolean,
+    },
+  },
   methods: {
     handleReject() {
       this.$emit("reject", [
