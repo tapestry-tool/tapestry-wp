@@ -6,6 +6,11 @@
     <node-modal></node-modal>
     <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
     <tapestry-error></tapestry-error>
+    <b-modal :visible="!loggedIn" id="loggedOutModal">
+      You can either refresh and stay logged out or log in again. <br />
+      <b-button @click="refresh">Refresh</b-button>
+      <b-button @click="redirectToLogin">Log In</b-button>
+    </b-modal>
   </div>
 </template>
 
@@ -17,6 +22,7 @@ import TapestrySidebar from "./components/TapestrySidebar"
 import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 import TapestryError from "./components/TapestryError"
+import $ from "jquery";
 
 export default {
   name: "app",
@@ -30,6 +36,7 @@ export default {
   data() {
     return {
       loading: true,
+      loggedIn: true,
     }
   },
   computed: {
@@ -38,7 +45,24 @@ export default {
       return Object.keys(this.nodes).length === 0
     },
   },
+  watch: {
+    loggedIn: function (newValue) {
+      if (!newValue) this.$bvModal.show("loggedOutModal")
+    }
+  },
   mounted() {
+var that = this
+jQuery( function($) {
+  wp.heartbeat.interval( 'fast' );
+
+  $(document).on('heartbeat-tick', function(event,data) {
+    that.loggedIn = data["wp-auth-check"]
+    console.log(that.loggedIn)
+  });
+});
+
+
+
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
@@ -57,6 +81,12 @@ export default {
   },
   methods: {
     ...mapMutations(["init"]),
+    refresh() {
+      this.$router.go()
+    },
+    redirectToLogin() {
+      
+    },
     recordAnalytics(evt) {
       const x = evt.clientX + window.scrollLeft
       const y = evt.clientY + window.scrollTop
