@@ -22,20 +22,21 @@ describe("Node Appearance", () => {
       cy.wait("@upload")
         .its("response.body.data.url")
         .then(url => {
-          expect(url)
-            .contain("/wp-content/uploads/")
-            .contain("reddit")
+          cy.get("No image").should("not.exist")
           cy.submitModal()
 
           cy.get(".toolbar").scrollIntoView()
+
           cy.getNodeById(node.id).within(() => {
             cy.getByTestId(`node-title-${node.id}`).should("not.exist")
             cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
             cy.getByTestId(`open-node-${node.id}`).should("not.exist")
+            cy.get("circle")
+              .should("have.attr", "fill")
+              .and("match", /url/)
             cy.getByTestId("nodeImage")
-              .should("exist")
-              .and("not.have.attr", "href", "")
-              .and("have.attr", "href", url)
+              .should("have.attr", "href")
+              .and("match", new RegExp(url, "i"))
           })
         })
     })
