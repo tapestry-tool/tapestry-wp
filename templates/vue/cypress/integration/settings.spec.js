@@ -40,6 +40,9 @@ describe("Settings", () => {
         cy.submitSettingsModal()
         cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
+      .then(() => {
+        throw new Error("Force fail to check if Cypress outputs image")
+      })
   })
 
   it(`should be able to duplicate a tapestry`, () => {
