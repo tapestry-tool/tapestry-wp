@@ -1,4 +1,5 @@
 import * as wp from "@/services/wp"
+import { nodeStatus } from "./constants"
 
 /**
  * Helper Functions
@@ -115,6 +116,48 @@ export default class Helpers {
   }
 
   /**
+   * Checks if two nodes are equal to each other
+   * - Allows missing property as long as loosely equals null
+   * Reference: https://stackoverflow.com/questions/25456013/javascript-deepequal-comparison/25456134
+   * @param {Object} src
+   * @param {Object} other
+   * @param {Array} ignoreProps
+   */
+  static nodeEqual(src, other, ignoreProps = []) {
+    if (src === other) {
+      return true
+    } else if (Array.isArray(src) && Array.isArray(other)) {
+      if (src.length !== other.length) return false
+
+      for (let i = 0; i < src.length; i++) {
+        if (!Helpers.nodeEqual(src[i], other[i])) return false
+      }
+    } else if (
+      typeof src == "object" &&
+      src != null &&
+      typeof other == "object" &&
+      other != null
+    ) {
+      for (let prop in src) {
+        if (ignoreProps.includes(prop)) continue
+        if (other.hasOwnProperty(prop)) {
+          if (!Helpers.nodeEqual(src[prop], other[prop])) {
+            return false
+          }
+        } else {
+          // If property does not exist, check if null or false
+          if (src[prop] != 0) {
+            return false
+          }
+        }
+      }
+    } else {
+      return false
+    }
+    return true
+  }
+
+  /**
    * Returns a deep copy of a given object.
    * Source: https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
    * @param {Object | Array} obj
@@ -139,19 +182,23 @@ export default class Helpers {
     return outObject
   }
 
-  static hasPermission(node, action) {
+  static hasPermission(node, action, showRejected) {
     // Check 0: node is null case - this should only apply to creating the root node.
     if (node === null) {
       return wp.canEditTapestry()
     }
 
     // Checks related to draft nodes
-    if (node.status === "draft") {
-      if (wp.canEditTapestry() && node.reviewStatus === "submitted") {
+    if (node.status === nodeStatus.DRAFT) {
+      if (
+        wp.canEditTapestry() &&
+        (node.reviewStatus === nodeStatus.SUBMIT ||
+          (showRejected && node.reviewStatus === nodeStatus.REJECT))
+      ) {
         return true
       } else if (node.author && wp.isCurrentUser(node.author.id)) {
         // authors cannot edit their submitted draft nodes
-        if (action == "edit" && node.reviewStatus === "submitted") {
+        if (action == "edit" && node.reviewStatus === nodeStatus.SUBMIT) {
           return false
         }
         return true
@@ -167,7 +214,7 @@ export default class Helpers {
 
     // Check 2: User is the author of the node (unless node was submitted, then accepted)
     if (node.author && wp.isCurrentUser(node.author.id)) {
-      if (node.reviewStatus !== "accept") {
+      if (node.reviewStatus !== nodeStatus.ACCEPT) {
         return true
       }
     }
@@ -206,5 +253,98 @@ export default class Helpers {
     }
 
     return false
+  }
+
+  /**
+   * Given an array of objects, return an array of unique objects
+   * determined by the given label.
+   * @template T
+   * @param {T[]} objs
+   * @param {string} label
+   * @return {T[]}
+   */
+  static unique(objs, label) {
+    const uniques = new Map()
+    for (const obj of objs) {
+      if (!uniques.has(obj[label])) {
+        uniques.set(obj[label], obj)
+      }
+    }
+    return [...uniques.values()]
+  }
+
+  /**
+   * @template T
+   * @param {T} obj
+   * @param {(keyof T)[]} keys
+   */
+  static omit(obj, keys) {
+    const partial = {}
+    for (const key in obj) {
+      if (!keys.includes(key)) {
+        partial[key] = obj[key]
+      }
+    }
+    return partial
+  }
+
+  static deepMerge(source, other) {
+    const out = { ...source }
+    for (const key in other) {
+      const value = other[key]
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        out[key] = Helpers.deepMerge(out[key], value)
+      } else {
+        out[key] = value
+      }
+    }
+    return out
+  }
+
+  static createDefaultNode({ settings = {}, ...overrides } = {}) {
+    const baseNode = {
+      type: "tapestry_node",
+      description: "",
+      conditions: [],
+      behaviour: "new-window",
+      status: "publish",
+      nodeType: "child",
+      title: "",
+      imageURL: "",
+      lockedImageURL: "",
+      mediaType: "text",
+      mediaFormat: "",
+      mediaDuration: 0,
+      typeId: 1,
+      group: 1,
+      progress: 0,
+      permissions: settings.defaultPermissions || {
+        public: ["read"],
+        authenticated: ["read"],
+      },
+      typeData: {
+        linkMetadata: null,
+        mediaURL: "",
+        mediaWidth: 960, //TODO: This needs to be flexible with H5P
+        mediaHeight: 600,
+        subAccordionText: "More content:",
+      },
+      hideTitle: false,
+      hideProgress: false,
+      hideMedia: false,
+      skippable: true,
+      fullscreen: false,
+      coordinates: {
+        x: 3000,
+        y: 3000,
+      },
+      childOrdering: [],
+      quiz: [],
+      license: "",
+      references: "",
+      unlocked: true,
+      accessible: true,
+    }
+    return Helpers.deepMerge(baseNode, overrides)
   }
 }
