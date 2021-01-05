@@ -35,7 +35,7 @@ describe("Node Appearance", () => {
             cy.getByTestId("nodeImage")
               .should("exist")
               .and("not.have.attr", "href", "")
-              .should("have.attr", "href", url)
+              .and("have.attr", "href", url)
           })
         })
     })
