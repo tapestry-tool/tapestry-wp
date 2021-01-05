@@ -94,7 +94,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
+import TapestryIcon from "@/components/common/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
 
