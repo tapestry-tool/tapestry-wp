@@ -91,7 +91,7 @@ class Tapestry implements ITapestry
             $this->links = $tapestry->links;
         }
         if (isset($tapestry->settings) && is_object($tapestry->settings)) {
-            $this->settings = array_replace((array) $this->settings, (array) $tapestry->settings);
+            $this->settings = $tapestry->settings;
         }
     }
 
@@ -599,6 +599,7 @@ class Tapestry implements ITapestry
                 array_push($nodesPermitted, $nodeId);
             }
         }
+
         return $nodesPermitted;
     }
 
