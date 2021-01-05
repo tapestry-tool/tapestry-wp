@@ -159,6 +159,12 @@ export default {
     }
     this.updateViewBox()
     this.dragSelectReady = true
+    this.$root.$on("open-node", id => {
+      this.openNode(id)
+    })
+    this.$root.$on("edit-node", id => {
+      this.editNode(id)
+    })
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
@@ -246,6 +252,20 @@ export default {
       }
 
       return box
+    },
+    openNode(id) {
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: id },
+        query: this.$route.query,
+      })
+    },
+    editNode(id) {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
   },
 }

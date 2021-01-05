@@ -10,13 +10,11 @@ describe("Review Nodes", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
-      textContent: "Abcd",
     }
 
     cy.getSelectedNode().then(root => {
       cy.getByTestId(`add-node-${root.id}`).click()
       cy.getByTestId(`node-title`).type(node.title)
-      cy.getEditable(`node-text-content`).type(node.textContent)
       cy.submitModal()
     })
 
@@ -45,9 +43,6 @@ describe("Review Nodes", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
-      typeData: {
-        textContent: "Abcd",
-      },
       status: "draft",
       reviewStatus: "submitted",
     }
