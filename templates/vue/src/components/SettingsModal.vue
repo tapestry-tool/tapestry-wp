@@ -320,7 +320,6 @@ export default {
         DragSelectModular.removeDragSelectListener()
       }
     })
-    this.updateEnableAnalytics()
     this.$root.$on("bv::modal::hide", (_, modalId) => {
       if (modalId === "settings-modal") {
         DragSelectModular.addDragSelectListener()
