@@ -59,9 +59,6 @@
         ],
         "subscriber": [
           "read"
-        ],
-        "copilot": [
-          "read"
         ]
       },
       "hideTitle": false,
@@ -82,8 +79,7 @@
         "public",
         "authenticated",
         "contributor",
-        "subscriber",
-        "copilot"
+        "subscriber"
       ],
       "index": 0,
       "x": 2939.49951171875,
@@ -93,7 +89,18 @@
       "nodeType": "root",
       "unlocked": true,
       "depth": 0,
-      "accessible": true
+      "accessible": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      }
     }
   ],
   "links": [],
