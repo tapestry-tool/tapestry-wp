@@ -170,7 +170,7 @@
               @click="handleSubmitForReview"
             >
               <span>
-                {{ node.reviewStatus === "reject" ? "Re-submit" : "Submit" }}
+                {{ wasRejected ? "Re-submit" : "Submit" }}
                 to Administrators for Review
               </span>
             </b-button>
@@ -235,7 +235,7 @@ import PermissionsTable from "./node-modal/PermissionsTable"
 import DeleteNodeButton from "./node-modal/DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
-import { sizes } from "@/utils/constants"
+import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import ReviewForm from "./node-modal/ReviewForm"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -303,6 +303,9 @@ export default {
         return `Edit node: ${this.node.title}`
       }
       return ""
+    },
+    wasRejected() {
+      return this.node.reviewStatus === nodeStatus.REJECT
     },
     isAuthenticated() {
       return wp.isLoggedIn()
@@ -618,15 +621,15 @@ export default {
       }
     },
     handlePublish() {
-      this.node.status = "publish"
+      this.node.status = nodeStatus.PUBLISH
       this.handleSubmit()
     },
     handleDraftSubmit() {
-      this.node.status = "draft"
+      this.node.status = nodeStatus.DRAFT
       this.handleSubmit()
     },
     handleSubmitForReview() {
-      this.node.reviewStatus = "submitted"
+      this.node.reviewStatus = nodeStatus.SUBMIT
       this.node.status = "draft"
       this.handleSubmit()
     },
@@ -769,13 +772,6 @@ export default {
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
-        }
-      } else if (this.node.mediaType === "text") {
-        if (
-          !this.node.typeData.textContent ||
-          !this.node.typeData.textContent.length
-        ) {
-          errMsgs.push("Please enter Text Content for this node")
         }
       }
 
