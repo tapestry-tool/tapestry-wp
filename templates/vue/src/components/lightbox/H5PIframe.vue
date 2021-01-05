@@ -67,8 +67,10 @@ export default {
     }
   },
   watch: {
-    node(_, oldNode) {
-      this.handlePause(oldNode)
+    node(newNode, oldNode) {
+      if (newNode.id !== oldNode.id) {
+        this.handlePause(oldNode)
+      }
     },
   },
   beforeDestroy() {

@@ -229,7 +229,6 @@ import DuplicateTapestryButton from "./settings-modal/DuplicateTapestryButton"
 import PermissionsTable from "./node-modal/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
-import client from "../services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -307,11 +306,6 @@ export default {
         )
       }
       return true
-    },
-  },
-  watch: {
-    enableAnalytics() {
-      this.updateEnableAnalytics()
     },
   },
   created() {
@@ -412,9 +406,6 @@ export default {
     },
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
-    },
-    updateEnableAnalytics() {
-      client.enableAnalytics(this.enableAnalytics)
     },
   },
 }

@@ -68,6 +68,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
+import client from "../services/TapestryAPI"
 import { mapMutations, mapState } from "vuex"
 import TapestryNode from "@/components/TapestryNode"
 import TapestryMap from "@/components/TapestryMap"
@@ -103,6 +104,9 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    analyticsEnabled() {
+      return this.settings.enableAnalytics
+    },
     background() {
       return this.settings.backgroundUrl
     },
@@ -128,6 +132,12 @@ export default {
     },
   },
   watch: {
+    analyticsEnabled: {
+      immediate: true,
+      handler(analyticsEnabled) {
+        client.enableAnalytics(analyticsEnabled)
+      },
+    },
     background: {
       immediate: true,
       handler(background) {
