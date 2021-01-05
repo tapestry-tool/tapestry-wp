@@ -5,6 +5,15 @@ describe("Node Appearance", () => {
   })
 
   it("should be able to edit a node's appearance using the node modal", () => {
+    // Check initial settings for render images
+    cy.store()
+      .its("state.settings")
+      .then(
+        settings =>
+          expect(!settings.hasOwnProperty("renderImages") || settings.renderImages)
+            .to.be.true
+      )
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
