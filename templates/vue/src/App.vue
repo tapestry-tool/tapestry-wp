@@ -11,12 +11,12 @@
 
 <script>
 import { mapState, mapMutations } from "vuex"
-import Tyde from "./components/Tyde"
-import NodeModal from "@/components/NodeModal"
+import NodeModal from "@/components/modals/NodeModal"
 import TapestrySidebar from "@/components/TapestrySidebar"
-import Loading from "./components/Loading"
-import client from "./services/TapestryAPI"
-import TapestryError from "./components/TapestryError"
+import TapestryError from "@/components/TapestryError"
+import Tyde from "@/components/Tyde"
+import Loading from "@/components/common/Loading"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "app",

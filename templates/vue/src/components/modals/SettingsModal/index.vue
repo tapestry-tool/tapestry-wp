@@ -1,0 +1,573 @@
+<template>
+  <b-modal
+    id="settings-modal"
+    data-qa="settings-modal"
+    :visible="show"
+    size="lg"
+    title="Tapestry Settings"
+    scrollable
+    body-class="p-0"
+    @hidden="$emit('close')"
+  >
+    <b-container fluid class="px-0">
+      <b-tabs card>
+        <b-tab
+          title="Appearance"
+          :active="tab === 'appearance'"
+          @click="$emit('change:tab', 'appearance')"
+        >
+          <b-form-group
+            label="Background URL"
+            description="Add a background image to the page where this tapestry
+              appears."
+          >
+            <file-upload
+              id="background-url"
+              v-model="backgroundUrl"
+              placeholder="Enter background URL"
+              autofocus
+              @isUploading="isUploading"
+            />
+          </b-form-group>
+
+          <b-form-group
+            label="Show me rejected nodes"
+            description="If enabled, you will be able to see all submitted nodes that have previously been rejected. This may slightly hinder performance."
+          >
+            <b-form-checkbox v-model="showRejected" switch>
+              {{ showRejected ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
+          </b-form-group>
+          <b-form-group
+            data-qa="superuser-override"
+            label="Show me all nodes by default"
+            description="If enabled, editors of this tapestry would be able to view all nodes even if they have
+            the 'read' permission off. If disabled, superusers will be able to use the filter to view such nodes,
+            but they won't appear in the tapestry by default. Note: Editors of this tapestry include users with
+            the Administator or Editor role, and the author of this Tapestry."
+          >
+            <b-form-checkbox v-model="superuserOverridePermissions" switch>
+              {{ superuserOverridePermissions ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
+          </b-form-group>
+          <b-form-group label="Default Depth" class="mb-0">
+            <b-form-input
+              v-model="defaultDepth"
+              class="depth-slider"
+              type="range"
+              min="0"
+              :max="maxDepth || 3"
+            ></b-form-input>
+            <p class="my-2 p-0 text-muted small">
+              <strong>Note:</strong>
+              You will need to refresh the page to see this change applied.
+            </p>
+            <div class="depth-slider-description">
+              Set to 0 to disable depth change. Selected depth: {{ defaultDepth }}
+            </div>
+          </b-form-group>
+        </b-tab>
+        <b-tab
+          title="TYDE"
+          :active="tab === 'tyde'"
+          @click="$emit('change:tab', 'tyde')"
+        >
+          <b-form-group
+            label="Spaceship Cockpit Background"
+            description="Add a background for the spaceship cockpit"
+          >
+            <file-upload
+              v-model="spaceshipBackgroundUrl"
+              placeholder="Enter the URL for the background"
+            />
+          </b-form-group>
+        </b-tab>
+        <b-tab
+          title="Profile"
+          :active="tab === 'profile'"
+          @click="$emit('change:tab', 'profile')"
+        >
+          <slick-list
+            :value="profileActivities"
+            lock-axis="y"
+            @input="updateProfileOrdering"
+          >
+            <slick-item
+              v-for="(activity, index) in profileActivities"
+              :key="index"
+              :index="index"
+              class="slick-list-item"
+              style="z-index: 9999 !important;"
+            >
+              <b-row align-v="center" class="m-0">
+                <b-input-group class="mb-3">
+                  <b-input-group-prepend is-text>
+                    <span class="fas fa-bars fa-xs"></span>
+                  </b-input-group-prepend>
+                  <b-form-group class="mb-0" style="flex:auto;">
+                    <combobox
+                      :key="`profile-${index}-${activity.activityRef}`"
+                      :value="activity.activityRef"
+                      :options="activities"
+                      item-text="text"
+                      item-value="id"
+                      placeholder="Choose activity"
+                      empty-message="There are no activities yet."
+                      class="mb-0"
+                      @input="profileActivities[index].activityRef = $event"
+                    >
+                      <template v-slot="slotProps">
+                        <p>
+                          {{ slotProps.option.text }}
+                        </p>
+                      </template>
+                    </combobox>
+                  </b-form-group>
+                  <b-input-group-append>
+                    <b-button
+                      size="md"
+                      variant="danger"
+                      style="height: calc(2.2em + 3px);"
+                      @click="deleteActivity(index)"
+                    >
+                      Delete
+                    </b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-row>
+            </slick-item>
+          </slick-list>
+          <b-row class="mx-0">
+            <b-button variant="primary" @click="addActivity">
+              <i class="fas fa-plus icon"></i>
+              Add Activity
+            </b-button>
+          </b-row>
+        </b-tab>
+        <b-tab
+          title="Advanced"
+          :active="tab === 'advanced'"
+          @click="$emit('change:tab', 'advanced')"
+        >
+          <b-form-group
+            label="Export/Duplicate"
+            description="Export your tapestry to a file and then you can import it on another site.
+              Duplicating will create a copy of this tapestry on this site."
+          >
+            <b-row class="mb-2">
+              <b-col>
+                <b-button
+                  id="export-button"
+                  block
+                  variant="light"
+                  :class="isExporting ? 'disabled' : ''"
+                  :disabled="isExporting"
+                  @click="exportTapestry"
+                >
+                  <b-spinner v-if="isExporting" small></b-spinner>
+                  <div :style="isExporting ? 'opacity: 50%;' : ''">
+                    Export Tapestry
+                  </div>
+                </b-button>
+                <b-alert
+                  :show="hasExported"
+                  variant="success"
+                  style="margin-top: 1em;"
+                >
+                  Your Tapestry has been exported! Find the .json file in your
+                  downloads.
+                </b-alert>
+              </b-col>
+              <b-col>
+                <duplicate-tapestry-button />
+              </b-col>
+            </b-row>
+          </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Show thumbnails"
+            description="When disabled, node thumbnails will not be rendered on the screen. Turning this off may improve performance."
+          >
+            <b-form-checkbox v-model="renderImages" switch>
+              {{ renderImages ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            label="Geography map"
+            :description="
+              'Replace Tapestry with a map of Earth with placeholders for each node.' +
+                (renderMap ? ' Set the default visible area below:' : '')
+            "
+          >
+            <b-form-checkbox v-model="renderMap" switch data-qa="map-checkbox">
+              {{ renderMap ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="renderMap">
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLat"
+                  placeholder="90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.neLat) ? null : false
+                  "
+                />
+                <b-form-text>Northern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLng"
+                  placeholder="-180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.swLng) ? null : false
+                  "
+                />
+                <b-form-text>Western Longitudinal Bound</b-form-text>
+              </b-col>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.neLng"
+                  placeholder="180"
+                  :state="
+                    lngRangeValid && isValidLng(mapBounds.neLng) ? null : false
+                  "
+                />
+                <b-form-text>Eastern Longitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col sm="4" offset-sm="4">
+                <b-form-input
+                  v-model="mapBounds.swLat"
+                  placeholder="-90"
+                  :state="
+                    latRangeValid && isValidLat(mapBounds.swLat) ? null : false
+                  "
+                />
+                <b-form-text>Southern Latitudinal Bound</b-form-text>
+              </b-col>
+            </b-row>
+          </b-form-group>
+        </b-tab>
+        <b-tab
+          title="Access"
+          :active="tab === 'access'"
+          @click="$emit('change:tab', 'access')"
+        >
+          <b-form-group
+            label="Default Permissions For New Nodes"
+            description="Newly created nodes in this tapestry will have these permissions by default."
+          >
+            <permissions-table v-model="defaultPermissions" />
+          </b-form-group>
+          <b-form-group
+            label="Show Access Tab"
+            description="When shown, users will see the Access tab when adding or editing a node
+              and can change the permissions for each node that they add. Hiding the Access tab
+              will hide it from all users except you, editors of this tapestry, and admins."
+          >
+            <b-form-checkbox v-model="showAccess" switch>
+              {{ showAccess ? "Show" : "Hide" }}
+            </b-form-checkbox>
+          </b-form-group>
+        </b-tab>
+      </b-tabs>
+    </b-container>
+    <template slot="modal-footer">
+      <b-button size="sm" variant="secondary" @click="closeModal">
+        Cancel
+      </b-button>
+      <b-button
+        id="save-button"
+        data-qa="submit-button"
+        size="sm"
+        variant="primary"
+        :disabled="fileUploading || !inputsValid"
+        @click="updateSettings"
+      >
+        <b-spinner v-if="fileUploading"></b-spinner>
+        <div :style="!fileUploading ? '' : 'opacity: 50%;'">Submit</div>
+      </b-button>
+    </template>
+  </b-modal>
+</template>
+
+<script>
+import { mapGetters, mapState } from "vuex"
+import FileUpload from "../common/FileUpload"
+import DuplicateTapestryButton from "./DuplicateTapestryButton"
+import PermissionsTable from "../common/PermissionsTable"
+import Combobox from "../common/Combobox"
+import { SlickList, SlickItem } from "vue-slicksort"
+import DragSelectModular from "@/utils/dragSelectModular"
+import { data as wpData } from "@/services/wp"
+
+const defaultPermissions = Object.fromEntries(
+  [
+    "public",
+    "authenticated",
+    ...Object.keys(wpData.roles).filter(
+      role => role !== "editor" && role !== "administrator" && role !== "author"
+    ),
+  ].map(rowName => [rowName, ["read"]])
+)
+
+export default {
+  name: "settings-modal",
+  components: {
+    FileUpload,
+    DuplicateTapestryButton,
+    PermissionsTable,
+    Combobox,
+    SlickList,
+    SlickItem,
+  },
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
+    },
+    tab: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    maxDepth: {
+      type: Number,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      backgroundUrl: "",
+      userId: "",
+      showAccess: true,
+      defaultPermissions,
+      spaceshipBackgroundUrl: "",
+      profileActivities: [],
+      fileUploading: false,
+      superuserOverridePermissions: true,
+      showRejected: false,
+      defaultDepth: 3,
+      isExporting: false,
+      renderImages: true,
+      renderMap: false,
+      mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
+      hasExported: false,
+    }
+  },
+  computed: {
+    ...mapGetters(["tapestryJson"]),
+    ...mapState(["nodes", "settings", "rootId"]),
+    activities() {
+      return Object.values(this.nodes)
+        .filter(node => Boolean(node.quiz))
+        .flatMap(node => node.quiz)
+    },
+    latRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLat, 90) >
+        this.getCoord(this.mapBounds.swLat, -90)
+      )
+    },
+    lngRangeValid() {
+      return (
+        this.getCoord(this.mapBounds.neLng, 180) >
+        this.getCoord(this.mapBounds.swLng, -180)
+      )
+    },
+    inputsValid() {
+      if (this.renderMap) {
+        return (
+          this.latRangeValid &&
+          this.isValidLat(this.mapBounds.swLat) &&
+          this.isValidLat(this.mapBounds.neLat) &&
+          this.lngRangeValid &&
+          this.isValidLng(this.mapBounds.swLng) &&
+          this.isValidLng(this.mapBounds.neLng)
+        )
+      }
+      return true
+    },
+  },
+  created() {
+    if (this.settings.defaultPermissions) {
+      this.defaultPermissions = this.settings.defaultPermissions
+    }
+  },
+  mounted() {
+    this.getSettings()
+    this.$root.$on("bv::modal::show", (_, modalId) => {
+      if (modalId === "settings-modal") {
+        DragSelectModular.removeDragSelectListener()
+      }
+    })
+    this.$root.$on("bv::modal::hide", (_, modalId) => {
+      if (modalId === "settings-modal") {
+        DragSelectModular.addDragSelectListener()
+        this.$emit("close")
+      }
+    })
+  },
+  methods: {
+    closeModal() {
+      this.$emit("close")
+    },
+    getSettings() {
+      const {
+        backgroundUrl = "",
+        autoLayout = false,
+        defaultPermissions = this.defaultPermissions,
+        showAccess = true,
+        spaceshipBackgroundUrl = "",
+        profileActivities = [],
+        superuserOverridePermissions = true,
+        showRejected = false,
+        defaultDepth = 3,
+        renderImages = true,
+        renderMap = false,
+        mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
+      } = this.settings
+      this.backgroundUrl = backgroundUrl
+      this.autoLayout = autoLayout
+      this.defaultPermissions = defaultPermissions
+      this.showAccess = showAccess
+      this.spaceshipBackgroundUrl = spaceshipBackgroundUrl
+      this.profileActivities = profileActivities
+      this.superuserOverridePermissions = superuserOverridePermissions
+      this.showRejected = showRejected
+      this.defaultDepth = defaultDepth
+      this.renderImages = renderImages
+      this.renderMap = renderMap
+      this.mapBounds = mapBounds
+    },
+    async updateSettings() {
+      const settings = Object.assign(this.settings, {
+        backgroundUrl: this.backgroundUrl,
+        autoLayout: this.autoLayout,
+        defaultPermissions: this.defaultPermissions,
+        showAccess: this.showAccess,
+        spaceshipBackgroundUrl: this.spaceshipBackgroundUrl,
+        profileActivities: this.profileActivities,
+        superuserOverridePermissions: this.superuserOverridePermissions,
+        showRejected: this.showRejected,
+        defaultDepth: parseInt(this.defaultDepth),
+        renderImages: this.renderImages,
+        renderMap: this.renderMap,
+        mapBounds: this.mapBounds,
+      })
+      await this.$store.dispatch("updateSettings", settings)
+      this.closeModal()
+    },
+    isUploading(status) {
+      this.fileUploading = status
+    },
+    exportTapestry() {
+      this.isExporting = true
+      let filteredTapestry = this.tapestryJson
+      filteredTapestry.nodes = filteredTapestry.nodes.filter(
+        node => node.status === "publish"
+      )
+      const tapestry = filteredTapestry
+      tapestry["site-url"] = wpData.wpUrl
+      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+        type: "application/json",
+      })
+      const fileUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = fileUrl
+      a.download = `${this.settings.title}.json`
+      document.body.appendChild(a)
+      a.click()
+      URL.revokeObjectURL(fileUrl)
+      document.body.removeChild(a)
+      this.isExporting = false
+      this.hasExported = true
+    },
+    addActivity() {
+      this.profileActivities = [
+        ...this.profileActivities,
+        {
+          activityRef: null,
+        },
+      ]
+    },
+    deleteActivity(index) {
+      this.profileActivities.splice(index, 1)
+    },
+    updateProfileOrdering(arr) {
+      this.profileActivities = [...arr]
+    },
+    isValidLat(coord) {
+      return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
+    },
+    isValidLng(coord) {
+      return this.getCoord(coord, 0) <= 180 && this.getCoord(coord, 0) >= -180
+    },
+    getCoord(coord, coordIfEmpty) {
+      return coord === "" ? coordIfEmpty : coord
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.depth-slider {
+  border: none;
+  padding: 0;
+  max-width: 350px;
+}
+
+.depth-slider-description {
+  color: #6c757d;
+  font-size: 80%;
+}
+
+.spinner {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#export-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+  }
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+#save-button {
+  position: relative;
+
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    left: 33%;
+  }
+}
+</style>
