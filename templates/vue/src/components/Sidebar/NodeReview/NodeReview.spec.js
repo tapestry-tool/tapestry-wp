@@ -6,7 +6,7 @@ import * as Comment from "@/utils/comments"
 import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
 
-import NodeReview from "@/components/NodeReview.vue"
+import NodeReview from "."
 
 jest.mock("@/services/TapestryAPI", () => {
   return {
