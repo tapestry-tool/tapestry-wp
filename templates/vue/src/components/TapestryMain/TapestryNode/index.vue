@@ -106,7 +106,7 @@
               :x="isSubAccordionRow ? 0 : 35"
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
-              @click="editNode"
+              @click="editNode(node.id)"
             >
               <tapestry-icon icon="pen" svg></tapestry-icon>
             </node-button>
