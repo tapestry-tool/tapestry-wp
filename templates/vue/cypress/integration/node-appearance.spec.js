@@ -32,7 +32,15 @@ describe("Node Appearance", () => {
         .its("response.body.data.url")
         .then(url => {
           cy.get("No image").should("not.exist")
+          cy.get(".alert-success").should("exist")
           cy.submitModal()
+
+          cy.store()
+            .its("state.nodes")
+            .then(nodes => {
+              const [node] = Object.values(nodes)
+              expect(node.imageURL).equal(url)
+            })
 
           cy.get(".toolbar").scrollIntoView()
 
