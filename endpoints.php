@@ -11,6 +11,7 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
+require_once __DIR__.'/classes/activities/class.circle-of-support.php';
 require_once __DIR__.'/utilities/class.tapestry-user-roles.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -299,6 +300,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'GET_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getCircleOfSupport',
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'postCircleOfSupport'
+        ]
+    ]
 ];
 
 /*
@@ -1384,4 +1399,16 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+function getCircleOfSupport($request)
+{
+    $cos = new CircleOfSupport();
+    return $cos->get();
+}
+
+function postCircleOfSupport($request)
+{
+    $cos = new CircleOfSupport();
+    return $cos->save($request->get_body());
 }
