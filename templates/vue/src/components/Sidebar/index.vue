@@ -114,13 +114,13 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
-import NodeReview from "@/components/NodeReview"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { nodeStatus } from "@/utils/constants"
 import { licenseTypes, licenses } from "@/utils/constants"
 import * as wp from "@/services/wp"
+import TapestryIcon from "@/components/common/TapestryIcon"
+import NodeReview from "./NodeReview"
 
 const PADDING_OFFSET = 48
 

@@ -36,8 +36,8 @@ import { nodeStatus } from "@/utils/constants"
 import * as Comment from "@/utils/comments"
 import * as wp from "@/services/wp"
 
-import ReviewLog from "./node-review/ReviewLog"
-import ReviewButtons from "./node-review/ReviewButtons"
+import ReviewLog from "./ReviewLog"
+import ReviewButtons from "./ReviewButtons"
 
 export default {
   components: {

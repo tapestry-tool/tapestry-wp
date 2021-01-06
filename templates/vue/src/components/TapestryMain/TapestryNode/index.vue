@@ -138,10 +138,10 @@ import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
 import { nodeStatus } from "@/utils/constants"
-import AddChildButton from "./tapestry-node/AddChildButton"
-import ProgressBar from "./tapestry-node/ProgressBar"
-import StatusBar from "./tapestry-node/StatusBar"
-import NodeButton from "./tapestry-node/NodeButton"
+import AddChildButton from "./AddChildButton"
+import ProgressBar from "./ProgressBar"
+import StatusBar from "./StatusBar"
+import NodeButton from "./NodeButton"
 
 export default {
   name: "tapestry-node",
