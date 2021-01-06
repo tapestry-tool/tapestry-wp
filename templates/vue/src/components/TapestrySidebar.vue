@@ -14,7 +14,11 @@
       >
         <tapestry-icon icon="copyright" />
       </button>
-      <button :class="['toggle-button', { closed: closed }]" @click.stop="toggle">
+      <button
+        data-qa="sidebar-toggle"
+        :class="['toggle-button', { closed: closed }]"
+        @click.stop="toggle"
+      >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
@@ -28,11 +32,19 @@
       <header class="sidebar-header">
         <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
         <div class="button-container">
-          <b-button v-if="node.accessible || canEdit" @click="viewNode">
+          <b-button
+            v-if="node.accessible || canEdit"
+            data-qa="sidebar-view-btn"
+            @click="$root.$emit('open-node', nodeId)"
+          >
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="$root.$emit('edit-node', nodeId)">
+          <b-button
+            v-if="canEdit"
+            data-qa="sidebar-edit-btn"
+            @click="$root.$emit('edit-node', nodeId)"
+          >
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -82,8 +94,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryIcon from "@/components/TapestryIcon"
-import { names } from "@/config/routes"
+import TapestryIcon from "@/components/common/TapestryIcon"
 import Helpers from "@/utils/Helpers"
 import { licenseTypes, licenses } from "@/utils/constants"
 
@@ -170,13 +181,6 @@ export default {
         const el = this.$refs[refName]
         this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
         this.active = refName
-      })
-    },
-    viewNode() {
-      this.$router.push({
-        name: names.LIGHTBOX,
-        params: { nodeId: this.nodeId },
-        query: this.$route.query,
       })
     },
     toggle() {
