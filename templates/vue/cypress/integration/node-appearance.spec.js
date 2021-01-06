@@ -30,21 +30,22 @@ describe("Node Appearance", () => {
       cy.getByTestId("import-file-input").attachFile("reddit.png")
       cy.wait("@upload")
         .its("response.body.data.url")
-        .then(url => {
+        .then(() => {
           cy.get("No image").should("not.exist")
           cy.get(".alert-success").should("exist")
           cy.submitModal()
 
-          cy.store()
-            .its("state.nodes")
-            .then(nodes => {
-              const [node] = Object.values(nodes)
-              expect(node.imageURL).equal(url)
-            })
-
           cy.get(".toolbar").scrollIntoView()
+          cy.reload()
 
           cy.getNodeById(node.id).within(() => {
+            cy.store()
+              .its("state.nodes")
+              .then(nodes => {
+                const [node] = Object.values(nodes)
+                expect(node.imageURL).match(/reddit/)
+              })
+
             cy.getByTestId(`node-title-${node.id}`).should("not.exist")
             cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
             cy.getByTestId(`open-node-${node.id}`).should("not.exist")
@@ -53,7 +54,7 @@ describe("Node Appearance", () => {
               .and("match", /url/)
             cy.getByTestId("nodeImage")
               .should("have.attr", "href")
-              .and("match", new RegExp(url, "i"))
+              .and("match", /reddit/)
           })
         })
     })
