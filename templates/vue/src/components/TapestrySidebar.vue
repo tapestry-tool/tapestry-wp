@@ -50,11 +50,15 @@
       <header ref="info" class="sidebar-header" data-name="info">
         <h1 class="content-title">{{ node.title }}</h1>
         <div class="button-container">
-          <b-button v-if="node.accessible || canEdit" @click="viewNode">
+          <b-button
+            v-if="node.accessible || canEdit"
+            data-qa="sidebar-view-btn"
+            @click="$root.$emit('open-node', nodeId)"
+          >
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button v-if="canEdit" @click="editNode">
+          <b-button v-if="canEdit" data-qa="sidebar-edit-btn" @click="editNode">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
