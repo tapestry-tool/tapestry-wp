@@ -1,5 +1,5 @@
 <template>
-  <loading v-if="loading" style="height: 75vh;"></loading>
+  <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
@@ -11,12 +11,12 @@
 
 <script>
 import { mapState, mapMutations } from "vuex"
-import NodeModal from "./components/NodeModal"
-import TapestryApp from "./components/TapestryApp"
-import TapestrySidebar from "./components/TapestrySidebar"
-import Loading from "./components/Loading"
-import client from "./services/TapestryAPI"
-import TapestryError from "./components/TapestryError"
+import NodeModal from "@/components/modals/NodeModal"
+import TapestryApp from "@/components/TapestryApp"
+import TapestrySidebar from "@/components/TapestrySidebar"
+import TapestryError from "@/components/TapestryError"
+import Loading from "@/components/common/Loading"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "app",

@@ -44,9 +44,8 @@ describe("Node Authoring", () => {
 
     const node = {
       title: "Root",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      mediaType: "text",
-      textContent: "dummy content",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     }
 
     cy.getByTestId(`root-node-button`).click()
@@ -112,20 +111,10 @@ describe("Node Authoring", () => {
       cy.getSelectedNode().then(parent => {
         const child = {
           title: "Child 1",
-          description: "I am a child 1",
-          mediaType: "text",
-          typeData: {
-            textContent: "Abcd",
-          },
         }
 
         cy.openModal("add", parent.id)
         cy.getByTestId(`node-title`).type(child.title)
-        cy.contains(/add description/i).click()
-        cy.getEditable(`node-description`).type(child.description)
-
-        cy.changeMediaType(child.mediaType)
-        cy.getEditable(`node-text-content`).type(child.typeData.textContent)
 
         cy.submitModal()
         cy.contains(child.title).should("exist")
@@ -170,10 +159,11 @@ describe("Node Authoring", () => {
 
         // check that error persists
         cy.getByTestId("submit-node-modal").click()
-        cy.contains(videoErrorMsg).should("exist")
+        cy.contains(videoErrorMsg, { timeout: 10000 }).should("exist")
 
         // check that node is not created
         cy.contains(/cancel/i).click()
+        cy.contains(/close/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
 
         // check that error does not persist to new creation
@@ -231,6 +221,7 @@ describe("Node Authoring", () => {
 
         // check that node is not created
         cy.contains(/cancel/i).click()
+        cy.contains(/close/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
       })
     })
