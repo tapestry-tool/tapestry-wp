@@ -178,7 +178,16 @@ export default {
       "isAccordionRow",
     ]),
     canReview() {
-      return wp.canEditTapestry() && this.node.reviewStatus === nodeStatus.SUBMIT
+      if (!this.isLoggedIn) {
+        return false
+      }
+      if (this.node.author.id === wp.getCurrentUser().id) {
+        return this.node.status === nodeStatus.DRAFT
+      }
+      if (wp.canEditTapestry()) {
+        return this.node.reviewStatus === nodeStatus.SUBMIT
+      }
+      return false
     },
     isLoggedIn() {
       return wp.isLoggedIn()
