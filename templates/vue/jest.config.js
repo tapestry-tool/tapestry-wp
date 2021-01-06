@@ -10,6 +10,7 @@ module.exports = {
     "\\.(css|less|scss)$": "<rootDir>/__mocks__/styleMock.js",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+  testMatch: ["**/*.spec.[tj]s?(x)"],
   transformIgnorePatterns: ["/node_modules/(?!(vue-youtube-embed)/).*/"],
   setupFilesAfterEnv: ["./config/jest-setup.js"],
   collectCoverage: true,
