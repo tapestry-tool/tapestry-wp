@@ -5,16 +5,15 @@ describe("Import Export", () => {
     cy.server()
     cy.route("GET", "**/tapestries/**/export").as("export")
 
-    cy.get('.settings-button').click()
+    cy.get(".settings-button").click()
     cy.contains(/advanced/i).click()
-    cy.get('#export-button').click()
+    cy.get("#export-button").click()
 
-    cy.wait('@export')
-    .then((xhr) => {
-        assert.isNotNull(xhr.response.body, "response body not null")
-    })
-    
-    cy.contains(/exported/i).should('be.visible') 
+    cy.wait("@export")
+      .its("response.body")
+      .should("not.be.null")
+
+    cy.contains(/exported/i).should("be.visible")
   })
 
   it("should be able to import a Tapestry using file input", () => {
@@ -28,7 +27,9 @@ describe("Import Export", () => {
     cy.wait("@import")
 
     cy.contains(/import successful/i).should("be.visible")
-    cy.get('button').contains(/confirm/i).click()
+    cy.get("button")
+      .contains(/confirm/i)
+      .click()
     cy.wait("@load")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
@@ -49,7 +50,9 @@ describe("Import Export", () => {
     cy.wait("@import")
 
     cy.contains(/import successful/i).should("be.visible")
-    cy.get('button').contains(/confirm/i).click()
+    cy.get("button")
+      .contains(/confirm/i)
+      .click()
     cy.wait("@load")
 
     cy.getByTestId("tapestry-loading").should("not.exist")
@@ -58,4 +61,3 @@ describe("Import Export", () => {
     })
   })
 })
-

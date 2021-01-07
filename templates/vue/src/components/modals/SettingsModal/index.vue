@@ -332,7 +332,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions({ exportTapestryStore: "exportTapestry" }),
+    ...mapActions(["getTapestryExport"]),
     closeModal() {
       this.$emit("close")
     },
@@ -381,8 +381,7 @@ export default {
     },
     async exportTapestry() {
       this.isExporting = true
-      const exportedTapestry = await this.exportTapestryStore()
-      console.log(exportedTapestry)
+      const exportedTapestry = await this.getTapestryExport()
       const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })

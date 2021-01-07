@@ -5,6 +5,7 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
+require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * Add/update/retrieve a Tapestry.
@@ -331,7 +332,7 @@ class Tapestry implements ITapestry
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
-            if ('draft' == $temp->status) {
+            if (NodeStatusTypes::DRAFT == $temp->status) {
                 continue;
             }
             $nodes[] = $temp;
