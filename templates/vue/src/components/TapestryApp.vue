@@ -37,7 +37,15 @@ export default {
       return Boolean(this.$route.query.sidebar)
     },
     analyticsEnabled() {
-      return this.settings.enableAnalytics
+      return this.settings.analyticsEnabled
+    },
+  },
+  watch: {
+    analyticsEnabled: {
+      immediate: true,
+      handler(analyticsEnabled) {
+        client.enableAnalytics(analyticsEnabled)
+      },
     },
   },
   mounted() {
@@ -47,14 +55,6 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
-  },
-  watch: {
-    analyticsEnabled: {
-      immediate: true,
-      handler(analyticsEnabled) {
-        client.enableAnalytics(analyticsEnabled)
-      },
-    },
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),

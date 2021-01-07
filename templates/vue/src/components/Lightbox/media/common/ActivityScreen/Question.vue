@@ -71,7 +71,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex"
-import client from "../../../services/TapestryAPI"
+import client from "../../../../../services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"

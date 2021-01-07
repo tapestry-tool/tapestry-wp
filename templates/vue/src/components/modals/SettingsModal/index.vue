@@ -187,8 +187,8 @@
             label="Enable analytics"
             description="When enabled, analytics such as mouse clicks will be saved."
           >
-            <b-form-checkbox v-model="enableAnalytics" switch>
-              {{ enableAnalytics ? "Enabled" : "Disabled" }}
+            <b-form-checkbox v-model="analyticsEnabled" switch>
+              {{ analyticsEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
@@ -287,7 +287,7 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
-      enableAnalytics: false,
+      analyticsEnabled: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -356,7 +356,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
-        enableAnalytics = true,
+        analyticsEnabled = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -368,7 +368,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
-      this.enableAnalytics = enableAnalytics
+      this.analyticsEnabled = analyticsEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -382,7 +382,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
-        enableAnalytics: this.enableAnalytics,
+        analyticsEnabled: this.analyticsEnabled,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)

@@ -96,7 +96,7 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
-import client from "../../services/TapestryAPI"
+import client from "../../../../services/TapestryAPI"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../../TapestryModal"
 import HeadlessAccordion from "./HeadlessAccordion"
