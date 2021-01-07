@@ -18,9 +18,7 @@ export default {
     }
   },
   async mounted() {
-    await client.saveCosActivity(this.cos)
-    const cos = await client.getCosActivity()
-    console.log(cos)
+    this.cos = await client.getCosActivity()
   },
 }
 </script>
