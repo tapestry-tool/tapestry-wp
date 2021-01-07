@@ -51,6 +51,7 @@
         ></locked-tooltip>
       </svg>
     </main>
+    <circle-of-support />
   </div>
 </template>
 
@@ -66,6 +67,7 @@ import LockedTooltip from "@/components/LockedTooltip"
 import TapestryFilter from "@/components/TapestryFilter"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
+import CircleOfSupport from "./tyde/activities/CircleOfSupport"
 import * as wp from "@/services/wp"
 
 export default {
@@ -77,6 +79,7 @@ export default {
     SettingsModalButton,
     RootNodeButton,
     LockedTooltip,
+    CircleOfSupport,
   },
   data() {
     return {

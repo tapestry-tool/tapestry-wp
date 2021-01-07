@@ -9,7 +9,11 @@ class CircleOfSupport
 
     public function __construct($userId = 0)
     {
-        $this->userId = $userId || wp_get_current_user()->ID;
+        if (!$userId) {
+            $userId = wp_get_current_user()->ID;
+        }
+
+        $this->userId = $userId;
         $this->versions = $this->_getVersions();
     }
 
@@ -25,6 +29,10 @@ class CircleOfSupport
             return null;
         }
 
+        if (0 === count($this->versions)) {
+            return null;
+        }
+
         return $this->versions[count($this->versions) - 1];
     }
 
@@ -32,23 +40,29 @@ class CircleOfSupport
     {
         $latest = $this->get();
 
-        if ($this->_isSameDay($latest->timestamp, $circleOfSupport->timestamp)) {
-            $this->versions[count($this->versions) - 1] = $circleOfSupport;
-        } else {
+        if (!isset($latest)) {
             array_push($this->versions, $circleOfSupport);
+        } else {
+            if ($this->_isSameDay($latest->timestamp, $circleOfSupport->timestamp)) {
+                $this->versions[count($this->versions) - 1] = $circleOfSupport;
+            } else {
+                array_push($this->versions, $circleOfSupport);
+            }
         }
 
-        update_user_meta($this->userId, CircleOfSupport::META_KEY, $this->versions);
+        return update_user_meta($this->userId, CircleOfSupport::META_KEY, $this->versions);
     }
 
     private function _getVersions()
     {
-        $versions = get_user_meta($this->userId, CircleOfSupport::META_KEY);
+        $versions = get_user_meta($this->userId, CircleOfSupport::META_KEY, true);
         if (!is_array($versions)) {
             return [];
         }
 
-        return $versions;
+        return array_map(function ($cos) {
+            return json_decode($cos);
+        }, $versions);
     }
 
     private function _isSameDay($date1, $date2)
