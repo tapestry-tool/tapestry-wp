@@ -10,13 +10,11 @@ describe("Review Nodes", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
-      textContent: "Abcd",
     }
 
     cy.getSelectedNode().then(root => {
       cy.getByTestId(`add-node-${root.id}`).click()
       cy.getByTestId(`node-title`).type(node.title)
-      cy.getEditable(`node-text-content`).type(node.textContent)
       cy.submitModal()
     })
 
@@ -27,7 +25,7 @@ describe("Review Nodes", () => {
 
     cy.findByLabelText("open sidebar").click()
     cy.sidebar().within(() => {
-      cy.findByText(/submitted this node for review/i).should("be.visible")
+      cy.findByText(/submitted/i).should("be.visible")
     })
 
     cy.logout().visitTapestry()
@@ -44,7 +42,7 @@ describe("Review Nodes", () => {
           cy.findByLabelText("edit node").should("not.exist")
           cy.contains(/accept/i).click()
           cy.contains(/accept/i).should("be.hidden")
-          cy.contains(/accepted this node/i).should("be.visible")
+          cy.contains(/accepted/i).should("be.visible")
 
           // hide the review form once accepted
           cy.findByRole("textbox", { name: /comment/i }).should("not.be.visible")
@@ -59,9 +57,6 @@ describe("Review Nodes", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
-      typeData: {
-        textContent: "Abcd",
-      },
       status: "draft",
       reviewStatus: "submitted",
     }
@@ -82,7 +77,7 @@ describe("Review Nodes", () => {
           cy.findByRole("textbox", { name: /comment/i }).type(comment)
           cy.contains(/reject/i).click()
           cy.contains(/reject/i).should("be.hidden")
-          cy.contains(/rejected this node/i).should("be.visible")
+          cy.contains(/rejected/i).should("be.visible")
           cy.contains(comment).should("be.visible")
           cy.findByRole("textbox", { name: /comment/i }).should("not.be.visible")
         })

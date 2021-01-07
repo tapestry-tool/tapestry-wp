@@ -137,11 +137,9 @@ describe("Map Tapestry", () => {
     const newNode = {
       title: "new node",
       mediaType: "text",
-      textContent: "content",
     }
 
     cy.getByTestId(`node-title`).type(newNode.title)
-    cy.getEditable(`node-text-content`).type(newNode.textContent)
     cy.submitModal()
 
     cy.store()
