@@ -201,6 +201,25 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group
+            class="mt-4"
+            label="Thumbnail optimization"
+            description="This will convert all existing thumbnails into optimized thumbnails"
+          >
+            <b-button
+              id="optimize-thumbnails-button"
+              block
+              variant="light"
+              :class="isOptimizing ? 'disabled' : ''"
+              :disabled="isOptimizing"
+              @click="optimizeThumbnails"
+            >
+              <b-spinner v-if="isOptimizing" small></b-spinner>
+              <div :style="isOptimizing ? 'opacity: 50%;' : ''">
+                Optimize All Thumbnails
+              </div>
+            </b-button>
+          </b-form-group>
+          <b-form-group
             label="Geography map"
             :description="
               'Replace Tapestry with a map of Earth with placeholders for each node.' +
@@ -312,6 +331,7 @@ import Combobox from "../common/Combobox"
 import { SlickList, SlickItem } from "vue-slicksort"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -365,6 +385,7 @@ export default {
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
+      isOptimizing: false,
     }
   },
   computed: {
@@ -510,6 +531,14 @@ export default {
     updateProfileOrdering(arr) {
       this.profileActivities = [...arr]
     },
+    async optimizeThumbnails() {
+      this.isOptimizing = true
+      let promises = []
+      for (let node of Object.values(this.nodes)) {
+        promises.push(client.optimizeNodeThumbnail(node.id, node.imageURL))
+      }
+      await Promise.all(promises).then(() => (this.isOptimizing = false))
+    },
     isValidLat(coord) {
       return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90
     },
@@ -543,6 +572,19 @@ export default {
 }
 
 #export-button {
+  position: relative;
+  > span {
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+  }
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+#optimize-thumbnails-button {
   position: relative;
   > span {
     position: absolute;
