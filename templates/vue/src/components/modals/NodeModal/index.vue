@@ -443,6 +443,9 @@ export default {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
+    this.$root.$on("fileID", fileId => {
+      this.node.thumbnailFileId = fileId
+    })
     this.node = this.createDefaultNode()
     if (!this.node.mapCoordinates) {
       this.node.mapCoordinates = {

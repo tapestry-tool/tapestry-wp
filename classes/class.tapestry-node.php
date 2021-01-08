@@ -23,6 +23,7 @@ class TapestryNode implements ITapestryNode
     private $reviewStatus;
     private $behaviour;
     private $typeData;
+    private $thumbnailFileId;
     private $imageURL;
     private $lockedImageURL;
     private $mediaType;
@@ -63,6 +64,7 @@ class TapestryNode implements ITapestryNode
         $this->size = '';
         $this->title = '';
         $this->status = '';
+        $this->thumbnailFileId = '';
         $this->reviewStatus = '';
         $this->imageURL = '';
         $this->lockedImageURL = '';
@@ -143,6 +145,13 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
+        }
+        if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
+            $this->thumbnailFileId = $node->thumbnailFileId;
+            set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
+            if (get_the_post_thumbnail_url($this->nodePostId, 'thumbnail')) {
+                $this->imageURL = get_the_post_thumbnail_url($this->nodePostId, 'thumbnail');
+            }
         }
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
             $this->lockedImageURL = $node->lockedImageURL;
@@ -411,11 +420,13 @@ class TapestryNode implements ITapestryNode
     {
         return (object) [
             'id' => $this->nodeMetaId,
+            'postId' => $this->nodePostId,
             'author' => $this->author,
             'type' => $this->type,
             'size' => $this->size,
             'title' => $this->title,
             'status' => $this->status,
+            'thumbnailFileId' => $this->thumbnailFileId,
             'reviewStatus' => $this->reviewStatus,
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
@@ -473,6 +484,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->typeData)) {
             $nodeData->typeData = $nodeMetadata->meta_value->typeData;
+        }
+        if (isset($nodeMetadata->meta_value->thumbnailFileId)) {
+            $nodeData->thumbnailFileId = $nodeMetadata->meta_value->thumbnailFileId;
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
