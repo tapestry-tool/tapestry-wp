@@ -293,7 +293,7 @@ describe("TYDE", () => {
       cy.closeTydeMenu()
     })
 
-    it.only("Should show a set background image in the cockpit", () => {
+    it("Should show a set background image in the cockpit", () => {
       cy.fixture("one-node.json").as("oneNode")
       cy.setup("@oneNode")
       cy.getByTestId("settings-button").click({ force: true })
