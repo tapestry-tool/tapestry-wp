@@ -21,6 +21,7 @@
       <tyde-button
         icon="user-circle"
         label="Profile"
+        data-qa="tyde-menu-profile-button"
         @click="setActivePage('profile')"
       ></tyde-button>
       <tyde-button

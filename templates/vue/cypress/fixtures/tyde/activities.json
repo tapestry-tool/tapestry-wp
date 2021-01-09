@@ -1,0 +1,328 @@
+{
+  "nodes": [
+    {
+      "type": "tapestry_node",
+      "description": "",
+      "conditions": [],
+      "behaviour": "new-window",
+      "status": "publish",
+      "nodeType": "child",
+      "title": "Activity 1",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "activity",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "typeId": 1,
+      "group": 1,
+      "progress": 1,
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ],
+        "copilot": [
+          "read"
+        ]
+      },
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "planetViewNotEarnedIconUrl": "",
+        "planetViewEarnedIconUrl": "",
+        "spaceshipPartNotEarnedIconUrl": "",
+        "spaceshipPartEarnedIconUrl": "",
+        "spaceshipPartHoverIconUrl": "",
+        "spaceshipPartX": 0,
+        "spaceshipPartY": 0,
+        "spaceshipPartWidth": 0,
+        "spaceshipPartHeight": 0,
+        "textContent": ""
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "fullscreen": false,
+      "tydeType": "Regular",
+      "coordinates": {
+        "x": 2920.3708991061108,
+        "y": 3082.284132178253,
+        "fx": 2499.2588385592358,
+        "fy": 3121.008253272003
+      },
+      "childOrdering": [],
+      "quiz": [
+        {
+          "id": "cd0c3dbb-6dbf-4f58-80c4-f19aec01a39b",
+          "isFollowUp": false,
+          "previousEntry": null,
+          "followUpText": "Previously, you said:",
+          "text": "What's your name?",
+          "answers": {
+            "textId": "",
+            "audioId": "1",
+            "checklistId": ""
+          },
+          "completed": true,
+          "entries": {
+            "audio": "__vue_devtool_undefined__",
+            "audioId": "<omitted>"
+          }
+        }
+      ],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "unlocked": true,
+      "accessible": true,
+      "hasSubAccordion": false,
+      "id": 406,
+      "author": {
+        "id": 1,
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "completed": true
+    },
+    {
+      "type": "tapestry_node",
+      "description": "",
+      "conditions": [],
+      "behaviour": "new-window",
+      "status": "publish",
+      "nodeType": "child",
+      "title": "Activity 2",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "activity",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "typeId": 1,
+      "group": 1,
+      "progress": 0,
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ],
+        "copilot": [
+          "read"
+        ]
+      },
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "planetViewNotEarnedIconUrl": "",
+        "planetViewEarnedIconUrl": "",
+        "spaceshipPartNotEarnedIconUrl": "",
+        "spaceshipPartEarnedIconUrl": "",
+        "spaceshipPartHoverIconUrl": "",
+        "spaceshipPartX": 0,
+        "spaceshipPartY": 0,
+        "spaceshipPartWidth": 0,
+        "spaceshipPartHeight": 0,
+        "textContent": ""
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "fullscreen": false,
+      "tydeType": "Regular",
+      "coordinates": {
+        "x": 2920.3708991061108,
+        "y": 3082.284132178253,
+        "fx": 2499.2588385592358,
+        "fy": 3121.008253272003
+      },
+      "childOrdering": [],
+      "quiz": [
+        {
+          "id": "cd0c3dbb-6dbf-4f58-80c4-f19aec01a39b",
+          "isFollowUp": false,
+          "previousEntry": null,
+          "followUpText": "Previously, you said:",
+          "text": "What's your favourite colour?",
+          "answers": {
+            "textId": "",
+            "audioId": "1",
+            "checklistId": ""
+          },
+          "completed": true,
+          "entries": {
+            "audio": "__vue_devtool_undefined__",
+            "audioId": "<omitted>"
+          }
+        }
+      ],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "unlocked": true,
+      "accessible": true,
+      "hasSubAccordion": false,
+      "id": 406,
+      "author": {
+        "id": 1,
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "completed": true
+    },
+    {
+      "type": "tapestry_node",
+      "description": "",
+      "conditions": [],
+      "behaviour": "new-window",
+      "status": "publish",
+      "nodeType": "child",
+      "title": "Activity 3",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "activity",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "typeId": 1,
+      "group": 1,
+      "progress": 1,
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ],
+        "copilot": [
+          "read"
+        ]
+      },
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "planetViewNotEarnedIconUrl": "",
+        "planetViewEarnedIconUrl": "",
+        "spaceshipPartNotEarnedIconUrl": "",
+        "spaceshipPartEarnedIconUrl": "",
+        "spaceshipPartHoverIconUrl": "",
+        "spaceshipPartX": 0,
+        "spaceshipPartY": 0,
+        "spaceshipPartWidth": 0,
+        "spaceshipPartHeight": 0,
+        "textContent": ""
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "fullscreen": false,
+      "tydeType": "Regular",
+      "coordinates": {
+        "x": 2920.3708991061108,
+        "y": 3082.284132178253,
+        "fx": 2499.2588385592358,
+        "fy": 3121.008253272003
+      },
+      "childOrdering": [],
+      "quiz": [
+        {
+          "id": "cd0c3dbb-6dbf-4f58-80c4-f19aec01a39b",
+          "isFollowUp": false,
+          "previousEntry": null,
+          "followUpText": "Previously, you said:",
+          "text": "Where in the world would you like to visit?",
+          "answers": {
+            "textId": "",
+            "audioId": "1",
+            "checklistId": ""
+          },
+          "completed": true,
+          "entries": {
+            "audio": "__vue_devtool_undefined__",
+            "audioId": "<omitted>"
+          }
+        }
+      ],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "unlocked": true,
+      "accessible": true,
+      "hasSubAccordion": false,
+      "id": 406,
+      "author": {
+        "id": 1,
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "completed": true
+    }
+  ],
+  "links": [],
+  "groups": [],
+  "site-url": "http://localhost:8000"
+}
