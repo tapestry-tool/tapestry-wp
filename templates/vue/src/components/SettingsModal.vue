@@ -82,6 +82,7 @@
             <file-upload
               v-model="spaceshipBackgroundUrl"
               placeholder="Enter the URL for the background"
+              input-test-id="tyde-background-image"
             />
           </b-form-group>
         </b-tab>

@@ -16,6 +16,9 @@ describe("TYDE", () => {
   const hoverCockpitIcon =
     "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip-art-clipart-2-wikiclipart-wikiclipart-transparent-background-earth-clipart.png"
 
+  const cockpitBackgroundImage =
+    "https://m.media-amazon.com/images/I/51h5kRXyipL._AC_.jpg"
+
   describe("Module Creation", () => {
     it("Should allow creation of a Module from the root node", () => {
       cy.fixture("one-node.json").as("oneNode")
@@ -258,7 +261,7 @@ describe("TYDE", () => {
       cy.contains(/Question Set 1/).should("be.visible")
     })
 
-    it.only("Should show completed profile activities in the menu", () => {
+    it("Should show completed profile activities in the menu", () => {
       cy.fixture("tyde/activities.json").as("activities")
       cy.setup("@activities")
       //cy.openModal("settings")
@@ -288,6 +291,17 @@ describe("TYDE", () => {
       cy.getByTestId("tyde-menu-profile-button").click()
       cy.contains("What's your name?").should("exist")
       cy.closeTydeMenu()
+    })
+
+    it.only("Should show a set background image in the cockpit", () => {
+      cy.fixture("one-node.json").as("oneNode")
+      cy.setup("@oneNode")
+      cy.getByTestId("settings-button").click({ force: true })
+      cy.contains("TYDE").click()
+      cy.getByTestId(`tyde-background-image`).type(cockpitBackgroundImage)
+      cy.submitSettingsModal()
+      cy.openTydeMenu()
+      cy.getByBackground(cockpitBackgroundImage).should("be.visible")
     })
   })
 })
