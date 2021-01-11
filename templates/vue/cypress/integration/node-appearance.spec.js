@@ -5,6 +5,15 @@ describe("Node Appearance", () => {
   })
 
   it("should be able to edit a node's appearance using the node modal", () => {
+    // Check initial settings for render images
+    cy.store()
+      .its("state.settings")
+      .then(
+        settings =>
+          expect(!settings.hasOwnProperty("renderImages") || settings.renderImages)
+            .to.be.true
+      )
+
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
@@ -22,19 +31,18 @@ describe("Node Appearance", () => {
       cy.wait("@upload")
         .its("response.body.data.url")
         .then(() => {
+          cy.get("No image").should("not.exist")
+          cy.get(".alert-success").should("exist")
           cy.submitModal()
-        })
 
-      cy.getNodeById(node.id).within(() => {
-        cy.getByTestId("nodeImage").should("exist")
-        cy.getByTestId("nodeImage")
-          .should("have.attr", "href")
-          .and("contain", "/wp-content/uploads/")
-          .and("contain", "reddit")
-        cy.getByTestId(`node-title-${node.id}`).should("not.exist")
-        cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
-        cy.getByTestId(`open-node-${node.id}`).should("not.exist")
-      })
+          cy.getNodeById(node.id).within(() => {
+            cy.getByTestId(`node-title-${node.id}`).should("not.exist")
+            cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
+            cy.getByTestId(`open-node-${node.id}`).should("not.exist")
+            cy.get("circle").should("have.attr", "fill")
+            cy.getByTestId("nodeImage").should("have.attr", "href")
+          })
+        })
     })
   })
 })
