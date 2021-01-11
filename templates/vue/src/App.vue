@@ -4,7 +4,7 @@
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
-    <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
+    <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
   </div>
 </template>
@@ -13,7 +13,7 @@
 import { mapState, mapMutations } from "vuex"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
-import TapestrySidebar from "@/components/TapestrySidebar"
+import Sidebar from "@/components/Sidebar"
 import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -24,7 +24,7 @@ export default {
     Loading,
     NodeModal,
     TapestryApp,
-    TapestrySidebar,
+    Sidebar,
     TapestryError,
   },
   data() {
@@ -80,6 +80,10 @@ html {
     text-align: center;
     color: #2c3e50;
 
+    li {
+      line-height: initial;
+    }
+
     h1,
     h2,
     h3,
@@ -88,10 +92,6 @@ html {
       &::before {
         display: none;
       }
-    }
-
-    p {
-      padding: 0;
     }
 
     button:focus {

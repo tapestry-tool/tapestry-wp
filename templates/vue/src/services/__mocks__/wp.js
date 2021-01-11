@@ -51,3 +51,5 @@ export const getCurrentUser = jest.fn().mockReturnValue({
 export const isLoggedIn = jest.fn().mockReturnValue(true)
 
 export const canEditTapestry = jest.fn().mockReturnValue(true)
+
+export const canReview = jest.fn().mockReturnValue(true)

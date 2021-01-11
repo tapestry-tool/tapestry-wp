@@ -12,7 +12,10 @@
         'has-title': !node.hideTitle,
       }"
       :style="{
-        cursor: node.accessible || hasPermission('edit') || hasPermission('move') ? 'pointer' : 'not-allowed',
+        cursor:
+          node.accessible || hasPermission('edit') || hasPermission('move')
+            ? 'pointer'
+            : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
@@ -85,21 +88,32 @@
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
-          <add-child-button
-            v-if="isLoggedIn && !isSubAccordionRow"
-            :node="node"
-            :x="hasPermission('edit') ? -35 : 0"
-            :y="radius"
-          ></add-child-button>
-          <node-button
-            v-if="isLoggedIn && hasPermission('edit')"
-            :x="isSubAccordionRow ? 0 : 35"
-            :y="radius"
-            :data-qa="`edit-node-${node.id}`"
-            @click="editNode(node.id)"
-          >
-            <tapestry-icon icon="pen" svg></tapestry-icon>
-          </node-button>
+          <template v-if="isLoggedIn">
+            <add-child-button
+              v-if="!isSubAccordionRow"
+              :node="node"
+              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :y="radius"
+            ></add-child-button>
+            <node-button
+              v-if="hasPermission('edit')"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`edit-node-${node.id}`"
+              @click="editNode(node.id)"
+            >
+              <tapestry-icon icon="pen" svg></tapestry-icon>
+            </node-button>
+            <node-button
+              v-else-if="canReview"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`review-node-${node.id}`"
+              @click="reviewNode"
+            >
+              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
+            </node-button>
+          </template>
         </g>
       </g>
       <defs>
@@ -127,6 +141,7 @@ import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
+import { nodeStatus } from "@/utils/constants"
 import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
 import StatusBar from "./StatusBar"
@@ -166,6 +181,18 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    canReview() {
+      if (!this.isLoggedIn) {
+        return false
+      }
+      if (this.node.author.id === wp.getCurrentUser().id) {
+        return this.node.status === nodeStatus.DRAFT
+      }
+      if (wp.canEditTapestry()) {
+        return this.node.reviewStatus === nodeStatus.SUBMIT
+      }
+      return false
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -277,7 +304,7 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
-    if (this.hasPermission("edit") || this.hasPermission('move')) {
+    if (this.hasPermission("edit") || this.hasPermission("move")) {
       const nodeRef = this.$refs.node
       d3.select(nodeRef).call(
         d3
@@ -355,6 +382,13 @@ export default {
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
+    },
+    reviewNode() {
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId: this.node.id },
+        query: { ...this.$route.query, sidebar: "review" },
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
