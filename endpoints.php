@@ -963,78 +963,27 @@ function updateTapestryNodeLockedImageURL($request)
 // takes a old thumbnail and optimizes it
 function optimizeTapestryNodeThumbnail($request)
 {
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-
-    $imageURL = $request['imageURL'];
-    if (!$imageURL) return;
-    $imageURL = "http:" . $imageURL;
-    // TODO: JSON validations should happen here
-    // make sure the permissions body exists and not null
-    try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-            throw new TapestryError('INVALID_CHILD_NODE');
-        }
-
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
-        $nodePostId = $node->get()->postId;
-        // is this already an image in our gallery?
-        $wpGalleryId = attachment_url_to_postid( $imageURL);
-        if ($wpGalleryId) {
-            $node->set((object) ['thumbnailFileId' => $wpGalleryId]);
-            $node->save();
-            return $node->get()->imageURL;
-        } 
-
-
-        // not an image in our gallery. let's upload it.
-        include_once( ABSPATH . 'wp-admin/includes/image.php' );
-
-        $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
-        $uniq_name = date('dmY').''.(int) microtime(true); 
-        $filename = $uniq_name.'.'.$imagetype;
-
-        $uploaddir = wp_upload_dir();
-        $uploadfile = $uploaddir['path'] . '/' . $filename;
-        $contents= file_get_contents($imageURL);
-        $savefile = fopen($uploadfile, 'w');
-        fwrite($savefile, $contents);
-        fclose($savefile);
-
-        $wp_filetype = wp_check_filetype(basename($filename), null );
-        $attachment = array(
-            'post_mime_type' => $wp_filetype['type'],
-            'post_title' => $filename,
-            'post_content' => '',
-            'post_status' => 'inherit'
-        );
-
-        $attach_id = wp_insert_attachment( $attachment, $uploadfile );
-        $imagenew = get_post( $attach_id );
-        $fullsizepath = get_attached_file( $imagenew->ID );
-        $attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
-        wp_update_attachment_metadata( $attach_id, $attach_data ); 
-
-        $node->set((object) ['thumbnailFileId' => $attach_id]);
+    $saveThumbnailFileId = function ($node, $thumbnailFileId)
+    {
+        $node->set((object) ['thumbnailFileId' => $thumbnailFileId]);
         $node->save();
         return $node->get()->imageURL;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }    
+    };
+    return optimizeTapestryThumbnail($request, $saveThumbnailFileId);
 }
 
 function optimizeTapestryNodeLockedThumbnail($request)
 {
+    $saveThumbnailFileId = function ($node, $thumbnailFileId)
+    {
+        $node->set((object) ['lockedThumbnailFileId' => $thumbnailFileId]);
+        $node->save();
+        return $node->get()->lockedImageURL;
+    };
+    return optimizeTapestryThumbnail($request, $saveThumbnailFileId);
+}
+
+function optimizeTapestryThumbnail($request, $saveThumbnailFileId) {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
 
@@ -1059,15 +1008,11 @@ function optimizeTapestryNodeLockedThumbnail($request)
 
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
-        $nodePostId = $node->get()->postId;
         // is this already an image in our gallery?
         $wpGalleryId = attachment_url_to_postid( $imageURL);
         if ($wpGalleryId) {
-            $node->set((object) ['lockedThumbnailFileId' => $wpGalleryId]);
-            $node->save();
-            return $node->get()->lockedImageURL;
+            return $saveThumbnailFileId($node, $wpGalleryId);
         } 
-
 
         // not an image in our gallery. let's upload it.
         include_once( ABSPATH . 'wp-admin/includes/image.php' );
@@ -1097,12 +1042,10 @@ function optimizeTapestryNodeLockedThumbnail($request)
         $attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
         wp_update_attachment_metadata( $attach_id, $attach_data ); 
 
-        $node->set((object) ['lockedThumbnailFileId' => $attach_id]);
-        $node->save();
-        return $node->get()->lockedImageURL;
+        return $saveThumbnailFileId($node, $attach_id);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }    
+    }
 }
 
 /**
