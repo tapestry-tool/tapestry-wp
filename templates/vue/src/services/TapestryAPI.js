@@ -128,7 +128,7 @@ class TapestryApi {
     return response
   }
 
-  async optimizeNodeLockedThumbnail(id, imageURL) {
+  async optimizeLockedNodeThumbnail(id, imageURL) {
     const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/optimize_locked_thumbnails`
     let response = await axios.post(url, { imageURL: imageURL })
     return response
