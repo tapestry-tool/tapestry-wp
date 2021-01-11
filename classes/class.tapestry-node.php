@@ -358,12 +358,101 @@ class TapestryNode implements ITapestryNode
 
     public function isAvailableToUser($userId = 0)
     {
+        $nodeMeta = $this->getMeta();
+
+        return $this->isAuthor($userId) || NodeStatus::DRAFT != $nodeMeta->status;
+    }
+
+    public function isAuthor($userId = 0)
+    {
         if (!$userId) {
             $userId = wp_get_current_user()->ID;
         }
         $nodeMeta = $this->getMeta();
 
-        return $nodeMeta->author->id == $userId || 'draft' != $nodeMeta->status;
+        return $nodeMeta->author->id == $userId;
+    }
+
+    public function addReview($comments)
+    {
+        if (NodeStatus::PUBLISH === $this->status) {
+            throw new TapestryError('REVIEW_PERMISSION_DENIED', "You're not allowed to review published nodes", 403);
+        }
+
+        $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
+        if (!$canEditTapestry && !$this->isAuthor()) {
+            throw new TapestryError('REVIEW_PERMISSION_DENIED', "You're not allowed to review this node", 403);
+        }
+
+        // Validate _all_ comments before adding them in
+        foreach ($comments as $comment) {
+            $this->_validateComment($comment);
+        }
+
+        foreach ($comments as $comment) {
+            if (CommentTypes::STATUS_CHANGE === $comment->type) {
+                $this->reviewStatus = $comment->to;
+                if (NodeStatus::ACCEPT === $comment->to) {
+                    $this->status = NodeStatus::PUBLISH;
+                }
+            }
+            array_push($this->reviewComments, $comment);
+        }
+
+        $this->save();
+
+        return (object) [
+            'status' => $this->status,
+            'reviewStatus' => $this->reviewStatus,
+            'reviewComments' => $this->reviewComments,
+        ];
+    }
+
+    private function _validateComment($review)
+    {
+        $canEditTapestry = current_user_can('edit_post', $this->tapestryPostId);
+
+        if (!isset($review->type)) {
+            throw new TapestryError('INVALID_REVIEW', "Missing property 'type'", 400);
+        }
+
+        if (!isset($review->timestamp)) {
+            throw new TapestryError('INVALID_REVIEW', "Missing property 'timestamp'", 400);
+        }
+
+        switch ($review->type) {
+            case CommentTypes::COMMENT:
+                if (!isset($review->comment) || !is_string($review->comment) || 0 === strlen($review->comment)) {
+                    throw new TapestryError('INVALID_REVIEW_COMMENT', 'A review comment must be a non-empty string.', 400);
+                }
+                break;
+            case CommentTypes::STATUS_CHANGE:
+                $validStatuses = [NodeStatus::SUBMIT, NodeStatus::REJECT, NodeStatus::ACCEPT];
+
+                if (!in_array($review->to, $validStatuses)) {
+                    $message = sprintf(
+                        'Invalid node status %s. A node status can only be changed to %s, %s, or %s.',
+                        $review->to,
+                        NodeStatus::SUBMIT,
+                        NodeStatus::REJECT,
+                        NodeStatus::ACCEPT
+                    );
+                    throw new TapestryError('INVALID_REVIEW_STATUS', $message, 400);
+                }
+
+                if (!$canEditTapestry && NodeStatus::SUBMIT !== $review->to) {
+                    throw new TapestryError('REVIEW_PERMISSION_DENIED', "You're not allowed to accept or reject this node.", 403);
+                }
+                break;
+            default:
+                $message = sprintf(
+                    'Unknown review type %s. A review type can only be one of %s or %s.',
+                    $review->type,
+                    CommentTypes::COMMENT,
+                    CommentTypes::STATUS_CHANGE
+                );
+                throw new TapestryError('INVALID_REVIEW', $message, 400);
+        }
     }
 
     private function _saveToDatabase()

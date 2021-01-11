@@ -1,5 +1,5 @@
 import * as wp from "@/services/wp"
-import { nodeStatus } from "./constants"
+import { nodeStatus, userActions } from "./constants"
 
 /**
  * Helper Functions
@@ -188,23 +188,26 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
-    // Checks related to draft nodes
+    /**
+     * If node is a draft:
+     *  - Allow all actions for original author EXCEPT if the node is submitted for
+     *    review
+     *  - Allow "read" to reviewers only if the node is submitted for review
+     */
     if (node.status === nodeStatus.DRAFT) {
-      if (
-        wp.canEditTapestry() &&
-        (node.reviewStatus === nodeStatus.SUBMIT ||
-          (showRejected && node.reviewStatus === nodeStatus.REJECT))
-      ) {
-        return true
-      } else if (node.author && wp.isCurrentUser(node.author.id)) {
-        // authors cannot edit their submitted draft nodes
-        if (action == "edit" && node.reviewStatus === nodeStatus.SUBMIT) {
-          return false
+      if (wp.isCurrentUser(node.author.id)) {
+        return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
+      }
+      if (wp.canEditTapestry()) {
+        if (action === userActions.READ) {
+          return (
+            node.reviewStatus === nodeStatus.SUBMIT ||
+            (showRejected && node.reviewStatus === nodeStatus.REJECT)
+          )
         }
-        return true
-      } else {
         return false
       }
+      return false
     }
 
     // Check 1: User has edit permissions for Tapestry
@@ -344,6 +347,7 @@ export default class Helpers {
       references: "",
       unlocked: true,
       accessible: true,
+      reviewComments: [],
     }
     return Helpers.deepMerge(baseNode, overrides)
   }

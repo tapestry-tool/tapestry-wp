@@ -107,12 +107,19 @@ class TapestryError extends Error
      *
      * @return null
      */
-    public function __construct($code)
+    public function __construct($code, $message = null, $status = null)
     {
-        $ERROR = (object) self::ERRORS[$code];
+        if (array_key_exists($code, self::ERRORS)) {
+            $ERROR = (object) self::ERRORS[$code];
+            $message = $ERROR->MESSAGE;
+            $status = $ERROR->STATUS['status'];
+        }
+
         $this->code = $code;
-        $this->message = $ERROR->MESSAGE;
-        $this->status = $ERROR->STATUS;
+        $this->message = $message;
+        $this->status = [
+            'status' => $status
+        ];
     }
 
     /**

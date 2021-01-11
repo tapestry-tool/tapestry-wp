@@ -115,14 +115,7 @@
     </b-container>
     <template slot="modal-footer">
       <b-overlay :show="loading || fileUploading" variant="white" class="w-100">
-        <review-form
-          v-if="canEditTapestry && node.reviewStatus === 'submitted'"
-          :node="node"
-          :disabled="loading || fileUploading"
-          @submit="handleSubmit"
-          @close="close"
-        ></review-form>
-        <template v-else>
+        <template>
           <div class="buttons-container d-flex w-100">
             <delete-node-button
               v-if="type === 'edit'"
@@ -231,11 +224,11 @@ import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
 import MoreInformationForm from "./forms/MoreInformationForm"
-import ReviewForm from "./forms/ReviewForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
+import * as Comment from "@/utils/comments"
 import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -263,7 +256,6 @@ export default {
     SlickList,
     PermissionsTable,
     DeleteNodeButton,
-    ReviewForm,
   },
   data() {
     return {
@@ -637,7 +629,15 @@ export default {
     },
     handleSubmitForReview() {
       this.node.reviewStatus = nodeStatus.SUBMIT
-      this.node.status = "draft"
+      this.node.status = nodeStatus.DRAFT
+
+      this.node.reviewComments.push(
+        Comment.createComment(Comment.types.STATUS_CHANGE, {
+          from: null,
+          to: nodeStatus.SUBMIT,
+        })
+      )
+
       this.handleSubmit()
     },
     async submitNode() {
