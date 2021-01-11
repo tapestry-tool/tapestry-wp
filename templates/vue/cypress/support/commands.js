@@ -186,6 +186,8 @@ Cypress.Commands.add("changeMediaType", type =>
 
 // -- Utils --
 
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
 Cypress.Commands.add("app", () => cy.window().its("app"))
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))

@@ -1,8 +1,13 @@
 <template>
-  <div ref="wrapper" :class="['sidebar-container', { closed: closed }]">
+  <div
+    ref="wrapper"
+    data-qa="sidebar"
+    :class="['sidebar-container', { closed: closed }]"
+  >
     <div class="sidebar-preview">
       <button
         :class="['anchor-button', { active: active === 'info' }]"
+        aria-label="information"
         @click.stop="scrollToRef('info')"
       >
         <tapestry-icon icon="info-circle" />
@@ -10,27 +15,40 @@
       <button
         v-if="node.license || node.references"
         :class="['anchor-button', { active: active === 'copyright' }]"
+        aria-label="copyright"
         @click.stop="scrollToRef('copyright')"
       >
         <tapestry-icon icon="copyright" />
       </button>
       <button
-        data-qa="sidebar-toggle"
+        v-if="isReviewParticipant"
+        :class="['anchor-button', { active: active === 'review' }]"
+        aria-label="review"
+        @click.stop="scrollToRef('review')"
+      >
+        <tapestry-icon icon="comment-dots" />
+      </button>
+      <button
+        :aria-label="closed ? 'open sidebar' : 'close sidebar'"
         :class="['toggle-button', { closed: closed }]"
-        @click.stop="toggle"
+        @click.stop="active = closed ? 'info' : undefined"
       >
         <tapestry-icon :icon="closed ? 'chevron-left' : 'chevron-right'" />
       </button>
       <button
         :class="['anchor-button', 'close-button-mobile', { closed: closed }]"
-        @click.stop="toggle"
+        @click.stop="active = undefined"
       >
         <tapestry-icon icon="times" />
       </button>
     </div>
-    <aside ref="content" :class="['sidebar', { closed: closed }]">
-      <header class="sidebar-header">
-        <h1 ref="info" data-name="info" class="content-title">{{ node.title }}</h1>
+    <aside
+      ref="content"
+      data-qa="sidebar-content"
+      :class="['sidebar', { closed: closed }]"
+    >
+      <header ref="info" class="sidebar-header" data-name="info">
+        <h1 class="content-title">{{ node.title }}</h1>
         <div class="button-container">
           <b-button
             v-if="node.accessible || canEdit"
@@ -40,11 +58,7 @@
             <tapestry-icon icon="eye" />
             View
           </b-button>
-          <b-button
-            v-if="canEdit"
-            data-qa="sidebar-edit-btn"
-            @click="$root.$emit('edit-node', nodeId)"
-          >
+          <b-button v-if="canEdit" data-qa="sidebar-edit-btn" @click="editNode">
             <tapestry-icon icon="pencil-alt" />
             Edit
           </b-button>
@@ -57,7 +71,9 @@
         </section>
         <section ref="copyright" data-name="copyright">
           <section v-if="node.license">
-            <h2 class="content-header">License</h2>
+            <h2 class="content-header">
+              License
+            </h2>
             <p class="content-body" style="margin-bottom: 0.5em;">
               <a
                 v-if="license.type === licenseTypes.CUSTOM && license.link"
@@ -87,6 +103,10 @@
             <div class="content-body" v-html="node.references"></div>
           </section>
         </section>
+        <section v-if="isReviewParticipant" ref="review" data-name="review">
+          <h2 class="content-header">Review</h2>
+          <node-review :node="node"></node-review>
+        </section>
       </div>
     </aside>
   </div>
@@ -94,34 +114,40 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryIcon from "@/components/common/TapestryIcon"
+import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
+import { nodeStatus } from "@/utils/constants"
 import { licenseTypes, licenses } from "@/utils/constants"
+import * as wp from "@/services/wp"
+import TapestryIcon from "@/components/common/TapestryIcon"
+import NodeReview from "./NodeReview"
 
-const INTERSECTION_THRESHOLD = 0.5
 const PADDING_OFFSET = 48
+
+const tabOrder = ["info", "copyright", "review"]
 
 export default {
   components: {
+    NodeReview,
     TapestryIcon,
-  },
-  data() {
-    return {
-      active: null,
-    }
   },
   computed: {
     ...mapGetters(["getNode"]),
-    closed: {
+    active: {
       get() {
-        return !this.$route.query.sidebar
+        return this.$route.query.sidebar
       },
-      set(closed) {
-        // eslint-disable-next-line no-unused-vars
-        const { sidebar: _, ...rest } = this.$route.query
-        const newQuery = closed ? rest : { ...this.$route.query, sidebar: true }
-        this.$router.push({ ...this.$route, query: newQuery })
+      set(section) {
+        if (section !== this.active) {
+          this.$router.push({
+            ...this.$route,
+            query: { ...this.$route.query, sidebar: section },
+          })
+        }
       },
+    },
+    closed() {
+      return this.active === undefined
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -141,50 +167,111 @@ export default {
         ...licenses[this.node.license.type],
       }
     },
+    isReviewParticipant() {
+      if (wp.canEditTapestry()) {
+        return this.node.reviewStatus
+      }
+      if (wp.isCurrentUser(this.node.author.id)) {
+        return this.node.reviewStatus || this.node.status === nodeStatus.DRAFT
+      }
+      return false
+    },
   },
   watch: {
-    closed(closed) {
-      if (closed) {
-        this.active = null
-      }
+    closed: {
+      immediate: true,
+      handler(closed) {
+        if (!closed) {
+          this.scrollToRef(this.active)
+        }
+      },
     },
-    nodeId() {
-      if (!this.closed) {
-        this.active = "info"
-      }
+    nodeId: {
+      immediate: true,
+      handler() {
+        if (!this.closed) {
+          /**
+           * If the new node doesn't have a particular section, change to the "info"
+           * section (guaranteed on all nodes).
+           */
+          this.$nextTick(() => {
+            if (!this.$refs[this.active]) {
+              this.$router.replace({
+                path: this.$route.path,
+                query: {
+                  ...this.$route.query,
+                  sidebar: "info",
+                },
+              })
+            }
+          })
+        }
+      },
     },
   },
   mounted() {
     const observer = new IntersectionObserver(this.handleObserve, {
-      threshold: INTERSECTION_THRESHOLD,
+      threshold: [0.5, 0.8],
     })
-    observer.observe(this.$refs.info)
+    const sections = Helpers.omit(this.$refs, ["content", "wrapper"])
+    for (const ref in sections) {
+      observer.observe(this.$refs[ref])
+    }
   },
   methods: {
+    /**
+     * This callback is called whenever any section cross 50% and 80% visibility.
+     *  - If a section crosses 80% visibility, make that the current active section.
+     *  - If a section goes below 50% visibility without another section going above
+     *    80%, go to the _next_ section.
+     */
     handleObserve(entries) {
       if (this.closed) {
         return
       }
-
-      const entry = entries[0]
-      if (entry.intersectionRatio > INTERSECTION_THRESHOLD) {
-        this.active = "info"
-      } else {
-        this.active = "copyright"
+      const inactive = entries.find(entry => !entry.isIntersecting)
+      const nextActive = entries.find(entry => entry.intersectionRatio > 0.8)
+      if (nextActive) {
+        this.active = nextActive.target.dataset.name
+      } else if (inactive) {
+        const { name } = inactive.target.dataset
+        if (name === this.active) {
+          this.active = this.nextTab()
+        }
       }
+    },
+    nextTab() {
+      const nextTabIndex = tabOrder.indexOf(this.active)
+      if (nextTabIndex >= 0 && nextTabIndex < tabOrder.length - 1) {
+        return tabOrder[nextTabIndex + 1]
+      }
+      return this.active
     },
     scrollToRef(refName) {
-      if (this.closed) {
-        this.toggle()
-      }
-      this.$nextTick(() => {
-        const el = this.$refs[refName]
-        this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+      if (refName) {
         this.active = refName
+        this.$nextTick(() => {
+          let el = this.$refs[refName]
+          if (el.hasOwnProperty("$el")) {
+            el = el.$el
+          }
+          this.$refs.content.scroll(0, el.offsetTop - PADDING_OFFSET)
+        })
+      }
+    },
+    viewNode() {
+      this.$router.push({
+        name: names.LIGHTBOX,
+        params: { nodeId: this.nodeId },
+        query: this.$route.query,
       })
     },
-    toggle() {
-      this.closed = !this.closed
+    editNode() {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.node.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
   },
 }
@@ -308,10 +395,11 @@ export default {
   }
 
   .sidebar {
+    position: relative;
     background: #5d656c;
     color: white;
     height: 100vh;
-    padding: 2.2rem 1rem;
+    padding: 2.2rem 1.5rem;
     transform: translateY(0);
     transition: all 0.2s ease-out;
     width: 100vw;
@@ -363,6 +451,8 @@ export default {
     }
 
     .sidebar-content {
+      text-align: left;
+
       section {
         margin-bottom: 2em;
         &:last-child {
@@ -370,11 +460,11 @@ export default {
         }
 
         .content-header {
-          margin: 1em 0 0.2em;
+          margin: 1em -1em 0.2em;
           position: relative;
-          text-align: left;
           border-bottom: solid 2px #6b747d;
-          padding: 0.2em 0;
+          padding: 0.2em 1em;
+          font-size: 1.75em;
         }
 
         .content-body {

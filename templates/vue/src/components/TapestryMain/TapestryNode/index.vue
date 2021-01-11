@@ -85,21 +85,32 @@
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
-          <add-child-button
-            v-if="isLoggedIn && !isSubAccordionRow"
-            :node="node"
-            :x="hasPermission('edit') ? -35 : 0"
-            :y="radius"
-          ></add-child-button>
-          <node-button
-            v-if="isLoggedIn && hasPermission('edit')"
-            :x="isSubAccordionRow ? 0 : 35"
-            :y="radius"
-            :data-qa="`edit-node-${node.id}`"
-            @click="editNode(node.id)"
-          >
-            <tapestry-icon icon="pen" svg></tapestry-icon>
-          </node-button>
+          <template v-if="isLoggedIn">
+            <add-child-button
+              v-if="!isSubAccordionRow"
+              :node="node"
+              :x="canReview || hasPermission('edit') ? -35 : 0"
+              :y="radius"
+            ></add-child-button>
+            <node-button
+              v-if="hasPermission('edit')"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`edit-node-${node.id}`"
+              @click="editNode(node.id)"
+            >
+              <tapestry-icon icon="pen" svg></tapestry-icon>
+            </node-button>
+            <node-button
+              v-else-if="canReview"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`review-node-${node.id}`"
+              @click="reviewNode"
+            >
+              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
+            </node-button>
+          </template>
         </g>
       </g>
       <defs v-if="imageUrl && imageUrl.length > 0">
@@ -158,6 +169,7 @@ import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
 import * as wp from "@/services/wp"
+import { nodeStatus } from "@/utils/constants"
 import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
 import StatusBar from "./StatusBar"
@@ -198,6 +210,18 @@ export default {
       "isAccordionRow",
       "getTydeProgress",
     ]),
+    canReview() {
+      if (!this.isLoggedIn) {
+        return false
+      }
+      if (this.node.author.id === wp.getCurrentUser().id) {
+        return this.node.status === nodeStatus.DRAFT
+      }
+      if (wp.canEditTapestry()) {
+        return this.node.reviewStatus === nodeStatus.SUBMIT
+      }
+      return false
+    },
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -421,6 +445,13 @@ export default {
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
+    },
+    reviewNode() {
+      this.$router.push({
+        name: names.APP,
+        params: { nodeId: this.node.id },
+        query: { ...this.$route.query, sidebar: "review" },
+      })
     },
     formatDuration() {
       const seconds = this.node.mediaDuration

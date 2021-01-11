@@ -44,4 +44,10 @@ export const nodeStatus = {
   ACCEPT: "accepted",
 }
 
+export const userActions = {
+  READ: "read",
+  ADD: "add",
+  EDIT: "edit",
+}
+
 export const DEFAULT_DEPTH = 3
