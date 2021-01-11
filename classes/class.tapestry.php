@@ -333,7 +333,7 @@ class Tapestry implements ITapestry
         $nodes = [];
         foreach ($this->nodes as $node) {
             $temp = (new TapestryNode($this->postId, $node))->get();
-            if (NodeStatusTypes::DRAFT == $temp->status) {
+            if (NodeStatus::DRAFT == $temp->status) {
                 continue;
             }
             $nodes[] = $temp;
