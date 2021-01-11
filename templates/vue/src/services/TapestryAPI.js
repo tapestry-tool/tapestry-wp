@@ -123,6 +123,12 @@ class TapestryApi {
     return await axios.put(url, coordinates)
   }
 
+  async optimizeNodeThumbnail(id, imageURL) {
+    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/optimize_thumbnails`
+    let response = await axios.post(url, { imageURL: imageURL })
+    return response
+  }
+
   async getUserProgress() {
     const url = `${apiUrl}/users/progress?post_id=${this.postId}`
     const response = await axios.get(url)

@@ -21,34 +21,90 @@
       </b-col>
     </b-row>
     <b-row v-if="!isUploading">
-      <b-col class="pr-0">
-        <b-form-file
-          ref="file"
-          name="async-upload"
-          class="image-file"
-          placeholder="Choose a file or drop it here..."
-          drop-placeholder="Drop file here..."
-          :disabled="isUploading"
-          required
-          @dragover.prevent
-          @drop.prevent="uploadFile"
-          @change="uploadFile"
-        ></b-form-file>
+      <b-col v-if="showImagePreview" class="thumbnail-col">
+        <svg
+          width="130"
+          height="130"
+          class="img-thumbnail"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid slice"
+          focusable="false"
+          role="img"
+          aria-label="Thumbnail placeholder for when no thumbnail is uploaded"
+        >
+          <rect
+            width="100%"
+            height="100%"
+            :fill="value ? 'url(#' + imagePatternId + ')' : '#868e96'"
+          ></rect>
+          <defs v-if="value">
+            <pattern :id="imagePatternId" width="1" height="1">
+              <image
+                preserveAspectRatio="xMidYMid slice"
+                :href="value"
+                x="0"
+                y="0"
+                width="130"
+                height="130"
+              />
+            </pattern>
+          </defs>
+          <text v-if="!value" x="50%" y="50%" fill="#dee2e6" dy=".3em" dx="-2em">
+            No image
+          </text>
+        </svg>
       </b-col>
-      <b-col sm="1" class="divider">
-        <h6 class="text-muted">OR</h6>
-      </b-col>
-      <b-col class="pl-0">
-        <b-form-input
-          name="text-input"
-          :placeholder="placeholder"
-          :value="value"
-          :data-qa="inputTestId"
-          :data-testid="inputTestId"
-          :disabled="isUploading"
-          required
-          @input="$emit('input', $event)"
-        />
+      <b-col>
+        <div v-if="showImagePreview && value">
+          <h6>Operations:</h6>
+          <button class="btn btn-outline-danger btn-sm mb-2" @click="removeImage">
+            Remove image
+          </button>
+          <br />
+          <button
+            v-if="!changeImage"
+            class="btn btn-outline-primary btn-sm"
+            @click="changeImage = true"
+          >
+            Change image
+          </button>
+          <h6 v-else>Change image:</h6>
+        </div>
+        <b-row v-if="!showImagePreview || !value || changeImage">
+          <b-col :class="{ 'pr-0': showUrlUpload }">
+            <b-form-file
+              ref="file"
+              name="async-upload"
+              class="image-file"
+              placeholder="Choose a file or drop it here..."
+              drop-placeholder="Drop file here..."
+              :accept="fileTypes"
+              :disabled="isUploading"
+              required
+              data-qa="import-file-input"
+              @dragover.prevent
+              @drop.prevent="uploadFile"
+              @change="uploadFile"
+            ></b-form-file>
+          </b-col>
+          <template v-if="showUrlUpload">
+            <b-col cols="1" class="divider">
+              <h6 class="text-muted">OR</h6>
+            </b-col>
+            <b-col :class="{ 'pl-0': !showImagePreview }">
+              <b-form-input
+                name="text-input"
+                :placeholder="placeholder"
+                :value="value"
+                :data-qa="inputTestId"
+                :data-testid="inputTestId"
+                :disabled="isUploading"
+                required
+                @input="$emit('input', $event)"
+              />
+            </b-col>
+          </template>
+        </b-row>
       </b-col>
     </b-row>
     <b-alert v-if="error" show variant="danger">
@@ -79,16 +135,34 @@ export default {
   props: {
     placeholder: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     value: {
       type: String,
       required: false,
+      default: "",
     },
     inputTestId: {
       type: String,
       required: false,
       default: "node-upload-input",
+    },
+    showUrlUpload: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    // See https://bootstrap-vue.org/docs/components/form-file#limiting-to-certain-file-types
+    fileTypes: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    showImagePreview: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -98,7 +172,18 @@ export default {
       uploadSource: null,
       isUploading: false,
       confirmedUpload: true,
+      changeImage: false,
+      imagePatternId: "",
       error: null,
+    }
+  },
+  created() {
+    if (this.showImagePreview) {
+      this.imagePatternId =
+        "thumbnail-preview-" +
+        Math.random()
+          .toString(36)
+          .substring(9)
     }
   },
   methods: {
@@ -152,6 +237,7 @@ export default {
           setTimeout(() => {
             if (response.data.success) {
               this.$emit("input", response.data.data.url)
+              this.$root.$emit("fileID", response.data.data.id)
             } else {
               this.handleError(response.data)
             }
@@ -179,6 +265,22 @@ export default {
     confirmUpload() {
       this.confirmedUpload = true
     },
+    removeImage(event) {
+      event.preventDefault()
+      this.$bvModal
+        .msgBoxConfirm("The currently uploaded image will be removed.", {
+          modalClass: "node-modal-confirmation",
+          title: "Are you sure you want to continue?",
+          okTitle: "Yes, Remove!",
+          okVariant: "danger",
+        })
+        .then(close => {
+          if (close) {
+            this.$emit("input", null)
+          }
+        })
+        .catch(err => console.log(err))
+    },
     handleError(error) {
       if (axios.isCancel(error)) {
         console.log("Request canceled", error.message)
@@ -190,6 +292,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.thumbnail-col {
+  -ms-flex: 0 0 160px;
+  flex: 0 0 160px;
+}
+
 .image-file {
   overflow: hidden;
   text-overflow: ellipsis;
