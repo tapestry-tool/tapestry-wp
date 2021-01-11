@@ -245,6 +245,18 @@ export async function saveAudio(
   }
 }
 
+export async function reviewNode({ commit, dispatch }, { id, comments }) {
+  try {
+    const updates = await client.reviewNode(id, comments)
+    commit("updateNode", {
+      id,
+      newNode: updates.data,
+    })
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 // links
 export async function addLink({ commit, dispatch, getters }, newLink) {
   try {

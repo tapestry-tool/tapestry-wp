@@ -7,11 +7,17 @@ class ConditionTypes
     const DATE_PASSED = 'date_passed';
 }
 
-class NodeStatusTypes
+class NodeStatus
 {
-    const DRAFT = 'draft';
     const PUBLISH = 'publish';
-    const SUBMITTED = 'submitted';
-    const ACCEPT = 'accepted';
+    const DRAFT = 'draft';
+    const SUBMIT = 'submitted';
     const REJECT = 'rejected';
+    const ACCEPT = 'accepted';
+}
+
+class CommentTypes
+{
+    const COMMENT = 'Comment';
+    const STATUS_CHANGE = 'StatusChange';
 }
