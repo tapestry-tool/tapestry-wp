@@ -989,7 +989,7 @@ function optimizeTapestryThumbnail($request, $saveThumbnailFileId) {
 
     $imageURL = $request['imageURL'];
     if (!$imageURL) return;
-    $imageURL = "http:" . $imageURL;
+    $imageURL = substr( $imageURL, 0, 4 ) === "http:" ? $imageURL : "http:" . $imageURL;
     // TODO: JSON validations should happen here
     // make sure the permissions body exists and not null
     try {
