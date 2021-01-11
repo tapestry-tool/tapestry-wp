@@ -93,22 +93,22 @@
               :y="radius"
             ></add-child-button>
             <node-button
-              v-if="canReview"
-              :x="isSubAccordionRow ? 0 : 35"
-              :y="radius"
-              :data-qa="`review-node-${node.id}`"
-              @click="reviewNode"
-            >
-              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
-            </node-button>
-            <node-button
-              v-else-if="hasPermission('edit')"
+              v-if="hasPermission('edit')"
               :x="isSubAccordionRow ? 0 : 35"
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
             >
               <tapestry-icon icon="pen" svg></tapestry-icon>
+            </node-button>
+            <node-button
+              v-else-if="canReview"
+              :x="isSubAccordionRow ? 0 : 35"
+              :y="radius"
+              :data-qa="`review-node-${node.id}`"
+              @click="reviewNode"
+            >
+              <tapestry-icon icon="comment-dots" svg></tapestry-icon>
             </node-button>
           </template>
         </g>
