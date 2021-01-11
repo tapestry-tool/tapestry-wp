@@ -444,7 +444,6 @@ export default {
       this.fileUploading = isUploading
     })
     this.$root.$on("fileID", fileId => {
-      console.log(fileId)
       if (fileId.thumbnailType == "locked") {
         this.node.lockedThumbnailFileId = fileId.data
       } else if (fileId.thumbnailType == "thumbnail") {
