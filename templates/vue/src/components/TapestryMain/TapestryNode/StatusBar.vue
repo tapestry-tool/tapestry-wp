@@ -67,9 +67,9 @@ export default {
         }
       } else {
         switch (this.status) {
-          case "publish":
+          case nodeStatus.PUBLISH:
             return "currentColor"
-          case "draft":
+          case nodeStatus.DRAFT:
             return "#999"
           default:
             return "currentColor"

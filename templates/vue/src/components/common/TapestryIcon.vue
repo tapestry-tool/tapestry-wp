@@ -30,6 +30,7 @@ const textContent = {
   plus: "\uf067",
   play: "\uf04b",
   text: "Aa",
+  "comment-dots": "\uf4ad",
 }
 
 const aliases = {

@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
 
 /**
@@ -555,16 +556,17 @@ class Tapestry implements ITapestry
             $nodeMeta = $node->getMeta();
             // draft nodes should only be visible to node authors
             // the exception is that the node is submitted in which case it should also be viewable to reviewers
-            if ('draft' == $nodeMeta->status) {
+            if (NodeStatus::DRAFT == $nodeMeta->status) {
                 if ($nodeMeta->author->id == $currentUserId) {
                     array_push($nodesPermitted, $nodeId);
-                } elseif (('submitted' == $nodeMeta->reviewStatus || ('reject' == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUser->canEdit($this->postId)) {
+                } elseif ((NodeStatus::SUBMIT == $nodeMeta->reviewStatus || (NodeStatus::REJECT == $nodeMeta->reviewStatus && $this->settings->showRejected)) && $currentUser->canEdit($this->postId)) {
                     array_push($nodesPermitted, $nodeId);
                 }
             } else {
                 array_push($nodesPermitted, $nodeId);
             }
         }
+
         return $nodesPermitted;
     }
 
