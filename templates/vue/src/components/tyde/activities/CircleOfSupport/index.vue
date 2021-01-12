@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import moment from "moment-timezone"
 import client from "@/services/TapestryAPI"
 
 export default {
@@ -14,6 +15,7 @@ export default {
         communities: [],
         connections: [],
         members: {},
+        timestamp: moment(),
       },
     }
   },
