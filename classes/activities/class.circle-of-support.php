@@ -5,7 +5,7 @@ class CircleOfSupport
     private $userId;
     private $versions;
 
-    const META_KEY = 'circle_of_support';
+    const META_KEY = 'tyde_circle_of_support';
 
     public function __construct($userId = 0)
     {
