@@ -11,7 +11,10 @@
         <file-upload
           v-model="node.imageURL"
           input-test-id="node-appearance-thumbnail-url"
-          placeholder="Enter the URL for the thumbnail"
+          :show-url-upload="false"
+          thumbnail-type="thumbnail"
+          :show-image-preview="true"
+          file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
@@ -26,8 +29,11 @@
       <b-form-group v-if="addLockedThumbnail">
         <file-upload
           v-model="node.lockedImageURL"
-          input-test-id="node-lockedImageURL"
-          placeholder="Enter the URL for the thumbnail"
+          input-test-id="node-appearance-lockedThumbnail-url"
+          :show-url-upload="false"
+          thumbnail-type="locked"
+          :show-image-preview="true"
+          file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
@@ -110,8 +116,9 @@ export default {
     },
   },
   created() {
-    this.addThumbnail = this.node.imageURL.length > 0
-    this.addLockedThumbnail = this.node.lockedImageURL.length > 0
+    this.addThumbnail = this.node.imageURL && this.node.imageURL.length > 0
+    this.addLockedThumbnail =
+      this.node.lockedImageURL && this.node.lockedImageURL.length > 0
   },
   methods: {
     handleUploadChange(state) {

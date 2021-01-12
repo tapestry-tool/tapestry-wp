@@ -2,6 +2,7 @@
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
     <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
+      <review-notifications v-if="canEdit" />
       <settings-modal-button
         v-if="canEdit"
         :max-depth="maxDepth"
@@ -20,6 +21,7 @@ import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
 import TapestryFilter from "./TapestryFilter"
+import ReviewNotifications from "./ReviewNotifications"
 import * as wp from "@/services/wp"
 
 export default {
@@ -27,6 +29,7 @@ export default {
     TapestryDepthSlider,
     TapestryFilter,
     SettingsModalButton,
+    ReviewNotifications,
   },
   data() {
     return {
