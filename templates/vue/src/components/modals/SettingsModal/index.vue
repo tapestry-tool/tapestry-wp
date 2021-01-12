@@ -219,6 +219,9 @@
               </div>
             </b-button>
           </b-form-group>
+          <b-alert :show="hasOptimized" variant="success" style="margin-top: 1em;">
+            Thumbnails have been successfully optimized!
+          </b-alert>
           <b-form-group
             label="Geography map"
             :description="
@@ -386,6 +389,7 @@ export default {
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
       isOptimizing: false,
+      hasOptimized: false,
     }
   },
   computed: {
@@ -533,11 +537,25 @@ export default {
     },
     async optimizeThumbnails() {
       this.isOptimizing = true
-      let promises = []
-      for (let node of Object.values(this.nodes)) {
-        promises.push(client.optimizeNodeThumbnail(node.id, node.imageURL))
-      }
-      await Promise.all(promises).then(() => (this.isOptimizing = false))
+      client
+        .optimizeNodeThumbnails()
+        .finally(() => {
+          this.isOptimizing = false
+          this.hasOptimized = true
+          setTimeout(() => {
+            this.hasOptimized = false
+          }, 10000)
+        })
+        .catch(err => {
+          console.log(err)
+          this.$bvToast.toast(
+            "Sorry, an error occurred. Some or all of the nodes were not optimized.",
+            {
+              title: "Optimization did not complete",
+              variant: "danger",
+            }
+          )
+        })
     },
     isValidLat(coord) {
       return this.getCoord(coord, 0) <= 90 && this.getCoord(coord, 0) >= -90

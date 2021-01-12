@@ -24,6 +24,7 @@ class TapestryNode implements ITapestryNode
     private $behaviour;
     private $typeData;
     private $thumbnailFileId;
+    private $lockedThumbnailFileId;
     private $imageURL;
     private $lockedImageURL;
     private $mediaType;
@@ -67,6 +68,7 @@ class TapestryNode implements ITapestryNode
         $this->title = '';
         $this->status = '';
         $this->thumbnailFileId = '';
+        $this->lockedThumbnailFileId = '';
         $this->reviewStatus = '';
         $this->imageURL = '';
         $this->lockedImageURL = '';
@@ -153,13 +155,20 @@ class TapestryNode implements ITapestryNode
         if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
             $this->thumbnailFileId = $node->thumbnailFileId;
             set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            if (get_the_post_thumbnail_url($this->nodePostId, 'thumbnail')) {
-                $this->imageURL = get_the_post_thumbnail_url($this->nodePostId, 'thumbnail');
+            if (get_the_post_thumbnail_url($this->nodePostId, [420, 420])) {
+                $this->imageURL = get_the_post_thumbnail_url($this->nodePostId, [420, 420]);
             }
         }
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
             $this->lockedImageURL = $node->lockedImageURL;
         }
+        if (isset($node->lockedThumbnailFileId) && is_numeric($node->lockedThumbnailFileId)) {
+            $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
+            if (wp_get_attachment_image_url($this->lockedThumbnailFileId, [420, 420])) {
+                $this->lockedImageURL = wp_get_attachment_image_url($this->lockedThumbnailFileId, [420, 420]);
+            }
+        }
+
         if (isset($node->mediaType) && is_string($node->mediaType)) {
             $this->mediaType = $node->mediaType;
         }
@@ -536,6 +545,7 @@ class TapestryNode implements ITapestryNode
             'title' => $this->title,
             'status' => $this->status,
             'thumbnailFileId' => $this->thumbnailFileId,
+            'lockedThumbnailFileId' => $this->lockedThumbnailFileId,
             'reviewStatus' => $this->reviewStatus,
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
@@ -598,6 +608,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($nodeMetadata->meta_value->thumbnailFileId)) {
             $nodeData->thumbnailFileId = $nodeMetadata->meta_value->thumbnailFileId;
+        }
+        if (isset($nodeMetadata->meta_value->lockedThumbnailFileId)) {
+            $nodeData->lockedThumbnailFileId = $nodeMetadata->meta_value->lockedThumbnailFileId;
         }
         if (isset($nodeMetadata->meta_value->imageURL)) {
             $nodeData->imageURL = $nodeMetadata->meta_value->imageURL;
