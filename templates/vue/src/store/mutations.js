@@ -153,5 +153,3 @@ export function addApiError(state, error) {
 export function updateSelectedModule(state, moduleId) {
   state.selectedModuleId = moduleId
 }
-
-

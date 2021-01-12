@@ -2,7 +2,6 @@ import client from "../services/TapestryAPI"
 import * as wp from "../services/wp"
 import Helpers from "../utils/Helpers"
 import ErrorHelper from "../utils/errorHelper"
-import { tydeTypes } from "@/utils/constants"
 
 const LOCAL_PROGRESS_ID = "tapestry-progress"
 
@@ -161,16 +160,16 @@ export async function completeNode(context, nodeId) {
     })
 
     const userProgress = await client.getUserProgress()
-    for (const [nodeId, progress] of Object.entries(userProgress)) {
+    for (const [nodeId] of Object.entries(userProgress)) {
       if (getters.getTydeProgress(nodeId) >= 1) {
         await client.completeNode(nodeId)
         commit("updateNode", {
           id: nodeId,
-          newNode: { completed: true }, 
+          newNode: { completed: true },
         })
       }
     }
-    
+
     const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
@@ -190,7 +189,6 @@ async function unlockNodes({ commit, getters, dispatch }) {
     const progress = await client.getUserProgress()
     for (const [id, nodeProgress] of Object.entries(progress)) {
       const currentNode = getters.getNode(id)
-      
       if (
         currentNode &&
         Helpers.isDifferent(
