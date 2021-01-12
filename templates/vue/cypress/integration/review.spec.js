@@ -6,7 +6,7 @@ describe("Review Nodes", () => {
     cy.setup("@oneNode", roles.SUBSCRIBER)
   })
 
-  it("should be able to submit a node and have it be accepted", () => {
+  it("should be able to submit and move a node and have it be accepted", () => {
     const node = {
       title: "For Review",
       mediaType: "text",
@@ -21,6 +21,21 @@ describe("Review Nodes", () => {
     cy.getNodeByTitle(node.title).then(node => {
       cy.getNodeById(node.id).click({ force: true })
       cy.getByTestId(`edit-node-${node.id}`).should("not.exist")
+      cy.getByTestId(`review-node-${node.id}`).should("be.visible")
+    })
+
+    // assert author can move submitted node
+    cy.getNodeByTitle(node.title).then(node => {
+      let coords
+      cy.getByTestId(`node-${node.id}`).then(el => {
+        coords = el[0].getBoundingClientRect()
+      })
+      cy.moveNode(node.id, 300, 500)
+      cy.getByTestId(`node-${node.id}`).then(el => {
+        let newCoords = el[0].getBoundingClientRect()
+        expect(newCoords.x).to.not.equal(coords.x)
+        expect(newCoords.y).to.not.equal(coords.y)
+      })
     })
 
     cy.findByLabelText("open sidebar").click()
