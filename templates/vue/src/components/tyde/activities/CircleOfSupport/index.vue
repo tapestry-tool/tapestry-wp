@@ -1,5 +1,7 @@
 <template>
-  <p>I'm temporary!</p>
+  <div class="cos">
+    <p>I'm temporary!</p>
+  </div>
 </template>
 
 <script>
@@ -24,3 +26,11 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.cos {
+  --cos-color-primary: #000;
+  --cos-color-secondary: #c4c4c4;
+  border: 3px solid var(--cos-color-secondary);
+}
+</style>
