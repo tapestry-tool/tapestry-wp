@@ -164,6 +164,11 @@ export default {
       required: false,
       default: false,
     },
+    thumbnailType: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -237,7 +242,12 @@ export default {
           setTimeout(() => {
             if (response.data.success) {
               this.$emit("input", response.data.data.url)
-              this.$root.$emit("fileID", response.data.data.id)
+              if (this.thumbnailType) {
+                this.$root.$emit("fileID", {
+                  thumbnailType: this.thumbnailType,
+                  data: response.data.data.id,
+                })
+              }
             } else {
               this.handleError(response.data)
             }

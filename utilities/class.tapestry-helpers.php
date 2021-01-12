@@ -148,7 +148,55 @@ class TapestryHelpers
     }
 
     /**
-     * Check if the current user is allowed to an action.
+     * Uploads the given image (by URL) as a Wordpress attachment and  returns the 
+     * attachment ID for the new attachment. If the given URL is already an attachment 
+     * in WP, it returns its existing attachment ID instead of re-uploading it.
+     *
+     * @param string $imageURL
+     *
+     * @return string $attachment_id
+     */
+    public static function attachImageByURL($imageURL)
+    {
+        // is this already an image in our gallery?
+        $attachment_id = attachment_url_to_postid( $imageURL);
+        if ($attachment_id) {
+            return $attachment_id;
+        } 
+
+        // not an image in our gallery. let's upload it.
+        include_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+        $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
+        $uniq_name = date('dmY').''.(int) microtime(true); 
+        $filename = $uniq_name.'.'.$imagetype;
+
+        $uploaddir = wp_upload_dir();
+        $uploadfile = $uploaddir['path'] . '/' . $filename;
+        $contents= file_get_contents($imageURL);
+        $savefile = fopen($uploadfile, 'w');
+        fwrite($savefile, $contents);
+        fclose($savefile);
+
+        $wp_filetype = wp_check_filetype(basename($filename), null );
+        $attachment = array(
+            'post_mime_type' => $wp_filetype['type'],
+            'post_title' => $filename,
+            'post_content' => '',
+            'post_status' => 'inherit'
+        );
+
+        $attachment_id = wp_insert_attachment( $attachment, $uploadfile );
+        $imagenew = get_post( $attachment_id );
+        $fullsizepath = get_attached_file( $imagenew->ID );
+        $attach_data = wp_generate_attachment_metadata( $attachment_id, $fullsizepath );
+        wp_update_attachment_metadata( $attachment_id, $attach_data );
+
+        return $attachment_id;
+    }
+
+    /**
+     * Check if the current user is allowed to an action to a node.
      *
      * @param string $action         action to be performed
      * @param Number $nodeMetaId     node meta ID
