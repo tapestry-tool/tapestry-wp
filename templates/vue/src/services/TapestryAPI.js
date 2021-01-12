@@ -127,16 +127,9 @@ class TapestryApi {
     return await this.client.put(url, coordinates)
   }
 
-  async optimizeNodeThumbnail(id, imageURL) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/optimize_thumbnails`
-    let response = await axios.post(url, { imageURL: imageURL })
-    return response
-  }
-
-  async optimizeLockedNodeThumbnail(id, imageURL) {
-    const url = `${apiUrl}/tapestries/${this.postId}/nodes/${id}/optimize_locked_thumbnails`
-    let response = await axios.post(url, { imageURL: imageURL })
-    return response
+  async optimizeNodeThumbnails() {
+    const url = `${apiUrl}/tapestries/${this.postId}/optimize_thumbnails`
+    return await this.client.post(url)
   }
 
   async getUserProgress() {
