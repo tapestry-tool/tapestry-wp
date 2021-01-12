@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import FileUpload from "@/components/FileUpload"
+import FileUpload from "../../common/FileUpload"
 
 export default {
   components: {

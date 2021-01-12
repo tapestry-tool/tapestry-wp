@@ -11,7 +11,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
-import TapestryModal from "../TapestryModal"
+import TapestryModal from "@/components/lightbox/TapestryModal"
 import UnlockImage from "@/assets/tyde-unlock.gif"
 import UnlockSound from "@/assets/tyde-unlock-sound.wav"
 

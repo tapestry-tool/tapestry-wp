@@ -1023,6 +1023,7 @@ table {
       cursor: not-allowed;
     }
   }
+}
 
 .error-wrapper {
   background: #f8d7da;
@@ -1046,9 +1047,9 @@ table {
   }
 
   &.disabled {
-      pointer-events: none;
-      cursor: not-allowed;
-    }
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 
 .indented-options {

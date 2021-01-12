@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import SpeechBubble from "../assets/speech-bubble-end.png"
+import SpeechBubble from "@/assets/speech-bubble-end.png"
 import { data } from "@/services/wp"
 
 export default {

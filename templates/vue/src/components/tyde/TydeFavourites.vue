@@ -1,6 +1,6 @@
 <template>
   <div ref="container">
-    <tapestry-accordion :rows="rows" :default-index="-1">
+    <headless-accordion :rows="rows" :default-index="-1">
       <template v-slot="{ isVisible, toggle }">
         <div class="favourites">
           <div
@@ -32,7 +32,7 @@
           </div>
         </div>
       </template>
-    </tapestry-accordion>
+    </headless-accordion>
     <div v-if="showUnfavouriteDialog" class="unfavourite-dialog">
       Are you sure you want to remove {{ focusedNode.title }} from your favourites?
       <div>
@@ -49,14 +49,14 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import TapestryAccordion from "@/components/TapestryAccordion"
+import HeadlessAccordion from "@/components/lightbox/media/AccordionMedia/HeadlessAccordion"
 import TydeFavouritesRow from "./tyde-favourites/TydeFavouritesRow"
-import Helpers from "../../utils/Helpers"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "tyde-favourites",
   components: {
-    TapestryAccordion,
+    HeadlessAccordion,
     TydeFavouritesRow,
   },
   props: {

@@ -49,8 +49,8 @@
 </template>
 
 <script>
-import SpeechBubble from "../SpeechBubble"
-import EndScreenBg from "../../assets/end-screen-bg.png"
+import SpeechBubble from "./SpeechBubble"
+import EndScreenBg from "@/assets/end-screen-bg.png"
 import client from "@/services/TapestryAPI"
 import { data } from "@/services/wp"
 

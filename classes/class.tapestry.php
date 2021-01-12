@@ -317,7 +317,7 @@ class Tapestry implements ITapestry
         $nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
-                $roles = new TapestryUserRoles();
+                $roles = new TapestryUser();
                 if ($roles->isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';
@@ -513,7 +513,7 @@ class Tapestry implements ITapestry
         $tapestry->nodes = array_map(
             function ($node) {
                 $tapestryNode = new TapestryNode($this->postId, $node->id);
-                $roles = new TapestryUserRoles();
+                $roles = new TapestryUser();
                 if ($roles->isRole('copilot')) {
                     if ($tapestryNode->isCopilotOnly()) {
                         $node->userType = 'copilot';

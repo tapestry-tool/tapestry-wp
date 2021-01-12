@@ -28,6 +28,49 @@ class TapestryUser
     }
 
     /**
+     * Check if the current user is a particular role.
+     *
+     * @return bool
+     */
+    public function isRole($role)
+    {
+        return in_array(
+            $role,
+            $this->user->roles
+        );
+    }
+
+    /**
+     * Check if the current user is an administrator.
+     *
+     * @return bool
+     */
+    public function isAdministrator()
+    {
+        return $this->isRole('administrator');
+    }
+
+    /**
+     * Check if the current user is an editor.
+     *
+     * @return bool
+     */
+    public function isEditor()
+    {
+        return $this->isRole('editor');
+    }
+
+    /**
+     * Check if the current user is an author.
+     *
+     * @return bool
+     */
+    public function isAuthor()
+    {
+        return $this->isRole('author');
+    }
+
+    /**
      * Check if the current user is an author of a post.
      *
      * @param int $postId post ID
@@ -37,5 +80,15 @@ class TapestryUser
     public function isAuthorOfThePost($postId)
     {
         return $this->user->ID == get_post($postId)->post_author;
+    }
+
+    /**
+     * Check if the current user is a subscriber.
+     *
+     * @return bool
+     */
+    public function isSubscriber()
+    {
+        return $this->isRole('subscriber');
     }
 }
