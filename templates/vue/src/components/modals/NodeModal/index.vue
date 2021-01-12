@@ -435,6 +435,13 @@ export default {
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
+    this.$root.$on("fileID", fileId => {
+      if (fileId.thumbnailType == "locked") {
+        this.node.lockedThumbnailFileId = fileId.data
+      } else if (fileId.thumbnailType == "thumbnail") {
+        this.node.thumbnailFileId = fileId.data
+      }
+    })
     this.node = this.createDefaultNode()
     if (!this.node.mapCoordinates) {
       this.node.mapCoordinates = {

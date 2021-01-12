@@ -127,6 +127,11 @@ class TapestryApi {
     return await this.client.put(url, coordinates)
   }
 
+  async optimizeNodeThumbnails() {
+    const url = `${apiUrl}/tapestries/${this.postId}/optimize_thumbnails`
+    return await this.client.post(url)
+  }
+
   async getUserProgress() {
     const url = `/users/progress?post_id=${this.postId}`
     const response = await this.client.get(url)

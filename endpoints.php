@@ -293,6 +293,14 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'OPTIMIZE_THUMBNAILS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'optimizeTapestryNodeThumbnails',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
 ];
 
 /*
@@ -1007,6 +1015,44 @@ function updateTapestryNodeLockedImageURL($request)
     }
 }
 
+// takes an old thumbnail and optimizes it
+function optimizeTapestryNodeThumbnails($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    // TODO: JSON validations should happen here
+    // make sure the permissions body exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        $tapestry = new Tapestry($postId);
+
+        foreach ($tapestry->getNodeIds() as $nodeMetaId) {
+            $node = $tapestry->getNode($nodeMetaId);
+            $nodeData = $node->get();
+            $protocol = is_ssl() ? "https:" : "http:";
+    
+            if ($nodeData->imageURL) {
+                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
+                $node->set((object) ['thumbnailFileId' => $attachmentId]);
+                $node->save();
+            }
+            if ($nodeData->lockedImageURL) {
+                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
+                $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
+                $node->save();
+            }
+        }
+        return true;
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
 /**
  * Update Tapestry Node Type Data.
  *
@@ -1353,3 +1399,4 @@ function getTapestryContributors($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
