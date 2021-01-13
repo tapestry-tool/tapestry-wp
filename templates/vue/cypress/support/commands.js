@@ -61,7 +61,7 @@ Cypress.Commands.add("getSelectedNode", () =>
 
 Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
   cy.server()
-  cy.route("POST", `**/nodes`).as("addNode")
+  cy.route("POST", `**/nodes*`).as("addNode")
   cy.store().then(store => {
     store.dispatch("addNode", {
       newNode: deepMerge(store.getters.createDefaultNode(), node),
