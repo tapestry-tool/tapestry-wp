@@ -49,7 +49,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import HeadlessAccordion from "@/components/lightbox/media/AccordionMedia/HeadlessAccordion"
+import HeadlessAccordion from "@/components/Lightbox/media/AccordionMedia/HeadlessAccordion"
 import TydeFavouritesRow from "./tyde-favourites/TydeFavouritesRow"
 import Helpers from "@/utils/Helpers"
 

@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import AccordionMedia from "@/components/lightbox/media/AccordionMedia"
-import TapestryMedia from "@/components/lightbox/media/TapestryMedia"
+import AccordionMedia from "@/components/Lightbox/media/AccordionMedia"
+import TapestryMedia from "@/components/Lightbox/media/TapestryMedia"
 
 export default {
   name: "tyde-favourites-row",
