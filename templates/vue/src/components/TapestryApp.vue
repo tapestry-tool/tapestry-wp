@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
@@ -34,6 +35,17 @@ export default {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
+    },
+    analyticsEnabled() {
+      return this.settings.analyticsEnabled
+    },
+  },
+  watch: {
+    analyticsEnabled: {
+      immediate: true,
+      handler(analyticsEnabled) {
+        client.enableAnalytics(analyticsEnabled)
+      },
     },
   },
   mounted() {

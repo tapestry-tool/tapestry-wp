@@ -358,13 +358,14 @@ function prefix_title_entity_decode($response)
 // Analytics
 
 add_action('init', 'create_tapestry_analytics_schema');
+add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
 add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
 
 function tapestry_tool_log_event() {
     global $wpdb;
 
     $actor = $_POST['actor'];
-    $action = $_POST['action'];
+    $action2 = $_POST['action2'];
     $object = $_POST['object'];
     $user_guid = $_POST['user_guid'];
     $object_id = $_POST['object_id'];
@@ -376,7 +377,7 @@ function tapestry_tool_log_event() {
         $table_name,
         [
             'actor' => $actor,
-            'action' => $action,
+            'action' => $action2,
             'object' => $object,
             'user_guid' => $user_guid,
             'object_id' => $object_id,
