@@ -651,6 +651,7 @@ export default {
             target: id,
             value: 1,
             type: "",
+            addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
           // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
