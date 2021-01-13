@@ -135,11 +135,9 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        // If user is author and node is not in review process, grant author edit permissions
-        $userId = wp_get_current_user()->ID;
-        $isAuthor = $userId === $tapestryNode->getAuthor()->id;
+        // If node is not in review process, grant author edit permissions
         $inReview = isset($node->reviewStatus);
-        $tapestryNode->set($node, $isAuthor && !$inReview);
+        $tapestryNode->set($node, !$inReview);
         $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);
