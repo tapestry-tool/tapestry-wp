@@ -287,9 +287,11 @@ describe("TYDE", () => {
         cy.contains("Your response has been recorded.").should("be.visible")
         cy.closeLightbox()
       })
+      cy.login("admin").visitTapestry()
       cy.openTydeMenu()
       cy.getByTestId("tyde-menu-profile-button").click()
       cy.contains("What's your name?").should("exist")
+      cy.contains("Your teen answered").should("exist")
       cy.closeTydeMenu()
     })
 
