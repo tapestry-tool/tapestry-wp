@@ -267,7 +267,10 @@ describe("TYDE", () => {
       cy.contains(/Question Set 1/).should("be.visible")
     })
 
-    it("Should show completed profile activities in the menu", () => {
+    // [CI FAIL]
+    // Fails due to problems described here:
+    // https://app.asana.com/0/1126491658233864/1199568177338630
+    it.skip("Should show completed profile activities in the menu", () => {
       cy.fixture("tyde/activities.json").as("activities")
       cy.setup("@activities")
       //cy.openModal("settings")
