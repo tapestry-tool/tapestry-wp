@@ -1,23 +1,29 @@
 describe("TYDE", () => {
-  const notEarnedIcon =
-    "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
-    "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg"
-
-  const earnedIcon =
-    "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
-    "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg"
-
-  const notEarnedCockpitIcon =
-    "https://lh3.googleusercontent.com/proxy/EfGXb_q2dzJt5VBgQuXuNjJGwLWO0tlSdVz5gTalgRNzkiso3HtplzRhGOpyYsaS4-4kZuda4SUewK0UcnhJPfYmuDzIp1Ohyg"
-
-  const earnedCockpitIcon =
-    "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip-art-clipart-2-wikiclipart-wikiclipart-transparent-background-earth-clipart.png"
-
-  const hoverCockpitIcon =
-    "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip-art-clipart-2-wikiclipart-wikiclipart-transparent-background-earth-clipart.png"
-
   const cockpitBackgroundImage =
     "https://m.media-amazon.com/images/I/51h5kRXyipL._AC_.jpg"
+
+  const icons = {
+    notEarned:
+      "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
+      "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg",
+    earned:
+      "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
+      "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg",
+    cockpit: {
+      notEarned:
+        "https://lh3.googleusercontent.com/proxy/EfGXb_q2dzJt5VBgQuXuNjJG" +
+        "wLWO0tlSdVz5gTalgRNzkiso3HtplzRhGOpyYsaS4-4kZuda4SUewK0UcnhJPfYm" +
+        "uDzIp1Ohyg",
+      earned:
+        "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip" +
+        "-art-clipart-2-wikiclipart-wikiclipart-transparent-background-ea" +
+        "rth-clipart.png",
+      hover:
+        "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip" +
+        "-art-clipart-2-wikiclipart-wikiclipart-transparent-background-ea" +
+        "rth-clipart.png",
+    },
+  }
 
   describe("Module Creation", () => {
     it("Should allow creation of a Module from the root node", () => {
@@ -30,11 +36,11 @@ describe("TYDE", () => {
         cy.getByTestId(`tyde-node-type`).select("Module")
         cy.getEditable(`node-text-content`).type("This is the main module.")
         cy.contains(/spaceship part/i).click()
-        cy.getByTestId(`tyde-planet-not-earned-icon`).type(notEarnedIcon)
-        cy.getByTestId(`tyde-planet-earned-icon`).type(earnedIcon)
+        cy.getByTestId(`tyde-planet-not-earned-icon`).type(icons.notEarned)
+        cy.getByTestId(`tyde-planet-earned-icon`).type(icons.earned)
         cy.submitModal()
-        cy.getBySrc(earnedIcon).should("exist")
-        cy.getBySrc(notEarnedIcon).should("not.exist")
+        cy.getBySrc(icons.earned).should("exist")
+        cy.getBySrc(icons.notEarned).should("not.exist")
       })
     })
 
@@ -50,8 +56,8 @@ describe("TYDE", () => {
           "This is the first stage for module 1."
         )
         cy.submitModal()
-        cy.getBySrc(earnedIcon).should("exist")
-        cy.getBySrc(notEarnedIcon).should("not.exist")
+        cy.getBySrc(icons.earned).should("exist")
+        cy.getBySrc(icons.notEarned).should("not.exist")
       })
     })
 
@@ -67,8 +73,8 @@ describe("TYDE", () => {
           "This is the first question set for module 1 stage 1."
         )
         cy.submitModal()
-        cy.getBySrc(earnedIcon).should("not.exist")
-        cy.getBySrc(notEarnedIcon).should("exist")
+        cy.getBySrc(icons.earned).should("not.exist")
+        cy.getBySrc(icons.notEarned).should("exist")
       })
     })
 
@@ -83,8 +89,8 @@ describe("TYDE", () => {
         cy.getByTestId(`tyde-node-type`).select("Regular")
         cy.getEditable(`node-text-content`).type("This is an example of a question.")
         cy.submitModal()
-        cy.getBySrc(earnedIcon).should("not.exist")
-        cy.getBySrc(notEarnedIcon).should("exist")
+        cy.getBySrc(icons.earned).should("not.exist")
+        cy.getBySrc(icons.notEarned).should("exist")
       })
     })
   })
@@ -93,14 +99,14 @@ describe("TYDE", () => {
     it("Should update show module earned part when all question sets are complete", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
-      cy.getBySrc(earnedIcon).should("not.exist")
-      cy.getBySrc(notEarnedIcon).should("exist")
+      cy.getBySrc(icons.earned).should("not.exist")
+      cy.getBySrc(icons.notEarned).should("exist")
       cy.getNodeByTitle("Question Set 1").then(node => {
         // Use viewing the question set as a proxy for node completion
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
-        cy.getBySrc(earnedIcon).should("exist")
-        cy.getBySrc(notEarnedIcon).should("not.exist")
+        cy.getBySrc(icons.earned).should("exist")
+        cy.getBySrc(icons.notEarned).should("not.exist")
       })
     })
 
@@ -162,7 +168,7 @@ describe("TYDE", () => {
       cy.getNodeByTitle("Module 1").then(module => {
         cy.getNodeById(module.id).click()
         cy.getByTestId(`open-node-${module.id}`).click()
-        cy.getBySrc(notEarnedIcon).should("be.visible")
+        cy.getBySrc(icons.notEarned).should("be.visible")
         cy.contains(/Stage 1/i).should("be.visible")
         cy.contains(/Question Set 1/i).should("be.visible")
         cy.contains(/0\/1/i).should("exist")
@@ -195,16 +201,16 @@ describe("TYDE", () => {
       cy.getNodeByTitle("Module 1").then(node => {
         cy.openModal("edit", node.id)
         cy.contains(/spaceship part/i).click()
-        cy.getByTestId(`tyde-cockpit-not-earned-icon`).type(notEarnedCockpitIcon)
-        cy.getByTestId(`tyde-cockpit-earned-icon`).type(earnedCockpitIcon)
-        cy.getByTestId(`tyde-cockpit-hover-icon`).type(hoverCockpitIcon)
+        cy.getByTestId(`tyde-cockpit-not-earned-icon`).type(icons.cockpit.notEarned)
+        cy.getByTestId(`tyde-cockpit-earned-icon`).type(icons.cockpit.earned)
+        cy.getByTestId(`tyde-cockpit-hover-icon`).type(icons.cockpit.hover)
         cy.getByTestId("node-spaceship-part-x").type("40")
         cy.getByTestId("node-spaceship-part-y").type("40")
         cy.getByTestId("node-spaceship-part-width").type("20")
         cy.getByTestId("node-spaceship-part-height").type("20")
         cy.submitModal()
         cy.openTydeMenu()
-        cy.getByBackground(notEarnedCockpitIcon).should("be.visible")
+        cy.getByBackground(icons.cockpit.notEarned).should("be.visible")
       })
     })
 
@@ -251,8 +257,8 @@ describe("TYDE", () => {
         cy.closeLightbox()
       })
       cy.openTydeMenu()
-      cy.getByBackground(earnedCockpitIcon).click()
-      cy.getBySrc(earnedIcon).should("exist")
+      cy.getByBackground(icons.cockpit.earned).click()
+      cy.getBySrc(icons.earned).should("exist")
       cy.contains(/Module 1/i).should("be.visible")
       cy.contains(/Stage 1/i).should("be.visible")
       cy.contains(/Question Set 1/i).should("be.visible")
