@@ -34,7 +34,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
-import client from "../../services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./media/AccordionMedia"
 import TapestryMedia from "./media/TapestryMedia"

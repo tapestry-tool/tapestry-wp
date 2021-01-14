@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import client from "../../../../services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "end-screen",
