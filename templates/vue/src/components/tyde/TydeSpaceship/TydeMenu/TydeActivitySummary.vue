@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import TydeIcon from "./TydeIcon"
+import TydeIcon from "@/components/tyde/common/TydeIcon"
 
 export default {
   name: "tyde-activity-summary",

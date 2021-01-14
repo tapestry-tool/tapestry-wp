@@ -19,7 +19,7 @@
 import TydeMenu from "./TydeMenu"
 import SpaceshipIcon from "@/assets/spaceship.png"
 import { mapState } from "vuex"
-import Helpers from "../../utils/Helpers"
+import Helpers from "@/utils/Helpers"
 
 const TYDE_BACKGROUND_AUDIO_SRC =
   "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // test file

@@ -47,7 +47,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import HeadlessAccordion from "./HeadlessAccordion"
+import HeadlessAccordion from "@/components/common/HeadlessAccordion"
 import TapestryMedia from "../TapestryMedia"
 import { names } from "@/config/routes"
 

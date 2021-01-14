@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import TydeButton from "./TydeButton"
+import TydeButton from "@/components/tyde/common/TydeButton"
 import TydeCockpit from "./TydeCockpit"
 import { mapState, mapGetters } from "vuex"
 import TydeMenuSettings from "./TydeMenuSettings"

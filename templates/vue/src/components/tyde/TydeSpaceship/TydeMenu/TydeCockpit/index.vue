@@ -12,7 +12,7 @@
 <script>
 import { tydeTypes } from "@/utils/constants"
 import { mapState } from "vuex"
-import TydeSpaceshipPart from "@/components/tyde/TydeSpaceshipPart"
+import TydeSpaceshipPart from "./TydeSpaceshipPart"
 
 export default {
   name: "tyde-cockpit",

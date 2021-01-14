@@ -43,9 +43,9 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import TydeButton from "./TydeButton"
-import TydeTopic from "./TydeTopic"
-import TydeProgressBar from "./TydeProgressBar"
+import TydeButton from "@/components/tyde/common/TydeButton"
+import TydeTopic from "@/components/tyde/common/TydeTopic"
+import TydeProgressBar from "@/components/tyde/common/TydeProgressBar"
 import TydeStarCelebration from "./TydeStarCelebration"
 import ActiveStar from "@/assets/star-active.png"
 import InactiveStar from "@/assets/star-inactive.png"

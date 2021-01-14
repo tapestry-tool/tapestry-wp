@@ -66,10 +66,10 @@
 <script>
 import { mapGetters } from "vuex"
 import TydeActivitySummary from "./TydeActivitySummary"
-import TydeButton from "./TydeButton"
+import TydeButton from "@/components/tyde/common/TydeButton"
 import TydeFavourites from "./TydeFavourites"
 import TydeTab from "./TydeTab"
-import TydeTopic from "./TydeTopic"
+import TydeTopic from "@/components/tyde/common/TydeTopic"
 
 export default {
   name: "tyde-module-summary",
