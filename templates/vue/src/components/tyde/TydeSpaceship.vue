@@ -94,7 +94,7 @@ export default {
 <style lang="scss" scoped>
 #tyde-spaceship-icon {
   position: absolute;
-  top: 0px;
+  top: 4rem;
   right: 5%;
   max-width: 140px;
   outline: none;
