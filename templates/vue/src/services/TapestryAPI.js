@@ -273,6 +273,16 @@ class TapestryApi {
     // Send the event to an AJAX URL to be saved
     await axios.post(analyticsAJAXUrl, data)
   }
+
+  getCosActivity() {
+    return axios.get(`${apiUrl}/activities/cos`).then(res => res.data)
+  }
+
+  saveCosActivity(circleOfSupport) {
+    return axios
+      .post(`${apiUrl}/activities/cos`, circleOfSupport)
+      .then(res => res.data)
+  }
 }
 
 export default new TapestryApi(postId)
