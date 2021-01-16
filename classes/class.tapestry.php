@@ -340,7 +340,7 @@ class Tapestry implements ITapestry
         }
         $groups = [];
         foreach ($this->groups as $group) {
-            $groups[] = (new TapestryNode($this->postId, $$group))->get();
+            $groups[] = (new TapestryGroup($this->postId, $$group))->get();
         }
         $parsedUrl = parse_url($this->settings->permalink);
         unset($this->settings->permalink);

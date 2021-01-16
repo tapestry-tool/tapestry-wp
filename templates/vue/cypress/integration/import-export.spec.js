@@ -1,5 +1,5 @@
 describe("Import Export", () => {
-  it("export endpoint should return not null response body", () => {
+  it("should be able to export a Tapestry", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
     cy.server()
@@ -17,7 +17,7 @@ describe("Import Export", () => {
   })
 
   it("should be able to import a Tapestry using file input", () => {
-    const tapestry = "complex-multinode.json"
+    const tapestry = "full-featured-exported-tapestry.json"
     cy.setup()
     cy.server()
     cy.route("PUT", "**/tapestries/**").as("import")

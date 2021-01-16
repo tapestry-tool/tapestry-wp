@@ -298,6 +298,7 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'exportTapestry',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
     'OPTIMIZE_THUMBNAILS' => (object) [
