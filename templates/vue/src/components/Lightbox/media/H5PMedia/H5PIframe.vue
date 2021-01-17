@@ -64,6 +64,7 @@ export default {
       type: null,
       loading: true,
       requiresRefresh: false,
+      playedOnce: false,
     }
   },
   watch: {
@@ -74,7 +75,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.handlePause(this.node)
     window.removeEventListener("resize", this.setFrameDimensions)
     document.removeEventListener("fullscreenchange", this.setFrameDimensions)
     document.removeEventListener("webkitfullscreenchange", this.setFrameDimensions)
@@ -216,6 +216,10 @@ export default {
     },
     handlePlay() {
       this.$emit("show-play-screen", false)
+      if (!this.playedOnce && this.autoplay) {
+        this.playedOnce = true
+        return
+      }
       const { id, progress, mediaDuration } = this.node
       client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
         time: progress * mediaDuration,
