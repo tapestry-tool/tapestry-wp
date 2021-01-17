@@ -358,16 +358,48 @@ function prefix_title_entity_decode($response)
 // Analytics
 
 add_action('init', 'create_tapestry_analytics_schema');
+add_action('init', 'create_tapestry_guid_cookie');
 add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
 add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
+
+/**
+* Create a uuid
+* 
+* @return string
+*/
+function create_tapestry_guid() {
+    $uuid = preg_replace_callback('/x/', function(){
+        $rand = (mt_rand() / mt_getrandmax() * 16 | 0) ^ 0x3;
+        $rand = base_convert ($rand, 10, 16);
+        return strval($rand);
+      }, "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx");
+    $uuid = preg_replace_callback('/y/', function(){
+        $rand = (mt_rand() / mt_getrandmax() * 16 | 0) ^ 0x8;
+        $rand = base_convert ($rand, 10, 16);
+        return strval($rand);
+      }, $uuid);
+    return $uuid;    
+}
+
+function create_tapestry_guid_cookie() {
+    if (!isset($_COOKIE['tapestry_guid'])) {
+        $uuid = create_tapestry_guid();
+        setcookie('tapestry_guid', $uuid, time()+31556926);
+    }
+}
 
 function tapestry_tool_log_event() {
     global $wpdb;
 
+    if(isset($_COOKIE['tapestry_guid'])) {
+        $user_guid = $_COOKIE['tapestry_guid'];
+    } else {
+        $user_guid = create_tapestry_guid();
+    }
+
     $actor = $_POST['actor'];
     $action2 = $_POST['action2'];
     $object = $_POST['object'];
-    $user_guid = $_POST['user_guid'];
     $object_id = $_POST['object_id'];
     $details = $_POST['details'];
 

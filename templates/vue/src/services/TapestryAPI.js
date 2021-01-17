@@ -266,7 +266,6 @@ class TapestryApi {
     params.append("actor", actor)
     params.append("action2", action)
     params.append("object", object)
-    params.append("user_guid", Helpers.createUUID())
     params.append("object_id", objectID)
     params.append("details", JSON.stringify(details))
 
