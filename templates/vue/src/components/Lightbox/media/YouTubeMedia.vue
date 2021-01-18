@@ -38,7 +38,7 @@ import EndScreen from "./common/EndScreen"
 import ActivityScreen from "./common/ActivityScreen"
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
-import client from "../../../services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
