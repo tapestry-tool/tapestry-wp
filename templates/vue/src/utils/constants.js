@@ -36,4 +36,18 @@ export const licenses = {
   },
 }
 
+export const nodeStatus = {
+  PUBLISH: "publish",
+  DRAFT: "draft",
+  SUBMIT: "submitted",
+  REJECT: "rejected",
+  ACCEPT: "accepted",
+}
+
+export const userActions = {
+  READ: "read",
+  ADD: "add",
+  EDIT: "edit",
+}
+
 export const DEFAULT_DEPTH = 3

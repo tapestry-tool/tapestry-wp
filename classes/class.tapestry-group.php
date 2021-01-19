@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-group.php';
 
 /**

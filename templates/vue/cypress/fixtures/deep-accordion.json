@@ -1,0 +1,217 @@
+{
+  "nodes": [
+    {
+      "id": 2171,
+      "author": {
+        "id": "1",
+        "name": "admin"
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "node",
+      "status": "publish",
+      "reviewStatus": "",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "accordion",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "lockRows": false,
+        "finishButtonText": "Finish",
+        "confirmationTitleText": "Section Complete!",
+        "confirmationBodyText": "Would you like to continue?",
+        "continueButtonText": "Continue",
+        "cancelLinkText": "Cancel",
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>t</p>"
+      },
+      "coordinates": {
+        "x": 2943.107421875,
+        "y": 2438.760986328125
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [
+        2670,
+        2670
+      ],
+      "fitWindow": true,
+      "reviewComments": [],
+      "license": "",
+      "references": "",
+      "accessible": true,
+      "unlocked": true,
+      "completed": true,
+      "nodeType": "child"
+    },
+    {
+      "type": "tapestry_node",
+      "description": "",
+      "conditions": [],
+      "behaviour": "new-window",
+      "status": "publish",
+      "nodeType": "child",
+      "title": "Child",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "typeId": 1,
+      "group": 1,
+      "progress": 0,
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Child</p>"
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "fullscreen": false,
+      "coordinates": {
+        "x": 3358.013072338598,
+        "y": 2467.8891274773423,
+        "fx": 2583.041880932348,
+        "fy": 2160.3608071648423
+      },
+      "childOrdering": [
+        2672,
+        2672
+      ],
+      "quiz": [],
+      "license": "",
+      "references": "",
+      "unlocked": true,
+      "accessible": true,
+      "hasSubAccordion": false,
+      "id": 2670,
+      "author": {
+        "id": 1,
+        "name": "admin"
+      }
+    },
+    {
+      "type": "tapestry_node",
+      "description": "",
+      "conditions": [],
+      "behaviour": "new-window",
+      "status": "publish",
+      "nodeType": "child",
+      "title": "Grandchild",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "typeId": 1,
+      "group": 1,
+      "progress": 0,
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>grandchild</p>"
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "fullscreen": false,
+      "coordinates": {
+        "x": 3769.6916819159483,
+        "y": 2487.017326871936,
+        "fx": 3762.0034494940733,
+        "fy": 2765.330315153186
+      },
+      "childOrdering": [],
+      "quiz": [],
+      "license": "",
+      "references": "",
+      "unlocked": true,
+      "accessible": true,
+      "hasSubAccordion": false,
+      "id": 2672,
+      "author": {
+        "id": 1,
+        "name": "admin"
+      }
+    }
+  ],
+  "links": [
+    {
+      "source": 2171,
+      "target": 2670,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 2670,
+      "target": 2672,
+      "value": 1,
+      "type": ""
+    }
+  ],
+  "groups": [],
+  "site-url": "http://localhost:8000"
+}

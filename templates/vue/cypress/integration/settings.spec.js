@@ -28,13 +28,7 @@ describe("Settings", () => {
       })
   })
 
-  /**
-   * [CI FAIL] indicates that the test fails in Tapestry's CI environment. These
-   * tests are failing because of a Docker-WordPress permissions issue. See the
-   * following Asana task for details:
-   *  - https://app.asana.com/0/1126491658233864/1198968596220741
-   */
-  it.skip(`[CI FAIL] should be able to set a background image`, () => {
+  it(`should be able to set a background image`, () => {
     cy.server()
     cy.route("POST", "**/async-upload.php").as("upload")
 
@@ -44,7 +38,7 @@ describe("Settings", () => {
       .then(url => {
         cy.getByTestId("node-upload-input").should("have.value", url)
         cy.submitSettingsModal()
-        cy.get("#app").should("have.css", "background-image", `url("${url}")`)
+        cy.get("body").should("have.css", "background-image", `url("${url}")`)
       })
   })
 
@@ -65,9 +59,11 @@ describe("Settings", () => {
         cy.visit(href)
       })
 
-    cy.contains(/loading/i).should("not.exist")
+    cy.getByTestId("tapestry-loading").should("not.exist")
     cy.get("@tapestry").then(({ nodes }) => {
-      nodes.forEach(node => cy.contains(node.title).should("be.visible"))
+      cy.get("#tapestry").within(() => {
+        nodes.forEach(node => cy.contains(node.title).should("be.visible"))
+      })
     })
     cy.deleteTapestry(`${TEST_TAPESTRY_NAME} (1)`)
   })
