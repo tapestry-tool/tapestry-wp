@@ -58,6 +58,14 @@
               You will need to refresh the page to see this change applied.
             </p>
           </b-form-group>
+          <b-form-group
+            label="Highlight accepted nodes"
+            description="If enabled, accepted nodes will be highlighted in green."
+          >
+            <b-form-checkbox v-model="showAcceptedHighlight" switch>
+              {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
@@ -298,6 +306,7 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       showRejected: false,
+      showAcceptedHighlight: true,
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
@@ -368,6 +377,7 @@ export default {
         showAccess = true,
         superuserOverridePermissions = true,
         showRejected = false,
+        showAcceptedHighlight = true,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
@@ -379,6 +389,7 @@ export default {
       this.showAccess = showAccess
       this.superuserOverridePermissions = superuserOverridePermissions
       this.showRejected = showRejected
+      this.showAcceptedHighlight = showAcceptedHighlight
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
@@ -392,6 +403,7 @@ export default {
         showAccess: this.showAccess,
         superuserOverridePermissions: this.superuserOverridePermissions,
         showRejected: this.showRejected,
+        showAcceptedHighlight: this.showAcceptedHighlight,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,

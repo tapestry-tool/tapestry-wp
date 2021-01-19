@@ -425,6 +425,7 @@ class Tapestry implements ITapestry
 
         $settings->showAccess = true;
         $settings->showRejected = false;
+        $settings->showAcceptedHighlight = true;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->permalink = get_permalink($this->postId);
