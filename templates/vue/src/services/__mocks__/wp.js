@@ -48,6 +48,8 @@ export const getCurrentUser = jest.fn().mockReturnValue({
   roles: ["administrator"],
 })
 
+export const isCurrentUser = jest.fn().mockReturnValue(true)
+
 export const isLoggedIn = jest.fn().mockReturnValue(true)
 
 export const canEditTapestry = jest.fn().mockReturnValue(true)
