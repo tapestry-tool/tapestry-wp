@@ -22,7 +22,10 @@ export default {
     }
   },
   async mounted() {
-    this.cos = await client.getCosActivity()
+    const latestCosVersion = await client.getCosActivity()
+    if (latestCosVersion) {
+      this.cos = latestCosVersion
+    }
   },
 }
 </script>

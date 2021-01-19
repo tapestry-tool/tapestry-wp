@@ -25,22 +25,20 @@ export function getParent(state) {
   }
 }
 
-export function isAccordion(_, { getNode, getParent }) {
+export function isAccordion(_, { getNode, isSubAccordion }) {
   return id => {
     const node = getNode(id)
+    return node.mediaType === "accordion" || isSubAccordion(id)
+  }
+}
 
-    // Check 1: Node itself is an accordion
-    if (node.mediaType === "accordion") {
-      return true
-    }
-
-    // Check 2: Node is a subaccordion
-    const parent = getParent(node.id)
+export function isSubAccordion(_, { getNode, getParent }) {
+  return id => {
+    const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
       return parentNode.mediaType === "accordion"
     }
-
     return false
   }
 }
@@ -58,14 +56,31 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
   }
 }
 
-export function isVisible(_, { getNode, isAccordionRow }) {
+export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
+  return id => {
+    let nodeId = id
+    while (nodeId) {
+      let parent = getParent(nodeId)
+      if (!parent) return false
+      if (isSubAccordion(nodeId)) return true
+      nodeId = parent
+    }
+    return false
+  }
+}
+
+export function isVisible(state, { getNode, hasAccordionAncestor }) {
+  const { showRejected } = state.settings
   return id => {
     const node = getNode(id)
     if (node.nodeType === "") {
       return false
     }
-    if (!Helpers.hasPermission(node, "edit")) {
-      return !isAccordionRow(node.id)
+    if (!Helpers.hasPermission(node, "read", showRejected)) {
+      return false
+    }
+    if (!Helpers.hasPermission(node, "edit", showRejected)) {
+      return !hasAccordionAncestor(node.id)
     }
     return true
   }
@@ -206,59 +221,7 @@ export function yOrFy({ settings }) {
 }
 
 export function createDefaultNode({ settings }) {
-  return () => ({
-    type: "tapestry_node",
-    description: "",
-    conditions: [],
-    behaviour: "new-window",
-    status: "publish",
-    nodeType: "child",
-    title: "",
-    imageURL: "",
-    lockedImageURL: "",
-    mediaType: "text",
-    mediaFormat: "",
-    mediaDuration: 0,
-    typeId: 1,
-    group: 1,
-    progress: 0,
-    permissions: settings.defaultPermissions || {
-      public: ["read"],
-      authenticated: ["read"],
-    },
-    typeData: {
-      linkMetadata: null,
-      mediaURL: "",
-      mediaWidth: 960, //TODO: This needs to be flexible with H5P
-      mediaHeight: 600,
-      subAccordionText: "More content:",
-      planetViewNotEarnedIconUrl: "",
-      planetViewEarnedIconUrl: "",
-      spaceshipPartNotEarnedIconUrl: "",
-      spaceshipPartEarnedIconUrl: "",
-      spaceshipPartHoverIconUrl: "",
-      spaceshipPartX: 0,
-      spaceshipPartY: 0,
-      spaceshipPartWidth: 0,
-      spaceshipPartHeight: 0,
-    },
-    hideTitle: false,
-    hideProgress: false,
-    hideMedia: false,
-    skippable: true,
-    fullscreen: false,
-    tydeType: tydeTypes.REGULAR,
-    coordinates: {
-      x: 3000,
-      y: 3000,
-    },
-    childOrdering: [],
-    quiz: [],
-    license: "",
-    references: "",
-    unlocked: true,
-    accessible: true,
-  })
+  return () => Helpers.createDefaultNode({ settings })
 }
 
 export function getNeighbouringLinks(state) {
