@@ -290,6 +290,11 @@ class TapestryApi {
           .post("/activities/cos/connections", connection)
           .then(res => res.data)
       },
+      updateConnection(id, connection) {
+        return client
+          .put(`/activities/cos/connections/${id}`, connection)
+          .then(res => res.data)
+      },
     }
   }
 }

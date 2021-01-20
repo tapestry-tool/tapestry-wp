@@ -21,7 +21,18 @@ class CircleOfSupport
 
     public function addConnection($connection)
     {
-        array_push($this->current->connections, $connection);
+        $id = uniqid();
+        $connection->id = $id;
+        $this->current->connections->$id = $connection;
+
+        return $connection;
+    }
+
+    public function updateConnection($id, $connection)
+    {
+        $this->current->connections->$id = $connection;
+
+        return $connection;
     }
 
     public function get()
@@ -50,10 +61,13 @@ class CircleOfSupport
             $circleOfSupport = $this->current;
         }
 
+        $circleOfSupport->id = $this->userId;
+        $now = date_format(new DateTime(), DateTime::ISO8601);
+
         if ($this->_isEmpty()) {
             array_push($this->versions, $circleOfSupport);
         } else {
-            if ($this->_isSameDay($this->current->timestamp, $circleOfSupport->timestamp)) {
+            if ($this->_isSameDay($this->current->timestamp, $now)) {
                 $this->versions[count($this->versions) - 1] = $circleOfSupport;
             } else {
                 array_push($this->versions, $circleOfSupport);
@@ -70,8 +84,8 @@ class CircleOfSupport
     {
         return [
             'id' => $this->userId,
-            'connections' => [],
-            'communities' => [],
+            'connections' => new stdClass(),
+            'communities' => new stdClass(),
             'circles' => [],
             'members' => new stdClass(),
             'timestamp' => date_format(new DateTime(), DateTime::ISO8601),

@@ -331,7 +331,7 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
-        'ROUTE' => '/activites/cos/connections/(?P<connectionId>[a-zA-Z0-9-]+)',
+        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'CircleOfSupportEndpoints::updateConnection'

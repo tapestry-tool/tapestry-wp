@@ -1,30 +1,45 @@
 <template>
   <div class="cos">
     <pre>{{ JSON.stringify(cos) }}</pre>
+    <button @click="addConnection">Add connection</button>
+    <button @click="updateConnection">Update connection</button>
   </div>
 </template>
 
 <script>
-import moment from "moment-timezone"
 import client from "@/services/TapestryAPI"
-import * as wp from "@/services/wp"
 
 export default {
   data() {
     return {
       cos: {
-        id: wp.getCurrentUser().id,
         circles: [],
-        communities: [],
-        connections: [],
+        communities: {},
+        connections: {},
         members: {},
-        timestamp: moment().toISOString(),
       },
     }
   },
   async mounted() {
     const latestCosVersion = await client.cos.getActivity()
     this.cos = latestCosVersion
+  },
+  methods: {
+    async addConnection() {
+      const connection = await client.cos.addConnection({
+        name: "Nanda",
+        avatar: "🤔",
+      })
+      this.$set(this.cos.connections, connection.id, connection)
+    },
+    async updateConnection() {
+      const [id, currentConnection] = Object.entries(this.cos.connections)[0]
+      const connection = await client.cos.updateConnection(id, {
+        ...currentConnection,
+        avatar: "🤡",
+      })
+      this.cos.connections[id] = connection
+    },
   },
 }
 </script>

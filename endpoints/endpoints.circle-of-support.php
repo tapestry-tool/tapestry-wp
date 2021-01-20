@@ -19,11 +19,17 @@ class CircleOfSupportEndpoints
     public static function addConnection($request)
     {
         $cos = new CircleOfSupport();
-        $cos->addConnection(json_decode($request->get_body()));
-        return $cos->save();
+        $connection = $cos->addConnection(json_decode($request->get_body()));
+        $cos->save();
+        return $connection;
     }
 
     public static function updateConnection($request)
     {
+        $connectionId = $request['connectionId'];
+        $cos = new CircleOfSupport();
+        $connection = $cos->updateConnection($connectionId, json_decode($request->get_body()));
+        $cos->save();
+        return $connection;
     }
 }
