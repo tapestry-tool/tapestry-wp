@@ -11,8 +11,8 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
-require_once __DIR__.'/classes/activities/class.circle-of-support.php';
 require_once __DIR__.'/classes/class.constants.php';
+require_once __DIR__.'/endpoints/endpoints.circle-of-support.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -301,20 +301,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
-    'GET_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getCircleOfSupport',
-        ]
-    ],
-    'POST_CIRCLE_OF_SUPPORT' => (object) [
-        'ROUTE' => '/activities/cos',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_POST_METHOD,
-            'callback' => 'postCircleOfSupport'
-        ]
-    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -322,6 +308,34 @@ $REST_API_ENDPOINTS = [
             'callback' => 'optimizeTapestryNodeThumbnails',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
+    ],
+    'GET_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::get',
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::save'
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
+        'ROUTE' => '/activities/cos/connections',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnection'
+        ]
+    ],
+    'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
+        'ROUTE' => '/activites/cos/connections/(?P<connectionId>[a-zA-Z0-9-]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::updateConnection'
+        ]
     ]
 ];
 
@@ -1096,13 +1110,13 @@ function optimizeTapestryNodeThumbnails($request)
             $protocol = is_ssl() ? "https:" : "http:";
     
             if ($nodeData->imageURL) {
-                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
                 $node->set((object) ['thumbnailFileId' => $attachmentId]);
                 $node->save();
             }
             if ($nodeData->lockedImageURL) {
-                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->lockedImageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
                 $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
                 $node->save();
@@ -1459,16 +1473,4 @@ function getTapestryContributors($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
-}
-
-function getCircleOfSupport($request)
-{
-    $cos = new CircleOfSupport();
-    return $cos->get();
-}
-
-function postCircleOfSupport($request)
-{
-    $cos = new CircleOfSupport();
-    return $cos->save($request->get_body());
 }

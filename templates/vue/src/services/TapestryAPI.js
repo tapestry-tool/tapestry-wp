@@ -276,14 +276,21 @@ class TapestryApi {
     })
   }
 
-  getCosActivity() {
-    return axios.get(`${apiUrl}/activities/cos`).then(res => res.data)
-  }
-
-  saveCosActivity(circleOfSupport) {
-    return axios
-      .post(`${apiUrl}/activities/cos`, circleOfSupport)
-      .then(res => res.data)
+  get cos() {
+    const client = this.client
+    return {
+      getActivity() {
+        return client.get("/activities/cos").then(res => res.data)
+      },
+      saveActivity(circleOfSupport) {
+        return client.post("/activities/cos", circleOfSupport).then(res => res.data)
+      },
+      addConnection(connection) {
+        return client
+          .post("/activities/cos/connections", connection)
+          .then(res => res.data)
+      },
+    }
   }
 }
 

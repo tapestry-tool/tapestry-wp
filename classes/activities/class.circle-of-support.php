@@ -4,6 +4,7 @@ class CircleOfSupport
 {
     private $userId;
     private $versions;
+    private $current;
 
     const META_KEY = 'tyde_circle_of_support';
 
@@ -15,42 +16,66 @@ class CircleOfSupport
 
         $this->userId = $userId;
         $this->versions = $this->_getVersions();
+        $this->current = $this->get();
     }
 
-    public function get($date = 0)
+    public function addConnection($connection)
     {
-        if ($date) {
-            foreach ($this->versions as $version) {
-                if ($this->_isSameDay($version->timestamp, $date)) {
-                    return $version;
-                }
-            }
+        array_push($this->current->connections, $connection);
+    }
 
-            return null;
-        }
-
-        if (0 === count($this->versions)) {
-            return null;
+    public function get()
+    {
+        if ($this->_isEmpty()) {
+            return $this->_getDefaultCos();
         }
 
         return $this->versions[count($this->versions) - 1];
     }
 
-    public function save($circleOfSupport)
+    public function getByDate($date)
     {
-        $latest = $this->get();
+        foreach ($this->versions as $version) {
+            if ($this->_isSameDay($version->timestamp, $date)) {
+                return $version;
+            }
+        }
 
-        if (!isset($latest)) {
+        return null;
+    }
+
+    public function save($circleOfSupport = null)
+    {
+        if (!$circleOfSupport) {
+            $circleOfSupport = $this->current;
+        }
+
+        if ($this->_isEmpty()) {
             array_push($this->versions, $circleOfSupport);
         } else {
-            if ($this->_isSameDay($latest->timestamp, $circleOfSupport->timestamp)) {
+            if ($this->_isSameDay($this->current->timestamp, $circleOfSupport->timestamp)) {
                 $this->versions[count($this->versions) - 1] = $circleOfSupport;
             } else {
                 array_push($this->versions, $circleOfSupport);
             }
         }
 
-        return update_user_meta($this->userId, CircleOfSupport::META_KEY, $this->versions);
+        $this->current = $this->get();
+        update_user_meta($this->userId, CircleOfSupport::META_KEY, $this->versions);
+
+        return $this->current;
+    }
+
+    private function _getDefaultCos()
+    {
+        return [
+            'id' => $this->userId,
+            'connections' => [],
+            'communities' => [],
+            'circles' => [],
+            'members' => new stdClass(),
+            'timestamp' => date_format(new DateTime(), DateTime::ISO8601),
+        ];
     }
 
     private function _getVersions()
@@ -60,9 +85,12 @@ class CircleOfSupport
             return [];
         }
 
-        return array_map(function ($cos) {
-            return json_decode($cos);
-        }, $versions);
+        return $versions;
+    }
+
+    private function _isEmpty()
+    {
+        return 0 === count($this->versions);
     }
 
     private function _isSameDay($date1, $date2)

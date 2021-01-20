@@ -1,31 +1,30 @@
 <template>
   <div class="cos">
-    <p>I'm temporary!</p>
+    <pre>{{ JSON.stringify(cos) }}</pre>
   </div>
 </template>
 
 <script>
 import moment from "moment-timezone"
 import client from "@/services/TapestryAPI"
+import * as wp from "@/services/wp"
 
 export default {
   data() {
     return {
       cos: {
-        id: "",
+        id: wp.getCurrentUser().id,
         circles: [],
         communities: [],
         connections: [],
         members: {},
-        timestamp: moment(),
+        timestamp: moment().toISOString(),
       },
     }
   },
   async mounted() {
-    const latestCosVersion = await client.getCosActivity()
-    if (latestCosVersion) {
-      this.cos = latestCosVersion
-    }
+    const latestCosVersion = await client.cos.getActivity()
+    this.cos = latestCosVersion
   },
 }
 </script>
