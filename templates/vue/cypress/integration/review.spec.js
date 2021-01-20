@@ -26,21 +26,12 @@ describe("Review Nodes", () => {
 
     // assert author can move submitted node
     cy.getNodeByTitle(node.title).then(node => {
-      let coords
-      cy.getByTestId(`node-${node.id}`)
-        .then(el => {
-          coords = el[0].getBoundingClientRect()
-        })
-        .then(() => {
-          cy.moveNode(node.id, 300, 500)
-        })
-        .then(() => {
-          cy.getByTestId(`node-${node.id}`).then(el => {
-            let newCoords = el[0].getBoundingClientRect()
-            expect(newCoords.x).to.not.equal(coords.x)
-            expect(newCoords.y).to.not.equal(coords.y)
-          })
-        })
+      cy.server()
+      cy.route("PUT", "**/coordinates").as("move")
+      cy.moveNode(node.id, 300, 500)
+      cy.wait("@move").should(xhr => {
+        expect(xhr.status, "successful PUT").to.equal(200)
+      })
     })
 
     cy.findByLabelText("open sidebar").click()
