@@ -202,15 +202,18 @@ Cypress.Commands.add("moveNode", (id, x, y) =>
     cy.getByTestId(`node-${id}`)
       .first()
       .trigger("mousedown", {
+        eventConstructor: "MouseEvent",
         force: true,
         view: win,
       })
       .trigger("mousemove", {
+        eventConstructor: "MouseEvent",
         clientX: x,
         clientY: y,
         force: true,
       })
       .trigger("mouseup", {
+        eventConstructor: "MouseEvent",
         force: true,
         view: win,
       })
