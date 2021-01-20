@@ -202,7 +202,6 @@ Cypress.Commands.add("moveNode", (id, x, y) =>
     cy.getByTestId(`node-${id}`)
       .first()
       .trigger("mousedown", {
-        which: 1,
         force: true,
         view: win,
       })
