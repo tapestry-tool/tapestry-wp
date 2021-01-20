@@ -28,7 +28,7 @@ describe("Review Nodes", () => {
     cy.getNodeByTitle(node.title).then(node => {
       cy.server()
       cy.route("PUT", "**/coordinates").as("move")
-      cy.moveNode(node.id, 300, 500)
+      cy.moveNode(node.id, 0, 0)
       cy.wait("@move").should(xhr => {
         expect(xhr.status, "successful PUT").to.equal(200)
       })
