@@ -119,7 +119,7 @@ class TapestryNode implements ITapestryNode
      *
      * @return null
      */
-    public function set($node, $allowAuthor = false)
+    public function set($node)
     {
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
@@ -182,9 +182,6 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->permissions) && is_object($node->permissions)) {
             $this->permissions = $node->permissions;
-            if ($allowAuthor) {
-                $this->_addAuthorPermissions($this->permissions);
-            }
         }
         if (isset($node->hideTitle) && is_bool($node->hideTitle)) {
             $this->hideTitle = $node->hideTitle;
@@ -274,11 +271,6 @@ class TapestryNode implements ITapestryNode
         if ($listModified) {
             $this->_saveToDatabase();
         }
-    }
-
-    public function getAuthor()
-    {
-        return $this->author;
     }
 
     public function getLockedState($userId = 0)
@@ -622,22 +614,6 @@ class TapestryNode implements ITapestryNode
                 'original_author_name' => '',
                 'original_author_email' => '',
             ];
-        }
-    }
-
-    private function _addAuthorPermissions($permissions)
-    {
-        $userId = wp_get_current_user()->ID;
-        $userId = 'user-'.$userId;
-        $authorPermissions = ['read', 'add', 'edit'];
-        if (property_exists($permissions, $userId)) {
-            foreach ($authorPermissions as $permission) {
-                if (!in_array($permission, $permissions->$userId)) {
-                    array_push($permissions->$userId, $permission);
-                }
-            }
-        } else {
-            $permissions->$userId = $authorPermissions;
         }
     }
 }
