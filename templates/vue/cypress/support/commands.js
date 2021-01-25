@@ -210,6 +210,10 @@ Cypress.Commands.add("moveNode", (id, x, y) =>
         eventConstructor: "MouseEvent",
         clientX: x,
         clientY: y,
+        screenX: x,
+        screenY: y,
+        pageX: x,
+        pageY: y,
         force: true,
       })
       .trigger("mouseup", {
