@@ -135,8 +135,11 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        $userId = wp_get_current_user()->ID;
-        $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        // Check if user is logged in to prevent logged out user-0 from getting permissions
+        if (is_user_logged_in()) {
+            $userId = wp_get_current_user()->ID;
+            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        }
 
         $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
