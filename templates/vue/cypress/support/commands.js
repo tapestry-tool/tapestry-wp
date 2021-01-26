@@ -197,23 +197,17 @@ Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
 )
 
-Cypress.Commands.add("moveNode", (id, x, y) =>
+// Reference: https://github.com/cypress-io/cypress/issues/3441
+Cypress.Commands.add("moveNode", (id, x, y) => {
   cy.window().then(win => {
     cy.getByTestId(`node-${id}`)
       .first()
       .trigger("mousedown", {
-        button: 0,
-        force: true,
         view: win,
       })
-      .wait(1000)
       .trigger("mousemove", {
         clientX: x,
         clientY: y,
-        screenX: x,
-        screenY: y,
-        pageX: x,
-        pageY: y,
         force: true,
       })
       .trigger("mouseup", {
@@ -221,4 +215,4 @@ Cypress.Commands.add("moveNode", (id, x, y) =>
         view: win,
       })
   })
-)
+})
