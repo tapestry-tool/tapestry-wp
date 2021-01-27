@@ -72,3 +72,9 @@ If your machine is low on resources, or you have a lot of containers running, yo
 1. Run `make stop` to bring down all containers and processes.
 2. Copy the file `bin/config-sample.sh` to `bin/config.sh`.
 3. In the file you just created, set the wait time to some bigger number, and try running your command again.
+
+### Managing Data
+Most of the site data is stored in the WP mySQL database. This is mounted to a volume
+in `docker-compose.yml`. By default, this volume is used for the initial setup and for
+all subsequent usage. To clear the data and start from scratch, run `make stop` 
+then `make clear-db`. Of course, you'll need to do the WP installation again.
