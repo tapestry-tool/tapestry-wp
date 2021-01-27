@@ -3,7 +3,8 @@
     "ADMIN_USERNAME": "admin",
     "ADMIN_PASSWORD": "secret",
     "SUBSCRIBER_USERNAME": "subscriber",
-    "SUBSCRIBER_PASSWORD": "subscriber"
+    "SUBSCRIBER_PASSWORD": "subscriber",
+    "TAPESTRY_ENV": "TYDE"
   },
   "baseUrl": "http://localhost:8000",
   "retries": 1

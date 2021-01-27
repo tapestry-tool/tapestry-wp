@@ -3,11 +3,11 @@ import roles from "./roles"
 import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 
-Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin", tyde = false) => {
+Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
   if (fixture) {
     cy.get(fixture).then(tapestry => {
       // Add copilot permissions for Tyde
-      if (tyde && !fixture.startsWith("tyde/")) {
+      if (Cypress.env("TAPESTRY_ENV") === "TYDE") {
         for (let node of tapestry.nodes) {
           if (node.hasOwnProperty("permissions") && !node.permissions.hasOwnProperty("copilot")) {
             node.permissions.copilot = ["read"]
@@ -26,10 +26,6 @@ Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin", 
     cy.login(role)
   }
   cy.visitTapestry()
-})
-
-Cypress.Commands.add("tydeSetup", { prevSubject: false }, (fixture, role = "admin") => {
-  cy.setup(fixture, role, true)
 })
 
 Cypress.Commands.add("login", role => {

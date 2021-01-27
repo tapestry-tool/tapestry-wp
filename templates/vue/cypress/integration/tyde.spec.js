@@ -28,7 +28,7 @@ describe("TYDE", () => {
   describe("Module Creation", () => {
     it("Should allow creation of a Module from the root node", () => {
       cy.fixture("one-node.json").as("oneNode")
-      cy.tydeSetup("@oneNode")
+      cy.setup("@oneNode")
       cy.getSelectedNode().then(node => {
         cy.openModal("add", node.id)
         cy.getByTestId(`node-title`).type("Module 1")
@@ -46,7 +46,7 @@ describe("TYDE", () => {
 
     it("Should allow creation of a Stage node from a module", () => {
       cy.fixture("tyde/one-module.json").as("oneModule")
-      cy.tydeSetup("@oneModule")
+      cy.setup("@oneModule")
       cy.getNodeByTitle("Module 1").then(node => {
         cy.openModal("add", node.id)
         cy.getByTestId(`node-title`).type("Stage 1")
@@ -63,7 +63,7 @@ describe("TYDE", () => {
 
     it("Should allow creation of a Question Set from a stage", () => {
       cy.fixture("tyde/one-stage.json").as("oneStage")
-      cy.tydeSetup("@oneStage")
+      cy.setup("@oneStage")
       cy.getNodeByTitle("Stage 1").then(node => {
         cy.openModal("add", node.id)
         cy.getByTestId(`node-title`).type("Question Set 1")
@@ -80,7 +80,7 @@ describe("TYDE", () => {
 
     it("Should allow creation of a regular node (subtopic) from a question set", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
-      cy.tydeSetup("@oneQuestionSet")
+      cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {
         cy.getNodeById(node.id).click()
         cy.openModal("add", node.id)
@@ -112,7 +112,7 @@ describe("TYDE", () => {
 
     it("Should show stage progress in the module content", () => {
       cy.fixture("tyde/two-stages.json").as("mixedProgress")
-      cy.tydeSetup("@mixedProgress")
+      cy.setup("@mixedProgress")
 
       cy.getNodeByTitle("Module 1").then(module => {
         // Should show when a single stage is completed
@@ -164,7 +164,7 @@ describe("TYDE", () => {
 
     it("Should show correct progress for an uncompleted stage", () => {
       cy.fixture("tyde/two-stages.json").as("mixedProgress")
-      cy.tydeSetup("@mixedProgress")
+      cy.setup("@mixedProgress")
       cy.getNodeByTitle("Module 1").then(module => {
         cy.getNodeById(module.id).click()
         cy.getByTestId(`open-node-${module.id}`).click()
@@ -180,7 +180,7 @@ describe("TYDE", () => {
   describe("Spaceship/Cockpit", () => {
     it("Should navigate from map to spaceship and back", () => {
       cy.fixture("one-node.json").as("oneNode")
-      cy.tydeSetup("@oneNode")
+      cy.setup("@oneNode")
       cy.openTydeMenu()
       cy.closeTydeMenu()
       cy.openTydeMenu()
@@ -188,7 +188,7 @@ describe("TYDE", () => {
 
     it("Should use the escape key for navigation", () => {
       cy.fixture("one-node.json").as("oneNode")
-      cy.tydeSetup("@oneNode")
+      cy.setup("@oneNode")
       cy.get("[id=tyde]").trigger("keydown", { code: "Escape" })
       cy.getByTestId("tyde-map-button").should("be.visible")
       cy.get("[id=tyde]").trigger("keydown", { code: "Escape" })
@@ -197,7 +197,7 @@ describe("TYDE", () => {
 
     it("Should show spaceship parts in the cockpit", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
-      cy.tydeSetup("@oneQuestionSet")
+      cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Module 1").then(node => {
         cy.openModal("edit", node.id)
         cy.contains(/spaceship part/i).click()
@@ -216,7 +216,7 @@ describe("TYDE", () => {
 
     it("Should show favourite items in the cockpit and allow removal", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
-      cy.tydeSetup("@oneQuestionSet")
+      cy.setup("@oneQuestionSet")
       cy.openTydeMenu()
       cy.getByTestId("tyde-favourites-button").click()
       cy.contains(/You have not added any items to your favourites./i).should(
@@ -241,7 +241,7 @@ describe("TYDE", () => {
 
     it("Should show help info in the cockpit", () => {
       cy.fixture("one-node.json").as("oneNode")
-      cy.tydeSetup("@oneNode")
+      cy.setup("@oneNode")
       cy.openTydeMenu()
       cy.getByTestId("tyde-help-button").click()
       cy.contains(/ask@tyde.ca/i).should("exist")
@@ -249,7 +249,7 @@ describe("TYDE", () => {
 
     it("Should navigate to the summary view when clicking a completed module", () => {
       cy.fixture("tyde/one-question-set-part-images.json").as("oneQuestionSet")
-      cy.tydeSetup("@oneQuestionSet")
+      cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
