@@ -52,11 +52,8 @@ export default {
     this.cos = latestCosVersion
   }, */
   methods: {
-    async addConnection() {
-      const connection = await client.cos.addConnection({
-        name: "Nanda",
-        avatar: "🤔",
-      })
+    async addConnection({ ...newConnection }) {
+      const connection = await client.cos.addConnection(newConnection)
       this.$set(this.cos.connections, connection.id, connection)
     },
     async updateConnection() {
