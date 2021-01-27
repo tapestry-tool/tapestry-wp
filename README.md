@@ -62,13 +62,13 @@ Docker can be used to encapsulate and simplify our dependency structure and spee
     ```
     This will start up the required containers, then set up the WP installation with starting data, such as plugins and users.
     Notes:
-    - You may see an error related to connecting to the database, which means that the containers were not ready when we tried to install the data. In this case, run `make-stop` then follow [these steps.](#setting-container-wait-time)
+    - You may see an error related to connecting to the database, which means that the containers were not ready when we tried to install the data. In this case, run `make stop` then follow [these steps.](#setting-container-wait-time)
     - When prompted for your Link Preview Key, enter the value you obtained in the [steps above](#getting-external-links-to-work). The script will create the `.env` file for you.
-3. If you completed the previous step successfully, you should have a WP instance running on `localhost`. You can now run the Tapestry app from the `templates/vue` directory.
-4. When you are finished, make sure to run `make-stop` to close the containers. This will also shut down the running node application if it is still running.
+3. If you completed the previous step successfully, you should have a WP instance running on `localhost`. You can now run the Tapestry app from the `templates/vue` directory (see `make start-app`).
+4. When you are finished, make sure to run `make stop` to close the containers. This will also shut down the running node application if it is still running.
 
 ### Setting Container Wait-Time
 If your machine is low on resources, or you have a lot of containers running, you may find that container start-up takes to long and prevents the install script from executing properly. The simple fix is to increase the amount of time the script waits:
-1. Run `make-stop` to bring down all containers and processes.
+1. Run `make stop` to bring down all containers and processes.
 2. Copy the file `bin/config-sample.sh` to `bin/config.sh`.
 3. In the file you just created, set the wait time to some bigger number, and try running your command again.
