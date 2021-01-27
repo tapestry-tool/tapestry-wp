@@ -20,6 +20,8 @@ To export this plugin to use on a non-local Wordpress instance:
 - CD into `templates/vue` folder and delete every file except the `dist` folder
 - Zip the `tapestry-deploy` folder and upload it in your other Wordpress instance under Plugins > Add New > Upload Plugin
 
+For a Quick-Start alternative, consider using [Docker](#docker).
+
 ### Getting External Links to Work
 
 It's strongly recommended you complete this to get link previews working for the "External Link" content type. To do this, you will need to get an API key for LinkPreview and set a config variable first by following these instructions:
