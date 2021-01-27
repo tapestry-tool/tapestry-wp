@@ -26,8 +26,11 @@ It's strongly recommended you complete this to get link previews working for the
 
 1. Navigate to [linkpreview.net](https://www.linkpreview.net/) and sign up to get an API Key
 2. Once logged in, press "Generate new access key" on the top right corner and copy the key
-3. In this directory (vue), make a copy of the `config-sample.js` file and rename it to `config.js` (if it doesn't exist yet)
-4. Open the `config.js` file and paste the API key as the value of the `LINK_PREVIEW_API_KEY` variable
+3. In the `templates/vue` directory, create a `.env` file containing the following line:
+    ```
+    LINK_PREVIEW_API_KEY=<key>
+    ```
+    where <key> is the key you generated.
 
 If you complete these steps before running `npm run build`, you will have link previews working
 
@@ -35,12 +38,17 @@ If you complete these steps before running `npm run build`, you will have link p
 
 Tapestry plugin uses 2 main JavaScript technologies:
 
-- D3 JS (used in `templates/tapestry.js` file)
-- Vue JS (used in `templates/vue` folder)
+- D3 JS (used for node rendering)
+- Vue JS (used for all frontend design and logic. See `templates/vue` folder, which is the root of the tapestry application)
 
 Both of these are loaded in the Tapestry page template under `templates/single-tapestry.php`
 
 To do development:
 - Follow the steps above to install the plugin locally
-- Set `$TAPESTRY_USE_DEV_MODE` to `TRUE` in `tapestry.php`
-- CD into `templates/vue` and run `npm run dev` to serve with hot reload at localhost:8080
+- Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
+- Get the Wordpress backend running using either a **MAMP** stack or [Docker](#docker)
+- In the `templates/vue` directory, run `npm run dev` to serve with hot reload at localhost:8080
+
+
+## Docker
+TODO
