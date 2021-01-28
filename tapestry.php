@@ -18,6 +18,7 @@ $TAPESTRY_USE_DEV_MODE = true;
  * Register endpoints.
  */
 require_once dirname(__FILE__).'/endpoints.php';
+require_once dirname(__FILE__).'/tapestry-settings.php';
 
 /**
  * Register Tapestry type on initialization.
