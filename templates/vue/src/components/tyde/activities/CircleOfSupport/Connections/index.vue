@@ -14,7 +14,7 @@
         class="form"
         :communities="communities"
         @back="state = states.OPEN"
-        @add-connection="$emit('add-connection', $event)"
+        @add-connection="addConnection"
       />
       <ul v-else>
         <li v-for="connection in connections" :key="connection.id">
@@ -65,6 +65,10 @@ export default {
   methods: {
     toggle() {
       this.state = this.state === states.CLOSED ? states.OPEN : states.CLOSED
+    },
+    addConnection(evt) {
+      this.state = states.OPEN
+      this.$emit("add-connection", evt)
     },
   },
 }

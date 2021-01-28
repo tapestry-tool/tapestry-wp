@@ -53,9 +53,10 @@ export default {
   }, */
   methods: {
     async addConnection({ community, ...newConnection }) {
-      console.log(community)
-      const connection = await client.cos.addConnection(newConnection)
-      this.$set(this.cos.connections, connection.id, connection)
+      if (community) {
+        this.$set(this.cos.members, newConnection.id, community)
+      }
+      this.$set(this.cos.connections, newConnection.id, newConnection)
     },
     async updateConnection() {
       const [id, currentConnection] = Object.entries(this.cos.connections)[0]

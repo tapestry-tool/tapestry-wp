@@ -295,6 +295,11 @@ class TapestryApi {
           .put(`/activities/cos/connections/${id}`, connection)
           .then(res => res.data)
       },
+      addConnectionToCommunity(communityId, connectionId) {
+        // TODO: Implement adding connection to communities
+        console.log("Not implemented - addConnectionToCommunity")
+        console.log({ communityId, connectionId })
+      },
     }
   }
 }
