@@ -4,7 +4,7 @@
       <span v-if="state === states.CLOSED">😊</span>
       <tapestry-icon v-else icon="chevron-down" />
     </button>
-    <div v-show="state !== states.CLOSED" class="content">
+    <div class="content">
       <div v-if="state === states.OPEN" class="controls">
         <button
           class="content-control"
@@ -91,9 +91,9 @@ export default {
     toggle() {
       this.state = this.state === states.CLOSED ? states.OPEN : states.CLOSED
     },
-    addConnection(evt) {
+    addConnection(...args) {
       this.state = states.OPEN
-      this.$emit("add-connection", evt)
+      this.$emit("add-connection", ...args)
     },
     getCommunities(connectionId) {
       return Object.values(this.communities).filter(community =>
@@ -140,6 +140,7 @@ ul {
   display: grid;
   grid-template-rows: repeat(2, 1fr);
   grid-auto-columns: 10rem;
+  grid-auto-flow: column;
   gap: 1rem;
 }
 

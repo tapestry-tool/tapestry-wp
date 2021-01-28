@@ -51,11 +51,11 @@ export default {
     this.cos = latestCosVersion
   }, */
   methods: {
-    async addConnection({ community: communityId, ...newConnection }) {
+    addConnection({ community: communityId, ...newConnection }) {
       if (communityId) {
-        const community = this.communities[communityId]
+        const community = this.cos.communities[communityId]
         community.connections.push(newConnection.id)
-        this.communities[communityId] = { ...community }
+        this.cos.communities[communityId] = { ...community }
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },
