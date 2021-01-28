@@ -6,7 +6,6 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
-require_once dirname(__FILE__).'/../classes/class.constants.php';
 
 /**
  * Add/update/retrieve a Tapestry.
@@ -194,7 +193,7 @@ class Tapestry implements ITapestry
                 $this->removeLink([
                     'source' => $link->source,
                     'target' => $link->target,
-                    ]);
+                ]);
             }
         }
 
@@ -357,6 +356,40 @@ class Tapestry implements ITapestry
         }
 
         return array_unique($authors, SORT_REGULAR);
+    }
+
+    /**
+     * Retrieve a Tapestry post for export.
+     *
+     * @return object $tapestry
+     */
+    public function export()
+    {
+        $nodes = [];
+        foreach ($this->nodes as $node) {
+            $temp = (new TapestryNode($this->postId, $node))->get();
+            if (NodeStatus::DRAFT == $temp->status) {
+                continue;
+            }
+            $nodes[] = $temp;
+        }
+        $groups = [];
+        foreach ($this->groups as $group) {
+            $groups[] = (new TapestryGroup($this->postId, $$group))->get();
+        }
+        $parsedUrl = parse_url($this->settings->permalink);
+        unset($this->settings->permalink);
+        unset($this->settings->tapestrySlug);
+        unset($this->settings->title);
+        unset($this->settings->status);
+
+        return (object) [
+            'nodes' => $nodes,
+            'groups' => $groups,
+            'links' => $this->links,
+            'settings' => $this->settings,
+            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+        ];
     }
 
     private function _setAccessibleStatus($nodes, $userId)
@@ -626,8 +659,10 @@ class Tapestry implements ITapestry
     {
         $checked[] = $node;
 
-        if ($this->_userIsAllowed($node, $superuser_override, $currentUserId)
-            || $this->_userIsAllowed($node, $superuser_override, $secondaryUserId)) {
+        if (
+            $this->_userIsAllowed($node, $superuser_override, $currentUserId)
+            || $this->_userIsAllowed($node, $superuser_override, $secondaryUserId)
+        ) {
             $nodesPermitted[] = $node;
 
             foreach ($this->links as $link) {
@@ -724,7 +759,7 @@ class Tapestry implements ITapestry
     private function _userIsAllowed($node, $superuser_override, $userId)
     {
         return TapestryHelpers::userIsAllowed('READ', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
-        || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
+            || TapestryHelpers::userIsAllowed('ADD', $node, $this->postId, $superuser_override, $userId)
+            || TapestryHelpers::userIsAllowed('EDIT', $node, $this->postId, $superuser_override, $userId);
     }
 }

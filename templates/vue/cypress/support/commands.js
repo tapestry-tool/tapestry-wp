@@ -9,10 +9,16 @@ Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") 
     cy.get(fixture).then(tapestry => {
       // Add copilot permissions for Tyde
       for (let node of tapestry.nodes) {
-        if (node.hasOwnProperty("permissions") && !node.permissions.hasOwnProperty("copilot")) {
+        if (
+          node.hasOwnProperty("permissions") &&
+          !node.permissions.hasOwnProperty("copilot")
+        ) {
           node.permissions.copilot = ["read"]
         }
-        if (node.hasOwnProperty("permissionsOrder") && !node.permissionsOrder.includes("copilot")) {
+        if (
+          node.hasOwnProperty("permissionsOrder") &&
+          !node.permissionsOrder.includes("copilot")
+        ) {
           node.permissionsOrder.push("copilot")
         }
       }
