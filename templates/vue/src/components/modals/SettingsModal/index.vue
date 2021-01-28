@@ -249,7 +249,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
@@ -357,6 +357,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["getTapestryExport"]),
     closeModal() {
       this.$emit("close")
     },
@@ -403,15 +404,10 @@ export default {
     isUploading(status) {
       this.fileUploading = status
     },
-    exportTapestry() {
+    async exportTapestry() {
       this.isExporting = true
-      let filteredTapestry = this.tapestryJson
-      filteredTapestry.nodes = filteredTapestry.nodes.filter(
-        node => node.status === "publish"
-      )
-      const tapestry = filteredTapestry
-      tapestry["site-url"] = wpData.wpUrl
-      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+      const exportedTapestry = await this.getTapestryExport()
+      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
@@ -423,6 +419,7 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+
       this.isExporting = false
       this.hasExported = true
     },
