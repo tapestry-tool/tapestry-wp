@@ -10,7 +10,6 @@ interface CircleOfSupport {
   connections: Connection[]
   communities: Community[]
   circles: Circle[]
-  members: Map<string, string> // Connection id -> community id
 }
 ```
 
@@ -36,6 +35,7 @@ interface Community {
   name: string
   icon: Emoji
   color: HexString
+  connections: ConnectionId[]
 }
 ```
 

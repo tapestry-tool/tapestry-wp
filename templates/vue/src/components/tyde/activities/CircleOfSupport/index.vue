@@ -1,6 +1,5 @@
 <template>
   <div class="cos">
-    <button @click="updateConnection">Update connection</button>
     <connections
       class="connections"
       :connections="cos.connections"
@@ -29,6 +28,7 @@ export default {
             name: "School",
             icon: "🎓",
             color: "#A1BCFC",
+            connections: ["abc"],
           },
         },
         connections: {
@@ -43,7 +43,6 @@ export default {
             avatar: "😊",
           },
         },
-        members: {},
       },
     }
   },
@@ -52,9 +51,11 @@ export default {
     this.cos = latestCosVersion
   }, */
   methods: {
-    async addConnection({ community, ...newConnection }) {
-      if (community) {
-        this.$set(this.cos.members, newConnection.id, community)
+    async addConnection({ community: communityId, ...newConnection }) {
+      if (communityId) {
+        const community = this.communities[communityId]
+        community.connections.push(newConnection.id)
+        this.communities[communityId] = { ...community }
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },
