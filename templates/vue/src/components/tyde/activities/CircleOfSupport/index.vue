@@ -1,11 +1,11 @@
 <template>
   <div class="cos">
-    <button @click="addConnection">Add connection</button>
     <button @click="updateConnection">Update connection</button>
     <connections
       class="connections"
       :connections="cos.connections"
       :communities="cos.communities"
+      @add-connection="addConnection"
     />
   </div>
 </template>
@@ -52,7 +52,8 @@ export default {
     this.cos = latestCosVersion
   }, */
   methods: {
-    async addConnection({ ...newConnection }) {
+    async addConnection({ community, ...newConnection }) {
+      console.log(community)
       const connection = await client.cos.addConnection(newConnection)
       this.$set(this.cos.connections, connection.id, connection)
     },

@@ -13,6 +13,8 @@
         v-if="state === states.ADD"
         class="form"
         :communities="communities"
+        @back="state = states.OPEN"
+        @add-connection="$emit('add-connection', $event)"
       />
       <ul v-else>
         <li v-for="connection in connections" :key="connection.id">

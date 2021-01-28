@@ -1,7 +1,12 @@
 <template>
   <form>
     <div class="connection" style="flex: 1">
-      <input v-model="connection.name" type="text" placeholder="connection" />
+      <input
+        v-model="connection.name"
+        class="connection-name"
+        type="text"
+        placeholder="connection"
+      />
       <div id="emoji-picker" style="position: relative">
         <button class="preview" @click="showPicker = !showPicker">
           {{ connection.avatar }}
@@ -11,16 +16,38 @@
         </div>
       </div>
       <div class="controls">
-        <button>Cancel</button>
-        <button class="submit">Add connection</button>
+        <button @click="$emit('back')">Cancel</button>
+        <button class="submit" @click="$emit('add-connection', connection)">
+          Add connection
+        </button>
       </div>
     </div>
     <div class="community" style="flex: 2">
       <h1 class="community-title">Which communities do this person belong to?</h1>
-      <ul>
+      <ul class="community-list">
         <li v-for="community in communities" :key="community.id">
-          <button>
-            {{ community.name }}
+          <button
+            :class="[
+              'community-item',
+              { selected: community.id === connection.community },
+            ]"
+            :style="`color: ${community.color}`"
+            @click="connection.community = community.id"
+          >
+            <span class="community-color"></span>
+            <span class="community-name">
+              {{ community.name }}
+            </span>
+          </button>
+        </li>
+        <li v-if="Object.keys(communities).length < 10">
+          <button class="community-item">
+            <span class="community-color" style="color: var(--cos-color-tertiary)">
+              <tapestry-icon icon="plus" />
+            </span>
+            <span class="community-name" style="color: var(--cos-color-tertiary)">
+              Add new
+            </span>
           </button>
         </li>
       </ul>
@@ -30,10 +57,13 @@
 
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
+import TapestryIcon from "@/components/common/TapestryIcon"
 
+// TODO: Implement navigation to add community
 export default {
   components: {
     VEmojiPicker,
+    TapestryIcon,
   },
   props: {
     communities: {
@@ -46,6 +76,7 @@ export default {
       connection: {
         name: "",
         avatar: "😊",
+        community: "",
       },
       showPicker: false,
     }
@@ -88,24 +119,76 @@ button {
   color: inherit;
 }
 
-input {
+.connection-name {
   font-size: 1.5rem;
   text-align: center;
   text-transform: uppercase;
   display: block;
+  font-weight: 500;
 }
 
 .community {
   border: var(--cos-border);
   border-radius: 1.5rem;
-  padding: 1rem;
+  padding: 1rem 2rem 1rem 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .community-title {
   font-size: 1.5rem;
   font-weight: 400;
   color: #7f88af;
+  margin-bottom: 2rem;
+}
+
+.community-list {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  row-gap: 1rem;
+  column-gap: 3rem;
+}
+
+.community-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  column-gap: 1.5rem;
+}
+
+.community-item:hover .community-color {
+  background: currentColor;
+}
+
+.community-item.selected .community-color {
+  background: currentColor;
+}
+
+.community-color {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid currentColor;
+  height: 100%;
+  width: 4rem;
+  border-top-right-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+}
+
+.community-name {
+  display: block;
+  border: 1px solid var(--cos-color-tertiary);
+  width: 100%;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: black;
+  font-size: 1.25rem;
 }
 
 .connection {
@@ -119,11 +202,6 @@ input {
 .preview {
   font-size: 12rem;
   line-height: 1;
-  transition: transform 0.2s ease-out;
-}
-
-.preview:hover {
-  transform: translateY(1rem);
 }
 
 .picker {
@@ -144,6 +222,11 @@ input {
   border: var(--cos-border);
   border-radius: 0.5rem;
   padding: 0.5rem;
+}
+
+.submit:hover {
+  background: var(--cos-color-secondary);
+  color: white;
 }
 </style>
 
