@@ -9,4 +9,3 @@ data/
 bin/config.sh
 
 fixtures/data
-fixtures/*.tar.gz
