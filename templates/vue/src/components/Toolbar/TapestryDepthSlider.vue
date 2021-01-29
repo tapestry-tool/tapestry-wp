@@ -26,6 +26,7 @@ import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 export default {
   computed: {
@@ -106,6 +107,9 @@ export default {
         } else {
           this.updateNodeTypes()
         }
+        client.recordAnalyticsEvent("user", "adjust", "depth", null, {
+          depth: depth,
+        })
       },
     },
     levels: {
