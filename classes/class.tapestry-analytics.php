@@ -11,6 +11,7 @@ class TapestryAnalytics implements ITapestryAnalytics
     private $cookieName = 'tapestry_guid';
     private $tableNameNoPrefix = 'tapestry_analytics_events';
 
+    private $userID = '';
     private $userUUID = '';
     private $tableName = '';
 
@@ -24,6 +25,7 @@ class TapestryAnalytics implements ITapestryAnalytics
         global $wpdb;
         $this->tableName = $wpdb->prefix.$this->tableNameNoPrefix;
         $this->userUUID = $this->getUserUUID();
+        $this->userID = apply_filters('determine_current_user', false);
     }
 
     /**
@@ -35,6 +37,10 @@ class TapestryAnalytics implements ITapestryAnalytics
      */
     public function log($data)
     {
+        if ($this->userID) {
+            $data['actor'] .= '-'.$this->userID;
+        }
+
         global $wpdb;
         $success = $wpdb->insert(
             $this->tableName,
