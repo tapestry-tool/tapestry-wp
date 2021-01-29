@@ -204,6 +204,15 @@
               </b-col>
             </b-row>
           </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Enable analytics"
+            description="When enabled, analytics such as mouse clicks will be saved."
+          >
+            <b-form-checkbox v-model="analyticsEnabled" switch>
+              {{ analyticsEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -301,6 +310,7 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      analyticsEnabled: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -372,6 +382,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        analyticsEnabled = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -383,6 +394,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.analyticsEnabled = analyticsEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -396,6 +408,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        analyticsEnabled: this.analyticsEnabled,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)

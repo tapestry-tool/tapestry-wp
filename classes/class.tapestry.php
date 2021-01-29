@@ -94,6 +94,9 @@ class Tapestry implements ITapestry
         }
         if (isset($tapestry->settings) && is_object($tapestry->settings)) {
             $this->settings = $tapestry->settings;
+            if (!isset($this->settings->analyticsEnabled)) {
+                $this->settings->analyticsEnabled = false;
+            }
         }
     }
 
@@ -462,6 +465,7 @@ class Tapestry implements ITapestry
         $settings->showRejected = false;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
+        $settings->analyticsEnabled = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
