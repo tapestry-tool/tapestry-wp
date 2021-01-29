@@ -21,10 +21,10 @@
 
 <script>
 import axios from "axios"
+import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./ActivityScreen/TapestryActivity"
 import GravityFormsApi from "@/services/GravityFormsApi"
-import client from "@/services/TapestryAPI"
 import { data } from "@/services/wp"
 
 export default {

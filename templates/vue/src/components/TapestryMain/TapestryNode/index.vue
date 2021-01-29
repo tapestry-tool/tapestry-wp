@@ -169,6 +169,7 @@ import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import { tydeTypes } from "@/utils/constants"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 import { nodeStatus } from "@/utils/constants"
 import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
@@ -442,9 +443,11 @@ export default {
     },
     openNode(id) {
       this.$root.$emit("open-node", id)
+      client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
+      client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
     },
     reviewNode() {
       this.$router.push({
@@ -452,6 +455,12 @@ export default {
         params: { nodeId: this.node.id },
         query: { ...this.$route.query, sidebar: "review" },
       })
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "review-node-button",
+        this.node.id
+      )
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -473,6 +482,7 @@ export default {
           ? this.updateSelectedModule(this.node.id)
           : this.openNode(this.node.id)
       }
+      client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
     },
     handleMouseover() {
       this.isHovered = true
@@ -499,6 +509,7 @@ export default {
           ? this.handleRequestOpen()
           : this.updateRootNode()
       }
+      client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)

@@ -28,6 +28,7 @@
       @is-loaded="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = allowEndScreen"
+      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateSettings"
     />
   </div>
@@ -35,11 +36,11 @@
 
 <script>
 import { mapActions, mapState } from "vuex"
+import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
 import EndScreen from "../common/EndScreen"
 import H5PIframe from "./H5PIframe"
 import ActivityScreen from "../common/ActivityScreen"
-import client from "@/services/TapestryAPI"
 
 export default {
   name: "h5p-media",
