@@ -11,6 +11,7 @@ const mockCos = {
       name: "School",
       icon: "🎓",
       color: "#A1BCFC",
+      connections: ["abc"],
     },
   },
   connections: {
