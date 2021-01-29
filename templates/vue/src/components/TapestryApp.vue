@@ -55,6 +55,7 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
+    client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),

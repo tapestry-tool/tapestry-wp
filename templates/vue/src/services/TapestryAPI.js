@@ -264,7 +264,11 @@ class TapestryApi {
       return false
     }
 
-    // TODO: Also need to save the tapestry slug or ID in the events
+    if (objectID) {
+      objectID = "" + this.postId + ":" + objectID
+    } else {
+      objectID = this.postId
+    }
 
     // details["user-ip"] = document.getElementById("user-ip").innerText
     var params = new URLSearchParams()

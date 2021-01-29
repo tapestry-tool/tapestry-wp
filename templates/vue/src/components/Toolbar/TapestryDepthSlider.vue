@@ -98,7 +98,7 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function(depth) {
+      handler: function(depth, oldDepth) {
         if (depth > this.maxDepth) {
           this.$router.replace({
             ...this.$route,
@@ -107,9 +107,12 @@ export default {
         } else {
           this.updateNodeTypes()
         }
-        client.recordAnalyticsEvent("user", "adjust", "depth", null, {
-          depth: depth,
-        })
+        if (oldDepth && depth != oldDepth) {
+          client.recordAnalyticsEvent("user", "adjust", "depth", null, {
+            from: oldDepth,
+            to: depth,
+          })
+        }
       },
     },
     levels: {
