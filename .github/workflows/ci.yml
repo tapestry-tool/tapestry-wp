@@ -40,14 +40,20 @@ jobs:
         run: bash ./bin/await-containers.sh
       - name: Setup WP
         run: sh ./bin/install.sh
+      - name: Stop containers
+        run: dock-compose down
       - name: Setup link preview config
         working-directory: templates/vue
         env:
           LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
         run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
+      - name: Load fixtures:
+        run: bash ./bin/load-fixture.bash h5p_content
+      - name: Launch containers with fixtures
+        run: docker-compose --env-file ./fixtures/.env up -d
       - name: Change content directory ownership
         working-directory: data/wp
-        run: sudo chown www-data:www-data wp-content
+        run: sudo chown www-data:www-data wp-content fixtures/uploads
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
