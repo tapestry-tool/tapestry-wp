@@ -41,7 +41,7 @@ jobs:
       - name: Setup WP
         run: sh ./bin/install.sh
       - name: Stop containers
-        run: dock-compose down
+        run: docker-compose down
       - name: Setup link preview config
         working-directory: templates/vue
         env:
@@ -53,7 +53,10 @@ jobs:
         run: docker-compose --env-file ./fixtures/.env up -d
       - name: Change content directory ownership
         working-directory: data/wp
-        run: sudo chown www-data:www-data wp-content fixtures/uploads
+        run: sudo chown www-data:www-data wp-content
+      - name: Change fixture uploads directory ownership
+        working-directory: fixtures
+        run: sudo chown www-data:www-data uploads
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
