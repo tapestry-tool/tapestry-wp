@@ -159,12 +159,12 @@ Cypress.Commands.add("openModal", (type, id) => {
   }
 })
 
-Cypress.Commands.add("submitModal", () => {
+Cypress.Commands.add("submitModal", (timeout = 10000) => {
   cy.server()
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   cy.getByTestId("submit-node-modal").click()
-  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
+  cy.getByTestId("node-modal", { timeout: timeout }).should("not.be.visible")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
