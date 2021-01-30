@@ -32,6 +32,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - name: Launch containers
         run: docker-compose up -d
       - name: Wait for containers to be ready
