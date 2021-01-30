@@ -4,7 +4,7 @@
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-user-roles.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 
 /**
  * Add/update/retrieve User progress.
@@ -42,7 +42,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
         $tapestry = new Tapestry($this->postId);
         $nodeIds = $tapestry->getNodeIds();
-        $roles = new TapestryUserRoles();
+        $roles = new TapestryUser();
 
         if (!$roles->isRole('copilot')) {
             return $this->_getUserProgress($nodeIds, $this->_userId);

@@ -11,7 +11,8 @@ require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
 require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
-require_once __DIR__.'/utilities/class.tapestry-user-roles.php';
+require_once __DIR__.'/classes/class.constants.php';
+require_once __DIR__.'/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -26,6 +27,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'addTapestryNode',
+        ],
+    ],
+    'POST_TAPESTRY_NODE_REVIEW' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/review',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'addTapestryNodeReview',
         ],
     ],
     'POST_TAPESTRY' => (object) [
@@ -106,13 +114,6 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestryNodeSize',
-        ],
-    ],
-    'PUT_TAPESTRY_NODE_PERMISSIONS' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/permissions',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_PUT_METHOD,
-            'callback' => 'updateTapestryNodePermissions',
         ],
     ],
     'PUT_TAPESTRY_NODE_DESCRIPTION' => (object) [
@@ -297,6 +298,14 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
             'callback' => 'get_all_user_roles',
+        ],
+    ],
+    'OPTIMIZE_THUMBNAILS' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'optimizeTapestryNodeThumbnails',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
 ];
@@ -591,13 +600,65 @@ function addTapestryNode($request)
         $tapestry = new Tapestry($postId);
 
         if ($tapestry->isEmpty()) {
-            $roles = new TapestryUserRoles();
-            if (!$roles->canEdit($postId)) {
+            $user = new TapestryUser();
+            if (!$user->canEdit($postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
         }
 
         return $tapestry->addNode($node, $parentId);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Add a review to a Tapestry node. A review is either a comment or a change of
+ * node status.
+ *
+ * Request Body
+ * --
+ * Accepts a review object in the request body, of shape:
+ * ```
+ * {
+ *  type: COMMENT | STATUS_CHANGE
+ *  timestamp: string // current datetime in ISO8601 format
+ *  ...data // varies by type of review
+ * }
+ * ```
+ *
+ * Access
+ * --
+ * - If the current user has Tapestry edit privileges, any review type is allowed.
+ * - If the current user is the author of the node, only comments are allowed.
+ * - Otherwise, the user is not allowed to review this node.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object HTTP response
+ */
+function addTapestryNodeReview($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+    $review = json_decode($request->get_body());
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (!isset($review->comments) || !is_array($review->comments)) {
+            throw new TapestryError('INVALID_REVIEW', 'A review should have an array of comments', 400);
+        }
+
+        $tapestry = new Tapestry($postId);
+        $node = $tapestry->getNode($nodeMetaId);
+        return $node->addReview($review->comments);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -685,7 +746,7 @@ function deleteTapestryLink($request)
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
-        } 
+        }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
             if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
@@ -693,7 +754,7 @@ function deleteTapestryLink($request)
             if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
                 throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
             }
-        }        
+        }
         $tapestry = new Tapestry($postId);
 
         return $tapestry->removeLink($link);
@@ -847,46 +908,7 @@ function updateTapestryNodeSize($request)
 }
 
 /**
- * Update Tapestry Node Permissions.
- *
- * @param object $request HTTP request
- *
- * @return object $response   HTTP response
- */
-function updateTapestryNodePermissions($request)
-{
-    $postId = $request['tapestryPostId'];
-    $nodeMetaId = $request['nodeMetaId'];
-    $permissions = json_decode($request->get_body());
-    // TODO: JSON validations should happen here
-    // make sure the permissions body exists and not null
-    try {
-        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-            throw new TapestryError('INVALID_POST_ID');
-        }
-        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-            throw new TapestryError('INVALID_NODE_META_ID');
-        }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-        }
-        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-            throw new TapestryError('INVALID_CHILD_NODE');
-        }
-
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
-
-        $node->set((object) ['permissions' => $permissions]);
-
-        return $node->save();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-/**
- * Update Tapestry Node Permissions.
+ * Update Tapestry Node Description.
  *
  * @param object $request HTTP request
  *
@@ -1035,6 +1057,44 @@ function updateTapestryNodeLockedImageURL($request)
         $node->set((object) ['lockedImageURL' => $imageURL]);
 
         return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+// takes an old thumbnail and optimizes it
+function optimizeTapestryNodeThumbnails($request)
+{
+    $postId = $request['tapestryPostId'];
+
+    // TODO: JSON validations should happen here
+    // make sure the permissions body exists and not null
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        $tapestry = new Tapestry($postId);
+
+        foreach ($tapestry->getNodeIds() as $nodeMetaId) {
+            $node = $tapestry->getNode($nodeMetaId);
+            $nodeData = $node->get();
+            $protocol = is_ssl() ? "https:" : "http:";
+    
+            if ($nodeData->imageURL) {
+                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
+                $node->set((object) ['thumbnailFileId' => $attachmentId]);
+                $node->save();
+            }
+            if ($nodeData->lockedImageURL) {
+                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
+                $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
+                $node->save();
+            }
+        }
+        return true;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
@@ -1373,10 +1433,10 @@ function updateUserFavourites($request)
 function getTapestryContributors($request)
 {
     $postId = $request['tapestryPostId'];
-    $roles = new TapestryUserRoles();
+    $user = new TapestryUser();
 
     try {
-        if (!$roles->canEdit($postId)) {
+        if (!$user->canEdit($postId)) {
             throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
@@ -1386,3 +1446,4 @@ function getTapestryContributors($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
+
