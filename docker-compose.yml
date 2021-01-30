@@ -8,6 +8,7 @@ services:
     volumes:
       - ./config/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini
       - ./data/wp:/var/www/html # Full wordpress project
+      - ./fixtures/uploads:/var/www/html/wp-content/uploads
       - ./:/var/www/html/wp-content/plugins/tapestry-wp
     environment:
       WORDPRESS_DB_HOST: db

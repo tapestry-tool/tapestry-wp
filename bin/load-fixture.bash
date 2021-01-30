@@ -1,5 +1,5 @@
 FIXTURE_DIR="./fixtures"
-FIXTURE_DATA="$FIXTURE_DIR/data"
+FIXTURE_DATA="$FIXTURE_DIR/data $FIXTURE_DIR/uploads"
 NAME=$1
 FILE="$NAME.tar.gz"
 if [[ -z "$NAME" ]]; then
