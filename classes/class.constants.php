@@ -14,3 +14,18 @@ class TydeTypes
     const STAGE = 'Stage';
     const QUESTION_SET = 'Question set';
 }
+
+class NodeStatus
+{
+    const PUBLISH = 'publish';
+    const DRAFT = 'draft';
+    const SUBMIT = 'submitted';
+    const REJECT = 'rejected';
+    const ACCEPT = 'accepted';
+}
+
+class CommentTypes
+{
+    const COMMENT = 'Comment';
+    const STATUS_CHANGE = 'StatusChange';
+}

@@ -5,7 +5,7 @@ const cli = new CLIEngine({
   fix: true,
 })
 
-const report = cli.executeOnFiles(["src/"])
+const report = cli.executeOnFiles(["src/", "cypress/"])
 const hasFixes = report.results.some(result => result.output)
 const hasErrors = report.results.some(result => result.errorCount)
 
