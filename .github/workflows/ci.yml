@@ -53,6 +53,8 @@ jobs:
         run: bash ./bin/load-fixture.bash h5p_content
       - name: Launch containers with fixtures
         run: docker-compose --env-file ./fixtures/.env up -d
+      - name: View container logs
+        run: docker-compose logs
       - name: Change content directory ownership
         working-directory: data/wp
         run: sudo chown www-data:www-data wp-content
