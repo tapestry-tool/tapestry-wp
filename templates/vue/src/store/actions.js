@@ -45,7 +45,6 @@ export async function addNode(
         [getters.yOrFy]: nodeToAdd.coordinates.y,
       },
     })
-    dispatch("updateNodePermissions", { id, permissions: nodeToAdd.permissions })
     return id
   } catch (error) {
     dispatch("addApiError", error)
@@ -74,9 +73,6 @@ export async function updateNode({ commit, dispatch, getters }, payload) {
           [getters.yOrFy]: newNode.coordinates.y,
         },
       })
-    }
-    if (newNode.permissions) {
-      dispatch("updateNodePermissions", { id, permissions: newNode.permissions })
     }
     return id
   } catch (error) {
@@ -211,14 +207,6 @@ async function unlockNodes({ commit, getters, dispatch }) {
   }
 }
 
-export function updateNodePermissions({ dispatch }, payload) {
-  try {
-    client.updatePermissions(payload.id, JSON.stringify(payload.permissions))
-  } catch (error) {
-    dispatch("addApiError", error)
-  }
-}
-
 export async function deleteNode({ commit, dispatch }, id) {
   try {
     await client.deleteNode(id)
@@ -255,6 +243,18 @@ export async function saveAudio(
       entry: { audio },
       nodeId,
       questionId,
+    })
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function reviewNode({ commit, dispatch }, { id, comments }) {
+  try {
+    const updates = await client.reviewNode(id, comments)
+    commit("updateNode", {
+      id,
+      newNode: updates.data,
     })
   } catch (error) {
     dispatch("addApiError", error)
@@ -341,4 +341,8 @@ export async function refetchTapestryData(
 export function addApiError({ commit }, error) {
   const message = ErrorHelper.getErrorMessage(error)
   commit("addApiError", { error: message })
+}
+
+export function setTapestryErrorReporting({ commit }, isEnabled) {
+  commit("setTapestryErrorReporting", isEnabled)
 }

@@ -1,7 +1,9 @@
 import "@testing-library/jest-dom"
+import { configure } from "@testing-library/vue"
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueYouTubeEmbed from "vue-youtube-embed"
+import vSelect from "vue-select"
 
 /**
  * JSDom, the "fake" DOM used by the Jest tests, doesn't have a script tag
@@ -9,7 +11,17 @@ import VueYouTubeEmbed from "vue-youtube-embed"
  */
 document.body.appendChild(document.createElement("script"))
 
+configure({
+  testIdAttribute: "data-qa",
+})
+
+Vue.component("v-select", vSelect)
+
 Vue.use(VueYouTubeEmbed)
 Vue.use(BootstrapVue)
 
 jest.mock("@/services/wp")
+
+configure({
+  testIdAttribute: "data-qa",
+})

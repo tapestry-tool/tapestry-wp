@@ -1,4 +1,5 @@
 import "cypress-file-upload"
+import "@testing-library/cypress/add-commands"
 import roles from "./roles"
 import { deepMerge } from "./utils"
 import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
@@ -42,7 +43,7 @@ Cypress.Commands.add("deleteTapestry", (title = TEST_TAPESTRY_NAME) => {
 
 Cypress.Commands.add("visitTapestry", () => {
   cy.visit(`/tapestry/${TEST_TAPESTRY_NAME}`)
-  cy.contains(/loading/i).should("not.exist")
+  cy.getByTestId("tapestry-loading").should("not.exist")
 })
 
 // -- Nodes --
@@ -60,13 +61,13 @@ Cypress.Commands.add("getSelectedNode", () =>
 
 Cypress.Commands.add("addNode", { prevSubject: false }, (parent, node) => {
   cy.server()
-  cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
+  cy.route("POST", `**/nodes*`).as("addNode")
   cy.store().then(store => {
     store.dispatch("addNode", {
       newNode: deepMerge(store.getters.createDefaultNode(), node),
       parentId: parent,
     })
-    cy.wait("@editPermissions")
+    cy.wait("@addNode")
     cy.getNodeByTitle(node.title).then(({ id }) => {
       store.commit("updateVisibleNodes", [...store.state.visibleNodes, id])
       if (parent) {
@@ -184,6 +185,10 @@ Cypress.Commands.add("changeMediaType", type =>
 )
 
 // -- Utils --
+
+Cypress.Commands.add("sidebar", () => cy.getByTestId("sidebar"))
+
+Cypress.Commands.add("app", () => cy.window().its("app"))
 
 Cypress.Commands.add("store", () => cy.window().its("app.$store"))
 

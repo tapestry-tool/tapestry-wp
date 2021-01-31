@@ -25,7 +25,20 @@ export const data = {
   ...Object.fromEntries(props.map(prop => [prop, ""])),
   apiUrl: "testing",
   postId: 0,
-  roles: ["administrator", "subscriber", "editor"],
+  nonce: "my_nonce",
+  currentUser: {
+    ID: "1",
+    roles: ["administrator"],
+  },
+  roles: [
+    {
+      administrator: "Administrator",
+      author: "Author",
+      contributor: "Contributor",
+      editor: "Editor",
+      subscriber: "Subscriber",
+    },
+  ],
 }
 
 export const getCurrentUser = jest.fn().mockReturnValue({
@@ -38,3 +51,5 @@ export const getCurrentUser = jest.fn().mockReturnValue({
 export const isLoggedIn = jest.fn().mockReturnValue(true)
 
 export const canEditTapestry = jest.fn().mockReturnValue(true)
+
+export const canReview = jest.fn().mockReturnValue(true)
