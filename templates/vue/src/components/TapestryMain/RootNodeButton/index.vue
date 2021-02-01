@@ -130,32 +130,37 @@ export default {
       }
       reader.readAsText(file)
     },
+    filterImportedPerms(permissions, wp_roles) {
+      let filteredPerms = permissions
+      filteredPerms = Object.keys(permissions)
+        // only keep roles that exist in the current site
+        .filter(key => wp_roles.has(key))
+        // create new permissiones object with filtered roles
+        .reduce((obj, key) => {
+          return {
+            ...obj,
+            [key]: permissions[key],
+          }
+        }, {})
+      // if permissions modified, add the role to changes
+      for (let key in permissions) {
+        if (!Object.keys(filteredPerms).includes(key)) {
+          this.changes.permissions.add(key)
+          this.changes.noChange = false
+        }
+      }
+      return filteredPerms
+    },
     async prepareImport(data) {
       let wp_roles = await client.getAllRoles()
       for (let node of data.nodes) {
-        const originalPerms = node.permissions
-        node.permissions = Object.keys(node.permissions)
-          .filter(key => wp_roles.has(key))
-          .reduce((obj, key) => {
-            return {
-              ...obj,
-              [key]: node.permissions[key],
-            }
-          }, {})
-        const keys = Object.keys(node.permissions)
-        for (let key in originalPerms) {
-          if (!keys.includes(key)) {
-            this.changes.permissions.add(key)
-          }
-        }
-        if (node.permissionsOrder) {
-          node.permissionsOrder = node.permissionsOrder.filter(role =>
-            wp_roles.has(role)
-          )
-        }
-        if (this.changes.permissions.size > 0) {
-          this.changes.noChange = false
-        }
+        node.permissions = this.filterImportedPerms(node.permissions, wp_roles)
+      }
+      if (data.settings) {
+        data.settings.defaultPermissions = this.filterImportedPerms(
+          data.settings.defaultPermissions,
+          wp_roles
+        )
       }
     },
     validateTapestryJSON(upload) {
