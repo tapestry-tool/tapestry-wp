@@ -276,6 +276,7 @@ ul {
 
 .form {
   width: 100%;
+  grid-column: 1 / -1;
 }
 
 .debug {
