@@ -2,7 +2,8 @@ import axios from "axios"
 import Helpers from "../utils/Helpers"
 import { data } from "./wp"
 
-const { apiUrl, nonce, postId } = data
+const { apiUrl, nonce, postId, adminAjaxUrl } = data
+var analyticsEnabled
 
 class TapestryApi {
   /**
@@ -61,6 +62,12 @@ class TapestryApi {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  async getTapestryExport() {
+    const url = `${apiUrl}/tapestries/${this.postId}/export`
+    const response = await axios.get(url)
+    return response.data
   }
 
   async getNode(id) {
@@ -242,30 +249,38 @@ class TapestryApi {
     return response.data
   }
 
+  enableAnalytics(enable) {
+    analyticsEnabled = enable
+  }
+
   async recordAnalyticsEvent(actor, action, object, objectID, details = {}) {
-    const analyticsAJAXUrl = "" // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
+    if (!analyticsEnabled) {
+      return
+    }
+    const analyticsAJAXUrl = adminAjaxUrl // e.g. '/wp-admin/admin-ajax.php' (set to empty string to disable analytics)
     const analyticsAJAXAction = "tapestry_tool_log_event" // Analytics
 
     if (!analyticsAJAXUrl.length || !analyticsAJAXAction.length) {
       return false
     }
 
-    // TODO: Also need to save the tapestry slug or ID in the events
-
-    details["user-ip"] = document.getElementById("user-ip").innerText
-
-    const data = {
-      action: analyticsAJAXAction,
-      actor: actor,
-      action2: action,
-      object: object,
-      user_guid: Helpers.createUUID(),
-      object_id: objectID,
-      details: JSON.stringify(details),
+    if (objectID) {
+      objectID = "" + this.postId + ":" + objectID
+    } else {
+      objectID = this.postId
     }
 
+    // details["user-ip"] = document.getElementById("user-ip").innerText
+    var params = new URLSearchParams()
+    params.append("action", analyticsAJAXAction)
+    params.append("actor", actor)
+    params.append("action2", action)
+    params.append("object", object)
+    params.append("object_id", objectID)
+    params.append("details", JSON.stringify(details))
+
     // Send the event to an AJAX URL to be saved
-    await this.client.post(analyticsAJAXUrl, data)
+    await this.client.post(analyticsAJAXUrl, params)
   }
 
   async reviewNode(id, comments) {
