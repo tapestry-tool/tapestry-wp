@@ -135,8 +135,9 @@ class Tapestry implements ITapestry
     {
         $tapestryNode = new TapestryNode($this->postId);
 
-        // Check if user is logged in to prevent logged out user-0 from getting permissions
-        if (is_user_logged_in()) {
+        // Checks if user is logged in to prevent logged out user-0 from getting permissions
+        // Only add user permissions if it is not a review node
+        if (is_user_logged_in() && count($node->reviewComments) === 0) {
             $userId = wp_get_current_user()->ID;
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }

@@ -219,9 +219,9 @@ class TapestryHelpers
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $user = new TapestryUser($userId);
 
-        // If user is author and node is in review, user is not allowed to edit node
-        $inReview = isset($node->reviewStatus);
-        if ($action === "EDIT" && $inReview && $user->isAuthorOfThePost($nodePostId)) {
+        // If user is author and node is submitted or accepted, user is not allowed to edit node
+        $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
+        if ($action === "EDIT" && $isEditableReviewStatus && $user->isAuthorOfThePost($nodePostId)) {
             return false;
         }
 
