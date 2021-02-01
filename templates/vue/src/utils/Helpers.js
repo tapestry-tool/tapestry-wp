@@ -188,7 +188,6 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
-    // Check 2: User submitted node, can't edit, but can move
     if (node.author && wp.isCurrentUser(node.author.id) && action == "move") {
       if (node.reviewStatus !== nodeStatus.ACCEPT) {
         return true
