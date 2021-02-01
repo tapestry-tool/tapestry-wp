@@ -26,6 +26,7 @@ import ZoomIn from "@/assets/zoom-in.png"
 import ZoomOut from "@/assets/zoom-out.png"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 export default {
   computed: {
@@ -97,7 +98,7 @@ export default {
   watch: {
     currentDepth: {
       immediate: true,
-      handler: function(depth) {
+      handler: function(depth, oldDepth) {
         if (depth > this.maxDepth) {
           this.$router.replace({
             ...this.$route,
@@ -105,6 +106,12 @@ export default {
           })
         } else {
           this.updateNodeTypes()
+        }
+        if (oldDepth && depth != oldDepth) {
+          client.recordAnalyticsEvent("user", "adjust", "depth", null, {
+            from: oldDepth,
+            to: depth,
+          })
         }
       },
     },

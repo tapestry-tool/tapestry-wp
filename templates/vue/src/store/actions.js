@@ -204,6 +204,14 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
+export async function getTapestryExport({ dispatch }) {
+  try {
+    return await client.getTapestryExport()
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeQuestion(
   { commit, dispatch },
   { answerType, formId, nodeId, questionId }
