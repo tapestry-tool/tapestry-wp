@@ -1,14 +1,14 @@
 <template>
   <div data-qa="end-screen" class="end-screen">
-    <button v-if="showQuizButton" @click="$emit('show-quiz')">
+    <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
       <i class="fas fa-question-circle fa-4x"></i>
       <p>{{ buttonText }}</p>
     </button>
-    <button @click="$emit('rewatch')">
+    <button @click="handleClick($event, 'rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
     </button>
-    <button @click="$emit('close')">
+    <button @click="handleClick($event, 'close')">
       <i class="far fa-times-circle fa-4x"></i>
       <p>Close</p>
     </button>
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
+
 export default {
   name: "end-screen",
   props: {
@@ -31,6 +33,15 @@ export default {
     buttonText() {
       const allDone = this.node.quiz.every(question => question.completed)
       return allDone ? "Reanswer Question" : "Answer Question"
+    },
+  },
+  methods: {
+    handleClick(evt, type) {
+      client.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
+        x: evt.clientX,
+        y: evt.clientY,
+      })
+      this.$emit(type)
     },
   },
 }

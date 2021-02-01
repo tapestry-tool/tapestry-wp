@@ -26,6 +26,7 @@ import * as d3 from "d3"
 import { mapActions, mapGetters, mapState } from "vuex"
 import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
+import client from "@/services/TapestryAPI"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import NodeButton from "./NodeButton"
 
@@ -140,6 +141,7 @@ export default {
         params: { nodeId: this.node.id, type: "add", tab: "content" },
         query: this.$route.query,
       })
+      client.recordAnalyticsEvent("user", "click", "edit-node-button", this.node.id)
     },
   },
 }
