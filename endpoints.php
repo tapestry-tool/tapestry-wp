@@ -1114,9 +1114,7 @@ function updateTapestryNodeCoordinates($request)
             throw new TapestryError('INVALID_NODE_META_ID');
         }
         if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            if (TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
-               // Authors are allowed to move their nodes but not edit after submission
-            } else {
+            if (!TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
                 throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
             }
         }
@@ -1403,4 +1401,3 @@ function getTapestryContributors($request)
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
-
