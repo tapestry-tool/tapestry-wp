@@ -7,6 +7,15 @@ import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
   if (fixture) {
     cy.get(fixture).then(tapestry => {
+      // Add copilot permissions for Tyde
+      for (let node of tapestry.nodes) {
+        if (node.hasOwnProperty("permissions") && !node.permissions.hasOwnProperty("copilot")) {
+          node.permissions.copilot = ["read"]
+        }
+        if (node.hasOwnProperty("permissionsOrder") && !node.permissionsOrder.includes("copilot")) {
+          node.permissionsOrder.push("copilot")
+        }
+      }
       cy.addTapestry(tapestry)
     })
   } else {
