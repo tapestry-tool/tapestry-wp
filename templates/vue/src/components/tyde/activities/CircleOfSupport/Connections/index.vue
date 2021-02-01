@@ -5,18 +5,31 @@
       <tapestry-icon v-else icon="chevron-down" />
     </button>
     <div class="content">
-      <div v-if="state === states.OPEN" class="controls">
-        <button
-          class="content-control"
-          aria-label="search"
-          @click="state = states.SEARCH"
-        >
-          <tapestry-icon icon="search" />
+      <button
+        v-if="state !== states.SEARCH && state !== states.ADD"
+        class="content-control"
+        aria-label="search"
+        @click="state = states.SEARCH"
+      >
+        <tapestry-icon icon="search" />
+      </button>
+      <div v-if="state === states.SEARCH" class="searchbar">
+        <label id="search-label" style="display: none;">
+          Search for a connection
+        </label>
+        <button aria-label="close search" @click="state = states.OPEN">
+          <tapestry-icon icon="times" />
         </button>
-        <button class="content-control" aria-label="add" @click="state = states.ADD">
-          <tapestry-icon icon="plus" />
-        </button>
+        <input v-model="search" aria-labelledby="search-label" type="text" />
       </div>
+      <button
+        v-if="state !== states.ADD"
+        class="content-control"
+        aria-label="add connection"
+        @click="state = states.ADD"
+      >
+        <tapestry-icon icon="plus" />
+      </button>
       <add-connection-form
         v-if="state === states.ADD"
         class="form"
@@ -24,9 +37,12 @@
         @back="state = states.OPEN"
         @add-connection="addConnection"
       />
-      <ul v-else class="connection-list">
+      <ul
+        v-else
+        :class="['connection-list', { searching: state === states.SEARCH }]"
+      >
         <li
-          v-for="connection in populatedConnections"
+          v-for="connection in visibleConnections"
           :key="connection.id"
           class="connection"
         >
@@ -46,6 +62,7 @@
 </template>
 
 <script>
+import { matchSorter } from "match-sorter"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddConnectionForm from "./AddConnectionForm"
 
@@ -74,17 +91,20 @@ export default {
   data() {
     return {
       state: states.CLOSED,
+      search: "",
     }
   },
   computed: {
     states() {
       return states
     },
-    populatedConnections() {
-      return Object.values(this.connections).map(connection => ({
+    visibleConnections() {
+      const populated = Object.values(this.connections).map(connection => ({
         ...connection,
         communities: this.getCommunities(connection.id),
       }))
+      const matches = matchSorter(populated, this.search, { keys: ["name"] })
+      return matches
     },
   },
   methods: {
@@ -108,15 +128,31 @@ export default {
 ul {
   list-style: none;
   margin: 0;
+  padding: 0;
 }
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.wrapper {
+  height: 80%;
+  z-index: 0;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+
+  &.open {
+    transform: translateY(0);
+  }
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  grid-template-rows: repeat(2, 1fr);
   gap: 1rem;
-  font-size: 6rem;
-  width: 12rem;
+  background: white;
+  position: relative;
+  z-index: 10;
+  padding: 3rem;
+  height: 100%;
+  border-top: 1px solid var(--cos-color-tertiary);
 }
 
 .content-control {
@@ -127,10 +163,20 @@ ul {
   padding: 0;
   display: block;
   border-radius: 1rem;
+  font-size: 6rem;
+  grid-column: 1;
 
   &:hover {
     background: var(--cos-color-tertiary);
     color: white;
+  }
+
+  &[aria-label="search"] {
+    grid-row: 1;
+  }
+
+  &[aria-label="add connection"] {
+    grid-row: 2;
   }
 }
 
@@ -138,10 +184,45 @@ ul {
   width: 100%;
   overflow-x: scroll;
   display: grid;
-  grid-template-rows: repeat(2, 1fr);
-  grid-auto-columns: 10rem;
-  grid-auto-flow: column;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-auto-rows: min-content;
   gap: 1rem;
+  grid-row: 1 / -1;
+
+  &.searching {
+    grid-row: 2 / span 1;
+  }
+}
+
+.searchbar {
+  grid-column: 1 / -1;
+  display: flex;
+  column-gap: 1rem;
+
+  button {
+    width: 12rem;
+    background: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    border-radius: 1rem;
+    color: var(--cos-color-secondary);
+
+    &:hover {
+      background: var(--cos-color-tertiary);
+      color: white;
+    }
+  }
+
+  input {
+    flex: 1;
+    font-size: 4rem;
+    border-radius: 1rem;
+    padding: 1rem 2rem;
+  }
 }
 
 .connection {
@@ -150,6 +231,7 @@ ul {
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
+  height: 12rem;
 
   p {
     padding: 0.25rem;
@@ -190,27 +272,6 @@ ul {
   font-size: 2.5rem;
   transform: translateY(20%);
   z-index: 0;
-}
-
-.wrapper {
-  height: 80%;
-  z-index: 0;
-  transform: translateY(100%);
-  transition: transform 0.3s ease-out;
-
-  &.open {
-    transform: translateY(0);
-  }
-}
-
-.content {
-  display: flex;
-  background: white;
-  position: relative;
-  z-index: 10;
-  padding: 3rem;
-  height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
 }
 
 .form {
