@@ -188,20 +188,20 @@ export default class Helpers {
       return wp.canEditTapestry()
     }
 
-    if (node.author && wp.isCurrentUser(node.author.id) && action == "move") {
-      if (node.reviewStatus !== nodeStatus.ACCEPT) {
-        return true
-      }
-    }
-
     // Checks related to draft nodes
     /**
      * If node is a draft:
+     *  - Allow author to move submitted and rejected nodes
      *  - Allow all actions for original author EXCEPT if the node is submitted for
      *    review
      *  - Allow "read" to reviewers only if the node is submitted for review
      */
     if (node.status === nodeStatus.DRAFT) {
+      if (node.author && wp.isCurrentUser(node.author.id) && action == "move") {
+        if (node.reviewStatus !== nodeStatus.ACCEPT) {
+          return true
+        }
+      }
       if (wp.isCurrentUser(node.author.id)) {
         return action === userActions.READ || node.reviewStatus !== nodeStatus.SUBMIT
       }
