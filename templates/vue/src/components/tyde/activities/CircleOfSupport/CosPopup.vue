@@ -1,7 +1,9 @@
 <template>
   <div :class="['wrapper', { open: isOpen }]">
     <slot name="toggle" :isOpen="isOpen" :toggle="toggle"></slot>
-    <slot name="content"></slot>
+    <div class="content-wrapper">
+      <slot name="content"></slot>
+    </div>
   </div>
 </template>
 
@@ -28,7 +30,17 @@ export default {
   transition: transform 0.3s ease-out;
 
   &.open {
+    z-index: 10;
     transform: translateY(0);
   }
+}
+
+.content-wrapper {
+  background: white;
+  position: relative;
+  z-index: 10;
+  padding: 3rem;
+  height: 100%;
+  border-top: 1px solid var(--cos-color-tertiary);
 }
 </style>

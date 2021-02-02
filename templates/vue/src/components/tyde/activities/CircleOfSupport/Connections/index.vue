@@ -142,12 +142,6 @@ ul {
   grid-template-columns: 6rem 1fr;
   grid-template-rows: repeat(4, 1fr);
   gap: 1rem;
-  background: white;
-  position: relative;
-  z-index: 10;
-  padding: 3rem;
-  height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
 }
 
 .content-control {

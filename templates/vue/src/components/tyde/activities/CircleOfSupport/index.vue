@@ -1,21 +1,24 @@
 <template>
   <div class="cos">
     <connections
-      class="connections"
+      class="tab"
       :connections="cos.connections"
       :communities="cos.communities"
       @add-connection="addConnection"
     />
+    <add-communities class="tab" />
   </div>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
 
+import AddCommunities from "./AddCommunities"
 import Connections from "./Connections"
 
 export default {
   components: {
+    AddCommunities,
     Connections,
   },
   data() {
@@ -83,7 +86,7 @@ export default {
   position: relative;
 }
 
-.connections {
+.tab {
   width: 100%;
   position: absolute;
   left: 0;
