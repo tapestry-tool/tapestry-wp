@@ -1,67 +1,74 @@
 <template>
-  <div :class="['wrapper', { open: state !== states.CLOSED }]">
-    <button class="toggle" aria-label="Connections" @click="toggle">
-      <span v-if="state === states.CLOSED">😊</span>
-      <tapestry-icon v-else icon="chevron-down" />
-    </button>
-    <div class="content">
-      <button
-        v-if="state !== states.ADD"
-        class="content-control"
-        aria-label="search"
-        @click="toggleSearch"
-      >
-        <tapestry-icon icon="search" />
-      </button>
-      <div v-if="state === states.SEARCH" class="searchbar">
-        <label id="search-label" style="display: none;">
-          Search for a connection
-        </label>
-        <input v-model="search" aria-labelledby="search-label" type="text" />
-      </div>
-      <button
-        v-if="state !== states.ADD"
-        class="content-control"
-        aria-label="add connection"
-        @click="state = states.ADD"
-      >
-        <tapestry-icon icon="plus" />
-      </button>
-      <add-connection-form
-        v-if="state === states.ADD"
-        class="form"
-        :communities="communities"
-        @back="state = states.OPEN"
-        @add-connection="addConnection"
-      />
-      <ul
-        v-else
-        :class="['connection-list', { searching: state === states.SEARCH }]"
-      >
-        <li
-          v-for="connection in visibleConnections"
-          :key="connection.id"
-          class="connection"
+  <cos-popup>
+    <template #toggle="{ isOpen, toggle }">
+      <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
+        <tapestry-icon v-if="isOpen" icon="chevron-down" />
+        <span v-else>😊</span>
+      </cos-popup-button>
+    </template>
+    <template #content>
+      <div class="content">
+        <button
+          v-if="state !== states.ADD"
+          class="content-control"
+          aria-label="search"
+          @click="toggleSearch"
         >
-          <p>{{ connection.name }}</p>
-          <h1>{{ connection.avatar }}</h1>
-          <ul class="community-list">
-            <li
-              v-for="community in connection.communities"
-              :key="community.id"
-              :style="`--community-color: ${community.color}`"
-            ></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
+          <tapestry-icon icon="search" />
+        </button>
+        <div v-if="state === states.SEARCH" class="searchbar">
+          <label id="search-label" style="display: none;">
+            Search for a connection
+          </label>
+          <input v-model="search" aria-labelledby="search-label" type="text" />
+        </div>
+        <button
+          v-if="state !== states.ADD"
+          class="content-control"
+          aria-label="add connection"
+          @click="state = states.ADD"
+        >
+          <tapestry-icon icon="plus" />
+        </button>
+        <add-connection-form
+          v-if="state === states.ADD"
+          class="form"
+          :communities="communities"
+          @back="state = states.OPEN"
+          @add-connection="addConnection"
+        />
+        <ul
+          v-else
+          :class="['connection-list', { searching: state === states.SEARCH }]"
+        >
+          <li
+            v-for="connection in visibleConnections"
+            :key="connection.id"
+            class="connection"
+          >
+            <p>{{ connection.name }}</p>
+            <h1>{{ connection.avatar }}</h1>
+            <ul class="community-list">
+              <li
+                v-for="community in connection.communities"
+                :key="community.id"
+                :style="`--community-color: ${community.color}`"
+              ></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </template>
+  </cos-popup>
 </template>
 
 <script>
 import { matchSorter } from "match-sorter"
 import TapestryIcon from "@/components/common/TapestryIcon"
+
 import AddConnectionForm from "./AddConnectionForm"
+import CosPopup from "../CosPopup"
+import CosPopupButton from "../CosPopupButton"
 
 const states = {
   CLOSED: 0,
@@ -73,6 +80,8 @@ const states = {
 export default {
   components: {
     AddConnectionForm,
+    CosPopup,
+    CosPopupButton,
     TapestryIcon,
   },
   props: {
@@ -105,9 +114,6 @@ export default {
     },
   },
   methods: {
-    toggle() {
-      this.state = this.state === states.CLOSED ? states.OPEN : states.CLOSED
-    },
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
     },
@@ -129,17 +135,6 @@ ul {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.wrapper {
-  height: 80%;
-  z-index: 0;
-  transform: translateY(100%);
-  transition: transform 0.3s ease-out;
-
-  &.open {
-    transform: translateY(0);
-  }
 }
 
 .content {
@@ -238,22 +233,6 @@ ul {
     border-radius: 50%;
     background-color: var(--community-color);
   }
-}
-
-.toggle {
-  --size: 5rem;
-
-  width: var(--size);
-  height: var(--size);
-  background: var(--cos-color-tertiary);
-  position: absolute;
-  left: 2rem;
-  top: calc(-1 * var(--size));
-  border-top-left-radius: var(--size);
-  border-top-right-radius: var(--size);
-  font-size: 2.5rem;
-  transform: translateY(20%);
-  z-index: 0;
 }
 
 .form {
