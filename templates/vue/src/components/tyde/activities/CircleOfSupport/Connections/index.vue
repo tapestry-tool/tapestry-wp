@@ -6,10 +6,10 @@
     </button>
     <div class="content">
       <button
-        v-if="state !== states.SEARCH && state !== states.ADD"
+        v-if="state !== states.ADD"
         class="content-control"
         aria-label="search"
-        @click="state = states.SEARCH"
+        @click="toggleSearch"
       >
         <tapestry-icon icon="search" />
       </button>
@@ -17,9 +17,6 @@
         <label id="search-label" style="display: none;">
           Search for a connection
         </label>
-        <button aria-label="close search" @click="state = states.OPEN">
-          <tapestry-icon icon="times" />
-        </button>
         <input v-model="search" aria-labelledby="search-label" type="text" />
       </div>
       <button
@@ -111,6 +108,9 @@ export default {
     toggle() {
       this.state = this.state === states.CLOSED ? states.OPEN : states.CLOSED
     },
+    toggleSearch() {
+      this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
+    },
     addConnection(...args) {
       this.state = states.OPEN
       this.$emit("add-connection", ...args)
@@ -144,8 +144,8 @@ ul {
 
 .content {
   display: grid;
-  grid-template-columns: 12rem 1fr;
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: 6rem 1fr;
+  grid-template-rows: repeat(4, 1fr);
   gap: 1rem;
   background: white;
   position: relative;
@@ -163,7 +163,7 @@ ul {
   padding: 0;
   display: block;
   border-radius: 1rem;
-  font-size: 6rem;
+  font-size: 4rem;
   grid-column: 1;
 
   &:hover {
@@ -190,38 +190,20 @@ ul {
   grid-row: 1 / -1;
 
   &.searching {
-    grid-row: 2 / span 1;
+    grid-row-start: 2;
   }
 }
 
 .searchbar {
-  grid-column: 1 / -1;
+  grid-column: 2 / -1;
   display: flex;
-  column-gap: 1rem;
-
-  button {
-    width: 12rem;
-    background: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 6rem;
-    border-radius: 1rem;
-    color: var(--cos-color-secondary);
-
-    &:hover {
-      background: var(--cos-color-tertiary);
-      color: white;
-    }
-  }
+  align-items: center;
 
   input {
-    flex: 1;
-    font-size: 4rem;
-    border-radius: 1rem;
-    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    height: 5rem;
+    font-size: 2rem;
   }
 }
 
