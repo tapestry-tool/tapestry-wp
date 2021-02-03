@@ -344,6 +344,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'CircleOfSupportEndpoints::addCommunity'
         ]
     ],
+    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
+        ]
+    ],
 ];
 
 /*

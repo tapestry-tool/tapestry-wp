@@ -38,6 +38,25 @@ class CircleOfSupport
         return $community;
     }
 
+    public function addConnectionToCommunity($connection, $communityId)
+    {
+        // Check if community exists
+        if (!isset($this->current->communities->$communityId)) {
+            return;
+        }
+
+        // Check if connection exists
+        $connectionId = $connection->id;
+        if (!isset($this->current->connections->$connectionId)) {
+            return;
+        }
+
+        $community = $this->current->communities->$communityId;
+        array_push($community->connections, $connectionId);
+
+        return $community;
+    }
+
     public function updateConnection($id, $connection)
     {
         $this->current->connections->$id = $connection;

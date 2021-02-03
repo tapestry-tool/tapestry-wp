@@ -40,4 +40,13 @@ class CircleOfSupportEndpoints
         $cos->save();
         return $community;
     }
+
+    public static function addConnectionToCommunity($request)
+    {
+        $communityId = $request['communityId'];
+        $cos = new CircleOfSupport();
+        $community = $cos->addConnectionToCommunity(json_decode($request->get_body()), $communityId);
+        $cos->save();
+        return $community;
+    }
 }
