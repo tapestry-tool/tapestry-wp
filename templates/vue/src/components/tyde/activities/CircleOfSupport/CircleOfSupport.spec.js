@@ -21,6 +21,6 @@ describe("CircleOfSupport", () => {
     const screen = render(CircleOfSupport)
     userEvent.click(screen.getByRole("button", { name: /connections/i }))
 
-    await screen.findByRole("button", { name: /add/i })
+    await screen.findByRole("button", { name: /add connection/i })
   })
 })
