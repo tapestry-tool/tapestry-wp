@@ -119,7 +119,7 @@ export default {
 
 form {
   display: flex;
-  column-gap: 3rem;
+  column-gap: clamp(1rem, 8vw, 3rem);
   height: 100%;
 }
 
@@ -150,6 +150,7 @@ button {
   text-transform: uppercase;
   display: block;
   font-weight: 500;
+  width: 100%;
 }
 
 .colors {
@@ -159,15 +160,14 @@ button {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
   gap: 0.5rem;
   align-items: center;
 }
 
 .color {
   background: var(--color);
-  width: 4rem;
-  height: 4rem;
+  width: clamp(2rem, 5vw, 4rem);
+  height: clamp(2rem, 5vw, 4rem);
   border-radius: 50%;
   position: relative;
 
@@ -200,7 +200,7 @@ button {
 }
 
 .preview {
-  font-size: 12rem;
+  font-size: clamp(8rem, 20vw, 12rem);
   line-height: 1;
 }
 
@@ -210,6 +210,7 @@ button {
   top: 50%;
   transform: translateY(-55%);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 10;
 }
 
 .controls {
