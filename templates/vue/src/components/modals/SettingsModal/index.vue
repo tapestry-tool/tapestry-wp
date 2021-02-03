@@ -204,6 +204,15 @@
               </b-col>
             </b-row>
           </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Enable analytics"
+            description="When enabled, analytics such as mouse clicks will be saved."
+          >
+            <b-form-checkbox v-model="analyticsEnabled" switch>
+              {{ analyticsEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -249,7 +258,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
@@ -301,6 +310,7 @@ export default {
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      analyticsEnabled: false,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -357,6 +367,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["getTapestryExport"]),
     closeModal() {
       this.$emit("close")
     },
@@ -371,6 +382,7 @@ export default {
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        analyticsEnabled = false,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -382,6 +394,7 @@ export default {
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.analyticsEnabled = analyticsEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -395,6 +408,7 @@ export default {
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        analyticsEnabled: this.analyticsEnabled,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -403,15 +417,10 @@ export default {
     isUploading(status) {
       this.fileUploading = status
     },
-    exportTapestry() {
+    async exportTapestry() {
       this.isExporting = true
-      let filteredTapestry = this.tapestryJson
-      filteredTapestry.nodes = filteredTapestry.nodes.filter(
-        node => node.status === "publish"
-      )
-      const tapestry = filteredTapestry
-      tapestry["site-url"] = wpData.wpUrl
-      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+      const exportedTapestry = await this.getTapestryExport()
+      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
@@ -423,6 +432,7 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+
       this.isExporting = false
       this.hasExported = true
     },

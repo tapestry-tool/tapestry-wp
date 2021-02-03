@@ -1,0 +1,847 @@
+{
+  "nodes": [
+    {
+      "id": 1468,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Root",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Root</p>"
+      },
+      "coordinates": {
+        "x": 2560.611328125,
+        "y": 2955.1328125
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1471,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Accordion",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "accordion",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "lockRows": true,
+        "finishButtonText": "Finish",
+        "confirmationTitleText": "Section Complete!",
+        "confirmationBodyText": "Would you like to continue?",
+        "continueButtonText": "Continue",
+        "cancelLinkText": "Cancel",
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Accordion</p>"
+      },
+      "coordinates": {
+        "x": 2897.723289247068,
+        "y": 3417.9070814092083,
+        "fx": 2904.689109559568,
+        "fy": 3406.2974622685833
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [
+        1028,
+        996,
+        1000
+      ],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1473,
+      "author": {
+        "id": "1",
+        "name": "subscriber_user",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Sub Accordion",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "accordion",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "lockRows": false,
+        "finishButtonText": "Finish",
+        "confirmationTitleText": "Section Complete!",
+        "confirmationBodyText": "Would you like to continue?",
+        "continueButtonText": "Continue",
+        "cancelLinkText": "Cancel",
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Sub Accordion</p>"
+      },
+      "coordinates": {
+        "x": 3309.667111822025,
+        "y": 3318.73955818754
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1475,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Sub Accordion Child",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Sub Accordion Child</p>"
+      },
+      "coordinates": {
+        "x": 3678.4875040708157,
+        "y": 3318.712748332747
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1477,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Accordion Child",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Accordion Child</p>"
+      },
+      "coordinates": {
+        "x": 3033.068273571339,
+        "y": 3977.5338878656876
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1479,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "External Link",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "url-embed",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "https://www.google.com/",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>External Link</p>"
+      },
+      "coordinates": {
+        "x": 3166.8246000246886,
+        "y": 2478.144559821544
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1481,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "h5p",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "h5p",
+      "mediaFormat": "h5p",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "http://localhost/wp-admin/admin-ajax.php?action=h5p_embed&id=1",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": ""
+      },
+      "coordinates": {
+        "x": 1951.3398829077191,
+        "y": 2958.424216068055
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": true,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1483,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "h5p",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "h5p",
+      "mediaFormat": "h5p",
+      "mediaDuration": 459,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "http://localhost/wp-admin/admin-ajax.php?action=h5p_embed&id=2",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": ""
+      },
+      "coordinates": {
+        "x": 2055.9744483584536,
+        "y": 2395.273401490486
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read",
+          "add"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": true,
+      "hideMedia": true,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1485,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Video",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "video",
+      "mediaFormat": "youtube",
+      "mediaDuration": 204,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "https://www.youtube.com/watch?v=9k11q1tuA38&ab_channel=DanAndShay",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "",
+        "youtubeID": "9k11q1tuA38"
+      },
+      "coordinates": {
+        "x": 3000,
+        "y": 3000
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1487,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Video",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "video",
+      "mediaFormat": "youtube",
+      "mediaDuration": 204,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "https://www.youtube.com/watch?v=9k11q1tuA38&ab_channel=DanAndShay",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "",
+        "youtubeID": "9k11q1tuA38"
+      },
+      "coordinates": {
+        "x": 2125.760811950169,
+        "y": 3478.454946278394
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    },
+    {
+      "id": 1489,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Child",
+      "status": "publish",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>Child</p>"
+      },
+      "coordinates": {
+        "x": 3319.3377453592134,
+        "y": 3642.450944761535
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": ""
+    }
+  ],
+  "groups": [],
+  "links": [
+    {
+      "source": 1468,
+      "target": 1471,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1471,
+      "target": 1473,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1473,
+      "target": 1475,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1471,
+      "target": 1477,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1468,
+      "target": 1479,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1468,
+      "target": 1481,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1468,
+      "target": 1483,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1468,
+      "target": 1485,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1468,
+      "target": 1487,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 1471,
+      "target": 1489,
+      "value": 1,
+      "type": ""
+    }
+  ],
+  "settings": {
+    "backgroundUrl": "",
+    "autoLayout": false,
+    "nodeDraggable": true,
+    "showAccess": true,
+    "defaultPermissions": {
+      "public": [
+        "read"
+      ],
+      "authenticated": [
+        "read"
+      ],
+      "contributor": [
+        "read"
+      ],
+      "subscriber": [
+        "read"
+      ]
+    },
+    "superuserOverridePermissions": true
+  },
+  "site-url": "http://localhost"
+}

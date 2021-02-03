@@ -1,15 +1,11 @@
 <template>
-  <button
-    data-qa="settings-button"
-    class="settings-button"
-    @click="settingsModalOpen = true"
-  >
+  <button data-qa="settings-button" class="settings-button" @click="open">
     <tapestry-icon icon="cog"></tapestry-icon>
     <settings-modal
       :show="settingsModalOpen"
       :tab="tab"
       :max-depth="maxDepth"
-      @close="settingsModalOpen = false"
+      @close="close"
       @change:tab="changeTab"
     ></settings-modal>
   </button>
@@ -19,6 +15,7 @@
 import SettingsModal from "@/components/modals/SettingsModal"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
+import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -66,6 +63,14 @@ export default {
     },
   },
   methods: {
+    open() {
+      this.settingsModalOpen = true
+      client.recordAnalyticsEvent("user", "open", "settings")
+    },
+    close() {
+      this.settingsModalOpen = false
+      client.recordAnalyticsEvent("user", "close", "settings")
+    },
     changeTab(tab) {
       this.$router.push({
         name: names.SETTINGS,
