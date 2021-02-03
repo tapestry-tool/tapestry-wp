@@ -1,77 +1,93 @@
 <template>
-  <b-overlay :show="isLoading">
-    <form @submit.stop.prevent>
-      <div class="connection" style="flex: 1">
-        <input
-          v-model="connection.name"
-          name="connection name"
-          class="connection-name"
-          type="text"
-          placeholder="connection"
-          @blur="isInputTouched = true"
-        />
-        <b-form-invalid-feedback :state="isNameValid">
-          Please enter a name for your connection.
-        </b-form-invalid-feedback>
-        <div id="emoji-picker" style="position: relative">
-          <button class="preview" @click="showPicker = !showPicker">
-            {{ connection.avatar }}
-          </button>
-          <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="connection.avatar = $event.data" />
+  <div>
+    <add-community-form
+      v-show="showCommunityForm"
+      @back="showCommunityForm = false"
+      @add-community="handleAddCommunity"
+    />
+    <b-overlay v-show="!showCommunityForm" :show="isLoading" style="height: 100%">
+      <form style="height: 100%" @submit.stop.prevent>
+        <div class="connection" style="flex: 1">
+          <input
+            v-model="connection.name"
+            name="connection name"
+            class="connection-name"
+            type="text"
+            placeholder="connection"
+            @blur="isInputTouched = true"
+          />
+          <b-form-invalid-feedback :state="isNameValid">
+            Please enter a name for your connection.
+          </b-form-invalid-feedback>
+          <div id="emoji-picker" style="position: relative">
+            <button class="preview" @click="showPicker = !showPicker">
+              {{ connection.avatar }}
+            </button>
+            <div v-show="showPicker" class="picker" data-qa="emoji-picker">
+              <v-emoji-picker @select="connection.avatar = $event.data" />
+            </div>
+          </div>
+          <div class="controls">
+            <button @click="$emit('back')">Cancel</button>
+            <button class="submit" @click="addConnection">
+              Add connection
+            </button>
           </div>
         </div>
-        <div class="controls">
-          <button @click="$emit('back')">Cancel</button>
-          <button class="submit" @click="addConnection">
-            Add connection
-          </button>
+        <div class="community" style="flex: 2">
+          <h1 class="community-title">
+            Which communities do this person belong to?
+          </h1>
+          <ul class="community-list">
+            <li v-for="community in communities" :key="community.id">
+              <button
+                :class="[
+                  'community-item',
+                  { selected: community.id === connection.community },
+                ]"
+                :style="`color: ${community.color}`"
+                @click="connection.community = community.id"
+              >
+                <span class="community-color"></span>
+                <span class="community-name">
+                  {{ community.name }}
+                </span>
+              </button>
+            </li>
+            <li v-if="Object.keys(communities).length < 10">
+              <button class="community-item" @click="showCommunityForm = true">
+                <span
+                  class="community-color"
+                  style="color: var(--cos-color-tertiary)"
+                >
+                  <tapestry-icon icon="plus" />
+                </span>
+                <span
+                  class="community-name"
+                  style="color: var(--cos-color-tertiary)"
+                >
+                  Add new
+                </span>
+              </button>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="community" style="flex: 2">
-        <h1 class="community-title">Which communities do this person belong to?</h1>
-        <ul class="community-list">
-          <li v-for="community in communities" :key="community.id">
-            <button
-              :class="[
-                'community-item',
-                { selected: community.id === connection.community },
-              ]"
-              :style="`color: ${community.color}`"
-              @click="connection.community = community.id"
-            >
-              <span class="community-color"></span>
-              <span class="community-name">
-                {{ community.name }}
-              </span>
-            </button>
-          </li>
-          <li v-if="Object.keys(communities).length < 10">
-            <button class="community-item">
-              <span class="community-color" style="color: var(--cos-color-tertiary)">
-                <tapestry-icon icon="plus" />
-              </span>
-              <span class="community-name" style="color: var(--cos-color-tertiary)">
-                Add new
-              </span>
-            </button>
-          </li>
-        </ul>
-      </div>
-    </form>
-  </b-overlay>
+      </form>
+    </b-overlay>
+  </div>
 </template>
 
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
+import AddCommunityForm from "../AddCommunityForm"
 
-// TODO: Implement navigation to add community
 export default {
   components: {
-    VEmojiPicker,
+    AddCommunityForm,
     TapestryIcon,
+    VEmojiPicker,
   },
   props: {
     communities: {
@@ -89,6 +105,7 @@ export default {
       showPicker: false,
       isLoading: false,
       isInputTouched: false,
+      showCommunityForm: false,
     }
   },
   computed: {
@@ -108,9 +125,6 @@ export default {
     })
   },
   methods: {
-    selectEmoji(emoji) {
-      this.connection.avatar = emoji.data
-    },
     async addConnection() {
       this.isLoading = true
 
@@ -131,6 +145,10 @@ export default {
         ...connection,
         community: this.connection.community,
       })
+    },
+    handleAddCommunity(community) {
+      this.$emit("add-community", community)
+      this.showCommunityForm = false
     },
   },
 }

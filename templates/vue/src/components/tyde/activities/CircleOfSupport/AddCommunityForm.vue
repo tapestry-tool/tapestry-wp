@@ -50,7 +50,6 @@
 import { VEmojiPicker } from "v-emoji-picker"
 import client from "@/services/TapestryAPI"
 
-// TODO: Implement navigation to add community
 export default {
   components: {
     VEmojiPicker,
@@ -59,7 +58,7 @@ export default {
     return {
       community: {
         name: "",
-        icon: "😊",
+        icon: "👨‍👩‍👦",
         color: "",
       },
       showPicker: false,
@@ -107,6 +106,12 @@ export default {
     async addCommunity() {
       this.isLoading = true
       const community = await client.cos.addCommunity(this.community)
+      // Reset the community object
+      this.community = {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      }
       this.isLoading = false
       this.$emit("add-community", community)
     },

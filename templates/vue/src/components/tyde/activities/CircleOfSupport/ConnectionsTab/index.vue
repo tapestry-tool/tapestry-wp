@@ -11,13 +11,16 @@
       </cos-popup-button>
     </template>
     <template #content>
-      <div class="content">
-        <button
-          v-if="state !== states.ADD"
-          class="content-control"
-          aria-label="search"
-          @click="toggleSearch"
-        >
+      <add-connection-form
+        v-if="state === states.ADD"
+        class="form"
+        :communities="communities"
+        @back="state = states.OPEN"
+        @add-connection="addConnection"
+        @add-community="$emit('add-community', $event)"
+      />
+      <div v-else class="content">
+        <button class="content-control" aria-label="search" @click="toggleSearch">
           <tapestry-icon icon="search" />
         </button>
         <div v-if="state === states.SEARCH" class="searchbar">
@@ -27,24 +30,13 @@
           <input v-model="search" aria-labelledby="search-label" type="text" />
         </div>
         <button
-          v-if="state !== states.ADD"
           class="content-control"
           aria-label="add connection"
           @click="state = states.ADD"
         >
           <tapestry-icon icon="plus" />
         </button>
-        <add-connection-form
-          v-if="state === states.ADD"
-          class="form"
-          :communities="communities"
-          @back="state = states.OPEN"
-          @add-connection="addConnection"
-        />
-        <ul
-          v-else
-          :class="['connection-list', { searching: state === states.SEARCH }]"
-        >
+        <ul :class="['connection-list', { searching: state === states.SEARCH }]">
           <li
             v-for="connection in visibleConnections"
             :key="connection.id"
@@ -236,7 +228,7 @@ ul {
 
 .form {
   width: 100%;
-  grid-column: 1 / -1;
+  height: 100%;
 }
 
 .debug {

@@ -5,6 +5,7 @@
       :connections="cos.connections"
       :communities="cos.communities"
       @add-connection="addConnection"
+      @add-community="addCommunity"
     />
     <add-community-tab class="tab" @add-community="addCommunity" />
   </div>
