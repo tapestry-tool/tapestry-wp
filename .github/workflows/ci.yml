@@ -57,10 +57,10 @@ jobs:
         run: docker-compose logs
       - name: Change content directory ownership
         working-directory: data/wp
-        run: sudo chown www-data:www-data wp-content
+        run: sudo chown -R www-data:www-data wp-content
       - name: Change fixture uploads directory ownership
         working-directory: fixtures
-        run: sudo chown www-data:www-data uploads
+        run: sudo chown -R www-data:www-data uploads
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json
