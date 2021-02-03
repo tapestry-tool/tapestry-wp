@@ -1,25 +1,23 @@
 <template>
   <div class="cos">
-    <connections
+    <connections-tab
       class="tab"
       :connections="cos.connections"
       :communities="cos.communities"
       @add-connection="addConnection"
     />
-    <add-communities class="tab" />
+    <add-community-tab class="tab" @add-community="addCommunity" />
   </div>
 </template>
 
 <script>
-import client from "@/services/TapestryAPI"
-
-import AddCommunities from "./AddCommunities"
-import Connections from "./Connections"
+import AddCommunityTab from "./AddCommunityTab"
+import ConnectionsTab from "./ConnectionsTab"
 
 export default {
   components: {
-    AddCommunities,
-    Connections,
+    AddCommunityTab,
+    ConnectionsTab,
   },
   data() {
     return {
@@ -62,13 +60,8 @@ export default {
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },
-    async updateConnection() {
-      const [id, currentConnection] = Object.entries(this.cos.connections)[0]
-      const connection = await client.cos.updateConnection(id, {
-        ...currentConnection,
-        avatar: "🤡",
-      })
-      this.cos.connections[id] = connection
+    addCommunity(community) {
+      this.$set(this.cos.communities, community.id, community)
     },
   },
 }

@@ -48,7 +48,7 @@
 
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
-// import client from "@/services/TapestryAPI"
+import client from "@/services/TapestryAPI"
 
 // TODO: Implement navigation to add community
 export default {
@@ -89,7 +89,7 @@ export default {
       ]
     },
     isNameValid() {
-      return !this.isInputTouched || this.connection.name.length > 0
+      return !this.isInputTouched || this.community.name.length > 0
     },
   },
   mounted() {
@@ -105,7 +105,10 @@ export default {
   },
   methods: {
     async addCommunity() {
-      // stub
+      this.isLoading = true
+      const community = await client.cos.addCommunity(this.community)
+      this.isLoading = false
+      this.$emit("add-community", community)
     },
   },
 }

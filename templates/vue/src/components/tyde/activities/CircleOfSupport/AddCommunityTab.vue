@@ -6,7 +6,10 @@
       </cos-popup-button>
     </template>
     <template #content>
-      <add-community-form @back="isOpen = false" />
+      <add-community-form
+        @back="isOpen = false"
+        @add-community="handleAddCommunity"
+      />
     </template>
   </cos-popup>
 </template>
@@ -28,6 +31,12 @@ export default {
     return {
       isOpen: false,
     }
+  },
+  methods: {
+    handleAddCommunity(community) {
+      this.isOpen = false
+      this.$emit("add-community", community)
+    },
   },
 }
 </script>

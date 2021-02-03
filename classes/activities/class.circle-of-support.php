@@ -28,6 +28,16 @@ class CircleOfSupport
         return $connection;
     }
 
+    public function addCommunity($community)
+    {
+        $id = uniqid();
+        $community->id = $id;
+        $community->connections = [];
+        $this->current->communities->$id = $community;
+
+        return $community;
+    }
+
     public function updateConnection($id, $connection)
     {
         $this->current->connections->$id = $connection;
