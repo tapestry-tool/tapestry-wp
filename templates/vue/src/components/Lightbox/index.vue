@@ -9,14 +9,14 @@
     :node-id="nodeId"
     :content-container-style="lightboxContentStyles"
     :allow-close="canSkip"
-    @close="close"
+    @close="handleUserClose"
   >
     <accordion-media
       v-if="node.mediaType === 'accordion'"
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
     />
     <tapestry-media
@@ -25,7 +25,7 @@
       :dimensions="dimensions"
       context="lightbox"
       @load="handleLoad"
-      @close="close"
+      @close="handleAutoClose"
       @complete="complete"
       @change:dimensions="updateDimensions"
     />
@@ -34,6 +34,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex"
+import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
 import AccordionMedia from "./media/AccordionMedia"
 import TapestryMedia from "./media/TapestryMedia"
@@ -228,6 +229,14 @@ export default {
     ...mapActions(["completeNode"]),
     complete() {
       this.completeNode(this.nodeId)
+    },
+    handleUserClose() {
+      client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)
+      this.close()
+    },
+    handleAutoClose() {
+      client.recordAnalyticsEvent("app", "close", "lightbox", this.nodeId)
+      this.close()
     },
     close() {
       this.$router.push({
