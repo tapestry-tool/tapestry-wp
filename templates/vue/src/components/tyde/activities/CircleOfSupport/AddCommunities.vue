@@ -1,12 +1,12 @@
 <template>
-  <cos-popup>
-    <template #toggle="{ isOpen, toggle }">
-      <cos-popup-button style="right: 2rem" @click="toggle">
+  <cos-popup :show="isOpen">
+    <template #toggle>
+      <cos-popup-button style="right: 2rem" @click="isOpen = !isOpen">
         <tapestry-icon :icon="isOpen ? 'chevron-down' : 'plus'" />
       </cos-popup-button>
     </template>
     <template #content>
-      <add-community-form />
+      <add-community-form @back="isOpen = false" />
     </template>
   </cos-popup>
 </template>
@@ -23,6 +23,11 @@ export default {
     CosPopup,
     CosPopupButton,
     TapestryIcon,
+  },
+  data() {
+    return {
+      isOpen: false,
+    }
   },
 }
 </script>

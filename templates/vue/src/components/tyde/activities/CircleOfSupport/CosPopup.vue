@@ -1,6 +1,6 @@
 <template>
-  <div :class="['wrapper', { open: isOpen }]">
-    <slot name="toggle" :isOpen="isOpen" :toggle="toggle"></slot>
+  <div :class="['wrapper', { show }]">
+    <slot name="toggle"></slot>
     <div class="content-wrapper">
       <slot name="content"></slot>
     </div>
@@ -9,14 +9,10 @@
 
 <script>
 export default {
-  data() {
-    return {
-      isOpen: false,
-    }
-  },
-  methods: {
-    toggle() {
-      this.isOpen = !this.isOpen
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
     },
   },
 }
@@ -29,7 +25,7 @@ export default {
   transform: translateY(100%);
   transition: transform 0.3s ease-out;
 
-  &.open {
+  &.show {
     z-index: 10;
     transform: translateY(0);
   }

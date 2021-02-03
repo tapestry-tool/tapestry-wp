@@ -1,7 +1,11 @@
 <template>
-  <cos-popup>
-    <template #toggle="{ isOpen, toggle }">
-      <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
+  <cos-popup :show="isOpen">
+    <template #toggle>
+      <cos-popup-button
+        style="left: 2rem"
+        aria-label="Connections"
+        @click="isOpen = !isOpen"
+      >
         <tapestry-icon v-if="isOpen" icon="chevron-down" />
         <span v-else>😊</span>
       </cos-popup-button>
@@ -98,6 +102,7 @@ export default {
     return {
       state: states.CLOSED,
       search: "",
+      isOpen: false,
     }
   },
   computed: {
