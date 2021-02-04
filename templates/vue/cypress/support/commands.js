@@ -196,3 +196,18 @@ Cypress.Commands.add("getByTestId", (testId, ...args) =>
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
 )
+
+// Query and load iFrame content into cypress
+// using the technique described in this blog:
+// https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
+// FIXME: subsequent finds don't seem to work
+Cypress.Commands.add("getIFrame", id =>
+  cy
+    .get(`iframe[id="${id}"]`)
+    // 1
+    .its("0.contentDocument")
+    .should("exist")
+    .its("body")
+    .should("not.be.undefined")
+    .then(cy.wrap)
+)
