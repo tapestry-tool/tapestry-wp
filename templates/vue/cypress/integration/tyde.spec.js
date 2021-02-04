@@ -1,19 +1,19 @@
 describe("TYDE", () => {
   const cockpitBackgroundImage =
-    "https://commons.wikimedia.org/wiki/Category:Images#/media/File:Background_3-8_01.43702ae9.jpg"
+    "https://upload.wikimedia.org/wikipedia/commons/3/3a/Background_3-8_01.43702ae9.jpg"
 
   const icons = {
     notEarned:
-      "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Gewitterblumen.png",
+      "https://upload.wikimedia.org/wikipedia/commons/c/c3/Gewitterblumen.png",
     earned:
-      "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Nevin+shingala+road.jpg#/media/File:Pallada_Platform.png",
+      "https://upload.wikimedia.org/wikipedia/commons/e/ea/Pallada_Platform.png",
     cockpit: {
       notEarned:
-        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Illustation_d'un_essai_de_traction.png",
+        "https://upload.wikimedia.org/wikipedia/commons/e/e6/Illustation_d%27un_essai_de_traction.png",
       earned:
-        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Imagen+dron.jpg#/media/File:Kappa_sistemi_integrati.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/d/d5/Kappa_sistemi_integrati.jpg",
       hover:
-        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Hidrogeno_loturak_ur_molekulan.png",
+        "https://upload.wikimedia.org/wikipedia/commons/7/7f/Hidrogeno_loturak_ur_molekulan.png",
     },
   }
 
