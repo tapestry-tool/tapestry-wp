@@ -45,12 +45,17 @@ Tapestry plugin uses 2 main JavaScript technologies:
 
 Both of these are loaded in the Tapestry page template under `templates/single-tapestry.php`
 
-To do development:
+Quick Start:
 - Follow the steps above to install the plugin locally
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
-- Get the Wordpress backend running using either a **MAMP** stack or [Docker](#docker)
+- Get the Wordpress backend running using a **MAMP** stack
 - In the `templates/vue` directory, run `npm run dev` to serve with hot reload at localhost:8080
 
+We recommend also following the detailed instruction for your platform:
+- [Mac & Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows))
+- [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux)
+
+Alternatively, use Docker.
 
 ## Docker
 Docker can be used to encapsulate and simplify our dependency structure and speed up the process of running the WordPress instance. It is theoretically suitable for both development and production environments.
