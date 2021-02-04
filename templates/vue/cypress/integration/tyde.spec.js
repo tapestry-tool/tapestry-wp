@@ -1,27 +1,19 @@
 describe("TYDE", () => {
   const cockpitBackgroundImage =
-    "https://m.media-amazon.com/images/I/51h5kRXyipL._AC_.jpg"
+    "https://commons.wikimedia.org/wiki/Category:Images#/media/File:Background_3-8_01.43702ae9.jpg"
 
   const icons = {
     notEarned:
-      "https://cdn.imgbin.com/11/2/4/imgbin-cyanide-happiness-satire-iran" +
-      "-cyanide-and-happiness-PRxa77GZR5WSHJzh85PDGEESy.jpg",
+      "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Gewitterblumen.png",
     earned:
-      "https://img.favpng.com/13/0/15/cyanide-happiness-character-drawing" +
-      "-png-favpng-pnWdvwDziWgdHuQjEjgtWjXEv.jpg",
+      "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Nevin+shingala+road.jpg#/media/File:Pallada_Platform.png",
     cockpit: {
       notEarned:
-        "https://lh3.googleusercontent.com/proxy/EfGXb_q2dzJt5VBgQuXuNjJG" +
-        "wLWO0tlSdVz5gTalgRNzkiso3HtplzRhGOpyYsaS4-4kZuda4SUewK0UcnhJPfYm" +
-        "uDzIp1Ohyg",
+        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Illustation_d'un_essai_de_traction.png",
       earned:
-        "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip" +
-        "-art-clipart-2-wikiclipart-wikiclipart-transparent-background-ea" +
-        "rth-clipart.png",
+        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Imagen+dron.jpg#/media/File:Kappa_sistemi_integrati.jpg",
       hover:
-        "https://www.clipartmax.com/png/middle/29-292956_world-globe-clip" +
-        "-art-clipart-2-wikiclipart-wikiclipart-transparent-background-ea" +
-        "rth-clipart.png",
+        "https://commons.wikimedia.org/w/index.php?title=Category:Images&filefrom=Folleto+T.T%C3%A9cnica+%28c.1992%29.jpg#/media/File:Hidrogeno_loturak_ur_molekulan.png",
     },
   }
 
