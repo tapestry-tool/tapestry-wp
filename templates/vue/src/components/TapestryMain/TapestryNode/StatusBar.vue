@@ -41,6 +41,11 @@ export default {
       required: false,
       default: "",
     },
+    enableHighlight: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     width() {
@@ -59,6 +64,7 @@ export default {
           case nodeStatus.SUBMIT:
             return "#FFC107"
           case nodeStatus.ACCEPT:
+            if (!this.enableHighlight) return "none"
             return "#5CE601"
           case nodeStatus.REJECT:
             return "#CC444B"

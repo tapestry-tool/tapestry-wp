@@ -5,7 +5,7 @@
       { fullscreen: node.fullscreen, 'allow-scroll': showActivityScreen },
     ]"
   >
-    <play-screen v-if="showPlayScreen" @play="play" />
+    <play-screen v-if="showPlayScreen" @play="handlePlay" />
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -71,6 +71,7 @@ export default {
       showEndScreen: this.getInitialEndScreenState(),
       showActivityScreen: false,
       videoDimensions: null,
+      playedOnce: false,
     }
   },
   computed: {
@@ -115,16 +116,10 @@ export default {
       this.showEndScreen = false
       this.showActivityScreen = true
     },
-    play() {
-      if (this.$refs.video) {
-        this.$refs.video.play()
-      }
-    },
     rewatch() {
       this.showPlayScreen = false
       this.showEndScreen = false
       if (this.$refs.video) {
-        this.$refs.video.currentTime = 0
         this.$refs.video.play()
       }
     },
@@ -154,6 +149,11 @@ export default {
       this.showPlayScreen = false
       this.showEndScreen = false
       const video = this.$refs.video
+      video.play()
+      if (!this.playedOnce && this.autoplay) {
+        this.playedOnce = true
+        return
+      }
       if (video) {
         client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
           time: video.currentTime,
@@ -178,7 +178,16 @@ export default {
       this.updateDimensions()
       this.seek()
       if (this.autoplay && !this.showEndScreen) {
-        this.play()
+        client.recordAnalyticsEvent(
+          "app",
+          "auto-play",
+          "html5-video",
+          this.node.id,
+          {
+            time: video.currentTime,
+          }
+        )
+        video.play()
       }
     },
     seek() {

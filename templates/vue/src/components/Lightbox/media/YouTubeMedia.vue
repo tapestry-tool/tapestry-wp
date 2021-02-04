@@ -26,7 +26,8 @@
         enablejsapi: 1,
       }"
       @ready="ready"
-      @paused="handlePause()"
+      @paused="handlePause"
+      @playing="handlePlay"
       @ended="handleEnd"
     />
   </div>
@@ -37,6 +38,7 @@ import EndScreen from "./common/EndScreen"
 import ActivityScreen from "./common/ActivityScreen"
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
@@ -70,6 +72,7 @@ export default {
       showActivityScreen: false,
       videoDimensions: null,
       player: null,
+      playedOnce: false,
     }
   },
   computed: {
@@ -96,6 +99,9 @@ export default {
       this.player = event.target
       this.player.seekTo(this.progress * this.player.getDuration(), true)
       this.applySettings()
+      if (this.autoplay) {
+        client.recordAnalyticsEvent("app", "auto-play", "yt-video", this.node.id)
+      }
     },
     openQuiz() {
       this.showEndScreen = false
@@ -151,6 +157,20 @@ export default {
     handlePause() {
       this.updateVideoProgress()
       this.updateSettings()
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "pause", "yt-video", id, {
+        time: progress * mediaDuration,
+      })
+    },
+    handlePlay() {
+      if (!this.playedOnce && this.autoplay) {
+        this.playedOnce = true
+        return
+      }
+      const { id, progress, mediaDuration } = this.node
+      client.recordAnalyticsEvent("user", "play", "yt-video", id, {
+        time: progress * mediaDuration,
+      })
     },
     handleEnd() {
       // Video current time may be a few milliseconds short and so won't mark it as complete

@@ -293,6 +293,14 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'GET_TAPESTRY_EXPORT' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestry',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -317,6 +325,16 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
             );
         }
     );
+}
+
+function exportTapestry($request) {
+    $postId = $request['tapestryPostId'];
+    try {
+        $tapestry = new Tapestry($postId);
+        return $tapestry->export();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 function get_all_user_roles($request)
@@ -480,7 +498,12 @@ function importTapestry($postId, $tapestryData)
     }
 
     $data = new stdClass();
-    $data->groups = $tapestryData->groups;
+    if (isset($tapestryData->groups)) {
+        $data->groups = $tapestryData->groups;
+    }
+    if (isset($tapestryData->settings)) {
+        $data->settings = $tapestryData->settings;
+    }
     $tapestry->set($data);
 
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
@@ -677,10 +700,11 @@ function addTapestryLink($request)
             return $tapestry->addLink($link);
         }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
+            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
 
@@ -707,10 +731,10 @@ function deleteTapestryLink($request)
         }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
             if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
             if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
         }
         $tapestry = new Tapestry($postId);

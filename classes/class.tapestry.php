@@ -6,6 +6,7 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
+require_once dirname(__FILE__).'/class.constants.php';
 
 /**
  * Add/update/retrieve a Tapestry.
@@ -93,6 +94,9 @@ class Tapestry implements ITapestry
         }
         if (isset($tapestry->settings) && is_object($tapestry->settings)) {
             $this->settings = $tapestry->settings;
+            if (!isset($this->settings->analyticsEnabled)) {
+                $this->settings->analyticsEnabled = false;
+            }
         }
     }
 
@@ -134,8 +138,15 @@ class Tapestry implements ITapestry
     public function addNode($node)
     {
         $tapestryNode = new TapestryNode($this->postId);
-        $tapestryNode->set($node);
 
+        // Checks if user is logged in to prevent logged out user-0 from getting permissions
+        // Only add user permissions if it is not a review node
+        if (is_user_logged_in() && count($node->reviewComments) === 0) {
+            $userId = wp_get_current_user()->ID;
+            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        }
+
+        $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);
@@ -322,6 +333,40 @@ class Tapestry implements ITapestry
         return array_unique($authors, SORT_REGULAR);
     }
 
+    /**
+     * Retrieve a Tapestry post for export.
+     *
+     * @return object $tapestry
+     */
+    public function export()
+    {
+        $nodes = [];
+        foreach ($this->nodes as $node) {
+            $temp = (new TapestryNode($this->postId, $node))->get();
+            if (NodeStatus::DRAFT == $temp->status) {
+                continue;
+            }
+            $nodes[] = $temp;
+        }
+        $groups = [];
+        foreach ($this->groups as $group) {
+            $groups[] = (new TapestryGroup($this->postId, $$group))->get();
+        }
+        $parsedUrl = parse_url($this->settings->permalink);
+        unset($this->settings->permalink);
+        unset($this->settings->tapestrySlug);
+        unset($this->settings->title);
+        unset($this->settings->status);
+
+        return (object) [
+            'nodes' => $nodes,
+            'groups' => $groups,
+            'links' => $this->links,
+            'settings' => $this->settings,
+            'site-url' => $parsedUrl['scheme'].'://'.$parsedUrl['host'],
+        ];
+    }
+
     private function _setAccessibleStatus($nodes, $userId)
     {
         $newNodes = array_map(
@@ -425,8 +470,10 @@ class Tapestry implements ITapestry
 
         $settings->showAccess = true;
         $settings->showRejected = false;
+        $settings->showAcceptedHighlight = true;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
+        $settings->analyticsEnabled = false;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;
