@@ -53,6 +53,8 @@
         :locked="!node.accessible"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
+        :enableHighlight="highlightNode"
+        :data-qa="`node-status-${node.id}`"
       ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <transition name="fade">
@@ -282,6 +284,12 @@ export default {
         .map(this.getNode)
         .filter(n => n.status !== "draft")
       return rows.filter(row => row.completed).length / rows.length
+    },
+    highlightNode() {
+      return (
+        this.node.reviewStatus !== nodeStatus.ACCEPT ||
+        this.settings.showAcceptedHighlight
+      )
     },
   },
   watch: {
