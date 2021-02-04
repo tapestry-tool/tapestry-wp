@@ -454,13 +454,6 @@ export default {
         this.node.thumbnailFileId = fileId.data
       }
     })
-    this.node = this.createDefaultNode()
-    if (!this.node.mapCoordinates) {
-      this.node.mapCoordinates = {
-        lat: "",
-        lng: "",
-      }
-    }
     this.initialize()
   },
   methods: {
@@ -530,6 +523,12 @@ export default {
       }
       copy.tydeType = copy.tydeType || this.getInitialTydeType(this.parent)
       copy.hasSubAccordion = this.hasSubAccordion(copy)
+      if (!copy.mapCoordinates) {
+        copy.mapCoordinates = {
+          lat: "",
+          lng: "",
+        }
+      }
       this.node = copy
       this.setTapestryErrorReporting(false)
     },
@@ -678,6 +677,7 @@ export default {
             target: id,
             value: 1,
             type: "",
+            addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
           // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
