@@ -302,54 +302,52 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
-    if (this.hasPermission("edit")) {
-      const nodeRef = this.$refs.node
-      d3.select(nodeRef).call(
-        d3
-          .drag()
-          .on("start", () => {
-            this.coordinates = {}
-            if (this.selection.length) {
-              this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-                const node = this.getNode(nodeId)
-                coordinates[nodeId] = {
-                  x: node.coordinates.x,
-                  y: node.coordinates.y,
-                }
-                return coordinates
-              }, {})
-            } else {
-              this.coordinates[this.node.id] = {
-                x: this.node.coordinates.x,
-                y: this.node.coordinates.y,
-              }
-            }
-          })
-          .on("drag", () => {
-            for (const id of Object.keys(this.coordinates)) {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-            }
-          })
-          .on("end", () => {
-            for (const [id, originalCoordinates] of Object.entries(
-              this.coordinates
-            )) {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-              let coordinates = {
+    const nodeRef = this.$refs.node
+    d3.select(nodeRef).call(
+      d3
+        .drag()
+        .on("start", () => {
+          this.coordinates = {}
+          if (this.selection.length) {
+            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
+              const node = this.getNode(nodeId)
+              coordinates[nodeId] = {
                 x: node.coordinates.x,
                 y: node.coordinates.y,
               }
-              if (
-                originalCoordinates.x == coordinates.x &&
-                originalCoordinates.y == coordinates.y
-              ) {
-                continue
-              }
-              this.$emit("dragend")
+              return coordinates
+            }, {})
+          } else {
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
+          }
+        })
+        .on("drag", () => {
+          for (const id of Object.keys(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+          }
+        })
+        .on("end", () => {
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+            let coordinates = {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
+            }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
+              continue
+            }
+            this.$emit("dragend")
+            if (this.hasPermission("edit")) {
               this.updateNodeCoordinates({
                 id,
                 coordinates,
@@ -358,9 +356,9 @@ export default {
                 this.$emit("dragend")
               })
             }
-          })
-      )
-    }
+          }
+        })
+    )
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
