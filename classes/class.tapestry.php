@@ -138,8 +138,15 @@ class Tapestry implements ITapestry
     public function addNode($node)
     {
         $tapestryNode = new TapestryNode($this->postId);
-        $tapestryNode->set($node);
 
+        // Checks if user is logged in to prevent logged out user-0 from getting permissions
+        // Only add user permissions if it is not a review node
+        if (is_user_logged_in() && count($node->reviewComments) === 0) {
+            $userId = wp_get_current_user()->ID;
+            $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
+        }
+
+        $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
 
         array_push($this->nodes, $node->id);
@@ -463,6 +470,7 @@ class Tapestry implements ITapestry
 
         $settings->showAccess = true;
         $settings->showRejected = false;
+        $settings->showAcceptedHighlight = true;
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;

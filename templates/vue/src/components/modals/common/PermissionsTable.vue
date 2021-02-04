@@ -77,6 +77,10 @@ export default {
           orderedPermissions.push([permission, this.value[higherPermission]])
         }
       })
+      const userPermissions = Object.entries(this.value).filter(
+        ([role, permissions]) => role.startsWith("user-") && permissions.length > 0
+      )
+      orderedPermissions.push(...userPermissions)
       return orderedPermissions
     },
   },
@@ -209,7 +213,8 @@ export default {
               higherRowPermissions.includes(type)
           )
           .forEach(type => newUserPermissions.push(type))
-        newPermissions[`user-${userId}`] = newUserPermissions
+        newPermissions[`user-${userId}`] =
+          newUserPermissions.length > 0 ? newUserPermissions : ["read"]
         this.userId = null
         this.$emit("input", newPermissions)
       } else {
