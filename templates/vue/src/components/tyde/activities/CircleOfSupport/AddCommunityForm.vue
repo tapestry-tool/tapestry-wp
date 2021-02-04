@@ -225,6 +225,7 @@ button {
   color: #757575;
   display: flex;
   column-gap: 1rem;
+  font-size: 1.2em;
 }
 
 .submit {
