@@ -700,10 +700,11 @@ function addTapestryLink($request)
             return $tapestry->addLink($link);
         }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
+            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
 
@@ -730,10 +731,10 @@ function deleteTapestryLink($request)
         }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
             if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
             if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
         }
         $tapestry = new Tapestry($postId);

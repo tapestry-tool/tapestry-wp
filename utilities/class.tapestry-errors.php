@@ -70,6 +70,14 @@ class TapestryError extends Error
             'MESSAGE' => 'You are not permitted to edit this node',
             'STATUS' => ['status' => 403],
         ],
+        'ADD_LINK_PERMISSION_DENIED' => [
+            'MESSAGE' => 'You are not permitted to add links to this node',
+            'STATUS' => ['status' => 403],
+        ],
+        'DELETE_LINK_PERMISSION_DENIED' => [
+            'MESSAGE' => 'You are not permitted to remove links from this node',
+            'STATUS' => ['status' => 403],
+        ],
         'EDIT_TAPESTRY_PERMISSION_DENIED' => [
             'MESSAGE' => 'You are not permitted to edit this tapestry',
             'STATUS' => ['status' => 403],
