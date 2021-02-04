@@ -53,6 +53,8 @@
         :locked="!node.accessible"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
+        :enableHighlight="highlightNode"
+        :data-qa="`node-status-${node.id}`"
       ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <transition name="fade">
@@ -343,6 +345,12 @@ export default {
       return node.lockedImageURL && !node.accessible
         ? node.lockedImageURL
         : node.imageURL
+    },
+    highlightNode() {
+      return (
+        this.node.reviewStatus !== nodeStatus.ACCEPT ||
+        this.settings.showAcceptedHighlight
+      )
     },
   },
   watch: {
