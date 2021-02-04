@@ -1,5 +1,10 @@
 <template>
   <div class="cos">
+    <communities-view :communities="cos.communities" />
+    <div class="test-controls">
+      <button @click="addMockCommunity">+</button>
+      <button @click="removeMockCommunity">-</button>
+    </div>
     <connections-tab
       class="tab"
       :connections="cos.connections"
@@ -12,13 +17,16 @@
 </template>
 
 <script>
+import Helpers from "@/utils/Helpers"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
+import CommunitiesView from "./CommunitiesView"
 
 export default {
   components: {
     AddCommunityTab,
     ConnectionsTab,
+    CommunitiesView,
   },
   data() {
     return {
@@ -64,11 +72,33 @@ export default {
     addCommunity(community) {
       this.$set(this.cos.communities, community.id, community)
     },
+    addMockCommunity() {
+      const community = {
+        id: Helpers.createUUID(),
+        name: "School",
+        icon: "🎓",
+        color: "#A1BCFC",
+        connections: ["abc"],
+      }
+      this.$set(this.cos.communities, community.id, community)
+    },
+    removeMockCommunity() {
+      const keys = Object.keys(this.cos.communities)
+      const last = keys[keys.length - 1]
+      this.$delete(this.cos.communities, last)
+    },
   },
 }
 </script>
 
 <style scoped>
+.test-controls {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .cos {
   --cos-color-primary: #000;
   --cos-color-secondary: #c4c4c4;
