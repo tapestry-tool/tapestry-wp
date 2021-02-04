@@ -53,6 +53,8 @@
         :locked="!node.accessible"
         :status="node.status"
         :reviewStatus="node.reviewStatus"
+        :enableHighlight="highlightNode"
+        :data-qa="`node-status-${node.id}`"
       ></status-bar>
       <g v-show="node.nodeType !== 'grandchild' && node.nodeType !== ''">
         <transition name="fade">
@@ -138,6 +140,7 @@ import { names } from "@/config/routes"
 import { bus } from "@/utils/event-bus"
 import Helpers from "@/utils/Helpers"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 import { nodeStatus } from "@/utils/constants"
 import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
@@ -282,6 +285,12 @@ export default {
         .filter(n => n.status !== "draft")
       return rows.filter(row => row.completed).length / rows.length
     },
+    highlightNode() {
+      return (
+        this.node.reviewStatus !== nodeStatus.ACCEPT ||
+        this.settings.showAcceptedHighlight
+      )
+    },
   },
   watch: {
     radius(newRadius) {
@@ -301,54 +310,52 @@ export default {
   mounted() {
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
-    if (this.hasPermission("edit")) {
-      const nodeRef = this.$refs.node
-      d3.select(nodeRef).call(
-        d3
-          .drag()
-          .on("start", () => {
-            this.coordinates = {}
-            if (this.selection.length) {
-              this.coordinates = this.selection.reduce((coordinates, nodeId) => {
-                const node = this.getNode(nodeId)
-                coordinates[nodeId] = {
-                  x: node.coordinates.x,
-                  y: node.coordinates.y,
-                }
-                return coordinates
-              }, {})
-            } else {
-              this.coordinates[this.node.id] = {
-                x: this.node.coordinates.x,
-                y: this.node.coordinates.y,
-              }
-            }
-          })
-          .on("drag", () => {
-            for (const id of Object.keys(this.coordinates)) {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-            }
-          })
-          .on("end", () => {
-            for (const [id, originalCoordinates] of Object.entries(
-              this.coordinates
-            )) {
-              const node = this.getNode(id)
-              node.coordinates.x += d3.event.dx
-              node.coordinates.y += d3.event.dy
-              let coordinates = {
+    const nodeRef = this.$refs.node
+    d3.select(nodeRef).call(
+      d3
+        .drag()
+        .on("start", () => {
+          this.coordinates = {}
+          if (this.selection.length) {
+            this.coordinates = this.selection.reduce((coordinates, nodeId) => {
+              const node = this.getNode(nodeId)
+              coordinates[nodeId] = {
                 x: node.coordinates.x,
                 y: node.coordinates.y,
               }
-              if (
-                originalCoordinates.x == coordinates.x &&
-                originalCoordinates.y == coordinates.y
-              ) {
-                continue
-              }
-              this.$emit("dragend")
+              return coordinates
+            }, {})
+          } else {
+            this.coordinates[this.node.id] = {
+              x: this.node.coordinates.x,
+              y: this.node.coordinates.y,
+            }
+          }
+        })
+        .on("drag", () => {
+          for (const id of Object.keys(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+          }
+        })
+        .on("end", () => {
+          for (const [id, originalCoordinates] of Object.entries(this.coordinates)) {
+            const node = this.getNode(id)
+            node.coordinates.x += d3.event.dx
+            node.coordinates.y += d3.event.dy
+            let coordinates = {
+              x: node.coordinates.x,
+              y: node.coordinates.y,
+            }
+            if (
+              originalCoordinates.x == coordinates.x &&
+              originalCoordinates.y == coordinates.y
+            ) {
+              continue
+            }
+            this.$emit("dragend")
+            if (this.hasPermission("edit")) {
               this.updateNodeCoordinates({
                 id,
                 coordinates,
@@ -357,9 +364,9 @@ export default {
                 this.$emit("dragend")
               })
             }
-          })
-      )
-    }
+          }
+        })
+    )
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
@@ -376,9 +383,11 @@ export default {
     },
     openNode(id) {
       this.$root.$emit("open-node", id)
+      client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
       this.$root.$emit("edit-node", id)
+      client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
     },
     reviewNode() {
       this.$router.push({
@@ -386,6 +395,12 @@ export default {
         params: { nodeId: this.node.id },
         query: { ...this.$route.query, sidebar: "review" },
       })
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "review-node-button",
+        this.node.id
+      )
     },
     formatDuration() {
       const seconds = this.node.mediaDuration
@@ -405,6 +420,7 @@ export default {
       if (this.node.accessible || this.hasPermission("edit")) {
         this.openNode(this.node.id)
       }
+      client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
     },
     handleMouseover() {
       this.isHovered = true
@@ -431,6 +447,7 @@ export default {
           ? this.openNode(this.node.id)
           : this.updateRootNode()
       }
+      client.recordAnalyticsEvent("user", "click", "node", this.node.id)
     },
     hasPermission(action) {
       return Helpers.hasPermission(this.node, action, this.settings.showRejected)

@@ -32,6 +32,7 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.permissions = response.data.permissions
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])
@@ -199,6 +200,14 @@ export async function deleteNode({ commit, dispatch }, id) {
   try {
     await client.deleteNode(id)
     commit("deleteNode", id)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function getTapestryExport({ dispatch }) {
+  try {
+    return await client.getTapestryExport()
   } catch (error) {
     dispatch("addApiError", error)
   }

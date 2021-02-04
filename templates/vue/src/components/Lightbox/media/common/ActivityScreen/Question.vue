@@ -71,6 +71,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex"
+import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
@@ -155,6 +156,7 @@ export default {
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
+      client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       const wasOpened = this.formOpened || this.recorderOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
@@ -163,9 +165,28 @@ export default {
       this.recorderOpened = false
     },
     openRecorder() {
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: "audio-recorder",
+        }
+      )
       this.recorderOpened = true
     },
     openForm(id, answerType) {
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: answerType,
+          id,
+        }
+      )
       this.formId = id
       this.formType = answerType
       this.formOpened = true
@@ -183,6 +204,10 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
+      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+        type: this.formType,
+        id: this.formId,
+      })
       this.$emit("submit")
     },
     async handleAudioSubmit(audioFile) {
@@ -203,6 +228,9 @@ export default {
         questionId: this.question.id,
       })
       this.loading = false
+      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+        type: "audio",
+      })
       this.$emit("submit")
     },
     hasId(label) {
