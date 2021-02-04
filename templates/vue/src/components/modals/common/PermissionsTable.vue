@@ -71,12 +71,15 @@ export default {
       const orderedPermissions = []
       PERMISSIONS_ORDER.forEach((permission, index) => {
         if (this.value.hasOwnProperty(permission)) {
-          orderedPermissions.push([permission, this.value[permission] || ["read"]])
+          orderedPermissions.push([
+            permission,
+            this.value[permission] ? this.value[permission] : [],
+          ])
         } else {
           const higherPermission = PERMISSIONS_ORDER[index - 1]
           orderedPermissions.push([
             permission,
-            this.value[higherPermission] || ["read"],
+            this.value[higherPermission] ? this.value[higherPermission] : [],
           ])
         }
       })
