@@ -2,7 +2,7 @@
 
 This is a plugin for Wordpress that allows creating non-linear, collaborative, and interactive content. This plugin adds a new post type to Wordpress called "Tapestry" and allows presentation and authoring in the frontend using Vue JS.
 
-Visit [tapestry-tool.com](https://www.tapestry-tool.com) for more info
+Visit [tapestry-tool.com](https://www.tapestry-tool.com) for more info.
 
 ## How to install this plugin for Wordpress
 
@@ -10,7 +10,7 @@ You can visit the [releases](https://github.com/wynnset/tapestry-wp/releases) pa
 
 ## Development
 
-The Vue application is loaded in the tapestry post type template under `templates/single-tapestry.php`. It is located in the `templates/vue` directory)
+The Vue application is loaded in the tapestry post type template under `templates/single-tapestry.php`. It is located in the `templates/vue` directory.
 
 ### Local Development
 
@@ -25,8 +25,8 @@ To get started with developing locally:
 
 ### Build & Deployment
 
-If you are editing the code, follow these instructions to build a new plugin zip file:
-- CD into the `templates/vue` directory and enter: `npm install && npm run build`
+To build a new plugin zip file with your local edits:
+- CD into the `templates/vue` directory and run: `npm install && npm run build`
 - Open up `tapestry.php` and set `$TAPESTRY_USE_DEV_MODE` to `FALSE`
 - You can safely delete:
   - All hidden files in the root directory
