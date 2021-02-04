@@ -1,28 +1,39 @@
 # tapestry-wp
 
-This is a plugin for Wordpress that allows creating non-linear, collaborative, and interactive content. 
+This is a plugin for Wordpress that allows creating non-linear, collaborative, and interactive content. This plugin adds a new post type to Wordpress called "Tapestry" and allows presentation and authoring in the frontend using Vue JS.
 
 Visit [tapestry-tool.com](https://www.tapestry-tool.com) for more info
 
-## Usage
+## How to install this plugin for Wordpress
 
-To install this plugin locally:
-- Ensure you have Wordpress installed locally
+You can visit the [releases](https://github.com/wynnset/tapestry-wp/releases) page in this repository and find the plugin zip file under the "Assets" toggle for a given version. Once downloaded, you can upload this zip file to Wordpress under Plugins > Add New > Upload Plugin and activate the plugin.
+
+## Development
+
+The Vue application is loaded in the tapestry post type template under `templates/single-tapestry.php`. It is located in the `templates/vue` directory)
+
+### Local Development
+
+To get started with developing locally:
 - Clone this repo into a directory called `tapestry` under your Wordpress directory in the plugins folder (`wp-content/plugins`)
-- Follow the steps below under "Getting External Links to Work"
+- Setup your local dev environment. You have 2 options for your local development:
+  1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows)), or [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux).
+  2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+- Follow the steps below under "Getting external links to work"
+- Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
+- In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
+
+### Build & Deployment
+
+If you are editing the code, follow these instructions to build a new plugin zip file:
 - CD into the `templates/vue` directory and enter: `npm install && npm run build`
 - Open up `tapestry.php` and set `$TAPESTRY_USE_DEV_MODE` to `FALSE`
+- You can safely delete:
+  - All hidden files in the root directory
+  - All files and directories in the `templates/vue` directory except the `dist` folder
+- Zip the `tapestry` folder and upload it in your other Wordpress instance under Plugins > Add New > Upload Plugin
 
-To export this plugin to use on a non-local Wordpress instance:
-- Follow the steps above to install the plugin locally
-- Make a copy of this `tapestry` folder that you have locally and call it `tapestry-deploy`
-- In `tapestry-deploy` folder, delete all hidden files in the root
-- CD into `templates/vue` folder and delete every file except the `dist` folder
-- Zip the `tapestry-deploy` folder and upload it in your other Wordpress instance under Plugins > Add New > Upload Plugin
-
-For a Quick-Start alternative, consider using [Docker](#docker).
-
-### Getting External Links to Work
+### Getting external links to work
 
 It's strongly recommended you complete this to get link previews working for the "External Link" content type. To do this, you will need to get an API key for LinkPreview and set a config variable first by following these instructions:
 
@@ -32,57 +43,6 @@ It's strongly recommended you complete this to get link previews working for the
     ```
     LINK_PREVIEW_API_KEY=<key>
     ```
-    where <key> is the key you generated.
+    where `<key>` is the key you generated.
 
-If you complete these steps before running `npm run build`, you will have link previews working
-
-## Development
-
-Tapestry plugin uses 2 main JavaScript technologies:
-
-- D3 JS (used for node rendering)
-- Vue JS (used for all frontend design and logic. See `templates/vue` folder, which is the root of the tapestry application)
-
-Both of these are loaded in the Tapestry page template under `templates/single-tapestry.php`
-
-Quick Start:
-- Follow the steps above to install the plugin locally
-- Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
-- Get the Wordpress backend running using a **MAMP** stack
-- In the `templates/vue` directory, run `npm run dev` to serve with hot reload at localhost:8080
-
-We recommend also following the detailed instruction for your platform:
-- [Mac & Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows))
-- [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux)
-
-Alternatively, use Docker.
-
-## Docker
-Docker can be used to encapsulate and simplify our dependency structure and speed up the process of running the WordPress instance. It is theoretically suitable for both development and production environments.
-### General Steps
-1. Make sure you have [installed Docker](https://docs.docker.com/get-docker/) for your host system, and cloned the branch of this repository you want to run. **Note**: the following steps assume that your system has a standard version of the **make** command installed, but the provided `Makefile` simply provides convenient aliases to standard shell commands, so these can be easily adapted if you do wish to use **make**.
-2. In the root of the repository, run
-    ```
-    > make init
-    ```
-    This will start up the required containers, then set up the WP installation with starting data, such as plugins and users.
-    Notes:
-    - You may see an error related to connecting to the database, which means that the containers were not ready when we tried to install the data. In this case, run `make stop` then follow [these steps.](#setting-container-wait-time)
-    - When prompted for your Link Preview Key, enter the value you obtained in the [steps above](#getting-external-links-to-work). The script will create the `.env` file for you.
-3. If you completed the previous step successfully, you should have a WP instance running on `localhost`. You can now run the Tapestry app from the `templates/vue` directory (see `make start-app`).
-4. When you are finished, make sure to run `make stop` to close the containers. This will also shut down the running node application if it is still running.
-
-### Setting Container Wait-Time
-If your machine is low on resources, or you have a lot of containers running, you may find that container start-up takes to long and prevents the install script from executing properly. The simple fix is to increase the amount of time the script waits:
-1. Run `make stop` to bring down all containers and processes.
-2. Copy the file `bin/config-sample.sh` to `bin/config.sh`.
-3. In the file you just created, set the wait time to some bigger number, and try running your command again.
-
-### Managing Data
-Most of the site data is stored in the WP mySQL database. This is mounted to a volume
-in `docker-compose.yml`. By default, this volume is used for the initial setup and for
-all subsequent usage. To clear the data and start from scratch, run `make stop` 
-then `make clear-db`. Of course, you'll need to do the WP installation again.
-
-### Further Information
-Check out [this wiki page](https://github.com/wynnset/tapestry-wp/wiki/Docker-Additional-Info) for more info about Docker as it pertains to this project.
+If you complete these steps before running `npm run build`, you will have link previews working.
