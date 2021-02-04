@@ -78,3 +78,6 @@ Most of the site data is stored in the WP mySQL database. This is mounted to a v
 in `docker-compose.yml`. By default, this volume is used for the initial setup and for
 all subsequent usage. To clear the data and start from scratch, run `make stop` 
 then `make clear-db`. Of course, you'll need to do the WP installation again.
+
+### Further Information
+Check out [this wiki page](https://github.com/wynnset/tapestry-wp/wiki/Docker-Additional-Info) for more info about Docker as it pertains to this project.
