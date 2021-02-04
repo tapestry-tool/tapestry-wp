@@ -21,6 +21,9 @@ describe("H5P", () => {
         cy.getNodeById(node.id).click()
         cy.openLightbox(node.id)
         cy.getIFrame("h5p").should("be.visible")
+        cy.getIFrame("h5p")
+          .contains("Start", { timeout: 10000 })
+          .click() // FIXME
       })
     })
   })

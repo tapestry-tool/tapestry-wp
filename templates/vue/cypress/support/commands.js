@@ -204,10 +204,8 @@ Cypress.Commands.add("getEditable", testId =>
 Cypress.Commands.add("getIFrame", id =>
   cy
     .get(`iframe[id="${id}"]`)
-    // 1
     .its("0.contentDocument")
     .should("exist")
     .its("body")
     .should("not.be.undefined")
-    .then(cy.wrap)
 )
