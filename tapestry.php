@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__.'/classes/class.tapestry-analytics.php';
+
 /**
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
@@ -353,4 +355,23 @@ function prefix_title_entity_decode($response)
     $response->set_data($data);
 
     return $response;
+}
+
+// Analytics
+
+register_activation_hook( __FILE__, 'create_tapestry_analytics_schema' );
+function create_tapestry_analytics_schema()
+{
+    $analytics = new TapestryAnalytics();
+    $analytics->createSchema();
+}
+
+add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
+add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
+function tapestry_tool_log_event() {
+
+    $analytics = new TapestryAnalytics();
+    $analytics->log($_POST);
+
+    wp_die();
 }

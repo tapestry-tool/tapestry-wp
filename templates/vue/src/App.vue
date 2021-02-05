@@ -4,19 +4,19 @@
     <tapestry-app></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
-    <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
+    <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex"
-import NodeModal from "./components/NodeModal"
-import TapestryApp from "./components/TapestryApp"
-import TapestrySidebar from "./components/TapestrySidebar"
-import Loading from "./components/Loading"
-import client from "./services/TapestryAPI"
-import TapestryError from "./components/TapestryError"
+import NodeModal from "@/components/modals/NodeModal"
+import TapestryApp from "@/components/TapestryApp"
+import Sidebar from "@/components/Sidebar"
+import TapestryError from "@/components/TapestryError"
+import Loading from "@/components/common/Loading"
+import client from "@/services/TapestryAPI"
 
 export default {
   name: "app",
@@ -24,7 +24,7 @@ export default {
     Loading,
     NodeModal,
     TapestryApp,
-    TapestrySidebar,
+    Sidebar,
     TapestryError,
   },
   data() {
@@ -58,8 +58,8 @@ export default {
   methods: {
     ...mapMutations(["init"]),
     recordAnalytics(evt) {
-      const x = evt.clientX + window.scrollLeft
-      const y = evt.clientY + window.scrollTop
+      const x = evt.clientX + window.pageXOffset
+      const y = evt.clientY + window.pageYOffset
       client.recordAnalyticsEvent("user", "click", "screen", null, {
         x: x,
         y: y,
