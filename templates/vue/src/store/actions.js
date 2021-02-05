@@ -32,6 +32,7 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.permissions = response.data.permissions
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])
