@@ -1,6 +1,26 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
-    <toolbar />
+    <toolbar style="margin-bottom: 100px;" />
+    <avataaars
+      style="max-width: 300px;"
+      :isCircle="true"
+      :circleColor="'#6fb8e0'"
+      :accessoriesType="'Round'"
+      :clotheType="'GraphicShirt'"
+      :clotheColor="'Heather'"
+      :eyebrowType="'RaisedExcited'"
+      :eyeType="'Happy'"
+      :facialHairColor="'Blonde'"
+      :facialHairType="'Blank'"
+      :graphicType="'Hola'"
+      :hairColor="'Auburn'"
+      :mouthType="'Tongue'"
+      :skinColor="'Pale'"
+      :topType="'LongHairBob'"
+      :topColor="'Red'"
+    ></avataaars>
+    <avataaars style="max-width: 300px;" />
+    <avataaars style="max-width: 300px;" />
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
@@ -18,12 +38,14 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
+import Avataaars from "vuejs-avataaars"
 
 export default {
   components: {
     TapestryMap,
     Toolbar,
     TapestryMain,
+    Avataaars,
   },
   data() {
     return {
