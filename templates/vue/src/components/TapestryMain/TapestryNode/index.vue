@@ -301,9 +301,7 @@ export default {
         .transition()
         .duration(800)
         .ease(d3.easePolyOut)
-        .on("
-        
-        ", () => {
+        .on("start", () => {
           this.transitioning = true
         })
         .on("end", () => {
