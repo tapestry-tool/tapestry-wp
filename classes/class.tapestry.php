@@ -141,7 +141,7 @@ class Tapestry implements ITapestry
 
         // Checks if user is logged in to prevent logged out user-0 from getting permissions
         // Only add user permissions if it is not a review node
-        if (is_user_logged_in() && count($node->reviewComments) === 0) {
+        if (is_user_logged_in() && 0 === count($node->reviewComments)) {
             $userId = wp_get_current_user()->ID;
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }
@@ -171,11 +171,12 @@ class Tapestry implements ITapestry
     {
         // Remove the rootId field
         if ($nodeId == $this->rootId) {
-            if (count($this->nodes) > 1) {
-                throw new TapestryError('CANNOT_DELETE_ROOT');
-            } else {
-                $this->rootId = 0;
+            foreach ($this->nodes as $node) {
+                if ($node !== $this->rootId && !TapestryHelpers::nodeIsDraft($node, $this->postId)) {
+                    throw new TapestryError('CANNOT_DELETE_ROOT');
+                }
             }
+            $this->rootId = 0;
         }
 
         // Delete the element from nodes array
@@ -238,7 +239,7 @@ class Tapestry implements ITapestry
     public function removeLink($linkToDelete)
     {
         foreach ($this->links as $linkIndex => $link) {
-            if ($link->source == $linkToDelete->source && $link->target == $linkToDelete->target) {
+            if ($link->source == $linkToDelete['source'] && $link->target == $linkToDelete['target']) {
                 array_splice($this->links, $linkIndex, 1);
                 break;
             }
