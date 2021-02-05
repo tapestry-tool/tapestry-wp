@@ -62,6 +62,16 @@ function run_db_commands() {
                     update_post_meta( $post_id, 'tapestry_node_data',  $node_meta_data);
                 }
             }
+            add_action( 'admin_notices', 'tapestry_h5p_conf_notice' ); 
         }
     }
 }
+
+function tapestry_h5p_conf_notice() {
+      ?>
+      <div class="notice updated" >
+      <p><?php _e('Clean h5p Nodes ran successfully'); ?></p>
+    </div>
+    <?php
+}
+
