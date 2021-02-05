@@ -12,6 +12,7 @@
       <review-buttons
         v-if="isReviewer"
         class="review-buttons"
+        :disableAccept="!hasPublishedNeighbour"
         :aria-hidden="loading"
         @accept="submitReview"
         @reject="handleReject"
@@ -25,12 +26,16 @@
       >
         {{ submitText }}
       </b-button>
+      <p v-if="!hasPublishedNeighbour" class="my-2 p-0 small">
+        <strong>Note:</strong>
+        Child nodes can only be added once the parent node has been added.
+      </p>
     </div>
   </b-overlay>
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapGetters, mapActions } from "vuex"
 
 import { nodeStatus } from "@/utils/constants"
 import * as Comment from "@/utils/comments"
@@ -57,6 +62,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getNode", "getNeighbours"]),
     events() {
       return this.node.reviewComments
     },
@@ -88,6 +94,14 @@ export default {
         return `Add comment`
       }
       return `Submit for review`
+    },
+    hasPublishedNeighbour() {
+      const neighbourIds = this.getNeighbours(this.node.id)
+      for (const neighbourId of neighbourIds) {
+        const neighbour = this.getNode(neighbourId)
+        if (neighbour.status == nodeStatus.PUBLISH) return true
+      }
+      return false
     },
   },
   methods: {
