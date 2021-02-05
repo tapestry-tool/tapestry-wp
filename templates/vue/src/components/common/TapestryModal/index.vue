@@ -12,6 +12,7 @@
           />
           <modal-button
             v-if="showFav"
+            data-qa="favourite-button"
             icon="heart"
             icon-size="sm"
             :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"

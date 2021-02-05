@@ -1,5 +1,5 @@
 <template>
-  <div id="tyde-menu">
+  <div id="tyde-menu" data-qa="tyde-menu">
     <div class="buttons">
       <!--tyde-button
         icon="cog"
@@ -9,21 +9,25 @@
       <tyde-button
         icon="globe-asia"
         label="Map"
+        data-qa="tyde-map-button"
         @click="$emit('return-to-map')"
       ></tyde-button>
       <tyde-button
         icon="question"
         label="Help"
+        data-qa="tyde-help-button"
         @click="setActivePage('help')"
       ></tyde-button>
       <tyde-button
         icon="user-circle"
         label="Profile"
+        data-qa="tyde-menu-profile-button"
         @click="setActivePage('profile')"
       ></tyde-button>
       <tyde-button
         icon="user-circle"
         label="Favourites"
+        data-qa="tyde-favourites-button"
         @click="setActivePage('favourites')"
       ></tyde-button>
       <tyde-button
