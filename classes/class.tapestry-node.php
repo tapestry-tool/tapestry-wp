@@ -151,7 +151,7 @@ class TapestryNode implements ITapestryNode
         if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
             $this->thumbnailFileId = $node->thumbnailFileId;
             set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, [300, 300]);
+            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumbnail');
             if ($post_thumbnail_url) {
                 $this->imageURL = $post_thumbnail_url;
             }
@@ -161,7 +161,7 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && is_numeric($node->lockedThumbnailFileId)) {
             $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
-            $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, [300, 300]);
+            $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumbnail');
             if ($image_url) {
                 $this->lockedImageURL = $image_url;
             }
