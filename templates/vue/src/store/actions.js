@@ -205,6 +205,14 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
+export async function getNodeHasDraftNeighbours({ dispatch }, id) {
+  try {
+    return await client.getNodeHasDraftNeighbours(id)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function getTapestryExport({ dispatch }) {
   try {
     return await client.getTapestryExport()

@@ -134,6 +134,12 @@ class TapestryApi {
     return await this.client.put(url, coordinates)
   }
 
+  async getNodeHasDraftNeighbours(id) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/hasDraftNeighbour`
+    const response = await this.client.get(url)
+    return response.data
+  }
+
   async optimizeNodeThumbnails() {
     const url = `${apiUrl}/tapestries/${this.postId}/optimize_thumbnails`
     return await this.client.post(url)
