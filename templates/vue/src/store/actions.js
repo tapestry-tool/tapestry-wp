@@ -284,9 +284,12 @@ export async function addLink({ commit, dispatch, getters }, newLink) {
   }
 }
 
-export async function deleteLink({ commit, dispatch }, { source, target }) {
+export async function deleteLink(
+  { commit, dispatch },
+  { source, target, useClient = true }
+) {
   try {
-    await client.deleteLink({ source: source, target: target })
+    if (useClient) await client.deleteLink({ source: source, target: target })
     commit("deleteLink", { source, target })
   } catch (error) {
     dispatch("addApiError", error)

@@ -84,7 +84,6 @@ export default {
             }
           })
           .catch(err => console.log(err))
-          .finally(() => this.$emit("setLoading", false))
       } else {
         this.removeNode()
       }
@@ -94,6 +93,7 @@ export default {
         this.deleteLink({
           source: this.neighbourLink.source,
           target: this.neighbourLink.target,
+          useClient: false,
         })
         this.updateNode({
           id: this.neighbour.id,
@@ -112,6 +112,7 @@ export default {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
+      this.$emit("setLoading", false)
     },
   },
 }
