@@ -1137,10 +1137,9 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-            if (!TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
-                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-            }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) && 
+            !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
             throw new TapestryError('INVALID_CHILD_NODE');
