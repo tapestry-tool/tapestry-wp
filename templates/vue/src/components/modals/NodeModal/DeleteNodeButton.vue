@@ -35,7 +35,7 @@ export default {
       return this.nodeId === this.rootId
     },
     isDisabled() {
-      return Boolean(this.disabled || this.disabledMessage.length)\
+      return Boolean(this.disabled || this.disabledMessage.length)
     },
     disabledMessage() {
       if (this.isRoot && Object.keys(this.nodes).length > 1) {
