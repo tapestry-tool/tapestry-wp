@@ -1,6 +1,7 @@
 <template>
   <b-form-group label="TYDE Node Type">
     <b-form-select
+      data-qa="tyde-node-type"
       v-model="node.tydeType"
       :options="tydeTypeOptions"
     ></b-form-select>

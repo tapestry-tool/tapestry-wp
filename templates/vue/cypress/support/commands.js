@@ -7,6 +7,15 @@ import { API_URL, TEST_TAPESTRY_NAME } from "./constants"
 Cypress.Commands.add("setup", { prevSubject: false }, (fixture, role = "admin") => {
   if (fixture) {
     cy.get(fixture).then(tapestry => {
+      // Add copilot permissions for Tyde
+      for (let node of tapestry.nodes) {
+        if (node.hasOwnProperty("permissions") && !node.permissions.hasOwnProperty("copilot")) {
+          node.permissions.copilot = ["read"]
+        }
+        if (node.hasOwnProperty("permissionsOrder") && !node.permissionsOrder.includes("copilot")) {
+          node.permissionsOrder.push("copilot")
+        }
+      }
       cy.addTapestry(tapestry)
     })
   } else {
@@ -199,3 +208,21 @@ Cypress.Commands.add("getByTestId", (testId, ...args) =>
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
 )
+
+Cypress.Commands.add("getBySrc", (srcURL, ...args) =>
+  cy.get(`[src="${srcURL}"]`, ...args)
+)
+
+Cypress.Commands.add("getByBackground", (imageURL, ...args) =>
+  cy.get(`[style^='background-image: url("${imageURL}")']`, ...args)
+)
+
+Cypress.Commands.add("openTydeMenu", () => {
+  cy.getByTestId("tyde-spaceship-icon").click()
+  cy.getByTestId("tyde-map-button").should("be.visible")
+})
+
+Cypress.Commands.add("closeTydeMenu", () => {
+  cy.getByTestId("tyde-map-button").click()
+  cy.getByTestId("tyde-map-button").should("not.be.visible")
+})

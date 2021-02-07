@@ -87,6 +87,7 @@
             <file-upload
               v-model="spaceshipBackgroundUrl"
               placeholder="Enter the URL for the background"
+              input-test-id="tyde-background-image"
             />
           </b-form-group>
         </b-tab>
@@ -120,6 +121,7 @@
                       item-text="text"
                       item-value="id"
                       placeholder="Choose activity"
+                      data-qa="profile-activity-combo"
                       empty-message="There are no activities yet."
                       class="mb-0"
                       @input="profileActivities[index].activityRef = $event"
