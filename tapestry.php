@@ -107,6 +107,14 @@ function add_tapestry_post_types_to_query($query)
 add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 
 /*
+ * Add custom tapestry_thumb size
+ */
+add_action( 'after_setup_theme', 'tapestry_theme_setup' );
+function tapestry_theme_setup() {
+    add_image_size( 'tapestry_thumb', 420, 420, true );
+}
+
+/*
  * Enqueue scripts and styles for the tapestry
  */
 
