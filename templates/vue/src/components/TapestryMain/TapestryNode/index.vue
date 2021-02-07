@@ -12,7 +12,10 @@
         'has-title': !node.hideTitle,
       }"
       :style="{
-        cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
+        cursor:
+          node.accessible || hasPermission('edit') || hasPermission('move')
+            ? 'pointer'
+            : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
@@ -416,7 +419,7 @@ export default {
               continue
             }
             this.$emit("dragend")
-            if (this.hasPermission("edit")) {
+            if (this.hasPermission("edit") || this.hasPermission("move")) {
               this.updateNodeCoordinates({
                 id,
                 coordinates,
