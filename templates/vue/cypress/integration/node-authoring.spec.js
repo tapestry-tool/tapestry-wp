@@ -145,7 +145,7 @@ describe("Node Authoring", () => {
         cy.store()
           .its("state.nodes")
           .then(nodes => {
-            expect(Object.keys(nodes)).to.have.length(1)
+            expect(Object.keys(nodes)).to.have.length(0)
           })
       })
   })
