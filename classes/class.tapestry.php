@@ -253,7 +253,7 @@ class Tapestry implements ITapestry
     public function removeLink($linkToDelete)
     {
         foreach ($this->links as $linkIndex => $link) {
-            if ($link->source == $linkToDelete['source'] && $link->target == $linkToDelete['target']) {
+            if ($link->source == $linkToDelete->source && $link->target == $linkToDelete->target) {
                 array_splice($this->links, $linkIndex, 1);
                 break;
             }
