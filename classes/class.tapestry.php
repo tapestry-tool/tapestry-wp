@@ -128,7 +128,6 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
-
     /**
      * Get links.
      *

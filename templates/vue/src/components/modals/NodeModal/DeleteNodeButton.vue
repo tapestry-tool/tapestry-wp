@@ -84,6 +84,7 @@ export default {
             }
           })
           .catch(err => console.log(err))
+          .finally(() => this.$emit("setLoading", false))
       } else {
         this.removeNode()
       }
@@ -111,7 +112,6 @@ export default {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
-      this.$emit("setLoading", false)
     },
   },
 }
