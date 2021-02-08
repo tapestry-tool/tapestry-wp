@@ -128,6 +128,21 @@ class Tapestry implements ITapestry
         return $this->nodes;
     }
 
+
+    /**
+     * Get links.
+     *
+     * @return array $links
+     */
+    public function getLinks()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->links;
+    }
+
     /**
      * Add a new node.
      *

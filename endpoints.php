@@ -1185,12 +1185,13 @@ function getTapestryNodeHasDraftNeighbours($request)
         }
 
         $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
+        $links = $tapestry->getLinks();
 
-        $neighbours = $tapestry->_getNeighbours($node);
-        foreach ($neighbours as $neighbour) {
-            if (TapestryHelpers::nodeIsDraft($neighbour, $postId)) {
-                return true;
+        foreach ($links as $link) {
+            if ($link->source == $nodeMetaId || $link->target == $nodeMetaId) {
+                if (TapestryHelpers::nodeIsDraft($link->source == $nodeMetaId ? $link->target : $link->{'source'}, $postId)) {
+                    return true;
+                }
             }
         }
 
