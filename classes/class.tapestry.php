@@ -167,7 +167,7 @@ class Tapestry implements ITapestry
         array_push($this->nodes, $node->id);
 
         if (empty($this->rootId)) {
-            $this->rootId = $this->nodes[0];
+            $this->rootId = $node->id;
         }
 
         $this->_saveToDatabase();
@@ -399,7 +399,14 @@ class Tapestry implements ITapestry
             $nodes
         );
         if (count($newNodes)) {
-            $this->_recursivelySetAccessible($newNodes[0], [], $newNodes);
+            $root = null;
+            foreach ($newNodes as $newNode) {
+                if ($this->rootId === $newNode->id) {
+                    $root = $newNode;
+                    break;
+                }
+            }
+            $this->_recursivelySetAccessible($root, [], $newNodes);
         }
 
         return $newNodes;
