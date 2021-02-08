@@ -90,22 +90,21 @@ export default {
     },
     removeNode() {
       if (!this.isRoot) {
+        const neighbour = this.neighbour
         this.deleteLink({
           source: this.neighbourLink.source,
           target: this.neighbourLink.target,
           useClient: false,
         })
         this.updateNode({
-          id: this.neighbour.id,
+          id: neighbour.id,
           newNode: {
-            childOrdering: this.neighbour.childOrdering.filter(
-              id => id !== this.nodeId
-            ),
+            childOrdering: neighbour.childOrdering.filter(id => id !== this.nodeId),
           },
         })
         this.$router.push({
           name: names.APP,
-          params: { nodeId: this.neighbour.id },
+          params: { nodeId: neighbour.id },
           query: this.$route.query,
         })
       } else {
