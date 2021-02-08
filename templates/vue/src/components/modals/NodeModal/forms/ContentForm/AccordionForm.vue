@@ -4,11 +4,12 @@
       <b-form-select
         id="node-presentation-style"
         data-qa="node-presentation-style"
-        :value="node.presentationStyle"
+        :value="node.presentationStyle ? node.presentationStyle : 'accordion'"
         :options="presentationStyle"
         @change="handlePresentationChange"
       ></b-form-select>
     </b-form-group>
+    <sub-item-table :node="node"></sub-item-table>
     <b-form-group>
       <b-form-checkbox v-model="node.typeData.lockRows">
         Lock rows until previous row is completed
@@ -33,8 +34,11 @@
 </template>
 
 <script>
+import SubItemTable from "./SubItemTable.vue"
+
 export default {
   name: "accordion-form",
+  components: { SubItemTable },
   props: {
     node: {
       type: Object,

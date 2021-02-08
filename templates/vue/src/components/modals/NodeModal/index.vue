@@ -289,7 +289,7 @@ export default {
     title() {
       if (this.type === "add") {
         return this.parent
-          ? `Add new sub-topic to ${this.parent.title}`
+          ? `Add new sub-item to ${this.parent.title}`
           : "Add root node"
       } else if (this.type === "edit") {
         return `Edit node: ${this.node.title}`
