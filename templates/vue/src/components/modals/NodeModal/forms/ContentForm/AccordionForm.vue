@@ -1,5 +1,14 @@
 <template>
   <div>
+    <b-form-group label="Presentation Style">
+      <b-form-select
+        id="node-presentation-style"
+        data-qa="node-presentation-style"
+        :value="node.presentationStyle"
+        :options="presentationStyle"
+        @change="handlePresentationChange"
+      ></b-form-select>
+    </b-form-group>
     <b-form-group>
       <b-form-checkbox v-model="node.typeData.lockRows">
         Lock rows until previous row is completed
@@ -32,6 +41,15 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      presentationStyle: [
+        { value: "accordion", text: "Accordion" },
+        { value: "slideshow", text: "Slideshow" },
+        { value: "page", text: "Page" },
+      ],
+    }
+  },
   mounted() {
     // set node defaults
     this.node.typeData = {
@@ -43,6 +61,11 @@ export default {
       cancelLinkText: "Cancel",
       ...this.node.typeData,
     }
+  },
+  methods: {
+    handlePresentationChange(evt) {
+      this.node.presentationStyle = evt
+    },
   },
 }
 </script>
