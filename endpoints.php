@@ -158,11 +158,11 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNodeCoordinates',
         ],
     ],
-    'GET_TAPESTRY_NODE_HAS_DRAFT_NEIGHBOUR' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/hasDraftNeighbour',
+    'GET_TAPESTRY_NODE_NEIGHBOUR_TYPES' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/neighbourType',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getTapestryNodeHasDraftNeighbours',
+            'callback' => 'getTapestryNodeNeighbourTypes',
         ],
     ],
     'POST_TAPESTRY_LINK' => (object) [
@@ -1165,7 +1165,7 @@ function updateTapestryNodeCoordinates($request)
 /**
  * Return whether tapestry node has draft neighbours.
  */
-function getTapestryNodeHasDraftNeighbours($request)
+function getTapestryNodeNeighbourTypes($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];
@@ -1186,16 +1186,23 @@ function getTapestryNodeHasDraftNeighbours($request)
 
         $tapestry = new Tapestry($postId);
         $links = $tapestry->getLinks();
+        $response = array(
+            "hasDraft" => false,
+            "hasRejected" => false,
+        );
 
         foreach ($links as $link) {
             if ($link->source == $nodeMetaId || $link->target == $nodeMetaId) {
-                if (TapestryHelpers::nodeIsDraft($link->source == $nodeMetaId ? $link->target : $link->{'source'}, $postId)) {
-                    return true;
+                $neighbour = new TapestryNode($postId, $link->source == $nodeMetaId ? $link->target : $link->source);
+                if ($neighbour->getMeta()->reviewStatus == "rejected") {
+                    $response["hasRejected"] = true;
+                } else if ($neighbour->getMeta()->status == "draft") {
+                    $response["hasDraft"] = true;
                 }
             }
         }
 
-        return false;
+        return $response;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

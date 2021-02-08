@@ -134,8 +134,8 @@ class TapestryApi {
     return await this.client.put(url, coordinates)
   }
 
-  async getNodeHasDraftNeighbours(id) {
-    const url = `/tapestries/${this.postId}/nodes/${id}/hasDraftNeighbour`
+  async getNodeNeighbourTypes(id) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/neighbourType`
     const response = await this.client.get(url)
     return response.data
   }

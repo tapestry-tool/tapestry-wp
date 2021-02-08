@@ -61,13 +61,22 @@ export default {
     this.$emit("message", this.disabledMessage)
   },
   methods: {
-    ...mapActions(["deleteNode", "deleteLink", "getNodeHasDraftNeighbours"]),
+    ...mapActions(["deleteNode", "deleteLink", "getNodeNeighbourTypes"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     async handleRemoveNode() {
       this.$emit("setLoading", true)
       this.updateSelectedNode(this.rootId)
-      const hasDraftNeighbours = await this.getNodeHasDraftNeighbours(this.nodeId)
-      if (hasDraftNeighbours) {
+      const neighbourTypes = await this.getNodeNeighbourTypes(this.nodeId)
+      if (neighbourTypes.hasRejected) {
+        this.$bvModal
+          .msgBoxOk(
+            'Only nodes with a single connection can be deleted. Please enable the "Show me rejected nodes" setting to delete attached rejected nodes.',
+            {
+              title: "Warning: Unable to delete node",
+            }
+          )
+          .catch(err => console.log(err))
+      } else if (neighbourTypes.hasDraft) {
         this.$bvModal
           .msgBoxConfirm(
             "There are draft nodes attached to this node. Deleting this node will also remove the draft nodes. Are you sure you want to continue?",
@@ -84,10 +93,10 @@ export default {
             }
           })
           .catch(err => console.log(err))
-          .finally(() => this.$emit("setLoading", false))
       } else {
         this.removeNode()
       }
+      this.$emit("setLoading", false)
     },
     removeNode() {
       if (!this.isRoot) {
