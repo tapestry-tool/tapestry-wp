@@ -6,20 +6,21 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
  * Plugin Name: Tapestry
  * Plugin URI: https://www.tapestry-tool.com
  * Description: Custom post type - Tapestry
- * Version: 2.35.0-beta
+ * Version: 2.41.0-beta
  * Author: Tapestry Team, University of British Coloumbia.
  */
 
 // Used to force-refresh assets
-$TAPESTRY_VERSION_NUMBER = '2.35.0-beta';
+$TAPESTRY_VERSION_NUMBER = '2.41.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
-$TAPESTRY_USE_DEV_MODE = true;
+$TAPESTRY_USE_DEV_MODE = false;
 
 /**
  * Register endpoints.
  */
 require_once dirname(__FILE__).'/endpoints.php';
+require_once dirname(__FILE__).'/tapestry-settings.php';
 
 /**
  * Register Tapestry type on initialization.
@@ -105,6 +106,14 @@ function add_tapestry_post_types_to_query($query)
     return $query;
 }
 add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
+
+/*
+ * Add custom tapestry_thumb size
+ */
+add_action( 'after_setup_theme', 'tapestry_theme_setup' );
+function tapestry_theme_setup() {
+    add_image_size( 'tapestry_thumb', 420, 420, true );
+}
 
 /*
  * Enqueue scripts and styles for the tapestry

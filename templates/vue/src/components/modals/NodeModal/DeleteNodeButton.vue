@@ -40,25 +40,22 @@ export default {
       return this.nodeId === this.rootId
     },
     isDisabled() {
-      if (this.disabled) {
-        return true
-      } else if (this.isRoot) {
-        return Object.keys(this.nodes).length > 1
-      } else {
-        return this.getNeighbouringLinks(this.nodeId).length > 1
-      }
+      return Boolean(this.disabled || this.disabledMessage.length)
     },
     disabledMessage() {
-      if (this.isDisabled) {
-        return this.isRoot
-          ? "Root node can only be deleted if there are no other nodes in the tapestry."
-          : "Only nodes with a single connection can be deleted."
+      if (this.isRoot && Object.keys(this.nodes).length > 1) {
+        return "Root node can only be deleted if there are no other nodes in the tapestry."
       }
-      return null
+      if (this.getNeighbouringLinks(this.nodeId).length > 1) {
+        return "Only nodes with a single connection can be deleted."
+      }
+      return ""
     },
   },
   mounted() {
-    this.$emit("message", this.disabledMessage)
+    if (this.isDisabled) {
+      this.$emit("message", this.disabledMessage)
+    }
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink", "getNodeNeighbourTypes"]),
