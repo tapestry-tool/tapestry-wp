@@ -101,7 +101,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "accordion", text: "Accordion" },
+        { value: "accordion", text: "Multi-content Presentation" },
       ],
     }
   },
