@@ -14,7 +14,7 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
 $TAPESTRY_VERSION_NUMBER = '2.41.0-beta';
 
 // Set this to false if you want to use the Vue build instead of npm dev
-$TAPESTRY_USE_DEV_MODE = false;
+$TAPESTRY_USE_DEV_MODE = true;
 
 /**
  * Register endpoints.
