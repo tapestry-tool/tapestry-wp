@@ -247,12 +247,17 @@
             label="Allow users to add draft nodes"
             description="When enabled, users will be able to create draft nodes and optionally submit nodes for review"
           >
-            <b-form-checkbox v-model="draftNodesEnabled" switch>
+            <b-form-checkbox
+              v-model="draftNodesEnabled"
+              switch
+              :data-qa="`enable-draft`"
+            >
               {{ draftNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
             <b-form-checkbox
               v-if="draftNodesEnabled"
               v-model="submitNodesEnabled"
+              :data-qa="`enable-submit-review`"
               switch
             >
               {{ submitNodesEnabled ? "Allow" : "Don't allow" }}
