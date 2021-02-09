@@ -103,17 +103,23 @@ export default {
     })
   },
   methods: {
-    async addCommunity() {
-      this.isLoading = true
-      const community = await client.cos.addCommunity(this.community)
-      // Reset the community object
-      this.community = {
-        name: "",
-        icon: "👨‍👩‍👦",
-        color: "",
-      }
-      this.isLoading = false
-      this.$emit("add-community", community)
+    addCommunity() {
+      this.isInputTouched = true
+      this.$nextTick(async () => {
+        if (!this.isNameValid) {
+          return
+        }
+        this.isLoading = true
+        const community = await client.cos.addCommunity(this.community)
+        // Reset the community object
+        this.community = {
+          name: "",
+          icon: "👨‍👩‍👦",
+          color: "",
+        }
+        this.isLoading = false
+        this.$emit("add-community", community)
+      })
     },
   },
 }
@@ -229,7 +235,8 @@ button {
 }
 
 .submit {
-  border: var(--cos-border);
+  background: #757575;
+  color: white;
   border-radius: 0.5rem;
   padding: 0.5rem;
 }

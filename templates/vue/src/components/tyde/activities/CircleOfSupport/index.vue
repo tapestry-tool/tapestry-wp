@@ -7,7 +7,7 @@
       @add-connection="addConnection"
       @add-community="addCommunity"
     />
-    <add-community-tab class="tab" @add-community="addCommunity" />
+    <add-community-tab @add-community="addCommunity" />
   </div>
 </template>
 
