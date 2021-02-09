@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     /**
-     * Group the communities together to where they're going to be placed.
+     * Group the communities together by where they're going to be placed.
      * The grid is split into four sections:
      *
      * --------------
