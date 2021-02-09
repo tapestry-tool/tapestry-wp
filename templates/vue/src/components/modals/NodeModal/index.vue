@@ -3,15 +3,24 @@
     v-if="node"
     id="node-modal"
     :visible="show"
-    :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
     @hide="handleClose"
   >
+    <template #modal-title>
+      <b-link v-if="isMultiContentNodeChild" @click="handleBack">
+        <i class="fas fa-chevron-left" />
+        Back to "{{ parent.title }}"
+      </b-link>
+      <div v-else>
+        {{ title }}
+      </div>
+    </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
+        <h4 v-if="isMultiContentNodeChild" class="modal-header">{{ title }}</h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
@@ -383,6 +392,9 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    isMultiContentNodeChild() {
+      return this.parent && this.parent.mediaType == "accordion"
+    },
   },
   watch: {
     nodeId: {
@@ -553,6 +565,13 @@ export default {
           query: this.$route.query,
         })
       }
+    },
+    handleBack() {
+      this.$router.push({
+        name: names.MODAL,
+        params: { nodeId: this.parent.id, type: "edit", tab: "content" },
+        query: this.$route.query,
+      })
     },
     handleClose(event) {
       const oldNode = this.getNode(this.nodeId)
