@@ -90,7 +90,11 @@
           >
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
-          <template v-if="isLoggedIn">
+          <template
+            v-if="
+              (isLoggedIn && this.settings.draftNodesEnabled) || hasPermission('add')
+            "
+          >
             <add-child-button
               v-if="!isSubAccordionRow"
               :node="node"
