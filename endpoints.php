@@ -1189,15 +1189,12 @@ function getTapestryNodeNeighbourTypes($request)
         $links = $tapestry->getLinks();
         $response = array(
             "hasDraft" => false,
-            "hasRejected" => false,
         );
 
         foreach ($links as $link) {
             if ($link->source == $nodeMetaId || $link->target == $nodeMetaId) {
                 $neighbour = new TapestryNode($postId, $link->source == $nodeMetaId ? $link->target : $link->source);
-                if ($neighbour->getMeta()->reviewStatus == "rejected") {
-                    $response["hasRejected"] = true;
-                } else if ($neighbour->getMeta()->status == "draft") {
+                if ($neighbour->getMeta()->status == "draft") {
                     $response["hasDraft"] = true;
                 }
             }

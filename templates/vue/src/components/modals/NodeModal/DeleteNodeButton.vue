@@ -13,6 +13,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
+import { nodeStatus } from "@/utils/constants"
 import { names } from "@/config/routes"
 
 export default {
@@ -46,7 +47,15 @@ export default {
       if (this.isRoot && Object.keys(this.nodes).length > 1) {
         return "Root node can only be deleted if there are no other nodes in the tapestry."
       }
-      if (this.getNeighbouringLinks(this.nodeId).length > 1) {
+      const nonDraftNeighbours = this.getNeighbouringLinks(this.nodeId).filter(
+        link => {
+          const node = this.getNode(
+            this.nodeId == link.source ? link.target : link.source
+          )
+          return node.status !== nodeStatus.DRAFT
+        }
+      )
+      if (nonDraftNeighbours.length > 1) {
         return "Only nodes with a single connection can be deleted."
       }
       return ""
@@ -64,16 +73,7 @@ export default {
       this.$emit("setLoading", true)
       this.updateSelectedNode(this.rootId)
       const neighbourTypes = await this.getNodeNeighbourTypes(this.nodeId)
-      if (neighbourTypes.hasRejected) {
-        this.$bvModal
-          .msgBoxOk(
-            'Only nodes with a single connection can be deleted. Please enable the "Show me rejected nodes" setting to delete attached rejected nodes.',
-            {
-              title: "Warning: Unable to delete node",
-            }
-          )
-          .catch(err => console.log(err))
-      } else if (neighbourTypes.hasDraft) {
+      if (neighbourTypes.hasDraft) {
         this.$bvModal
           .msgBoxConfirm(
             "There are draft nodes attached to this node. Deleting this node will also remove the draft nodes. Are you sure you want to continue?",
