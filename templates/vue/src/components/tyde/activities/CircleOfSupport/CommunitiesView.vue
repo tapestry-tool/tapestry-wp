@@ -1,26 +1,31 @@
 <template>
-  <ul class="community-area" :style="{ '--cols': columns }">
+  <ul class="community-area">
     <li
-      v-for="community in communityList"
-      :key="community.id"
-      :class="['community', community.orientation]"
+      v-for="(group, index) in communityGroups"
+      :key="index"
+      class="group"
       :style="{
-        '--color': community.color,
-        '--column': community.column,
-        '--row': community.row,
+        '--column': group.column,
+        '--row': group.row,
       }"
     >
-      {{ community.icon }}
+      <ul :class="group.orientation">
+        <li
+          v-for="community in group.communities"
+          :key="community.id"
+          :class="['community', group.orientation]"
+          :style="{
+            '--color': community.color,
+          }"
+        >
+          {{ community.icon }}
+        </li>
+      </ul>
     </li>
   </ul>
 </template>
 
 <script>
-const Columns = {
-  Small: 3,
-  Large: 4,
-}
-
 export default {
   props: {
     communities: {
@@ -29,37 +34,62 @@ export default {
     },
   },
   computed: {
-    communityList() {
-      const communities = Object.values(this.communities)
-      return communities.map((community, index) => ({
-        ...community,
-        ...this.getCommunityPosition(index, communities.length),
-      }))
-    },
-    columns() {
-      const { length } = Object.keys(this.communities)
-      if (length <= 4) {
-        return Columns.Small
-      }
-      return Columns.Large
+    /**
+     * Group the communities together to where they're going to be placed.
+     * The grid is split into four sections:
+     *
+     * --------------
+     *    |__0__|
+     *  3 |_____|  1
+     *    |  2  |
+     * --------------
+     *
+     * Each community is added to a section in a circular motion as they are
+     * created. For example, the first five communities will be added in the
+     * following order: 0 -> 1 -> 2 -> 3 -> 0. All following communities, with the
+     * exception of the last two, will be added in the same cycle.
+     *
+     * The last two communities are added to group 3 and 1 respectively, resulting
+     * in 3 communities in groups 3 and 1 and 2 communities in groups 0 and 2.
+     */
+    communityGroups() {
+      const NUM_GROUPS = 4
+      const MAX_COMMUNITIES = 10
+
+      const groups = Array.from({ length: NUM_GROUPS })
+        .fill(-1)
+        .map(this.getGroupPosition)
+
+      Object.values(this.communities).forEach((community, index) => {
+        let groupNumber = index % NUM_GROUPS
+        if (index >= MAX_COMMUNITIES - 2) {
+          const lookup = {
+            [MAX_COMMUNITIES - 2]: 3,
+            [MAX_COMMUNITIES - 1]: 1,
+          }
+          groupNumber = lookup[index]
+        }
+        groups[groupNumber].communities.push(community)
+      })
+
+      return groups
     },
   },
   methods: {
-    getCommunityPosition(communityIndex, communityCount) {
+    getGroupPosition(_, index) {
       const positions = [
         [2, 1],
-        [-2, 2],
-        [communityCount === 5 ? `2 / span 2` : 2, -2],
-        [1, 2],
-        [3, 1],
-        [3, -2],
-        [1, 1],
-        [-2, 1],
-        [1, -2],
-        [-2, -2],
+        [-2, `1 / span 3`],
+        [2, -2],
+        [1, `1 / span 3`],
       ]
-      const [column, row] = positions[communityIndex]
-      return { column, row, orientation: this.getOrientation(column, row) }
+      const [column, row] = positions[index]
+      return {
+        column,
+        row,
+        orientation: this.getOrientation(column, row),
+        communities: [],
+      }
     },
     getOrientation(column, row) {
       if (column === 1) {
@@ -85,19 +115,34 @@ ul {
   margin: 0;
   width: 100%;
   height: 100%;
+  list-style: none;
 }
 
 .community-area {
   display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-gap: 1rem;
 }
 
-.community {
-  background: var(--color, var(--cos-color-secondary));
+.group {
   grid-column: var(--column);
   grid-row: var(--row);
+
+  ul {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+
+    &.east,
+    &.west {
+      flex-direction: column;
+    }
+  }
+}
+
+.community {
+  background: var(--color, var(--cos-color-secondary));
 
   --border-radius: 9999px;
   --size: 12rem;
@@ -106,28 +151,24 @@ ul {
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
     width: var(--size);
-    justify-self: center;
   }
 
   &.east {
     border-top-right-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
     height: var(--size);
-    align-self: center;
   }
 
   &.south {
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
     width: var(--size);
-    justify-self: center;
   }
 
   &.west {
     border-bottom-left-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
     height: var(--size);
-    align-self: center;
   }
 }
 </style>
