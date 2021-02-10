@@ -118,6 +118,7 @@ export default {
           color: "",
         }
         this.isLoading = false
+        this.isInputTouched = false
         this.$emit("add-community", community)
       })
     },
