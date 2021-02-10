@@ -24,6 +24,10 @@ export default {
   z-index: 0;
   transform: translateY(100%);
   transition: transform 0.3s ease-out;
+  min-height: 16rem;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
 
   &.show {
     z-index: 10;
