@@ -22,34 +22,22 @@ export default {
     return {
       cos: {
         circles: [],
-        communities: {
-          abcdef: {
-            id: "abcdef",
-            name: "School",
-            icon: "🎓",
-            color: "#A1BCFC",
-            connections: ["abc"],
-          },
-        },
-        connections: {
-          abc: {
-            id: "abc",
-            name: "Nanda",
-            avatar: "🤡",
-          },
-          def: {
-            id: "def",
-            name: "Shirley",
-            avatar: "😊",
-          },
-        },
+        communities: {},
+        connections: {},
       },
     }
   },
-  /* async mounted() {
-    const latestCosVersion = await client.cos.getActivity()
-    this.cos = latestCosVersion
-  }, */
+  async mounted() {
+    const { circles, communities, connections } = await client.cos.getActivity()
+
+    circles.forEach(circle => this.cos.circles.push(circle))
+    Object.entries(communities).forEach(([id, community]) =>
+      this.$set(this.cos.communities, id, community)
+    )
+    Object.entries(connections).forEach(([id, connection]) =>
+      this.$set(this.cos.connections, id, connection)
+    )
+  },
   methods: {
     addConnection({ community: communityId, ...newConnection }) {
       if (communityId) {
