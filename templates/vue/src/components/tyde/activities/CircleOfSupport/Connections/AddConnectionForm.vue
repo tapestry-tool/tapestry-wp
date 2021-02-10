@@ -35,10 +35,10 @@
             <button
               :class="[
                 'community-item',
-                { selected: community.id === connection.community },
+                { selected: connection.communities.includes(community.id) },
               ]"
               :style="`color: ${community.color}`"
-              @click="connection.community = community.id"
+              @click="toggleCommunity(community.id)"
             >
               <span class="community-color"></span>
               <span class="community-name">
@@ -84,7 +84,7 @@ export default {
       connection: {
         name: "",
         avatar: "😊",
-        community: "",
+        communities: [],
       },
       showPicker: false,
       isLoading: false,
@@ -108,28 +108,44 @@ export default {
     })
   },
   methods: {
-    selectEmoji(emoji) {
-      this.connection.avatar = emoji.data
-    },
-    async addConnection() {
-      this.isLoading = true
-
-      const connection = await client.cos.addConnection({
-        name: this.connection.name,
-        avatar: this.connection.avatar,
-      })
-
-      if (this.connection.community) {
-        await client.cos.addConnectionToCommunity(
-          this.connection.community,
-          connection.id
+    toggleCommunity(communityId) {
+      if (this.connection.communities.includes(communityId)) {
+        this.connection.communities = this.connection.communities.filter(
+          id => id !== communityId
         )
+      } else {
+        this.connection.communities.push(communityId)
       }
+    },
+    addConnection() {
+      this.isInputTouched = true
 
-      this.isLoading = false
-      this.$emit("add-connection", {
-        ...connection,
-        community: this.connection.community,
+      this.$nextTick(async () => {
+        if (!this.isNameValid) {
+          return
+        }
+
+        this.isLoading = true
+
+        const connection = await client.cos.addConnection({
+          name: this.connection.name,
+          avatar: this.connection.avatar,
+        })
+
+        if (this.connection.communities.length) {
+          await Promise.all(
+            this.connection.communities.map(communityId =>
+              client.cos.addConnectionToCommunity(communityId, connection.id)
+            )
+          )
+        }
+
+        this.isLoading = false
+        this.isInputTouched = false
+        this.$emit("add-connection", {
+          ...connection,
+          community: this.connection.community,
+        })
       })
     },
   },
