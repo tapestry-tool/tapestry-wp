@@ -161,6 +161,7 @@ ul {
   border-top: 1px solid var(--cos-color-tertiary);
   display: flex;
   overflow: hidden;
+  flex: 1;
 }
 
 .controls {
