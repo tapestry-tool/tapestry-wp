@@ -81,6 +81,7 @@ export default {
   border: var(--cos-border);
   height: 600px;
   position: relative;
+  overflow: hidden;
 }
 
 .connections {

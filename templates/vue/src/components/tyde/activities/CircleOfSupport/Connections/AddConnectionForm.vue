@@ -140,6 +140,7 @@ export default {
 form {
   display: flex;
   column-gap: 3rem;
+  padding: 2rem;
 }
 
 ul {
