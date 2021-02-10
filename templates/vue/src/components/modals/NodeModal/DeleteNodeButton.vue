@@ -21,6 +21,11 @@ export default {
       required: false,
       default: false,
     },
+    isMultiContentNodeChild: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
@@ -53,6 +58,7 @@ export default {
     }
   },
   methods: {
+    ...mapGetters(["getParent"]),
     ...mapActions(["deleteNode", "deleteLink"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     removeNode() {
@@ -73,7 +79,11 @@ export default {
         })
         this.$router.push({
           name: names.APP,
-          params: { nodeId: this.neighbour.id },
+          params: {
+            nodeId: this.isMultiContentNodeChild
+              ? this.parent.id
+              : this.neighbour.id,
+          },
           query: this.$route.query,
         })
       } else {

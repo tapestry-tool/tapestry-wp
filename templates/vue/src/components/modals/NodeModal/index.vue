@@ -130,6 +130,7 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
+              :isMultiContentNodeChild="isMultiContentNodeChild"
               @submit="loading = true"
               @message="setDisabledMessage"
             ></delete-node-button>
@@ -608,6 +609,12 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.rootId },
+            query: this.$route.query,
+          })
+        } else if (this.isMultiContentNodeChild) {
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.parent.id, type: "edit", tab: "content" },
             query: this.$route.query,
           })
         } else {
