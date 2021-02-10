@@ -10,7 +10,7 @@
     @hide="handleClose"
   >
     <template #modal-title>
-      <b-link v-if="isMultiContentNodeChild" @click="handleBack">
+      <b-link v-if="isMultiContentNodeChild" @click="handleClose">
         <i class="fas fa-chevron-left" />
         Back to "{{ parent.title }}"
       </b-link>
@@ -566,13 +566,6 @@ export default {
           query: this.$route.query,
         })
       }
-    },
-    handleBack() {
-      this.$router.push({
-        name: names.MODAL,
-        params: { nodeId: this.parent.id, type: "edit", tab: "content" },
-        query: this.$route.query,
-      })
     },
     handleClose(event) {
       const oldNode = this.getNode(this.nodeId)
