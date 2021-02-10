@@ -147,11 +147,7 @@ ul {
 }
 
 .content {
-  background: white;
-  position: relative;
-  z-index: 10;
   height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
   display: flex;
   overflow: hidden;
 }
@@ -187,7 +183,6 @@ ul {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
   grid-auto-rows: min-content;
-  padding: 1rem;
   margin-left: 7rem;
   height: 100%;
 

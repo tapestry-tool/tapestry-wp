@@ -39,7 +39,7 @@ export default {
   background: white;
   position: relative;
   z-index: 10;
-  padding: 3rem;
+  padding: 2rem;
   height: 100%;
   border-top: 1px solid var(--cos-color-tertiary);
 }
