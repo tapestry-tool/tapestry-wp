@@ -150,6 +150,7 @@ ul {
   height: 100%;
   display: flex;
   overflow: hidden;
+  flex: 1;
 }
 
 .controls {
