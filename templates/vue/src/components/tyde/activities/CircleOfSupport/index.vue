@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
 

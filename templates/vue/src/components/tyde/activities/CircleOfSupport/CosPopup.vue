@@ -20,7 +20,6 @@ export default {
 
 <style lang="scss" scoped>
 .wrapper {
-  height: 80%;
   z-index: 0;
   transform: translateY(100%);
   transition: transform 0.3s ease-out;
