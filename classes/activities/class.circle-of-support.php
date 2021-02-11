@@ -52,7 +52,7 @@ class CircleOfSupport
         }
 
         $community = $this->current['communities']->$communityId;
-        array_push($community['connections'], $connectionId);
+        array_push($community->connections, $connectionId);
 
         return $community;
     }
