@@ -18,7 +18,7 @@
             {{ connection.avatar }}
           </button>
           <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="connection.avatar = $event.data" />
+            <v-emoji-picker @select="handleEmojiSelect" />
           </div>
         </div>
         <div class="controls">
@@ -116,6 +116,10 @@ export default {
       } else {
         this.connection.communities.push(communityId)
       }
+    },
+    handleEmojiSelect(event) {
+      this.connection.avatar = event.data
+      this.showPicker = false
     },
     addConnection() {
       this.isInputTouched = true
