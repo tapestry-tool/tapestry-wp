@@ -23,14 +23,14 @@ class CircleOfSupport
     {
         $id = uniqid();
         $connection->id = $id;
-        $this->current->connections->$id = $connection;
+        $this->current['connections']->$id = $connection;
 
         return $connection;
     }
 
     public function updateConnection($id, $connection)
     {
-        $this->current->connections->$id = $connection;
+        $this->current['connections']->$id = $connection;
 
         return $connection;
     }
@@ -61,7 +61,7 @@ class CircleOfSupport
             $circleOfSupport = $this->current;
         }
 
-        $circleOfSupport->id = $this->userId;
+        $circleOfSupport['id'] = $this->userId;
         $now = date_format(new DateTime(), DateTime::ISO8601);
 
         if ($this->_isEmpty()) {
