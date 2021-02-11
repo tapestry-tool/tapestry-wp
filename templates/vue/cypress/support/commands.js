@@ -197,15 +197,23 @@ Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
 )
 
-// Query and load iFrame content into cypress
-// using the technique described in this blog:
-// https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
-// FIXME: subsequent finds don't seem to work
-Cypress.Commands.add("getIFrame", id =>
+// Get an iFrame subject by id and execute optional
+// assertions on its document
+// Limitation: cannot do cypress commands on subjects within the frame,
+// only make assertions on the static DOM object
+Cypress.Commands.add("getIFrame", (id, fn = fr => fr) =>
   cy
     .get(`iframe[id="${id}"]`)
-    .its("0.contentDocument")
-    .should("exist")
-    .its("body")
-    .should("not.be.undefined")
+    // Assertions like this will fail
+    // .find("body")
+    // .should("exist")
+    // However,
+    .should(frame => {
+      // this assertion passes
+      // (reference: https://github.com/danteoh/cypress-iframe-test/blob/master/cypress/integration/iframe_spec.js)
+      expect(frame.contents().find("body")).to.exist
+
+      // and we can do arbitrary assertions on the contents
+      fn(frame.contents())
+    })
 )
