@@ -12,12 +12,14 @@
       @add-connection="addConnection"
       @add-community="addCommunity"
     />
-    <add-community-tab class="tab" @add-community="addCommunity" />
+    <add-community-tab @add-community="addCommunity" />
   </div>
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
 import Helpers from "@/utils/Helpers"
+
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
 import CommunitiesView from "./CommunitiesView"
@@ -32,40 +34,30 @@ export default {
     return {
       cos: {
         circles: [],
-        communities: {
-          abcdef: {
-            id: "abcdef",
-            name: "School",
-            icon: "🎓",
-            color: "#A1BCFC",
-            connections: ["abc"],
-          },
-        },
-        connections: {
-          abc: {
-            id: "abc",
-            name: "Nanda",
-            avatar: "🤡",
-          },
-          def: {
-            id: "def",
-            name: "Shirley",
-            avatar: "😊",
-          },
-        },
+        communities: {},
+        connections: {},
       },
     }
   },
-  /* async mounted() {
-    const latestCosVersion = await client.cos.getActivity()
-    this.cos = latestCosVersion
-  }, */
+  async mounted() {
+    const { circles, communities, connections } = await client.cos.getActivity()
+
+    circles.forEach(circle => this.cos.circles.push(circle))
+    Object.entries(communities).forEach(([id, community]) =>
+      this.$set(this.cos.communities, id, community)
+    )
+    Object.entries(connections).forEach(([id, connection]) =>
+      this.$set(this.cos.connections, id, connection)
+    )
+  },
   methods: {
-    addConnection({ community: communityId, ...newConnection }) {
-      if (communityId) {
-        const community = this.cos.communities[communityId]
-        community.connections.push(newConnection.id)
-        this.cos.communities[communityId] = { ...community }
+    addConnection({ communities, ...newConnection }) {
+      if (communities.length) {
+        communities.forEach(communityId => {
+          const community = this.cos.communities[communityId]
+          community.connections.push(newConnection.id)
+          this.cos.communities[communityId] = { ...community }
+        })
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },
@@ -108,6 +100,7 @@ export default {
   border: var(--cos-border);
   height: 600px;
   position: relative;
+  overflow: hidden;
 }
 
 .tab {

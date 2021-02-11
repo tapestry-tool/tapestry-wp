@@ -23,7 +23,7 @@ class CircleOfSupport
     {
         $id = uniqid();
         $connection->id = $id;
-        $this->current->connections->$id = $connection;
+        $this->current['connections']->$id = $connection;
 
         return $connection;
     }
@@ -33,7 +33,7 @@ class CircleOfSupport
         $id = uniqid();
         $community->id = $id;
         $community->connections = [];
-        $this->current->communities->$id = $community;
+        $this->current['communities']->$id = $community;
 
         return $community;
     }
@@ -41,17 +41,17 @@ class CircleOfSupport
     public function addConnectionToCommunity($connection, $communityId)
     {
         // Check if community exists
-        if (!isset($this->current->communities->$communityId)) {
+        if (!isset($this->current['communities']->$communityId)) {
             return;
         }
 
         // Check if connection exists
         $connectionId = $connection->id;
-        if (!isset($this->current->connections->$connectionId)) {
+        if (!isset($this->current['connections']->$connectionId)) {
             return;
         }
 
-        $community = $this->current->communities->$communityId;
+        $community = $this->current['communities']->$communityId;
         array_push($community->connections, $connectionId);
 
         return $community;
@@ -59,7 +59,7 @@ class CircleOfSupport
 
     public function updateConnection($id, $connection)
     {
-        $this->current->connections->$id = $connection;
+        $this->current['connections']->$id = $connection;
 
         return $connection;
     }
@@ -90,7 +90,7 @@ class CircleOfSupport
             $circleOfSupport = $this->current;
         }
 
-        $circleOfSupport->id = $this->userId;
+        $circleOfSupport['id'] = $this->userId;
         $now = date_format(new DateTime(), DateTime::ISO8601);
 
         if ($this->_isEmpty()) {

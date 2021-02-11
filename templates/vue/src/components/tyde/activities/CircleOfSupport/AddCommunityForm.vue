@@ -90,6 +90,21 @@ export default {
     isNameValid() {
       return !this.isInputTouched || this.community.name.length > 0
     },
+    changed() {
+      const defaultCommunity = {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      }
+      return Object.entries(this.community).some(
+        ([key, value]) => value !== defaultCommunity[key]
+      )
+    },
+  },
+  watch: {
+    changed(hasChanged) {
+      this.$emit("changed", hasChanged)
+    },
   },
   mounted() {
     const handleClick = evt => {
@@ -103,17 +118,24 @@ export default {
     })
   },
   methods: {
-    async addCommunity() {
-      this.isLoading = true
-      const community = await client.cos.addCommunity(this.community)
-      // Reset the community object
-      this.community = {
-        name: "",
-        icon: "👨‍👩‍👦",
-        color: "",
-      }
-      this.isLoading = false
-      this.$emit("add-community", community)
+    addCommunity() {
+      this.isInputTouched = true
+      this.$nextTick(async () => {
+        if (!this.isNameValid) {
+          return
+        }
+        this.isLoading = true
+        const community = await client.cos.addCommunity(this.community)
+        // Reset the community object
+        this.community = {
+          name: "",
+          icon: "👨‍👩‍👦",
+          color: "",
+        }
+        this.isLoading = false
+        this.isInputTouched = false
+        this.$emit("add-community", community)
+      })
     },
   },
 }
@@ -168,7 +190,8 @@ button {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+  column-gap: 0.5rem;
+  row-gap: 1rem;
   align-items: center;
 }
 
@@ -182,8 +205,8 @@ button {
   &:after {
     content: "";
     position: absolute;
-    width: 130%;
-    height: 130%;
+    width: 120%;
+    height: 120%;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -229,7 +252,8 @@ button {
 }
 
 .submit {
-  border: var(--cos-border);
+  background: #757575;
+  color: white;
   border-radius: 0.5rem;
   padding: 0.5rem;
 }

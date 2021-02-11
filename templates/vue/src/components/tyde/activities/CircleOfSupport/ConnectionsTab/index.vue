@@ -20,22 +20,30 @@
         @add-community="$emit('add-community', $event)"
       />
       <div v-else class="content">
-        <button class="content-control" aria-label="search" @click="toggleSearch">
-          <tapestry-icon icon="search" />
-        </button>
-        <div v-if="state === states.SEARCH" class="searchbar">
-          <label id="search-label" style="display: none;">
-            Search for a connection
-          </label>
-          <input v-model="search" aria-labelledby="search-label" type="text" />
+        <div class="controls">
+          <div class="search">
+            <button
+              class="content-control"
+              aria-label="search"
+              @click="toggleSearch"
+            >
+              <tapestry-icon icon="search" />
+            </button>
+            <div v-if="state === states.SEARCH" class="searchbar">
+              <label id="search-label" style="display: none;">
+                Search for a connection
+              </label>
+              <input v-model="search" aria-labelledby="search-label" type="text" />
+            </div>
+          </div>
+          <button
+            class="content-control"
+            aria-label="add connection"
+            @click="state = states.ADD"
+          >
+            <tapestry-icon icon="plus" />
+          </button>
         </div>
-        <button
-          class="content-control"
-          aria-label="add connection"
-          @click="state = states.ADD"
-        >
-          <tapestry-icon icon="plus" />
-        </button>
         <ul :class="['connection-list', { searching: state === states.SEARCH }]">
           <li
             v-for="connection in visibleConnections"
@@ -134,56 +142,61 @@ ul {
   padding: 0;
 }
 
+.search {
+  display: flex;
+}
+
 .content {
-  display: grid;
-  grid-template-columns: 6rem 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  gap: 1rem;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  flex: 1;
+}
+
+.controls {
+  position: absolute;
+  left: 2rem;
+  top: 2rem;
 }
 
 .content-control {
-  flex: 1;
-  background: none;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--cos-color-secondary);
   margin: 0;
   padding: 0;
-  display: block;
   border-radius: 1rem;
-  font-size: 4rem;
-  grid-column: 1;
+  font-size: 3rem;
+  background: white;
 
   &:hover {
     background: var(--cos-color-tertiary);
     color: white;
   }
-
-  &[aria-label="search"] {
-    grid-row: 1;
-  }
-
-  &[aria-label="add connection"] {
-    grid-row: 2;
-  }
 }
 
 .connection-list {
   width: 100%;
-  overflow-x: scroll;
+  overflow-y: scroll;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
   grid-auto-rows: min-content;
-  gap: 1rem;
-  grid-row: 1 / -1;
+  margin-left: 7rem;
+  height: 100%;
 
   &.searching {
-    grid-row-start: 2;
+    margin-top: 7rem;
+    height: calc(100% - 7rem);
   }
 }
 
 .searchbar {
-  grid-column: 2 / -1;
   display: flex;
   align-items: center;
+  margin-left: 1rem;
 
   input {
     border-radius: 0.5rem;
@@ -206,10 +219,12 @@ ul {
     border: 1px solid var(--cos-color-tertiary);
     color: var(--cos-color-secondary);
     text-transform: uppercase;
+    cursor: default;
   }
 
   h1 {
     font-size: 4rem;
+    cursor: default;
   }
 }
 
@@ -217,6 +232,9 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
 
   li {
     height: 1rem;
