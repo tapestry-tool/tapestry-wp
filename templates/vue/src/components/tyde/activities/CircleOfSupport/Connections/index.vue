@@ -169,11 +169,13 @@ export default {
       })
 
       if (this.connection.communities.length) {
-        await Promise.all(
-          this.connection.communities.map(communityId =>
-            client.cos.addConnectionToCommunity(communityId, connection.id)
-          )
-        )
+        /**
+         * Add connection to community one at a time to avoid race condition where
+         * only the last community is kept.
+         */
+        for (const communityId of this.connection.communities) {
+          await client.cos.addConnectionToCommunity(communityId, connection.id)
+        }
       }
       this.$emit("add-connection", {
         ...connection,
