@@ -90,6 +90,21 @@ export default {
     isNameValid() {
       return !this.isInputTouched || this.community.name.length > 0
     },
+    changed() {
+      const defaultCommunity = {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      }
+      return Object.entries(this.community).some(
+        ([key, value]) => value !== defaultCommunity[key]
+      )
+    },
+  },
+  watch: {
+    changed(hasChanged) {
+      this.$emit("changed", hasChanged)
+    },
   },
   mounted() {
     const handleClick = evt => {
@@ -175,7 +190,8 @@ button {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+  column-gap: 0.5rem;
+  row-gap: 1rem;
   align-items: center;
 }
 
@@ -189,8 +205,8 @@ button {
   &:after {
     content: "";
     position: absolute;
-    width: 130%;
-    height: 130%;
+    width: 120%;
+    height: 120%;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);

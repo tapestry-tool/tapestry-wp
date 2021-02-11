@@ -5,10 +5,7 @@
       style="position: absolute; left: 0; bottom: 0; width: 100%;"
     >
       <template #toggle>
-        <cos-popup-button
-          style="right: 2rem"
-          @click="isOpen ? (showModal = true) : (isOpen = true)"
-        >
+        <cos-popup-button style="right: 2rem" @click="togglePopup">
           <tapestry-icon :icon="isOpen ? 'chevron-down' : 'plus'" />
         </cos-popup-button>
       </template>
@@ -17,6 +14,7 @@
           ref="form"
           @back="isOpen = false"
           @add-community="handleAddCommunity"
+          @changed="wasEdited = $event"
         />
       </template>
     </cos-popup>
@@ -55,9 +53,17 @@ export default {
     return {
       isOpen: false,
       showModal: false,
+      wasEdited: false,
     }
   },
   methods: {
+    togglePopup() {
+      if (this.isOpen && this.wasEdited) {
+        this.showModal = true
+      } else {
+        this.isOpen = !this.isOpen
+      }
+    },
     close() {
       this.showModal = false
       this.isOpen = false
