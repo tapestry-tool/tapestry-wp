@@ -42,11 +42,13 @@ export default {
     )
   },
   methods: {
-    addConnection({ community: communityId, ...newConnection }) {
-      if (communityId) {
-        const community = this.cos.communities[communityId]
-        community.connections.push(newConnection.id)
-        this.cos.communities[communityId] = { ...community }
+    addConnection({ communities, ...newConnection }) {
+      if (communities.length) {
+        communities.forEach(communityId => {
+          const community = this.cos.communities[communityId]
+          community.connections.push(newConnection.id)
+          this.cos.communities[communityId] = { ...community }
+        })
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },

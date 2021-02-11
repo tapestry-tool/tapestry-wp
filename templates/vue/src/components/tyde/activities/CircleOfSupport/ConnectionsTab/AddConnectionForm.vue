@@ -161,7 +161,7 @@ export default {
         this.isInputTouched = false
         this.$emit("add-connection", {
           ...connection,
-          community: this.connection.community,
+          communities: this.connection.communities,
         })
       })
     },
