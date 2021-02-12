@@ -300,6 +300,11 @@ class TapestryApi {
         console.log("Not implemented - addConnectionToCommunity")
         console.log({ communityId, connectionId })
       },
+      removeConnectionFromCommunity(communityId, connectionId) {
+        // TODO: Implement remove connection from communities
+        console.log("Not implemented - removeConnectionFromCommunity")
+        console.log({ communityId, connectionId })
+      },
     }
   }
 }
