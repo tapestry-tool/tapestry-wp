@@ -5,82 +5,73 @@
       @back="showCommunityForm = false"
       @add-community="handleAddCommunity"
     />
-    <b-overlay v-show="!showCommunityForm" :show="isLoading" style="height: 100%">
-      <form style="height: 100%" @submit.stop.prevent>
-        <div class="connection" style="flex: 1">
-          <input
-            v-model="connection.name"
-            name="connection name"
-            class="connection-name"
-            type="text"
-            placeholder="connection"
-            @blur="isInputTouched = true"
-          />
-          <b-form-invalid-feedback :state="isNameValid">
-            Please enter a name for your connection.
-          </b-form-invalid-feedback>
-          <div id="emoji-picker" style="position: relative">
-            <button class="preview" @click="showPicker = !showPicker">
-              {{ connection.avatar }}
-            </button>
-            <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-              <v-emoji-picker @select="connection.avatar = $event.data" />
-            </div>
-          </div>
-          <div class="controls">
-            <button @click="$emit('back')">Cancel</button>
-            <button class="submit" @click="addConnection">
-              Add connection
-            </button>
+    <form v-show="!showCommunityForm" style="height: 100%" @submit.stop.prevent>
+      <div class="connection" style="flex: 1">
+        <input
+          v-model="connection.name"
+          name="connection name"
+          class="connection-name"
+          type="text"
+          placeholder="connection"
+          @blur="isInputTouched = true"
+        />
+        <b-form-invalid-feedback :state="isNameValid">
+          Please enter a name for your connection.
+        </b-form-invalid-feedback>
+        <div id="emoji-picker" style="position: relative">
+          <button class="preview" @click="showPicker = !showPicker">
+            {{ connection.avatar }}
+          </button>
+          <div v-show="showPicker" class="picker" data-qa="emoji-picker">
+            <v-emoji-picker @select="connection.avatar = $event.data" />
           </div>
         </div>
-        <div class="community" style="flex: 2">
-          <h1 class="community-title">
-            Which communities do this person belong to?
-          </h1>
-          <ul class="community-list">
-            <li v-for="community in communities" :key="community.id">
-              <button
-                :class="[
-                  'community-item',
-                  { selected: connection.communities.includes(community.id) },
-                ]"
-                :style="`color: ${community.color}`"
-                @click="toggleCommunity(community.id)"
-              >
-                <span class="community-color"></span>
-                <span class="community-name">
-                  {{ community.name }}
-                </span>
-              </button>
-            </li>
-            <li v-if="Object.keys(communities).length < 10">
-              <button class="community-item" @click="showCommunityForm = true">
-                <span
-                  class="community-color"
-                  style="color: var(--cos-color-tertiary)"
-                >
-                  <tapestry-icon icon="plus" />
-                </span>
-                <span
-                  class="community-name"
-                  style="color: var(--cos-color-tertiary)"
-                >
-                  Add new
-                </span>
-              </button>
-            </li>
-          </ul>
+        <div class="controls">
+          <button @click="$emit('back')">Cancel</button>
+          <button class="submit" @click="addConnection">
+            Add connection
+          </button>
         </div>
-      </form>
-    </b-overlay>
+      </div>
+      <div class="community" style="flex: 2">
+        <h1 class="community-title">
+          Which communities do this person belong to?
+        </h1>
+        <ul class="community-list">
+          <li v-for="community in communities" :key="community.id">
+            <button
+              :class="[
+                'community-item',
+                { selected: connection.communities.includes(community.id) },
+              ]"
+              :style="`color: ${community.color}`"
+              @click="toggleCommunity(community.id)"
+            >
+              <span class="community-color"></span>
+              <span class="community-name">
+                {{ community.name }}
+              </span>
+            </button>
+          </li>
+          <li v-if="Object.keys(communities).length < 10">
+            <button class="community-item" @click="showCommunityForm = true">
+              <span class="community-color" style="color: var(--cos-color-tertiary)">
+                <tapestry-icon icon="plus" />
+              </span>
+              <span class="community-name" style="color: var(--cos-color-tertiary)">
+                Add new
+              </span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </form>
   </div>
 </template>
 
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import client from "@/services/TapestryAPI"
 import AddCommunityForm from "../AddCommunityForm"
 
 export default {
@@ -89,21 +80,23 @@ export default {
     TapestryIcon,
     VEmojiPicker,
   },
+  model: {
+    prop: "connection",
+    event: "change",
+  },
   props: {
     communities: {
+      type: Object,
+      required: true,
+    },
+    connection: {
       type: Object,
       required: true,
     },
   },
   data() {
     return {
-      connection: {
-        name: "",
-        avatar: "😊",
-        communities: [],
-      },
       showPicker: false,
-      isLoading: false,
       isInputTouched: false,
       showCommunityForm: false,
     }
@@ -141,30 +134,8 @@ export default {
         if (!this.isNameValid) {
           return
         }
-
-        this.isLoading = true
-
-        const connection = await client.cos.addConnection({
-          name: this.connection.name,
-          avatar: this.connection.avatar,
-        })
-
-        if (this.connection.communities.length) {
-          /**
-           * Add connection to community one at a time to avoid race condition where
-           * only the last community is kept.
-           */
-          for (const communityId of this.connection.communities) {
-            await client.cos.addConnectionToCommunity(communityId, connection.id)
-          }
-        }
-
-        this.isLoading = false
         this.isInputTouched = false
-        this.$emit("add-connection", {
-          ...connection,
-          communities: this.connection.communities,
-        })
+        this.$emit("submit")
       })
     },
     handleAddCommunity(community) {

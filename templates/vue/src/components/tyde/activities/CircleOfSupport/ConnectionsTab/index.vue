@@ -11,14 +11,19 @@
       </cos-popup-button>
     </template>
     <template #content>
-      <add-connection-form
-        v-if="state === states.ADD"
+      <b-overlay
+        v-if="state === states.ADD || state === states.EDIT"
         class="form"
-        :communities="communities"
-        @back="state = states.OPEN"
-        @add-connection="addConnection"
-        @add-community="$emit('add-community', $event)"
-      />
+        :show="isSubmitting"
+      >
+        <add-connection-form
+          v-model="connection"
+          :communities="communities"
+          @back="state = states.OPEN"
+          @submit="handleSubmit"
+          @add-community="$emit('add-community', $event)"
+        />
+      </b-overlay>
       <div v-else class="content">
         <div class="controls">
           <div class="search">
@@ -46,15 +51,16 @@
         </div>
         <ul :class="['connection-list', { searching: state === states.SEARCH }]">
           <li
-            v-for="connection in visibleConnections"
-            :key="connection.id"
-            class="connection"
+            v-for="visibleConnection in visibleConnections"
+            :key="visibleConnection.id"
+            class="visibleConnection"
+            @click="editConnection(visibleConnection)"
           >
-            <p>{{ connection.name }}</p>
-            <h1>{{ connection.avatar }}</h1>
+            <p>{{ visibleConnection.name }}</p>
+            <h1>{{ visibleConnection.avatar }}</h1>
             <ul class="community-list">
               <li
-                v-for="community in connection.communities"
+                v-for="community in visibleConnection.communities"
                 :key="community.id"
                 :style="`--community-color: ${community.color}`"
               ></li>
@@ -69,7 +75,7 @@
 <script>
 import { matchSorter } from "match-sorter"
 import TapestryIcon from "@/components/common/TapestryIcon"
-
+import client from "@/services/TapestryAPI"
 import AddConnectionForm from "./AddConnectionForm"
 import CosPopup from "../CosPopup"
 import CosPopupButton from "../CosPopupButton"
@@ -79,6 +85,7 @@ const states = {
   OPEN: 1,
   SEARCH: 2,
   ADD: 3,
+  EDIT: 4,
 }
 
 export default {
@@ -103,6 +110,13 @@ export default {
       state: states.CLOSED,
       search: "",
       isOpen: false,
+      isSubmitting: false,
+      connection: {
+        id: "",
+        name: "",
+        avatar: "😊",
+        communities: [],
+      },
     }
   },
   computed: {
@@ -122,14 +136,90 @@ export default {
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
     },
-    addConnection(...args) {
+    editConnection(connection) {
+      this.connection.id = connection.id
+      this.connection.name = connection.name
+      this.connection.avatar = connection.avatar
+      this.connection.communities = [
+        ...connection.communities.map(community => community.id),
+      ]
+      this.state = states.EDIT
+    },
+    async handleSubmit() {
+      this.isSubmitting = true
+
+      switch (this.state) {
+        case states.ADD:
+          await this.addNewConnection()
+          break
+        case states.EDIT:
+          await this.updateConnection()
+          break
+        default:
+          break
+      }
+
+      this.isSubmitting = false
+      this.connection = {
+        id: "",
+        name: "",
+        avatar: "😊",
+        communities: [],
+      }
       this.state = states.OPEN
-      this.$emit("add-connection", ...args)
+    },
+    async addNewConnection() {
+      const connection = await client.cos.addConnection({
+        name: this.connection.name,
+        avatar: this.connection.avatar,
+      })
+
+      if (this.connection.communities.length) {
+        /**
+         * Add connection to community one at a time to avoid race condition where
+         * only the last community is kept.
+         */
+        for (const communityId of this.connection.communities) {
+          await client.cos.addConnectionToCommunity(communityId, connection.id)
+        }
+      }
+      this.$emit("add-connection", {
+        ...connection,
+        communities: this.connection.communities,
+      })
+    },
+    async updateConnection() {
+      const currentCommunities = this.getCommunities(this.connection.id)
+      await client.cos.updateConnection(this.connection.id, { ...this.connection })
+
+      const { additions, deletions } = this.getDifferences(
+        currentCommunities.map(community => community.id),
+        this.connection.communities
+      )
+
+      for (const addition of additions) {
+        await client.cos.addConnectionToCommunity(addition, this.connection.id)
+      }
+
+      for (const deletion of deletions) {
+        await client.cos.removeConnectionFromCommunity(deletion, this.connection.id)
+      }
+
+      this.$emit("update-connection", {
+        ...this.connection,
+        additions,
+        deletions,
+      })
     },
     getCommunities(connectionId) {
       return Object.values(this.communities).filter(community =>
         community.connections.includes(connectionId)
       )
+    },
+    getDifferences(original, newVersion) {
+      const additions = newVersion.filter(item => !original.includes(item))
+      const deletions = original.filter(item => !newVersion.includes(item))
+      return { additions, deletions }
     },
   },
 }
@@ -213,6 +303,8 @@ ul {
   justify-content: space-between;
   padding: 1rem;
   height: 12rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
 
   p {
     padding: 0.25rem;
@@ -225,6 +317,10 @@ ul {
   h1 {
     font-size: 4rem;
     cursor: default;
+  }
+
+  &:hover {
+    background: #f0f0f0;
   }
 }
 

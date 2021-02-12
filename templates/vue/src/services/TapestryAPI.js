@@ -305,6 +305,11 @@ class TapestryApi {
           .post(`/activities/cos/communities`, community)
           .then(res => res.data)
       },
+      removeConnectionFromCommunity(communityId, connectionId) {
+        // TODO: Implement remove connection from communities
+        console.log("Not implemented - removeConnectionFromCommunity")
+        console.log({ communityId, connectionId })
+      },
     }
   }
 }
