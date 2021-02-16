@@ -53,7 +53,7 @@
           <li
             v-for="visibleConnection in visibleConnections"
             :key="visibleConnection.id"
-            class="visibleConnection"
+            class="connection"
             @click="editConnection(visibleConnection)"
           >
             <p>{{ visibleConnection.name }}</p>

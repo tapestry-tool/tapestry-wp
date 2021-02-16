@@ -3,17 +3,17 @@
 /**
  * Tapestry Endpoints.
  */
-require_once __DIR__.'/utilities/class.tapestry-permissions.php';
-require_once __DIR__.'/classes/class.tapestry.php';
-require_once __DIR__.'/classes/class.tapestry-node.php';
-require_once __DIR__.'/classes/class.tapestry-group.php';
-require_once __DIR__.'/classes/class.tapestry-user-progress.php';
-require_once __DIR__.'/classes/class.tapestry-audio.php';
-require_once __DIR__.'/classes/class.tapestry-form.php';
-require_once __DIR__.'/classes/class.tapestry-h5p.php';
-require_once __DIR__.'/classes/class.constants.php';
-require_once __DIR__.'/endpoints/endpoints.circle-of-support.php';
-require_once __DIR__.'/utilities/class.tapestry-user.php';
+require_once __DIR__ . '/utilities/class.tapestry-permissions.php';
+require_once __DIR__ . '/classes/class.tapestry.php';
+require_once __DIR__ . '/classes/class.tapestry-node.php';
+require_once __DIR__ . '/classes/class.tapestry-group.php';
+require_once __DIR__ . '/classes/class.tapestry-user-progress.php';
+require_once __DIR__ . '/classes/class.tapestry-audio.php';
+require_once __DIR__ . '/classes/class.tapestry-form.php';
+require_once __DIR__ . '/classes/class.tapestry-h5p.php';
+require_once __DIR__ . '/classes/class.constants.php';
+require_once __DIR__ . '/endpoints/endpoints.circle-of-support.php';
+require_once __DIR__ . '/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -351,6 +351,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
         ]
     ],
+    'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
+        ]
+    ],
 ];
 
 /*
@@ -381,7 +388,7 @@ function saveAnalytics($request)
     $object_id = $body->object_id;
     $details = $body->details;
 
-    $table_name = $wpdb->prefix.'tapestry_analytics_events';
+    $table_name = $wpdb->prefix . 'tapestry_analytics_events';
 
     $success = $wpdb->insert(
         $table_name,
@@ -405,12 +412,12 @@ function saveAnalytics($request)
 function get_all_user_roles($request)
 {
     global $wp_roles;
-    
+
     $roles = $wp_roles->roles;
-    
+
     return $roles;
 }
-  
+
 
 function login($request)
 {
@@ -510,10 +517,10 @@ function addTapestry($request)
         $page = get_page_by_title($tapestryData->title, 'OBJECT', 'tapestry');
         if ($page) {
             $count = 1;
-            $title = $tapestryData->title.' ('.$count.')';
+            $title = $tapestryData->title . ' (' . $count . ')';
             while (get_page_by_title($title, 'OBJECT', 'tapestry')) {
                 ++$count;
-                $title = $tapestryData->title.' ('.$count.')';
+                $title = $tapestryData->title . ' (' . $count . ')';
             }
         }
         $user = wp_get_current_user();
@@ -755,8 +762,10 @@ function addTapestryLink($request)
         ) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
-        if (TapestryHelpers::nodeIsDraft($link->source, $postId)
-            || TapestryHelpers::nodeIsDraft($link->target, $postId)) {
+        if (
+            TapestryHelpers::nodeIsDraft($link->source, $postId)
+            || TapestryHelpers::nodeIsDraft($link->target, $postId)
+        ) {
             $tapestry = new Tapestry($postId);
             return $tapestry->addLink($link);
         }
@@ -1122,7 +1131,7 @@ function optimizeTapestryNodeThumbnails($request)
             $node = $tapestry->getNode($nodeMetaId);
             $nodeData = $node->get();
             $protocol = is_ssl() ? "https:" : "http:";
-    
+
             if ($nodeData->imageURL) {
                 $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
