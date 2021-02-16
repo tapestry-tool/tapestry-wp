@@ -4,7 +4,7 @@
       <span v-if="state === states.CLOSED">😊</span>
       <tapestry-icon v-else icon="chevron-down" />
     </button>
-    <div class="content">
+    <div :class="['content', { list: state === states.OPEN }]">
       <div class="controls">
         <div class="search">
           <button
@@ -257,8 +257,11 @@ ul {
   height: 100%;
   border-top: 1px solid var(--cos-color-tertiary);
   display: flex;
-  overflow: hidden;
   flex: 1;
+
+  &.list {
+    overflow: hidden;
+  }
 }
 
 .controls {
