@@ -44,7 +44,7 @@
           <button
             class="content-control"
             aria-label="add connection"
-            @click="state = states.ADD"
+            @click="openConnectionForm"
           >
             <tapestry-icon icon="plus" />
           </button>
