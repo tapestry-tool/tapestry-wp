@@ -4,7 +4,12 @@
       <span v-if="state === states.CLOSED">😊</span>
       <tapestry-icon v-else icon="chevron-down" />
     </button>
-    <div :class="['content', { list: state === states.OPEN }]">
+    <div
+      :class="[
+        'content',
+        { list: !(state === states.ADD || state === states.EDIT) },
+      ]"
+    >
       <div class="controls">
         <div class="search">
           <button
