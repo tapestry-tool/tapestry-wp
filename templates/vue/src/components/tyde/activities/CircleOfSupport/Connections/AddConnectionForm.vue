@@ -65,7 +65,6 @@
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import client from "@/services/TapestryAPI"
 
 // TODO: Implement navigation to add community
 export default {
@@ -73,21 +72,23 @@ export default {
     VEmojiPicker,
     TapestryIcon,
   },
+  model: {
+    prop: "connection",
+    event: "change",
+  },
   props: {
     communities: {
+      type: Object,
+      required: true,
+    },
+    connection: {
       type: Object,
       required: true,
     },
   },
   data() {
     return {
-      connection: {
-        name: "",
-        avatar: "😊",
-        communities: [],
-      },
       showPicker: false,
-      isLoading: false,
       isInputTouched: false,
     }
   },
@@ -128,28 +129,8 @@ export default {
         if (!this.isNameValid) {
           return
         }
-
-        this.isLoading = true
-
-        const connection = await client.cos.addConnection({
-          name: this.connection.name,
-          avatar: this.connection.avatar,
-        })
-
-        if (this.connection.communities.length) {
-          await Promise.all(
-            this.connection.communities.map(communityId =>
-              client.cos.addConnectionToCommunity(communityId, connection.id)
-            )
-          )
-        }
-
-        this.isLoading = false
         this.isInputTouched = false
-        this.$emit("add-connection", {
-          ...connection,
-          community: this.connection.community,
-        })
+        this.$emit("submit")
       })
     },
   },

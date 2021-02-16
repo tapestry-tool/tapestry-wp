@@ -5,6 +5,7 @@
       :connections="cos.connections"
       :communities="cos.communities"
       @add-connection="addConnection"
+      @update-connection="updateConnection"
     />
   </div>
 </template>
@@ -39,21 +40,31 @@ export default {
     )
   },
   methods: {
-    addConnection({ community: communityId, ...newConnection }) {
-      if (communityId) {
-        const community = this.cos.communities[communityId]
-        community.connections.push(newConnection.id)
-        this.cos.communities[communityId] = { ...community }
+    addConnection({ communities, ...newConnection }) {
+      if (communities.length) {
+        communities.forEach(communityId =>
+          this.addConnectionToCommunity(communityId, newConnection.id)
+        )
       }
       this.$set(this.cos.connections, newConnection.id, newConnection)
     },
-    async updateConnection() {
-      const [id, currentConnection] = Object.entries(this.cos.connections)[0]
-      const connection = await client.cos.updateConnection(id, {
-        ...currentConnection,
-        avatar: "🤡",
-      })
-      this.cos.connections[id] = connection
+    updateConnection({ additions, deletions, id, name, avatar }) {
+      additions.forEach(communityId =>
+        this.addConnectionToCommunity(communityId, id)
+      )
+      deletions.forEach(communityId =>
+        this.removeConnectionFromCommunity(communityId, id)
+      )
+      this.cos.connections[id] = { id, name, avatar }
+    },
+    addConnectionToCommunity(communityId, connectionId) {
+      const community = this.cos.communities[communityId]
+      community.connections.push(connectionId)
+      this.cos.communities[communityId] = { ...community }
+    },
+    removeConnectionFromCommunity(communityId, connectionId) {
+      const community = this.cos.communities[communityId]
+      community.connections = community.connections.filter(id => id !== connectionId)
     },
   },
 }
