@@ -16,6 +16,22 @@
         </template>
       </combobox>
     </b-form-group>
+    <b-form-group v-if="selectedH5p.library == 'H5P.ThreeImage'" label="Scene">
+      <combobox
+        v-model="node.typeData.scene"
+        item-text="scenename"
+        item-value="sceneId"
+        empty-message="There are no scenes in this H5P 360. Please double-check you have scenes set up in your H5P Virtual Tour (360) content."
+        :options="scenes"
+      >
+        <template v-slot="{ option }">
+          <p>
+            <code>{{ option.sceneId }}</code>
+            {{ option.scenename }}
+          </p>
+        </template>
+      </combobox>
+    </b-form-group>
   </div>
 </template>
 
@@ -43,6 +59,19 @@ export default {
   computed: {
     mediaUrl() {
       return `${data.adminAjaxUrl}?action=h5p_embed&id=${this.selectedId}`
+    },
+    selectedH5p() {
+      const selectedId = this.selectedId
+      if (selectedId) {
+        const selectedValue = this.options.find(content => {
+          return content.id == selectedId
+        })
+        return selectedValue
+      }
+      return { library: null }
+    },
+    scenes() {
+      return this.selectedH5p.details.threeImage.scenes
     },
   },
   watch: {
