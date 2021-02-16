@@ -1,9 +1,7 @@
 <template>
   <div :class="['wrapper', { show }]">
     <slot name="toggle"></slot>
-    <div class="content-wrapper">
-      <slot name="content"></slot>
-    </div>
+    <slot name="content"></slot>
   </div>
 </template>
 
@@ -32,14 +30,5 @@ export default {
     z-index: 10;
     transform: translateY(0);
   }
-}
-
-.content-wrapper {
-  background: white;
-  position: relative;
-  z-index: 10;
-  height: 100%;
-  border-top: 1px solid var(--cos-color-tertiary);
-  overflow: hidden;
 }
 </style>
