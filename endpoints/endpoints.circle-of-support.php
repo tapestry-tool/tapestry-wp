@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../classes/activities/class.circle-of-support.php';
+require_once __DIR__ . '/../classes/activities/class.circle-of-support.php';
 
 class CircleOfSupportEndpoints
 {
@@ -46,6 +46,16 @@ class CircleOfSupportEndpoints
         $communityId = $request['communityId'];
         $cos = new CircleOfSupport();
         $community = $cos->addConnectionToCommunity(json_decode($request->get_body()), $communityId);
+        $cos->save();
+        return $community;
+    }
+
+    public static function removeConnectionFromCommunity($request)
+    {
+        $communityId = $request['communityId'];
+        $connectionId = $request['connectionId'];
+        $cos = new CircleOfSupport();
+        $community = $cos->removeConnectionFromCommunity($connectionId, $communityId);
         $cos->save();
         return $community;
     }

@@ -57,6 +57,29 @@ class CircleOfSupport
         return $community;
     }
 
+    public function removeConnectionFromCommunity($connectionId, $communityId)
+    {
+        // Check if community exists
+        if (!isset($this->current['communities']->$communityId)) {
+            return;
+        }
+
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+
+        $community = $this->current['communities']->$communityId;
+        $index = array_search($connectionId, $community->connections);
+        if (!is_numeric($index)) {
+            return;
+        }
+
+        array_splice($community->connections, $index, 1);
+
+        return $community;
+    }
+
     public function updateConnection($id, $connection)
     {
         $this->current['connections']->$id = $connection;

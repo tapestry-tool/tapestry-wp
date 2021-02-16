@@ -130,6 +130,10 @@ function tapestry_enqueue_vue_app()
             true
         );
 
+        // This is required to stop Wordpress from forcefully overtaking emojis
+        // which conflicts with our emoji picker
+        remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+
         // make custom data available to the Vue app with wp_localize_script.
         global $post;
         global $wp_roles;
