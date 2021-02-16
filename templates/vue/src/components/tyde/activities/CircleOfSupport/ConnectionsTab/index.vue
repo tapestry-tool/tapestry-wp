@@ -133,6 +133,10 @@ export default {
     },
   },
   methods: {
+    openConnectionForm() {
+      this.resetConnection()
+      this.state = states.ADD
+    },
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
     },
@@ -144,6 +148,13 @@ export default {
         ...connection.communities.map(community => community.id),
       ]
       this.state = states.EDIT
+    },
+    resetConnection() {
+      // Do it per property to maintain reactivity
+      this.connection.id = ""
+      this.connection.name = ""
+      this.connection.avatar = "😊"
+      this.connection.communities = []
     },
     async handleSubmit() {
       this.isSubmitting = true
@@ -160,12 +171,7 @@ export default {
       }
 
       this.isSubmitting = false
-      this.connection = {
-        id: "",
-        name: "",
-        avatar: "😊",
-        communities: [],
-      }
+      this.resetConnection()
       this.state = states.OPEN
     },
     async addNewConnection() {

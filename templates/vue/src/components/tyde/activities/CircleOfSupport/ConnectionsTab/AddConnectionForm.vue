@@ -23,7 +23,7 @@
             {{ connection.avatar }}
           </button>
           <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-            <v-emoji-picker @select="connection.avatar = $event.data" />
+            <v-emoji-picker @select="handleEmojiSelect" />
           </div>
         </div>
         <div class="controls">
@@ -34,9 +34,7 @@
         </div>
       </div>
       <div class="community" style="flex: 2">
-        <h1 class="community-title">
-          Which communities do this person belong to?
-        </h1>
+        <h1 class="community-title">Which communities do this person belong to?</h1>
         <ul class="community-list">
           <li v-for="community in communities" :key="community.id">
             <button
@@ -126,6 +124,10 @@ export default {
       } else {
         this.connection.communities.push(communityId)
       }
+    },
+    handleEmojiSelect(event) {
+      this.connection.avatar = event.data
+      this.showPicker = false
     },
     addConnection() {
       this.isInputTouched = true
