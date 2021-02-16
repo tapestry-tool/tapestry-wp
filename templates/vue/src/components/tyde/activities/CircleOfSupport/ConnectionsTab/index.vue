@@ -11,7 +11,12 @@
       </cos-popup-button>
     </template>
     <template #content>
-      <div :class="['content-wrapper', { list: state === states.OPEN }]">
+      <div
+        :class="[
+          'content-wrapper',
+          { list: !(state === states.ADD || state === states.EDIT) },
+        ]"
+      >
         <b-overlay
           v-if="state === states.ADD || state === states.EDIT"
           class="form"
@@ -83,7 +88,6 @@ import CosPopup from "../CosPopup"
 import CosPopupButton from "../CosPopupButton"
 
 const states = {
-  CLOSED: 0,
   OPEN: 1,
   SEARCH: 2,
   ADD: 3,
@@ -109,7 +113,7 @@ export default {
   },
   data() {
     return {
-      state: states.CLOSED,
+      state: states.OPEN,
       search: "",
       isOpen: false,
       isSubmitting: false,
