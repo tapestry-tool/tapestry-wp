@@ -603,18 +603,18 @@ export default {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
-        } else if (this.rootId && !this.nodeId) {
-          // We just added a root node
-          this.$router.push({
-            name: names.APP,
-            params: { nodeId: this.rootId },
-            query: this.$route.query,
-          })
         } else if (this.keepOpen) {
           // Switch to edit mode if multi-content just added
           this.$router.push({
             name: names.MODAL,
             params: { nodeId: this.node.id, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
+        } else if (this.rootId && !this.nodeId) {
+          // We just added a root node
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.rootId },
             query: this.$route.query,
           })
         } else if (this.isMultiContentNodeChild) {
