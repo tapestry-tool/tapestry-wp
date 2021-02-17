@@ -18,7 +18,7 @@
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="library === 'H5P.InteractiveVideo'"
+      :scrolling="scrollingValue"
       @load="handleLoad"
     ></iframe>
   </div>
@@ -66,6 +66,14 @@ export default {
       requiresRefresh: false,
       playedOnce: false,
     }
+  },
+  computed: {
+    scrollingValue() {
+      const noscroll = ["H5P.InteractiveVideo", "H5P.ThreeImage"]
+      if (noscroll.includes(this.library)) {
+        return "no"
+      } else return "auto"
+    },
   },
   watch: {
     node(newNode, oldNode) {
