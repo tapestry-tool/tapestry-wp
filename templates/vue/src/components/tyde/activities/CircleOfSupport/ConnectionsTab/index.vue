@@ -30,7 +30,7 @@
             @add-community="$emit('add-community', $event)"
           />
         </b-overlay>
-        <div v-else class="content">
+        <template v-else>
           <div class="controls">
             <div class="search">
               <button
@@ -73,7 +73,7 @@
               </ul>
             </li>
           </ul>
-        </div>
+        </template>
       </div>
     </template>
   </cos-popup>
@@ -251,19 +251,13 @@ ul {
   display: flex;
 }
 
-.content {
-  height: 100%;
-  display: flex;
-  overflow: hidden;
-  flex: 1;
-}
-
 .content-wrapper {
   background: white;
   position: relative;
   z-index: 10;
   height: 100%;
   border-top: 1px solid var(--cos-color-tertiary);
+  flex-grow: 1;
 
   &.list {
     overflow: hidden;
