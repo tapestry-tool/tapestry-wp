@@ -146,9 +146,7 @@ export default {
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
       if (this.state === states.SEARCH) {
-        setTimeout(() => {
-          this.$refs.connectionSearch.focus()
-        }, 200)
+        this.$nextTick(() => this.$refs.connectionSearch.focus())
       }
     },
     editConnection(connection) {
