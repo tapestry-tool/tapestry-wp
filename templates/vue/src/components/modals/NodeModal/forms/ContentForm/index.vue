@@ -59,7 +59,7 @@
 import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
-import AccordionForm from "./AccordionForm"
+import MultiContentForm from "./MultiContentForm"
 import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
 import TextForm from "./TextForm"
@@ -71,7 +71,7 @@ import WpPostForm from "./WpPostForm"
 export default {
   components: {
     ActivityForm,
-    AccordionForm,
+    MultiContentForm,
     GravityFormForm,
     H5pForm,
     TextForm,
@@ -101,7 +101,7 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "accordion", text: "Accordion" },
+        { value: "multi-content", text: "Multi-content Presentation" },
       ],
     }
   },

@@ -70,7 +70,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
+            v-if="node.mediaType === 'multi-content' || node.hasSubAccordion"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -528,7 +528,7 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+          return this.node.mediaType === "multi-content" || this.node.hasSubAccordion
         }
       }
 
@@ -537,7 +537,7 @@ export default {
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return this.parent.mediaType === "accordion" && children.length > 0
+        return this.parent.presentationStyle === "accordion" && children.length > 0
       }
       return false
     },
