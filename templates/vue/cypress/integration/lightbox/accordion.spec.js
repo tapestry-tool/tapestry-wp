@@ -10,7 +10,7 @@ describe("Accordion", () => {
 
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
-      cy.changeMediaType("accordion")
+      cy.changeMediaType("multi-content")
       cy.submitModal()
 
       cy.openLightbox(node.id).within(() => {
@@ -25,7 +25,8 @@ describe("Accordion", () => {
 
     cy.getSelectedNode().then(node =>
       cy.editNode(node.id, {
-        mediaType: "accordion",
+        mediaType: "multi-content",
+        presentationStyle: "accordion",
       })
     )
 
