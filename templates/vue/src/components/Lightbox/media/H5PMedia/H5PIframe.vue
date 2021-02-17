@@ -354,6 +354,19 @@ export default {
           break
         case "H5P.ThreeImage":
           {
+            let threeSixtySizingInterval = setInterval(() => {
+              if (typeof h5pInstance.threeSixty !== "undefined") {
+                clearInterval(threeSixtySizingInterval)
+                const h5pDocument = h5pInstance.threeSixty.element.ownerDocument
+                if (h5pDocument) {
+                  this.frameHeight = h5pDocument.querySelector(
+                    "body > div"
+                  ).clientHeight
+                  this.$emit("change:dimensions", { height: this.frameHeight })
+                }
+              }
+            }, 500)
+
             let threeSixtyLoadInterval = setInterval(() => {
               if (typeof h5pInstance.reDraw !== "undefined") {
                 clearInterval(threeSixtyLoadInterval)
