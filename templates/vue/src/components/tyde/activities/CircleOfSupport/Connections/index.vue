@@ -24,7 +24,12 @@
             <label id="search-label" style="display: none;">
               Search for a connection
             </label>
-            <input v-model="search" aria-labelledby="search-label" type="text" />
+            <input
+              ref="connectionSearch"
+              v-model="search"
+              aria-labelledby="search-label"
+              type="text"
+            />
           </div>
         </div>
         <button
@@ -138,6 +143,11 @@ export default {
     },
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
+      if (this.state === states.SEARCH) {
+        setTimeout(() => {
+          this.$refs.connectionSearch.focus()
+        }, 200)
+      }
     },
     editConnection(connection) {
       this.connection.id = connection.id
