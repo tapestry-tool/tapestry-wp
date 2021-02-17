@@ -71,6 +71,7 @@ class TapestryNode implements ITapestryNode
         $this->imageURL = '';
         $this->lockedImageURL = '';
         $this->mediaType = '';
+        $this->presentationStyle = '';
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
         $this->description = '';
@@ -169,6 +170,9 @@ class TapestryNode implements ITapestryNode
 
         if (isset($node->mediaType) && is_string($node->mediaType)) {
             $this->mediaType = $node->mediaType;
+        }
+        if (isset($node->presentationStyle) && is_string($node->presentationStyle)) {
+            $this->presentationStyle = $node->presentationStyle;
         }
         if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
             $this->mediaFormat = $node->mediaFormat;
@@ -521,6 +525,10 @@ class TapestryNode implements ITapestryNode
         if ('video' == $this->mediaType && 'h5p' == $this->mediaFormat) {
             $this->mediaType = 'h5p';
         }
+        if ('accordion' == $this->mediaType) {
+            $this->mediaType = 'multi-content';
+            $this->presentationStyle = 'accordion';
+        }
 
         return (object) [
             'id' => $this->nodeMetaId,
@@ -536,6 +544,7 @@ class TapestryNode implements ITapestryNode
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
+            'presentationStyle' => $this->presentationStyle,
             'mediaFormat' => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
             'description' => $this->description,
