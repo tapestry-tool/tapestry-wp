@@ -835,10 +835,11 @@ export default {
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
     },
-    handleTypeChange() {
+    handleTypeChange(evt) {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
+      if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
