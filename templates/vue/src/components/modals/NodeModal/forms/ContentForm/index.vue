@@ -47,6 +47,7 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
+          :actionType="actionType"
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
@@ -83,6 +84,10 @@ export default {
   props: {
     node: {
       type: Object,
+      required: true,
+    },
+    actionType: {
+      type: String,
       required: true,
     },
     maxDescriptionLength: {

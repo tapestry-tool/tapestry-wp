@@ -3,15 +3,24 @@
     v-if="node"
     id="node-modal"
     :visible="show"
-    :title="title"
     size="lg"
     class="text-muted"
     scrollable
     body-class="p-0"
     @hide="handleClose"
   >
+    <template #modal-title>
+      <b-link v-if="isMultiContentNodeChild" @click="handleClose">
+        <i class="fas fa-chevron-left" />
+        Back to "{{ parent.title }}"
+      </b-link>
+      <div v-else>
+        {{ title }}
+      </div>
+    </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
+        <h4 v-if="isMultiContentNodeChild" class="modal-header">{{ title }}</h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
@@ -27,6 +36,7 @@
           >
             <content-form
               :node="node"
+              :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
@@ -121,6 +131,7 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
+              :isMultiContentNodeChild="isMultiContentNodeChild"
               @submit="loading = true"
               @message="setDisabledMessage"
             ></delete-node-button>
@@ -269,6 +280,7 @@ export default {
       loadDuration: false,
       warningText: "",
       deleteWarningText: "",
+      keepOpen: false,
     }
   },
   computed: {
@@ -383,6 +395,9 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    isMultiContentNodeChild() {
+      return this.parent && this.parent.mediaType == "multi-content"
+    },
   },
   watch: {
     nodeId: {
@@ -441,6 +456,10 @@ export default {
       } else if (fileId.thumbnailType == "thumbnail") {
         this.node.thumbnailFileId = fileId.data
       }
+    })
+    this.$root.$on("add-node", () => {
+      this.keepOpen = true
+      this.handlePublish()
     })
     this.initialize()
   },
@@ -591,14 +610,30 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
-        } else {
+        } else if (this.isMultiContentNodeChild) {
+          // Return to modal of parent node
           this.$router.push({
-            name: names.APP,
-            params: { nodeId: this.nodeId },
+            name: names.MODAL,
+            params: { nodeId: this.parent.id, type: "edit", tab: "content" },
             query: this.$route.query,
           })
+        } else {
+          if (this.keepOpen) {
+            this.$router.push({
+              name: names.MODAL,
+              params: { nodeId: this.node.id, type: "edit", tab: "content" },
+              query: this.$route.query,
+            })
+          } else {
+            this.$router.push({
+              name: names.APP,
+              params: { nodeId: this.nodeId },
+              query: this.$route.query,
+            })
+          }
         }
       }
+      this.keepOpen = false
       this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
