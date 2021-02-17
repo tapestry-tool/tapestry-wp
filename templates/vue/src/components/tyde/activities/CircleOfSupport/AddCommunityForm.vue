@@ -145,6 +145,7 @@ export default {
 .content {
   height: 100%;
   display: flex;
+  padding: 2rem;
 }
 
 form {

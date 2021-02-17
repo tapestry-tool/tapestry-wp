@@ -10,12 +10,14 @@
         </cos-popup-button>
       </template>
       <template #content>
-        <add-community-form
-          ref="form"
-          @back="isOpen = false"
-          @add-community="handleAddCommunity"
-          @changed="wasEdited = $event"
-        />
+        <div class="content-wrapper">
+          <add-community-form
+            ref="form"
+            @back="isOpen = false"
+            @add-community="handleAddCommunity"
+            @changed="wasEdited = $event"
+          />
+        </div>
       </template>
     </cos-popup>
     <cos-modal v-model="showModal">
@@ -91,6 +93,14 @@ export default {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;
   }
+}
+
+.content-wrapper {
+  background: white;
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  border-top: 1px solid var(--cos-color-tertiary);
 }
 
 .controls {

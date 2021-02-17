@@ -11,62 +11,69 @@
       </cos-popup-button>
     </template>
     <template #content>
-      <b-overlay
-        v-if="state === states.ADD || state === states.EDIT"
-        class="form"
-        :show="isSubmitting"
+      <div
+        :class="[
+          'content-wrapper',
+          { list: !(state === states.ADD || state === states.EDIT) },
+        ]"
       >
-        <add-connection-form
-          v-model="connection"
-          :communities="communities"
-          @back="state = states.OPEN"
-          @submit="handleSubmit"
-          @add-community="$emit('add-community', $event)"
-        />
-      </b-overlay>
-      <div v-else class="content">
-        <div class="controls">
-          <div class="search">
+        <b-overlay
+          v-if="state === states.ADD || state === states.EDIT"
+          class="form"
+          :show="isSubmitting"
+        >
+          <add-connection-form
+            v-model="connection"
+            :communities="communities"
+            @back="state = states.OPEN"
+            @submit="handleSubmit"
+            @add-community="$emit('add-community', $event)"
+          />
+        </b-overlay>
+        <template v-else>
+          <div class="controls">
+            <div class="search">
+              <button
+                class="content-control"
+                aria-label="search"
+                @click="toggleSearch"
+              >
+                <tapestry-icon icon="search" />
+              </button>
+              <div v-if="state === states.SEARCH" class="searchbar">
+                <label id="search-label" style="display: none;">
+                  Search for a connection
+                </label>
+                <input v-model="search" aria-labelledby="search-label" type="text" />
+              </div>
+            </div>
             <button
               class="content-control"
-              aria-label="search"
-              @click="toggleSearch"
+              aria-label="add connection"
+              @click="openConnectionForm"
             >
-              <tapestry-icon icon="search" />
+              <tapestry-icon icon="plus" />
             </button>
-            <div v-if="state === states.SEARCH" class="searchbar">
-              <label id="search-label" style="display: none;">
-                Search for a connection
-              </label>
-              <input v-model="search" aria-labelledby="search-label" type="text" />
-            </div>
           </div>
-          <button
-            class="content-control"
-            aria-label="add connection"
-            @click="openConnectionForm"
-          >
-            <tapestry-icon icon="plus" />
-          </button>
-        </div>
-        <ul :class="['connection-list', { searching: state === states.SEARCH }]">
-          <li
-            v-for="visibleConnection in visibleConnections"
-            :key="visibleConnection.id"
-            class="connection"
-            @click="editConnection(visibleConnection)"
-          >
-            <p>{{ visibleConnection.name }}</p>
-            <h1>{{ visibleConnection.avatar }}</h1>
-            <ul class="community-list">
-              <li
-                v-for="community in visibleConnection.communities"
-                :key="community.id"
-                :style="`--community-color: ${community.color}`"
-              ></li>
-            </ul>
-          </li>
-        </ul>
+          <ul :class="['connection-list', { searching: state === states.SEARCH }]">
+            <li
+              v-for="visibleConnection in visibleConnections"
+              :key="visibleConnection.id"
+              class="connection"
+              @click="editConnection(visibleConnection)"
+            >
+              <p>{{ visibleConnection.name }}</p>
+              <h1>{{ visibleConnection.avatar }}</h1>
+              <ul class="community-list">
+                <li
+                  v-for="community in visibleConnection.communities"
+                  :key="community.id"
+                  :style="`--community-color: ${community.color}`"
+                ></li>
+              </ul>
+            </li>
+          </ul>
+        </template>
       </div>
     </template>
   </cos-popup>
@@ -81,7 +88,6 @@ import CosPopup from "../CosPopup"
 import CosPopupButton from "../CosPopupButton"
 
 const states = {
-  CLOSED: 0,
   OPEN: 1,
   SEARCH: 2,
   ADD: 3,
@@ -107,7 +113,7 @@ export default {
   },
   data() {
     return {
-      state: states.CLOSED,
+      state: states.OPEN,
       search: "",
       isOpen: false,
       isSubmitting: false,
@@ -139,6 +145,9 @@ export default {
     },
     toggleSearch() {
       this.state = this.state === states.SEARCH ? states.OPEN : states.SEARCH
+      if (this.state === states.SEARCH) {
+        this.$nextTick(() => this.$refs.connectionSearch.focus())
+      }
     },
     editConnection(connection) {
       this.connection.id = connection.id
@@ -242,11 +251,17 @@ ul {
   display: flex;
 }
 
-.content {
+.content-wrapper {
+  background: white;
+  position: relative;
+  z-index: 10;
   height: 100%;
-  display: flex;
-  overflow: hidden;
-  flex: 1;
+  border-top: 1px solid var(--cos-color-tertiary);
+  flex-grow: 1;
+
+  &.list {
+    overflow: hidden;
+  }
 }
 
 .controls {
@@ -282,6 +297,7 @@ ul {
   grid-auto-rows: min-content;
   margin-left: 7rem;
   height: 100%;
+  padding: 1rem;
 
   &.searching {
     margin-top: 7rem;

@@ -28,8 +28,8 @@
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
-          <button class="submit" @click="addConnection">
-            Add connection
+          <button class="submit" @click="submitConnection">
+            {{ submitLabel }}
           </button>
         </div>
       </div>
@@ -103,6 +103,9 @@ export default {
     isNameValid() {
       return !this.isInputTouched || this.connection.name.length > 0
     },
+    submitLabel() {
+      return this.connection.id ? "Save connection" : "Add connection"
+    },
   },
   mounted() {
     const handleClick = evt => {
@@ -129,7 +132,7 @@ export default {
       this.connection.avatar = event.data
       this.showPicker = false
     },
-    addConnection() {
+    submitConnection() {
       this.isInputTouched = true
 
       this.$nextTick(async () => {
