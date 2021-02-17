@@ -610,6 +610,13 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
+        } else if (this.keepOpen) {
+          // Switch to edit mode if multi-content just added
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.node.id, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
         } else if (this.isMultiContentNodeChild) {
           // Return to modal of parent node
           this.$router.push({
@@ -618,19 +625,11 @@ export default {
             query: this.$route.query,
           })
         } else {
-          if (this.keepOpen) {
-            this.$router.push({
-              name: names.MODAL,
-              params: { nodeId: this.node.id, type: "edit", tab: "content" },
-              query: this.$route.query,
-            })
-          } else {
-            this.$router.push({
-              name: names.APP,
-              params: { nodeId: this.nodeId },
-              query: this.$route.query,
-            })
-          }
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: this.nodeId },
+            query: this.$route.query,
+          })
         }
       }
       this.keepOpen = false
