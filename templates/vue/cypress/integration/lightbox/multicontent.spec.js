@@ -67,8 +67,9 @@ describe("Multi-content", () => {
             .then(nodes => {
               const allNodes = Object.values(nodes)
               expect(allNodes.length).equals(2)
-              // TODO: Uncomment once multi-child ordering is fixed
-              // expect(allNodes.filter(n => n.title === node.title)[0].childOrdering).equals(1)
+              expect(
+                allNodes.filter(n => n.title === node.title)[0].childOrdering
+              ).equals(1)
             })
         })
 
