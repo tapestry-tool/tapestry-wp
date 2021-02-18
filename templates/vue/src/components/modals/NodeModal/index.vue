@@ -144,6 +144,7 @@
               :isMultiContentNodeChild="isMultiContentNodeChild"
               @submit="loading = true"
               @message="setDisabledMessage"
+              @complete="loading = false"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
             <b-button

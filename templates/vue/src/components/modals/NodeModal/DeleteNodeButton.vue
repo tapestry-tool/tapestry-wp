@@ -79,17 +79,26 @@ export default {
             ),
           },
         })
-        this.$router.push({
-          name: names.APP,
-          params: {
-            nodeId: this.isMultiContentNodeChild ? this.parent : this.neighbour.id,
-          },
-          query: this.$route.query,
-        })
+        if (this.isMultiContentNodeChild) {
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.parent, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
+        } else {
+          this.$router.push({
+            name: names.APP,
+            params: {
+              nodeId: this.neighbour.id,
+            },
+            query: this.$route.query,
+          })
+        }
       } else {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
+      this.$emit("complete")
     },
   },
 }
