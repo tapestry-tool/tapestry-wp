@@ -28,13 +28,16 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
+    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks", "getParent"]),
     ...mapState(["nodes", "rootId"]),
     neighbourLink() {
       return this.getNeighbouringLinks(this.nodeId)[0]
     },
     neighbour() {
       return this.getNode(this.getNeighbours(this.nodeId)[0])
+    },
+    parent() {
+      return this.getParent(this.nodeId)
     },
     isRoot() {
       return this.nodeId === this.rootId
@@ -58,7 +61,6 @@ export default {
     }
   },
   methods: {
-    ...mapGetters(["getParent"]),
     ...mapActions(["deleteNode", "deleteLink"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     removeNode() {
@@ -80,9 +82,7 @@ export default {
         this.$router.push({
           name: names.APP,
           params: {
-            nodeId: this.isMultiContentNodeChild
-              ? this.parent.id
-              : this.neighbour.id,
+            nodeId: this.isMultiContentNodeChild ? this.parent : this.neighbour.id,
           },
           query: this.$route.query,
         })
