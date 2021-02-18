@@ -290,7 +290,7 @@ ul {
 }
 
 .connection-list {
-  width: 100%;
+  width: calc(100% - 7rem);
   overflow-y: scroll;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));

@@ -1,10 +1,9 @@
 <template>
   <div class="cos">
-    <communities-view :communities="cos.communities" />
-    <div class="test-controls">
-      <button @click="addMockCommunity">+</button>
-      <button @click="removeMockCommunity">-</button>
-    </div>
+    <communities-view
+      :communities="cos.communities"
+      :connections="cos.connections"
+    />
     <connections-tab
       class="tab"
       :connections="cos.connections"
@@ -19,7 +18,6 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import Helpers from "@/utils/Helpers"
 
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
@@ -62,21 +60,6 @@ export default {
     },
     addCommunity(community) {
       this.$set(this.cos.communities, community.id, community)
-    },
-    addMockCommunity() {
-      const community = {
-        id: Helpers.createUUID(),
-        name: "School",
-        icon: "🎓",
-        color: "#A1BCFC",
-        connections: ["abc"],
-      }
-      this.$set(this.cos.communities, community.id, community)
-    },
-    removeMockCommunity() {
-      const keys = Object.keys(this.cos.communities)
-      const last = keys[keys.length - 1]
-      this.$delete(this.cos.communities, last)
     },
     updateConnection({ additions, deletions, id, name, avatar }) {
       additions.forEach(communityId =>

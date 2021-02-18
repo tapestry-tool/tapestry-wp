@@ -1,24 +1,24 @@
 <template>
-  <ul class="community-area">
+  <ul class="community-area" :style="{ '--cols': columns }">
     <li
-      v-for="(group, index) in communityGroups"
-      :key="index"
-      class="group"
+      v-for="community in communitiesWithPosition"
+      :key="community.id"
+      :class="[
+        'community',
+        community.position.orientation,
+        { active: community.id === activeCommunity },
+      ]"
       :style="{
-        '--column': group.column,
-        '--row': group.row,
+        '--color': community.color,
+        '--column-start': community.position.column,
+        '--column-end': community.position.columnEnd,
+        '--row': community.position.row,
       }"
+      @click="toggle(community.id)"
     >
-      <ul :class="group.orientation">
-        <li
-          v-for="community in group.communities"
-          :key="community.id"
-          :class="['community', group.orientation]"
-          :style="{
-            '--color': community.color,
-          }"
-        >
-          {{ community.icon }}
+      <ul>
+        <li v-for="connection in community.connections" :key="connection.id">
+          {{ connection.avatar }}
         </li>
       </ul>
     </li>
@@ -32,63 +32,87 @@ export default {
       type: Object,
       required: true,
     },
+    connections: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      activeCommunity: "",
+    }
   },
   computed: {
-    /**
-     * Group the communities together by where they're going to be placed.
-     * The grid is split into four sections:
-     *
-     * --------------
-     *    |__0__|
-     *  3 |_____|  1
-     *    |  2  |
-     * --------------
-     *
-     * Each community is added to a section in a circular motion as they are
-     * created. For example, the first five communities will be added in the
-     * following order: 0 -> 1 -> 2 -> 3 -> 0. All following communities, with the
-     * exception of the last two, will be added in the same cycle.
-     *
-     * The last two communities are added to group 3 and 1 respectively, resulting
-     * in 3 communities in groups 3 and 1 and 2 communities in groups 0 and 2.
-     */
-    communityGroups() {
-      const NUM_GROUPS = 4
-      const MAX_COMMUNITIES = 10
-
-      const groups = Array.from({ length: NUM_GROUPS })
-        .fill(-1)
-        .map(this.getGroupPosition)
-
-      Object.values(this.communities).forEach((community, index) => {
-        let groupNumber = index % NUM_GROUPS
-        if (index >= MAX_COMMUNITIES - 2) {
-          const lookup = {
-            [MAX_COMMUNITIES - 2]: 3,
-            [MAX_COMMUNITIES - 1]: 1,
-          }
-          groupNumber = lookup[index]
-        }
-        groups[groupNumber].communities.push(community)
-      })
-
-      return groups
+    columns() {
+      return Object.values(this.communities).length > 4
+        ? `1fr repeat(2, var(--size)) 1fr`
+        : `1fr calc(var(--size) * 2) 1fr`
+    },
+    communitiesWithPosition() {
+      return Object.values(this.communities).map(
+        (community, index, communities) => ({
+          ...community,
+          position: this.getPosition(index, communities.length),
+          connections: community.connections.map(id => this.connections[id]),
+        })
+      )
     },
   },
   methods: {
-    getGroupPosition(_, index) {
+    toggle(communityId) {
+      this.activeCommunity = this.activeCommunity === communityId ? "" : communityId
+    },
+    getPosition(index, communitySize) {
+      // Map the community index to where it should go on the grid
       const positions = [
-        [2, 1],
-        [-2, `1 / span 3`],
-        [2, -2],
-        [1, `1 / span 3`],
+        {
+          column: 2,
+          row: 1,
+        },
+        {
+          column: -2,
+          row: communitySize > 7 && communitySize < 10 ? 2 : 3,
+        },
+        {
+          column: 2,
+          columnEnd: communitySize === 5 ? "span 2" : "initial",
+          row: -3,
+        },
+        {
+          column: 1,
+          row: communitySize > 6 && communitySize < 9 ? 2 : 3,
+        },
+        {
+          column: 3,
+          row: 1,
+        },
+        {
+          column: 3,
+          row: -3,
+        },
+        {
+          column: 1,
+          row: communitySize > 8 ? -3 : 4,
+        },
+        {
+          column: -2,
+          row: communitySize > 9 ? -3 : 4,
+        },
+        {
+          column: 1,
+          row: 1,
+        },
+        {
+          column: -2,
+          row: 1,
+        },
       ]
-      const [column, row] = positions[index]
+      const { column, columnEnd, row } = positions[index] || {}
       return {
         column,
+        columnEnd,
         row,
         orientation: this.getOrientation(column, row),
-        communities: [],
       }
     },
     getOrientation(column, row) {
@@ -101,7 +125,7 @@ export default {
       if (row === 1) {
         return "south"
       }
-      if (row === -2) {
+      if (row === -3) {
         return "north"
       }
     },
@@ -119,10 +143,12 @@ ul {
 }
 
 .community-area {
+  --size: 14rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: var(--cols);
+  grid-template-rows: repeat(6, 1fr);
   grid-gap: 1rem;
+  justify-items: center;
 }
 
 .group {
@@ -142,33 +168,61 @@ ul {
 }
 
 .community {
+  --row-end: span 2;
+
   background: var(--color, var(--cos-color-secondary));
+  grid-column-start: var(--column-start);
+  grid-column-end: var(--column-end);
+  grid-row-start: var(--row);
+  grid-row-end: var(--row-end);
+  position: relative;
 
   --border-radius: 9999px;
-  --size: 12rem;
+
+  &.active {
+    z-index: 10;
+  }
 
   &.north {
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
     width: var(--size);
+
+    &.active {
+      --row: 2 !important;
+      --row-end: -1;
+    }
   }
 
   &.east {
     border-top-right-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
-    height: var(--size);
+    justify-self: stretch;
+
+    &.active {
+      --column-end: -2;
+    }
   }
 
   &.south {
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
     width: var(--size);
+
+    &.active {
+      --row-end: -2;
+    }
   }
 
   &.west {
     border-bottom-left-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
-    height: var(--size);
+    justify-self: stretch;
+
+    &.active {
+      --column-start: 2 !important;
+      --column-end: -1;
+    }
   }
 }
 </style>
