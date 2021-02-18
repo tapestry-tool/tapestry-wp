@@ -6,16 +6,18 @@
     size="lg"
     class="text-muted"
     scrollable
+    :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
     @hide="handleClose"
   >
     <template #modal-title>
       <b-link
         v-if="isMultiContentNodeChild"
+        class="nav-item modal-header-link"
         data-qa="node-modal-header-back"
         @click="handleClose"
       >
-        <i class="fas fa-chevron-left" />
+        <i class="fas fa-chevron-left fa-xs" />
         Back to "{{ parent.title }}"
       </b-link>
       <div v-else data-qa="node-modal-header">
@@ -1038,6 +1040,16 @@ table {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.modal-header-small {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.modal-header-link {
+  font-weight: normal;
+  font-size: 16px;
 }
 
 .error-wrapper {

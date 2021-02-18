@@ -21,7 +21,7 @@
       <p v-if="requiresSaving" class="my-2 p-0 text-muted small">
         To enable add sub-item, please save this node.
       </p>
-      <div class="buttons-container">
+      <div class="buttons-container" :style="buttonContainerStyle">
         <b-button
           class="add-subitem-button"
           data-qa="add-subitem"
@@ -67,6 +67,9 @@ export default {
     requiresSaving() {
       return this.actionType === "add"
     },
+    buttonContainerStyle() {
+      return this.node.childOrdering.length > 0 ? "margin-top: 20px" : ""
+    },
   },
   methods: {
     addSubitem() {
@@ -89,9 +92,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.buttons-container {
-  margin-top: 20px;
-}
-</style>
