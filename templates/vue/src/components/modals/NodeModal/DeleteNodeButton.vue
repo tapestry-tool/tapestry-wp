@@ -56,9 +56,7 @@ export default {
     },
   },
   mounted() {
-    if (this.isDisabled) {
-      this.$emit("message", this.disabledMessage)
-    }
+    this.$emit("message", this.disabledMessage)
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),
