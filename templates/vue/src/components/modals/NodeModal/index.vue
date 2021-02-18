@@ -705,7 +705,7 @@ export default {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {
-                childOrdering: [...this.parent.childOrdering, id],
+                childOrdering: [...this.parent.childOrdering],
               },
             })
           }
