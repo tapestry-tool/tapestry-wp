@@ -1,7 +1,12 @@
 <template>
   <div id="modal-permissions">
     <b-form-group label="Sub-items">
-      <b-table-simple class="text-center mb-0" striped responsive>
+      <b-table-simple
+        class="text-center mb-0"
+        striped
+        responsive
+        data-qa="sub-item-table"
+      >
         <b-tbody>
           <b-tr v-for="nodeId in node.childOrdering" :key="nodeId">
             <b-td class="text-left text-capitalize">

@@ -10,17 +10,27 @@
     @hide="handleClose"
   >
     <template #modal-title>
-      <b-link v-if="isMultiContentNodeChild" @click="handleClose">
+      <b-link
+        v-if="isMultiContentNodeChild"
+        data-qa="node-modal-header-back"
+        @click="handleClose"
+      >
         <i class="fas fa-chevron-left" />
         Back to "{{ parent.title }}"
       </b-link>
-      <div v-else>
+      <div v-else data-qa="node-modal-header">
         {{ title }}
       </div>
     </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
-        <h4 v-if="isMultiContentNodeChild" class="modal-header">{{ title }}</h4>
+        <h4
+          v-if="isMultiContentNodeChild"
+          data-qa="node-modal-title"
+          class="modal-header"
+        >
+          {{ title }}
+        </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
