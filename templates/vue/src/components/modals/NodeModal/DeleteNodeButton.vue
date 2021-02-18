@@ -58,6 +58,9 @@ export default {
   mounted() {
     this.$emit("message", this.disabledMessage)
   },
+  updated() {
+    this.$emit("message", this.disabledMessage)
+  },
   methods: {
     ...mapActions(["deleteNode", "deleteLink"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
