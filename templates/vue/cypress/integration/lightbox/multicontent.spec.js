@@ -68,7 +68,7 @@ describe("Multi-content", () => {
               const allNodes = Object.values(nodes)
               expect(allNodes.length).equals(2)
               expect(
-                allNodes.filter(n => n.title === node.title)[0].childOrdering
+                allNodes.filter(n => n.title === node.title)[0].childOrdering.length
               ).equals(1)
             })
         })
