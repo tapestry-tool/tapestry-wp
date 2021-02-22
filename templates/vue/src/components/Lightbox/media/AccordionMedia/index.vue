@@ -3,75 +3,16 @@
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>
-    <headless-accordion
-      :rows="rows.map(row => row.node.id)"
-      :value="rowId"
-      @input="changeRow"
-    >
-      <template v-slot="{ isVisible, hasNext, next, toggle }">
-        <div data-qa="accordion-rows">
-          <div
-            v-for="(row, index) in rows"
-            :key="row.node.id"
-            ref="rowRefs"
-            class="accordion-row"
-          >
-            <div class="button-row">
-              <button
-                class="button-row-trigger"
-                :disabled="disableRow(index)"
-                @click="toggle(row.node.id)"
-              >
-                <i
-                  :class="isVisible(row.node.id) ? 'fas fa-minus' : 'fas fa-plus'"
-                ></i>
-                {{ row.node.title }}
-              </button>
-              <a v-if="!disableRow(index)" @click="toggleFavourite(row.node.id)">
-                <i
-                  v-if="isFavourite(row.node.id)"
-                  class="fas fa-heart fa-sm"
-                  style="color:red;"
-                ></i>
-                <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
-              </a>
-            </div>
-            <div
-              v-if="isVisible(row.node.id)"
-              :data-qa="`row-content-${row.node.id}`"
-            >
-              <tapestry-media
-                :node-id="row.node.id"
-                :dimensions="dimensions"
-                context="accordion"
-                :autoplay="false"
-                style="color: white; margin-bottom: 24px;"
-                @complete="updateProgress(row.node.id)"
-                @close="toggle(row.node.id)"
-                @load="handleLoad($refs.rowRefs[index])"
-              />
-              <p v-if="row.children.length > 0" style="color: white;">
-                {{ row.node.typeData.subAccordionText }}
-              </p>
-              <sub-accordion
-                v-if="row.children.length > 0"
-                :dimensions="dimensions"
-                :rows="row.children"
-                :row-id="subRowId"
-                @load="handleLoad"
-              ></sub-accordion>
-            </div>
-            <button
-              v-if="row.node.completed && isVisible(row)"
-              class="mt-2"
-              @click="hasNext ? next() : (showCompletion = true)"
-            >
-              {{ node.typeData.finishButtonText }}
-            </button>
-          </div>
-        </div>
-      </template>
-    </headless-accordion>
+    <accordion-rows
+      v-if="node.presentationStyle === 'accordion'"
+      :dimensions="dimensions"
+      :node="node"
+      :rowId="rowId"
+      :subRowId="subRowId"
+      @load="handleLoad"
+      @changeRow="changeRow"
+      @updateProgress="updateProgress"
+    ></accordion-rows>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -97,19 +38,17 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
-import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../../TapestryModal"
-import HeadlessAccordion from "./HeadlessAccordion"
-import SubAccordion from "./SubAccordion"
+import AccordionRows from "./AccordionRows.vue"
+import PageRows from "./PageRows"
 import { names } from "@/config/routes"
 
 export default {
   name: "accordion-media",
   components: {
-    TapestryMedia,
     TapestryModal,
-    HeadlessAccordion,
-    SubAccordion,
+    AccordionRows,
+    PageRows,
   },
   props: {
     node: {
