@@ -13,6 +13,16 @@
       @changeRow="changeRow"
       @updateProgress="updateProgress"
     ></accordion-rows>
+    <page-rows
+      v-if="node.presentationStyle === 'page'"
+      :dimensions="dimensions"
+      :node="node"
+      :rowId="rowId"
+      :subRowId="subRowId"
+      @load="handleLoad"
+      @changeRow="changeRow"
+      @updateProgress="updateProgress"
+    ></page-rows>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
