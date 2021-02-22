@@ -49,12 +49,12 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import client from "@/services/TapestryAPI"
 import TapestryModal from "../../TapestryModal"
-import AccordionRows from "./AccordionRows.vue"
+import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
 import { names } from "@/config/routes"
 
 export default {
-  name: "accordion-media",
+  name: "multi-content-media",
   components: {
     TapestryModal,
     AccordionRows,

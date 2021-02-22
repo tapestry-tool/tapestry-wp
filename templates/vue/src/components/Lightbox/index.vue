@@ -11,7 +11,7 @@
     :allow-close="canSkip"
     @close="handleUserClose"
   >
-    <accordion-media
+    <multi-content-media
       v-if="node.mediaType === 'multi-content'"
       :node="node"
       :row-id="rowId"
@@ -36,7 +36,7 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
-import AccordionMedia from "./media/AccordionMedia"
+import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
@@ -46,7 +46,7 @@ import DragSelectModular from "@/utils/dragSelectModular"
 export default {
   name: "lightbox",
   components: {
-    AccordionMedia,
+    MultiContentMedia,
     TapestryMedia,
     TapestryModal,
   },
