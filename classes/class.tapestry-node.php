@@ -538,9 +538,10 @@ class TapestryNode implements ITapestryNode
 
     private function _formNode()
     {
-        if ($this->mediaType == "video" && $this->mediaFormat == "h5p") {
-            $this->mediaType = "h5p";
+        if ('video' == $this->mediaType && 'h5p' == $this->mediaFormat) {
+            $this->mediaType = 'h5p';
         }
+
         return (object) [
             'id' => $this->nodeMetaId,
             'postId' => $this->nodePostId,
