@@ -278,7 +278,7 @@ body.tapestry-lightbox-open {
 <style lang="scss" scoped>
 .content-text {
   .media-wrapper {
-    overflow: scroll;
+    overflow: auto;
   }
 }
 

@@ -166,7 +166,7 @@ export default {
   background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: scroll;
+  overflow: auto;
   height: 100%;
   padding: 0;
 

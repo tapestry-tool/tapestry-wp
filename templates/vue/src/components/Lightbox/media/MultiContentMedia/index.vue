@@ -202,7 +202,7 @@ button[disabled] {
 
 .media-container {
   height: 100%;
-  overflow: scroll;
+  overflow: auto;
   scrollbar-color: auto black;
   scrollbar-width: none;
 
