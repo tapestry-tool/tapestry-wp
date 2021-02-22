@@ -56,7 +56,7 @@ function parseToStore(dataset) {
   }
 
   for (const node of dataset.nodes.filter(
-    node => node.presentationStyle === "accordion"
+    node => node.mediaType === "multi-content"
   )) {
     const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
     accordionRowIds.forEach(accordionRowId => {
@@ -64,7 +64,7 @@ function parseToStore(dataset) {
       accordionRow.presentationStyle = "accordion-row"
       const subRows = getChildIds({ links: dataset.links }, accordionRowId)
       if (subRows.length) {
-        accordionRow.isSubAccordion = true
+        accordionRow.isSubMultiContent = true
       }
       subRows.forEach(id => {
         const subRow = getNode(dataset, id)
@@ -80,7 +80,7 @@ function parseToStore(dataset) {
   }
 
   dataset.nodes
-    .filter(n => n.presentationStyle === "accordion" || n.isSubAccordion)
+    .filter(n => n.mediaType === "multi-content" || n.isSubMultiContent)
     .forEach(n => initializeOrdering(dataset, n))
 
   store.selectedNodeId = dataset.rootId

@@ -92,14 +92,14 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="!isSubAccordionRow"
+              v-if="!isSubMultiContentRow"
               :node="node"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="isSubMultiContentRow ? 0 : 35"
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
@@ -108,7 +108,7 @@
             </node-button>
             <node-button
               v-else-if="canReview"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="isSubMultiContentRow ? 0 : 35"
               :y="radius"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
@@ -182,7 +182,7 @@ export default {
       "getDirectChildren",
       "isVisible",
       "getParent",
-      "isAccordionRow",
+      "isMultiContentRow",
     ]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -199,10 +199,10 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isSubAccordionRow() {
+    isSubMultiContentRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
-        return this.isAccordionRow(parent)
+        return this.isMultiContentRow(parent)
       }
       return false
     },

@@ -12,7 +12,7 @@
     @close="handleUserClose"
   >
     <accordion-media
-      v-if="node.presentationStyle === 'accordion'"
+      v-if="node.mediaType === 'multi-content'"
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
@@ -77,7 +77,7 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
-    ...mapGetters(["getNode", "isAccordion", "isAccordionRow"]),
+    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -101,7 +101,7 @@ export default {
         styles.position = "relative"
       }
 
-      if (this.node.presentationStyle === "accordion") {
+      if (this.node.mediaType === "multi-content") {
         return Object.assign(styles, { padding: "24px" })
       }
 
@@ -190,8 +190,8 @@ export default {
       handler(rowId) {
         if (rowId) {
           if (
-            !this.isAccordion(this.nodeId) ||
-            !this.isAccordionRow(rowId, this.nodeId)
+            !this.isMultiContent(this.nodeId) ||
+            !this.isMultiContentRow(rowId, this.nodeId)
           ) {
             this.$router.replace({
               name: names.LIGHTBOX,
@@ -206,7 +206,7 @@ export default {
       immediate: true,
       handler(subRowId) {
         if (subRowId) {
-          if (!this.isAccordionRow(subRowId, this.rowId)) {
+          if (!this.isMultiContentRow(subRowId, this.rowId)) {
             this.$router.replace({
               name: names.ACCORDION,
               params: { nodeId: this.nodeId, rowId: this.rowId },

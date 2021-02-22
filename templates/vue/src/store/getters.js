@@ -24,25 +24,25 @@ export function getParent(state) {
   }
 }
 
-export function isAccordion(_, { getNode, isSubAccordion }) {
+export function isMultiContent(_, { getNode, isSubMultiContent }) {
   return id => {
     const node = getNode(id)
-    return node.presentationStyle === "accordion" || isSubAccordion(id)
+    return node.mediaType === "multi-content" || isSubMultiContent(id)
   }
 }
 
-export function isSubAccordion(_, { getNode, getParent }) {
+export function isSubMultiContent(_, { getNode, getParent }) {
   return id => {
     const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
-      return parentNode.presentationStyle === "accordion"
+      return parentNode.mediaType === "multi-content"
     }
     return false
   }
 }
 
-export function isAccordionRow(_, { getParent, isAccordion }) {
+export function isMultiContentRow(_, { getParent, isMultiContent }) {
   return (id, accordion) => {
     const parent = getParent(id)
     if (!parent) {
@@ -51,17 +51,17 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
     if (accordion !== undefined) {
       return parent === accordion
     }
-    return isAccordion(parent)
+    return isMultiContent(parent)
   }
 }
 
-export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
+export function hasAccordionAncestor(_, { getParent, isSubMultiContent }) {
   return id => {
     let nodeId = id
     while (nodeId) {
       let parent = getParent(nodeId)
       if (!parent) return false
-      if (isSubAccordion(nodeId)) return true
+      if (isSubMultiContent(nodeId)) return true
       nodeId = parent
     }
     return false

@@ -14,7 +14,7 @@
       @updateProgress="updateProgress"
     ></accordion-rows>
     <page-rows
-      v-if="node.presentationStyle === 'page'"
+      v-else-if="node.presentationStyle === 'page'"
       :dimensions="dimensions"
       :node="node"
       :rowId="rowId"
@@ -82,12 +82,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isAccordion"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
-        const children = this.isAccordion(node.id)
+        const children = this.isMultiContent(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
@@ -240,38 +240,5 @@ button[disabled] {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.button-row {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  width: 100%;
-  border-radius: 4px;
-
-  i {
-    margin-right: 8px;
-  }
-
-  a {
-    cursor: pointer;
-  }
-}
-
-.button-row-trigger {
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.accordion-row {
-  background: #262626;
-  border-radius: 4px;
-  padding: 8px 16px;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 </style>

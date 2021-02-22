@@ -94,12 +94,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isAccordion"]),
+    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
-        const children = this.isAccordion(node.id)
+        const children = this.isMultiContent(node.id)
           ? node.childOrdering.map(this.getNode)
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
@@ -137,53 +137,6 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.title {
-  color: #fff;
-  margin-bottom: 1em;
-}
-
-.media-container {
-  height: 100%;
-  overflow: scroll;
-  scrollbar-color: auto black;
-  scrollbar-width: none;
-
-  ::-webkit-scrollbar-track {
-    background-color: black;
-  }
-}
-
-.button-completion {
-  background: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: inherit;
-  margin-right: 2em;
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  &:hover {
-    color: #11a6d8;
-  }
-
-  p {
-    margin: 1em auto 0;
-    padding: 0;
-    font-weight: 600;
-  }
-}
-
-.button-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .button-row {
   display: flex;
   align-items: center;
@@ -198,12 +151,6 @@ button[disabled] {
   a {
     cursor: pointer;
   }
-}
-
-.button-row-trigger {
-  background: none;
-  width: 100%;
-  text-align: left;
 }
 
 .accordion-row {
