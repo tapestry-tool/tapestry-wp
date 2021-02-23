@@ -1,6 +1,6 @@
 <template>
   <div ref="container">
-    <headless-accordion
+    <headless-multi-content
       :rows="rows.map(row => row.id)"
       :value="rowId"
       @input="changeRow"
@@ -40,20 +40,20 @@
           </div>
         </div>
       </template>
-    </headless-accordion>
+    </headless-multi-content>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import HeadlessAccordion from "./HeadlessAccordion"
+import HeadlessMultiContent from "./HeadlessMultiContent"
 import TapestryMedia from "../TapestryMedia"
 import { names } from "@/config/routes"
 
 export default {
   name: "sub-accordion",
   components: {
-    HeadlessAccordion,
+    HeadlessMultiContent,
     TapestryMedia,
   },
   props: {
