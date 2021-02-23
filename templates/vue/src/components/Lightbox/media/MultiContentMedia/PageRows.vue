@@ -10,10 +10,18 @@
           v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
-          class="accordion-row"
+          class="page-row"
         >
-          <div class="button-row">
-            <a v-if="!disableRow(index)" @click="toggleFavourite(row.node.id)">
+          <div class="title-row">
+            <div class="title">
+              {{ disableRow(index) ? row.node.title : "" }}
+            </div>
+            <i
+              v-if="disableRow(index)"
+              class="fas fa-lock fa-sm"
+              style="color:white;"
+            ></i>
+            <a v-else class="title-row-icon" @click="toggleFavourite(row.node.id)">
               <i
                 v-if="isFavourite(row.node.id)"
                 class="fas fa-heart fa-sm"
@@ -22,7 +30,7 @@
               <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
             </a>
           </div>
-          <div :data-qa="`row-content-${row.node.id}`">
+          <div v-if="!disableRow(index)" :data-qa="`row-content-${row.node.id}`">
             <tapestry-media
               :node-id="row.node.id"
               :dimensions="dimensions"
@@ -137,23 +145,32 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.button-row {
+.title-row {
   display: flex;
   align-items: center;
   margin: 0;
   width: 100%;
   border-radius: 4px;
 
-  i {
-    margin-right: 8px;
-  }
-
   a {
     cursor: pointer;
   }
 }
 
-.accordion-row {
+.title-row-icon {
+  text-align: right;
+}
+
+.title {
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.page-row {
   background: #262626;
   border-radius: 4px;
   padding: 8px 16px;
