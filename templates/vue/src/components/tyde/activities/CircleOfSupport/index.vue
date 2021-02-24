@@ -18,7 +18,6 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
 import CommunitiesView from "./CommunitiesView"
@@ -84,13 +83,6 @@ export default {
 </script>
 
 <style scoped>
-.test-controls {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .cos {
   --cos-color-primary: #000;
   --cos-color-secondary: #c4c4c4;
