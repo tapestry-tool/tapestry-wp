@@ -243,6 +243,7 @@ ul {
   position: relative;
   display: flex;
   justify-content: flex-end;
+  pointer-events: none;
 
   --border-radius: 9999px;
 
@@ -330,6 +331,7 @@ ul {
   max-height: 100%;
   background: var(--color, var(--cos-color-secondary));
   position: relative;
+  pointer-events: all;
 
   --border-radius: 9999px;
 
