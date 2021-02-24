@@ -4,7 +4,7 @@
       v-for="community in communitiesWithPosition"
       :key="community.id"
       :class="[
-        'community',
+        'community-wrapper',
         community.position.orientation,
         { active: community.id === activeCommunity },
       ]"
@@ -14,18 +14,13 @@
         '--row': community.position.row,
       }"
     >
-      <ul
-        :ref="`${community.id}-list`"
-        :class="[
-          'connection-list',
-          community.position.orientation,
-          { odd: isOdd(community.connections.length) },
-        ]"
-        :data-orientation="community.position.orientation"
+      <div
+        :class="['community', community.position.orientation]"
         :style="{
           '--color': community.color,
         }"
       >
+        <span class="community-icon">{{ community.icon }}</span>
         <button
           v-if="clickables[community.id]"
           class="toggle"
@@ -33,15 +28,25 @@
         >
           <tapestry-icon icon="chevron-down" />
         </button>
-        <li
-          v-for="connection in community.connections"
-          :key="connection.id"
-          class="connection"
+        <ul
+          :ref="`${community.id}-list`"
+          :data-orientation="community.position.orientation"
+          :class="[
+            'connection-list',
+            community.position.orientation,
+            { odd: isOdd(community.connections.length) },
+          ]"
         >
-          <p>{{ connection.name }}</p>
-          <h1>{{ connection.avatar }}</h1>
-        </li>
-      </ul>
+          <li
+            v-for="connection in community.connections"
+            :key="connection.id"
+            class="connection"
+          >
+            <p>{{ connection.name }}</p>
+            <h1>{{ connection.avatar }}</h1>
+          </li>
+        </ul>
+      </div>
     </li>
   </ul>
 </template>
@@ -227,7 +232,7 @@ ul {
   width: 100%;
 }
 
-.community {
+.community-wrapper {
   --row-end: span 2;
   --border-offset: 3rem;
 
@@ -254,7 +259,7 @@ ul {
       --row: 1 !important;
       --row-end: -1;
 
-      .connection-list {
+      .community {
         height: auto;
       }
 
@@ -272,7 +277,7 @@ ul {
     &.active {
       --column-end: -2;
 
-      .connection-list {
+      .community {
         width: auto;
       }
 
@@ -290,7 +295,7 @@ ul {
     &.active {
       --row-end: -1;
 
-      .connection-list {
+      .community {
         height: auto;
       }
 
@@ -307,7 +312,7 @@ ul {
       --column-start: 2 !important;
       --column-end: -1;
 
-      .connection-list {
+      .community {
         width: auto;
       }
 
@@ -318,19 +323,101 @@ ul {
   }
 }
 
-.connection-list {
+.community {
   width: 100%;
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  overflow: hidden;
-  padding: 0.5rem;
-
   background: var(--color, var(--cos-color-secondary));
   position: relative;
 
-  --row-size: repeat(2, 1fr);
   --border-radius: 9999px;
+
+  &.north,
+  &.south {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  &.east,
+  &.west {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  &.north {
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    padding-top: var(--border-offset);
+
+    .toggle {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) rotate(180deg);
+    }
+
+    .community-icon {
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  &.east {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    padding-right: 4rem;
+
+    .toggle {
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%) rotate(-90deg);
+    }
+
+    .community-icon {
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  &.south {
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    padding-bottom: var(--border-offset);
+
+    .toggle {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .community-icon {
+      bottom: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  &.west {
+    border-bottom-left-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+    padding-left: 4rem;
+
+    .toggle {
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%) rotate(90deg);
+    }
+
+    .community-icon {
+      top: 0.5rem;
+      left: 0.5rem;
+    }
+  }
+}
+
+.connection-list {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 
   &.north,
   &.south {
@@ -346,7 +433,7 @@ ul {
   &.west {
     display: grid;
     align-items: center;
-    grid-template-rows: var(--row-size);
+    grid-template-rows: repeat(2, 1fr);
     grid-auto-columns: min-content;
     grid-auto-flow: column;
 
@@ -356,56 +443,23 @@ ul {
   }
 
   &.north {
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    padding-top: var(--border-offset);
     flex-wrap: wrap;
-
-    .toggle {
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) rotate(180deg);
-    }
+    padding-bottom: 0.5rem;
   }
 
   &.east {
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-    padding-right: 4rem;
-
     // Reverse the direction of column placement so it places from right to left.
     direction: rtl;
-
-    .toggle {
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%) rotate(-90deg);
-    }
-  }
-
-  &.south {
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-    padding-bottom: var(--border-offset);
-    flex-wrap: wrap-reverse;
-
-    .toggle {
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    padding-left: 0.5rem;
   }
 
   &.west {
-    border-bottom-left-radius: var(--border-radius);
-    border-top-left-radius: var(--border-radius);
-    padding-left: 4rem;
+    padding-right: 0.5rem;
+  }
 
-    .toggle {
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%) rotate(90deg);
-    }
+  &.south {
+    flex-wrap: wrap-reverse;
+    padding-top: 0.5rem;
   }
 }
 
@@ -440,5 +494,10 @@ ul {
   position: absolute;
   background: none;
   font-size: 1.5rem;
+}
+
+.community-icon {
+  position: absolute;
+  font-size: 2.5rem;
 }
 </style>
