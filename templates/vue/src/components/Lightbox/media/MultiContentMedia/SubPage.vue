@@ -11,9 +11,13 @@
           <i
             v-if="isFavourite(row.id)"
             class="fas fa-heart fa-sm"
-            style="color:red;"
+            style="color:red; cursor:pointer;"
           ></i>
-          <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+          <i
+            v-else
+            class="fas fa-heart fa-sm"
+            style="color:white; cursor:pointer;"
+          ></i>
         </a>
       </div>
       <tapestry-media
@@ -93,10 +97,6 @@ export default {
 .title-row-icon {
   flex: 1;
   text-align: right;
-
-  a {
-    cursor: pointer;
-  }
 }
 
 .button-row-trigger {

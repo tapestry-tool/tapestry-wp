@@ -13,21 +13,25 @@
           class="page-row"
         >
           <div class="title-row">
-            <div class="title">
-              {{ disableRow(index) ? row.node.title : "" }}
+            <div v-if="disableRow(index)" class="title">
+              {{ row.node.title }}
             </div>
             <i
               v-if="disableRow(index)"
-              class="fas fa-lock fa-sm"
+              class="fas fa-lock fa-sm title-row-icon"
               style="color:white;"
             ></i>
             <a v-else class="title-row-icon" @click="toggleFavourite(row.node.id)">
               <i
                 v-if="isFavourite(row.node.id)"
                 class="fas fa-heart fa-sm"
-                style="color:red;"
+                style="color:red; cursor:pointer;"
               ></i>
-              <i v-else class="fas fa-heart fa-sm" style="color:white;"></i>
+              <i
+                v-else
+                class="fas fa-heart fa-sm"
+                style="color:white; cursor:pointer;"
+              ></i>
             </a>
           </div>
           <div v-if="!disableRow(index)" :data-qa="`row-content-${row.node.id}`">
@@ -43,13 +47,13 @@
             <p v-if="row.children.length > 0" style="color: white;">
               {{ row.node.typeData.subAccordionText }}
             </p>
-            <sub-accordion
+            <sub-page
               v-if="row.children.length > 0"
               :dimensions="dimensions"
               :rows="row.children"
               :row-id="subRowId"
               @load="handleLoad"
-            ></sub-accordion>
+            ></sub-page>
           </div>
           <button
             v-if="row.node.completed && isVisible(row)"
@@ -68,14 +72,14 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
-import SubAccordion from "./SubAccordion"
+import SubPage from "./SubPage.vue"
 
 export default {
   name: "page-rows",
   components: {
     TapestryMedia,
     HeadlessMultiContent,
-    SubAccordion,
+    SubPage,
   },
   props: {
     node: {
@@ -151,13 +155,10 @@ button[disabled] {
   margin: 0;
   width: 100%;
   border-radius: 4px;
-
-  a {
-    cursor: pointer;
-  }
 }
 
 .title-row-icon {
+  flex: 1;
   text-align: right;
 }
 
