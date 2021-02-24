@@ -101,6 +101,9 @@ export default {
       this.applySettings()
       if (this.autoplay) {
         client.recordAnalyticsEvent("app", "auto-play", "yt-video", this.node.id)
+      } else {
+        // To prevent autoplay on video states other than "not started"
+        this.player.stopVideo()
       }
     },
     openQuiz() {
@@ -115,7 +118,6 @@ export default {
       this.showEndScreen = false
       if (this.player) {
         this.player.seekTo(0, true)
-        this.player.playVideo()
       }
     },
     close() {
