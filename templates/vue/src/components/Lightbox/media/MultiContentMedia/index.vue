@@ -77,6 +77,7 @@ export default {
   },
   data() {
     return {
+      activeIndex: -1,
       showCompletion: false,
       isMounted: false,
     }
@@ -113,6 +114,7 @@ export default {
   },
   mounted() {
     this.isMounted = true
+    this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
   },
   methods: {
     ...mapMutations(["updateNode"]),
