@@ -20,7 +20,18 @@
           '--color': community.color,
         }"
       >
-        <span class="community-icon">{{ community.icon }}</span>
+        <div class="community-icon">
+          {{ community.icon }}
+          <div ref="tooltip" class="community-tooltip">
+            <span>{{ community.icon }}</span>
+            <h1>
+              {{ community.name }}
+            </h1>
+            <button @click="$emit('edit-community', community.id)">
+              <tapestry-icon icon="pencil-alt" />
+            </button>
+          </div>
+        </div>
         <button
           v-if="clickables[community.id]"
           class="toggle"
@@ -248,7 +259,7 @@ ul {
   --border-radius: 9999px;
 
   &.active {
-    z-index: 10;
+    z-index: 20;
   }
 
   &.north {
@@ -501,5 +512,41 @@ ul {
 .community-icon {
   position: absolute;
   font-size: 2.5rem;
+  z-index: 10;
+
+  .community-tooltip {
+    display: none;
+  }
+
+  &:hover {
+    .community-tooltip {
+      display: flex;
+    }
+  }
+}
+
+.community-tooltip {
+  position: absolute;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--cos-color-secondary);
+  background: white;
+  padding: 0.2rem 1rem;
+
+  h1 {
+    font-size: 1em;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    text-transform: uppercase;
+  }
+
+  button {
+    background: none;
+    padding: 0;
+    color: var(--cos-color-secondary);
+  }
 }
 </style>
