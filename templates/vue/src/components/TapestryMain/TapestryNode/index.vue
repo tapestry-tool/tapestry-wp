@@ -286,6 +286,8 @@ export default {
       const rows = this.getDirectChildren(this.node.id)
         .map(this.getNode)
         .filter(n => n.status !== "draft")
+
+      if (rows.length === 0) return 0
       return rows.filter(row => row.completed).length / rows.length
     },
     highlightNode() {
