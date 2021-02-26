@@ -1,5 +1,5 @@
 <template>
-  <div class="cos">
+  <div id="cos" class="cos">
     <communities-view
       :communities="cos.communities"
       :connections="cos.connections"
