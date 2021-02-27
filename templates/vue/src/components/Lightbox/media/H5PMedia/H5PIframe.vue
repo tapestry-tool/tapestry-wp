@@ -93,7 +93,7 @@ export default {
         // Video should fit within the smaller of the viewport or the container it's in
         let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
         if (this.context === "multi-content") {
-          // Count for the accordion header
+          // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
           fitHeight -= 100
         }

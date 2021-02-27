@@ -43,19 +43,19 @@ export function isSubMultiContent(_, { getNode, getParent }) {
 }
 
 export function isMultiContentRow(_, { getParent, isMultiContent }) {
-  return (id, accordion) => {
+  return (id, multiContent) => {
     const parent = getParent(id)
     if (!parent) {
       return false
     }
-    if (accordion !== undefined) {
-      return parent === accordion
+    if (multiContent !== undefined) {
+      return parent === multiContent
     }
     return isMultiContent(parent)
   }
 }
 
-export function hasAccordionAncestor(_, { getParent, isSubMultiContent }) {
+export function hasMultiContentAncestor(_, { getParent, isSubMultiContent }) {
   return id => {
     let nodeId = id
     while (nodeId) {
@@ -68,7 +68,7 @@ export function hasAccordionAncestor(_, { getParent, isSubMultiContent }) {
   }
 }
 
-export function isVisible(state, { getNode, hasAccordionAncestor }) {
+export function isVisible(state, { getNode, hasMultiContentAncestor }) {
   const { showRejected } = state.settings
   return id => {
     const node = getNode(id)
@@ -79,7 +79,7 @@ export function isVisible(state, { getNode, hasAccordionAncestor }) {
       return false
     }
     if (!Helpers.hasPermission(node, "edit", showRejected)) {
-      return !hasAccordionAncestor(node.id)
+      return !hasMultiContentAncestor(node.id)
     }
     return true
   }

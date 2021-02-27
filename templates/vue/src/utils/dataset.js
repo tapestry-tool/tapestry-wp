@@ -58,17 +58,17 @@ function parseToStore(dataset) {
   for (const node of dataset.nodes.filter(
     node => node.mediaType === "multi-content"
   )) {
-    const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
-    accordionRowIds.forEach(accordionRowId => {
-      const accordionRow = getNode(dataset, accordionRowId)
-      accordionRow.presentationStyle = "accordion-row"
-      const subRows = getChildIds({ links: dataset.links }, accordionRowId)
+    const multiContentRowIds = getChildIds({ links: dataset.links }, node.id)
+    multiContentRowIds.forEach(multiContentRowId => {
+      const multiContentRow = getNode(dataset, multiContentRowId)
+      multiContentRow.presentationStyle = "multi-content-row"
+      const subRows = getChildIds({ links: dataset.links }, multiContentRowId)
       if (subRows.length) {
-        accordionRow.isSubMultiContent = true
+        multiContentRow.isSubMultiContent = true
       }
       subRows.forEach(id => {
         const subRow = getNode(dataset, id)
-        subRow.presentationStyle = "accordion-row"
+        subRow.presentationStyle = "multi-content-row"
       })
     })
   }

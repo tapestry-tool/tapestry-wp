@@ -92,7 +92,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'multi-content' || node.hasSubAccordion"
+            v-if="node.mediaType === 'multi-content' || node.hasSubMultiContent"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -530,7 +530,7 @@ export default {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
       }
-      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      copy.hasSubMultiContent = this.hasSubMultiContent(copy)
       if (!copy.mapCoordinates) {
         copy.mapCoordinates = {
           lat: "",
@@ -560,13 +560,15 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return this.node.mediaType === "multi-content" || this.node.hasSubAccordion
+          return (
+            this.node.mediaType === "multi-content" || this.node.hasSubMultiContent
+          )
         }
       }
 
       return false
     },
-    hasSubAccordion(node) {
+    hasSubMultiContent(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
         return this.parent.presentationStyle === "accordion" && children.length > 0
@@ -700,7 +702,7 @@ export default {
             addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
+          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
