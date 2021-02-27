@@ -118,6 +118,7 @@ export default {
       this.showEndScreen = false
       if (this.player) {
         this.player.seekTo(0, true)
+        this.player.playVideo()
       }
     },
     close() {

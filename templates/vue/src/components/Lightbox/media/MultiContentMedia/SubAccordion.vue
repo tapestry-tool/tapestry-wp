@@ -31,7 +31,7 @@
               v-if="isVisible(row.id)"
               :node-id="row.id"
               :dimensions="dimensions"
-              context="accordion"
+              context="multi-content"
               :autoplay="false"
               @complete="completeNode(row.id)"
               @close="toggle(row.id)"

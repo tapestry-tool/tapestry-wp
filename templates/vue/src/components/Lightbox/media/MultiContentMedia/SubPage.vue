@@ -23,7 +23,7 @@
       <tapestry-media
         :node-id="row.id"
         :dimensions="dimensions"
-        context="accordion"
+        context="multi-content"
         :autoplay="false"
         @complete="completeNode(row.id)"
         @load="handleLoad(index)"
