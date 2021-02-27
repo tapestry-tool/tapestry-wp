@@ -9,8 +9,8 @@ Vue.use(VueRouter)
 export const routes = [
   routeConfig.app,
   routeConfig.lightbox,
-  routeConfig.accordion,
-  routeConfig.subAccordion,
+  routeConfig.multiContent,
+  routeConfig.subMultiContent,
   routeConfig.settings,
   ...routeConfig.redirects,
   routeConfig.modal,

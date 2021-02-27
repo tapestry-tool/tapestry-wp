@@ -69,13 +69,13 @@ export default {
       const { nodeId, rowId } = this.$route.params
       if (subRowId) {
         this.$router.push({
-          name: names.SUBACCORDION,
+          name: names.SUBMULTICONTENT,
           params: { nodeId, rowId, subRowId },
           query: this.$route.query,
         })
       } else {
         this.$router.push({
-          name: names.ACCORDION,
+          name: names.MULTICONTENT,
           params: { nodeId, rowId },
           query: this.$route.query,
         })

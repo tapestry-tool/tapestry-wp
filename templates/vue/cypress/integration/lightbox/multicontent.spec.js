@@ -137,7 +137,7 @@ describe("Multi-content", () => {
         cy.submitModal()
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion").should("be.visible")
+          cy.getByTestId("multi-content").should("be.visible")
           cy.contains(node.title).should("be.visible")
         })
       })

@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="media-container" data-qa="accordion">
+  <div ref="container" class="media-container" data-qa="multi-content">
     <header>
       <h1 class="title">{{ node.title }}</h1>
     </header>
@@ -122,15 +122,21 @@ export default {
     handleLoad(el) {
       this.$nextTick(() => {
         if (this.activeIndex >= 0) {
-          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
-            to: el.offsetTop - 12,
-          })
+          client.recordAnalyticsEvent(
+            "app",
+            "scroll",
+            "multi-content",
+            this.node.id,
+            {
+              to: el.offsetTop - 12,
+            }
+          )
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
     },
     handleClose(evt) {
-      client.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {
+      client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })
@@ -140,7 +146,7 @@ export default {
       client.recordAnalyticsEvent(
         "user",
         "close",
-        "accordion-completion-screen",
+        "multi-content-completion-screen",
         this.node.id,
         {
           x: evt.clientX,
@@ -161,7 +167,7 @@ export default {
     changeRow(rowId) {
       if (rowId) {
         this.$router.push({
-          name: names.ACCORDION,
+          name: names.MULTICONTENT,
           params: { nodeId: this.node.id, rowId },
           query: this.$route.query,
         })
