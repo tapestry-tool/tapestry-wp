@@ -121,27 +121,13 @@ export default {
     ...mapActions(["completeNode", "updateNodeProgress", "toggleFavourite"]),
     handleLoad(el) {
       this.$nextTick(() => {
-        if (this.activeIndex < 0) {
-          client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
-            to: 0,
-          })
-          this.$refs.container.scrollTop = 0
-        } else {
+        if (this.activeIndex >= 0) {
           client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
             to: el.offsetTop - 12,
           })
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
-    },
-    scrollToTop() {
-      const el = this.$refs.container
-      if (el) {
-        client.recordAnalyticsEvent("app", "scroll", "accordion", this.node.id, {
-          to: 0,
-        })
-        el.scrollTop = 0
-      }
     },
     handleClose(evt) {
       client.recordAnalyticsEvent("user", "close", "accordion", this.node.id, {

@@ -318,7 +318,7 @@ describe("Multi-content", () => {
           const [pageNode, videoNode, textNode, moreNode] = Object.values(nodes)
 
           cy.editNode(pageNode.id, {
-            childOrdering: [ videoNode.id, textNode.id ],
+            childOrdering: [videoNode.id, textNode.id],
           })
 
           console.log(pageNode)
@@ -334,7 +334,7 @@ describe("Multi-content", () => {
           cy.closeLightbox()
 
           cy.openModal("edit", pageNode.id)
-          cy.getByTestId("lock-checkbox").click({force: true})
+          cy.getByTestId("lock-checkbox").click({ force: true })
           cy.submitModal()
 
           cy.openLightbox(pageNode.id).within(() => {
@@ -344,7 +344,7 @@ describe("Multi-content", () => {
             cy.contains(moreNode.title).should("not.exist")
             cy.contains(moreNode.typeData.textContent).should("not.exist")
           })
-      })
+        })
     })
   })
 })
