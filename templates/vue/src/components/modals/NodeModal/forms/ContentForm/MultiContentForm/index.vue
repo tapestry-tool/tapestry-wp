@@ -11,7 +11,7 @@
     </b-form-group>
     <sub-item-table :actionType="actionType" :node="node"></sub-item-table>
     <b-form-group>
-      <b-form-checkbox v-model="node.typeData.lockRows">
+      <b-form-checkbox v-model="node.typeData.lockRows" data-qa="lock-checkbox">
         Lock rows until previous row is completed
       </b-form-checkbox>
     </b-form-group>
