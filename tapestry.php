@@ -413,11 +413,36 @@ function accordion_update() {
 }
 register_activation_hook( __FILE__, 'accordion_update' );
 
+function accordion_row_update() {
+    $query_args = array(
+        'post_type' => 'tapestry_node',
+        'meta_query' => array(
+            array(
+               'key'     => 'tapestry_node_data',
+               'value'   => '"presentationStyle";s:13:"accordion-row"',
+               'compare' => 'LIKE',
+            ),
+        ),
+    );
+    $query = new WP_Query( $query_args );
+    while ( $query->have_posts() ) {
+        $query->the_post();
+        $post_id = get_the_ID();
+        $node_meta_data = get_post_meta($post_id,'tapestry_node_data', true);
+        if (isset($node_meta_data->presentationStyle) && $node_meta_data->mediapresentationStyleType == 'accordion-row') {
+            $node_meta_data->presentationStyle = 'multi-content-row';
+            update_post_meta( $post_id, 'tapestry_node_data',  $node_meta_data);
+        }
+    }
+}
+register_activation_hook( __FILE__, 'accordion_row_update' );
+
 function tapestry_plugin_update() {
     global $TAPESTRY_VERSION_NUMBER;
     $installed_version = get_site_option('tapestry_version');
     if ( $installed_version != $TAPESTRY_VERSION_NUMBER) {
         accordion_update();
+        accordion_row_update();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         update_option( 'tapestry_version', $TAPESTRY_VERSION_NUMBER );
     }
