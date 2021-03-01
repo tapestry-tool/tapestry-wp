@@ -20,9 +20,18 @@
           '--color': community.color,
         }"
       >
-        <div class="community-icon">
+        <button
+          class="community-icon"
+          @click="
+            activeCommunityTooltip =
+              activeCommunityTooltip === community.id ? null : community.id
+          "
+        >
           {{ community.icon }}
-          <div class="community-tooltip">
+          <div
+            v-show="activeCommunityTooltip === community.id"
+            class="community-tooltip"
+          >
             <p>{{ community.icon }}</p>
             <h1>
               {{ community.name }}
@@ -31,7 +40,7 @@
               <tapestry-icon icon="pencil-alt" />
             </button>
           </div>
-        </div>
+        </button>
         <button
           v-if="clickables[community.id]"
           class="toggle"
@@ -113,6 +122,7 @@ export default {
       clickables: {},
       activeCommunity: "",
       activeConnectionId: null,
+      activeCommunityTooltip: "",
     }
   },
   computed: {
@@ -727,19 +737,13 @@ ul {
 }
 
 .community-icon {
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
   position: absolute;
   font-size: 2.5rem;
   z-index: 10;
-
-  .community-tooltip {
-    display: none;
-  }
-
-  &:hover {
-    .community-tooltip {
-      display: flex;
-    }
-  }
 }
 
 .community-tooltip {
