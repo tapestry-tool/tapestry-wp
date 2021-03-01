@@ -61,9 +61,12 @@
           <li
             v-for="connection in community.connections"
             :key="connection.id"
-            :ref="connection.id"
+            :ref="`${connection.id}-${community.id}`"
           >
-            <button class="connection" @click="toggleConnectionInfo(connection.id)">
+            <button
+              class="connection"
+              @click="toggleConnectionInfo(connection.id, community.id)"
+            >
               <p>{{ connection.name }}</p>
               <h1>{{ connection.avatar }}</h1>
             </button>
@@ -89,7 +92,7 @@
         </ul>
       </div>
       <div class="controls">
-        <button>
+        <button @click="editConnection">
           <tapestry-icon icon="pencil-alt" />
         </button>
         <button @click="activeConnectionId = null">
@@ -144,8 +147,7 @@ export default {
       )
     },
     activeConnection() {
-      const connection = this.connections[this.activeConnectionId]
-      if (!connection) {
+      if (!this.activeConnectionId) {
         return {
           name: "placeholder",
           avatar: "😊",
@@ -157,10 +159,12 @@ export default {
           ],
         }
       }
+      const [connectionId] = this.activeConnectionId.split("-")
+      const connection = this.connections[connectionId]
       return {
         ...connection,
         communities: Object.values(this.communities).filter(({ connections }) =>
-          connections.includes(this.activeConnectionId)
+          connections.includes(connectionId)
         ),
       }
     },
@@ -185,13 +189,18 @@ export default {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
-    toggleConnectionInfo(connectionId) {
-      if (connectionId === this.activeConnectionId) {
+    editConnection() {
+      this.$emit("edit-connection", this.activeConnection)
+      this.activeConnectionId = null
+    },
+    toggleConnectionInfo(connectionId, communityId) {
+      const refName = `${connectionId}-${communityId}`
+      if (refName === this.activeConnectionId) {
         this.activeConnectionId = null
         return
       }
-      this.positionTooltip(connectionId)
-      this.activeConnectionId = connectionId
+      this.positionTooltip(connectionId, communityId)
+      this.activeConnectionId = refName
     },
     /**
      * Positions the connection tooltip according to the given connectionId.
@@ -210,8 +219,8 @@ export default {
      * 3. The tooltip is clipped on BOTH the bottom and the right (when the
      *    connection is on the bottom-right of the CoS)
      */
-    positionTooltip(connectionId) {
-      const [connectionRef] = this.$refs[connectionId]
+    positionTooltip(connectionId, communityId) {
+      const [connectionRef] = this.$refs[`${connectionId}-${communityId}`]
       const tooltipRef = this.$refs["connection-tooltip"]
 
       const {

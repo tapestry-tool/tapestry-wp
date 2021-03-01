@@ -1,6 +1,10 @@
 <template>
   <div style="height: 100%; width: 100%;">
-    <communities-list :communities="communities" :connections="connections" />
+    <communities-list
+      :communities="communities"
+      :connections="connections"
+      @edit-connection="editConnection"
+    />
     <connections-tab
       class="tab"
       :show="isConnectionTabOpen"
