@@ -3,26 +3,60 @@
     <communities-list :communities="communities" :connections="connections" />
     <connections-tab
       class="tab"
-      :connections="connections"
-      :communities="communities"
-      @add-connection="$emit('add-connection', $event)"
-      @add-community="$emit('add-community', $event)"
-      @update-connection="$emit('update-connection', $event)"
-    />
+      :show="isConnectionTabOpen"
+      @toggle="toggleConnectionTab"
+    >
+      <div
+        v-if="state === states.AddConnection || state === states.EditConnection"
+        class="content-wrapper"
+      >
+        <b-overlay class="form" :show="isSubmitting">
+          <add-connection-form
+            v-model="connection"
+            :communities="communities"
+            @back="state = lastState"
+            @submit="handleSubmit"
+            @add-community="$emit('add-community', $event)"
+          />
+        </b-overlay>
+      </div>
+      <connections-list
+        v-else
+        :connections="connections"
+        :communities="communities"
+        @add-connection="openConnectionForm"
+        @edit-connection="editConnection"
+      />
+    </connections-tab>
     <add-community-tab @add-community="$emit('add-community', $event)" />
   </div>
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
+
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
+import AddConnectionForm from "./AddConnectionForm"
+import ConnectionsList from "./ConnectionsList"
+
+const States = {
+  Home: 0,
+  List: 1,
+  AddConnection: 2,
+  EditConnection: 3,
+  AddCommunity: 4,
+  EditCommunity: 5,
+}
 
 export default {
   components: {
     AddCommunityTab,
-    ConnectionsTab,
+    AddConnectionForm,
     CommunitiesList,
+    ConnectionsList,
+    ConnectionsTab,
   },
   props: {
     connections: {
@@ -34,6 +68,134 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      state: States.Home,
+      lastState: States.Home,
+      isSubmitting: false,
+      connection: {
+        id: "",
+        name: "",
+        avatar: "😊",
+        communities: [],
+      },
+    }
+  },
+  computed: {
+    states() {
+      return States
+    },
+    isConnectionTabOpen() {
+      return [States.List, States.AddConnection, States.EditConnection].includes(
+        this.state
+      )
+    },
+  },
+  watch: {
+    state(_, lastState) {
+      this.lastState = lastState
+    },
+  },
+  methods: {
+    toggleConnectionTab() {
+      if (this.isConnectionTabOpen) {
+        this.state = States.Home
+      } else {
+        this.state = States.List
+      }
+    },
+    openConnectionForm() {
+      this.resetConnection()
+      this.state = States.AddConnection
+    },
+    editConnection(connection) {
+      this.connection.id = connection.id
+      this.connection.name = connection.name
+      this.connection.avatar = connection.avatar
+      this.connection.communities = [
+        ...connection.communities.map(community => community.id),
+      ]
+      this.state = States.EditConnection
+    },
+    resetConnection() {
+      // Do it per property to maintain reactivity
+      this.connection.id = ""
+      this.connection.name = ""
+      this.connection.avatar = "😊"
+      this.connection.communities = []
+    },
+    async handleSubmit() {
+      this.isSubmitting = true
+
+      switch (this.state) {
+        case States.AddConnection:
+          await this.addNewConnection()
+          break
+        case States.EditConnection:
+          await this.updateConnection()
+          break
+        default:
+          break
+      }
+
+      this.isSubmitting = false
+      this.resetConnection()
+      this.state = this.lastState
+    },
+    async addNewConnection() {
+      const connection = await client.cos.addConnection({
+        name: this.connection.name,
+        avatar: this.connection.avatar,
+      })
+
+      if (this.connection.communities.length) {
+        /**
+         * Add connection to community one at a time to avoid race condition where
+         * only the last community is kept.
+         */
+        for (const communityId of this.connection.communities) {
+          await client.cos.addConnectionToCommunity(communityId, connection.id)
+        }
+      }
+      this.$emit("add-connection", {
+        ...connection,
+        communities: this.connection.communities,
+      })
+    },
+    async updateConnection() {
+      const currentCommunities = this.getCommunities(this.connection.id)
+      await client.cos.updateConnection(this.connection.id, { ...this.connection })
+
+      const { additions, deletions } = this.getDifferences(
+        currentCommunities.map(community => community.id),
+        this.connection.communities
+      )
+
+      for (const addition of additions) {
+        await client.cos.addConnectionToCommunity(addition, this.connection.id)
+      }
+
+      for (const deletion of deletions) {
+        await client.cos.removeConnectionFromCommunity(deletion, this.connection.id)
+      }
+
+      this.$emit("update-connection", {
+        ...this.connection,
+        additions,
+        deletions,
+      })
+    },
+    getCommunities(connectionId) {
+      return Object.values(this.communities).filter(community =>
+        community.connections.includes(connectionId)
+      )
+    },
+    getDifferences(original, newVersion) {
+      const additions = newVersion.filter(item => !original.includes(item))
+      const deletions = original.filter(item => !newVersion.includes(item))
+      return { additions, deletions }
+    },
+  },
 }
 </script>
 
@@ -43,5 +205,25 @@ export default {
   position: absolute;
   left: 0;
   bottom: 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.form {
+  width: 100%;
+  height: 100%;
+}
+
+.content-wrapper {
+  background: white;
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  border-top: 1px solid var(--cos-color-tertiary);
+  flex-grow: 1;
 }
 </style>

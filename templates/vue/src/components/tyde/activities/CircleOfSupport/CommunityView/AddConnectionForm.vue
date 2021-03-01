@@ -70,7 +70,7 @@
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import AddCommunityForm from "../AddCommunityForm"
+import AddCommunityForm from "./AddCommunityForm"
 
 export default {
   components: {
@@ -135,7 +135,7 @@ export default {
     submitConnection() {
       this.isInputTouched = true
 
-      this.$nextTick(async () => {
+      this.$nextTick(() => {
         if (!this.isNameValid) {
           return
         }
