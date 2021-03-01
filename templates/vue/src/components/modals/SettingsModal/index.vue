@@ -251,6 +251,7 @@
               v-model="draftNodesEnabled"
               switch
               :data-qa="`enable-draft`"
+              @change="handleSubmitNodesEnabled"
             >
               {{ draftNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
@@ -507,6 +508,9 @@ export default {
     },
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
+    },
+    handleSubmitNodesEnabled(event) {
+      this.submitNodesEnabled = event
     },
   },
 }
