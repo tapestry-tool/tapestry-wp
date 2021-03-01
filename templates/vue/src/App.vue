@@ -6,10 +6,17 @@
     <node-modal></node-modal>
     <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
     <tapestry-error></tapestry-error>
-    <b-modal :visible="!loggedIn" id="loggedOutModal">
+    <b-modal
+      :visible="!loggedIn"
+      id="loggedOutModal"
+      title="Not Logged In"
+      no-close-on-backdrop
+    >
       You can either refresh and stay logged out or log in again. <br />
-      <b-button @click="refresh">Refresh</b-button>
-      <b-button @click="redirectToLogin">Log In</b-button>
+      <template #modal-footer>
+        <b-button @click="refresh">Refresh</b-button>
+        <b-button @click="redirectToLogin">Log In</b-button>
+      </template>
     </b-modal>
   </div>
 </template>
