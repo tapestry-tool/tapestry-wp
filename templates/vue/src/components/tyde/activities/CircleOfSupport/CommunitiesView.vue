@@ -675,6 +675,9 @@ ul {
 
   .info {
     flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     p {
       padding: 0.25rem;
@@ -683,6 +686,7 @@ ul {
       color: black;
       cursor: default;
       font-size: 0.7em;
+      margin: 0;
     }
 
     h1 {
