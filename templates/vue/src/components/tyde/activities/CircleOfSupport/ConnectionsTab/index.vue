@@ -366,8 +366,4 @@ ul {
   width: 100%;
   height: 100%;
 }
-
-.debug {
-  border: 3px solid black;
-}
 </style>
