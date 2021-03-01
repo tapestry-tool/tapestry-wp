@@ -357,10 +357,4 @@ function prefix_title_entity_decode($response)
     return $response;
 }
 
-function wpse125952_redirect_to_request( $redirect_to, $request, $user ){
-    // instead of using $redirect_to we're redirecting back to $request
-    return $request;
-}
-add_filter('login_redirect', 'wpse125952_redirect_to_request', 10, 3);
-
 ?>
