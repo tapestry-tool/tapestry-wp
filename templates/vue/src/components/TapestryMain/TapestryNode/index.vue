@@ -91,9 +91,7 @@
             <tapestry-icon :icon="icon" svg></tapestry-icon>
           </node-button>
           <template
-            v-if="
-              (isLoggedIn && this.settings.draftNodesEnabled) || hasPermission('add')
-            "
+            v-if="(isLoggedIn && this.settings.draftNodesEnabled) || canEditTapestry"
           >
             <add-child-button
               v-if="!isSubAccordionRow"
@@ -188,6 +186,9 @@ export default {
       "getParent",
       "isAccordionRow",
     ]),
+    canEditTapestry() {
+      return wp.canEditTapestry()
+    },
     canReview() {
       if (!this.isLoggedIn) {
         return false
