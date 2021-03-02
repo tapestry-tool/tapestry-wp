@@ -258,7 +258,7 @@ button {
 }
 
 .preview {
-  font-size: 10rem;
+  font-size: clamp(7rem, 10vw, 10rem);
   line-height: 1;
 }
 
