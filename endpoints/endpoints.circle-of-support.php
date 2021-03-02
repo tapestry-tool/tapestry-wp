@@ -41,6 +41,15 @@ class CircleOfSupportEndpoints
         return $community;
     }
 
+    public static function updateCommunity($request)
+    {
+        $communityId = $request['communityId'];
+        $cos = new CircleOfSupport();
+        $community = $cos->updateCommunity($communityId, json_decode($request->get_body()));
+        $cos->save();
+        return $community;
+    }
+
     public static function addConnectionToCommunity($request)
     {
         $communityId = $request['communityId'];

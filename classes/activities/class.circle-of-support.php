@@ -87,6 +87,13 @@ class CircleOfSupport
         return $connection;
     }
 
+    public function updateCommunity($id, $community)
+    {
+        $this->current['communities']->$id = $community;
+
+        return $community;
+    }
+
     public function get()
     {
         if ($this->_isEmpty()) {
