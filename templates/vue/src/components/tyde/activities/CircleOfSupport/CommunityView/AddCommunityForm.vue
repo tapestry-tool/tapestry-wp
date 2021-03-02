@@ -4,11 +4,12 @@
       <form @submit.stop.prevent>
         <div class="community" style="flex: 1">
           <input
-            v-model="community.name"
+            :value="community.name"
             name="community name"
             class="community-name"
             type="text"
             placeholder="community"
+            @change="handleChange('name', $event.target.value)"
             @blur="isInputTouched = true"
           />
           <b-form-invalid-feedback :state="isNameValid">
@@ -19,13 +20,13 @@
               {{ community.icon }}
             </button>
             <div v-show="showPicker" class="picker" data-qa="emoji-picker">
-              <v-emoji-picker @select="community.icon = $event.data" />
+              <v-emoji-picker @select="handleChange('icon', $event.data)" />
             </div>
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
             <button class="submit" @click="addCommunity">
-              Add community
+              {{ submitLabel }}
             </button>
           </div>
         </div>
@@ -37,7 +38,7 @@
           <li v-for="color in colors" :key="color" :style="{ '--color': color }">
             <button
               :class="['color', { active: color === community.color }]"
-              @click="community.color = color"
+              @click="handleChange('color', color)"
             ></button>
           </li>
         </ul>
@@ -54,13 +55,18 @@ export default {
   components: {
     VEmojiPicker,
   },
+  model: {
+    prop: "community",
+    event: "change",
+  },
+  props: {
+    community: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
-      community: {
-        name: "",
-        icon: "👨‍👩‍👦",
-        color: "",
-      },
       showPicker: false,
       isLoading: false,
       isInputTouched: false,
@@ -90,20 +96,8 @@ export default {
     isNameValid() {
       return !this.isInputTouched || this.community.name.length > 0
     },
-    changed() {
-      const defaultCommunity = {
-        name: "",
-        icon: "👨‍👩‍👦",
-        color: "",
-      }
-      return Object.entries(this.community).some(
-        ([key, value]) => value !== defaultCommunity[key]
-      )
-    },
-  },
-  watch: {
-    changed(hasChanged) {
-      this.$emit("changed", hasChanged)
+    submitLabel() {
+      return this.community.id ? "Save community" : "Add community"
     },
   },
   mounted() {
@@ -118,6 +112,9 @@ export default {
     })
   },
   methods: {
+    handleChange(prop, value) {
+      this.$emit("change", { ...this.community, [prop]: value })
+    },
     addCommunity() {
       this.isInputTouched = true
       this.$nextTick(async () => {
@@ -127,11 +124,11 @@ export default {
         this.isLoading = true
         const community = await client.cos.addCommunity(this.community)
         // Reset the community object
-        this.community = {
+        this.$emit("change", {
           name: "",
           icon: "👨‍👩‍👦",
           color: "",
-        }
+        })
         this.isLoading = false
         this.isInputTouched = false
         this.$emit("add-community", community)
@@ -145,13 +142,13 @@ export default {
 .content {
   height: 100%;
   display: flex;
-  padding: 2rem;
 }
 
 form {
   display: flex;
   column-gap: clamp(1rem, 8vw, 3rem);
   height: 100%;
+  padding: 2rem;
 }
 
 ul {
@@ -232,7 +229,7 @@ button {
 }
 
 .preview {
-  font-size: clamp(8rem, 20vw, 12rem);
+  font-size: clamp(8rem, 20vw, 10rem);
   line-height: 1;
 }
 

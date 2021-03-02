@@ -20,7 +20,12 @@
           '--color': community.color,
         }"
       >
-        <div class="community-icon">
+        <div
+          :class="[
+            'community-icon',
+            { active: activeCommunityTooltip === community.id },
+          ]"
+        >
           <button
             @click="
               activeCommunityTooltip =
@@ -37,7 +42,7 @@
             <h1>
               {{ community.name }}
             </h1>
-            <button @click="$emit('edit-community', community.id)">
+            <button @click="editCommunity(community)">
               <tapestry-icon icon="pencil-alt" />
             </button>
           </div>
@@ -126,7 +131,7 @@ export default {
       clickables: {},
       activeCommunity: "",
       activeConnectionId: null,
-      activeCommunityTooltip: "",
+      activeCommunityTooltip: null,
     }
   },
   computed: {
@@ -189,6 +194,10 @@ export default {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
+    editCommunity(community) {
+      this.$emit("edit-community", community)
+      this.activeCommunityTooltip = null
+    },
     editConnection() {
       this.$emit("edit-connection", this.activeConnection)
       this.activeConnectionId = null
@@ -756,6 +765,10 @@ ul {
     padding: 0;
     margin: 0;
     color: inherit;
+  }
+
+  &.active {
+    z-index: 20;
   }
 }
 

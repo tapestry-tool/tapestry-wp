@@ -2,6 +2,7 @@
   <div>
     <add-community-form
       v-show="showCommunityForm"
+      v-model="community"
       @back="showCommunityForm = false"
       @add-community="handleAddCommunity"
     />
@@ -36,18 +37,18 @@
       <div class="community" style="flex: 2">
         <h1 class="community-title">Which communities do this person belong to?</h1>
         <ul class="community-list">
-          <li v-for="community in communities" :key="community.id">
+          <li v-for="existingCommunity in communities" :key="existingCommunity.id">
             <button
               :class="[
                 'community-item',
-                { selected: connection.communities.includes(community.id) },
+                { selected: connection.communities.includes(existingCommunity.id) },
               ]"
-              :style="`color: ${community.color}`"
-              @click="toggleCommunity(community.id)"
+              :style="`color: ${existingCommunity.color}`"
+              @click="toggleCommunity(existingCommunity.id)"
             >
               <span class="community-color"></span>
               <span class="community-name">
-                {{ community.name }}
+                {{ existingCommunity.name }}
               </span>
             </button>
           </li>
@@ -97,6 +98,11 @@ export default {
       showPicker: false,
       isInputTouched: false,
       showCommunityForm: false,
+      community: {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      },
     }
   },
   computed: {
@@ -252,7 +258,7 @@ button {
 }
 
 .preview {
-  font-size: 12rem;
+  font-size: 10rem;
   line-height: 1;
 }
 

@@ -1,21 +1,22 @@
 <template>
   <div style="width: 100%">
     <cos-popup
-      :show="isOpen"
+      :show="show"
       style="position: absolute; left: 0; bottom: 0; width: 100%;"
     >
       <template #toggle>
         <cos-popup-button style="right: 2rem" @click="togglePopup">
-          <tapestry-icon :icon="isOpen ? 'chevron-down' : 'plus'" />
+          <tapestry-icon :icon="show ? 'chevron-down' : 'plus'" />
         </cos-popup-button>
       </template>
       <template #content>
         <div class="content-wrapper">
           <add-community-form
             ref="form"
-            @back="isOpen = false"
+            :community="community"
+            @change="handleChange"
+            @back="$emit('back')"
             @add-community="handleAddCommunity"
-            @changed="wasEdited = $event"
           />
         </div>
       </template>
@@ -51,31 +52,49 @@ export default {
     CosPopupButton,
     TapestryIcon,
   },
+  model: {
+    prop: "community",
+    event: "change",
+  },
+  props: {
+    community: {
+      type: Object,
+      required: true,
+    },
+    show: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
-      isOpen: false,
       showModal: false,
       wasEdited: false,
     }
   },
   methods: {
+    handleChange(evt) {
+      this.wasEdited = true
+      this.$emit("change", evt)
+    },
     togglePopup() {
-      if (this.isOpen && this.wasEdited) {
+      if (this.show && this.wasEdited) {
         this.showModal = true
       } else {
-        this.isOpen = !this.isOpen
+        this.$emit("toggle")
       }
     },
     close() {
       this.showModal = false
-      this.isOpen = false
+      this.$emit("back")
     },
     addCommunityViaModal() {
       this.showModal = false
       this.$refs.form.addCommunity()
     },
     handleAddCommunity(community) {
-      this.isOpen = false
+      this.wasEdited = false
+      this.$emit("back")
       this.$emit("add-community", community)
     },
   },

@@ -4,6 +4,7 @@
       :communities="communities"
       :connections="connections"
       @edit-connection="editConnection"
+      @edit-community="editCommunity"
     />
     <connections-tab
       class="tab"
@@ -32,7 +33,13 @@
         @edit-connection="editConnection"
       />
     </connections-tab>
-    <add-community-tab @add-community="$emit('add-community', $event)" />
+    <add-community-tab
+      v-model="community"
+      :show="isCommunityTabOpen"
+      @back="state = lastState"
+      @add-community="$emit('add-community', $event)"
+      @toggle="toggleCommunityTab"
+    />
   </div>
 </template>
 
@@ -83,6 +90,11 @@ export default {
         avatar: "😊",
         communities: [],
       },
+      community: {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      },
     }
   },
   computed: {
@@ -93,6 +105,9 @@ export default {
       return [States.List, States.AddConnection, States.EditConnection].includes(
         this.state
       )
+    },
+    isCommunityTabOpen() {
+      return [States.EditCommunity, States.AddCommunity].includes(this.state)
     },
   },
   watch: {
@@ -108,25 +123,43 @@ export default {
         this.state = States.List
       }
     },
+    toggleCommunityTab() {
+      if (this.isCommunityTabOpen) {
+        this.state = States.Home
+      } else {
+        this.resetCommunity()
+        this.state = States.AddCommunity
+      }
+    },
     openConnectionForm() {
       this.resetConnection()
       this.state = States.AddConnection
     },
+    editCommunity(community) {
+      this.community = community
+      this.state = States.EditCommunity
+    },
     editConnection(connection) {
-      this.connection.id = connection.id
-      this.connection.name = connection.name
-      this.connection.avatar = connection.avatar
-      this.connection.communities = [
-        ...connection.communities.map(community => community.id),
-      ]
+      this.connection = {
+        ...connection,
+        communities: connection.communities.map(community => community.id),
+      }
       this.state = States.EditConnection
     },
+    resetCommunity() {
+      this.community = {
+        name: "",
+        icon: "👨‍👩‍👦",
+        color: "",
+      }
+    },
     resetConnection() {
-      // Do it per property to maintain reactivity
-      this.connection.id = ""
-      this.connection.name = ""
-      this.connection.avatar = "😊"
-      this.connection.communities = []
+      this.connection = {
+        id: "",
+        name: "",
+        avatar: "😊",
+        communities: [],
+      }
     },
     async handleSubmit() {
       this.isSubmitting = true

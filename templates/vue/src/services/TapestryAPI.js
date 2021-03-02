@@ -304,6 +304,11 @@ class TapestryApi {
       addCommunity(community) {
         return client.post(`${baseUrl}/communities`, community).then(res => res.data)
       },
+      updateCommunity(id, community) {
+        return client
+          .put(`${baseUrl}/communities/${id}`, community)
+          .then(res => res.data)
+      },
       removeConnectionFromCommunity(communityId, connectionId) {
         return client
           .delete(
