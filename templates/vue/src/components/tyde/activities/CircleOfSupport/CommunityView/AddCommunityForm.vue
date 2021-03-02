@@ -96,8 +96,11 @@ export default {
     isNameValid() {
       return !this.isInputTouched || this.community.name.length > 0
     },
+    isEdit() {
+      return Boolean(this.community.id)
+    },
     submitLabel() {
-      return this.community.id ? "Save community" : "Add community"
+      return this.isEdit ? "Save community" : "Add community"
     },
   },
   mounted() {
@@ -122,7 +125,9 @@ export default {
           return
         }
         this.isLoading = true
-        const community = await client.cos.addCommunity(this.community)
+        const community = this.isEdit
+          ? await client.cos.updateCommunity(this.community.id, this.community)
+          : await client.cos.addCommunity(this.community)
         // Reset the community object
         this.$emit("change", {
           name: "",

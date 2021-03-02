@@ -432,6 +432,7 @@ ul {
     --row-end: span 3;
     margin-top: var(--border-offset);
     flex-direction: column;
+    align-items: center;
 
     &.active {
       --row: 1 !important;
@@ -469,6 +470,7 @@ ul {
     --row-end: span 3;
     margin-bottom: var(--border-offset);
     flex-direction: column-reverse;
+    align-items: center;
 
     &.active {
       --row-end: -1;
@@ -516,6 +518,7 @@ ul {
   &.south {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    max-width: 14rem;
   }
 
   &.east,
