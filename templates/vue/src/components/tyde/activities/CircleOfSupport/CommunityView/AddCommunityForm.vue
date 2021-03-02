@@ -25,7 +25,7 @@
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
-            <button class="submit" @click="addCommunity">
+            <button class="submit" @click="saveCommunity">
               {{ submitLabel }}
             </button>
           </div>
@@ -118,7 +118,7 @@ export default {
     handleChange(prop, value) {
       this.$emit("change", { ...this.community, [prop]: value })
     },
-    addCommunity() {
+    saveCommunity() {
       this.isInputTouched = true
       this.$nextTick(async () => {
         if (!this.isNameValid) {

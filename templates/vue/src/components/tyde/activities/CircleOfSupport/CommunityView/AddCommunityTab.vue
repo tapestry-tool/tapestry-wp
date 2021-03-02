@@ -86,6 +86,7 @@ export default {
     },
     close() {
       this.showModal = false
+      this.wasEdited = false
       this.$emit("back")
     },
     addCommunityViaModal() {
