@@ -345,7 +345,7 @@ $REST_API_ENDPOINTS = [
         ]
     ],
     'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
-        'ROUTE' => '/activities/cos/communities/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
         'ARGUMENTS' => [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'CircleOfSupportEndpoints::updateCommunity'

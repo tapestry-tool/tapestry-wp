@@ -126,7 +126,10 @@ export default {
         }
         this.isLoading = true
         const community = this.isEdit
-          ? await client.cos.updateCommunity(this.community.id, this.community)
+          ? await client.cos.updateCommunity(
+              this.community.id,
+              this.cleanCommunity(this.community)
+            )
           : await client.cos.addCommunity(this.community)
         // Reset the community object
         this.$emit("change", {
@@ -138,6 +141,25 @@ export default {
         this.isInputTouched = false
         this.$emit("add-community", community)
       })
+    },
+    /**
+     * Clean up the community properties to only those that match the schema in the
+     * README.
+     *
+     * This is necessary because we add other properties to render the community
+     * correctly in <communities-list>.
+     */
+    cleanCommunity(community) {
+      const { id, name, icon, color, connections } = community
+      return {
+        id,
+        name,
+        icon,
+        color,
+        connections: connections.map(connection =>
+          typeof connection !== "string" ? connection.id : connection
+        ),
+      }
     },
   },
 }
