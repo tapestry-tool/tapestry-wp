@@ -7,12 +7,12 @@
     <tapestry-sidebar v-if="!isEmpty"></tapestry-sidebar>
     <tapestry-error></tapestry-error>
     <b-modal
-      :visible="!loggedIn"
       id="loggedOutModal"
+      :visible="!loggedIn"
       title="Not Logged In"
       no-close-on-backdrop
     >
-      You can either refresh and stay logged out or log in again. <br />
+      You can either refresh and stay logged out or log in again.
       <template #modal-footer>
         <b-button @click="refresh">Refresh</b-button>
         <b-button @click="redirectToLogin">Log In</b-button>
@@ -29,7 +29,8 @@ import TapestrySidebar from "./components/TapestrySidebar"
 import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 import TapestryError from "./components/TapestryError"
-import $ from "jquery";
+import { isLoggedIn } from './services/wp'
+import $ from "jquery"
 
 export default {
   name: "app",
@@ -53,22 +54,24 @@ export default {
     },
   },
   watch: {
-    loggedIn: function (newValue) {
-      if (!newValue) this.$bvModal.show("loggedOutModal")
-    }
+    loggedIn(newValue) {
+      if (!newValue) {
+        this.$bvModal.show("loggedOutModal")
+      }
+    },
   },
   mounted() {
-var that = this
-jQuery( function($) {
-  wp.heartbeat.interval( 'fast' );
+    if (isLoggedIn()) {
+      var that = this
+      jQuery(function($) {
+        wp.heartbeat.interval("fast")
 
-  $(document).on('heartbeat-tick', function(event,data) {
-    that.loggedIn = data["wp-auth-check"]
-    console.log(that.loggedIn)
-  });
-});
-
-
+        $(document).on("heartbeat-tick", function(event, data) {
+          that.loggedIn = data["wp-auth-check"]
+          console.log(that.loggedIn)
+        })
+      })
+    }
 
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
