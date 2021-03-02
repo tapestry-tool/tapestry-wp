@@ -17,6 +17,8 @@ import client from "@/services/TapestryAPI"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "./ConnectionsTab"
 
+import Connections from "./Connections"
+
 export default {
   components: {
     AddCommunityTab,
