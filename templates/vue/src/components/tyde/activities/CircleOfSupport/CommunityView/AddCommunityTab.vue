@@ -51,7 +51,7 @@ import CosPopup from "./CosPopup"
 import CosModal from "./CosModal"
 import CosPopupButton from "./CosPopupButton"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import { MAX_COMMUNITIES } from "../config"
+import { MAX_COMMUNITIES } from "../cos.config"
 
 export default {
   components: {

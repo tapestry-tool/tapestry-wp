@@ -52,7 +52,7 @@ import ConnectionsTab from "./ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
-import { MAX_COMMUNITIES } from "../config"
+import { MAX_COMMUNITIES } from "../cos.config"
 
 const States = {
   Home: 0,
