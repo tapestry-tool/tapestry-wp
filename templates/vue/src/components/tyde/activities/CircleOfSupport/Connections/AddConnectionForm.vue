@@ -1,12 +1,6 @@
 <template>
-  <div>
-    <add-community-form
-      v-show="showCommunityForm"
-      v-model="community"
-      @back="showCommunityForm = false"
-      @add-community="handleAddCommunity"
-    />
-    <form v-show="!showCommunityForm" style="height: 100%" @submit.stop.prevent>
+  <b-overlay :show="isLoading">
+    <form @submit.stop.prevent>
       <div class="connection" style="flex: 1">
         <input
           v-model="connection.name"
@@ -35,25 +29,25 @@
         </div>
       </div>
       <div class="community" style="flex: 2">
-        <h1 class="community-title">Which communities does this person belong to?</h1>
+        <h1 class="community-title">Which communities do this person belong to?</h1>
         <ul class="community-list">
-          <li v-for="existingCommunity in communities" :key="existingCommunity.id">
+          <li v-for="community in communities" :key="community.id">
             <button
               :class="[
                 'community-item',
-                { selected: connection.communities.includes(existingCommunity.id) },
+                { selected: connection.communities.includes(community.id) },
               ]"
-              :style="`color: ${existingCommunity.color}`"
-              @click="toggleCommunity(existingCommunity.id)"
+              :style="`color: ${community.color}`"
+              @click="toggleCommunity(community.id)"
             >
               <span class="community-color"></span>
               <span class="community-name">
-                {{ existingCommunity.name }}
+                {{ community.name }}
               </span>
             </button>
           </li>
           <li v-if="Object.keys(communities).length < 10">
-            <button class="community-item" @click="showCommunityForm = true">
+            <button class="community-item">
               <span class="community-color" style="color: var(--cos-color-tertiary)">
                 <tapestry-icon icon="plus" />
               </span>
@@ -65,19 +59,18 @@
         </ul>
       </div>
     </form>
-  </div>
+  </b-overlay>
 </template>
 
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import AddCommunityForm from "./AddCommunityForm"
 
+// TODO: Implement navigation to add community
 export default {
   components: {
-    AddCommunityForm,
-    TapestryIcon,
     VEmojiPicker,
+    TapestryIcon,
   },
   model: {
     prop: "connection",
@@ -97,12 +90,6 @@ export default {
     return {
       showPicker: false,
       isInputTouched: false,
-      showCommunityForm: false,
-      community: {
-        name: "",
-        icon: "👨‍👩‍👦",
-        color: "",
-      },
     }
   },
   computed: {
@@ -141,17 +128,13 @@ export default {
     submitConnection() {
       this.isInputTouched = true
 
-      this.$nextTick(() => {
+      this.$nextTick(async () => {
         if (!this.isNameValid) {
           return
         }
         this.isInputTouched = false
         this.$emit("submit")
       })
-    },
-    handleAddCommunity(community) {
-      this.$emit("add-community", community)
-      this.showCommunityForm = false
     },
   },
 }
@@ -258,7 +241,7 @@ button {
 }
 
 .preview {
-  font-size: clamp(7rem, 10vw, 10rem);
+  font-size: 12rem;
   line-height: 1;
 }
 

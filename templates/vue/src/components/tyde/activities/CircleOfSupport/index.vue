@@ -20,6 +20,8 @@ const CosView = {
   Circle: 1,
 }
 
+import Connections from "./Connections"
+
 export default {
   components: {
     CommunityView,
