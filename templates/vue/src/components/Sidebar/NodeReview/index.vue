@@ -2,7 +2,9 @@
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <review-log :events="events" :aria-hidden="loading"></review-log>
     <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
-      <p class="commenter-name">{{ username }}</p>
+      <p class="commenter-name">
+        {{ username }}
+      </p>
       <textarea
         v-model="comment"
         aria-label="comment"
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapState, mapActions } from "vuex"
 
 import { nodeStatus } from "@/utils/constants"
 import * as Comment from "@/utils/comments"
@@ -57,6 +59,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["settings"]),
     events() {
       return this.node.reviewComments
     },
@@ -68,6 +71,8 @@ export default {
     isReviewFormVisible() {
       if (this.isReviewer) {
         return this.node.reviewStatus === nodeStatus.SUBMIT
+      } else if (!this.settings.submitNodesEnabled) {
+        return false
       }
       return this.node.status === nodeStatus.DRAFT
     },

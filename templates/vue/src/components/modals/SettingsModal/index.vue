@@ -322,6 +322,36 @@
               {{ showAccess ? "Show" : "Hide" }}
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group
+            label="Allow users to add draft nodes"
+            description="When enabled, users will be able to add draft nodes that are only visible to 
+              them to any node in the tapestry. These nodes will not be viewable by anyone else, 
+              including administrators."
+          >
+            <b-form-checkbox
+              v-model="draftNodesEnabled"
+              switch
+              :data-qa="`enable-draft`"
+              @change="handleSubmitNodesEnabled"
+            >
+              {{ draftNodesEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            v-if="draftNodesEnabled"
+            label="Allow users to submit draft nodes"
+            description="When enabled, users will be able to submit their nodes to administrators 
+              for review. Administrators can add a submitted node to the main tapestry by accepting 
+              the submission."
+          >
+            <b-form-checkbox
+              v-model="submitNodesEnabled"
+              :data-qa="`enable-submit-review`"
+              switch
+            >
+              {{ submitNodesEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
       </b-tabs>
     </b-container>
@@ -406,6 +436,8 @@ export default {
       isExporting: false,
       renderImages: true,
       analyticsEnabled: false,
+      draftNodesEnabled: true,
+      submitNodesEnabled: true,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -486,6 +518,8 @@ export default {
         renderImages = true,
         renderMap = false,
         analyticsEnabled = false,
+        draftNodesEnabled = true,
+        submitNodesEnabled = true,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -501,6 +535,8 @@ export default {
       this.renderImages = renderImages
       this.renderMap = renderMap
       this.analyticsEnabled = analyticsEnabled
+      this.draftNodesEnabled = draftNodesEnabled
+      this.submitNodesEnabled = submitNodesEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -518,6 +554,8 @@ export default {
         renderImages: this.renderImages,
         renderMap: this.renderMap,
         analyticsEnabled: this.analyticsEnabled,
+        draftNodesEnabled: this.draftNodesEnabled,
+        submitNodesEnabled: this.submitNodesEnabled,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -589,6 +627,9 @@ export default {
     },
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
+    },
+    handleSubmitNodesEnabled(event) {
+      this.submitNodesEnabled = event
     },
   },
 }
