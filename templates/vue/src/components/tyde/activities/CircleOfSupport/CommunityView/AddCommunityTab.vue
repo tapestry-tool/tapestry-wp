@@ -5,7 +5,12 @@
       style="position: absolute; left: 0; bottom: 0; width: 100%;"
     >
       <template #toggle>
-        <cos-popup-button style="right: 2rem" @click="togglePopup">
+        <cos-popup-button
+          id="community-tab-popup-trigger"
+          style="right: 2rem"
+          :disabled="!show && disabled"
+          @click="togglePopup"
+        >
           <tapestry-icon :icon="show ? 'chevron-down' : 'plus'" />
         </cos-popup-button>
       </template>
@@ -21,6 +26,9 @@
         </div>
       </template>
     </cos-popup>
+    <b-tooltip :disabled="show || !disabled" target="community-tab-popup-trigger">
+      {{ tooltipText }}
+    </b-tooltip>
     <cos-modal v-model="showModal">
       <div class="confirm">
         <h1>Would you like to add this community now or later?</h1>
@@ -43,6 +51,7 @@ import CosPopup from "./CosPopup"
 import CosModal from "./CosModal"
 import CosPopupButton from "./CosPopupButton"
 import TapestryIcon from "@/components/common/TapestryIcon"
+import { MAX_COMMUNITIES } from "../config"
 
 export default {
   components: {
@@ -65,12 +74,22 @@ export default {
       type: Boolean,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       showModal: false,
       wasEdited: false,
     }
+  },
+  computed: {
+    tooltipText() {
+      return `Cannot add more communities (limit: ${MAX_COMMUNITIES}). Please delete a community before adding another.`
+    },
   },
   methods: {
     handleChange(evt) {

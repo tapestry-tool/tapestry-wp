@@ -1,11 +1,29 @@
 <template>
-  <button @click="$emit('click', $event)">
-    <slot></slot>
-  </button>
+  <span
+    class="popup-button"
+    v-bind="$attrs"
+    :style="{ cursor: disabled ? 'not-allowed' : 'pointer' }"
+  >
+    <button :disabled="disabled" @click="$emit('click', $event)">
+      <slot></slot>
+    </button>
+  </span>
 </template>
 
-<style scoped>
-button {
+<script>
+export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+}
+</script>
+
+<style scoped lang="scss">
+.popup-button {
   --size: 5rem;
 
   width: var(--size);
@@ -18,5 +36,17 @@ button {
   font-size: 2.5rem;
   transform: translateY(20%);
   z-index: 0;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  padding: 0;
+  margin: 0;
+  background: none;
+
+  &[disabled] {
+    pointer-events: none;
+  }
 }
 </style>

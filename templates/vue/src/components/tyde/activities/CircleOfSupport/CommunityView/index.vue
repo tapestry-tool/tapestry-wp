@@ -36,6 +36,7 @@
     <add-community-tab
       v-model="community"
       :show="isCommunityTabOpen"
+      :disabled="!canAddCommunity"
       @back="state = lastState"
       @add-community="$emit('add-community', $event)"
       @toggle="toggleCommunityTab"
@@ -51,6 +52,7 @@ import ConnectionsTab from "./ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
+import { MAX_COMMUNITIES } from "../config"
 
 const States = {
   Home: 0,
@@ -108,6 +110,9 @@ export default {
     },
     isCommunityTabOpen() {
       return [States.EditCommunity, States.AddCommunity].includes(this.state)
+    },
+    canAddCommunity() {
+      return Object.keys(this.communities).length < MAX_COMMUNITIES
     },
   },
   watch: {
