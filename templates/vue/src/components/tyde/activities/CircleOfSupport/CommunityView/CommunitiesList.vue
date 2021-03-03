@@ -26,12 +26,7 @@
             { active: activeCommunityTooltip === community.id },
           ]"
         >
-          <button
-            @click="
-              activeCommunityTooltip =
-                activeCommunityTooltip === community.id ? null : community.id
-            "
-          >
+          <button @click="toggleCommunityTooltip(community.id)">
             {{ community.icon }}
           </button>
           <div
@@ -44,6 +39,9 @@
             </h1>
             <button @click="editCommunity(community)">
               <tapestry-icon icon="pencil-alt" />
+            </button>
+            <button @click="toggleCommunityTooltip(community.id)">
+              <tapestry-icon icon="times" />
             </button>
           </div>
         </div>
@@ -202,6 +200,14 @@ export default {
       this.$emit("edit-connection", this.activeConnection)
       this.activeConnectionId = null
     },
+    toggleCommunityTooltip(communityId) {
+      if (this.activeCommunityTooltip === communityId) {
+        this.activeCommunityTooltip = null
+        return
+      }
+      this.activeCommunityTooltip = communityId
+      this.activeConnectionId = null
+    },
     toggleConnectionInfo(connectionId, communityId) {
       const refName = `${connectionId}-${communityId}`
       if (refName === this.activeConnectionId) {
@@ -210,6 +216,7 @@ export default {
       }
       this.positionTooltip(connectionId, communityId)
       this.activeConnectionId = refName
+      this.activeCommunityTooltip = null
     },
     /**
      * Positions the connection tooltip according to the given connectionId.
