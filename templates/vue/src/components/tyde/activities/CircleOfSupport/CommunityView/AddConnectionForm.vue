@@ -35,7 +35,9 @@
         </div>
       </div>
       <div class="community" style="flex: 2">
-        <h1 class="community-title">Which communities does this person belong to?</h1>
+        <h1 class="community-title">
+          Which communities does this person belong to?
+        </h1>
         <ul class="community-list">
           <li v-for="existingCommunity in communities" :key="existingCommunity.id">
             <button

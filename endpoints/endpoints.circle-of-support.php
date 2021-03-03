@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../classes/activities/class.circle-of-support.php';
+require_once __DIR__ . '/../utilities/class.tapestry-errors.php';
 
 class CircleOfSupportEndpoints
 {
@@ -35,10 +36,14 @@ class CircleOfSupportEndpoints
 
     public static function addCommunity($request)
     {
-        $cos = new CircleOfSupport();
-        $community = $cos->addCommunity(json_decode($request->get_body()));
-        $cos->save();
-        return $community;
+        try {
+            $cos = new CircleOfSupport();
+            $community = $cos->addCommunity(json_decode($request->get_body()));
+            $cos->save();
+            return $community;
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
     }
 
     public static function updateCommunity($request)

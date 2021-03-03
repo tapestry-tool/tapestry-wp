@@ -1,5 +1,6 @@
 <?php
 
+require_once dirname(__FILE__).'/../../utilities/class.tapestry-errors.php';
 class CircleOfSupport
 {
     private $userId;
@@ -7,6 +8,7 @@ class CircleOfSupport
     private $current;
 
     const META_KEY = 'tyde_circle_of_support';
+    const MAX_COMMUNITIES = 10;
 
     public function __construct($userId = 0)
     {
@@ -30,6 +32,10 @@ class CircleOfSupport
 
     public function addCommunity($community)
     {
+        if (count(get_object_vars($this->current['communities'])) >= CircleOfSupport::MAX_COMMUNITIES) {
+            throw new TapestryError('CANNOT_ADD_COMMUNITY', sprintf('Cannot add more communities (limit: %d). Please delete a community before adding another.', CircleOfSupport::MAX_COMMUNITIES), 400);
+        }
+
         $id = uniqid();
         $community->id = $id;
         $community->connections = [];
@@ -113,7 +119,7 @@ class CircleOfSupport
 
         return null;
     }
-  
+
     public function save($circleOfSupport = null)
     {
         if (!$circleOfSupport) {
