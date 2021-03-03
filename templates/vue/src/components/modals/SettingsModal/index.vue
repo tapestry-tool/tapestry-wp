@@ -245,7 +245,9 @@
           </b-form-group>
           <b-form-group
             label="Allow users to add draft nodes"
-            description="When enabled, users will be able to create draft nodes"
+            description="When enabled, users will be able to add draft nodes that are only visible to 
+              them to any node in the tapestry. These nodes will not be viewable by anyone else, 
+              including administrators."
           >
             <b-form-checkbox
               v-model="draftNodesEnabled"
@@ -259,7 +261,9 @@
           <b-form-group
             v-if="draftNodesEnabled"
             label="Allow users to submit draft nodes"
-            description="When enabled, users will be able to submit their nodes to administrators for review. Administrators can add a submitted node to the main tapestry by accepting the submission."
+            description="When enabled, users will be able to submit their nodes to administrators 
+              for review. Administrators can add a submitted node to the main tapestry by accepting 
+              the submission."
           >
             <b-form-checkbox
               v-model="submitNodesEnabled"
