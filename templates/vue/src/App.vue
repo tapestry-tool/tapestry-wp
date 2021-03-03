@@ -29,8 +29,7 @@ import TapestrySidebar from "./components/TapestrySidebar"
 import Loading from "./components/Loading"
 import client from "./services/TapestryAPI"
 import TapestryError from "./components/TapestryError"
-import { isLoggedIn } from './services/wp'
-import $ from "jquery"
+import { isLoggedIn } from "./services/wp"
 
 export default {
   name: "app",
