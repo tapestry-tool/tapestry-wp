@@ -1,5 +1,5 @@
 import { render as r } from "@testing-library/vue"
-import { store } from "@/store"
+import { store as defaultStore } from "@/store"
 import { routes } from "@/router"
 import { parse, makeMockProgress } from "./dataset"
 import Helpers from "./Helpers"
@@ -10,16 +10,34 @@ import Helpers from "./Helpers"
  */
 export function render(
   component,
-  { fixture = null, settings = {}, ...options } = {},
+  {
+    fixture = null,
+    settings = {},
+    actions = {},
+    mutations = {},
+    getters = {},
+    ...options
+  } = {},
   callback = () => {}
 ) {
   return r(
     component,
     {
       store: {
-        ...store,
+        actions: {
+          ...defaultStore.actions,
+          ...actions,
+        },
+        mutations: {
+          ...defaultStore.mutations,
+          ...mutations,
+        },
+        getters: {
+          ...defaultStore.getters,
+          ...getters,
+        },
         state: {
-          ...store.state,
+          ...defaultStore.state,
           ...parseFixture(fixture, settings),
         },
       },

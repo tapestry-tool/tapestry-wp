@@ -19,7 +19,7 @@ class TapestryH5P implements ITapestryH5P
     public function get()
     {
         global $wpdb;
-        $content = $wpdb->get_results('select id, title from '.$wpdb->prefix.'h5p_contents');
+        $content = $wpdb->get_results('select content.id as id, content.title as title, content.filtered as details, name as library from '.$wpdb->prefix.'h5p_contents content join '.$wpdb->prefix.'h5p_libraries lib on content.library_id = lib.id');
 
         return $content;
     }

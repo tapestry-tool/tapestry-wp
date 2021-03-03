@@ -32,6 +32,7 @@ export async function addNode({ commit, dispatch, getters, state }, newNode) {
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.permissions = response.data.permissions
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])
@@ -204,6 +205,14 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
+export async function getTapestryExport({ dispatch }) {
+  try {
+    return await client.getTapestryExport()
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeQuestion(
   { commit, dispatch },
   { answerType, formId, nodeId, questionId }
@@ -231,6 +240,18 @@ export async function saveAudio(
       entry: { audio },
       nodeId,
       questionId,
+    })
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function reviewNode({ commit, dispatch }, { id, comments }) {
+  try {
+    const updates = await client.reviewNode(id, comments)
+    commit("updateNode", {
+      id,
+      newNode: updates.data,
     })
   } catch (error) {
     dispatch("addApiError", error)
