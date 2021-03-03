@@ -45,7 +45,7 @@
                 'community-item',
                 { selected: connection.communities.includes(existingCommunity.id) },
               ]"
-              :style="`color: ${existingCommunity.color}`"
+              :style="`--color: ${existingCommunity.color}`"
               @click="toggleCommunity(existingCommunity.id)"
             >
               <span class="community-color"></span>
@@ -54,7 +54,7 @@
               </span>
             </button>
           </li>
-          <li v-if="Object.keys(communities).length < 10">
+          <li v-if="Object.keys(communities).length < maxCommunitiesCount">
             <button class="community-item" @click="showCommunityForm = true">
               <span class="community-color" style="color: var(--cos-color-tertiary)">
                 <tapestry-icon icon="plus" />
@@ -74,6 +74,7 @@
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "./AddCommunityForm"
+import { MAX_COMMUNITIES } from "../cos.config"
 
 export default {
   components: {
@@ -113,6 +114,9 @@ export default {
     },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
+    },
+    maxCommunitiesCount() {
+      return MAX_COMMUNITIES
     },
   },
   mounted() {
@@ -218,6 +222,7 @@ button {
   width: 100%;
   height: 100%;
   column-gap: 1.5rem;
+  color: var(--color, var(--cos-color-secondary));
 }
 
 .community-item:hover .community-color {
