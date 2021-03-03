@@ -842,6 +842,10 @@ function updateTapestryNode($request)
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
+        if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
+            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
+            throw new TapestryError('NODE_APPROVAL_DENIED');
+        }
 
         $tapestry = new Tapestry($postId);
         $isValid = $tapestry->validateNode((object) $nodeData, $tapestry->getNodeParent($nodeMetaId));
