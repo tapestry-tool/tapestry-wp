@@ -245,7 +245,7 @@
           </b-form-group>
           <b-form-group
             label="Allow users to add draft nodes"
-            description="When enabled, users will be able to create draft nodes and optionally submit nodes for review"
+            description="When enabled, users will be able to create draft nodes"
           >
             <b-form-checkbox
               v-model="draftNodesEnabled"
@@ -255,14 +255,18 @@
             >
               {{ draftNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            v-if="draftNodesEnabled"
+            label="Allow users to submit draft nodes"
+            description="When enabled, users will be able to submit their nodes to administrators for review. Administrators can add a submitted node to the main tapestry by accepting the submission."
+          >
             <b-form-checkbox
-              v-if="draftNodesEnabled"
               v-model="submitNodesEnabled"
               :data-qa="`enable-submit-review`"
               switch
             >
-              {{ submitNodesEnabled ? "Allow" : "Don't allow" }}
-              users to submit nodes for review
+              {{ submitNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
