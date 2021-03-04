@@ -65,8 +65,8 @@ class TapestryApi {
   }
 
   async getTapestryExport() {
-    const url = `${apiUrl}/tapestries/${this.postId}/export`
-    const response = await axios.get(url)
+    const url = `/tapestries/${this.postId}/export`
+    const response = await this.client.get(url)
     return response.data
   }
 
