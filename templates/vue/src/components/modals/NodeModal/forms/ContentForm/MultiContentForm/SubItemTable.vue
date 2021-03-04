@@ -19,7 +19,7 @@
         </b-tbody>
       </b-table-simple>
       <p v-if="requiresSaving" class="my-2 p-0 text-muted small">
-        To enable add sub-item, please save this node.
+        To add sub-items, please save this node.
       </p>
       <div class="buttons-container" :style="buttonContainerStyle">
         <b-button

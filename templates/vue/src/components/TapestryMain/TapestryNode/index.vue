@@ -92,7 +92,10 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="!isSubMultiContentRow"
+              v-if="
+                !isSubMultiContentRow &&
+                  (hasPermission('add') || this.settings.draftNodesEnabled)
+              "
               :node="node"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
