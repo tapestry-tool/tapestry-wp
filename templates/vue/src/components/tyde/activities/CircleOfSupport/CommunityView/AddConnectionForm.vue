@@ -210,7 +210,7 @@ button {
 .community-list {
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(5, 1fr);
   row-gap: 1rem;
   column-gap: 3rem;
@@ -254,6 +254,7 @@ button {
   text-transform: uppercase;
   color: black;
   font-size: 1.25rem;
+  overflow-x: scroll;
 }
 
 .connection {
