@@ -8,17 +8,19 @@
     />
     <form v-show="!showCommunityForm" style="height: 100%" @submit.stop.prevent>
       <div class="connection" style="flex: 1">
-        <input
-          v-model="connection.name"
-          name="connection name"
-          class="connection-name"
-          type="text"
-          placeholder="connection"
-          @blur="isInputTouched = true"
-        />
-        <b-form-invalid-feedback :state="isNameValid">
-          Please enter a name for your connection.
-        </b-form-invalid-feedback>
+        <div class="connection-name">
+          <input
+            v-model="connection.name"
+            name="connection name"
+            type="text"
+            placeholder="connection"
+            @blur="isInputTouched = true"
+          />
+          <p :style="{ '--color': countColor }">{{ characterCount }}</p>
+          <b-form-invalid-feedback :state="!validationMessage">
+            {{ validationMessage }}
+          </b-form-invalid-feedback>
+        </div>
         <div id="emoji-picker" style="position: relative">
           <button class="preview" @click="showPicker = !showPicker">
             {{ connection.avatar }}
@@ -74,7 +76,7 @@
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import AddCommunityForm from "./AddCommunityForm"
-import { MAX_COMMUNITIES } from "../cos.config"
+import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
 
 export default {
   components: {
@@ -109,14 +111,34 @@ export default {
     }
   },
   computed: {
-    isNameValid() {
-      return !this.isInputTouched || this.connection.name.length > 0
-    },
     submitLabel() {
       return this.connection.id ? "Save connection" : "Add connection"
     },
     maxCommunitiesCount() {
       return MAX_COMMUNITIES
+    },
+    remainingCharacters() {
+      return MAX_CONNECTION_NAME_LENGTH - this.connection.name.length
+    },
+    characterCount() {
+      return `${this.remainingCharacters} / ${MAX_CONNECTION_NAME_LENGTH}`
+    },
+    countColor() {
+      return this.remainingCharacters < 0
+        ? `var(--danger)`
+        : this.remainingCharacters < 5
+        ? `var(--warning)`
+        : `var(--secondary)`
+    },
+    validationMessage() {
+      if (this.isInputTouched) {
+        if (this.connection.name.length === 0) {
+          return "Please enter a name for your community"
+        } else if (this.connection.name.length > MAX_CONNECTION_NAME_LENGTH) {
+          return `Please shorten the connection name to not more than ${MAX_CONNECTION_NAME_LENGTH} characters.`
+        }
+      }
+      return null
     },
   },
   mounted() {
@@ -148,7 +170,7 @@ export default {
       this.isInputTouched = true
 
       this.$nextTick(() => {
-        if (!this.isNameValid) {
+        if (this.validationMessage) {
           return
         }
         this.isInputTouched = false
@@ -163,7 +185,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 form {
   display: flex;
   column-gap: 3rem;
@@ -184,11 +206,25 @@ button {
 }
 
 .connection-name {
-  font-size: 1.5rem;
-  text-align: center;
-  text-transform: uppercase;
-  display: block;
-  font-weight: 500;
+  position: relative;
+
+  input {
+    font-size: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    display: block;
+    font-weight: 500;
+    width: 100%;
+  }
+
+  p {
+    position: absolute;
+    margin: 0;
+    top: 100%;
+    right: 0;
+    font-size: 0.9em;
+    color: var(--color);
+  }
 }
 
 .community {

@@ -666,7 +666,7 @@ ul {
   align-items: center;
   justify-content: space-between;
   border-radius: 0.5rem;
-  width: 5rem;
+  width: 5.5rem;
   position: relative;
   padding: 0;
   margin: 0;
@@ -683,6 +683,8 @@ ul {
     color: black;
     cursor: default;
     font-size: 0.7em;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   h1 {
