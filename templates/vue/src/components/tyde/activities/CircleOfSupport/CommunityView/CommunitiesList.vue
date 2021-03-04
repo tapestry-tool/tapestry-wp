@@ -20,31 +20,13 @@
           '--color': community.color,
         }"
       >
-        <div
-          :class="[
-            'community-icon',
-            { active: activeCommunityTooltip === community.id },
-          ]"
+        <button
+          :ref="`${community.id}-icon`"
+          class="community-icon"
+          @click="toggleCommunityTooltip(community.id)"
         >
-          <button @click="toggleCommunityTooltip(community.id)">
-            {{ community.icon }}
-          </button>
-          <div
-            v-show="activeCommunityTooltip === community.id"
-            class="community-tooltip"
-          >
-            <p>{{ community.icon }}</p>
-            <h1>
-              {{ community.name }}
-            </h1>
-            <button @click="editCommunity(community)">
-              <tapestry-icon icon="pencil-alt" />
-            </button>
-            <button @click="toggleCommunityTooltip(community.id)">
-              <tapestry-icon icon="times" />
-            </button>
-          </div>
-        </div>
+          {{ community.icon }}
+        </button>
         <button
           v-if="clickables[community.id]"
           class="toggle"
@@ -103,6 +85,22 @@
         </button>
       </div>
     </div>
+    <div
+      v-show="isCommunityTooltipVisible"
+      ref="community-tooltip"
+      class="community-tooltip"
+    >
+      <p>{{ activeCommunityTooltip.icon }}</p>
+      <h1>
+        {{ activeCommunityTooltip.name }}
+      </h1>
+      <button @click="editCommunity(activeCommunityTooltip)">
+        <tapestry-icon icon="pencil-alt" />
+      </button>
+      <button @click="toggleCommunityTooltip(activeCommunityTooltip.id)">
+        <tapestry-icon icon="times" />
+      </button>
+    </div>
   </ul>
 </template>
 
@@ -129,7 +127,7 @@ export default {
       clickables: {},
       activeCommunity: "",
       activeConnectionId: null,
-      activeCommunityTooltip: null,
+      activeCommunityTooltipId: null,
     }
   },
   computed: {
@@ -171,8 +169,14 @@ export default {
         ),
       }
     },
+    activeCommunityTooltip() {
+      return this.communities[this.activeCommunityTooltipId] || {}
+    },
     isTooltipVisible() {
       return this.activeConnectionId !== null
+    },
+    isCommunityTooltipVisible() {
+      return this.activeCommunityTooltipId !== null
     },
   },
   /**
@@ -194,19 +198,23 @@ export default {
   methods: {
     editCommunity(community) {
       this.$emit("edit-community", community)
-      this.activeCommunityTooltip = null
+      this.activeCommunityTooltipId = null
     },
     editConnection() {
       this.$emit("edit-connection", this.activeConnection)
       this.activeConnectionId = null
     },
     toggleCommunityTooltip(communityId) {
-      if (this.activeCommunityTooltip === communityId) {
-        this.activeCommunityTooltip = null
+      if (this.activeCommunityTooltipId === communityId) {
+        this.activeCommunityTooltipId = null
         return
       }
-      this.activeCommunityTooltip = communityId
+      this.activeCommunityTooltipId = communityId
       this.activeConnectionId = null
+
+      const [communityRef] = this.$refs[`${communityId}-icon`]
+      const tooltipRef = this.$refs["community-tooltip"]
+      this.$nextTick(() => this.positionTooltip(communityRef, tooltipRef))
     },
     toggleConnectionInfo(connectionId, communityId) {
       const refName = `${connectionId}-${communityId}`
@@ -214,9 +222,12 @@ export default {
         this.activeConnectionId = null
         return
       }
-      this.positionTooltip(connectionId, communityId)
       this.activeConnectionId = refName
-      this.activeCommunityTooltip = null
+      this.activeCommunityTooltipId = null
+
+      const [connectionRef] = this.$refs[`${connectionId}-${communityId}`]
+      const tooltipRef = this.$refs["connection-tooltip"]
+      this.$nextTick(() => this.positionTooltip(connectionRef, tooltipRef))
     },
     /**
      * Positions the connection tooltip according to the given connectionId.
@@ -235,15 +246,12 @@ export default {
      * 3. The tooltip is clipped on BOTH the bottom and the right (when the
      *    connection is on the bottom-right of the CoS)
      */
-    positionTooltip(connectionId, communityId) {
-      const [connectionRef] = this.$refs[`${connectionId}-${communityId}`]
-      const tooltipRef = this.$refs["connection-tooltip"]
-
+    positionTooltip(target, tooltip) {
       const {
         height: tooltipHeight,
         width: tooltipWidth,
-      } = tooltipRef.getBoundingClientRect()
-      const { left, bottom, width, top } = connectionRef.getBoundingClientRect()
+      } = tooltip.getBoundingClientRect()
+      const { left, bottom, width, top } = target.getBoundingClientRect()
       const containerBox = document.getElementById("cos").getBoundingClientRect()
 
       /**
@@ -289,7 +297,7 @@ export default {
         }
       }
 
-      tooltipRef.style.transform = `translate(${x}px, ${y}px)`
+      tooltip.style.transform = `translate(${x}px, ${y}px)`
     },
     toggle(communityId) {
       if (this.activeCommunity === communityId) {
@@ -769,17 +777,10 @@ ul {
   position: absolute;
   font-size: 2.5rem;
   z-index: 10;
-
-  button {
-    background: none;
-    padding: 0;
-    margin: 0;
-    color: inherit;
-  }
-
-  &.active {
-    z-index: 20;
-  }
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
 }
 
 .community-tooltip {
@@ -791,6 +792,11 @@ ul {
   border: 1px solid var(--cos-color-secondary);
   background: white;
   padding: 0.2rem 1rem;
+  z-index: 20;
+
+  p {
+    margin: 0;
+  }
 
   h1 {
     font-size: 1em;
