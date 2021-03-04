@@ -1,5 +1,9 @@
 <template>
   <div id="cos" class="cos">
+    <div>
+      <button class="change-view" @click="view = views.Circle">Circle</button>
+      <button class="change-view" @click="view = views.Community">Community</button>
+    </div>
     <community-view
       v-if="view === views.Community"
       :connections="cos.connections"
@@ -8,12 +12,14 @@
       @update-connection="updateConnection"
       @add-community="addCommunity"
     />
+    <circle-view v-if="view === views.Circle" />
   </div>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
 import CommunityView from "./CommunityView"
+import CircleView from "./CircleView"
 
 const CosView = {
   Community: 0,
@@ -23,6 +29,7 @@ const CosView = {
 export default {
   components: {
     CommunityView,
+    CircleView,
   },
   data() {
     return {
