@@ -97,6 +97,10 @@ class Tapestry implements ITapestry
             if (!isset($this->settings->analyticsEnabled)) {
                 $this->settings->analyticsEnabled = false;
             }
+            if (!isset($this->settings->draftNodesEnabled)) {
+                $this->settings->draftNodesEnabled = true;
+                $this->settings->submitNodesEnabled = true;
+            }
         }
     }
 
@@ -307,6 +311,14 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get the links in the Tapestry.
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
      * Returns true if the tapestry is empty.
      *
      * @return bool true if there is no root node, false otherwise
@@ -496,6 +508,8 @@ class Tapestry implements ITapestry
         $settings->defaultPermissions = TapestryNodePermissions::getDefaultNodePermissions($this->postId);
         $settings->superuserOverridePermissions = true;
         $settings->analyticsEnabled = false;
+        $settings->draftNodesEnabled = true;
+        $settings->submitNodesEnabled = true;
         $settings->permalink = get_permalink($this->postId);
 
         return $settings;

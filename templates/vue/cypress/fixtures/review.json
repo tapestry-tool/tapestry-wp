@@ -1,0 +1,257 @@
+{
+  "nodes": [
+    {
+      "id": 6953,
+      "author": {
+        "id": "1",
+        "name": "admin",
+        "email": "foo@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Root",
+      "status": "publish",
+      "reviewStatus": "",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>I am root...</p>"
+      },
+      "coordinates": {
+        "x": 2939.435302734375,
+        "y": 3038.9345703125
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "reviewComments": [],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "mapCoordinates": {
+        "lat": "",
+        "lng": ""
+      },
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    },
+    {
+      "id": 6960,
+      "author": {
+        "id": "1",
+        "name": "subscriber",
+        "email": "sub@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Review",
+      "status": "draft",
+      "reviewStatus": "submitted",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>I am review node.</p>"
+      },
+      "coordinates": {
+        "x": 2600,
+        "y": 3000
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "reviewComments": [],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "mapCoordinates": {
+        "lat": "",
+        "lng": ""
+      },
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    },
+    {
+      "id": 6962,
+      "author": {
+        "id": "1",
+        "name": "subscriber",
+        "email": "sub@bar.com",
+        "original_author_name": "",
+        "original_author_email": ""
+      },
+      "type": "tapestry_node",
+      "size": "",
+      "title": "Review Child",
+      "status": "draft",
+      "reviewStatus": "submitted",
+      "imageURL": "",
+      "lockedImageURL": "",
+      "mediaType": "text",
+      "mediaFormat": "",
+      "mediaDuration": 0,
+      "description": "",
+      "behaviour": "new-window",
+      "typeData": {
+        "linkMetadata": null,
+        "mediaURL": "",
+        "mediaWidth": 960,
+        "mediaHeight": 600,
+        "subAccordionText": "More content:",
+        "textContent": "<p>I am review child node.</p>"
+      },
+      "coordinates": {
+        "x": 2300,
+        "y": 3000
+      },
+      "permissions": {
+        "public": [
+          "read"
+        ],
+        "authenticated": [
+          "read"
+        ],
+        "contributor": [
+          "read"
+        ],
+        "subscriber": [
+          "read"
+        ]
+      },
+      "hideTitle": false,
+      "hideProgress": false,
+      "hideMedia": false,
+      "skippable": true,
+      "quiz": [],
+      "fullscreen": false,
+      "conditions": [],
+      "childOrdering": [],
+      "fitWindow": true,
+      "reviewComments": [],
+      "license": {
+        "name": "CC-BY-SA",
+        "icons": [
+          "fab fa-creative-commons",
+          "fab fa-creative-commons-by",
+          "fab fa-creative-commons-sa"
+        ],
+        "type": "cc",
+        "link": "",
+        "description": ""
+      },
+      "references": "",
+      "mapCoordinates": {
+        "lat": "",
+        "lng": ""
+      },
+      "accessible": true,
+      "unlocked": true,
+      "completed": false,
+      "progress": 0,
+      "nodeType": "child"
+    }
+  ],
+  "links": [
+    {
+      "source": 6953,
+      "target": 6960,
+      "value": 1,
+      "type": ""
+    },
+    {
+      "source": 6960,
+      "target": 6962,
+      "value": 1,
+      "type": ""
+    }
+  ],
+  "groups": [],
+  "site-url": "http://localhost"
+}
