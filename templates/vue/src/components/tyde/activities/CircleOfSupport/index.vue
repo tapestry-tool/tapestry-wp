@@ -1,18 +1,27 @@
 <template>
   <div id="cos" class="cos">
-    <div>
-      <button class="change-view" @click="view = views.Circle">Circle</button>
-      <button class="change-view" @click="view = views.Community">Community</button>
+    <div class="contents">
+      <community-view
+        v-if="view === views.Community"
+        :connections="cos.connections"
+        :communities="cos.communities"
+        @add-connection="addConnection"
+        @update-connection="updateConnection"
+        @add-community="addCommunity"
+      />
+      <circle-view
+        v-if="view === views.Circle"
+        :connections="cos.connections"
+        :communities="cos.communities"
+        :circles="[[], [], []]"
+      />
+      <div class="switch">
+        <button class="change-view" @click="view = views.Community">
+          Community
+        </button>
+        <button class="change-view" @click="view = views.Circle">Circle</button>
+      </div>
     </div>
-    <community-view
-      v-if="view === views.Community"
-      :connections="cos.connections"
-      :communities="cos.communities"
-      @add-connection="addConnection"
-      @update-connection="updateConnection"
-      @add-community="addCommunity"
-    />
-    <circle-view v-if="view === views.Circle" />
   </div>
 </template>
 
@@ -99,8 +108,26 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-  height: 600px;
+
+  /* Fix the aspect ratio to 3:2 */
+  height: 0;
+  padding-top: 66.7%;
+
   position: relative;
   overflow: hidden;
+}
+
+.contents {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.switch {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
 }
 </style>

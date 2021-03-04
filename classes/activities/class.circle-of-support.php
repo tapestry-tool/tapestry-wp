@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/../../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__) . '/../../utilities/class.tapestry-errors.php';
 class CircleOfSupport
 {
     private $userId;
@@ -151,7 +151,7 @@ class CircleOfSupport
             'id' => $this->userId,
             'connections' => new stdClass(),
             'communities' => new stdClass(),
-            'circles' => [],
+            'circles' => [[], [], []],
             'members' => new stdClass(),
             'timestamp' => date_format(new DateTime(), DateTime::ISO8601),
         ];
