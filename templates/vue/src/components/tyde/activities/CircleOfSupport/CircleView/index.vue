@@ -10,8 +10,13 @@
       }"
       class="circle"
     >
-      <ul>
-        <li v-for="connection in circle.connections" :key="connection.id">
+      <ul class="connection-list">
+        <li
+          v-for="connection in circle.connections"
+          :key="connection.id"
+          :style="{ '--x': connection.x, '--y': connection.y }"
+          class="connection"
+        >
           {{ connection.avatar }}
         </li>
       </ul>
@@ -52,9 +57,13 @@ export default {
       return this.circles.map((connections, index) => {
         const order = this.circles.length - index
         const borderWidth = `${order}px`
+        const radius = 125 + 125 * 0.75 * index - 32
         return {
           borderWidth,
-          connections,
+          connections: connections.map((connection, index) => ({
+            ...connection,
+            ...this.getPosition({ index, radius, size: connections.length }),
+          })),
           order,
         }
       })
@@ -73,20 +82,34 @@ export default {
     removeConnection() {
       this.circles[this.activeCircle].pop()
     },
+    getPosition({ index, radius, size }) {
+      const angle = ((2 * Math.PI) / size) * index - Math.PI / 2
+      const x = radius * Math.cos(angle)
+      const y = radius * Math.sin(angle)
+      return {
+        x: `${x}px`,
+        y: `${y}px`,
+      }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .circle-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  list-style: none;
 
-  --startSize: calc(max(250px, 25vw));
+  --startSize: 250px;
   --offsetSize: calc(var(--startSize) * 0.75);
 }
 
@@ -105,6 +128,20 @@ export default {
   position: absolute;
   right: 2rem;
   bottom: 2rem;
+}
+
+.connection-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.connection {
+  position: absolute;
+  transform: translate(var(--x), var(--y));
+  font-size: 3rem;
 }
 
 button {
