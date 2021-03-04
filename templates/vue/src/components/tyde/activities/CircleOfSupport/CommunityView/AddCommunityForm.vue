@@ -3,17 +3,19 @@
     <b-overlay :show="isLoading" style="width: 100%">
       <form @submit.stop.prevent>
         <div class="community" style="flex: 1">
-          <input
-            :value="community.name"
-            name="community name"
-            class="community-name"
-            type="text"
-            placeholder="community"
-            @change="handleChange('name', $event.target.value)"
-            @blur="isInputTouched = true"
-          />
-          <b-form-invalid-feedback :state="isNameValid">
-            Please enter a name for your community.
+          <div class="community-name">
+            <input
+              :value="community.name"
+              name="community name"
+              type="text"
+              placeholder="community"
+              @input="handleChange('name', $event.target.value)"
+              @blur="isInputTouched = true"
+            />
+            <p :style="{ '--color': countColor }">{{ characterCount }}</p>
+          </div>
+          <b-form-invalid-feedback :state="!validationMessage">
+            {{ validationMessage }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
             <button class="preview" @click="showPicker = !showPicker">
@@ -50,6 +52,7 @@
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import client from "@/services/TapestryAPI"
+import { MAX_COMMUNITY_NAME_LENGTH } from "../cos.config"
 
 export default {
   components: {
@@ -93,14 +96,34 @@ export default {
         "#9AF8EC",
       ]
     },
-    isNameValid() {
-      return !this.isInputTouched || this.community.name.length > 0
-    },
     isEdit() {
       return Boolean(this.community.id)
     },
     submitLabel() {
       return this.isEdit ? "Save community" : "Add community"
+    },
+    remainingCharacters() {
+      return MAX_COMMUNITY_NAME_LENGTH - this.community.name.length
+    },
+    characterCount() {
+      return `${this.remainingCharacters} / ${MAX_COMMUNITY_NAME_LENGTH}`
+    },
+    countColor() {
+      return this.remainingCharacters < 0
+        ? `var(--danger)`
+        : this.remainingCharacters < 5
+        ? `var(--warning)`
+        : `var(--secondary)`
+    },
+    validationMessage() {
+      if (this.isInputTouched) {
+        if (this.community.name.length === 0) {
+          return "Please enter a name for your community"
+        } else if (this.community.name.length > MAX_COMMUNITY_NAME_LENGTH) {
+          return `Please shorten the community name to not more than ${MAX_COMMUNITY_NAME_LENGTH} characters.`
+        }
+      }
+      return null
     },
   },
   mounted() {
@@ -121,7 +144,7 @@ export default {
     saveCommunity() {
       this.isInputTouched = true
       this.$nextTick(async () => {
-        if (!this.isNameValid) {
+        if (this.validationMessage) {
           return
         }
         this.isLoading = true
@@ -200,12 +223,25 @@ button {
 }
 
 .community-name {
-  font-size: 1.5rem;
-  text-align: center;
-  text-transform: uppercase;
-  display: block;
-  font-weight: 500;
-  width: 100%;
+  position: relative;
+
+  input {
+    font-size: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    display: block;
+    font-weight: 500;
+    width: 100%;
+  }
+
+  p {
+    position: absolute;
+    margin: 0;
+    top: 100%;
+    right: 0;
+    font-size: 0.9em;
+    color: var(--color);
+  }
 }
 
 .colors {
