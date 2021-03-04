@@ -158,11 +158,11 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNodeCoordinates',
         ],
     ],
-    'GET_TAPESTRY_NODE_NEIGHBOUR_TYPES' => (object) [
-        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/neighbourType',
+    'GET_TAPESTRY_NODE_HAS_DRAFT_CHILDREN' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/nodeHasDraftChildren',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getTapestryNodeNeighbourTypes',
+            'callback' => 'getTapestryNodeHasDraftChildren',
         ],
     ],
     'POST_TAPESTRY_LINK' => (object) [
@@ -1170,7 +1170,7 @@ function updateTapestryNodeCoordinates($request)
 /**
  * Return whether tapestry node has draft neighbours.
  */
-function getTapestryNodeNeighbourTypes($request)
+function getTapestryNodeHasDraftChildren($request)
 {
     $postId = $request['tapestryPostId'];
     $nodeMetaId = $request['nodeMetaId'];

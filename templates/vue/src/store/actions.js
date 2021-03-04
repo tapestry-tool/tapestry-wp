@@ -205,9 +205,9 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
-export async function getNodeNeighbourTypes({ dispatch }, id) {
+export async function getNodeHasDraftChildren({ dispatch }, id) {
   try {
-    return await client.getNodeNeighbourTypes(id)
+    return await client.getNodeHasDraftChildren(id)
   } catch (error) {
     dispatch("addApiError", error)
   }

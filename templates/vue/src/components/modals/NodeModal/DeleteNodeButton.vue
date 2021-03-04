@@ -65,13 +65,13 @@ export default {
     this.$emit("message", this.disabledMessage)
   },
   methods: {
-    ...mapActions(["deleteNode", "deleteLink", "getNodeNeighbourTypes"]),
+    ...mapActions(["deleteNode", "deleteLink", "getNodeHasDraftChildren"]),
     ...mapMutations(["updateSelectedNode", "updateNode"]),
     async handleRemoveNode() {
       this.$emit("setLoading", true)
       this.updateSelectedNode(this.rootId)
-      const neighbourTypes = await this.getNodeNeighbourTypes(this.nodeId)
-      if (neighbourTypes.hasDraft) {
+      const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
+      if (nodeHasDraftChildren.hasDraft) {
         this.$bvModal
           .msgBoxConfirm(
             "There are draft nodes attached to this node. Deleting this node will also remove the draft nodes. Are you sure you want to continue?",
