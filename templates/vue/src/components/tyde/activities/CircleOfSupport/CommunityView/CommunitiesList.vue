@@ -685,6 +685,7 @@ ul {
     font-size: 0.7em;
     max-width: 100%;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   h1 {
@@ -694,11 +695,10 @@ ul {
 
 .connection-tooltip {
   position: absolute;
-  width: 10rem;
+  min-width: 10rem;
   border: var(--cos-border);
   border-radius: 1.5rem;
-  padding: 1rem 0;
-  padding-right: 0.5rem;
+  padding: 1rem 0.5rem;
   display: flex;
   background: white;
   z-index: 20;
@@ -727,6 +727,7 @@ ul {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-right: 0.5rem;
 
     p {
       padding: 0.25rem;
