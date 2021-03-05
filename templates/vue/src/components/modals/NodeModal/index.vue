@@ -121,7 +121,7 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
-              @submit="loading = true"
+              @setLoading="setLoading"
               @message="setDisabledMessage"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
@@ -155,7 +155,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else
+              v-else-if="this.settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
@@ -453,6 +453,9 @@ export default {
       "updateLockedStatus",
       "setTapestryErrorReporting",
     ]),
+    setLoading(status) {
+      this.loading = status
+    },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -627,6 +630,9 @@ export default {
       this.handleSubmit()
     },
     handleSubmitForReview() {
+      if (!this.settings.draftNodesEnabled || !this.settings.submitNodesEnabled) {
+        return
+      }
       this.node.reviewStatus = nodeStatus.SUBMIT
       this.node.status = nodeStatus.DRAFT
 
@@ -879,6 +885,9 @@ export default {
         : this.node.mediaURL !== mediaURL
     },
     hasDraftPermission(ID) {
+      if (!this.settings.draftNodesEnabled) {
+        return false
+      }
       if (ID === 0) {
         this.warningText = "You must be authenticated to create a draft node"
         return false

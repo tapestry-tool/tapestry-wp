@@ -90,6 +90,8 @@ const mockSettings = {
   superuserOverridePermissions: true,
   permalink: "testing",
   showRejected: false,
+  draftNodesEnabled: true,
+  submitNodesEnabled: true,
 }
 
 function parseFixture(fixture, settings) {
@@ -100,5 +102,7 @@ function parseFixture(fixture, settings) {
     state.favourites = fixture.favourites || []
     return state
   }
-  return {}
+  return {
+    settings: { ...Helpers.deepCopy(mockSettings), ...settings },
+  }
 }
