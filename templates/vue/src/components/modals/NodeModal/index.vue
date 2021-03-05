@@ -121,7 +121,7 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
-              @submit="loading = true"
+              @setLoading="setLoading"
               @message="setDisabledMessage"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
@@ -453,6 +453,9 @@ export default {
       "updateLockedStatus",
       "setTapestryErrorReporting",
     ]),
+    setLoading(status) {
+      this.loading = status
+    },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
