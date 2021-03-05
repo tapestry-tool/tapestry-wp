@@ -132,6 +132,20 @@ class Tapestry implements ITapestry
     }
 
     /**
+     * Get links.
+     *
+     * @return array $links
+     */
+    public function getLinks()
+    {
+        if (!$this->postId) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+
+        return $this->links;
+    }
+
+    /**
      * Add a new node.
      *
      * @param object $node Tapestry node
@@ -165,7 +179,7 @@ class Tapestry implements ITapestry
         array_push($this->nodes, $node->id);
 
         if (empty($this->rootId)) {
-            $this->rootId = $this->nodes[0];
+            $this->rootId = $node->id;
         }
 
         $this->_saveToDatabase();
@@ -184,11 +198,12 @@ class Tapestry implements ITapestry
     {
         // Remove the rootId field
         if ($nodeId == $this->rootId) {
-            if (count($this->nodes) > 1) {
-                throw new TapestryError('CANNOT_DELETE_ROOT');
-            } else {
-                $this->rootId = 0;
+            foreach ($this->nodes as $node) {
+                if ($node !== $this->rootId && !TapestryHelpers::nodeIsDraft($node, $this->postId)) {
+                    throw new TapestryError('CANNOT_DELETE_ROOT');
+                }
             }
+            $this->rootId = 0;
         }
 
         // Delete the element from nodes array
@@ -314,14 +329,6 @@ class Tapestry implements ITapestry
     }
 
     /**
-     * Get the links in the Tapestry.
-     */
-    public function getLinks()
-    {
-        return $this->links;
-    }
-
-    /**
      * Returns true if the tapestry is empty.
      *
      * @return bool true if there is no root node, false otherwise
@@ -430,7 +437,14 @@ class Tapestry implements ITapestry
             $nodes
         );
         if (count($newNodes)) {
-            $this->_recursivelySetAccessible($newNodes[0], [], $newNodes);
+            $root = null;
+            foreach ($newNodes as $newNode) {
+                if ($this->rootId === $newNode->id) {
+                    $root = $newNode;
+                    break;
+                }
+            }
+            $this->_recursivelySetAccessible($root, [], $newNodes);
         }
 
         return $newNodes;
