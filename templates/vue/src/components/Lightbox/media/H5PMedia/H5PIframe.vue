@@ -3,7 +3,7 @@
     ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
-      'context-multi-content': context === 'multi-content',
+      'context-multi-content': hasMultiContentContext,
     }"
     :style="{
       height: frameHeight ? frameHeight + 'px' : 'auto',
@@ -75,6 +75,9 @@ export default {
         return "no"
       } else return "auto"
     },
+    hasMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
+    },
   },
   watch: {
     node(newNode, oldNode) {
@@ -97,10 +100,10 @@ export default {
       this.frameHeight = h5pDimensions.height
       this.frameWidth = 0
 
-      if (this.node.fitWindow || this.context === "multi-content") {
+      if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
         let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
-        if (this.context === "multi-content") {
+        if (this.hasMultiContentContext) {
           // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
           fitHeight -= 100
@@ -390,7 +393,7 @@ export default {
             }
 
             if (h5pVideo.getDuration() !== undefined) {
-              this.requiresRefresh = this.context === "multi-content"
+              this.requiresRefresh = this.hasMultiContentContext
               handleH5pAfterLoad()
             } else {
               h5pVideo.on("loaded", handleH5pAfterLoad)
