@@ -94,7 +94,7 @@ export default {
       this.$router.go()
     },
     redirectToLogin() {
-      window.location.href = `${window.location.origin}/wp-login.php?redirect_to=${window.location.pathname}`
+      window.location.href = `${window.location.origin}/wp-login.php?redirect_to=${window.location.href}`
     },
     recordAnalytics(evt) {
       const x = evt.clientX + window.pageXOffset
