@@ -53,8 +53,8 @@ export default {
     },
   },
   watch: {
-    loggedIn(newValue) {
-      if (!newValue) {
+    loggedIn(isStillLoggedIn) {
+      if (!isStillLoggedIn) {
         this.$bvModal.show("loggedOutModal")
       }
     },
