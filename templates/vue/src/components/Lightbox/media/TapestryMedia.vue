@@ -14,6 +14,7 @@
     <text-media
       v-if="node.mediaType === 'text'"
       :node="node"
+      :context="context"
       @complete="complete"
       @load="handleLoad"
     />
@@ -22,6 +23,7 @@
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -32,6 +34,7 @@
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -41,6 +44,7 @@
       v-if="node.mediaType === 'url-embed'"
       :dimensions="dimensions"
       :node="node"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
     />
@@ -59,18 +63,22 @@
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
+      :node="node"
+      :context="context"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
+      :context="context"
       @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
       v-if="node.mediaType === 'activity'"
       :node="node"
+      :context="context"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"

@@ -1,31 +1,36 @@
 <template>
-  <div class="external-media-container">
-    <iframe
-      v-if="node.behaviour === 'embed'"
-      id="external"
-      frameborder="0"
-      allowfullscreen="allowfullscreen"
-      :src="normalizedUrl"
-      :style="'min-height:' + this.dimensions.height + 'px'"
-      @load="$emit('load')"
-    ></iframe>
-    <div v-else class="preview" :style="previewStyles">
-      <div
-        class="preview-image"
-        :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
-      >
-        <a :href="node.typeData.mediaURL" target="blank"></a>
-      </div>
-      <div class="preview-content">
-        <h1>
-          <a :href="node.typeData.mediaURL" target="blank">
-            {{ node.typeData.linkMetadata.title }}
-          </a>
-        </h1>
-        <p>{{ node.typeData.linkMetadata.description }}</p>
-        <p>
-          <a :href="node.typeData.mediaURL" target="blank">Open link</a>
-        </p>
+  <div>
+    <h1 v-if="showTitle" class="external-media-title external-page-style">
+      {{ node.title }}
+    </h1>
+    <div class="external-media-container">
+      <iframe
+        v-if="node.behaviour === 'embed'"
+        id="external"
+        frameborder="0"
+        allowfullscreen="allowfullscreen"
+        :src="normalizedUrl"
+        :style="'min-height:' + this.dimensions.height + 'px'"
+        @load="$emit('load')"
+      ></iframe>
+      <div v-else class="preview" :style="previewStyles">
+        <div
+          class="preview-image"
+          :style="{ 'background-image': `url(${node.typeData.linkMetadata.image})` }"
+        >
+          <a :href="node.typeData.mediaURL" target="blank"></a>
+        </div>
+        <div class="preview-content">
+          <h1>
+            <a :href="node.typeData.mediaURL" target="blank">
+              {{ node.typeData.linkMetadata.title }}
+            </a>
+          </h1>
+          <p>{{ node.typeData.linkMetadata.description }}</p>
+          <p>
+            <a :href="node.typeData.mediaURL" target="blank">Open link</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -46,6 +51,11 @@ export default {
       type: Object,
       required: true,
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     normalizedUrl() {
@@ -59,6 +69,9 @@ export default {
         }
       }
       return {}
+    },
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   mounted() {
@@ -134,5 +147,19 @@ export default {
 #external {
   width: 100%;
   height: 100%;
+}
+
+.external-page-style {
+  text-align: left;
+  margin: 1em auto;
+}
+
+.external-media-title {
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
-  <div class="gf-container">
+  <div :class="{ 'gf-container': true, 'gf-page-style': showTitle }">
+    <h1 v-if="showTitle" class="gf-title">{{ node.title }}</h1>
     <loading v-show="loading" label="Loading form..." />
     <div
       v-show="!loading"
@@ -27,6 +28,16 @@ export default {
       type: String,
       required: true,
     },
+    node: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -34,6 +45,11 @@ export default {
       html: "",
       loading: true,
     }
+  },
+  computed: {
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
+    },
   },
   watch: {
     id(newId) {
@@ -209,6 +225,20 @@ export default {
         }
       }
     }
+  }
+}
+
+.gf-page-style {
+  text-align: left;
+  margin: 1em auto;
+}
+
+.gf-title {
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
   }
 }
 </style>

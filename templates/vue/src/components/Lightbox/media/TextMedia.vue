@@ -1,6 +1,6 @@
 <template>
-  <article class="article">
-    <h1>{{ node.title }}</h1>
+  <article :class="{ article: true, 'page-style': showTitle }">
+    <h1 v-if="showTitle">{{ node.title }}</h1>
     <div v-html="content"></div>
   </article>
 </template>
@@ -13,10 +13,21 @@ export default {
       type: Object,
       required: true,
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     content() {
       return this.node.typeData.textContent
+    },
+    showTitle() {
+      return (
+        this.context !== "page" ||
+        (this.context === "page" && this.node.typeData.showTitle !== false)
+      )
     },
   },
   mounted() {
@@ -51,8 +62,7 @@ export default {
 </style>
 
 <style lang="scss">
-.lightbox-text {
-  padding: 0;
-  margin-bottom: 1rem;
+.page-style {
+  padding: 0 !important;
 }
 </style>

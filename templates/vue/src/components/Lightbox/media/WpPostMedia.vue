@@ -1,8 +1,11 @@
 <template>
-  <loading v-if="loading" />
-  <div v-else class="article">
-    <h1 class="article-title" v-html="title"></h1>
-    <article v-html="content"></article>
+  <div>
+    <h1 v-if="showTitle" class="wp-media-title">{{ node.title }}</h1>
+    <loading v-if="loading" />
+    <div v-else class="article">
+      <h1 class="article-title" v-html="title"></h1>
+      <article v-html="content"></article>
+    </div>
   </div>
 </template>
 
@@ -20,6 +23,11 @@ export default {
       type: Object,
       required: true,
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -31,6 +39,12 @@ export default {
   computed: {
     id() {
       return this.node.typeData.mediaURL
+    },
+    showTitle() {
+      return (
+        this.context !== "page" ||
+        (this.context === "page" && this.node.typeData.showTitle !== false)
+      )
     },
   },
   async mounted() {
@@ -63,6 +77,17 @@ export default {
     color: #47425d;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 16px;
+  }
+}
+
+.wp-media-title {
+  text-align: left;
+  margin: 1em auto;
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
   }
 }
 </style>
