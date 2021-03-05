@@ -59,9 +59,7 @@ export default {
     margin: 0 auto;
   }
 }
-</style>
 
-<style lang="scss">
 .page-style {
   padding: 0 !important;
 }

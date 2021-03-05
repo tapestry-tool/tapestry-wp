@@ -94,7 +94,7 @@
             <add-child-button
               v-if="
                 !isSubMultiContentRow &&
-                  (hasPermission('add') || this.settings.draftNodesEnabled)
+                  (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
               :x="canReview || hasPermission('edit') ? -35 : 0"

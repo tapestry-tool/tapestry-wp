@@ -180,7 +180,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else-if="this.settings.submitNodesEnabled"
+              v-else-if="settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
