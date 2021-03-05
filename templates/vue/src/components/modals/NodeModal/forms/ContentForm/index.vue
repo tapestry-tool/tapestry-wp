@@ -10,6 +10,14 @@
         autofocus
         required
       />
+      <b-form-checkbox
+        v-if="node.presentationStyle == 'multi-content-row'"
+        v-model="node.typeData.showTitle"
+        class="small title-checkbox"
+        data-qa="node-show-page-title"
+      >
+        Show title in page
+      </b-form-checkbox>
     </b-form-group>
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
@@ -111,7 +119,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getParent"]),
+    parent() {
+      return this.getParent(this.node.id)
+    },
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
@@ -142,3 +153,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.title-checkbox {
+  padding-top: 3px;
+  text-align: right;
+}
+</style>
