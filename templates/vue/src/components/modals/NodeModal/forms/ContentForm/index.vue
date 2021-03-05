@@ -12,7 +12,7 @@
       />
       <b-form-checkbox
         v-if="showTitleCheckbox"
-        v-model="node.typeData.showTitle"
+        v-model="shouldShowTitle"
         class="small title-checkbox"
         data-qa="node-show-page-title"
       >
@@ -121,6 +121,7 @@ export default {
         { value: "activity", text: "Activity" },
         { value: "multi-content", text: "Multi-content Presentation" },
       ],
+      shouldShowTitle: this.node.typeData.showTitle !== false,
     }
   },
   computed: {
@@ -137,6 +138,9 @@ export default {
   watch: {
     activeForm() {
       this.$emit("unload")
+    },
+    shouldShowTitle(shouldShowTitle) {
+      this.node.typeData.showTitle = shouldShowTitle
     },
   },
   mounted() {
