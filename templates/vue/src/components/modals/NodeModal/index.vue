@@ -47,6 +47,7 @@
             @click="changeTab('content')"
           >
             <content-form
+              :parent="parent"
               :node="node"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"

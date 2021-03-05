@@ -11,7 +11,7 @@
         required
       />
       <b-form-checkbox
-        v-if="node.presentationStyle == 'multi-content-row'"
+        v-if="showTitleCheckbox"
         v-model="node.typeData.showTitle"
         class="small title-checkbox"
         data-qa="node-show-page-title"
@@ -65,7 +65,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
@@ -90,6 +89,11 @@ export default {
     WpPostForm,
   },
   props: {
+    parent: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     node: {
       type: Object,
       required: true,
@@ -119,12 +123,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getParent"]),
-    parent() {
-      return this.getParent(this.node.id)
-    },
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
+    },
+    showTitleCheckbox() {
+      return (
+        this.node.presentationStyle == "multi-content-row" ||
+        (this.parent && this.parent.presentationStyle == "page")
+      )
     },
   },
   watch: {
