@@ -151,7 +151,7 @@ export default {
 
 .external-page-style {
   text-align: left;
-  margin: 1em auto;
+  margin-bottom: 0.9em;
 }
 
 .external-media-title {

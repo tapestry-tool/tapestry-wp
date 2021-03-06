@@ -182,9 +182,3 @@ button[disabled] {
   }
 }
 </style>
-
-<style lang="scss">
-h1 {
-  margin-top: 0 !important;
-}
-</style>

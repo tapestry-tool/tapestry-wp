@@ -223,7 +223,7 @@ export default {
 
 .video-title {
   text-align: left;
-  margin: 1em auto;
+  margin-bottom: 0.9em;
   font-weight: 500;
   font-size: 1.75rem;
 

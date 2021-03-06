@@ -41,10 +41,7 @@ export default {
       return this.node.typeData.mediaURL
     },
     showTitle() {
-      return (
-        this.context !== "page" ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
-      )
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   async mounted() {
@@ -82,7 +79,7 @@ export default {
 
 .wp-media-title {
   text-align: left;
-  margin: 1em auto;
+  margin-bottom: 0.9em;
   font-weight: 500;
   font-size: 1.75rem;
 

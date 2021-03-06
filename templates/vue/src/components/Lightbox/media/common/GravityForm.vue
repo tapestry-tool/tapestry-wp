@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'gf-container': true, 'gf-page-style': showTitle }">
+  <div :class="{ 'gf-container': true, 'gf-page-style': context === 'page' }">
     <h1 v-if="showTitle" class="gf-title">{{ node.title }}</h1>
     <loading v-show="loading" label="Loading form..." />
     <div
@@ -230,7 +230,7 @@ export default {
 
 .gf-page-style {
   text-align: left;
-  margin: 1em auto;
+  margin-bottom: 0.9em;
 }
 
 .gf-title {
