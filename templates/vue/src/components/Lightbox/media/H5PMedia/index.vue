@@ -1,37 +1,35 @@
 <template>
-  <div>
+  <div class="container">
     <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
-    <div class="container">
-      <end-screen
-        v-if="showEndScreen"
-        :node="node"
-        @rewatch="rewatch"
-        @close="close"
-        @show-quiz="openQuiz"
-      />
-      <activity-screen
-        v-else-if="showActivityScreen"
-        :id="node.id"
-        @back="back"
-        @close="close"
-      />
-      <loading v-if="isLoading" label="Loading H5P media..." />
-      <h5p-iframe
-        ref="h5pIframe"
-        :autoplay="autoplay"
-        :dimensions="dimensions"
-        :node="node"
-        :context="context"
-        :settings="h5pSettings"
-        @complete="$emit('complete')"
-        @change:dimensions="$emit('change:dimensions', $event)"
-        @is-loaded="handleLoad"
-        @timeupdate="$emit('timeupdate', $event)"
-        @show-end-screen="showEndScreen = true"
-        @show-play-screen="showPlayScreen = $event"
-        @update-settings="updateSettings"
-      />
-    </div>
+    <end-screen
+      v-if="showEndScreen"
+      :node="node"
+      @rewatch="rewatch"
+      @close="close"
+      @show-quiz="openQuiz"
+    />
+    <activity-screen
+      v-else-if="showActivityScreen"
+      :id="node.id"
+      @back="back"
+      @close="close"
+    />
+    <loading v-if="isLoading" label="Loading H5P media..." />
+    <h5p-iframe
+      ref="h5pIframe"
+      :autoplay="autoplay"
+      :dimensions="dimensions"
+      :node="node"
+      :context="context"
+      :settings="h5pSettings"
+      @complete="$emit('complete')"
+      @change:dimensions="$emit('change:dimensions', $event)"
+      @is-loaded="handleLoad"
+      @timeupdate="$emit('timeupdate', $event)"
+      @show-end-screen="showEndScreen = true"
+      @show-play-screen="showPlayScreen = $event"
+      @update-settings="updateSettings"
+    />
   </div>
 </template>
 

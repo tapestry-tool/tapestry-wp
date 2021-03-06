@@ -1,7 +1,10 @@
 <template>
   <div>
     <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
-    <div class="embed-responsive embed-responsive-16by9">
+    <div
+      class="embed-responsive embed-responsive-16by9"
+      :style="isMultiContentContext ? '' : 'top: 1.75em'"
+    >
       <end-screen
         v-if="showEndScreen"
         :node="node"
@@ -95,6 +98,9 @@ export default {
     },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
+    },
+    isMultiContentContext() {
+      return this.context === "page" || this.context === "multi-content"
     },
   },
   beforeDestroy() {
