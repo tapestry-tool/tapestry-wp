@@ -5,7 +5,7 @@
         v-if="showTitle"
         :class="{
           title: true,
-          'nested-media-title': context === 'page' || context === 'accordion',
+          'nested-media-title': isMultiContentContext,
         }"
       >
         {{ node.title }}
@@ -17,6 +17,7 @@
       :node="node"
       :rowId="rowId"
       :subRowId="subRowId"
+      :context="context"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -128,9 +129,12 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "page" ||
+        this.context !== "multi-content" ||
         (this.context === "page" && this.node.typeData.showTitle !== false)
       )
+    },
+    isMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
     },
   },
   mounted() {

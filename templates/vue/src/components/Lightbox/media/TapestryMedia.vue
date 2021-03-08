@@ -103,7 +103,6 @@ import ActivityMedia from "./ActivityMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
 import GravityForm from "./common/GravityForm"
-import MultiContentMedia from "./MultiContentMedia"
 import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
 
 export default {
@@ -118,7 +117,7 @@ export default {
     CompletionScreen,
     ActivityMedia,
     "youtube-media": YouTubeMedia,
-    MultiContentMedia,
+    MultiContentMedia: () => import("./MultiContentMedia"),
   },
   props: {
     nodeId: {
