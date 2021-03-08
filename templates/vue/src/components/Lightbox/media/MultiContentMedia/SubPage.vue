@@ -7,16 +7,18 @@
       class="sub-page-row"
     >
       <div class="title-row">
-        <a class="title-row-icon" @click="toggleFavourite(row.id)">
+        <a class="title-row-icon">
           <i
             v-if="isFavourite(row.id)"
             class="fas fa-heart fa-sm"
             style="color:red; cursor:pointer;"
+            @click="toggleFavourite(row.id)"
           ></i>
           <i
             v-else
             class="fas fa-heart fa-sm"
             style="color:white; cursor:pointer;"
+            @click="toggleFavourite(row.id)"
           ></i>
         </a>
       </div>

@@ -21,16 +21,18 @@
               class="fas fa-lock fa-sm title-row-icon"
               style="color:white;"
             ></i>
-            <a v-else class="title-row-icon" @click="toggleFavourite(row.node.id)">
+            <a v-else class="title-row-icon">
               <i
                 v-if="isFavourite(row.node.id)"
                 class="fas fa-heart fa-sm"
                 style="color:red; cursor:pointer;"
+                @click="toggleFavourite(row.node.id)"
               ></i>
               <i
                 v-else
                 class="fas fa-heart fa-sm"
                 style="color:white; cursor:pointer;"
+                @click="toggleFavourite(row.node.id)"
               ></i>
             </a>
           </div>
