@@ -312,11 +312,7 @@ export default {
                   case h5pObj.Video.PLAYING: {
                     // Disable Autoplay For Youtube Workaround:
                     // Unhide iframe when playing
-                    if (
-                      this.firstPlay &&
-                      this.node.typeData.youtubeID &&
-                      !this.autoplay
-                    ) {
+                    if (this.firstPlay && !this.autoplay) {
                       const h5pDoc = this.$refs.h5p.contentDocument
                       h5pDoc.getElementsByTagName("iframe")[0].style.display = ""
                     }
@@ -357,11 +353,7 @@ export default {
                   case h5pObj.Video.BUFFERING: {
                     // Disable Autoplay For Youtube Workaround:
                     // Hide iframe when buffering due to an endless spinner from the pause below.
-                    if (
-                      this.firstPlay &&
-                      this.node.typeData.youtubeID &&
-                      !this.autoplay
-                    ) {
+                    if (this.firstPlay && !this.autoplay) {
                       const h5pDoc = this.$refs.h5p.contentDocument
                       h5pDoc.getElementsByTagName("iframe")[0].style.display = "none"
                     }
@@ -383,7 +375,7 @@ export default {
                 // Disable Autoplay For Youtube Workaround:
                 // There's a bug with the Youtube Video API such that you cannot disable autoplay.
                 // This is a workaround to stop the video upon loading.
-                if (this.node.typeData.youtubeID && !this.autoplay) {
+                if (!this.autoplay) {
                   // As of Feb 2021, H5P has not implemented a stop functionality,
                   // so there is no way to avoid the "More Videos" when paused.
                   // Because this pause is immediate, there is an endless buffer that is hidden and unhidden in stateChange.
