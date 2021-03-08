@@ -83,6 +83,12 @@
       @close="$emit('close')"
       @load="handleLoad"
     />
+    <multi-content-media
+      v-if="node.mediaType === 'multi-content'"
+      :node="node"
+      :context="context"
+      @complete="complete"
+    />
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -97,6 +103,7 @@ import ActivityMedia from "./ActivityMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
 import GravityForm from "./common/GravityForm"
+import MultiContentMedia from "./MultiContentMedia"
 import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
 
 export default {
@@ -111,6 +118,7 @@ export default {
     CompletionScreen,
     ActivityMedia,
     "youtube-media": YouTubeMedia,
+    MultiContentMedia,
   },
   props: {
     nodeId: {
