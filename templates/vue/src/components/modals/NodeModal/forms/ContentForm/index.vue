@@ -129,10 +129,7 @@ export default {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
     showTitleCheckbox() {
-      return (
-        this.node.presentationStyle == "multi-content-row" ||
-        (this.parent && this.parent.presentationStyle == "page")
-      )
+      return this.node.isMultiContentChild || this.node.isSubMultiContent
     },
   },
   watch: {

@@ -430,7 +430,8 @@ function accordion_row_update() {
         $post_id = get_the_ID();
         $node_meta_data = get_post_meta($post_id,'tapestry_node_data', true);
         if (isset($node_meta_data->presentationStyle) && $node_meta_data->mediapresentationStyleType == 'accordion-row') {
-            $node_meta_data->presentationStyle = 'multi-content-row';
+            unset($node_meta_data->presentationStyle);
+            $node_meta_data->isMultiContentChild = true;
             update_post_meta( $post_id, 'tapestry_node_data',  $node_meta_data);
         }
     }
