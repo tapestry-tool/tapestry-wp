@@ -21,7 +21,10 @@
       }"
       class="circle"
     >
-      <ul class="connection-list">
+      <ul
+        v-show="activeCircle > 2 || activeCircle === index"
+        class="connection-list"
+      >
         <li
           v-for="connection in circle.connections"
           :key="connection.id"
@@ -34,11 +37,10 @@
     </li>
     <div class="controls">
       <p>Circle: {{ activeCircle }}</p>
-      <button @click="activeCircle++">+</button>
-      <button @click="activeCircle--">-</button>
       <button @click="addConnection">Add connection</button>
       <button @click="removeConnection">Remove connection</button>
     </div>
+    <circle-toggle class="circle-toggle" @change="activeCircle = $event" />
   </ul>
 </template>
 
@@ -46,6 +48,7 @@
 import Helpers from "@/utils/Helpers"
 
 import ConnectionsTab from "../ConnectionsTab"
+import CircleToggle from "./CircleToggle"
 
 const CONNECTION_SPACE = 10
 const MIN_CIRCLE_SIZE = 125
@@ -59,6 +62,7 @@ const States = {
 export default {
   components: {
     ConnectionsTab,
+    CircleToggle,
   },
   props: {
     communities: {
@@ -193,7 +197,7 @@ ul {
   font-size: 3rem;
 }
 
-button {
+button:not(.circle-toggle) {
   display: block;
   width: 100%;
   font-size: 0.8em;
@@ -204,5 +208,11 @@ button {
   position: absolute;
   left: 0;
   bottom: 0;
+}
+
+.circle-toggle {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
 }
 </style>
