@@ -14,6 +14,7 @@
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handlEditConnection"
+      @add-community="$emit('add-community', $event)"
     />
     <add-community-tab
       v-model="community"
@@ -28,7 +29,7 @@
 
 <script>
 import AddCommunityTab from "./AddCommunityTab"
-import ConnectionsTab from "./ConnectionsTab"
+import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
 

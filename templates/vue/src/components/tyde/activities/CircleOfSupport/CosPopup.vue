@@ -24,10 +24,10 @@ export default {
   max-height: 80%;
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: 50;
 
   &.show {
-    z-index: 20;
+    z-index: 60;
     transform: translateY(0);
   }
 }

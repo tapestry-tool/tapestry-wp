@@ -14,6 +14,9 @@
         :connections="cos.connections"
         :communities="cos.communities"
         :circles="[[], [], []]"
+        @add-connection="addConnection"
+        @edit-connection="editConnection"
+        @add-community="addCommunity"
       />
       <div class="switch">
         <button class="change-view" @click="view = views.Community">

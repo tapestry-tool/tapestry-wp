@@ -40,8 +40,8 @@
 import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 
-import CosPopup from "./CosPopup"
-import CosPopupButton from "./CosPopupButton"
+import CosPopup from "../CosPopup"
+import CosPopupButton from "../CosPopupButton"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
 

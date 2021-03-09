@@ -1,5 +1,15 @@
 <template>
   <ul class="circle-container">
+    <connections-tab
+      ref="connections"
+      class="tab"
+      :connections="connections"
+      :communities="communities"
+      @back="handleBack"
+      @add-connection="$emit('add-connection', $event)"
+      @edit-connection="handlEditConnection"
+      @add-community="$emit('add-community', $event)"
+    />
     <li
       v-for="(circle, index) in circlesWithData"
       :key="index"
@@ -35,11 +45,21 @@
 <script>
 import Helpers from "@/utils/Helpers"
 
+import ConnectionsTab from "../ConnectionsTab"
+
 const CONNECTION_SPACE = 10
 const MIN_CIRCLE_SIZE = 125
 const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.75
 
+const States = {
+  Home: 0,
+  EditConnection: 1,
+}
+
 export default {
+  components: {
+    ConnectionsTab,
+  },
   props: {
     communities: {
       type: Object,
@@ -55,6 +75,7 @@ export default {
     return {
       circles: [[], [], []],
       activeCircle: 0,
+      state: States.Home,
     }
   },
   computed: {
@@ -110,6 +131,20 @@ export default {
         y: `${y}px`,
       }
     },
+    editConnection(connection) {
+      this.state = States.EditConnection
+      this.$refs.connections.editConnection(connection)
+    },
+    handleBack() {
+      if (this.state === States.EditConnection) {
+        this.state = States.Home
+        this.$refs.connections.close()
+      }
+    },
+    handlEditConnection(event) {
+      this.handleBack()
+      this.$emit("edit-connection", event)
+    },
   },
 }
 </script>
@@ -162,5 +197,12 @@ button {
   display: block;
   width: 100%;
   font-size: 0.8em;
+}
+
+.tab {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }
 </style>

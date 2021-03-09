@@ -75,7 +75,7 @@
 <script>
 import { VEmojiPicker } from "v-emoji-picker"
 import TapestryIcon from "@/components/common/TapestryIcon"
-import AddCommunityForm from "./AddCommunityForm"
+import AddCommunityForm from "../CommunityView/AddCommunityForm"
 import { MAX_COMMUNITIES, MAX_CONNECTION_NAME_LENGTH } from "../cos.config"
 
 export default {
