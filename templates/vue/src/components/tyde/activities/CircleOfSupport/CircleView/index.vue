@@ -28,8 +28,10 @@
         <li
           v-for="connection in circle.connections"
           :key="connection.id"
+          :ref="connection.id"
           :style="{ '--x': connection.x, '--y': connection.y }"
           class="connection"
+          @click="toggleConnectionTooltip(connection.id)"
         >
           {{ connection.avatar }}
         </li>
@@ -41,6 +43,14 @@
       <button @click="removeConnection">Remove connection</button>
     </div>
     <circle-toggle class="circle-toggle" @change="activeCircle = $event" />
+    <connection-tooltip
+      ref="connection-tooltip"
+      class="connection-tooltip"
+      :connection="activeConnection"
+      :show="activeConnectionId != null"
+      @edit="editConnection(activeConnection)"
+      @close="activeConnectionId = null"
+    />
   </ul>
 </template>
 
@@ -48,6 +58,7 @@
 import Helpers from "@/utils/Helpers"
 
 import ConnectionsTab from "../ConnectionsTab"
+import ConnectionTooltip from "../ConnectionTooltip"
 import CircleToggle from "./CircleToggle"
 
 const CONNECTION_SPACE = 10
@@ -63,6 +74,7 @@ export default {
   components: {
     ConnectionsTab,
     CircleToggle,
+    ConnectionTooltip,
   },
   props: {
     communities: {
@@ -80,9 +92,32 @@ export default {
       circles: [[], [], []],
       activeCircle: 0,
       state: States.Home,
+      activeConnectionId: null,
     }
   },
   computed: {
+    activeConnection() {
+      if (!this.activeConnectionId) {
+        return {
+          name: "placeholder",
+          avatar: "😊",
+          communities: [
+            {
+              id: "placeholder",
+              color: "var(--cos-color-secondary)",
+            },
+          ],
+        }
+      }
+      const [connectionId] = this.activeConnectionId.split("-")
+      const connection = this.connections[connectionId]
+      return {
+        ...connection,
+        communities: Object.values(this.communities).filter(({ connections }) =>
+          connections.includes(connectionId)
+        ),
+      }
+    },
     circlesWithData() {
       return this.circles.map((connections, index) => {
         const order = this.circles.length - index
@@ -116,7 +151,7 @@ export default {
     },
     addConnection() {
       const connection = {
-        id: Helpers.createUUID(),
+        id: "603e883e65f90",
         name: "nan",
         avatar: "😀",
         communities: ["603e883568aae", "603e884ee69c1"],
@@ -136,6 +171,7 @@ export default {
       }
     },
     editConnection(connection) {
+      this.activeConnectionId = null
       this.state = States.EditConnection
       this.$refs.connections.editConnection(connection)
     },
@@ -148,6 +184,24 @@ export default {
     handleEditConnection(event) {
       this.handleBack()
       this.$emit("edit-connection", event)
+    },
+    toggleConnectionTooltip(connectionId) {
+      if (connectionId === this.activeConnectionId) {
+        this.activeConnectionId = null
+        return
+      }
+      this.activeConnectionId = connectionId
+      this.activeCommunityTooltipId = null
+
+      const [connectionRef] = this.$refs[connectionId]
+      const tooltipRef = this.$refs["connection-tooltip"].$el
+      this.$nextTick(() =>
+        Helpers.positionTooltip(
+          connectionRef,
+          tooltipRef,
+          document.getElementById("cos")
+        )
+      )
     },
   },
 }
@@ -214,5 +268,11 @@ button:not(.circle-toggle) {
   position: absolute;
   top: 2rem;
   right: 2rem;
+}
+
+.connection-tooltip {
+  top: 0;
+  left: 0;
+  z-index: 70;
 }
 </style>

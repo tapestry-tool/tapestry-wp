@@ -211,77 +211,13 @@ export default {
 
       const [connectionRef] = this.$refs[`${connectionId}-${communityId}`]
       const tooltipRef = this.$refs["connection-tooltip"].$el
-      this.$nextTick(() => this.positionTooltip(connectionRef, tooltipRef))
-    },
-    /**
-     * Positions the connection tooltip according to the given connectionId.
-     *
-     * This function works by taking the bounding box of the connection trigger and
-     * translating the tooltip according to that box.
-     *
-     * Two things to note — (1) the tooltip is placed on the BOTTOM of the
-     * connection, and (2) the tooltip is wider than the connection button. This
-     * means there are three edge cases we have to consider:
-     *
-     * 1. The tooltip is clipped on the RIGHT side (when the connection is on the
-     *    right of the CoS)
-     * 2. The tooltip is clipped on the BOTTOM (when the connection is on the bottom
-     *    of the CoS)
-     * 3. The tooltip is clipped on BOTH the bottom and the right (when the
-     *    connection is on the bottom-right of the CoS)
-     */
-    positionTooltip(target, tooltip) {
-      const {
-        height: tooltipHeight,
-        width: tooltipWidth,
-      } = tooltip.getBoundingClientRect()
-      const { left, bottom, width, top } = target.getBoundingClientRect()
-      const containerBox = document.getElementById("cos").getBoundingClientRect()
-
-      /**
-       * First, calculate the x and y values without considering clipping (but make
-       * sure they're still within bounds).
-       */
-      let x = Helpers.clamp(
-        0,
-        left - containerBox.left,
-        containerBox.width - tooltipWidth
+      this.$nextTick(() =>
+        Helpers.positionTooltip(
+          connectionRef,
+          tooltipRef,
+          document.getElementById("cos")
+        )
       )
-
-      let y = Helpers.clamp(
-        0,
-        bottom - containerBox.top,
-        containerBox.height - tooltipHeight
-      )
-
-      /**
-       * Next, we consider how clipping affects the position by checking if the
-       * tooltip is clipped on the bottom and on the right.
-       */
-      const isBottomClipped =
-        bottom - containerBox.top >= containerBox.height - tooltipHeight
-
-      const isRightClipped =
-        left - containerBox.left >= containerBox.width - tooltipWidth
-
-      /**
-       * Here, we're only going to consider edge case (2) and (3) because (1) is
-       * already handled by clamping the x value to the CoS bounds.
-       */
-      if (isBottomClipped) {
-        /**
-         * If clipped on the bottom and on the right, place the tooltip on the LEFT
-         * of the connection element. Otherwise, put it on the RIGHT.
-         */
-        if (isRightClipped) {
-          x = x - tooltipWidth
-        } else {
-          x = x + width
-          y = Math.min(top - containerBox.top, containerBox.height - tooltipHeight)
-        }
-      }
-
-      tooltip.style.transform = `translate(${x}px, ${y}px)`
     },
     toggle(communityId) {
       if (this.activeCommunity === communityId) {
