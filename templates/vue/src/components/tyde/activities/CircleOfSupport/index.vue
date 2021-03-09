@@ -6,7 +6,7 @@
         :connections="cos.connections"
         :communities="cos.communities"
         @add-connection="addConnection"
-        @update-connection="updateConnection"
+        @edit-connection="editConnection"
         @add-community="addCommunity"
       />
       <circle-view
@@ -78,7 +78,7 @@ export default {
     addCommunity(community) {
       this.$set(this.cos.communities, community.id, community)
     },
-    updateConnection({ additions, deletions, id, name, avatar }) {
+    editConnection({ additions, deletions, id, name, avatar }) {
       additions.forEach(communityId =>
         this.addConnectionToCommunity(communityId, id)
       )
