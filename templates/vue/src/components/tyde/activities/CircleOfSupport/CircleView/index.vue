@@ -7,6 +7,7 @@
         '--index': index,
         '--border-width': circle.borderWidth,
         '--order': circle.order,
+        '--radius': circle.radius,
       }"
       class="circle"
     >
@@ -34,6 +35,10 @@
 <script>
 import Helpers from "@/utils/Helpers"
 
+const CONNECTION_SPACE = 10
+const MIN_CIRCLE_SIZE = 125
+const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.75
+
 export default {
   props: {
     communities: {
@@ -56,20 +61,34 @@ export default {
     circlesWithData() {
       return this.circles.map((connections, index) => {
         const order = this.circles.length - index
-        const borderWidth = `${order}px`
-        const radius = 125 + 125 * 0.75 * index - 32
+        const radius = this.getRadius(index)
         return {
-          borderWidth,
+          order,
+          borderWidth: `${order}px`,
           connections: connections.map((connection, index) => ({
             ...connection,
-            ...this.getPosition({ index, radius, size: connections.length }),
+            ...this.getPosition({
+              index,
+              radius: radius - 32,
+              size: connections.length,
+            }),
           })),
-          order,
+          radius: `${radius}px`,
         }
       })
     },
   },
   methods: {
+    getRadius(index) {
+      const numConnections = this.circles[index].length
+      if (index === 0) {
+        return Math.max(numConnections * CONNECTION_SPACE, MIN_CIRCLE_SIZE)
+      }
+      return Math.max(
+        numConnections * CONNECTION_SPACE,
+        OFFSET_SIZE + this.getRadius(index - 1)
+      )
+    },
     addConnection() {
       const connection = {
         id: Helpers.createUUID(),
@@ -108,18 +127,13 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  --startSize: 250px;
-  --offsetSize: calc(var(--startSize) * 0.75);
 }
 
 .circle {
-  --radius: calc(var(--startSize) + var(--offsetSize) * var(--index));
-
   position: absolute;
   border: var(--border-width, 2px) solid var(--cos-color-secondary);
-  width: var(--radius);
-  height: var(--radius);
+  width: calc(var(--radius) * 2);
+  height: calc(var(--radius) * 2);
   border-radius: 50%;
   z-index: calc(var(--order) * 10);
 }
