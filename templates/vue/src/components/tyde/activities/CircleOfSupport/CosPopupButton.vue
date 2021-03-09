@@ -3,8 +3,9 @@
     class="popup-button"
     v-bind="$attrs"
     :style="{ cursor: disabled ? 'not-allowed' : 'pointer' }"
+    @click="$emit('click', $event)"
   >
-    <button :disabled="disabled" @click="$emit('click', $event)">
+    <button :disabled="disabled">
       <slot></slot>
     </button>
   </span>
