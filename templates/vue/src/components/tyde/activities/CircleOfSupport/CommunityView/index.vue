@@ -13,7 +13,7 @@
       :communities="communities"
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
-      @edit-connection="handlEditConnection"
+      @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
     />
     <add-community-tab
@@ -113,7 +113,7 @@ export default {
         this.$refs.connections.close()
       }
     },
-    handlEditConnection(event) {
+    handleEditConnection(event) {
       this.handleBack()
       this.$emit("edit-connection", event)
     },
