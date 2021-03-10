@@ -46,18 +46,11 @@
               @complete="updateProgress(row.node.id)"
               @load="handleLoad($refs.rowRefs[index])"
             />
-            <p
-              v-if="
-                row.children.length > 0 && row.node.mediaType !== 'multi-content'
-              "
-              style="color: white;"
-            >
+            <p v-if="row.children.length > 0" style="color: white;">
               {{ row.node.typeData.subAccordionText }}
             </p>
             <sub-page
-              v-if="
-                row.children.length > 0 && row.node.mediaType !== 'multi-content'
-              "
+              v-if="row.children.length > 0"
               :dimensions="dimensions"
               :rows="row.children"
               :row-id="subRowId"
