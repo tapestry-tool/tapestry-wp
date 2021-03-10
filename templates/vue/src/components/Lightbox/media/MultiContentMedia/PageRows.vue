@@ -102,16 +102,11 @@ export default {
     subRowId: {
       type: Number,
       required: false,
-      default: -1,
+      default: 0,
     },
     dimensions: {
       type: Object,
       required: true,
-    },
-    context: {
-      type: String,
-      required: false,
-      default: "",
     },
   },
   data() {

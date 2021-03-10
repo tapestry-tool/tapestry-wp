@@ -10,11 +10,7 @@
           v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
-          :class="{
-            'accordion-row': true,
-            'nested-accordion-row':
-              isMultiContentContext && node.mediaType == 'multi-content',
-          }"
+          class="accordion-row"
         >
           <div class="button-row">
             <button
@@ -109,11 +105,6 @@ export default {
       type: Object,
       required: true,
     },
-    context: {
-      type: String,
-      required: false,
-      default: "",
-    },
   },
   data() {
     return {
@@ -137,9 +128,6 @@ export default {
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
-    },
-    isMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
     },
   },
   methods: {
@@ -197,10 +185,6 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
-  }
-
-  &.nested-accordion-row {
-    background: rgb(30, 30, 30) !important;
   }
 }
 </style>
