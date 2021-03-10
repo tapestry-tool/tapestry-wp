@@ -37,6 +37,9 @@
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
+            <h1 v-if="showTitle(row)" class="sub-multicontent-title">
+              {{ row.node.title }}
+            </h1>
             <tapestry-media
               :node-id="row.node.id"
               :dimensions="dimensions"
@@ -55,10 +58,15 @@
             >
               {{ row.node.typeData.subAccordionText }}
             </p>
+            <sub-page
+              v-if="row.children.length > 0 && row.node.presentationStyle === 'page'"
+              :dimensions="dimensions"
+              :rows="row.children"
+              :row-id="subRowId"
+              @load="handleLoad"
+            ></sub-page>
             <sub-accordion
-              v-if="
-                row.children.length > 0 && row.node.mediaType !== 'multi-content'
-              "
+              v-else-if="row.children.length > 0"
               :dimensions="dimensions"
               :rows="row.children"
               :row-id="subRowId"
@@ -82,6 +90,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
+import SubPage from "./SubPage"
 import SubAccordion from "./SubAccordion"
 
 export default {
@@ -89,6 +98,7 @@ export default {
   components: {
     TapestryMedia,
     HeadlessMultiContent,
+    SubPage,
     SubAccordion,
   },
   props: {
@@ -141,6 +151,15 @@ export default {
     isMultiContentContext() {
       return this.context === "multi-content" || this.context === "page"
     },
+    subMultiContentTitleStyle() {
+      return {
+        textAlign: "left",
+        fontSize: "1.75rem",
+        fontWeight: 500,
+        marginBottom: "0.9em",
+        color: "white",
+      }
+    },
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -156,6 +175,12 @@ export default {
     },
     changeRow(rowId) {
       this.$emit("changeRow", rowId)
+    },
+    showTitle(row) {
+      return (
+        this.node.presentationStyle === "page" &&
+        row.node.typeData.showTitle !== false
+      )
     },
   },
 }
@@ -201,6 +226,18 @@ button[disabled] {
 
   &.nested-accordion-row {
     background: rgb(30, 30, 30) !important;
+  }
+}
+
+.sub-multicontent-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.9em;
+  color: white;
+
+  :before {
+    display: none;
   }
 }
 </style>
