@@ -156,8 +156,10 @@ export default {
   },
   methods: {
     handleDragStart({ x, y, connection }) {
-      this.draggingConnection = connection
-      this.handleDragMove({ x, y })
+      this.timeout = setTimeout(() => {
+        this.draggingConnection = connection
+        this.handleDragMove({ x, y })
+      }, 150)
     },
     handleDragMove({ x, y }) {
       const connectionRef = this.$refs["dragging-connection"]
@@ -166,6 +168,7 @@ export default {
       this.activeCircle = this.getActiveCircle(connectionRef)
     },
     handleDragEnd() {
+      clearTimeout(this.timeout)
       if (this.activeCircle !== CircleStates.All) {
         this.circles[this.activeCircle].push(this.draggingConnection)
         this.activeCircle = CircleStates.All

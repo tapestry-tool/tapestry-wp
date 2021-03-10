@@ -1,50 +1,45 @@
 <template>
-  <cos-popup :show="isOpen">
-    <template #toggle>
-      <cos-popup-button
-        style="left: 2rem"
-        aria-label="Connections"
-        @click="isOpen = !isOpen"
-      >
-        <tapestry-icon v-if="isOpen" icon="chevron-down" />
-        <span v-else>😊</span>
-      </cos-popup-button>
-    </template>
-    <template #content>
-      <div
-        v-if="state === states.Add || state === states.Edit"
-        class="content-wrapper"
-      >
-        <b-overlay class="form" :show="isSubmitting">
-          <add-connection-form
-            v-model="connection"
-            :communities="communities"
-            @back="back"
-            @submit="handleSubmit"
-            @add-community="$emit('add-community', $event)"
-          />
-        </b-overlay>
-      </div>
-      <connections-list
-        v-else
-        :connections="connections"
-        :communities="communities"
-        :draggable="draggable"
-        @add-connection="openConnectionForm"
-        @edit-connection="editConnection"
-        @drag:start="$emit('drag:start', $event)"
-        @drag:move="$emit('drag:move', $event)"
-        @drag:end="$emit('drag:end', $event)"
-      />
-    </template>
-  </cos-popup>
+  <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
+    <cos-popup-button
+      style="left: 2rem"
+      aria-label="Connections"
+      @click="isOpen = !isOpen"
+    >
+      <tapestry-icon v-if="isOpen" icon="chevron-down" />
+      <span v-else>😊</span>
+    </cos-popup-button>
+    <div
+      v-if="state === states.Add || state === states.Edit"
+      class="content-wrapper"
+    >
+      <b-overlay class="form" :show="isSubmitting">
+        <add-connection-form
+          v-model="connection"
+          :communities="communities"
+          @back="back"
+          @submit="handleSubmit"
+          @add-community="$emit('add-community', $event)"
+        />
+      </b-overlay>
+    </div>
+    <connections-list
+      v-else
+      :connections="connections"
+      :communities="communities"
+      :draggable="draggable"
+      @add-connection="openConnectionForm"
+      @edit-connection="editConnection"
+      @drag:start="handleDragStart"
+      @drag:move="$emit('drag:move', $event)"
+      @drag:end="handleDragEnd"
+    />
+  </div>
 </template>
 
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
 import client from "@/services/TapestryAPI"
 
-import CosPopup from "../CosPopup"
 import CosPopupButton from "../CosPopupButton"
 import AddConnectionForm from "./AddConnectionForm"
 import ConnectionsList from "./ConnectionsList"
@@ -57,7 +52,6 @@ const States = {
 
 export default {
   components: {
-    CosPopup,
     CosPopupButton,
     AddConnectionForm,
     ConnectionsList,
@@ -81,6 +75,7 @@ export default {
   data() {
     return {
       isOpen: false,
+      isHidden: false,
       state: States.Home,
       isSubmitting: false,
       connection: {
@@ -97,6 +92,15 @@ export default {
     },
   },
   methods: {
+    handleDragStart(evt) {
+      this.timeout = setTimeout(() => (this.isHidden = true), 200)
+      this.$emit("drag:start", evt)
+    },
+    handleDragEnd(evt) {
+      clearTimeout(this.timeout)
+      this.isHidden = false
+      this.$emit("drag:end", evt)
+    },
     back() {
       this.state = States.Home
       this.$emit("back")
@@ -203,6 +207,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.wrapper {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  min-height: 16rem;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+
+  &.show {
+    z-index: 60;
+    transform: translateY(0);
+  }
+
+  &.hidden {
+    transform: translateY(90%);
+  }
+}
+
 ul {
   list-style: none;
   margin: 0;
