@@ -37,9 +37,6 @@
             </a>
           </div>
           <div v-if="!disableRow(index)" :data-qa="`row-content-${row.node.id}`">
-            <h1 v-if="showTitle(row)" class="sub-multicontent-title">
-              {{ row.node.title }}
-            </h1>
             <tapestry-media
               :node-id="row.node.id"
               :dimensions="dimensions"
@@ -58,19 +55,14 @@
               {{ row.node.typeData.subAccordionText }}
             </p>
             <sub-page
-              v-if="row.children.length > 0 && row.node.presentationStyle === 'page'"
+              v-if="
+                row.children.length > 0 && row.node.mediaType !== 'multi-content'
+              "
               :dimensions="dimensions"
               :rows="row.children"
               :row-id="subRowId"
               @load="handleLoad"
             ></sub-page>
-            <sub-accordion
-              v-else-if="row.children.length > 0"
-              :dimensions="dimensions"
-              :rows="row.children"
-              :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-accordion>
           </div>
           <button
             v-if="row.node.completed && isVisible(row)"
@@ -89,8 +81,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
-import SubPage from "./SubPage"
-import SubAccordion from "./SubAccordion"
+import SubPage from "./SubPage.vue"
 
 export default {
   name: "page-rows",
@@ -98,7 +89,6 @@ export default {
     TapestryMedia,
     HeadlessMultiContent,
     SubPage,
-    SubAccordion,
   },
   props: {
     node: {
@@ -112,7 +102,7 @@ export default {
     subRowId: {
       type: Number,
       required: false,
-      default: 0,
+      default: -1,
     },
     dimensions: {
       type: Object,
@@ -163,12 +153,6 @@ export default {
     changeRow(rowId) {
       this.$emit("changeRow", rowId)
     },
-    showTitle(row) {
-      return (
-        this.node.presentationStyle === "page" &&
-        row.node.typeData.showTitle !== false
-      )
-    },
   },
 }
 </script>
@@ -209,18 +193,6 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
-  }
-}
-
-.sub-multicontent-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
-  color: white;
-
-  :before {
-    display: none;
   }
 }
 </style>

@@ -83,6 +83,12 @@
       @close="$emit('close')"
       @load="handleLoad"
     />
+    <multi-content-media
+      v-if="node.mediaType === 'multi-content'"
+      :node="node"
+      :context="context"
+      @complete="complete"
+    />
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -111,6 +117,7 @@ export default {
     CompletionScreen,
     ActivityMedia,
     "youtube-media": YouTubeMedia,
+    MultiContentMedia: () => import("./MultiContentMedia"),
   },
   props: {
     nodeId: {

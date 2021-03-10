@@ -191,23 +191,11 @@ export default {
     },
     changeRow(rowId) {
       if (rowId) {
-        if (this.isMultiContentContext) {
-          this.$router.push({
-            name: names.SUBMULTICONTENT,
-            params: {
-              nodeId: this.$route.params.nodeId,
-              rowId: this.node.id,
-              subRowId: rowId,
-            },
-            query: this.$route.query,
-          })
-        } else {
-          this.$router.push({
-            name: names.MULTICONTENT,
-            params: { nodeId: this.node.id, rowId },
-            query: this.$route.query,
-          })
-        }
+        this.$router.push({
+          name: names.MULTICONTENT,
+          params: { nodeId: this.node.id, rowId },
+          query: this.$route.query,
+        })
       } else {
         this.$router.push({
           name: names.LIGHTBOX,

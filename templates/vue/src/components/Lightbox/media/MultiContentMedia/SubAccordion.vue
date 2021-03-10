@@ -82,20 +82,11 @@ export default {
     changeRow(subRowId) {
       const { nodeId, rowId } = this.$route.params
       if (subRowId) {
-        if (rowId) {
-          this.$router.push({
-            name: names.SUBMULTICONTENT,
-            params: { nodeId, rowId, subRowId },
-            query: this.$route.query,
-          })
-        } else {
-          // Nested multi-content routing
-          this.$router.push({
-            name: names.SUBMULTICONTENT,
-            params: { nodeId, rowId: this.nodeId, subRowId },
-            query: this.$route.query,
-          })
-        }
+        this.$router.push({
+          name: names.SUBMULTICONTENT,
+          params: { nodeId, rowId, subRowId },
+          query: this.$route.query,
+        })
       } else {
         this.$router.push({
           name: names.MULTICONTENT,
@@ -136,7 +127,6 @@ export default {
   border-radius: 4px;
   padding: 8px 16px;
   margin-bottom: 8px;
-  color: white;
 
   &:last-child {
     margin-bottom: 0;
