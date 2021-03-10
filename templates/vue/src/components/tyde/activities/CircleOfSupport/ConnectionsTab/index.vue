@@ -217,7 +217,7 @@ export default {
   z-index: 50;
 
   &.show {
-    z-index: 60;
+    z-index: 75;
     transform: translateY(0);
   }
 

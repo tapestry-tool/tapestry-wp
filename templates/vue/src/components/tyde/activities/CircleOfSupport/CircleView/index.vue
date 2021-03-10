@@ -41,14 +41,12 @@
           variant="name"
           draggable
           @click="toggleConnectionTooltip(connection.id)"
+          @drag:start="handleDragStart"
+          @drag:move="handleDragMove"
+          @drag:end="handleDragEnd"
         />
       </ul>
     </li>
-    <div class="controls">
-      <p>Circle: {{ activeCircle }}</p>
-      <button @click="addConnection">Add connection</button>
-      <button @click="removeConnection">Remove connection</button>
-    </div>
     <circle-toggle v-model="activeCircle" class="circle-toggle" />
     <connection-tooltip
       ref="connection-tooltip"
@@ -61,6 +59,7 @@
     <div v-show="draggingConnection" ref="dragging-connection" class="draggable">
       {{ draggingConnection && draggingConnection.avatar }}
     </div>
+    <div class="user">😊</div>
   </ul>
 </template>
 
@@ -130,12 +129,11 @@ export default {
           ],
         }
       }
-      const [connectionId] = this.activeConnectionId.split("-")
-      const connection = this.connections[connectionId]
+      const connection = this.connections[this.activeConnectionId]
       return {
         ...connection,
         communities: Object.values(this.communities).filter(({ connections }) =>
-          connections.includes(connectionId)
+          connections.includes(this.activeConnectionId)
         ),
       }
     },
@@ -146,8 +144,8 @@ export default {
         return {
           order,
           borderWidth: `${order}px`,
-          connections: connections.map((connection, index) => ({
-            ...connection,
+          connections: connections.map((connectionId, index) => ({
+            ...this.connections[connectionId],
             ...this.getPosition({
               index,
               radius: radius - CONNECTION_OFFSET,
@@ -174,8 +172,14 @@ export default {
     },
     handleDragEnd() {
       clearTimeout(this.timeout)
+
+      const oldCircle = this.getCircle(this.draggingConnection.id)
+      if (oldCircle != null) {
+        this.removeConnectionFromCircle(oldCircle, this.draggingConnection.id)
+      }
+
       if (this.activeCircle !== CircleStates.All) {
-        this.circles[this.activeCircle].push(this.draggingConnection)
+        this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
         this.activeCircle = CircleStates.All
       }
 
@@ -183,6 +187,27 @@ export default {
       connectionRef.style.setProperty("--x", `0px`)
       connectionRef.style.setProperty("--y", `0px`)
       this.draggingConnection = null
+    },
+    getCircle(connectionId) {
+      const circle = this.circles.findIndex(circle => circle.includes(connectionId))
+      if (circle < 0) {
+        return null
+      }
+      return circle
+    },
+    addConnectionToCircle(circle, connectionId) {
+      const connections = this.circles[circle]
+      if (!connections.includes(connectionId)) {
+        this.circles[circle].push(connectionId)
+      }
+    },
+    removeConnectionFromCircle(circle, connectionId) {
+      const connections = this.circles[circle]
+      this.$set(
+        this.circles,
+        circle,
+        connections.filter(id => id !== connectionId)
+      )
     },
     /**
      * Gets the circle the ref is currently hovering over. If it's not hovering over
@@ -221,18 +246,6 @@ export default {
         numConnections * CONNECTION_SPACE,
         OFFSET_SIZE + this.getRadius(index - 1)
       )
-    },
-    addConnection() {
-      const connection = {
-        id: Helpers.createUUID(),
-        name: "nan",
-        avatar: "😀",
-        communities: ["603e883568aae", "603e884ee69c1"],
-      }
-      this.circles[this.activeCircle].push(connection)
-    },
-    removeConnection() {
-      this.circles[this.activeCircle].pop()
     },
     getPosition({ index, radius, size }) {
       const angle = ((2 * Math.PI) / size) * index - Math.PI / 2
@@ -324,12 +337,6 @@ ul {
   max-width: 8em;
 }
 
-button:not(.circle-toggle) {
-  display: block;
-  width: 100%;
-  font-size: 0.8em;
-}
-
 .tab {
   width: 100%;
   position: absolute;
@@ -356,5 +363,14 @@ button:not(.circle-toggle) {
   z-index: 100;
   font-size: 4rem;
   transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
+}
+
+.user {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  z-index: 60;
 }
 </style>
