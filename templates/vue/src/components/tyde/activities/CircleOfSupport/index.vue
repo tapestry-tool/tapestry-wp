@@ -1,6 +1,7 @@
 <template>
   <div id="cos" class="cos">
-    <div class="contents">
+    <loading v-if="isLoading" />
+    <div v-else class="contents">
       <community-view
         v-if="view === views.Community"
         :connections="cos.connections"
@@ -30,6 +31,7 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import Loading from "@/components/common/Loading"
 import CommunityView from "./CommunityView"
 import CircleView from "./CircleView"
 
@@ -42,9 +44,11 @@ export default {
   components: {
     CommunityView,
     CircleView,
+    Loading,
   },
   data() {
     return {
+      isLoading: true,
       view: CosView.Community,
       cos: {
         circles: [],
@@ -68,6 +72,8 @@ export default {
     Object.entries(connections).forEach(([id, connection]) =>
       this.$set(this.cos.connections, id, connection)
     )
+
+    this.isLoading = false
   },
   methods: {
     addConnection({ communities, ...newConnection }) {

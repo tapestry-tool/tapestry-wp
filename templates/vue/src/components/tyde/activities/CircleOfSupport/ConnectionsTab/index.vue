@@ -29,8 +29,12 @@
         v-else
         :connections="connections"
         :communities="communities"
+        :draggable="draggable"
         @add-connection="openConnectionForm"
         @edit-connection="editConnection"
+        @drag:start="$emit('drag:start', $event)"
+        @drag:move="$emit('drag:move', $event)"
+        @drag:end="$emit('drag:end', $event)"
       />
     </template>
   </cos-popup>
@@ -67,6 +71,11 @@ export default {
     communities: {
       type: Object,
       required: true,
+    },
+    draggable: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

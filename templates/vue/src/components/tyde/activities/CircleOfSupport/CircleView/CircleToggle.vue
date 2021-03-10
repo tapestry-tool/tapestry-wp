@@ -21,35 +21,35 @@ const States = {
 }
 
 export default {
-  data() {
-    return {
-      state: States.All,
-    }
+  model: {
+    prop: "state",
+    event: "change",
+  },
+  props: {
+    state: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
     states() {
       return States
     },
   },
-  watch: {
-    state(index) {
-      this.$emit("change", index)
-    },
-  },
   methods: {
     transition() {
       switch (this.state) {
         case States.All:
-          this.state = States.Three
+          this.$emit("change", States.Three)
           break
         case States.One:
-          this.state = States.All
+          this.$emit("change", States.All)
           break
         case States.Two:
-          this.state = States.One
+          this.$emit("change", States.One)
           break
         case States.Three:
-          this.state = States.Two
+          this.$emit("change", States.Two)
           break
         default:
           break

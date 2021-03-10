@@ -26,22 +26,16 @@
       </button>
     </div>
     <ul :class="['connection-list', { searching }]">
-      <li
+      <single-connection
         v-for="visibleConnection in visibleConnections"
         :key="visibleConnection.id"
-        class="connection"
+        :connection="visibleConnection"
+        :draggable="draggable"
         @click="$emit('edit-connection', visibleConnection)"
-      >
-        <p>{{ visibleConnection.name }}</p>
-        <h1>{{ visibleConnection.avatar }}</h1>
-        <ul class="community-list">
-          <li
-            v-for="community in visibleConnection.communities"
-            :key="community.id"
-            :style="`--community-color: ${community.color}`"
-          ></li>
-        </ul>
-      </li>
+        @drag:start="$emit('drag:start', $event)"
+        @drag:move="$emit('drag:move', $event)"
+        @drag:end="$emit('drag:end', $event)"
+      />
     </ul>
   </div>
 </template>
@@ -50,9 +44,12 @@
 import { matchSorter } from "match-sorter"
 import TapestryIcon from "@/components/common/TapestryIcon"
 
+import SingleConnection from "./SingleConnection"
+
 export default {
   components: {
     TapestryIcon,
+    SingleConnection,
   },
   props: {
     connections: {
@@ -62,6 +59,11 @@ export default {
     communities: {
       type: Object,
       required: true,
+    },
+    draggable: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -162,50 +164,6 @@ export default {
     width: 100%;
     height: 5rem;
     font-size: 2rem;
-  }
-}
-
-.connection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  height: 12rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-
-  p {
-    padding: 0.25rem;
-    border: 1px solid var(--cos-color-tertiary);
-    color: var(--cos-color-secondary);
-    text-transform: uppercase;
-    cursor: default;
-  }
-
-  h1 {
-    font-size: 4rem;
-    cursor: default;
-  }
-
-  &:hover {
-    background: #f0f0f0;
-  }
-}
-
-.community-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  column-gap: 4px;
-
-  li {
-    height: 1rem;
-    width: 1rem;
-    border-radius: 50%;
-    background-color: var(--community-color, var(--cos-color-secondary));
   }
 }
 </style>

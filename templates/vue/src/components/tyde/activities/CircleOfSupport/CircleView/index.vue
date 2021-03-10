@@ -5,13 +5,18 @@
       class="tab"
       :connections="connections"
       :communities="communities"
+      draggable
       @back="handleBack"
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
+      @drag:start="handleDragStart"
+      @drag:move="handleDragMove"
+      @drag:end="handleDragEnd"
     />
     <li
       v-for="(circle, index) in circlesWithData"
+      ref="circles"
       :key="index"
       :style="{
         '--index': index,
@@ -42,7 +47,7 @@
       <button @click="addConnection">Add connection</button>
       <button @click="removeConnection">Remove connection</button>
     </div>
-    <circle-toggle class="circle-toggle" @change="activeCircle = $event" />
+    <circle-toggle v-model="activeCircle" class="circle-toggle" />
     <connection-tooltip
       ref="connection-tooltip"
       class="connection-tooltip"
@@ -51,6 +56,9 @@
       @edit="editConnection(activeConnection)"
       @close="activeConnectionId = null"
     />
+    <div v-show="draggingConnection" ref="dragging-connection" class="draggable">
+      {{ draggingConnection && draggingConnection.avatar }}
+    </div>
   </ul>
 </template>
 
@@ -68,6 +76,13 @@ const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.75
 const States = {
   Home: 0,
   EditConnection: 1,
+}
+
+const CircleStates = {
+  All: 3,
+  One: 0,
+  Two: 1,
+  Three: 2,
 }
 
 export default {
@@ -90,9 +105,10 @@ export default {
   data() {
     return {
       circles: [[], [], []],
-      activeCircle: 0,
+      activeCircle: CircleStates.All,
       state: States.Home,
       activeConnectionId: null,
+      draggingConnection: null,
     }
   },
   computed: {
@@ -139,6 +155,55 @@ export default {
     },
   },
   methods: {
+    handleDragStart({ x, y, connection }) {
+      this.draggingConnection = connection
+      this.handleDragMove({ x, y })
+    },
+    handleDragMove({ x, y }) {
+      const connectionRef = this.$refs["dragging-connection"]
+      connectionRef.style.setProperty("--x", `${x}px`)
+      connectionRef.style.setProperty("--y", `${y}px`)
+      this.activeCircle = this.getActiveCircle(connectionRef)
+    },
+    handleDragEnd() {
+      if (this.activeCircle !== CircleStates.All) {
+        this.circles[this.activeCircle].push(this.draggingConnection)
+        this.activeCircle = CircleStates.All
+      }
+
+      const connectionRef = this.$refs["dragging-connection"]
+      connectionRef.style.setProperty("--x", `0px`)
+      connectionRef.style.setProperty("--y", `0px`)
+      this.draggingConnection = null
+    },
+    /**
+     * Gets the circle the ref is currently hovering over. If it's not hovering over
+     * any circle, return `CircleStates.All`.
+     */
+    getActiveCircle(ref) {
+      const circles = this.$refs.circles
+
+      const refBox = ref.getBoundingClientRect()
+      const circleBoxes = circles.map(ref => ref.getBoundingClientRect())
+
+      /**
+       * Find the _first_ circle whose bounding box contains the floating
+       * connection's bounding box. This works because the circles are placed in
+       * reverse order (i.e. smallest circle is first in the ref array).
+       */
+      const matchingCircle = circleBoxes.findIndex(circleBox => {
+        const { x, y } = refBox
+        const xMax = circleBox.x + circleBox.width
+        const yMax = circleBox.y + circleBox.height
+        return x >= circleBox.x && x <= xMax && y >= circleBox.y && y <= yMax
+      })
+
+      if (matchingCircle >= 0) {
+        return matchingCircle
+      }
+
+      return CircleStates.All
+    },
     getRadius(index) {
       const numConnections = this.circles[index].length
       if (index === 0) {
@@ -151,7 +216,7 @@ export default {
     },
     addConnection() {
       const connection = {
-        id: "603e883e65f90",
+        id: Helpers.createUUID(),
         name: "nan",
         avatar: "😀",
         communities: ["603e883568aae", "603e884ee69c1"],
@@ -274,5 +339,14 @@ button:not(.circle-toggle) {
   top: 0;
   left: 0;
   z-index: 70;
+}
+
+.draggable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  font-size: 4rem;
+  transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
 }
 </style>
