@@ -2,12 +2,12 @@
   <li
     ref="connection"
     class="connection"
-    :style="{ opacity: isDragging ? 0.2 : 1 }"
+    :style="{ opacity: isDragging ? 0.2 : 1, '--size': fontSize }"
     @click="$emit('click')"
   >
     <p>{{ connection.name }}</p>
     <h1>{{ connection.avatar }}</h1>
-    <ul class="community-list">
+    <ul v-if="variant !== 'name'" class="community-list">
       <li
         v-for="community in connection.communities"
         :key="community.id"
@@ -31,11 +31,30 @@ export default {
       required: false,
       default: false,
     },
+    size: {
+      type: String,
+      required: false,
+      default: "base",
+    },
+    variant: {
+      type: String,
+      required: false,
+      default: "base",
+    },
   },
   data() {
     return {
       isDragging: false,
     }
+  },
+  computed: {
+    fontSize() {
+      const sizes = {
+        sm: "0.6rem",
+        base: "1rem",
+      }
+      return sizes[this.size]
+    },
   },
   mounted() {
     if (this.draggable) {
@@ -79,22 +98,24 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  height: 12rem;
-  border-radius: 0.5rem;
+  font-size: var(--size, 1rem);
+  padding: 1em;
+  border-radius: 0.5em;
   cursor: pointer;
   transform: translate(var(--x), var(--y));
 
   p {
-    padding: 0.25rem;
-    border: 1px solid var(--cos-color-tertiary);
-    color: var(--cos-color-secondary);
+    padding: 0.25em;
+    border: 1px solid currentColor;
     text-transform: uppercase;
     cursor: default;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
   }
 
   h1 {
-    font-size: 4rem;
+    font-size: 4em;
     cursor: default;
   }
 
@@ -112,8 +133,8 @@ export default {
   column-gap: 4px;
 
   li {
-    height: 1rem;
-    width: 1rem;
+    height: 1em;
+    width: 1em;
     border-radius: 50%;
     background-color: var(--community-color, var(--cos-color-secondary));
   }

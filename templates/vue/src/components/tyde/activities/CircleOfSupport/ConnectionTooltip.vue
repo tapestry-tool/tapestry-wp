@@ -117,7 +117,7 @@ export default {
       height: 1rem;
       width: 1rem;
       border-radius: 50%;
-      background-color: var(--community-color);
+      background-color: var(--community-color, var(--cos-color-secondary));
     }
   }
 }

@@ -44,7 +44,7 @@
 import { matchSorter } from "match-sorter"
 import TapestryIcon from "@/components/common/TapestryIcon"
 
-import SingleConnection from "./SingleConnection"
+import SingleConnection from "../SingleConnection"
 
 export default {
   components: {
@@ -147,6 +147,10 @@ export default {
   margin-left: 7rem;
   height: 100%;
   padding: 1rem;
+
+  > * {
+    height: 12rem;
+  }
 
   &.searching {
     margin-top: 7rem;

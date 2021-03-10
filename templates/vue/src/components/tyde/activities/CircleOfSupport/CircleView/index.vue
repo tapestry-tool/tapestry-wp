@@ -30,16 +30,18 @@
         v-show="activeCircle > 2 || activeCircle === index"
         class="connection-list"
       >
-        <li
+        <single-connection
           v-for="connection in circle.connections"
           :key="connection.id"
           :ref="connection.id"
           :style="{ '--x': connection.x, '--y': connection.y }"
+          :connection="connection"
           class="connection"
+          size="sm"
+          variant="name"
+          draggable
           @click="toggleConnectionTooltip(connection.id)"
-        >
-          {{ connection.avatar }}
-        </li>
+        />
       </ul>
     </li>
     <div class="controls">
@@ -67,9 +69,11 @@ import Helpers from "@/utils/Helpers"
 
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
+import SingleConnection from "../SingleConnection"
 import CircleToggle from "./CircleToggle"
 
 const CONNECTION_SPACE = 10
+const CONNECTION_OFFSET = 48
 const MIN_CIRCLE_SIZE = 125
 const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.75
 
@@ -90,6 +94,7 @@ export default {
     ConnectionsTab,
     CircleToggle,
     ConnectionTooltip,
+    SingleConnection,
   },
   props: {
     communities: {
@@ -145,7 +150,7 @@ export default {
             ...connection,
             ...this.getPosition({
               index,
-              radius: radius - 32,
+              radius: radius - CONNECTION_OFFSET,
               size: connections.length,
             }),
           })),
@@ -265,7 +270,7 @@ export default {
       const tooltipRef = this.$refs["connection-tooltip"].$el
       this.$nextTick(() =>
         Helpers.positionTooltip(
-          connectionRef,
+          connectionRef.$el,
           tooltipRef,
           document.getElementById("cos")
         )
@@ -316,7 +321,7 @@ ul {
 .connection {
   position: absolute;
   transform: translate(var(--x), var(--y));
-  font-size: 3rem;
+  max-width: 8em;
 }
 
 button:not(.circle-toggle) {
