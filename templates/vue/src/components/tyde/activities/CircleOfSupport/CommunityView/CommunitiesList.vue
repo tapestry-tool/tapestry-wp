@@ -168,15 +168,10 @@ export default {
    * this way because we determine if a community is clickable using $refs, and
    * since Vue updates the DOM asynchronously, we can't immediately access the $refs.
    */
-  watch: {
-    connections() {
-      this.$nextTick(() => this.updateClickables())
-    },
-    communities() {
-      this.$nextTick(() => this.updateClickables())
-    },
-  },
   mounted() {
+    this.$nextTick(() => this.updateClickables())
+  },
+  updated() {
     this.$nextTick(() => this.updateClickables())
   },
   methods: {
@@ -227,10 +222,16 @@ export default {
       }
     },
     updateClickables() {
-      this.clickables = {}
-      Object.keys(this.communities).forEach(id => {
-        this.$set(this.clickables, id, this.isClickable(id))
-      })
+      const clickableCommunities = Object.keys(this.communities).reduce(
+        (clickables, id) => {
+          clickables[id] = this.isClickable(id)
+          return clickables
+        },
+        {}
+      )
+      if (Helpers.isDifferent(this.clickables, clickableCommunities)) {
+        this.clickables = clickableCommunities
+      }
     },
     // A community is only clickable if it's overflowing (i.e. there's more
     // connections than what's visible)
