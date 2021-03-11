@@ -116,12 +116,11 @@ export default {
         : `var(--secondary)`
     },
     validationMessage() {
-      if (this.isInputTouched) {
-        if (this.community.name.length === 0) {
-          return "Please enter a name for your community"
-        } else if (this.community.name.length > MAX_COMMUNITY_NAME_LENGTH) {
-          return `Please shorten the community name to not more than ${MAX_COMMUNITY_NAME_LENGTH} characters.`
-        }
+      if (this.community.name.length > MAX_COMMUNITY_NAME_LENGTH) {
+        return `Please shorten the community name to not more than ${MAX_COMMUNITY_NAME_LENGTH} characters.`
+      }
+      if (this.isInputTouched && this.community.name.length === 0) {
+        return "Please enter a name for your community"
       }
       return null
     },

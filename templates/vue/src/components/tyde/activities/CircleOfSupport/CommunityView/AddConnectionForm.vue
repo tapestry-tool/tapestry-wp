@@ -131,12 +131,10 @@ export default {
         : `var(--secondary)`
     },
     validationMessage() {
-      if (this.isInputTouched) {
-        if (this.connection.name.length === 0) {
-          return "Please enter a name for your community"
-        } else if (this.connection.name.length > MAX_CONNECTION_NAME_LENGTH) {
-          return `Please shorten the connection name to not more than ${MAX_CONNECTION_NAME_LENGTH} characters.`
-        }
+      if (this.connection.name.length > MAX_CONNECTION_NAME_LENGTH) {
+        return `Please shorten the connection name to not more than ${MAX_CONNECTION_NAME_LENGTH} characters.`
+      } else if (this.isInputTouched && this.connection.name.length === 0) {
+        return "Please enter a name for your community"
       }
       return null
     },
