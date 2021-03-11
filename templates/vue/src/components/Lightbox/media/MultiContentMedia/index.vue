@@ -1,7 +1,15 @@
 <template>
   <div ref="container" class="media-container" data-qa="multi-content">
     <header>
-      <h1 class="title">{{ node.title }}</h1>
+      <h1
+        v-if="showTitle"
+        :class="{
+          title: true,
+          'nested-media-title': isMultiContentContext,
+        }"
+      >
+        {{ node.title }}
+      </h1>
     </header>
     <accordion-rows
       v-if="node.presentationStyle === 'accordion'"
@@ -9,6 +17,7 @@
       :node="node"
       :rowId="rowId"
       :subRowId="subRowId"
+      :context="context"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -19,6 +28,7 @@
       :node="node"
       :rowId="rowId"
       :subRowId="subRowId"
+      :context="context"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -67,12 +77,18 @@ export default {
     },
     rowId: {
       type: Number,
-      required: true,
+      required: false,
+      default: 0,
     },
     subRowId: {
       type: Number,
       required: false,
       default: 0,
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "",
     },
   },
   data() {
@@ -110,6 +126,15 @@ export default {
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
+    },
+    showTitle() {
+      return (
+        this.context !== "multi-content" ||
+        (this.context === "page" && this.node.typeData.showTitle !== false)
+      )
+    },
+    isMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
     },
   },
   mounted() {
@@ -202,6 +227,17 @@ button[disabled] {
 
   ::-webkit-scrollbar-track {
     background-color: black;
+  }
+}
+
+.nested-media-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.9em;
+
+  :before {
+    display: none;
   }
 }
 

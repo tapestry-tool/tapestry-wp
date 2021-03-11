@@ -10,7 +10,11 @@
           v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
-          class="accordion-row"
+          :class="{
+            'accordion-row': true,
+            'nested-accordion-row':
+              isMultiContentContext && node.mediaType == 'multi-content',
+          }"
         >
           <div class="button-row">
             <button
@@ -33,6 +37,9 @@
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
+            <h1 v-if="showTitle(row)" class="sub-multicontent-title">
+              {{ row.node.title }}
+            </h1>
             <tapestry-media
               :node-id="row.node.id"
               :dimensions="dimensions"
@@ -98,6 +105,11 @@ export default {
       type: Object,
       required: true,
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -122,6 +134,9 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    isMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
+    },
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -137,6 +152,13 @@ export default {
     },
     changeRow(rowId) {
       this.$emit("changeRow", rowId)
+    },
+    showTitle(row) {
+      return (
+        this.node.presentationStyle === "page" &&
+        row.node.mediaType === "multi-content" &&
+        row.node.typeData.showTitle !== false
+      )
     },
   },
 }
@@ -178,6 +200,22 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  &.nested-accordion-row {
+    background: rgb(30, 30, 30) !important;
+  }
+}
+
+.sub-multicontent-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.9em;
+  color: white;
+
+  :before {
+    display: none;
   }
 }
 </style>
