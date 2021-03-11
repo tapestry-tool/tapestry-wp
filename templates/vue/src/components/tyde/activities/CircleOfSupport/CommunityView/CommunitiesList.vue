@@ -309,7 +309,6 @@ export default {
         },
         {}
       )
-      console.log(clickableCommunities)
       if (Helpers.isDifferent(this.clickables, clickableCommunities)) {
         this.clickables = clickableCommunities
       }
