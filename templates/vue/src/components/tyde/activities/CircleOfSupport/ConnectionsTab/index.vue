@@ -1,10 +1,6 @@
 <template>
   <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
-    <cos-popup-button
-      style="left: 2rem"
-      aria-label="Connections"
-      @click="isOpen = !isOpen"
-    >
+    <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>😊</span>
     </cos-popup-button>
@@ -92,6 +88,12 @@ export default {
     },
   },
   methods: {
+    toggle() {
+      if (this.isOpen) {
+        this.state = States.Home
+      }
+      this.isOpen = !this.isOpen
+    },
     handleDragStart(evt) {
       this.timeout = setTimeout(() => (this.isHidden = true), 200)
       this.$emit("drag:start", evt)

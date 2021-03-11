@@ -169,6 +169,8 @@ export default {
     handleDragStart({ x, y, connection }) {
       this.timeout = setTimeout(() => {
         this.draggingConnection = connection
+        // Close the tooltip on drag
+        this.activeConnectionId = null
         this.handleDragMove({ x, y })
       }, 150)
     },
@@ -181,20 +183,25 @@ export default {
     async handleDragEnd() {
       clearTimeout(this.timeout)
 
-      const oldCircle = this.getCircle(this.draggingConnection.id)
-      if (oldCircle != null) {
-        await this.removeConnectionFromCircle(oldCircle, this.draggingConnection.id)
-      }
+      if (this.draggingConnection) {
+        const oldCircle = this.getCircle(this.draggingConnection.id)
+        if (oldCircle != null) {
+          await this.removeConnectionFromCircle(
+            oldCircle,
+            this.draggingConnection.id
+          )
+        }
 
-      if (this.activeCircle !== CircleStates.All) {
-        this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
-        this.activeCircle = CircleStates.All
-      }
+        if (this.activeCircle !== CircleStates.All) {
+          this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
+          this.activeCircle = CircleStates.All
+        }
 
-      const connectionRef = this.$refs["dragging-connection"]
-      connectionRef.style.setProperty("--x", `0px`)
-      connectionRef.style.setProperty("--y", `0px`)
-      this.draggingConnection = null
+        const connectionRef = this.$refs["dragging-connection"]
+        connectionRef.style.setProperty("--x", `0px`)
+        connectionRef.style.setProperty("--y", `0px`)
+        this.draggingConnection = null
+      }
     },
     getCircle(connectionId) {
       const circle = this.circles.findIndex(circle => circle.includes(connectionId))

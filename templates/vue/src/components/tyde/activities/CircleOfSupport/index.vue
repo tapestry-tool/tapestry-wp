@@ -20,11 +20,20 @@
         @add-community="addCommunity"
       />
       <div class="switch">
-        <button class="change-view" @click="view = views.Community">
-          Community
+        <button
+          :class="['change-view', { active: view === views.Community }]"
+          aria-label="Community view"
+          @click="view = views.Community"
+        >
+          <div class="community-view"></div>
         </button>
-        <button class="change-view" @click="view = views.Circle">Circle</button>
-        <button @click="nuke">💣</button>
+        <button
+          :class="['change-view', { active: view === views.Circle }]"
+          aria-label="Circle view"
+          @click="view = views.Circle"
+        >
+          <div class="circle-view"></div>
+        </button>
       </div>
     </div>
   </div>
@@ -77,11 +86,6 @@ export default {
     this.isLoading = false
   },
   methods: {
-    async nuke() {
-      await client.cos.deleteActivity()
-      const cos = await client.cos.getActivity()
-      this.cos = cos
-    },
     addConnection({ communities, ...newConnection }) {
       if (communities.length) {
         communities.forEach(communityId =>
@@ -115,7 +119,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .cos {
   --cos-color-primary: #000;
   --cos-color-secondary: #c4c4c4;
@@ -134,7 +138,57 @@ export default {
 
 .switch {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+}
+
+.change-view {
+  width: 50%;
+  background: none;
+  border: 2px solid var(--cos-color-tertiary);
+
+  --icon-size: 1.5rem;
+
+  &:hover {
+    > div {
+      transform: scale(1.3);
+    }
+  }
+
+  &.active {
+    background: var(--cos-color-tertiary);
+
+    > div {
+      transform: scale(1.5);
+    }
+  }
+
+  &:first-child {
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+  }
+
+  &:last-child {
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
+}
+
+.community-view {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border: 2px solid var(--cos-color-tertiary);
+  border-top-left-radius: 9999px;
+  border-top-right-radius: 9999px;
+  background: white;
+}
+
+.circle-view {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border-radius: 50%;
+  border: 2px solid var(--cos-color-tertiary);
+  background: white;
 }
 </style>

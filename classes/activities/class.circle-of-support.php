@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__).'/../../utilities/class.tapestry-errors.php';
 class CircleOfSupport
 {
     private $userId;
