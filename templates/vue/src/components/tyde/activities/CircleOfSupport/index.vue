@@ -12,9 +12,9 @@
       />
       <circle-view
         v-if="view === views.Circle"
+        v-model="cos.circles"
         :connections="cos.connections"
         :communities="cos.communities"
-        :circles="[[], [], []]"
         @add-connection="addConnection"
         @edit-connection="editConnection"
         @add-community="addCommunity"
@@ -24,6 +24,7 @@
           Community
         </button>
         <button class="change-view" @click="view = views.Circle">Circle</button>
+        <button @click="nuke">💣</button>
       </div>
     </div>
   </div>
@@ -76,6 +77,11 @@ export default {
     this.isLoading = false
   },
   methods: {
+    async nuke() {
+      await client.cos.deleteActivity()
+      const cos = await client.cos.getActivity()
+      this.cos = cos
+    },
     addConnection({ communities, ...newConnection }) {
       if (communities.length) {
         communities.forEach(communityId =>

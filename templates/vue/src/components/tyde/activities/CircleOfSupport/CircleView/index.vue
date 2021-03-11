@@ -65,6 +65,7 @@
 
 <script>
 import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
 
 import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
@@ -95,6 +96,10 @@ export default {
     ConnectionTooltip,
     SingleConnection,
   },
+  model: {
+    prop: "circles",
+    event: "change",
+  },
   props: {
     communities: {
       type: Object,
@@ -104,11 +109,14 @@ export default {
       type: Object,
       required: true,
     },
+    circles: {
+      type: Array,
+      required: true,
+    },
   },
   // STUB: Change this to props
   data() {
     return {
-      circles: [[], [], []],
       activeCircle: CircleStates.All,
       state: States.Home,
       activeConnectionId: null,
@@ -196,18 +204,21 @@ export default {
       return circle
     },
     addConnectionToCircle(circle, connectionId) {
-      const connections = this.circles[circle]
-      if (!connections.includes(connectionId)) {
-        this.circles[circle].push(connectionId)
-      }
+      client.cos.addConnectionToCircle(circle, connectionId).then(() => {
+        const circles = [...this.circles]
+        const connections = circles[circle]
+        if (!connections.includes(connectionId)) {
+          circles[circle] = [...circles[circle], connectionId]
+        }
+        this.$emit("change", circles)
+      })
     },
     removeConnectionFromCircle(circle, connectionId) {
-      const connections = this.circles[circle]
-      this.$set(
-        this.circles,
-        circle,
-        connections.filter(id => id !== connectionId)
-      )
+      client.cos.removeConnectionFromCircle(circle, connectionId).then(() => {
+        const circles = [...this.circles]
+        circles[circle] = circles[circle].filter(id => id !== connectionId)
+        this.$emit("change", circles)
+      })
     },
     /**
      * Gets the circle the ref is currently hovering over. If it's not hovering over

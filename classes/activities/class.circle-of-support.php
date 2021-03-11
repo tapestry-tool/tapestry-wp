@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/../../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__) . '/../../utilities/class.tapestry-errors.php';
 class CircleOfSupport
 {
     private $userId;
@@ -143,6 +143,60 @@ class CircleOfSupport
         update_user_meta($this->userId, CircleOfSupport::META_KEY, $this->versions);
 
         return $this->current;
+    }
+
+    /**
+     * Deletes the entire CoS from the db. Currently not called anywhere other than
+     * for development/testing.
+     */
+    public function delete()
+    {
+        return delete_user_meta($this->userId, CircleOfSupport::META_KEY);
+    }
+
+    public function addConnectionToCircle($circleIndex, $connectionId)
+    {
+        // Check if circle exists
+        if (!isset($this->current['circles'][$circleIndex])) {
+            return;
+        }
+
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+
+        $circle = $this->current['circles'][$circleIndex];
+        array_push($circle, $connectionId);
+        $this->current['circles'][$circleIndex] = $circle;
+
+        return $circle;
+    }
+
+    public function removeConnectionFromCircle($circleIndex, $connectionId)
+    {
+        // Check if circle exists
+        if (!isset($this->current['circles'][$circleIndex])) {
+            return;
+        }
+
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+
+        $circle = $this->current['circles'][$circleIndex];
+        $index = array_search($connectionId, $circle);
+
+        // This circle doesn't contain the connection
+        if (!is_numeric($index)) {
+            return;
+        }
+
+        array_splice($circle, $index, 1);
+        $this->current['circles'][$circleIndex] = $circle;
+
+        return $circle;
     }
 
     private function _getDefaultCos()

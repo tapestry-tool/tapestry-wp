@@ -323,6 +323,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'CircleOfSupportEndpoints::save'
         ]
     ],
+    'DELETE_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::delete'
+        ]
+    ],
     'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
         'ROUTE' => '/activities/cos/connections',
         'ARGUMENTS' => [
@@ -363,6 +370,20 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_DELETE_METHOD,
             'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
+        ]
+    ],
+    'COS_ADD_CONNECTION_TO_CIRCLE' => (object) [
+        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnectionToCircle'
+        ]
+    ],
+    'COS_REMOVE_CONNECTION_FROM_CIRCLE' => (object) [
+        'ROUTE' => '/activities/cos/circles/(?P<circleIndex>[0-2])/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCircle'
         ]
     ],
 ];

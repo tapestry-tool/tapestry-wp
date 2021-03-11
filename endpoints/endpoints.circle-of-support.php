@@ -11,6 +11,12 @@ class CircleOfSupportEndpoints
         return $cos->get();
     }
 
+    public static function delete()
+    {
+        $cos = new CircleOfSupport();
+        return $cos->delete();
+    }
+
     public static function save($request)
     {
         $cos = new CircleOfSupport();
@@ -72,5 +78,27 @@ class CircleOfSupportEndpoints
         $community = $cos->removeConnectionFromCommunity($connectionId, $communityId);
         $cos->save();
         return $community;
+    }
+
+    public static function addConnectionToCircle($request)
+    {
+        $circleIndex = $request['circleIndex'];
+        $cos = new CircleOfSupport();
+        $circle = $cos->addConnectionToCircle(
+            $circleIndex,
+            json_decode($request->get_body())->id
+        );
+        $cos->save();
+        return $circle;
+    }
+
+    public static function removeConnectionFromCircle($request)
+    {
+        $circleIndex = $request['circleIndex'];
+        $connectionId = $request['connectionId'];
+        $cos = new CircleOfSupport();
+        $circle = $cos->removeConnectionFromCircle($circleIndex, $connectionId);
+        $cos->save();
+        return $circle;
     }
 }

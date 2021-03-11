@@ -286,6 +286,9 @@ class TapestryApi {
       saveActivity(circleOfSupport) {
         return client.post(baseUrl, circleOfSupport).then(res => res.data)
       },
+      deleteActivity() {
+        return client.delete(baseUrl).then(res => res.data)
+      },
       addConnection(connection) {
         return client
           .post(`${baseUrl}/connections`, connection)
@@ -313,6 +316,18 @@ class TapestryApi {
         return client
           .delete(
             `${baseUrl}/communities/${communityId}/connections/${connectionId}`
+          )
+          .then(res => res.data)
+      },
+      addConnectionToCircle(circleIndex, connectionId) {
+        return client
+          .post(`${baseUrl}/circles/${circleIndex}`, { id: connectionId })
+          .then(res => res.data)
+      },
+      removeConnectionFromCircle(circleIndex, connectionId) {
+        return client
+          .delete(
+            `${baseUrl}/communities/${circleIndex}/connections/${connectionId}`
           )
           .then(res => res.data)
       },
