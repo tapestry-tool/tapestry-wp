@@ -177,12 +177,12 @@ class CircleOfSupport
     {
         // Check if circle exists
         if (!isset($this->current['circles'][$circleIndex])) {
-            return;
+            throw new TapestryError('CIRCLE_DOESNT_EXIST', sprintf('Cannot find circle with index %d', $circleIndex), 404);
         }
 
         // Check if connection exists
         if (!isset($this->current['connections']->$connectionId)) {
-            return;
+            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf('Cannot find connection with id %s', $connectionId), 404);
         }
 
         $circle = $this->current['circles'][$circleIndex];
@@ -190,7 +190,7 @@ class CircleOfSupport
 
         // This circle doesn't contain the connection
         if (!is_numeric($index)) {
-            return;
+            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf("Circle %d doesn't contain connection %s", $circleIndex, $connectionId), 404);
         }
 
         array_splice($circle, $index, 1);

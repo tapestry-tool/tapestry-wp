@@ -178,12 +178,12 @@ export default {
       connectionRef.style.setProperty("--y", `${y}px`)
       this.activeCircle = this.getActiveCircle(connectionRef)
     },
-    handleDragEnd() {
+    async handleDragEnd() {
       clearTimeout(this.timeout)
 
       const oldCircle = this.getCircle(this.draggingConnection.id)
       if (oldCircle != null) {
-        this.removeConnectionFromCircle(oldCircle, this.draggingConnection.id)
+        await this.removeConnectionFromCircle(oldCircle, this.draggingConnection.id)
       }
 
       if (this.activeCircle !== CircleStates.All) {
@@ -204,7 +204,7 @@ export default {
       return circle
     },
     addConnectionToCircle(circle, connectionId) {
-      client.cos.addConnectionToCircle(circle, connectionId).then(() => {
+      return client.cos.addConnectionToCircle(circle, connectionId).then(() => {
         const circles = [...this.circles]
         const connections = circles[circle]
         if (!connections.includes(connectionId)) {
@@ -214,7 +214,7 @@ export default {
       })
     },
     removeConnectionFromCircle(circle, connectionId) {
-      client.cos.removeConnectionFromCircle(circle, connectionId).then(() => {
+      return client.cos.removeConnectionFromCircle(circle, connectionId).then(() => {
         const circles = [...this.circles]
         circles[circle] = circles[circle].filter(id => id !== connectionId)
         this.$emit("change", circles)

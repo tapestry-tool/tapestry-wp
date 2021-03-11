@@ -326,9 +326,7 @@ class TapestryApi {
       },
       removeConnectionFromCircle(circleIndex, connectionId) {
         return client
-          .delete(
-            `${baseUrl}/communities/${circleIndex}/connections/${connectionId}`
-          )
+          .delete(`${baseUrl}/circles/${circleIndex}/connections/${connectionId}`)
           .then(res => res.data)
       },
     }

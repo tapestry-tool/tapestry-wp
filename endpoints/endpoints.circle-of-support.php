@@ -94,11 +94,15 @@ class CircleOfSupportEndpoints
 
     public static function removeConnectionFromCircle($request)
     {
-        $circleIndex = $request['circleIndex'];
-        $connectionId = $request['connectionId'];
-        $cos = new CircleOfSupport();
-        $circle = $cos->removeConnectionFromCircle($circleIndex, $connectionId);
-        $cos->save();
-        return $circle;
+        try {
+            $circleIndex = $request['circleIndex'];
+            $connectionId = $request['connectionId'];
+            $cos = new CircleOfSupport();
+            $circle = $cos->removeConnectionFromCircle($circleIndex, $connectionId);
+            $cos->save();
+            return $circle;
+        } catch (TapestryError $e) {
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
     }
 }

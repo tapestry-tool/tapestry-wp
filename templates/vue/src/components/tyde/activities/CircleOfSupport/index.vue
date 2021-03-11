@@ -123,21 +123,13 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-
-  /* Fix the aspect ratio to 3:2 */
-  height: 0;
-  padding-top: 66.7%;
-
+  height: 600px;
   position: relative;
   overflow: hidden;
 }
 
 .contents {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  height: 100%;
 }
 
 .switch {
