@@ -50,11 +50,18 @@
               @close="toggle(row.node.id)"
               @load="handleLoad($refs.rowRefs[index])"
             />
-            <p v-if="row.children.length > 0" style="color: white;">
+            <p v-if="row.children.length > 0 && row.node.mediaType !== 'multi-content'" style="color: white;">
               {{ row.node.typeData.subAccordionText }}
             </p>
+            <sub-page
+              v-if="row.children.length > 0 && row.node.presentationStyle === 'page'"
+              :dimensions="dimensions"
+              :rows="row.children"
+              :row-id="subRowId"
+              @load="handleLoad"
+            ></sub-page>
             <sub-accordion
-              v-if="row.children.length > 0"
+              v-else-if="row.children.length > 0"
               :dimensions="dimensions"
               :rows="row.children"
               :row-id="subRowId"
@@ -78,6 +85,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
+import SubPage from "./SubPage"
 import SubAccordion from "./SubAccordion"
 
 export default {
@@ -85,6 +93,7 @@ export default {
   components: {
     TapestryMedia,
     HeadlessMultiContent,
+    SubPage,
     SubAccordion,
   },
   props: {
