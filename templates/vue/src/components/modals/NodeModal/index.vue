@@ -145,6 +145,7 @@
               :disabled="loading || fileUploading"
               :isMultiContentNodeChild="isMultiContentNodeChild"
               @submit="loading = true"
+              @setLoading="setLoading"
               @message="setDisabledMessage"
               @complete="loading = false"
             ></delete-node-button>
@@ -485,6 +486,9 @@ export default {
       "updateLockedStatus",
       "setTapestryErrorReporting",
     ]),
+    setLoading(status) {
+      this.loading = status
+    },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
