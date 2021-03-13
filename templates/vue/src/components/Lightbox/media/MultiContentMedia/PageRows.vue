@@ -10,6 +10,7 @@
           v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
+          :id="`row-${row.node.id}`"
           class="page-row"
         >
           <div class="title-row">

@@ -4,6 +4,7 @@
       v-for="(row, index) in rows"
       ref="rowRefs"
       :key="row.id"
+      :id="`row-${row.id}`"
       class="sub-page-row"
     >
       <div class="title-row">

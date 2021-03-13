@@ -13,7 +13,7 @@
           v-if="!node.unlocked"
           icon="lock"
         />
-        <div class="content-title">
+        <div class="content-title" @click="scrollToRow">
           {{ node.title }}
         </div>
       </div>
@@ -73,7 +73,12 @@ export default {
   methods: {
     toggleChildren() {
       this.showChildren = !this.showChildren
-    }
+    },
+    scrollToRow() {
+      document.getElementById(`row-${this.node.id}`).scrollIntoView({
+        behavior: "smooth",
+      })
+    },
   }
 }
 </script>
