@@ -9,9 +9,9 @@
         <div>
           <div
             v-for="(row, index) in rows"
+            :id="`row-${row.id}`"
             ref="rowRefs"
             :key="row.id"
-            :id="`row-${row.id}`"
             class="sub-accordion-row"
           >
             <div class="button-row">
@@ -74,6 +74,9 @@ export default {
   },
   computed: {
     ...mapGetters(["isFavourite"]),
+  },
+  mounted() {
+    this.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapActions(["completeNode", "toggleFavourite"]),

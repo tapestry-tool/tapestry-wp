@@ -18,6 +18,7 @@
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
+      @observe-rows="observeRows"
     />
     <tapestry-media
       v-else
@@ -264,6 +265,9 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
+    },
+    observeRows(refs) {
+      this.$refs.rowRefs = refs
     },
   },
 }

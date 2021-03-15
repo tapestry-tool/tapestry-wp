@@ -8,9 +8,9 @@
       <div data-qa="page-rows">
         <div
           v-for="(row, index) in rows"
+          :id="`row-${row.node.id}`"
           :key="row.node.id"
           ref="rowRefs"
-          :id="`row-${row.node.id}`"
           class="page-row"
         >
           <div class="title-row">
@@ -59,6 +59,7 @@
               :rows="row.children"
               :row-id="subRowId"
               @load="handleLoad"
+              @observe-rows="observeRows"
             ></sub-page>
           </div>
           <button
@@ -156,6 +157,10 @@ export default {
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false
       )
+    },
+    observeRows(refs) {
+      const allRefs = [...this.$refs.rowRefs, ...refs]
+      this.$emit("observe-rows", allRefs)
     },
   },
 }

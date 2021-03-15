@@ -59,6 +59,7 @@
               :rows="row.children"
               :row-id="subRowId"
               @load="handleLoad"
+              @observe-rows="observeRows"
             ></sub-accordion>
           </div>
           <button
@@ -159,6 +160,10 @@ export default {
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false
       )
+    },
+    observeRows(refs) {
+      const allRefs = [...this.$refs.rowRefs, ...refs]
+      this.$emit("observe-rows", allRefs)
     },
   },
 }
