@@ -9,7 +9,7 @@
         >
           <tapestry-icon :icon="showChildren ? 'chevron-down' : 'chevron-up'" />
         </div>
-        <tapestry-icon v-if="!node.unlocked" icon="lock" />
+        <tapestry-icon v-if="shouldDisable" icon="lock" />
         <div class="content-title" @click="handleTitleClick">
           {{ node.title }}
         </div>
@@ -20,6 +20,9 @@
           :key="row.node.id"
           :node="row.node"
           :depth="depth + 1"
+          :lockRows="lockRows"
+          :shouldDisable="shouldDisable || disableRow(row.node.id)"
+          @scroll-to="scrollToRow"
         />
       </div>
     </div>
@@ -38,13 +41,22 @@ export default {
   props: {
     node: {
       type: Object,
-      required: false,
-      default: null,
+      required: true,
     },
     depth: {
       type: Number,
       required: false,
       default: 0,
+    },
+    lockRows: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    shouldDisable: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -65,6 +77,9 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
+    },
+    disabledFrom() {
+      return this.rows.findIndex(row => !row.node.completed)
     },
   },
   methods: {
@@ -87,6 +102,10 @@ export default {
           query: { ...this.$route.query, row: this.node.id },
         })
       }
+    },
+    disableRow(nodeId) {
+      const index = this.rows.findIndex(row => row.node.id === nodeId)
+      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
   },
 }
