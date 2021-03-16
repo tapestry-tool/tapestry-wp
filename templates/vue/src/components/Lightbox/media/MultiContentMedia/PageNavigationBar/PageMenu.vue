@@ -90,10 +90,11 @@ export default {
       this.setActive()
       this.scrollToRow()
     },
-    scrollToRow() {
-      document.getElementById(`row-${this.node.id}`).scrollIntoView({
-        behavior: "smooth",
-      })
+    scrollToRow(nodeId) {
+      if (!nodeId) {
+        nodeId = this.node.id
+      }
+      this.$emit("scroll-to", nodeId)
     },
     setActive() {
       if (this.$route.query.row !== this.node.id) {
