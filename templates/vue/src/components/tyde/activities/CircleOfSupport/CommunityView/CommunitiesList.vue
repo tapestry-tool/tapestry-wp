@@ -224,7 +224,7 @@ export default {
     updateClickables() {
       const clickableCommunities = Object.keys(this.communities).reduce(
         (clickables, id) => {
-          clickables[id] = this.isClickable(id)
+          clickables[id] = id === this.activeCommunity || this.isClickable(id)
           return clickables
         },
         {}
@@ -592,6 +592,7 @@ ul {
   padding: 0;
   margin: 0;
   background: none;
+  direction: ltr;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);

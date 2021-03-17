@@ -17,8 +17,8 @@
             @blur="isInputTouched = true"
           />
           <p :style="{ '--color': countColor }">{{ characterCount }}</p>
-          <b-form-invalid-feedback :state="!validationMessage">
-            {{ validationMessage }}
+          <b-form-invalid-feedback :state="hideErrorMessage">
+            {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
         </div>
         <div id="emoji-picker" style="position: relative">
@@ -31,7 +31,11 @@
         </div>
         <div class="controls">
           <button @click="$emit('back')">Cancel</button>
-          <button class="submit" @click="submitConnection">
+          <button
+            class="submit"
+            :disabled="validationState"
+            @click="submitConnection"
+          >
             {{ submitLabel }}
           </button>
         </div>
@@ -130,13 +134,29 @@ export default {
         ? `var(--warning)`
         : `var(--secondary)`
     },
-    validationMessage() {
-      if (this.connection.name.length > MAX_CONNECTION_NAME_LENGTH) {
-        return `Please shorten the connection name to not more than ${MAX_CONNECTION_NAME_LENGTH} characters.`
-      } else if (this.isInputTouched && this.connection.name.length === 0) {
-        return "Please enter a name for your community"
+    errorMessages() {
+      return {
+        TOO_LONG: `Please shorten the connection name to not more than ${MAX_CONNECTION_NAME_LENGTH} characters.`,
+        EMPTY: "Please enter a name for your connection",
       }
-      return null
+    },
+    validationState() {
+      if (this.connection.name.length > MAX_CONNECTION_NAME_LENGTH) {
+        return {
+          type: "TOO_LONG",
+          display: true,
+        }
+      }
+      if (this.connection.name.length === 0) {
+        return {
+          type: "EMPTY",
+          display: this.isInputTouched,
+        }
+      }
+      return false
+    },
+    hideErrorMessage() {
+      return this.validationState && !this.validationState.display
     },
   },
   mounted() {
@@ -168,7 +188,7 @@ export default {
       this.isInputTouched = true
 
       this.$nextTick(() => {
-        if (this.validationMessage) {
+        if (this.validationState) {
           return
         }
         this.isInputTouched = false
@@ -319,12 +339,18 @@ button {
 }
 
 .submit {
-  border: var(--cos-border);
+  background: #757575;
+  color: white;
   border-radius: 0.5rem;
   padding: 0.5rem;
 }
 
-.submit:hover {
+.submit:disabled {
+  cursor: not-allowed;
+  background: var(--cos-color-tertiary);
+}
+
+.submit:hover:not(:disabled) {
   background: var(--cos-color-secondary);
   color: white;
 }

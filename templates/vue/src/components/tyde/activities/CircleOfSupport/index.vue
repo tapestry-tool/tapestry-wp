@@ -35,6 +35,7 @@
           <div class="circle-view"></div>
         </button>
       </div>
+      <button class="nuke" @click="nuke">💣</button>
     </div>
   </div>
 </template>
@@ -115,6 +116,11 @@ export default {
       const community = this.cos.communities[communityId]
       community.connections = community.connections.filter(id => id !== connectionId)
     },
+    async nuke() {
+      await client.cos.deleteActivity()
+      const cos = await client.cos.getActivity()
+      this.cos = cos
+    },
   },
 }
 </script>
@@ -145,7 +151,7 @@ export default {
 
 .change-view {
   width: 50%;
-  background: none;
+  background: white;
   border: 2px solid var(--cos-color-tertiary);
 
   --icon-size: 1.5rem;
@@ -190,5 +196,14 @@ export default {
   border-radius: 50%;
   border: 2px solid var(--cos-color-tertiary);
   background: white;
+}
+
+.nuke {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: none;
+  font-size: 4rem;
 }
 </style>

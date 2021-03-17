@@ -129,8 +129,9 @@ export default {
   padding: 0;
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  column-gap: 4px;
+  gap: 4px;
 
   li {
     height: 1em;
