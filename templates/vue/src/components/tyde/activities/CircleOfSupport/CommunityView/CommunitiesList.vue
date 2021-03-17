@@ -304,7 +304,7 @@ export default {
     updateClickables() {
       const clickableCommunities = Object.keys(this.communities).reduce(
         (clickables, id) => {
-          clickables[id] = this.isClickable(id)
+          clickables[id] = id === this.activeCommunity || this.isClickable(id)
           return clickables
         },
         {}
@@ -672,6 +672,7 @@ ul {
   padding: 0;
   margin: 0;
   background: none;
+  direction: ltr;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
@@ -759,14 +760,16 @@ ul {
     padding: 0;
     list-style: none;
     display: flex;
+    flex-wrap: wrap;
+    justify-items: center;
     justify-content: center;
-    column-gap: 4px;
+    gap: 4px;
 
     li {
       height: 1rem;
       width: 1rem;
       border-radius: 50%;
-      background-color: var(--community-color);
+      background-color: var(--community-color, var(--cos-color-secondary));
     }
   }
 }

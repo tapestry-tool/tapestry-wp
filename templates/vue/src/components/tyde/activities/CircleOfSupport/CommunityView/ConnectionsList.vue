@@ -169,9 +169,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   padding: 1rem;
-  height: 12rem;
+  min-height: 12rem;
   border-radius: 0.5rem;
   cursor: pointer;
 
@@ -181,11 +180,16 @@ export default {
     color: var(--cos-color-secondary);
     text-transform: uppercase;
     cursor: default;
+    margin-bottom: 2rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   h1 {
     font-size: 4rem;
     cursor: default;
+    margin-bottom: 2rem;
   }
 
   &:hover {
@@ -198,8 +202,9 @@ export default {
   padding: 0;
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  column-gap: 4px;
+  gap: 4px;
 
   li {
     height: 1rem;
