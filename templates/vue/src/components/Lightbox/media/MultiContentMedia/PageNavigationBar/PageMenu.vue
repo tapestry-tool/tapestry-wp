@@ -10,7 +10,10 @@
           <tapestry-icon :icon="showChildren ? 'chevron-down' : 'chevron-up'" />
         </div>
         <tapestry-icon v-if="shouldDisable" icon="lock" />
-        <div class="content-title" @click="handleTitleClick">
+        <div
+          :class="['content-title', { active: active === node.id }]"
+          @click="handleTitleClick"
+        >
           {{ node.title }}
         </div>
       </div>
@@ -19,6 +22,7 @@
           v-for="row in rows"
           :key="row.node.id"
           :node="row.node"
+          :active="active"
           :depth="depth + 1"
           :lockRows="lockRows"
           :shouldDisable="shouldDisable || disableRow(row.node.id)"
@@ -42,6 +46,11 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    active: {
+      type: Number,
+      required: false,
+      default: -1,
     },
     depth: {
       type: Number,
@@ -121,5 +130,9 @@ export default {
 }
 .content-title {
   margin-left: 8px;
+}
+.active {
+  font-weight: bold;
+  text-decoration-line: underline;
 }
 </style>

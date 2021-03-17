@@ -16,6 +16,7 @@
         v-for="row in rows"
         :key="row.node.id"
         :node="row.node"
+        :active="active"
         :lockRows="lockRows"
         :shouldDisable="disableRow(row.node.id)"
         @scroll-to="scrollToRef"
@@ -115,9 +116,6 @@ export default {
           })
         }
       },
-    },
-    active(newNodeId) {
-      this.scrollToRef(newNodeId)
     },
   },
   mounted() {
