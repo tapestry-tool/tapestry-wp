@@ -14,8 +14,8 @@
             />
             <p :style="{ '--color': countColor }">{{ characterCount }}</p>
           </div>
-          <b-form-invalid-feedback :state="!validationMessage">
-            {{ validationMessage }}
+          <b-form-invalid-feedback :state="hideErrorMessage">
+            {{ errorMessages[validationState.type] }}
           </b-form-invalid-feedback>
           <div id="emoji-picker" style="position: relative">
             <button class="preview" @click="showPicker = !showPicker">
@@ -27,7 +27,11 @@
           </div>
           <div class="controls">
             <button @click="$emit('back')">Cancel</button>
-            <button class="submit" @click="saveCommunity">
+            <button
+              class="submit"
+              :disabled="validationState"
+              @click="saveCommunity"
+            >
               {{ submitLabel }}
             </button>
           </div>
@@ -115,14 +119,29 @@ export default {
         ? `var(--warning)`
         : `var(--secondary)`
     },
-    validationMessage() {
+    errorMessages() {
+      return {
+        TOO_LONG: `Please shorten the community name to not more than ${MAX_COMMUNITY_NAME_LENGTH} characters.`,
+        EMPTY: "Please enter a name for your community",
+      }
+    },
+    validationState() {
       if (this.community.name.length > MAX_COMMUNITY_NAME_LENGTH) {
-        return `Please shorten the community name to not more than ${MAX_COMMUNITY_NAME_LENGTH} characters.`
+        return {
+          type: "TOO_LONG",
+          display: true,
+        }
       }
-      if (this.isInputTouched && this.community.name.length === 0) {
-        return "Please enter a name for your community"
+      if (this.community.name.length === 0) {
+        return {
+          type: "EMPTY",
+          display: this.isInputTouched,
+        }
       }
-      return null
+      return false
+    },
+    hideErrorMessage() {
+      return this.validationState && !this.validationState.display
     },
   },
   mounted() {
@@ -143,7 +162,7 @@ export default {
     saveCommunity() {
       this.isInputTouched = true
       this.$nextTick(async () => {
-        if (this.validationMessage) {
+        if (this.validationState) {
           return
         }
         this.isLoading = true
@@ -318,7 +337,12 @@ button {
   padding: 0.5rem;
 }
 
-.submit:hover {
+.submit:disabled {
+  cursor: not-allowed;
+  background: var(--cos-color-tertiary);
+}
+
+.submit:hover:not(:disabled) {
   background: var(--cos-color-secondary);
   color: white;
 }
