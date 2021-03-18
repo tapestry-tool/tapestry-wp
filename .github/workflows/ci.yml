@@ -36,7 +36,7 @@ jobs:
         run: docker-compose up -d
       - name: Wait for containers to be ready
         env:
-          DOCKER_WP_INSTALL_DELAY: 60
+          DOCKER_WP_INSTALL_DELAY: 300
         run: bash ./bin/await-containers.sh
       - name: Setup WP
         run: sh ./bin/install.sh
