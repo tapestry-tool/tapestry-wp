@@ -38,8 +38,6 @@ jobs:
         env:
           DOCKER_WP_INSTALL_DELAY: 60
         run: bash ./bin/await-containers.sh
-      - name: Show logs
-        run: docker-compose logs
       - name: Setup WP
         run: sh ./bin/install.sh
       - name: Setup link preview config
