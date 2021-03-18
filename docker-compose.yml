@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   wp:
-    image: wordpress:latest
+    image: wordpress:5.5.3
     ports:
       - ${IP}:8000:80
     volumes:
