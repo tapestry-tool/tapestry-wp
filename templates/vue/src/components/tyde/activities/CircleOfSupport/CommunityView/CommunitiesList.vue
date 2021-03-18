@@ -622,6 +622,8 @@ ul {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    flex-wrap: wrap;
+    padding-bottom: 0.5rem;
   }
 
   // For the horizontal communities, we're forced to use grid because flex-column
@@ -640,11 +642,6 @@ ul {
     }
   }
 
-  &.north {
-    flex-wrap: wrap;
-    padding-bottom: 0.5rem;
-  }
-
   &.east {
     // Reverse the direction of column placement so it places from right to left.
     direction: rtl;
@@ -655,9 +652,21 @@ ul {
     padding-right: 0.5rem;
   }
 
+  // Chrome doesn't allow content to overflow upwards which breaks the mechanism for
+  // checking if a community is clickable or not. Currently, content only overflows
+  // upwards for south-facing communities (i.e. the ones on the top of the CoS).
+  //
+  // As a workaround, we let these communities overflow downwards but make them
+  // *look* like they're overflowing upwards by rotating the container.
+  //
+  // However, we still want the items to look aligned normally so we counteract
+  // the rotation on each child.
   &.south {
-    flex-wrap: wrap-reverse;
-    padding-top: 0.5rem;
+    transform: rotate(180deg);
+
+    > * {
+      transform: rotate(180deg);
+    }
   }
 }
 
