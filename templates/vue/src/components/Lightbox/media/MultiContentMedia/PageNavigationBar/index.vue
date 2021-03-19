@@ -19,7 +19,6 @@
         :active="active"
         :lockRows="lockRows"
         :shouldDisable="disableRow(row.node.id)"
-        @scroll-to="scrollToRef"
       />
     </aside>
   </div>
@@ -157,22 +156,6 @@ export default {
         return this.rowOrder[nextTabIndex + 1]
       }
       return this.active
-    },
-    scrollToRef(nodeId) {
-      if (nodeId) {
-        this.active = nodeId
-        this.$nextTick(() => {
-          let el = this.parentRefs.rowRefs.find(ref => ref.id === `row-${nodeId}`)
-          if (el && el.hasOwnProperty("$el")) {
-            el = el.$el
-          }
-          if (el) {
-            el.scrollIntoView({
-              behavior: "smooth",
-            })
-          }
-        })
-      }
     },
     disableRow(nodeId) {
       const index = this.rows.findIndex(row => row.node.id === nodeId)

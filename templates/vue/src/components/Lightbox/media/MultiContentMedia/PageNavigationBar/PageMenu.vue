@@ -10,10 +10,7 @@
           <tapestry-icon :icon="showChildren ? 'chevron-down' : 'chevron-up'" />
         </div>
         <tapestry-icon v-if="shouldDisable" icon="lock" />
-        <div
-          :class="['content-title', { active: active === node.id }]"
-          @click="handleTitleClick"
-        >
+        <div :class="['content-title', { active: active === node.id }]">
           {{ node.title }}
         </div>
       </div>
@@ -95,24 +92,6 @@ export default {
     toggleChildren() {
       this.showChildren = !this.showChildren
     },
-    handleTitleClick() {
-      this.setActive()
-      this.scrollToRow()
-    },
-    scrollToRow(nodeId) {
-      if (!nodeId) {
-        nodeId = this.node.id
-      }
-      this.$emit("scroll-to", nodeId)
-    },
-    setActive() {
-      if (this.$route.query.row !== this.node.id) {
-        this.$router.push({
-          ...this.$route,
-          query: { ...this.$route.query, row: this.node.id },
-        })
-      }
-    },
     disableRow(nodeId) {
       const index = this.rows.findIndex(row => row.node.id === nodeId)
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
@@ -129,7 +108,6 @@ export default {
   margin-right: 8px;
 }
 .content-title {
-  cursor: pointer;
   margin-left: 8px;
 }
 .active {
