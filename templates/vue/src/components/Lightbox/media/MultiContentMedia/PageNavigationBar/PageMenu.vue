@@ -129,6 +129,7 @@ export default {
   margin-right: 8px;
 }
 .content-title {
+  cursor: pointer;
   margin-left: 8px;
 }
 .active {

@@ -111,7 +111,11 @@ export default {
       }
 
       if (this.node.mediaType === "multi-content") {
-        return Object.assign(styles, { padding: "24px" })
+        if (this.node.fullscreen && this.node.presentationStyle === "page") {
+          return Object.assign(styles, { paddingTop: "24px" })
+        } else {
+          return Object.assign(styles, { padding: "24px" })
+        }
       }
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {

@@ -43,7 +43,7 @@
           <b-tab
             title="Content"
             :active="tab === 'content'"
-            style="overflow-x: hidden;"
+            style="overflow-x: hidden; overflow-y: hidden;"
             @click="changeTab('content')"
           >
             <content-form
