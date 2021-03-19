@@ -10,7 +10,7 @@
           <tapestry-icon :icon="showChildren ? 'chevron-down' : 'chevron-up'" />
         </div>
         <tapestry-icon v-if="shouldDisable" icon="lock" />
-        <div :class="['content-title', { active: active === node.id }]">
+        <div :class="['page-nav-title', { active: active === node.id }]">
           {{ node.title }}
         </div>
       </div>
@@ -107,7 +107,7 @@ export default {
 .page-toggle {
   margin-right: 8px;
 }
-.content-title {
+.page-nav-title {
   margin-left: 8px;
 }
 .active {

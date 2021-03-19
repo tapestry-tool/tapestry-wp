@@ -21,7 +21,11 @@
       @observe-rows="observeRows"
     />
     <page-navigation-bar
-      v-if="node.fullscreen && node.typeData.showNavBar && node.presentationStyle === 'page'"
+      v-if="
+        node.fullscreen &&
+          node.typeData.showNavBar &&
+          node.presentationStyle === 'page'
+      "
       class="page-nav-bar"
       :node="node"
       :parentRefs="$refs"

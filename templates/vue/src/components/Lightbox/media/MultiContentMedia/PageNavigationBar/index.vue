@@ -2,24 +2,35 @@
   <div
     ref="wrapper"
     data-qa="page-nav"
-    :class="['page-nav-container', { closed: closed }]"
+    :class="['page-nav-wrapper', { closed: burgerView }]"
   >
     <aside
-      ref="content"
-      data-qa="page-nav-content"
-      :class="['page-nav', { closed: closed }]"
+      ref="container"
+      data-qa="page-nav-container"
+      :class="['page-nav', { closed: burgerView }]"
     >
-      <div class="content-title">
-        {{ node.title }}
+      <button
+        v-if="burgerView"
+        class="page-nav-toggle"
+        data-qa="page-nav-toggle"
+        @click="opened = !opened"
+      >
+        <i v-if="!opened" class="fas fa-bars fa-lg"></i>
+        <i v-else class="fas fa-times fa-lg"></i>
+      </button>
+      <div v-if="opened || !burgerView" class="page-nav-content">
+        <div class="page-nav-title">
+          {{ node.title }}
+        </div>
+        <page-menu
+          v-for="row in rows"
+          :key="row.node.id"
+          :node="row.node"
+          :active="Number(active)"
+          :lockRows="lockRows"
+          :shouldDisable="disableRow(row.node.id)"
+        />
       </div>
-      <page-menu
-        v-for="row in rows"
-        :key="row.node.id"
-        :node="row.node"
-        :active="active"
-        :lockRows="lockRows"
-        :shouldDisable="disableRow(row.node.id)"
-      />
     </aside>
   </div>
 </template>
@@ -27,6 +38,7 @@
 <script>
 import { mapGetters } from "vuex"
 import PageMenu from "./PageMenu"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "page-navigation-bar",
@@ -43,25 +55,35 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      opened: false,
+      width: Helpers.getBrowserWidth(),
+    }
+  },
+  created() {
+    window.addEventListener("resize", Helpers.debounce(this.setWidth, 300))
+  },
+  destroyed() {
+    window.removeEventListener("resize", Helpers.debounce(this.setWidth, 300))
+  },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     active: {
       get() {
         return this.$route.query.row
       },
-      set(section) {
-        if (section !== this.active) {
+      set(nodeId) {
+        if (nodeId !== this.active) {
           this.$router.push({
             ...this.$route,
-            query: { ...this.$route.query, row: section },
+            query: { ...this.$route.query, row: nodeId },
           })
         }
       },
     },
-    closed() {
-      // TODO: Only close if screen dimensions are too small
-      return false
-      // return this.active === undefined
+    burgerView() {
+      return this.width < 800
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -85,38 +107,6 @@ export default {
       return this.getRowOrder(this.node)
     },
   },
-  watch: {
-    closed: {
-      immediate: true,
-      handler(closed) {
-        if (!closed) {
-          this.scrollToRef(this.active)
-        }
-      },
-    },
-    nodeId: {
-      immediate: true,
-      handler() {
-        if (!this.closed) {
-          /**
-           * If the new node doesn't have a particular section, change to the multi-content node ID
-           * section (guaranteed on all nodes).
-           */
-          this.$nextTick(() => {
-            if (!this.$refs[this.active]) {
-              this.$router.replace({
-                path: this.$route.path,
-                query: {
-                  ...this.$route.query,
-                  row: this.node.id,
-                },
-              })
-            }
-          })
-        }
-      },
-    },
-  },
   mounted() {
     // TODO: Get ALL the refs
     if (this.parentRefs.rowRefs) {
@@ -128,7 +118,17 @@ export default {
       }
     }
   },
+  beforeDestroy() {
+    this.$router.push({
+      ...this.$route,
+      query: { ...this.$route.query, row: undefined },
+    })
+  },
   methods: {
+    setWidth() {
+      let width = Helpers.getBrowserWidth()
+      this.width = width
+    },
     /**
      * This callback is called whenever any section cross 50% and 80% visibility.
      *  - If a section crosses 80% visibility, make that the current active section.
@@ -136,13 +136,11 @@ export default {
      *    80%, go to the _next_ section.
      */
     handleObserve(entries) {
-      if (this.closed) {
-        return
-      }
       const inactive = entries.find(entry => !entry.isIntersecting)
       const nextActive = entries.find(entry => entry.intersectionRatio > 0.8)
       if (nextActive) {
-        this.active = Number(nextActive.target.id.split("-")[1])
+        const nodeId = Number(nextActive.target.id.split("-")[1])
+        this.active = nodeId
       } else if (inactive) {
         const nodeId = Number(inactive.target.id.split("-")[1])
         if (nodeId == this.active) {
@@ -179,23 +177,13 @@ export default {
 </script>
 
 <style lang="scss">
-.page-nav-container {
-  position: fixed;
+.page-nav-wrapper {
+  position: absolute;
+  top: 24px;
   left: 0;
-  top: 0;
   z-index: 11;
   transform: translateX(0);
   transition: all 0.2s ease-out;
-
-  &.closed {
-    transform: translateX(0);
-  }
-
-  @media screen and (min-width: 500px) {
-    &.closed {
-      transform: translateX(100%);
-    }
-  }
 
   .page-nav {
     position: relative;
@@ -205,28 +193,10 @@ export default {
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
     transition: all 0.2s ease-out;
-    width: 100vw;
     font-size: 14px;
     text-align: left;
     z-index: 0;
     overflow-y: auto;
-
-    &.closed {
-      cursor: pointer;
-      transform: translateY(100%);
-    }
-
-    @media screen and (min-width: 500px) {
-      min-width: 300px;
-      width: 25vw;
-      max-width: 400px;
-      grid-column: 2;
-      padding-bottom: 0;
-
-      &.closed {
-        transform: translateY(0);
-      }
-    }
 
     @media screen and (min-width: 960px) {
       font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));
@@ -236,51 +206,18 @@ export default {
       font-size: 16px;
     }
 
-    .page-nav-header {
-      margin-bottom: 1.5em;
-      text-align: left;
-
-      .content-title {
-        margin-bottom: 0.2em;
-      }
-
-      .button-container {
-        button {
-          font-size: 1em;
-          i {
-            margin-right: 4px;
-          }
-        }
-      }
+    .page-nav-toggle {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1em;
     }
 
-    .page-nav-content {
+    .page-nav-title {
+      margin-bottom: 1em;
+    }
+
+    .page-nav-container {
       text-align: left;
-
-      section {
-        margin-bottom: 2em;
-        &:last-child {
-          margin-bottom: 3rem;
-        }
-
-        .content-header {
-          margin: 1em -1em 0.2em;
-          position: relative;
-          border-bottom: solid 2px #6b747d;
-          padding: 0.2em 1em;
-          font-size: 1.75em;
-        }
-
-        .content-body {
-          display: block;
-          text-align: left;
-          color: #becddc;
-
-          a {
-            color: #becddc;
-          }
-        }
-      }
     }
   }
 }

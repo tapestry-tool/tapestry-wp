@@ -359,4 +359,17 @@ export default class Helpers {
     }
     return Helpers.deepMerge(baseNode, overrides)
   }
+
+  // Source: https://stackoverflow.com/questions/42199956/how-to-implement-debounce-in-vue2
+  static debounce(fn, delay) {
+    var timeoutID = null
+    return function() {
+      clearTimeout(timeoutID)
+      var args = arguments
+      var that = this
+      timeoutID = setTimeout(function() {
+        fn.apply(that, args)
+      }, delay)
+    }
+  }
 }
