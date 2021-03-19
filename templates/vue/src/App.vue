@@ -67,7 +67,6 @@ export default {
 
         $(document).on("heartbeat-tick", function(event, data) {
           that.loggedIn = data["wp-auth-check"]
-          console.log(that.loggedIn)
         })
       })
     }
