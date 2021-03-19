@@ -20,6 +20,12 @@
       @complete="complete"
       @observe-rows="observeRows"
     />
+    <page-navigation-bar
+      v-if="node.fullscreen && node.presentationStyle === 'page'"
+      class="page-nav-bar"
+      :node="node"
+      :parentRefs="$refs"
+    />
     <tapestry-media
       v-else
       :node-id="nodeId"
@@ -39,6 +45,7 @@ import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
+import PageNavigationBar from "./media/MultiContentMedia/PageNavigationBar"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
@@ -50,6 +57,7 @@ export default {
     MultiContentMedia,
     TapestryMedia,
     TapestryModal,
+    PageNavigationBar,
   },
   props: {
     nodeId: {
