@@ -1,13 +1,16 @@
 <template>
-  <div
-    ref="wrapper"
-    data-qa="page-nav"
-    :class="['page-nav-wrapper', { closed: burgerView }]"
-  >
+  <div ref="wrapper" class="page-nav-wrapper">
     <aside
       ref="container"
       data-qa="page-nav-container"
-      :class="['page-nav', { closed: burgerView }]"
+      :class="[
+        'page-nav',
+        {
+          lightbox: !this.node.fullscreen,
+          closed: this.burgerView && !this.opened,
+        },
+      ]"
+      :style="pageNavStyle"
     >
       <button
         v-if="burgerView"
@@ -54,6 +57,11 @@ export default {
       type: Object,
       required: true,
     },
+    dimensions: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -83,7 +91,12 @@ export default {
       },
     },
     burgerView() {
-      return this.width < 800
+      return !this.node.fullscreen || this.width < 800
+    },
+    pageNavStyle() {
+      return {
+        height: this.node.fullscreen ? "100vh" : `${this.dimensions.height}px`,
+      }
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -144,12 +157,12 @@ export default {
             this.active = nodeId
           } else {
             // Page leaving
-            this.active = this.nextTab()
+            this.active = this.nextPage()
           }
         }
       }
     },
-    nextTab() {
+    nextPage() {
       const nextTabIndex = this.rowOrder.indexOf(this.active)
       if (nextTabIndex >= 0 && nextTabIndex < this.rowOrder.length - 1) {
         return this.rowOrder[nextTabIndex + 1]
@@ -180,24 +193,32 @@ export default {
 <style lang="scss">
 .page-nav-wrapper {
   position: absolute;
-  top: 24px;
+  top: 0;
   left: 0;
   z-index: 11;
   transform: translateX(0);
-  transition: all 0.2s ease-out;
+  transition: all 0.2s ease-in-out;
 
   .page-nav {
     position: relative;
-    background: #5d656c;
     color: white;
-    height: 100vh;
+    background: #5d656c;
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
-    transition: all 0.2s ease-out;
+    transition: all 0.2s ease-in-out;
     font-size: 14px;
     text-align: left;
     z-index: 0;
     overflow-y: auto;
+    min-width: 200px;
+
+    &.lightbox {
+      border-radius: 15px 0 0 15px;
+
+      &.closed {
+        background: transparent;
+      }
+    }
 
     @media screen and (min-width: 960px) {
       font-size: calc(14px + (2 * (100vw - 960px) / 1280px - 960px));

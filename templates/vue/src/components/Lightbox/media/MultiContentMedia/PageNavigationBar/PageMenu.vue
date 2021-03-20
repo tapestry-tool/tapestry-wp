@@ -23,7 +23,6 @@
           :depth="depth + 1"
           :lockRows="lockRows"
           :shouldDisable="shouldDisable || disableRow(row.node.id)"
-          @scroll-to="scrollToRow"
         />
       </div>
     </div>

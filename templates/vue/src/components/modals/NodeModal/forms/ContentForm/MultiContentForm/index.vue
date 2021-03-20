@@ -21,7 +21,7 @@
         data-qa="nav-checkbox"
         @change="node.typeData.showNavBar = $event"
       >
-        Add navigation bar on full-screen
+        Add navigation bar
       </b-form-checkbox>
     </b-form-group>
     <b-form-group>
