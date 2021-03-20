@@ -111,7 +111,7 @@ export default {
     // TODO: Get ALL the refs
     if (this.parentRefs.rowRefs) {
       const observer = new IntersectionObserver(this.handleObserve, {
-        threshold: [0.5, 0.8],
+        threshold: [0.5],
       })
       for (const ref of this.parentRefs.rowRefs) {
         observer.observe(ref)
@@ -130,21 +130,22 @@ export default {
       this.width = width
     },
     /**
-     * This callback is called whenever any section cross 50% and 80% visibility.
-     *  - If a section crosses 80% visibility, make that the current active section.
-     *  - If a section goes below 50% visibility without another section going above
-     *    80%, go to the _next_ section.
+     * This callback is called whenever any section cross 50% visibility.
+     *  - If a page enters from above, set it to the active page.
+     *  - If a page leaves from above, set the next page to the active page.
      */
     handleObserve(entries) {
-      const inactive = entries.find(entry => !entry.isIntersecting)
-      const nextActive = entries.find(entry => entry.intersectionRatio > 0.8)
-      if (nextActive) {
-        const nodeId = Number(nextActive.target.id.split("-")[1])
-        this.active = nodeId
-      } else if (inactive) {
-        const nodeId = Number(inactive.target.id.split("-")[1])
-        if (nodeId == this.active) {
-          this.active = this.nextTab()
+      for (const entry of entries) {
+        // Page visibility from above
+        if (entry.boundingClientRect.top <= 0) {
+          if (entry.isIntersecting) {
+            // Page entering
+            const nodeId = Number(entry.target.id.split("-")[1])
+            this.active = nodeId
+          } else {
+            // Page leaving
+            this.active = this.nextTab()
+          }
         }
       }
     },
