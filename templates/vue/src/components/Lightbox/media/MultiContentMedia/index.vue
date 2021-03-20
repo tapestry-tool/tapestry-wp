@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="media-container" data-qa="multi-content">
+  <div
+    ref="container"
+    class="media-container"
+    :style="navBarStyle"
+    data-qa="multi-content"
+  >
     <header>
       <h1
         v-if="showTitle"
@@ -64,6 +69,7 @@ import TapestryModal from "../../TapestryModal"
 import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
 import { names } from "@/config/routes"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "multi-content-media",
@@ -98,6 +104,7 @@ export default {
       activeIndex: -1,
       showCompletion: false,
       isMounted: false,
+      navBarStyle: {},
     }
   },
   computed: {
@@ -142,6 +149,27 @@ export default {
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
+
+    if (
+      this.node.presentationStyle === "page" &&
+      this.node.fullscreen &&
+      this.node.typeData.showNavBar
+    ) {
+      this.$root.$on("page-nav-bar::view", navBar => {
+        let gap = 0
+        let navBarWidth = 0
+        if (navBar) {
+          gap = navBar.scrollHeight > navBar.clientHeight ? 20 : 0
+          navBarWidth = navBar.clientWidth
+        }
+        this.navBarStyle = {
+          position: "relative",
+          left: `${navBarWidth + gap}px`,
+          width: `${Helpers.getBrowserWidth() - (navBarWidth + gap)}px`,
+          padding: `10px`,
+        }
+      })
+    }
   },
   methods: {
     ...mapMutations(["updateNode"]),

@@ -66,14 +66,14 @@ export default {
   data() {
     return {
       opened: false,
-      width: Helpers.getBrowserWidth(),
+      browserWidth: Helpers.getBrowserWidth(),
     }
   },
   created() {
-    window.addEventListener("resize", Helpers.debounce(this.setWidth, 300))
+    window.addEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
   },
   destroyed() {
-    window.removeEventListener("resize", Helpers.debounce(this.setWidth, 300))
+    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
@@ -91,7 +91,7 @@ export default {
       },
     },
     burgerView() {
-      return !this.node.fullscreen || this.width < 800
+      return !this.node.fullscreen || this.browserWidth < 800
     },
     pageNavStyle() {
       return {
@@ -139,6 +139,7 @@ export default {
               : undefined,
         },
       })
+      this.$root.$emit("page-nav-bar::view", this.$refs.container)
     }
   },
   beforeDestroy() {
@@ -148,9 +149,12 @@ export default {
     })
   },
   methods: {
-    setWidth() {
-      let width = Helpers.getBrowserWidth()
-      this.width = width
+    setBrowserWidth() {
+      let browserWidth = Helpers.getBrowserWidth()
+      this.browserWidth = browserWidth
+      this.$nextTick(() => {
+        this.$root.$emit("page-nav-bar::view", this.$refs.container)
+      })
     },
     /**
      * This callback is called whenever any section cross 50% visibility.
