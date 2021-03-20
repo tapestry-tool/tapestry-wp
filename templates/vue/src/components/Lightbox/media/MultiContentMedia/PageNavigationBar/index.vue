@@ -129,6 +129,16 @@ export default {
       for (const ref of this.parentRefs.rowRefs) {
         observer.observe(ref)
       }
+      this.$router.push({
+        ...this.$route,
+        query: {
+          ...this.$route.query,
+          row:
+            this.node.childOrdering.length > 0
+              ? this.node.childOrdering[0]
+              : undefined,
+        },
+      })
     }
   },
   beforeDestroy() {
@@ -211,6 +221,10 @@ export default {
     z-index: 0;
     overflow-y: auto;
     min-width: 200px;
+
+    &.closed {
+      min-width: 0px;
+    }
 
     &.lightbox {
       border-radius: 15px 0 0 15px;
