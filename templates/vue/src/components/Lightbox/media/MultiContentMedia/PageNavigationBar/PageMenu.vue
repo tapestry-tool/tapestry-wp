@@ -107,7 +107,7 @@ export default {
     margin-bottom: 1.5em;
   }
 
-  .page-menu-title {
+  .page-menu-item {
     margin-bottom: 1.5em;
   }
 
