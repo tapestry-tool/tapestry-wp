@@ -109,14 +109,16 @@ export default {
         styles.width = "100vw"
         styles.height = "100vh"
         styles.position = "relative"
+
+        const adminBar = document.getElementById("wpadminbar")
+        if (adminBar) {
+          styles.top = `${adminBar.clientHeight}px`
+          styles.height = `calc(100vh - ${styles.top})`
+        }
       }
 
       if (this.node.mediaType === "multi-content") {
-        if (this.node.fullscreen && this.node.presentationStyle === "page") {
-          return Object.assign(styles, { paddingTop: "24px" })
-        } else {
-          return Object.assign(styles, { padding: "24px" })
-        }
+        return Object.assign(styles, { padding: "24px" })
       }
 
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {

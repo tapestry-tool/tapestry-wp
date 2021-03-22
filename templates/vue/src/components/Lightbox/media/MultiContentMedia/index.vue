@@ -157,6 +157,7 @@ export default {
     ) {
       this.$root.$on("page-nav-bar::view", navBar => {
         let gap = 0
+        const widthOffset = 24
         let navBarWidth = 0
         if (navBar) {
           gap = navBar.scrollHeight > navBar.clientHeight ? 20 : 0
@@ -165,8 +166,10 @@ export default {
         this.navBarStyle = {
           position: "relative",
           left: `${navBarWidth + gap}px`,
-          width: `${Helpers.getBrowserWidth() - (navBarWidth + gap)}px`,
-          padding: `10px`,
+          width: `${Helpers.getBrowserWidth() -
+            (navBarWidth + gap) -
+            widthOffset}px`,
+          paddingRight: `${widthOffset}px`,
         }
       })
     }
