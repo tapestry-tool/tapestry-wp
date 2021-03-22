@@ -156,21 +156,11 @@ export default {
       this.node.typeData.showNavBar
     ) {
       this.$root.$on("page-nav-bar::view", navBar => {
-        let gap = 0
-        const widthOffset = 24
-        let navBarWidth = 0
-        if (navBar) {
-          gap = navBar.scrollHeight > navBar.clientHeight ? 20 : 0
-          navBarWidth = navBar.clientWidth
-        }
-        this.navBarStyle = {
-          position: "relative",
-          left: `${navBarWidth + gap}px`,
-          width: `${Helpers.getBrowserWidth() -
-            (navBarWidth + gap) -
-            widthOffset}px`,
-          paddingRight: `${widthOffset}px`,
-        }
+        // The navigation bar size changes twice when browser moves from fully-expanded to burger view.
+        // setTimeout was added to capture the final change.
+        setTimeout(() => {
+          this.resizeOn(navBar)
+        }, 1)
       })
     }
   },
@@ -239,6 +229,21 @@ export default {
     },
     observeRows(refs) {
       this.$emit("observe-rows", refs)
+    },
+    resizeOn(navBar) {
+      let gap = 0
+      const widthOffset = 24
+      let navBarWidth = 0
+      if (navBar) {
+        gap = navBar.scrollHeight > navBar.clientHeight ? 20 : 0
+        navBarWidth = navBar.clientWidth
+      }
+      this.navBarStyle = {
+        position: "relative",
+        left: `${navBarWidth + gap}px`,
+        width: `${Helpers.getBrowserWidth() - (navBarWidth + gap) - widthOffset}px`,
+        paddingRight: `${widthOffset}px`,
+      }
     },
   },
 }
