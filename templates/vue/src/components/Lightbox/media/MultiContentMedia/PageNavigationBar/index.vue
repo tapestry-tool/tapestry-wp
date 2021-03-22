@@ -115,11 +115,7 @@ export default {
       return this.getRowOrder(this.node)
     },
   },
-  destroyed() {
-    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
-  },
   mounted() {
-    // TODO: Get ALL the refs
     if (this.parentRefs.rowRefs) {
       const observer = new IntersectionObserver(this.handleObserve, {
         threshold: [0.5],
@@ -141,6 +137,7 @@ export default {
     }
   },
   beforeDestroy() {
+    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
     this.$router.push({
       ...this.$route,
       query: { ...this.$route.query, row: undefined },
