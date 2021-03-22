@@ -1,25 +1,33 @@
 <template>
-  <div class="page-menu">
-    <div class="page-menu-item" :style="indent">
-      <div class="page-menu-title">
-        <i v-if="shouldDisable" class="fas fa-lock" />
-        <div :class="['page-nav-title', { active: active === node.id }]">
-          {{ node.title }}
-        </div>
-      </div>
-      <div v-if="!shouldDisable" class="page-menu-wrapper">
-        <page-menu
-          v-for="row in rows"
-          :key="row.node.id"
-          :node="row.node"
-          :active="active"
-          :depth="depth + 1"
-          :lockRows="lockRows"
-          :shouldDisable="shouldDisable || disableRow(row.node.id)"
-        />
-      </div>
+  <ul class="page-menu fa-ul">
+    <li class="page-menu-item">
+      <span class="page-menu-title fa-li">
+        <i v-if="shouldDisable" class="fas fa-lock page-menu-disabled" />
+        <i v-else-if="isBase" class="far fa-circle" :style="bulletStyle" />
+        <i v-else class="fas fa-circle" :style="bulletStyle" />
+      </span>
+      <span
+        :class="[
+          'page-nav-title',
+          { active: active === node.id, 'page-menu-disabled': shouldDisable },
+        ]"
+      >
+        {{ node.title }}
+      </span>
+    </li>
+    <div v-if="!shouldDisable" class="page-menu-wrapper">
+      <page-menu
+        v-for="row in rows"
+        :key="row.node.id"
+        :node="row.node"
+        :active="active"
+        :depth="depth + 1"
+        :lockRows="lockRows"
+        :shouldDisable="shouldDisable || disableRow(row.node.id)"
+        :isBase="false"
+      />
     </div>
-  </div>
+  </ul>
 </template>
 
 <script>
@@ -52,6 +60,11 @@ export default {
       required: false,
       default: false,
     },
+    isBase: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -60,9 +73,6 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
-    indent() {
-      return { transform: `translate(${this.depth * 20}px)` }
-    },
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -75,6 +85,12 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    bulletStyle() {
+      return {
+        verticalAlign: "middle",
+        fontSize: "0.5rem",
+      }
+    },
   },
   methods: {
     disableRow(nodeId) {
@@ -86,17 +102,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page-menu-title {
-  display: inline-flex;
-}
-.page-toggle {
-  margin-right: 8px;
-}
-.page-nav-title {
-  margin-left: 8px;
-}
-.active {
-  font-weight: bold;
-  text-decoration-line: underline;
+.page-menu {
+  &.fa-ul {
+    margin-bottom: 1.5em;
+  }
+
+  .page-menu-title {
+    margin-bottom: 1.5em;
+  }
+
+  .active {
+    font-weight: bold;
+    text-decoration-line: underline;
+  }
+  .page-menu-disabled {
+    opacity: 0.5;
+  }
 }
 </style>

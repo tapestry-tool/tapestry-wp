@@ -29,6 +29,7 @@
           :active="Number(active)"
           :lockRows="lockRows"
           :shouldDisable="disableRow(row.node.id)"
+          :isBase="true"
         />
       </div>
     </aside>
