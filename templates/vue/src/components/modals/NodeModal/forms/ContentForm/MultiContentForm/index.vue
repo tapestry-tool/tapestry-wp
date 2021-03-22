@@ -11,20 +11,6 @@
     </b-form-group>
     <sub-item-table :actionType="actionType" :node="node"></sub-item-table>
     <b-form-group>
-      <b-form-checkbox
-        v-if="node.presentationStyle === 'page'"
-        :checked="
-          node.typeData.hasOwnProperty('showNavBar')
-            ? node.typeData.showNavBar
-            : true
-        "
-        data-qa="nav-checkbox"
-        @change="node.typeData.showNavBar = $event"
-      >
-        Add navigation bar
-      </b-form-checkbox>
-    </b-form-group>
-    <b-form-group>
       <b-form-checkbox v-model="node.typeData.lockRows" data-qa="lock-checkbox">
         Lock rows until previous row is completed
       </b-form-checkbox>
