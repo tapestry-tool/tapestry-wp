@@ -12,7 +12,7 @@
           { active: active === node.id, 'page-menu-disabled': shouldDisable },
         ]"
       >
-        {{ node.title }}
+        {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </li>
     <div v-if="!shouldDisable" class="page-menu-wrapper">
