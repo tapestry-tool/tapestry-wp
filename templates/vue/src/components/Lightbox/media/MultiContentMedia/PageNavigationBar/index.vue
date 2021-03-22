@@ -6,8 +6,8 @@
       :class="[
         'page-nav',
         {
-          lightbox: !this.node.fullscreen,
-          closed: this.burgerView && !this.opened,
+          lightbox: !node.fullscreen,
+          closed: burgerView && !opened,
         },
       ]"
       :style="pageNavStyle"
@@ -22,9 +22,6 @@
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
       <div v-if="opened || !burgerView" class="page-nav-content">
-        <div class="page-nav-title">
-          {{ node.title }}
-        </div>
         <page-menu
           v-for="row in rows"
           :key="row.node.id"
@@ -72,9 +69,6 @@ export default {
   created() {
     window.addEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
   },
-  destroyed() {
-    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
-  },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     active: {
@@ -119,6 +113,9 @@ export default {
     rowOrder() {
       return this.getRowOrder(this.node)
     },
+  },
+  destroyed() {
+    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
   },
   mounted() {
     // TODO: Get ALL the refs

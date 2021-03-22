@@ -2,19 +2,12 @@
   <div class="page-menu">
     <div class="page-menu-item" :style="indent">
       <div class="page-menu-title">
-        <div
-          v-if="node.childOrdering.length > 0"
-          class="page-toggle"
-          @click.stop="toggleChildren"
-        >
-          <tapestry-icon :icon="showChildren ? 'chevron-down' : 'chevron-up'" />
-        </div>
-        <tapestry-icon v-if="shouldDisable" icon="lock" />
+        <i v-if="shouldDisable" class="fas fa-lock" />
         <div :class="['page-nav-title', { active: active === node.id }]">
           {{ node.title }}
         </div>
       </div>
-      <div v-if="showChildren" class="page-menu-wrapper">
+      <div v-if="!shouldDisable" class="page-menu-wrapper">
         <page-menu
           v-for="row in rows"
           :key="row.node.id"
@@ -31,13 +24,9 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TapestryIcon from "@/components/common/TapestryIcon"
 
 export default {
   name: "page-menu",
-  components: {
-    TapestryIcon,
-  },
   props: {
     node: {
       type: Object,
@@ -72,7 +61,7 @@ export default {
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
     indent() {
-      return { transform: `translate(${this.depth * 20}px` }
+      return { transform: `translate(${this.depth * 20}px)` }
     },
     rows() {
       return this.node.childOrdering.map(id => {
@@ -88,9 +77,6 @@ export default {
     },
   },
   methods: {
-    toggleChildren() {
-      this.showChildren = !this.showChildren
-    },
     disableRow(nodeId) {
       const index = this.rows.findIndex(row => row.node.id === nodeId)
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
