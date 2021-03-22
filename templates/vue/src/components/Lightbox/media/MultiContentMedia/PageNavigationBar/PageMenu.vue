@@ -31,6 +31,10 @@
 </template>
 
 <script>
+/**
+ * The `<page-menu>` component is a child component used in PageNavigationBar used recursively
+ * for nested navigation.
+ */
 import { mapGetters } from "vuex"
 
 export default {
