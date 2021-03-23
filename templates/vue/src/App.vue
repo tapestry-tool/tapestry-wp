@@ -6,6 +6,18 @@
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
     <tapestry-error></tapestry-error>
+    <b-modal
+      id="loggedOutModal"
+      :visible="!loggedIn"
+      title="Not Logged In"
+      no-close-on-backdrop
+    >
+      You can either refresh and stay logged out or log in again.
+      <template #modal-footer>
+        <b-button @click="refresh">Refresh</b-button>
+        <b-button @click="redirectToLogin">Log In</b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -17,6 +29,7 @@ import Sidebar from "@/components/Sidebar"
 import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
+import { isLoggedIn } from "./services/wp"
 
 export default {
   name: "app",
@@ -30,6 +43,7 @@ export default {
   data() {
     return {
       loading: true,
+      loggedIn: true,
     }
   },
   computed: {
@@ -38,7 +52,25 @@ export default {
       return Object.keys(this.nodes).length === 0
     },
   },
+  watch: {
+    loggedIn(isStillLoggedIn) {
+      if (!isStillLoggedIn) {
+        this.$bvModal.show("loggedOutModal")
+      }
+    },
+  },
   mounted() {
+    if (isLoggedIn()) {
+      var that = this
+      jQuery(function($) {
+        wp.heartbeat.interval("fast")
+
+        $(document).on("heartbeat-tick", function(event, data) {
+          that.loggedIn = data["wp-auth-check"]
+        })
+      })
+    }
+
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
@@ -57,6 +89,12 @@ export default {
   },
   methods: {
     ...mapMutations(["init"]),
+    refresh() {
+      this.$router.go()
+    },
+    redirectToLogin() {
+      window.location.href = `${window.location.origin}/wp-login.php?redirect_to=${window.location.href}`
+    },
     recordAnalytics(evt) {
       const x = evt.clientX + window.pageXOffset
       const y = evt.clientY + window.pageYOffset
