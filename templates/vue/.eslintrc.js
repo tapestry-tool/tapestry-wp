@@ -3,6 +3,7 @@ module.exports = {
   env: {
     node: true,
     jest: true,
+    jquery: true,
   },
   extends: [
     "plugin:vue/recommended",
@@ -35,4 +36,7 @@ module.exports = {
   parserOptions: {
     parser: "babel-eslint",
   },
+  globals: {
+    wp: true,
+  }
 }
