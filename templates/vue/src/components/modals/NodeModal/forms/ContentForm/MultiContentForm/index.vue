@@ -5,7 +5,7 @@
         id="node-presentation-style"
         data-qa="node-presentation-style"
         :value="node.presentationStyle ? node.presentationStyle : 'accordion'"
-        :options="presentationStyle"
+        :options="presentationStyles"
         @change="handlePresentationChange"
       ></b-form-select>
     </b-form-group>
@@ -51,11 +51,7 @@ export default {
   },
   data() {
     return {
-      presentationStyle: [
-        { value: "accordion", text: "Accordion" },
-        { value: "slideshow", text: "Slideshow" },
-        { value: "page", text: "Page" },
-      ],
+      presentationStyles: [{ value: "accordion", text: "Accordion" }],
     }
   },
   mounted() {
