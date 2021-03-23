@@ -580,7 +580,7 @@ class Tapestry implements ITapestry
                     $tapestry->rootId,
                     $tapestry->settings->superuserOverridePermissions,
                     $filterUserId
-                ) 
+                )
             );
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
