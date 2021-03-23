@@ -105,6 +105,7 @@ export default {
   transform: translate(var(--x), var(--y));
 
   p {
+    position: relative;
     padding: 0.25em;
     border: 1px solid currentColor;
     text-transform: uppercase;
@@ -112,6 +113,7 @@ export default {
     text-overflow: ellipsis;
     overflow: hidden;
     max-width: 100%;
+    background: white;
   }
 
   h1 {
