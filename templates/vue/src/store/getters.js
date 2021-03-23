@@ -57,11 +57,19 @@ export function isAccordionRow(_, { getParent, isAccordion }) {
 
 export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
   return id => {
+    const visited = new Set()
     let nodeId = id
     while (nodeId) {
+      visited.add(nodeId)
+
       let parent = getParent(nodeId)
       if (!parent) return false
       if (isSubAccordion(nodeId)) return true
+
+      if (visited.has(parent)) {
+        break
+      }
+
       nodeId = parent
     }
     return false
