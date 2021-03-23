@@ -676,7 +676,7 @@ ul {
   align-items: center;
   justify-content: space-between;
   border-radius: 0.5rem;
-  width: 5.5rem;
+  width: clamp(4rem, 8vw, 5.5rem);
   position: relative;
   padding: 0;
   margin: 0;
