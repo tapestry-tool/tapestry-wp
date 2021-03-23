@@ -580,7 +580,7 @@ class Tapestry implements ITapestry
                     $tapestry->rootId,
                     $tapestry->settings->superuserOverridePermissions,
                     $filterUserId
-                )
+                ) 
             );
             $tapestry->links = $this->_filterLinksByNodeMetaIds($tapestry->links, $tapestry->nodes);
             $tapestry->groups = TapestryHelpers::getGroupIdsOfUser(wp_get_current_user()->ID, $this->postId);
@@ -654,9 +654,9 @@ class Tapestry implements ITapestry
             $nodesPermitted[] = $node;
 
             foreach ($this->links as $link) {
-                if ($link->target == $node && !in_array($link->source, $checked)) {
+                if ($link->target == $node && $link->source && !in_array($link->source, $checked)) {
                     $this->_traverseNodes($link->source, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
-                } elseif ($link->source == $node && !in_array($link->target, $checked)) {
+                } elseif ($link->source == $node && $link->target && !in_array($link->target, $checked)) {
                     $this->_traverseNodes($link->target, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
                 }
             }
