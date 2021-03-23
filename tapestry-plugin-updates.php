@@ -23,7 +23,6 @@ function accordion_update() {
         }
     }
 }
-register_activation_hook( __FILE__, 'accordion_update' );
 
 function accordion_row_update() {
     $query_args = array(
@@ -48,7 +47,6 @@ function accordion_row_update() {
         }
     }
 }
-register_activation_hook( __FILE__, 'accordion_row_update' );
 
 function tapestry_plugin_update() {
     global $TAPESTRY_VERSION_NUMBER;
