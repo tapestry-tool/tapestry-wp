@@ -107,6 +107,7 @@ export default {
     removeNode() {
       if (!this.isRoot) {
         const neighbour = this.neighbour
+        const parent = this.parent
         this.deleteLink({
           source: this.neighbourLink.source,
           target: this.neighbourLink.target,
@@ -121,7 +122,7 @@ export default {
         if (this.isMultiContentNodeChild) {
           this.$router.push({
             name: names.MODAL,
-            params: { nodeId: this.parent, type: "edit", tab: "content" },
+            params: { nodeId: parent, type: "edit", tab: "content" },
             query: this.$route.query,
           })
         } else {
