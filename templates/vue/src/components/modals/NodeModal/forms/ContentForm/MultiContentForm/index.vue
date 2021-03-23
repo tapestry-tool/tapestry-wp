@@ -51,7 +51,10 @@ export default {
   },
   data() {
     return {
-      presentationStyles: [{ value: "accordion", text: "Accordion" }],
+      presentationStyles: [
+        { value: "accordion", text: "Accordion" },
+        { value: "page", text: "Page" },
+      ],
     }
   },
   mounted() {
