@@ -12,7 +12,7 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
 
 // Used to force-refresh assets
 $TAPESTRY_VERSION_NUMBER = '2.44.0-beta';
-add_option( "tapestry_version", $TAPESTRY_VERSION_NUMBER );
+add_option( "tapestry_plugin_version", "2.41.0-beta" );
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
