@@ -72,6 +72,7 @@ import ConnectionsTab from "../ConnectionsTab"
 import ConnectionTooltip from "../ConnectionTooltip"
 import SingleConnection from "../SingleConnection"
 import CircleToggle from "./CircleToggle"
+import { CircleStates } from "./states"
 
 const CONNECTION_SPACE = 10
 const CONNECTION_OFFSET = 56
@@ -81,13 +82,6 @@ const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.85
 const States = {
   Home: 0,
   EditConnection: 1,
-}
-
-const CircleStates = {
-  All: 3,
-  One: 0,
-  Two: 1,
-  Three: 2,
 }
 
 export default {

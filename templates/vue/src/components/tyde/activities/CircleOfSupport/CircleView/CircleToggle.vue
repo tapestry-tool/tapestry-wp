@@ -13,12 +13,7 @@
 </template>
 
 <script>
-const States = {
-  All: 3,
-  One: 0,
-  Two: 1,
-  Three: 2,
-}
+import { CircleStates } from "./states"
 
 export default {
   model: {
@@ -33,23 +28,23 @@ export default {
   },
   computed: {
     states() {
-      return States
+      return CircleStates
     },
   },
   methods: {
     transition() {
       switch (this.state) {
-        case States.All:
-          this.$emit("change", States.Three)
+        case CircleStates.All:
+          this.$emit("change", CircleStates.Three)
           break
-        case States.One:
-          this.$emit("change", States.All)
+        case CircleStates.One:
+          this.$emit("change", CircleStates.All)
           break
-        case States.Two:
-          this.$emit("change", States.One)
+        case CircleStates.Two:
+          this.$emit("change", CircleStates.One)
           break
-        case States.Three:
-          this.$emit("change", States.Two)
+        case CircleStates.Three:
+          this.$emit("change", CircleStates.Two)
           break
         default:
           break
