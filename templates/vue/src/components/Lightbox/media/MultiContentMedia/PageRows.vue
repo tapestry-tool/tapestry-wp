@@ -68,6 +68,8 @@
               :row-id="subRowId"
               context="page"
               :level="level + 1"
+              @close="handleAutoClose"
+              @complete="complete"
             />
           </div>
           <button
@@ -191,6 +193,12 @@ export default {
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false
       )
+    },
+    handleAutoClose() {
+      this.$emit("close")
+    },
+    complete() {
+      this.$emit("complete")
     },
   },
 }

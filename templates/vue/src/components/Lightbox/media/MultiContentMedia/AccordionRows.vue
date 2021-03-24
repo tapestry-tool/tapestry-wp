@@ -197,6 +197,12 @@ export default {
         row.node.typeData.showTitle !== false
       )
     },
+    handleAutoClose() {
+      this.$emit("close")
+    },
+    complete() {
+      this.$emit("complete")
+    },
   },
 }
 </script>
