@@ -109,12 +109,21 @@
                   </div>
                 </b-button>
                 <b-alert
+                  v-if="apiError == null"
                   :show="hasExported"
                   variant="success"
                   style="margin-top: 1em;"
                 >
                   Your Tapestry has been exported! Find the .json file in your
                   downloads.
+                </b-alert>
+                <b-alert
+                  v-else
+                  :show="hasExported"
+                  variant="danger"
+                  style="margin-top: 1em;"
+                >
+                  {{ apiError.error }}
                 </b-alert>
               </b-col>
               <b-col>
@@ -355,13 +364,14 @@ export default {
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
+      exportFailed: false,
       isOptimizing: false,
       hasOptimized: false,
     }
   },
   computed: {
     ...mapGetters(["tapestryJson"]),
-    ...mapState(["settings", "rootId", "nodes"]),
+    ...mapState(["settings", "rootId", "nodes", "apiError"]),
     latRangeValid() {
       return (
         this.getCoord(this.mapBounds.neLat, 90) >
@@ -470,6 +480,11 @@ export default {
     async exportTapestry() {
       this.isExporting = true
       const exportedTapestry = await this.getTapestryExport()
+      if (!exportedTapestry) {
+        this.isExporting = false
+        this.hasExported = true
+        return
+      }
       const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })
