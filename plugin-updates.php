@@ -50,12 +50,12 @@ function accordion_row_update() {
 
 function tapestry_plugin_update() {
     global $TAPESTRY_VERSION_NUMBER;
-    $installed_version = get_site_option('tapestry_version');
+    $installed_version = get_site_option('tapestry_plugin_version');
     if ( version_compare($installed_version, '2.44.0-beta', '<') ) {
         accordion_update();
         accordion_row_update();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        update_option( 'tapestry_version', $TAPESTRY_VERSION_NUMBER );
+        update_option( 'tapestry_plugin_version', $TAPESTRY_VERSION_NUMBER );
     }
 }
 add_action( 'init', 'tapestry_plugin_update');
