@@ -18,6 +18,7 @@
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
+      :level="level"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -29,6 +30,7 @@
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
+      :level="level"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -90,6 +92,11 @@ export default {
       required: false,
       default: "",
     },
+    level: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -129,12 +136,16 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "multi-content" ||
+        (this.context !== "multi-content" && this.context !== "accordion") ||
         (this.context === "page" && this.node.typeData.showTitle !== false)
       )
     },
     isMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return (
+        this.context === "multi-content" ||
+        this.context === "page" ||
+        this.context === "accordion"
+      )
     },
   },
   mounted() {

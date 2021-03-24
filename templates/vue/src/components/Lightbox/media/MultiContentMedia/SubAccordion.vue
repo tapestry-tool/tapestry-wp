@@ -102,7 +102,7 @@ export default {
           query: this.$route.query,
         })
       }
-    }
+    },
   },
 }
 </script>

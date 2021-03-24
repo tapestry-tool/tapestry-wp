@@ -11,6 +11,7 @@
           :key="row.node.id"
           ref="rowRefs"
           class="page-row"
+          :style="rowBackground"
         >
           <div class="title-row">
             <div v-if="disableRow(index)" class="title">
@@ -40,32 +41,34 @@
             <h1 v-if="showTitle(row)" class="sub-multicontent-title">
               {{ row.node.title }}
             </h1>
-            <tapestry-media
-              :node-id="row.node.id"
-              :dimensions="dimensions"
-              context="page"
-              :autoplay="false"
-              style="color: white; margin-bottom: 24px;"
-              @complete="updateProgress(row.node.id)"
-              @load="handleLoad($refs.rowRefs[index])"
-            />
-            <p v-if="row.children.length > 0 && row.node.mediaType !== 'multi-content'" style="color: white;">
-              {{ row.node.typeData.subAccordionText }}
-            </p>
-            <sub-page
-              v-if="row.children.length > 0 && row.node.presentationStyle === 'page'"
-              :dimensions="dimensions"
-              :rows="row.children"
-              :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-page>
-            <sub-accordion
+            <div v-if="row.node.mediaType !== 'multi-content'">
+              <tapestry-media
+                :node-id="row.node.id"
+                :dimensions="dimensions"
+                context="page"
+                :autoplay="false"
+                style="color: white; margin-bottom: 24px;"
+                @complete="updateProgress(row.node.id)"
+                @load="handleLoad($refs.rowRefs[index])"
+              />
+              <p v-if="row.children.length > 0" style="color: white;">
+                {{ row.node.typeData.subAccordionText }}
+              </p>
+              <sub-accordion
+                v-if="row.children.length > 0"
+                :dimensions="dimensions"
+                :rows="row.children"
+                :row-id="subRowId"
+                @load="handleLoad"
+              />
+            </div>
+            <multi-content-media
               v-else-if="row.children.length > 0"
-              :dimensions="dimensions"
-              :rows="row.children"
+              :node="getNode(row.node.id)"
               :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-accordion>
+              context="page"
+              :level="level + 1"
+            />
           </div>
           <button
             v-if="row.node.completed && isVisible(row)"
@@ -84,7 +87,6 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
-import SubPage from "./SubPage"
 import SubAccordion from "./SubAccordion"
 
 export default {
@@ -92,7 +94,7 @@ export default {
   components: {
     TapestryMedia,
     HeadlessMultiContent,
-    SubPage,
+    MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
   },
   props: {
@@ -118,6 +120,11 @@ export default {
       required: false,
       default: "",
     },
+    level: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -142,6 +149,25 @@ export default {
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
     },
+    isMultiContentContext() {
+      return (
+        this.context === "multi-content" ||
+        this.context === "page" ||
+        this.context === "accordion"
+      )
+    },
+    rowBackground() {
+      if (this.isMultiContentContext) {
+        let rgb = 40
+        let colorOffset = this.level * 10
+        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        return {
+          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
+        }
+      } else {
+        return null
+      }
+    },
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -160,6 +186,7 @@ export default {
     },
     showTitle(row) {
       return (
+        !row.node.isMultiContentChild &&
         this.node.presentationStyle === "page" &&
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false

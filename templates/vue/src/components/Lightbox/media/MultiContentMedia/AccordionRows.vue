@@ -10,11 +10,8 @@
           v-for="(row, index) in rows"
           :key="row.node.id"
           ref="rowRefs"
-          :class="{
-            'accordion-row': true,
-            'nested-accordion-row':
-              isMultiContentContext && node.mediaType == 'multi-content',
-          }"
+          class="accordion-row"
+          :style="rowBackground"
         >
           <div class="button-row">
             <button
@@ -40,33 +37,37 @@
             <h1 v-if="showTitle(row)" class="sub-multicontent-title">
               {{ row.node.title }}
             </h1>
-            <tapestry-media
-              :node-id="row.node.id"
-              :dimensions="dimensions"
-              context="multi-content"
-              :autoplay="false"
-              style="color: white; margin-bottom: 24px;"
-              @complete="updateProgress(row.node.id)"
-              @close="toggle(row.node.id)"
-              @load="handleLoad($refs.rowRefs[index])"
-            />
-            <p v-if="row.children.length > 0 && row.node.mediaType !== 'multi-content'" style="color: white;">
-              {{ row.node.typeData.subAccordionText }}
-            </p>
-            <sub-page
-              v-if="row.children.length > 0 && row.node.presentationStyle === 'page'"
-              :dimensions="dimensions"
-              :rows="row.children"
-              :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-page>
-            <sub-accordion
+            <div v-if="row.node.mediaType !== 'multi-content'">
+              <tapestry-media
+                :node-id="row.node.id"
+                :dimensions="dimensions"
+                context="multi-content"
+                :autoplay="false"
+                style="color: white; margin-bottom: 24px;"
+                @complete="updateProgress(row.node.id)"
+                @close="toggle(row.node.id)"
+                @load="handleLoad($refs.rowRefs[index])"
+              />
+              <p v-if="row.children.length > 0" style="color: white;">
+                {{ row.node.typeData.subAccordionText }}
+              </p>
+              <sub-accordion
+                v-if="row.children.length > 0"
+                :dimensions="dimensions"
+                :rows="row.children"
+                :row-id="subRowId"
+                @load="handleLoad"
+              />
+            </div>
+            <multi-content-media
               v-else-if="row.children.length > 0"
-              :dimensions="dimensions"
-              :rows="row.children"
+              :node="getNode(row.node.id)"
               :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-accordion>
+              context="accordion"
+              :level="level + 1"
+              @close="handleAutoClose"
+              @complete="complete"
+            />
           </div>
           <button
             v-if="row.node.completed && isVisible(row)"
@@ -85,7 +86,6 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
-import SubPage from "./SubPage"
 import SubAccordion from "./SubAccordion"
 
 export default {
@@ -93,7 +93,7 @@ export default {
   components: {
     TapestryMedia,
     HeadlessMultiContent,
-    SubPage,
+    MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
   },
   props: {
@@ -119,6 +119,11 @@ export default {
       required: false,
       default: "",
     },
+    level: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -126,7 +131,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
+    ...mapGetters([
+      "getDirectChildren",
+      "getNode",
+      "getParent",
+      "isFavourite",
+      "isMultiContent",
+    ]),
     ...mapState(["favourites"]),
     rows() {
       return this.node.childOrdering.map(id => {
@@ -144,7 +155,23 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     isMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return (
+        this.context === "multi-content" ||
+        this.context === "page" ||
+        this.context === "accordion"
+      )
+    },
+    rowBackground() {
+      if (this.isMultiContentContext) {
+        let rgb = 40
+        let colorOffset = this.level * 10
+        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
+        return {
+          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
+        }
+      } else {
+        return null
+      }
     },
   },
   methods: {
@@ -164,6 +191,7 @@ export default {
     },
     showTitle(row) {
       return (
+        !row.node.isMultiContentChild &&
         this.node.presentationStyle === "page" &&
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false
@@ -209,10 +237,6 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
-  }
-
-  &.nested-accordion-row {
-    background: rgb(30, 30, 30) !important;
   }
 }
 
