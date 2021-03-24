@@ -133,7 +133,7 @@ export default {
   --cos-border: 3px solid var(--cos-color-secondary);
 
   border: var(--cos-border);
-  height: 600px;
+  height: 700px;
   position: relative;
   overflow: hidden;
 }
