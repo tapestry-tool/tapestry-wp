@@ -25,9 +25,9 @@
       :draggable="draggable"
       @add-connection="openConnectionForm"
       @edit-connection="editConnection"
-      @drag:start="handleDragStart"
+      @drag:start="$emit('drag:start', $event)"
       @drag:move="$emit('drag:move', $event)"
-      @drag:end="handleDragEnd"
+      @drag:end="$emit('drag:end', $event)"
     />
   </div>
 </template>
@@ -94,14 +94,15 @@ export default {
       }
       this.isOpen = !this.isOpen
     },
-    handleDragStart(evt) {
-      this.timeout = setTimeout(() => (this.isHidden = true), 200)
-      this.$emit("drag:start", evt)
+    hide() {
+      if (this.isOpen) {
+        this.isHidden = true
+      }
     },
-    handleDragEnd(evt) {
-      clearTimeout(this.timeout)
-      this.isHidden = false
-      this.$emit("drag:end", evt)
+    show() {
+      if (this.isOpen) {
+        this.isHidden = false
+      }
     },
     back() {
       this.state = States.Home

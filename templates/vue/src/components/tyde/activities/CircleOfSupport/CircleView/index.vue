@@ -1,7 +1,7 @@
 <template>
   <ul class="circle-container">
     <connections-tab
-      ref="connections"
+      ref="connectionsTab"
       class="tab"
       :connections="connections"
       :communities="communities"
@@ -23,6 +23,7 @@
         '--border-width': circle.borderWidth,
         '--order': circle.order,
         '--radius': circle.radius,
+        '--background': getCircleBackground(index),
       }"
       class="circle"
     >
@@ -73,9 +74,9 @@ import SingleConnection from "../SingleConnection"
 import CircleToggle from "./CircleToggle"
 
 const CONNECTION_SPACE = 10
-const CONNECTION_OFFSET = 48
+const CONNECTION_OFFSET = 56
 const MIN_CIRCLE_SIZE = 125
-const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.75
+const OFFSET_SIZE = MIN_CIRCLE_SIZE * 0.85
 
 const States = {
   Home: 0,
@@ -114,7 +115,6 @@ export default {
       required: true,
     },
   },
-  // STUB: Change this to props
   data() {
     return {
       activeCircle: CircleStates.All,
@@ -166,9 +166,17 @@ export default {
     },
   },
   methods: {
+    getCircleBackground(index) {
+      if (this.activeCircle === index && this.draggingConnection) {
+        return `#ececec`
+      }
+      return "white"
+    },
     handleDragStart({ x, y, connection }) {
       this.timeout = setTimeout(() => {
         this.draggingConnection = connection
+        this.$refs.connectionsTab.hide()
+
         // Close the tooltip on drag
         this.activeConnectionId = null
         this.handleDragMove({ x, y })
@@ -201,6 +209,8 @@ export default {
         connectionRef.style.setProperty("--x", `0px`)
         connectionRef.style.setProperty("--y", `0px`)
         this.draggingConnection = null
+
+        setTimeout(() => this.$refs.connectionsTab.show(), 300)
       }
     },
     getCircle(connectionId) {
@@ -277,12 +287,12 @@ export default {
     editConnection(connection) {
       this.activeConnectionId = null
       this.state = States.EditConnection
-      this.$refs.connections.editConnection(connection)
+      this.$refs.connectionsTab.editConnection(connection)
     },
     handleBack() {
       if (this.state === States.EditConnection) {
         this.state = States.Home
-        this.$refs.connections.close()
+        this.$refs.connectionsTab.close()
       }
     },
     handleEditConnection(event) {
@@ -332,6 +342,7 @@ ul {
   width: calc(var(--radius) * 2);
   height: calc(var(--radius) * 2);
   border-radius: 50%;
+  background: var(--background);
   z-index: calc(var(--order) * 10);
 }
 
