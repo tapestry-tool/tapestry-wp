@@ -106,8 +106,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
-    ...mapState(["favourites"]),
+    ...mapGetters([
+      "getDirectChildren",
+      "getNode",
+      "getParent",
+      "isFavourite",
+      "isMultiContent",
+    ]),
+    ...mapState(["favourites", "rootId"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -207,8 +213,10 @@ export default {
             name: names.SUBMULTICONTENT,
             params: {
               nodeId: this.$route.params.nodeId,
-              rowId: this.node.id,
-              subRowId: rowId,
+              ...this.getRouteToParent(
+                rowId,
+                this.$route.params.rowId || this.node.id
+              ),
             },
             query: this.$route.query,
           })
@@ -225,6 +233,45 @@ export default {
           params: { nodeId: this.node.id },
           query: this.$route.query,
         })
+      }
+    },
+    getRouteToParent(childId, parentId) {
+      let path = [childId]
+      let subRowIds = []
+
+      if (this.$route.params.subRowId) {
+        const subRowIdString = this.$route.params.subRowId.toString()
+        subRowIds = subRowIdString.split(",")
+      }
+
+      while (childId !== this.rootId) {
+        const pid = this.getParent(childId)
+
+        // Handling shared parent in subRowIds
+        if (subRowIds.includes(pid.toString())) {
+          const sharedPath = subRowIds.slice(
+            0,
+            subRowIds.indexOf(pid.toString()) + 1
+          )
+          return {
+            rowId: parentId,
+            subRowId: sharedPath.concat(path).join(","),
+          }
+        }
+        if (pid == this.$route.params.nodeId) {
+          const rowId = path[0]
+          path.shift()
+          return {
+            rowId: rowId,
+            subRowId: path.join(","),
+          }
+        }
+        path.unshift(pid)
+        childId = pid
+      }
+      return {
+        rowId: parentId,
+        subRowId: path.join(","),
       }
     },
   },
