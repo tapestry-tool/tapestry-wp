@@ -87,7 +87,8 @@ export default {
     },
     dimensions: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     context: {
       type: String,
@@ -130,7 +131,7 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    updateProgress(amountViewed) {
+    updateProgress({ amountViewed }) {
       this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
     complete() {

@@ -234,7 +234,7 @@ export default {
       const video = this.$refs.video
       if (video) {
         const amountViewed = video.currentTime / video.duration
-        this.$emit("timeupdate", amountViewed)
+        this.$emit("timeupdate", { amountViewed, currentTime: video.currentTime })
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
           this.$emit("complete")

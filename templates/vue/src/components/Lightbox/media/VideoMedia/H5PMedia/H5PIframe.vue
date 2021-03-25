@@ -329,7 +329,10 @@ export default {
                         currentPlayedTime = h5pVideo.getCurrentTime()
                         const amountViewed = currentPlayedTime / videoDuration
 
-                        h5pIframeComponent.$emit("timeupdate", amountViewed)
+                        h5pIframeComponent.$emit("timeupdate", {
+                          amountViewed,
+                          currentTime: currentPlayedTime,
+                        })
 
                         h5pIframeComponent.updateSettings(h5pVideo)
 

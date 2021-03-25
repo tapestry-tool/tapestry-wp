@@ -95,6 +95,27 @@ export default {
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
+    /**
+     * Don't really think this is best practice, but these methods are meant to be
+     * used by parent components to play/pause the video, returning true if the
+     * particular action was successful and false otherwise.
+     *
+     * The goal here is to create a unified interface between Videos and H5Ps.
+     */
+    play() {
+      if (this.player) {
+        this.player.playVideo()
+        return true
+      }
+      return false
+    },
+    pause() {
+      if (this.player) {
+        this.player.stopVideo()
+        return true
+      }
+      return false
+    },
     ready(event) {
       this.player = event.target
       this.player.seekTo(this.progress * this.player.getDuration(), true)
@@ -115,15 +136,13 @@ export default {
       this.showEndScreen = false
       if (this.player) {
         this.player.seekTo(0, true)
-        this.player.playVideo()
+        this.play()
       }
     },
     close() {
-      if (this.player) {
-        this.player.stopVideo()
-        this.updateVideoProgress()
-        this.updateSettings()
-      }
+      this.pause()
+      this.updateVideoProgress()
+      this.updateSettings()
       this.$emit("close")
     },
     getInitialEndScreenState() {
@@ -144,7 +163,10 @@ export default {
         } else {
           amountViewed = this.player.getCurrentTime() / this.player.getDuration()
         }
-        this.$emit("timeupdate", amountViewed)
+        this.$emit("timeupdate", {
+          amountViewed,
+          currentTime: this.player.getCurrentTime(),
+        })
 
         if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
           this.$emit("complete")

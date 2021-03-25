@@ -80,6 +80,12 @@ export default {
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
+    play() {
+      this.$refs.h5pIframe.play()
+    },
+    pause() {
+      this.$refs.h5pIframe.pause()
+    },
     openQuiz() {
       this.showEndScreen = false
       this.showActivityScreen = true
