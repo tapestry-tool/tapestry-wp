@@ -208,8 +208,8 @@ export default {
       }
     },
     changeRow(rowId) {
-      if (rowId) {
-        if (this.isMultiContentContext) {
+      if (this.isMultiContentContext) {
+        if (rowId) {
           this.$router.push({
             name: names.SUBMULTICONTENT,
             params: {
@@ -222,18 +222,34 @@ export default {
             query: this.$route.query,
           })
         } else {
+          if (this.$route.params.subRowId) {
+            let updatedSubRowIds = this.$route.params.subRowId.split(",")
+            updatedSubRowIds.pop()
+            this.$router.push({
+              name: names.SUBMULTICONTENT,
+              params: {
+                nodeId: this.$route.params.nodeId,
+                rowId: this.$route.params.rowId,
+                subRowId: updatedSubRowIds.join(","),
+              },
+              query: this.$route.query,
+            })
+          }
+        }
+      } else {
+        if (rowId) {
           this.$router.push({
             name: names.MULTICONTENT,
             params: { nodeId: this.node.id, rowId },
             query: this.$route.query,
           })
+        } else {
+          this.$router.push({
+            name: names.LIGHTBOX,
+            params: { nodeId: this.node.id },
+            query: this.$route.query,
+          })
         }
-      } else {
-        this.$router.push({
-          name: names.LIGHTBOX,
-          params: { nodeId: this.node.id },
-          query: this.$route.query,
-        })
       }
     },
     getRouteToParent(childId, parentId) {
