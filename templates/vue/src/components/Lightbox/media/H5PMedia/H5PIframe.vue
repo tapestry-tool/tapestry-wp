@@ -142,25 +142,40 @@ export default {
       }
       this.$emit("change:dimensions", updatedDimensions)
     },
-    play() {
+    getInstance() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const h5pVideo = h5pObj.instances[0].video
+      return h5pObj.instances[0].video
+    },
+    /**
+     * Don't really think this is best practice, but these methods are meant to be
+     * used by parent components to play/pause the video, returning true if the
+     * particular action was successful and false otherwise.
+     *
+     * The goal here is to create a unified interface between Videos and H5Ps.
+     */
+    play() {
+      const h5pVideo = this.getInstance()
       if (h5pVideo) {
         h5pVideo.play()
+        return true
       }
+      return false
+    },
+    pause() {
+      const h5pVideo = this.getInstance()
+      if (h5pVideo) {
+        h5pVideo.pause()
+        return true
+      }
+      return false
     },
     rewatch() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const h5pVideo = h5pObj.instances[0].video
+      const h5pVideo = this.getInstance()
       h5pVideo.seek(0)
       h5pVideo.play()
     },
     close() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      const h5pVideo = h5pObj.instances[0].video
-      if (h5pVideo) {
-        h5pVideo.pause()
-      }
+      this.pause()
     },
     updateSettings(h5pVideo) {
       let newSettings = {}

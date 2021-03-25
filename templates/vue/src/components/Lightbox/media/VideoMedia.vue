@@ -134,6 +134,27 @@ export default {
       }
       this.$emit("close")
     },
+    /**
+     * Don't really think this is best practice, but these methods are meant to be
+     * used by parent components to play/pause the video, returning true if the
+     * particular action was successful and false otherwise.
+     *
+     * The goal here is to create a unified interface between Videos and H5Ps.
+     */
+    play() {
+      if (this.$refs.video) {
+        this.$refs.video.play()
+        return true
+      }
+      return false
+    },
+    pause() {
+      if (this.$refs.video) {
+        this.$refs.video.pause()
+        return true
+      }
+      return false
+    },
     getInitialEndScreenState() {
       const progress = this.node.progress
       if (progress >= 1) {
