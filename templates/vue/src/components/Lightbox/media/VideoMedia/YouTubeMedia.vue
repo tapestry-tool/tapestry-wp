@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import EndScreen from "./common/EndScreen"
-import ActivityScreen from "./common/ActivityScreen"
+import EndScreen from "../common/EndScreen"
+import ActivityScreen from "../common/ActivityScreen"
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"

@@ -34,14 +34,14 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import EndScreen from "./common/EndScreen"
-import ActivityScreen from "./common/ActivityScreen"
-import PlayScreen from "./common/PlayScreen"
+import EndScreen from "../common/EndScreen"
+import ActivityScreen from "../common/ActivityScreen"
+import PlayScreen from "../common/PlayScreen"
 
 const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
-  name: "video-media",
+  name: "url-video-media",
   components: {
     EndScreen,
     ActivityScreen,

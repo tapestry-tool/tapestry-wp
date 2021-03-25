@@ -36,9 +36,9 @@
 import { mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
-import EndScreen from "../common/EndScreen"
+import EndScreen from "@/components/Lightbox/media/common/EndScreen"
+import ActivityScreen from "@/components/Lightbox/media/common/ActivityScreen"
 import H5PIframe from "./H5PIframe"
-import ActivityScreen from "../common/ActivityScreen"
 
 export default {
   name: "h5p-media",

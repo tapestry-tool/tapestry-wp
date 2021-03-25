@@ -18,34 +18,7 @@
       @load="handleLoad"
     />
     <video-media
-      v-if="node.mediaFormat === 'mp4'"
-      :autoplay="autoplay"
-      :node="node"
-      :dimensions="dimensions"
-      @load="handleLoad"
-      @complete="complete"
-      @timeupdate="updateProgress"
-      @close="$emit('close')"
-    />
-    <youtube-media
-      v-if="node.mediaFormat === 'youtube'"
-      :autoplay="autoplay"
-      :node="node"
-      :dimensions="dimensions"
-      @load="handleLoad"
-      @complete="complete"
-      @timeupdate="updateProgress"
-      @close="$emit('close')"
-    />
-    <external-media
-      v-if="node.mediaType === 'url-embed'"
-      :dimensions="dimensions"
-      :node="node"
-      @load="handleLoad"
-      @complete="complete"
-    />
-    <h5p-media
-      v-if="node.mediaFormat === 'h5p'"
+      v-if="isVideoNode"
       :autoplay="autoplay"
       :dimensions="dimensions"
       :context="context"
@@ -55,6 +28,13 @@
       @timeupdate="updateProgress"
       @complete="complete"
       @close="$emit('close')"
+    />
+    <external-media
+      v-if="node.mediaType === 'url-embed'"
+      :dimensions="dimensions"
+      :node="node"
+      @load="handleLoad"
+      @complete="complete"
     />
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
@@ -84,9 +64,7 @@ import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
 import ExternalMedia from "./ExternalMedia"
-import H5PMedia from "./H5PMedia"
 import ActivityMedia from "./ActivityMedia"
-import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
 import GravityForm from "./common/GravityForm"
 import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
@@ -97,12 +75,10 @@ export default {
     TextMedia,
     VideoMedia,
     ExternalMedia,
-    "h5p-media": H5PMedia,
     GravityForm,
     WpPostMedia,
     CompletionScreen,
     ActivityMedia,
-    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {
@@ -134,6 +110,9 @@ export default {
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
+    },
+    isVideoNode() {
+      return ["mp4", "youtube", "h5p"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {
