@@ -38,9 +38,6 @@
             </a>
           </div>
           <div v-if="!disableRow(index)" :data-qa="`row-content-${row.node.id}`">
-            <h1 v-if="showTitle(row)" class="sub-multicontent-title">
-              {{ row.node.title }}
-            </h1>
             <div v-if="row.node.mediaType !== 'multi-content'">
               <tapestry-media
                 :node-id="row.node.id"
@@ -186,14 +183,6 @@ export default {
     changeRow(rowId) {
       this.$emit("changeRow", rowId)
     },
-    showTitle(row) {
-      return (
-        !row.node.isMultiContentChild &&
-        this.node.presentationStyle === "page" &&
-        row.node.mediaType === "multi-content" &&
-        row.node.typeData.showTitle !== false
-      )
-    },
     handleAutoClose() {
       this.$emit("close")
     },
@@ -240,18 +229,6 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
-  }
-}
-
-.sub-multicontent-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
-  color: white;
-
-  :before {
-    display: none;
   }
 }
 </style>

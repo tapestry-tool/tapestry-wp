@@ -141,10 +141,7 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     showTitle() {
-      return (
-        (this.context !== "multi-content" && this.context !== "accordion") ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
-      )
+      return this.level == 0 || this.node.typeData.showTitle !== false
     },
     isMultiContentContext() {
       return (
