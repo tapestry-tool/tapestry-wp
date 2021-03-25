@@ -561,7 +561,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
-            'popup' => $this->popup
+            'popup' => $this->popup,
         ];
     }
 

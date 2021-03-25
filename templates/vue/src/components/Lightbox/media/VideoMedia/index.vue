@@ -26,11 +26,10 @@ import { mapGetters } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
-import TapestryMedia from "../TapestryMedia"
 
 export default {
   components: {
-    TapestryMedia,
+    TapestryMedia: () => import("../TapestryMedia"),
     UrlVideoMedia,
     "youtube-media": YouTubeMedia,
     "h5p-media": H5PMedia,
