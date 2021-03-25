@@ -141,7 +141,11 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     showTitle() {
-      return this.level == 0 || this.node.typeData.showTitle !== false
+      return (
+        this.level == 0 ||
+        (this.node.presentationStyle !== "accordion" &&
+          this.node.typeData.showTitle !== false)
+      )
     },
     isMultiContentContext() {
       return (
