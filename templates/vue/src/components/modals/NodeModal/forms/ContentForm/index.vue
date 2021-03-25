@@ -26,6 +26,9 @@
     <b-form-group v-if="node.hasSubAccordion" label="Subaccordion Text">
       <b-form-input v-model="node.typeData.subAccordionText"></b-form-input>
     </b-form-group>
+    <b-form-group v-if="isPopupCandidate" label="Popup">
+      <popup-form :node="node" />
+    </b-form-group>
     <b-form-group label="Content Type">
       <b-form-select
         id="node-media-type"
@@ -62,6 +65,7 @@ import ActivityForm from "./ActivityForm"
 import AccordionForm from "./AccordionForm"
 import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
+import PopupForm from "./PopupForm"
 import TextForm from "./TextForm"
 import RichTextForm from "./RichTextForm"
 import UrlEmbedForm from "./UrlEmbedForm"
@@ -74,6 +78,7 @@ export default {
     AccordionForm,
     GravityFormForm,
     H5pForm,
+    PopupForm,
     TextForm,
     RichTextForm,
     UrlEmbedForm,
@@ -82,6 +87,10 @@ export default {
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    parent: {
       type: Object,
       required: true,
     },
@@ -109,6 +118,16 @@ export default {
     ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
+    },
+    /**
+     * If we're currently editing, a node is a popup candidate if its parent is a
+     * video node.
+     */
+    isPopupCandidate() {
+      if (this.parent) {
+        return ["video", "h5p"].includes(this.parent.mediaType)
+      }
+      return false
     },
   },
   watch: {

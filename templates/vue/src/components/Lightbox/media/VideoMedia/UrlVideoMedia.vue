@@ -192,6 +192,7 @@ export default {
     },
     handleLoad() {
       const video = this.$refs.video
+      console.log(video)
       this.videoDimensions = {
         height: video.videoHeight,
         width: video.videoWidth,

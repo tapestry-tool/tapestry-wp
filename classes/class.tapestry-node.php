@@ -45,6 +45,7 @@ class TapestryNode implements ITapestryNode
     private $license;
     private $references;
     private $mapCoordinates;
+    private $popup;
 
     /**
      * Constructor.
@@ -94,6 +95,7 @@ class TapestryNode implements ITapestryNode
             'lat' => '',
             'lng' => '',
         ];
+        $this->popup = null;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -223,6 +225,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
             $this->mapCoordinates = $node->mapCoordinates;
+        }
+        if (isset($node->popup) && is_object($node->popup)) {
+            $this->popup = $node->popup;
         }
     }
 
@@ -556,6 +561,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
+            'popup' => $this->popup
         ];
     }
 

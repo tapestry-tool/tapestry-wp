@@ -27,6 +27,7 @@
           >
             <content-form
               :node="node"
+              :parent="parent"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"

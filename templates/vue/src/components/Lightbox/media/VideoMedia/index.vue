@@ -90,6 +90,7 @@ export default {
   },
   methods: {
     checkAndShowPopup({ amountViewed, currentTime }) {
+      console.log(currentTime)
       const activePopup = this.popups.find(
         popup => popup.time >= this.lastTime && popup.time <= currentTime
       )
