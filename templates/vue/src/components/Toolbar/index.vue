@@ -2,7 +2,7 @@
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
     <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
-      <review-notifications v-if="canEdit" />
+      <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
       <settings-modal-button
         v-if="canEdit"
         :max-depth="maxDepth"

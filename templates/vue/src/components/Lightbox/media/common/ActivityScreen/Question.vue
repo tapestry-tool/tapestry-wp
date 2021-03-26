@@ -90,6 +90,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex"
+import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
@@ -97,7 +98,6 @@ import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import SpeechBubble from "../SpeechBubble"
 import Helpers from "@/utils/Helpers"
-import client from "@/services/TapestryAPI"
 import * as wp from "@/services/wp"
 
 export default {

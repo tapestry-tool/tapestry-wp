@@ -58,8 +58,8 @@
 
 <script>
 import AudioRecoder from "audio-recorder-polyfill"
-import { mapGetters } from "vuex"
 import client from "@/services/TapestryAPI"
+import { mapGetters } from "vuex"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {

@@ -1,7 +1,11 @@
+import { roles } from "../support/roles"
+
 describe("Node Authoring", () => {
   beforeEach(() => {
     cy.fixture("one-node.json").as("oneNode")
     cy.fixture("two-nodes.json").as("twoNodes")
+    cy.fixture("two-nodes-diff-user.json").as("twoNodesDiffUser")
+    cy.fixture("subscriber-node.json").as("subscriberNode")
   })
 
   it("should be able to add a root node using the node modal", () => {
@@ -99,6 +103,50 @@ describe("Node Authoring", () => {
           cy.openModal("edit", id)
           cy.contains(/delete node/i).should("be.disabled")
         })
+      })
+  })
+
+  it("should render warning and be able to delete node if node has draft child from another user", () => {
+    cy.setup("@twoNodesDiffUser")
+
+    cy.store()
+      .its("state.nodes")
+      .then(nodes => {
+        const root = Object.values(nodes)[0]
+        cy.openModal("edit", root.id)
+
+        const modalTitle = "Are you sure you want to continue?"
+
+        // Expect cancel to not delete node
+        cy.contains(/delete/i).click()
+        cy.contains(modalTitle).should("be.visible")
+        cy.contains(modalTitle)
+          .parentsUntil(".modal-dialog")
+          .within(() => {
+            cy.contains(/cancel/i).click()
+          })
+        cy.contains(modalTitle).should("not.be.visible")
+        cy.contains(/delete node/i).should("be.visible")
+
+        // Expect delete to delete node
+        cy.server()
+        cy.route("DELETE", `**/nodes/**`).as("deleteNode")
+
+        cy.contains(/delete/i).click()
+        cy.contains(modalTitle).should("be.visible")
+        cy.contains(modalTitle)
+          .parentsUntil(".modal-dialog")
+          .within(() => {
+            cy.contains(/delete/i).click()
+          })
+        cy.wait("@deleteNode")
+
+        cy.getNodeById(root.id).should("not.exist")
+        cy.store()
+          .its("state.nodes")
+          .then(nodes => {
+            expect(Object.keys(nodes)).to.have.length(0)
+          })
       })
   })
 
@@ -223,6 +271,42 @@ describe("Node Authoring", () => {
         cy.contains(/cancel/i).click()
         cy.contains(/close/i).click()
         cy.contains(`/${nodeName}/i`).should("not.exist")
+      })
+    })
+  })
+
+  describe("As subscriber:", () => {
+    beforeEach(() => {
+      cy.setup("@subscriberNode", roles.SUBSCRIBER)
+    })
+
+    it("should be able to add a child node using the node modal and edit as subscriber", () => {
+      const child = {
+        title: "Child 1",
+        mediaType: "text",
+        typeData: {
+          textContent: "Abcd",
+        },
+      }
+
+      cy.getSelectedNode().then(parent => {
+        cy.openModal("add", parent.id)
+        cy.getByTestId(`node-title`).type(child.title)
+
+        cy.changeMediaType(child.mediaType)
+        cy.getEditable(`node-text-content`).type(child.typeData.textContent)
+
+        cy.submitModal()
+        cy.contains(child.title).should("exist")
+        cy.getNodeByTitle(child.title)
+          .its("id")
+          .then(childId => {
+            cy.link(parent.id, childId).should("exist")
+            cy.getByTestId(`edit-node-${childId}`).click({ force: true })
+            cy.getByTestId("node-modal").should("be.visible")
+            cy.submitModal()
+            cy.getByTestId("node-modal").should("not.be.visible")
+          })
       })
     })
   })

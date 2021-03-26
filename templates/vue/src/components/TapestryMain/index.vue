@@ -19,17 +19,13 @@
           :key="id"
           :node="node"
           class="node"
-          :class="{ selectable: nodeIsEditable(node) }"
+          :class="{ selectable: true }"
           :data-id="id"
           :root="id == selectedId"
           @dragend="updateViewBox"
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
-          @mounted="
-            dragSelectEnabled && nodeIsEditable(node)
-              ? updateSelectableNodes(node)
-              : null
-          "
+          @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
         ></tapestry-node>
       </g>
       <locked-tooltip
