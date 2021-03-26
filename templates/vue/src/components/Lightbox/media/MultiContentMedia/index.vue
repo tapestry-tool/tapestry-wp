@@ -202,10 +202,11 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     updateProgress(rowId) {
-      this.completeNode(rowId)
-      if (this.rows.every(row => row.node.completed)) {
-        this.$emit("complete")
-      }
+      this.completeNode(rowId).then(() => {
+        if (this.rows.every(row => row.node.completed)) {
+          this.$emit("complete", this.node.id)
+        }
+      })
     },
     changeRow(rowId) {
       if (this.isMultiContentContext) {

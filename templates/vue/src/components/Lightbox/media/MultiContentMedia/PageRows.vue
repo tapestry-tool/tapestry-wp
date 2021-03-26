@@ -66,7 +66,7 @@
               context="page"
               :level="level + 1"
               @close="handleAutoClose"
-              @complete="complete"
+              @complete="updateProgress"
             />
           </div>
           <button
@@ -185,9 +185,6 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
-    },
-    complete() {
-      this.$emit("complete")
     },
   },
 }
