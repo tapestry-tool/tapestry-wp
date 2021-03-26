@@ -329,7 +329,6 @@ describe("Multi-content", () => {
             cy.contains(textNode.title).should("exist")
             cy.contains(textNode.typeData.textContent).should("exist")
             cy.contains(moreNode.title).should("exist")
-            cy.contains(moreNode.typeData.textContent).should("exist")
           })
           cy.closeLightbox()
 
