@@ -1,37 +1,43 @@
 <template>
-  <div class="cos">
-    <connections-tab
-      class="tab"
+  <div id="cos" class="cos">
+    <community-view
+      v-if="view === views.Community"
       :connections="cos.connections"
       :communities="cos.communities"
       @add-connection="addConnection"
-      @add-community="addCommunity"
       @update-connection="updateConnection"
+      @add-community="addCommunity"
     />
-    <add-community-tab @add-community="addCommunity" />
   </div>
 </template>
 
 <script>
 import client from "@/services/TapestryAPI"
-import AddCommunityTab from "./AddCommunityTab"
-import ConnectionsTab from "./ConnectionsTab"
+import CommunityView from "./CommunityView"
 
-import Connections from "./Connections"
+const CosView = {
+  Community: 0,
+  Circle: 1,
+}
 
 export default {
   components: {
-    AddCommunityTab,
-    ConnectionsTab,
+    CommunityView,
   },
   data() {
     return {
+      view: CosView.Community,
       cos: {
         circles: [],
         communities: {},
         connections: {},
       },
     }
+  },
+  computed: {
+    views() {
+      return CosView
+    },
   },
   async mounted() {
     const { circles, communities, connections } = await client.cos.getActivity()
@@ -89,12 +95,5 @@ export default {
   height: 600px;
   position: relative;
   overflow: hidden;
-}
-
-.tab {
-  width: 100%;
-  position: absolute;
-  left: 0;
-  bottom: 0;
 }
 </style>
