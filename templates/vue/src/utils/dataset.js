@@ -61,14 +61,14 @@ function parseToStore(dataset) {
     const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
     accordionRowIds.forEach(accordionRowId => {
       const accordionRow = getNode(dataset, accordionRowId)
-      accordionRow.presentationStyle = "accordion-row"
+      accordionRow.isMultiContentChild = true
       const subRows = getChildIds({ links: dataset.links }, accordionRowId)
       if (subRows.length) {
         accordionRow.isSubAccordion = true
       }
       subRows.forEach(id => {
         const subRow = getNode(dataset, id)
-        subRow.presentationStyle = "accordion-row"
+        subRow.isMultiContentChild = true
       })
     })
   }
