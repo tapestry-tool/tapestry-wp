@@ -104,11 +104,11 @@
             <coordinates-form :node="node" />
           </b-tab>
           <b-tab
-            title="More Information"
-            :active="tab === 'more-information'"
-            @click="changeTab('more-information')"
+            title="Copyright"
+            :active="tab === 'copyright'"
+            @click="changeTab('copyright')"
           >
-            <more-information-form :node="node" />
+            <copyright-form :node="node" />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -223,7 +223,7 @@ import BehaviourForm from "./forms/BehaviourForm"
 import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
-import MoreInformationForm from "./forms/MoreInformationForm"
+import CopyrightForm from "./forms/CopyrightForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
@@ -251,7 +251,7 @@ export default {
     ActivityForm,
     ConditionsForm,
     CoordinatesForm,
-    MoreInformationForm,
+    CopyrightForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -513,7 +513,7 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information", "coordinates"]
+      const okTabs = ["content", "appearance", "copyright", "coordinates"]
       if (okTabs.includes(requestedTab)) {
         return true
       }
