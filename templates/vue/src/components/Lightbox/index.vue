@@ -12,7 +12,7 @@
     @close="handleUserClose"
   >
     <accordion-media
-      v-if="node.mediaType === 'accordion'"
+      v-if="node.presentationStyle === 'accordion'"
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
@@ -101,7 +101,7 @@ export default {
         styles.position = "relative"
       }
 
-      if (this.node.mediaType === "accordion") {
+      if (this.node.presentationStyle === "accordion") {
         return Object.assign(styles, { padding: "24px" })
       }
 

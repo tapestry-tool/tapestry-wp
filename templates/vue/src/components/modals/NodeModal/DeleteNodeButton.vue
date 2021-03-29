@@ -27,15 +27,23 @@ export default {
       required: false,
       default: false,
     },
+    isMultiContentNodeChild: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
-    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks"]),
+    ...mapGetters(["getNode", "getNeighbours", "getNeighbouringLinks", "getParent"]),
     ...mapState(["nodes", "rootId"]),
     neighbourLink() {
       return this.getNeighbouringLinks(this.nodeId)[0]
     },
     neighbour() {
       return this.getNode(this.getNeighbours(this.nodeId)[0])
+    },
+    parent() {
+      return this.getParent(this.nodeId)
     },
     isRoot() {
       return this.nodeId === this.rootId
@@ -62,6 +70,9 @@ export default {
     },
   },
   mounted() {
+    this.$emit("message", this.disabledMessage)
+  },
+  updated() {
     this.$emit("message", this.disabledMessage)
   },
   methods: {
@@ -96,6 +107,7 @@ export default {
     removeNode() {
       if (!this.isRoot) {
         const neighbour = this.neighbour
+        const parent = this.parent
         this.deleteLink({
           source: this.neighbourLink.source,
           target: this.neighbourLink.target,
@@ -107,15 +119,24 @@ export default {
             childOrdering: neighbour.childOrdering.filter(id => id !== this.nodeId),
           },
         })
-        this.$router.push({
-          name: names.APP,
-          params: { nodeId: neighbour.id },
-          query: this.$route.query,
-        })
+        if (this.isMultiContentNodeChild) {
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: parent, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
+        } else {
+          this.$router.push({
+            name: names.APP,
+            params: { nodeId: neighbour.id },
+            query: this.$route.query,
+          })
+        }
       } else {
         this.$router.push({ path: "/", query: this.$route.query })
       }
       this.deleteNode(this.nodeId)
+      this.$emit("complete")
     },
   },
 }

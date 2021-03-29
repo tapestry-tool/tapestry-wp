@@ -3,15 +3,36 @@
     v-if="node"
     id="node-modal"
     :visible="show"
-    :title="title"
     size="lg"
     class="text-muted"
     scrollable
+    :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
     @hide="handleClose"
   >
+    <template #modal-title>
+      <b-link
+        v-if="isMultiContentNodeChild"
+        class="nav-item modal-header-link"
+        data-qa="node-modal-header-back"
+        @click="handleClose"
+      >
+        <i class="fas fa-chevron-left fa-xs" />
+        Back to "{{ parent.title }}"
+      </b-link>
+      <div v-else data-qa="node-modal-header">
+        {{ title }}
+      </div>
+    </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
+        <h4
+          v-if="isMultiContentNodeChild"
+          data-qa="node-modal-title"
+          class="modal-header"
+        >
+          {{ title }}
+        </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
@@ -27,6 +48,7 @@
           >
             <content-form
               :node="node"
+              :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
@@ -70,7 +92,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
+            v-if="node.mediaType === 'multi-content' || node.hasSubAccordion"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -121,8 +143,11 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
+              :isMultiContentNodeChild="isMultiContentNodeChild"
+              @submit="loading = true"
               @setLoading="setLoading"
               @message="setDisabledMessage"
+              @complete="loading = false"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
             <b-button
@@ -269,6 +294,7 @@ export default {
       loadDuration: false,
       warningText: "",
       deleteWarningText: "",
+      keepOpen: false,
     }
   },
   computed: {
@@ -383,6 +409,9 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    isMultiContentNodeChild() {
+      return this.parent && this.parent.mediaType == "multi-content"
+    },
   },
   watch: {
     nodeId: {
@@ -441,6 +470,10 @@ export default {
       } else if (fileId.thumbnailType == "thumbnail") {
         this.node.thumbnailFileId = fileId.data
       }
+    })
+    this.$root.$on("add-node", () => {
+      this.keepOpen = true
+      this.handlePublish()
     })
     this.initialize()
   },
@@ -531,7 +564,7 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+          return this.node.mediaType === "multi-content" || this.node.hasSubAccordion
         }
       }
 
@@ -540,7 +573,7 @@ export default {
     hasSubAccordion(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return this.parent.mediaType === "accordion" && children.length > 0
+        return this.parent.presentationStyle === "accordion" && children.length > 0
       }
       return false
     },
@@ -587,11 +620,25 @@ export default {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
+        } else if (this.keepOpen) {
+          // Switch to edit mode if multi-content just added
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.node.id, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
         } else if (this.rootId && !this.nodeId) {
           // We just added a root node
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.rootId },
+            query: this.$route.query,
+          })
+        } else if (this.isMultiContentNodeChild) {
+          // Return to modal of parent node
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.parent.id, type: "edit", tab: "content" },
             query: this.$route.query,
           })
         } else {
@@ -602,6 +649,7 @@ export default {
           })
         }
       }
+      this.keepOpen = false
       this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
@@ -664,7 +712,7 @@ export default {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {
-                childOrdering: [...this.parent.childOrdering, id],
+                childOrdering: [...this.parent.childOrdering],
               },
             })
           }
@@ -806,10 +854,11 @@ export default {
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
     },
-    handleTypeChange() {
+    handleTypeChange(evt) {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
+      if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
@@ -1001,6 +1050,16 @@ table {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.modal-header-small {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.modal-header-link {
+  font-weight: normal;
+  font-size: 16px;
 }
 
 .error-wrapper {
