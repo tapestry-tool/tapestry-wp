@@ -34,6 +34,13 @@
             />
           </b-tab>
           <b-tab
+            title="References"
+            :active="tab === 'references'"
+            @click="changeTab('references')"
+          >
+            <references-form :node="node" />
+          </b-tab>
+          <b-tab
             title="Appearance"
             :active="tab === 'appearance'"
             @click="changeTab('appearance')"
@@ -224,6 +231,7 @@ import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
 import CopyrightForm from "./forms/CopyrightForm"
+import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
@@ -252,6 +260,7 @@ export default {
     ConditionsForm,
     CoordinatesForm,
     CopyrightForm,
+    ReferencesForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -513,7 +522,13 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "copyright", "coordinates"]
+      const okTabs = [
+        "content",
+        "references",
+        "appearance",
+        "copyright",
+        "coordinates",
+      ]
       if (okTabs.includes(requestedTab)) {
         return true
       }
