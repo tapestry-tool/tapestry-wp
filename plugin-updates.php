@@ -51,6 +51,9 @@ function tapestry_accordion_row_update() {
 function tapestry_plugin_update() {
     global $TAPESTRY_VERSION_NUMBER;
     $installed_version = get_site_option('tapestry_plugin_version');
+    if ( !$installed_version ) {
+        add_option( "tapestry_plugin_version", "2.43.0-beta" );
+    }
     if ( version_compare($installed_version, '2.44.0-beta', '<') ) {
         tapestry_accordion_update();
         tapestry_accordion_row_update();
