@@ -224,7 +224,7 @@ export default {
           return "tasks"
         case "url-embed":
           return "window-maximize"
-        case "accordion":
+        case "multi-content":
           return "bars"
         case "wp-post":
           return "post"
@@ -283,7 +283,7 @@ export default {
       return this.selection.includes(this.node.id)
     },
     progress() {
-      if (this.node.mediaType !== "accordion") {
+      if (this.node.mediaType !== "multi-content") {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)

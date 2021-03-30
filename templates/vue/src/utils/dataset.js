@@ -55,18 +55,20 @@ function parseToStore(dataset) {
     }
   }
 
-  for (const node of dataset.nodes.filter(node => node.mediaType === "accordion")) {
+  for (const node of dataset.nodes.filter(
+    node => node.presentationStyle === "accordion"
+  )) {
     const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
     accordionRowIds.forEach(accordionRowId => {
       const accordionRow = getNode(dataset, accordionRowId)
-      accordionRow.presentationStyle = "accordion-row"
+      accordionRow.isMultiContentChild = true
       const subRows = getChildIds({ links: dataset.links }, accordionRowId)
       if (subRows.length) {
         accordionRow.isSubAccordion = true
       }
       subRows.forEach(id => {
         const subRow = getNode(dataset, id)
-        subRow.presentationStyle = "accordion-row"
+        subRow.isMultiContentChild = true
       })
     })
   }
@@ -78,7 +80,7 @@ function parseToStore(dataset) {
   }
 
   dataset.nodes
-    .filter(n => n.mediaType === "accordion" || n.isSubAccordion)
+    .filter(n => n.presentationStyle === "accordion" || n.isSubAccordion)
     .forEach(n => initializeOrdering(dataset, n))
 
   store.selectedNodeId = dataset.rootId
@@ -139,7 +141,7 @@ function setDatasetProgress(dataset, progress) {
         node.typeData = content.typeData
       }
 
-      if (node.mediaType !== "accordion") {
+      if (node.mediaType !== "multi-content") {
         node.progress = nodeProgress.progress
         const questions = node.quiz
         if (nodeProgress.quiz) {

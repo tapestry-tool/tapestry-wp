@@ -324,6 +324,7 @@ export default class Helpers {
       lockedImageURL: "",
       mediaType: "text",
       mediaFormat: "",
+      presentationStyle: "",
       mediaDuration: 0,
       typeId: 1,
       group: 1,
