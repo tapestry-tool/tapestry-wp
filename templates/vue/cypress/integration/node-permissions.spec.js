@@ -48,4 +48,39 @@ describe("Node Permissions", () => {
       cy.getByTestId(`add-node-${node.id}`).should("exist")
     })
   })
+
+  it("should not see add button or draft button if drafts disabled", () => {
+    cy.get(".settings-button").click()
+    cy.contains(/access/i).click()
+    cy.getByTestId(`enable-draft`).click({ force: true })
+    cy.submitSettingsModal()
+    cy.visitTapestry()
+    cy.getSelectedNode().then(node => {
+      cy.openModal("add", node.id)
+      cy.get("#draft-button").should("not.exist")
+    })
+    cy.logout()
+    cy.login("subscriber").visitTapestry()
+    cy.getSelectedNode().then(node => {
+      cy.getByTestId(`add-node-${node.id}`).should("not.exist")
+    })
+  })
+
+  it("should not see submit for review button if submit for review disabled", () => {
+    setup({
+      public: ["read"],
+      authenticated: ["read"],
+    })
+    cy.get(".settings-button").click()
+    cy.contains(/access/i).click()
+    cy.getByTestId(`enable-submit-review`).click({ force: true })
+    cy.submitSettingsModal()
+    cy.logout().visitTapestry()
+    cy.getSelectedNode().then(node => {
+      cy.login("subscriber").visitTapestry()
+      cy.openModal("add", node.id)
+      cy.getByTestId("submit-node-modal").should("not.exist")
+      cy.get("#draft-button").should("exist")
+    })
+  })
 })

@@ -2,6 +2,7 @@
   <div>
     <input
       id="tyde-spaceship-icon"
+      data-qa="tyde-spaceship-icon"
       type="image"
       :src="spaceshipIconUrl"
       @click="toggleMenu"

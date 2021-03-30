@@ -2,7 +2,7 @@
   <div>
     <p>You answered:</p>
     <div>
-      <audio-player v-if="log.audioSrc" :audio-src="log.audioSrc"></audio-player>
+      <audio v-if="log.audioSrc" :src="log.audioSrc"></audio>
       <div v-else-if="log.text" v-html="log.text"></div>
       <ul v-else-if="log.checklist">
         <li v-for="answer in log.checklist" :key="answer">{{ answer }}</li>
@@ -12,13 +12,8 @@
 </template>
 
 <script>
-import AudioPlayer from "@/components/AudioPlayer"
-
 export default {
   name: "tyde-activity",
-  components: {
-    AudioPlayer,
-  },
   props: {
     log: {
       type: Object,
@@ -27,3 +22,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+audio {
+  width: calc(100% - 30px);
+}
+</style>

@@ -71,15 +71,22 @@ export default {
       const orderedPermissions = []
       PERMISSIONS_ORDER.forEach((permission, index) => {
         if (this.value.hasOwnProperty(permission)) {
-          orderedPermissions.push([permission, this.value[permission] || ["read"]])
+          orderedPermissions.push([
+            permission,
+            this.value[permission] ? this.value[permission] : [],
+          ])
         } else {
           const higherPermission = PERMISSIONS_ORDER[index - 1]
           orderedPermissions.push([
             permission,
-            this.value[higherPermission] || ["read"],
+            this.value[higherPermission] ? this.value[higherPermission] : [],
           ])
         }
       })
+      const userPermissions = Object.entries(this.value).filter(
+        ([role, permissions]) => role.startsWith("user-") && permissions.length > 0
+      )
+      orderedPermissions.push(...userPermissions)
       return orderedPermissions
     },
   },
@@ -212,7 +219,8 @@ export default {
               higherRowPermissions.includes(type)
           )
           .forEach(type => newUserPermissions.push(type))
-        newPermissions[`user-${userId}`] = newUserPermissions
+        newPermissions[`user-${userId}`] =
+          newUserPermissions.length > 0 ? newUserPermissions : ["read"]
         this.userId = null
         this.$emit("input", newPermissions)
       } else {

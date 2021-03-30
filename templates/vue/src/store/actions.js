@@ -35,6 +35,7 @@ export async function addNode(
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
+    nodeToAdd.permissions = response.data.permissions
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])
@@ -207,6 +208,22 @@ export async function deleteNode({ commit, dispatch }, id) {
   }
 }
 
+export async function getNodeHasDraftChildren({ dispatch }, id) {
+  try {
+    return await client.getNodeHasDraftChildren(id)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
+export async function getTapestryExport({ dispatch }) {
+  try {
+    return await client.getTapestryExport()
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function completeQuestion(
   { commit, dispatch },
   { answerType, formId, nodeId, questionId }
@@ -270,9 +287,12 @@ export async function addLink({ commit, dispatch, getters }, newLink) {
   }
 }
 
-export async function deleteLink({ commit, dispatch }, { source, target }) {
+export async function deleteLink(
+  { commit, dispatch },
+  { source, target, useClient = true }
+) {
   try {
-    await client.deleteLink({ source: source, target: target })
+    if (useClient) await client.deleteLink({ source: source, target: target })
     commit("deleteLink", { source, target })
   } catch (error) {
     dispatch("addApiError", error)

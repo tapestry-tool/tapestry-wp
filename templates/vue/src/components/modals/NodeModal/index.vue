@@ -130,7 +130,7 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
-              @submit="loading = true"
+              @setLoading="setLoading"
               @message="setDisabledMessage"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
@@ -164,7 +164,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else
+              v-else-if="this.settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
@@ -454,13 +454,6 @@ export default {
         this.node.thumbnailFileId = fileId.data
       }
     })
-    this.node = this.createDefaultNode()
-    if (!this.node.mapCoordinates) {
-      this.node.mapCoordinates = {
-        lat: "",
-        lng: "",
-      }
-    }
     this.initialize()
   },
   methods: {
@@ -482,6 +475,9 @@ export default {
           : tydeTypes.REGULAR
       }
       return tydeTypes.REGULAR
+    },
+    setLoading(status) {
+      this.loading = status
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
@@ -530,6 +526,12 @@ export default {
       }
       copy.tydeType = copy.tydeType || this.getInitialTydeType(this.parent)
       copy.hasSubAccordion = this.hasSubAccordion(copy)
+      if (!copy.mapCoordinates) {
+        copy.mapCoordinates = {
+          lat: "",
+          lng: "",
+        }
+      }
       this.node = copy
       this.setTapestryErrorReporting(false)
     },
@@ -652,6 +654,9 @@ export default {
       this.handleSubmit()
     },
     handleSubmitForReview() {
+      if (!this.settings.draftNodesEnabled || !this.settings.submitNodesEnabled) {
+        return
+      }
       this.node.reviewStatus = nodeStatus.SUBMIT
       this.node.status = nodeStatus.DRAFT
 
@@ -678,6 +683,7 @@ export default {
             target: id,
             value: 1,
             type: "",
+            addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
           // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
@@ -906,6 +912,9 @@ export default {
         : this.node.mediaURL !== mediaURL
     },
     hasDraftPermission(ID) {
+      if (!this.settings.draftNodesEnabled) {
+        return false
+      }
       if (ID === 0) {
         this.warningText = "You must be authenticated to create a draft node"
         return false

@@ -15,10 +15,12 @@ export default {
 
 function parse(response) {
   if (response && response.length) {
-    return response.map(({ id, title }) => {
+    return response.map(({ id, title, library, details }) => {
       return {
         id,
         title: Helpers.decodeHTMLChars(title),
+        library,
+        details: JSON.parse(details),
       }
     })
   }
