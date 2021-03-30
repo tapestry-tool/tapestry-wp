@@ -27,7 +27,7 @@ export function getParent(state) {
 export function isAccordion(_, { getNode, isSubAccordion }) {
   return id => {
     const node = getNode(id)
-    return node.mediaType === "accordion" || isSubAccordion(id)
+    return node.presentationStyle === "accordion" || isSubAccordion(id)
   }
 }
 
@@ -36,7 +36,7 @@ export function isSubAccordion(_, { getNode, getParent }) {
     const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
-      return parentNode.mediaType === "accordion"
+      return parentNode.presentationStyle === "accordion"
     }
     return false
   }

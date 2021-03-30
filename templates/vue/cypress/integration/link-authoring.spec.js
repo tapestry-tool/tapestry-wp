@@ -72,7 +72,7 @@ describe("Link Authoring", () => {
         const [root, child1, child2] = Object.values(nodes)
 
         cy.openModal("edit", root.id)
-        cy.changeMediaType("accordion")
+        cy.changeMediaType("multi-content")
         cy.submitModal()
 
         /**
