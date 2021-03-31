@@ -143,8 +143,7 @@ export default {
     showTitle() {
       return (
         this.level == 0 ||
-        (this.node.presentationStyle !== "accordion" &&
-          this.node.typeData.showTitle !== false)
+        (this.context !== "accordion" && this.node.typeData.showTitle !== false)
       )
     },
     isMultiContentContext() {
