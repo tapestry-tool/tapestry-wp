@@ -43,7 +43,7 @@
           <b-tab
             title="Content"
             :active="tab === 'content'"
-            style="overflow-x: hidden;"
+            style="overflow: hidden;"
             @click="changeTab('content')"
           >
             <content-form
@@ -54,6 +54,13 @@
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
             />
+          </b-tab>
+          <b-tab
+            title="References"
+            :active="tab === 'references'"
+            @click="changeTab('references')"
+          >
+            <references-form :node="node" />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -126,11 +133,11 @@
             <coordinates-form :node="node" />
           </b-tab>
           <b-tab
-            title="More Information"
-            :active="tab === 'more-information'"
-            @click="changeTab('more-information')"
+            title="Copyright"
+            :active="tab === 'copyright'"
+            @click="changeTab('copyright')"
           >
-            <more-information-form :node="node" />
+            <copyright-form :node="node" />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -248,7 +255,8 @@ import BehaviourForm from "./forms/BehaviourForm"
 import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
-import MoreInformationForm from "./forms/MoreInformationForm"
+import CopyrightForm from "./forms/CopyrightForm"
+import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
@@ -276,7 +284,8 @@ export default {
     ActivityForm,
     ConditionsForm,
     CoordinatesForm,
-    MoreInformationForm,
+    CopyrightForm,
+    ReferencesForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -546,7 +555,13 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information", "coordinates"]
+      const okTabs = [
+        "content",
+        "references",
+        "appearance",
+        "copyright",
+        "coordinates",
+      ]
       if (okTabs.includes(requestedTab)) {
         return true
       }
