@@ -119,7 +119,8 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "multi-content", text: "Multi-content Presentation" },
+        { value: "gravity-form", text: "Gravity Form", disabled: true },
+        { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
     }
@@ -142,11 +143,14 @@ export default {
   },
   mounted() {
     GravityFormsApi.exists().then(exists => {
-      this.mediaTypes.push({
-        value: "gravity-form",
-        text: "Gravity Form",
-        disabled: !exists,
-      })
+      const i = this.mediaTypes.findIndex(
+        mediaType => mediaType.value == "gravity-form"
+      )
+      if (exists) {
+        this.mediaTypes[i].disabled = false
+      } else {
+        this.mediaTypes[i].text += " (plugin unavailable)"
+      }
     })
   },
   methods: {
