@@ -65,7 +65,9 @@ export default {
   computed: {
     ...mapGetters(["getNode"]),
     requiresSaving() {
-      return this.actionType === "add"
+      // Require saving if node is changing from non-multi-content to multi-content
+      const node = this.getNode(this.node.id)
+      return this.actionType === "add" || node.mediaType !== "multi-content"
     },
     buttonContainerStyle() {
       return this.node.childOrdering.length > 0 ? "margin-top: 20px" : ""
