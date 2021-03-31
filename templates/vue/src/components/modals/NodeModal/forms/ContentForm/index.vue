@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
@@ -126,11 +127,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["isMultiContentRow"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
     showTitleCheckbox() {
-      return this.node.isMultiContentChild || this.node.isSubMultiContent
+      return this.isMultiContentRow(this.node.id)
     },
   },
   watch: {
