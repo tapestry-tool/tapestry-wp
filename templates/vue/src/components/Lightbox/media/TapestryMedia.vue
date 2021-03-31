@@ -22,7 +22,7 @@
       :autoplay="autoplay"
       :dimensions="dimensions"
       :context="context"
-      :node="node"
+      :node-id="nodeId"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"

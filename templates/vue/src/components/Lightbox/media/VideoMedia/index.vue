@@ -5,15 +5,16 @@
       v-show="activePopupId === null"
       ref="video"
       :node="node"
+      :dimensions="dimensions"
       v-bind="$attrs"
       v-on="$listeners"
       @timeupdate="checkAndShowPopup"
     />
     <tapestry-media
       v-if="activePopupId != null"
-      :dimensions="$attrs.dimensions"
+      :dimensions="dimensions"
       :node-id="activePopupId"
-      @complete="isPopupComplete = true"
+      @complete="completeNode(activePopupId)"
     />
     <button v-if="isPopupComplete" @click="resume">
       Continue
@@ -22,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapActions } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
@@ -35,7 +36,11 @@ export default {
     "h5p-media": H5PMedia,
   },
   props: {
-    node: {
+    nodeId: {
+      type: [Number, String],
+      required: true,
+    },
+    dimensions: {
       type: Object,
       required: true,
     },
@@ -43,11 +48,13 @@ export default {
   data() {
     return {
       activePopupId: null,
-      isPopupComplete: false,
     }
   },
   computed: {
     ...mapGetters(["getNode", "getDirectChildren"]),
+    node() {
+      return this.getNode(this.nodeId)
+    },
     videoComponent() {
       switch (this.node.mediaFormat) {
         case "mp4":
@@ -68,6 +75,13 @@ export default {
       popups.sort((a, b) => a.time - b.time)
       return popups
     },
+    isPopupComplete() {
+      const popup = this.getNode(this.activePopupId)
+      if (popup) {
+        return popup.completed
+      }
+      return false
+    },
   },
   watch: {
     /**
@@ -80,7 +94,7 @@ export default {
      * As a consequence, we have to reset the `lastTime` every time the node
      * changes, so `lastTime` is always <= the current time.
      */
-    node: {
+    nodeId: {
       immediate: true,
       handler() {
         this.lastTime = 0
@@ -88,10 +102,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["completeNode"]),
     checkAndShowPopup({ amountViewed, currentTime }) {
-      console.log(currentTime)
       const activePopup = this.popups.find(
-        popup => popup.time >= this.lastTime && popup.time <= currentTime
+        popup => popup.time > (this.lastTime || 0) && popup.time < currentTime
       )
 
       if (activePopup) {
@@ -104,15 +118,25 @@ export default {
     },
     resume() {
       this.activePopupId = null
-      this.isPopupComplete = false
       this.$refs.video.play()
     },
   },
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 div {
   height: 100%;
+}
+
+button {
+  position: absolute;
+  border-radius: 0.5rem;
+  right: 1rem;
+  bottom: 1rem;
+
+  &:hover {
+    background: var(--tapestry-light-gray);
+  }
 }
 </style>
