@@ -631,10 +631,10 @@ export default {
           })
           .catch(err => console.log(err))
       } else {
-        this.close()
+        this.close(event)
       }
     },
-    close() {
+    close(event = null) {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
@@ -653,6 +653,9 @@ export default {
             query: this.$route.query,
           })
         } else if (this.isMultiContentNodeChild) {
+          // Prevent NodeModal from closing
+          if (event) event.preventDefault()
+
           // Return to modal of parent node
           this.$router.push({
             name: names.MODAL,
