@@ -84,13 +84,13 @@ class CircleOfSupportEndpoints
     {
         try {
             $circleIndex = $request['circleIndex'];
-            $connectionId = $request['connectionId'];
             $cos = new CircleOfSupport();
             $circle = $cos->addConnectionToCircle(
-                    $circleIndex,
-                    json_decode($request->get_body())->id
-             );
+                $circleIndex,
+                json_decode($request->get_body())->id
+            );
             $cos->save();
+            return $circle;
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }

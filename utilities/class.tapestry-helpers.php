@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__) . '/class.tapestry-node-permissions.php';
 
 /**
  * Tapestry Helper Functions.
@@ -159,26 +159,26 @@ class TapestryHelpers
     public static function attachImageByURL($imageURL)
     {
         // is this already an image in our gallery?
-        $attachment_id = attachment_url_to_postid( $imageURL);
+        $attachment_id = attachment_url_to_postid($imageURL);
         if ($attachment_id) {
             return $attachment_id;
-        } 
+        }
 
         // not an image in our gallery. let's upload it.
-        include_once( ABSPATH . 'wp-admin/includes/image.php' );
+        include_once(ABSPATH . 'wp-admin/includes/image.php');
 
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
-        $uniq_name = date('dmY').''.(int) microtime(true); 
-        $filename = $uniq_name.'.'.$imagetype;
+        $uniq_name = date('dmY') . '' . (int) microtime(true);
+        $filename = $uniq_name . '.' . $imagetype;
 
         $uploaddir = wp_upload_dir();
         $uploadfile = $uploaddir['path'] . '/' . $filename;
-        $contents= file_get_contents($imageURL);
+        $contents = file_get_contents($imageURL);
         $savefile = fopen($uploadfile, 'w');
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null );
+        $wp_filetype = wp_check_filetype(basename($filename), null);
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +186,11 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment( $attachment, $uploadfile );
-        $imagenew = get_post( $attachment_id );
-        $fullsizepath = get_attached_file( $imagenew->ID );
-        $attach_data = wp_generate_attachment_metadata( $attachment_id, $fullsizepath );
-        wp_update_attachment_metadata( $attachment_id, $attach_data );
+        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
+        $imagenew = get_post($attachment_id);
+        $fullsizepath = get_attached_file($imagenew->ID);
+        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
+        wp_update_attachment_metadata($attachment_id, $attach_data);
 
         return $attachment_id;
     }
@@ -208,7 +208,7 @@ class TapestryHelpers
     {
         $options = TapestryNodePermissions::getNodePermissions();
         $nodePostId = get_metadata_by_mid('post', $nodeMetaId)->meta_value->post_id;
-       
+
         $tapestry = new Tapestry($tapestryPostId);
         $node = $tapestry->getNode($nodeMetaId);
 
@@ -219,16 +219,23 @@ class TapestryHelpers
         $groupIds = self::getGroupIdsOfUser($userId, $tapestryPostId);
         $user = new TapestryUser($userId);
 
+        // If node is submitted or accepted, users without edit access cannot edit node
+        $isEditableReviewStatus = isset($node->reviewStatus) && ($node->reviewStatus === "submitted" || $node->reviewStatus === "accepted");
+        if ($action === "EDIT" && $isEditableReviewStatus && !$user->canEdit($tapestryPostId)) {
+            return false;
+        }
+
         if ($user->canEdit($tapestryPostId) && $superuser_override) {
             return true;
-        }
-        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+            return true;
+        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE') {
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (
-                property_exists($nodePermissions, 'user-'.$userId) &&
-                in_array($options[$action], $nodePermissions->{'user-'.$userId})
+                property_exists($nodePermissions, 'user-' . $userId) &&
+                in_array($options[$action], $nodePermissions->{'user-' . $userId})
             ) {
                 return true;
             } elseif (
@@ -255,8 +262,8 @@ class TapestryHelpers
             } else {
                 foreach ($groupIds as $groupId) {
                     if (
-                        (property_exists($nodePermissions, 'group-'.$groupId))
-                        && (in_array($options[$action], $nodePermissions->{'group-'.$groupId}))
+                        (property_exists($nodePermissions, 'group-' . $groupId))
+                        && (in_array($options[$action], $nodePermissions->{'group-' . $groupId}))
                     ) {
                         return true;
                     }
@@ -279,5 +286,26 @@ class TapestryHelpers
     {
         $node = new TapestryNode($tapestryPostId, $nodeMetaId);
         return $node->getMeta()->status == "draft";
+    }
+
+    /**
+     * Check if neighbour node is published
+     *
+     * @param Number $nodeMetaId     node meta ID
+     * @param Number $tapestryPostId post ID
+     *
+     * @return bool
+     */
+    public static function nodeNeighbourIsPublished($nodeMetaId, $tapestryPostId)
+    {
+        $tapestry = new Tapestry($tapestryPostId);
+        foreach ($tapestry->getLinks() as $link) {
+            if (($link->target == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->source, $tapestryPostId)) ||
+                ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId))
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 }

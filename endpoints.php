@@ -159,6 +159,13 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateTapestryNodeCoordinates',
         ],
     ],
+    'GET_TAPESTRY_NODE_HAS_DRAFT_CHILDREN' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/nodeHasDraftChildren',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getTapestryNodeHasDraftChildren',
+        ],
+    ],
     'POST_TAPESTRY_LINK' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/links',
         'ARGUMENTS' => [
@@ -301,6 +308,14 @@ $REST_API_ENDPOINTS = [
             'callback' => 'get_all_user_roles',
         ],
     ],
+    'GET_TAPESTRY_EXPORT' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/export',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'exportTapestry',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
+        ],
+    ],
     'OPTIMIZE_THUMBNAILS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/optimize_thumbnails',
         'ARGUMENTS' => [
@@ -435,6 +450,17 @@ function saveAnalytics($request)
     }
 
     return new WP_REST_Response(null, 201);
+}
+
+function exportTapestry($request)
+{
+    $postId = $request['tapestryPostId'];
+    try {
+        $tapestry = new Tapestry($postId);
+        return $tapestry->export();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
 }
 
 function get_all_user_roles($request)
@@ -598,7 +624,12 @@ function importTapestry($postId, $tapestryData)
     }
 
     $data = new stdClass();
-    $data->groups = $tapestryData->groups;
+    if (isset($tapestryData->groups)) {
+        $data->groups = $tapestryData->groups;
+    }
+    if (isset($tapestryData->settings)) {
+        $data->settings = $tapestryData->settings;
+    }
     $tapestry->set($data);
 
     if (isset($tapestryData->nodes) && isset($tapestryData->links)) {
@@ -607,7 +638,8 @@ function importTapestry($postId, $tapestryData)
         // Construct ID map and add nodes to new Tapestry
         foreach ($tapestryData->nodes as $node) {
             $oldNodeId = $node->id;
-            $newNode = $tapestry->addNode($node);
+            $parentId = $node->import_parent_id;
+            $newNode = $tapestry->addNode($node, $parentId);
             $newNodeId = $newNode->id;
             $idMap->$oldNodeId = $newNodeId;
         }
@@ -798,10 +830,13 @@ function addTapestryLink($request)
             return $tapestry->addLink($link);
         }
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-            throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+        if (
+            !TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
+            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)
+        ) {
+            throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
 
@@ -828,10 +863,10 @@ function deleteTapestryLink($request)
         }
         if (!TapestryHelpers::nodeIsDraft($link->target, $postId) && !TapestryHelpers::nodeIsDraft($link->source, $postId)) {
             if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
             if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)) {
-                throw new TapestryError('ADD_NODE_PERMISSION_DENIED');
+                throw new TapestryError('DELETE_LINK_PERMISSION_DENIED');
             }
         }
         $tapestry = new Tapestry($postId);
@@ -893,6 +928,12 @@ function updateTapestryNode($request)
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
             throw new TapestryError('INVALID_CHILD_NODE');
+        }
+        if (
+            TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
+            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)
+        ) {
+            throw new TapestryError('NODE_APPROVAL_DENIED');
         }
 
         $tapestry = new Tapestry($postId);
@@ -1239,7 +1280,10 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+        if (
+            !TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
+            !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)
+        ) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
@@ -1252,6 +1296,49 @@ function updateTapestryNodeCoordinates($request)
         $node->set((object) ['coordinates' => $coordinates]);
 
         return $node->save();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Return whether tapestry node has draft neighbours.
+ */
+function getTapestryNodeHasDraftChildren($request)
+{
+    $postId = $request['tapestryPostId'];
+    $nodeMetaId = $request['nodeMetaId'];
+
+    try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
+        if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+            throw new TapestryError('INVALID_NODE_META_ID');
+        }
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+            throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+        }
+        if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+            throw new TapestryError('INVALID_CHILD_NODE');
+        }
+
+        $tapestry = new Tapestry($postId);
+        $links = $tapestry->getLinks();
+        $response = array(
+            "hasDraft" => false,
+        );
+
+        foreach ($links as $link) {
+            if ($link->source == $nodeMetaId || $link->target == $nodeMetaId) {
+                $neighbour = new TapestryNode($postId, $link->source == $nodeMetaId ? $link->target : $link->source);
+                if ($neighbour->getMeta()->status == "draft") {
+                    $response["hasDraft"] = true;
+                }
+            }
+        }
+
+        return $response;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

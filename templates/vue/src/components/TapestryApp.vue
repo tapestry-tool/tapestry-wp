@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import client from "../services/TapestryAPI"
 import { names } from "@/config/routes"
 import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
@@ -41,6 +42,17 @@ export default {
     isTest() {
       return Boolean(window.Cypress)
     },
+    analyticsEnabled() {
+      return this.settings.analyticsEnabled
+    },
+  },
+  watch: {
+    analyticsEnabled: {
+      immediate: true,
+      handler(analyticsEnabled) {
+        client.enableAnalytics(analyticsEnabled)
+      },
+    },
   },
   mounted() {
     this.$root.$on("open-node", id => {
@@ -49,6 +61,7 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
+    client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),

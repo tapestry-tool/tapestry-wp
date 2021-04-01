@@ -32,12 +32,12 @@
 </template>
 
 <script>
+import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapGetters } from "vuex"
 import Helpers from "@/utils/Helpers"
 import BackgroundImg from "@/assets/question-screen-bg.png"
-import client from "@/services/TapestryAPI"
 
 export default {
   name: "activity-screen",
