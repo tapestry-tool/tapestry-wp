@@ -11,6 +11,7 @@
           'page-nav-title',
           { active: active === node.id, 'page-menu-disabled': shouldDisable },
         ]"
+        @click="handleTitleClick"
       >
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
@@ -101,6 +102,15 @@ export default {
       const index = this.rows.findIndex(row => row.node.id === nodeId)
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
+    handleTitleClick() {
+      this.scrollToRow()
+    },
+    scrollToRow(nodeId) {
+      if (!nodeId) {
+        nodeId = this.node.id
+      }
+      this.$emit("scroll-to", nodeId)
+    },
   },
 }
 </script>
@@ -121,6 +131,9 @@ export default {
   }
   .page-menu-disabled {
     opacity: 0.5;
+  }
+  .page-nav-title {
+    cursor: pointer;
   }
 }
 </style>

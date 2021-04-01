@@ -117,6 +117,9 @@ export default {
       showCompletion: false,
     }
   },
+  mounted() {
+    this.$emit("observe-rows", this.$refs.rowRefs)
+  },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
     ...mapState(["favourites"]),

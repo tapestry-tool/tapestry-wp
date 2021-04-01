@@ -30,6 +30,7 @@
           :lockRows="lockRows"
           :shouldDisable="disableRow(row.node.id)"
           :isBase="true"
+          @scroll-to="scrollToRef"
         />
       </div>
     </aside>
@@ -194,6 +195,21 @@ export default {
         }
       }
       return nodes
+    },
+    scrollToRef(nodeId) {
+      this.$nextTick(() => {
+        if (this.parentRefs.rowRefs) {
+          let el = this.parentRefs.rowRefs.find(ref => ref.id === `row-${nodeId}`)
+          if (el && el.hasOwnProperty("$el")) {
+            el = el.$el
+          }
+          if (el) {
+            el.scrollIntoView({
+              behavior: "smooth",
+            })
+          }
+        }
+      })
     },
   },
 }
