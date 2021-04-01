@@ -12,7 +12,6 @@ require_once __DIR__.'/classes/class.tapestry-analytics.php';
 
 // Used to force-refresh assets
 $TAPESTRY_VERSION_NUMBER = '2.44.0-beta';
-add_option( "tapestry_version", $TAPESTRY_VERSION_NUMBER );
 
 // Set this to false if you want to use the Vue build instead of npm dev
 $TAPESTRY_USE_DEV_MODE = true;
@@ -21,8 +20,8 @@ $TAPESTRY_USE_DEV_MODE = true;
  * Register endpoints.
  */
 require_once dirname(__FILE__).'/endpoints.php';
-require_once dirname(__FILE__).'/tapestry-settings.php';
-require_once dirname(__FILE__).'/tapestry-plugin-updates.php';
+require_once dirname(__FILE__).'/settings.php';
+require_once dirname(__FILE__).'/plugin-updates.php';
 
 /**
  * Register Tapestry type on initialization.

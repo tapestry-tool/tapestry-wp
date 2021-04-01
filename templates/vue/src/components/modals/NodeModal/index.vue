@@ -43,7 +43,7 @@
           <b-tab
             title="Content"
             :active="tab === 'content'"
-            style="overflow-x: hidden; overflow-y: hidden;"
+            style="overflow: hidden;"
             @click="changeTab('content')"
           >
             <content-form
@@ -55,6 +55,13 @@
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
             />
+          </b-tab>
+          <b-tab
+            title="References"
+            :active="tab === 'references'"
+            @click="changeTab('references')"
+          >
+            <references-form :node="node" />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -127,11 +134,11 @@
             <coordinates-form :node="node" />
           </b-tab>
           <b-tab
-            title="More Information"
-            :active="tab === 'more-information'"
-            @click="changeTab('more-information')"
+            title="Copyright"
+            :active="tab === 'copyright'"
+            @click="changeTab('copyright')"
           >
-            <more-information-form :node="node" />
+            <copyright-form :node="node" />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -249,7 +256,8 @@ import BehaviourForm from "./forms/BehaviourForm"
 import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
-import MoreInformationForm from "./forms/MoreInformationForm"
+import CopyrightForm from "./forms/CopyrightForm"
+import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
@@ -277,7 +285,8 @@ export default {
     ActivityForm,
     ConditionsForm,
     CoordinatesForm,
-    MoreInformationForm,
+    CopyrightForm,
+    ReferencesForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -547,7 +556,13 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information", "coordinates"]
+      const okTabs = [
+        "content",
+        "references",
+        "appearance",
+        "copyright",
+        "coordinates",
+      ]
       if (okTabs.includes(requestedTab)) {
         return true
       }
@@ -616,10 +631,10 @@ export default {
           })
           .catch(err => console.log(err))
       } else {
-        this.close()
+        this.close(event)
       }
     },
-    close() {
+    close(event = null) {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
@@ -638,6 +653,9 @@ export default {
             query: this.$route.query,
           })
         } else if (this.isMultiContentNodeChild) {
+          // Prevent NodeModal from closing
+          if (event) event.preventDefault()
+
           // Return to modal of parent node
           this.$router.push({
             name: names.MODAL,

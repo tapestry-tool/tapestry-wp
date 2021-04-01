@@ -57,11 +57,19 @@ export function isMultiContentRow(_, { getParent, isMultiContent }) {
 
 export function hasMultiContentAncestor(_, { getParent, isSubMultiContent }) {
   return id => {
+    const visited = new Set()
     let nodeId = id
     while (nodeId) {
+      visited.add(nodeId)
+
       let parent = getParent(nodeId)
       if (!parent) return false
       if (isSubMultiContent(nodeId)) return true
+
+      if (visited.has(parent)) {
+        break
+      }
+
       nodeId = parent
     }
     return false

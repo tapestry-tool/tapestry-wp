@@ -79,9 +79,7 @@ function parseToStore(dataset) {
     store.settings.defaultDepth = DEFAULT_DEPTH
   }
 
-  dataset.nodes
-    .filter(n => n.mediaType === "multi-content" || n.isSubMultiContent)
-    .forEach(n => initializeOrdering(dataset, n))
+  dataset.nodes.forEach(n => initializeOrdering(dataset, n))
 
   store.selectedNodeId = dataset.rootId
   store.visibleNodes = dataset.nodes.map(node => parseInt(node.id, 10))

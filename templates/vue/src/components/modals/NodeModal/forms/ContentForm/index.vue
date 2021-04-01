@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
@@ -138,18 +139,23 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "multi-content", text: "Multi-content Presentation" },
+        { value: "gravity-form", text: "Gravity Form", disabled: true },
+        { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
       addMenuTitle: false,
     }
   },
   computed: {
+    ...mapGetters(["isMultiContentRow"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
     isMultiContentChild() {
-      return this.node.isMultiContentChild || this.node.isSubMultiContent
+      return (
+        (this.parent && this.parent.mediaType === "multi-content") ||
+        this.isMultiContentRow(this.node.id)
+      )
     },
   },
   watch: {
@@ -162,11 +168,14 @@ export default {
   },
   mounted() {
     GravityFormsApi.exists().then(exists => {
-      this.mediaTypes.push({
-        value: "gravity-form",
-        text: "Gravity Form",
-        disabled: !exists,
-      })
+      const i = this.mediaTypes.findIndex(
+        mediaType => mediaType.value == "gravity-form"
+      )
+      if (exists) {
+        this.mediaTypes[i].disabled = false
+      } else {
+        this.mediaTypes[i].text += " (plugin unavailable)"
+      }
     })
   },
   methods: {
