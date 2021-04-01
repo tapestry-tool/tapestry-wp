@@ -132,7 +132,10 @@ export default {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
     showTitleCheckbox() {
-      return this.isMultiContentRow(this.node.id)
+      return (
+        (this.parent && this.parent.mediaType === "multi-content") ||
+        this.isMultiContentRow(this.node.id)
+      )
     },
   },
   watch: {
