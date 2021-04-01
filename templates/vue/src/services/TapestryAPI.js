@@ -299,32 +299,43 @@ class TapestryApi {
 
   get cos() {
     const client = this.client
+    const baseUrl = "/activities/cos"
     return {
       getActivity() {
-        return client.get("/activities/cos").then(res => res.data)
+        return client.get(baseUrl).then(res => res.data)
       },
       saveActivity(circleOfSupport) {
-        return client.post("/activities/cos", circleOfSupport).then(res => res.data)
+        return client.post(baseUrl, circleOfSupport).then(res => res.data)
       },
       addConnection(connection) {
         return client
-          .post("/activities/cos/connections", connection)
+          .post(`${baseUrl}/connections`, connection)
           .then(res => res.data)
       },
       updateConnection(id, connection) {
         return client
-          .put(`/activities/cos/connections/${id}`, connection)
+          .put(`${baseUrl}/connections/${id}`, connection)
           .then(res => res.data)
       },
       addConnectionToCommunity(communityId, connectionId) {
-        // TODO: Implement adding connection to communities
-        console.log("Not implemented - addConnectionToCommunity")
-        console.log({ communityId, connectionId })
+        return client
+          .post(`${baseUrl}/communities/${communityId}`, { id: connectionId })
+          .then(res => res.data)
+      },
+      addCommunity(community) {
+        return client.post(`${baseUrl}/communities`, community).then(res => res.data)
+      },
+      updateCommunity(id, community) {
+        return client
+          .put(`${baseUrl}/communities/${id}`, community)
+          .then(res => res.data)
       },
       removeConnectionFromCommunity(communityId, connectionId) {
-        // TODO: Implement remove connection from communities
-        console.log("Not implemented - removeConnectionFromCommunity")
-        console.log({ communityId, connectionId })
+        return client
+          .delete(
+            `${baseUrl}/communities/${communityId}/connections/${connectionId}`
+          )
+          .then(res => res.data)
       },
     }
   }

@@ -351,7 +351,35 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'CircleOfSupportEndpoints::updateConnection'
         ]
-    ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
+        'ROUTE' => '/activities/cos/communities',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addCommunity'
+        ]
+    ],
+    'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::updateCommunity'
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
+        ]
+    ],
+    'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
+        ]
+    ],
 ];
 
 /*
