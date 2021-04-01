@@ -8,6 +8,8 @@
       @loadeddata="handleLoad"
       @play="handlePlay"
       @pause="handlePause"
+      @seeked="handleSeek"
+      @seeking="$emit('seeking')"
       @timeupdate="updateVideoProgress"
     ></video>
   </div>
@@ -86,6 +88,9 @@ export default {
     this.updateVideoProgress()
   },
   methods: {
+    handleSeek() {
+      this.$emit("seeked", { currentTime: this.$refs.video.currentTime })
+    },
     reset() {
       this.$refs.video.currentTime = 0
     },

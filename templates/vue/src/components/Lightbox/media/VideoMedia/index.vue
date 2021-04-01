@@ -13,6 +13,8 @@
       @play="transition(events.Play)"
       @pause="transition(events.Pause)"
       @timeupdate="transition(events.Timeupdate, $event)"
+      @seeking="seeking = true"
+      @seeked="handleSeek"
     />
     <tapestry-media
       v-if="state === states.Popup"
@@ -98,6 +100,7 @@ export default {
     return {
       state: VideoStates.Loading,
       activePopupId: null,
+      seeking: false,
     }
   },
   computed: {
@@ -181,7 +184,7 @@ export default {
                 popup =>
                   popup.time > (this.lastTime || 0) && popup.time < currentTime
               )
-              if (activePopup) {
+              if (activePopup && !this.seeking) {
                 this.state = VideoStates.Popup
                 this.activePopupId = activePopup.id
               } else {
@@ -225,6 +228,14 @@ export default {
         }
       }
       this.$emit(eventName, context)
+    },
+    /**
+     * We uniquely handle seek events because they don't trigger any state
+     * transitions, and can occur at any video state.
+     */
+    handleSeek({ currentTime }) {
+      this.lastTime = currentTime
+      this.seeking = false
     },
     getLoadState() {
       if (this.node.progress < 1) {
