@@ -1,32 +1,13 @@
 <template>
-  <div
-    :class="[
-      'video-container',
-      { fullscreen: node.fullscreen, 'allow-scroll': showActivityScreen },
-    ]"
-  >
-    <play-screen v-if="showPlayScreen" @play="handlePlay" />
-    <end-screen
-      v-if="showEndScreen"
-      :node="node"
-      @rewatch="rewatch"
-      @close="close"
-      @show-quiz="openQuiz"
-    />
-    <activity-screen
-      v-else-if="showActivityScreen"
-      :id="node.id"
-      @back="back"
-      @close="close"
-    />
+  <div :class="['video-container', { fullscreen: node.fullscreen }]">
     <video
       ref="video"
       controls
       :src="node.typeData.mediaURL"
       :style="videoStyles"
       @loadeddata="handleLoad"
-      @play="handlePlay(node)"
-      @pause="handlePause(node)"
+      @play="handlePlay"
+      @pause="handlePause"
       @timeupdate="updateVideoProgress"
     ></video>
   </div>
@@ -34,19 +15,9 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import EndScreen from "../common/EndScreen"
-import ActivityScreen from "../common/ActivityScreen"
-import PlayScreen from "../common/PlayScreen"
-
-const ALLOW_SKIP_THRESHOLD = 0.95
 
 export default {
   name: "url-video-media",
-  components: {
-    EndScreen,
-    ActivityScreen,
-    PlayScreen,
-  },
   props: {
     node: {
       type: Object,
@@ -64,14 +35,14 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    playing: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
-      showPlayScreen: !this.autoplay,
-      showEndScreen: this.getInitialEndScreenState(),
-      showActivityScreen: false,
       videoDimensions: null,
-      playedOnce: false,
     }
   },
   computed: {
@@ -83,6 +54,11 @@ export default {
       if (width / height <= 1) {
         return { height: "100%", width: "auto" }
       }
+
+      /**
+       * If the video is full screen, we want to fit it into the window based on its
+       * aspect ratio.
+       */
       if (this.node.fullscreen && this.node.fitWindow) {
         if (width > window.innerWidth) {
           const resizeRatio = window.innerWidth / width
@@ -98,108 +74,47 @@ export default {
     },
   },
   watch: {
-    node(newNode, oldNode) {
-      if (newNode.id !== oldNode.id) {
-        this.handlePause(oldNode)
-        this.handleLoad()
+    playing(isPlaying) {
+      if (isPlaying) {
+        this.$refs.video.play()
+      } else {
+        this.$refs.video.pause()
       }
     },
   },
   beforeDestroy() {
-    if (this.$refs.video) {
-      this.$refs.video.pause()
-      this.updateVideoProgress()
-    }
+    this.updateVideoProgress()
   },
   methods: {
-    openQuiz() {
-      this.showEndScreen = false
-      this.showActivityScreen = true
-    },
-    rewatch() {
-      this.showPlayScreen = false
-      this.showEndScreen = false
-      if (this.$refs.video) {
-        this.$refs.video.play()
-      }
-    },
-    back() {
-      this.showEndScreen = true
-      this.showActivityScreen = false
-    },
-    close() {
-      if (this.$refs.video) {
-        this.$refs.video.pause()
-        this.updateVideoProgress()
-      }
-      this.$emit("close")
-    },
-    /**
-     * Don't really think this is best practice, but these methods are meant to be
-     * used by parent components to play/pause the video, returning true if the
-     * particular action was successful and false otherwise.
-     *
-     * The goal here is to create a unified interface between Videos and H5Ps.
-     */
-    play() {
-      if (this.$refs.video) {
-        this.$refs.video.play()
-        return true
-      }
-      return false
-    },
-    pause() {
-      if (this.$refs.video) {
-        this.$refs.video.pause()
-        return true
-      }
-      return false
-    },
-    getInitialEndScreenState() {
-      const progress = this.node.progress
-      if (progress >= 1) {
-        return true
-      }
-      if (this.$refs.video) {
-        const viewedAmount = progress * this.$refs.video.duration
-        return this.$refs.video.duration <= viewedAmount
-      }
-      return false
+    reset() {
+      this.$refs.video.currentTime = 0
     },
     handlePlay() {
-      this.showPlayScreen = false
-      this.showEndScreen = false
-      const video = this.$refs.video
-      video.play()
-      if (!this.playedOnce && this.autoplay) {
-        this.playedOnce = true
-        return
-      }
-      if (video) {
-        client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
-          time: video.currentTime,
-        })
-      }
+      this.$emit("play")
+      client.recordAnalyticsEvent("user", "play", "html5-video", this.node.id, {
+        time: this.$refs.video.currentTime,
+      })
     },
     handlePause() {
-      this.showPlayScreen = true
-      const video = this.$refs.video
-      if (video) {
-        client.recordAnalyticsEvent("user", "pause", "html5-video", this.node.id, {
-          time: video.currentTime,
-        })
-      }
+      this.$emit("pause")
+      client.recordAnalyticsEvent("user", "pause", "html5-video", this.node.id, {
+        time: this.$refs.video.currentTime,
+      })
     },
     handleLoad() {
       const video = this.$refs.video
-      console.log(video)
       this.videoDimensions = {
         height: video.videoHeight,
         width: video.videoWidth,
       }
-      this.updateDimensions()
-      this.seek()
-      if (this.autoplay && !this.showEndScreen) {
+      const currentTime = this.node.progress * video.duration
+      video.currentTime = currentTime
+
+      /**
+       * If the `playing` prop is set to true when the video's loaded, the video
+       * will autoplay so we should record it accordingly in analytics.
+       */
+      if (this.playing) {
         client.recordAnalyticsEvent(
           "app",
           "auto-play",
@@ -211,38 +126,21 @@ export default {
         )
         video.play()
       }
-    },
-    seek() {
-      const video = this.$refs.video
-      if (video) {
-        const progress = this.node.progress
-        const viewedAmount = progress * video.duration
-        video.currentTime = viewedAmount
-      }
-    },
-    updateDimensions() {
-      const video = this.$refs.video
-      if (video) {
-        const videoRect = this.$refs.video.getBoundingClientRect()
-        this.$emit("load", {
-          width: videoRect.width,
-          height: videoRect.height,
-          el: this.$refs.video,
-        })
-      }
+
+      /**
+       * Adjust the lightbox height to fit the video
+       */
+      const aspectRatio = video.videoHeight / video.videoWidth
+      this.$emit("load", {
+        height: aspectRatio * this.dimensions.width,
+        currentTime,
+      })
     },
     updateVideoProgress() {
       const video = this.$refs.video
       if (video) {
         const amountViewed = video.currentTime / video.duration
         this.$emit("timeupdate", { amountViewed, currentTime: video.currentTime })
-
-        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-          this.$emit("complete")
-        }
-        if (amountViewed >= 1) {
-          this.showEndScreen = true
-        }
       }
     },
   },

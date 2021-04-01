@@ -2,38 +2,83 @@
   <div>
     <component
       :is="videoComponent"
-      v-show="activePopupId === null"
+      v-show="showVideo"
       ref="video"
       :node="node"
       :dimensions="dimensions"
+      :playing="state === states.Playing"
       v-bind="$attrs"
       v-on="$listeners"
-      @timeupdate="checkAndShowPopup"
+      @load="transition(events.Load, $event)"
+      @play="transition(events.Play)"
+      @pause="transition(events.Pause)"
+      @timeupdate="transition(events.Timeupdate, $event)"
     />
     <tapestry-media
-      v-if="activePopupId != null"
+      v-if="state === states.Popup"
       :dimensions="dimensions"
       :node-id="activePopupId"
-      @complete="completeNode(activePopupId)"
+      @complete="$emit('complete')"
     />
-    <button v-if="isPopupComplete" @click="resume">
+    <button v-if="isPopupComplete" @click="transition(events.Continue)">
       Continue
     </button>
+    <play-screen
+      v-if="state === states.Paused"
+      class="screen"
+      @play="transition(events.Play)"
+    />
+    <end-screen
+      v-if="state === states.Finished"
+      class="screen"
+      :node="node"
+      @rewatch="transition(events.Rewatch)"
+      @close="transition(events.Close)"
+    />
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters } from "vuex"
+
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
+import EndScreen from "../common/EndScreen"
+import PlayScreen from "../common/PlayScreen"
+
+/**
+ * Video states and events as defined by the state machine diagram on Notion.
+ * See:
+ *   - https://www.notion.so/tapestrytool/977-Add-ability-to-create-timed-pop-up-for-Videos-1cda32c4c0e0486f8a20936bdabc0990#1212f47603534300a92aea2d59c5a248
+ */
+const VideoStates = {
+  Loading: "loading",
+  Paused: "paused",
+  Playing: "playing",
+  Finished: "finished",
+  Popup: "popup",
+}
+
+const VideoEvents = {
+  Load: "load",
+  Play: "play",
+  Pause: "pause",
+  Timeupdate: "timeupdate",
+  Seeked: "seeked",
+  Rewatch: "rewatch",
+  Continue: "continue",
+  Close: "close",
+}
 
 export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
-    UrlVideoMedia,
     "youtube-media": YouTubeMedia,
     "h5p-media": H5PMedia,
+    UrlVideoMedia,
+    EndScreen,
+    PlayScreen,
   },
   props: {
     nodeId: {
@@ -44,14 +89,25 @@ export default {
       type: Object,
       required: true,
     },
+    autoplay: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
+      state: VideoStates.Loading,
       activePopupId: null,
     }
   },
   computed: {
     ...mapGetters(["getNode", "getDirectChildren"]),
+    states() {
+      return VideoStates
+    },
+    events() {
+      return VideoEvents
+    },
     node() {
       return this.getNode(this.nodeId)
     },
@@ -82,43 +138,99 @@ export default {
       }
       return false
     },
-  },
-  watch: {
-    /**
-     * The `timeupdate` event doesn't trigger at every ms, so it's possible a popup
-     * time is between two timeupdate calls. To compensate, we need to keep track of
-     * a `lastTime` which corresponds to the last time the `timeupdate` event
-     * triggered. Every time a `timeupdate` triggers, we check if there is a popup
-     * between the current time and the last time.
-     *
-     * As a consequence, we have to reset the `lastTime` every time the node
-     * changes, so `lastTime` is always <= the current time.
-     */
-    nodeId: {
-      immediate: true,
-      handler() {
-        this.lastTime = 0
-      },
+    showVideo() {
+      return [VideoStates.Paused, VideoStates.Playing].includes(this.state)
     },
   },
   methods: {
-    ...mapActions(["completeNode"]),
-    checkAndShowPopup({ amountViewed, currentTime }) {
-      const activePopup = this.popups.find(
-        popup => popup.time > (this.lastTime || 0) && popup.time < currentTime
-      )
+    /**
+     * This function calculates the next state given the current state and the event
+     * name, as well as perform any necessary side effects.
+     */
+    transition(eventName, context) {
+      switch (this.state) {
+        case VideoStates.Loading: {
+          switch (eventName) {
+            case VideoEvents.Load: {
+              this.lastTime = context.currentTime
+              this.state = this.getLoadState()
+              break
+            }
+          }
+          break
+        }
+        case VideoStates.Paused: {
+          switch (eventName) {
+            case VideoEvents.Play: {
+              this.state = VideoStates.Playing
+              break
+            }
+          }
+          break
+        }
+        case VideoStates.Playing: {
+          switch (eventName) {
+            case VideoEvents.Pause: {
+              this.state = VideoStates.Paused
+              break
+            }
+            case VideoEvents.Timeupdate: {
+              const { amountViewed, currentTime } = context
 
-      if (activePopup) {
-        this.activePopupId = activePopup.id
-        this.$refs.video.pause()
+              const activePopup = this.popups.find(
+                popup =>
+                  popup.time > (this.lastTime || 0) && popup.time < currentTime
+              )
+              if (activePopup) {
+                this.state = VideoStates.Popup
+                this.activePopupId = activePopup.id
+              } else {
+                if (amountViewed >= 0.95) {
+                  this.$emit("complete")
+                }
+
+                // End of video
+                if (amountViewed >= 1) {
+                  this.state = VideoStates.Finished
+                }
+              }
+
+              this.lastTime = currentTime
+              this.$emit("timeupdate", { amountViewed, currentTime })
+              break
+            }
+          }
+          break
+        }
+        case VideoStates.Popup: {
+          switch (eventName) {
+            case VideoEvents.Continue:
+              this.state = VideoStates.Playing
+              this.activePopupId = null
+          }
+          break
+        }
+        case VideoStates.Finished: {
+          switch (eventName) {
+            case VideoEvents.Rewatch: {
+              this.$refs.video.reset()
+              this.state = VideoStates.Playing
+              break
+            }
+            case VideoEvents.Close: {
+              this.$emit("close")
+            }
+          }
+          break
+        }
       }
-
-      this.lastTime = currentTime
-      this.$emit("timeupdate", { amountViewed, currentTime })
+      this.$emit(eventName, context)
     },
-    resume() {
-      this.activePopupId = null
-      this.$refs.video.play()
+    getLoadState() {
+      if (this.node.progress < 1) {
+        return this.autoplay ? VideoStates.Playing : VideoStates.Paused
+      }
+      return VideoStates.Finished
     },
   },
 }
@@ -138,5 +250,9 @@ button {
   &:hover {
     background: var(--tapestry-light-gray);
   }
+}
+
+.screen {
+  border-radius: 15px;
 }
 </style>
