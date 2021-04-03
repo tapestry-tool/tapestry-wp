@@ -8,7 +8,7 @@
         {
           lightbox: !node.fullscreen,
           fullscreen: node.fullscreen,
-          closed: burgerView && !opened,
+          closed: !opened,
         },
       ]"
       :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
@@ -31,7 +31,7 @@
           'page-nav-content',
           {
             fullscreen: node.fullscreen,
-            closed: burgerView && !opened,
+            closed: !opened,
           },
         ]"
       >
@@ -95,9 +95,6 @@ export default {
           })
         }
       },
-    },
-    burgerView() {
-      return !this.node.fullscreen || this.browserWidth < 800
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
