@@ -3,6 +3,18 @@ import PageNavigationBar from "./PageNavigationBar"
 import pageTapestry from "@/fixtures/deep-page.json"
 
 describe("PageNavigationBar", () => {
+  beforeEach(() => {
+    // https://stackoverflow.com/questions/44249985/js-testing-code-that-uses-an-intersectionobserver
+    // IntersectionObserver isn't available in test environment
+    const mockIntersectionObserver = jest.fn()
+    mockIntersectionObserver.mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null,
+    })
+    window.IntersectionObserver = mockIntersectionObserver
+  })
+
   it("should render page navigation bar with all children names on full screen", async () => {
     const node = pageTapestry.nodes[0]
     const childNames = pageTapestry.nodes
@@ -12,7 +24,7 @@ describe("PageNavigationBar", () => {
       fixture: pageTapestry,
       props: {
         node: node,
-        parentRefs: { rowRefs: null },
+        rowRefs: [],
         dimensions: {
           height: 800,
           width: 900,
@@ -34,7 +46,7 @@ describe("PageNavigationBar", () => {
       fixture: pageTapestry,
       props: {
         node: node,
-        parentRefs: { rowRefs: null },
+        rowRefs: [],
         dimensions: {
           height: 800,
           width: 500,

@@ -66,7 +66,7 @@ export default {
       required: true,
     },
     rowRefs: {
-      type: Object,
+      type: Array,
       required: true,
     },
     dimensions: {
