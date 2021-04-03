@@ -7,21 +7,34 @@
         'page-nav',
         {
           lightbox: !node.fullscreen,
+          fullscreen: node.fullscreen,
           closed: burgerView && !opened,
         },
       ]"
-      :style="pageNavStyle"
+      :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
     >
       <button
-        v-if="burgerView"
-        class="page-nav-toggle"
+        :class="[
+          'page-nav-toggle',
+          {
+            fullscreen: node.fullscreen,
+          },
+        ]"
         data-qa="page-nav-toggle"
         @click="opened = !opened"
       >
         <i v-if="!opened" class="fas fa-bars fa-lg"></i>
         <i v-else class="fas fa-times fa-lg"></i>
       </button>
-      <div v-if="opened || !burgerView" class="page-nav-content">
+      <div
+        :class="[
+          'page-nav-content',
+          {
+            fullscreen: node.fullscreen,
+            closed: burgerView && !opened,
+          },
+        ]"
+      >
         <page-menu
           v-for="row in rows"
           :key="row.node.id"
@@ -64,12 +77,9 @@ export default {
   },
   data() {
     return {
-      opened: false,
+      opened: false || this.browserWidth > 800,
       browserWidth: Helpers.getBrowserWidth(),
     }
-  },
-  created() {
-    window.addEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
@@ -88,11 +98,6 @@ export default {
     },
     burgerView() {
       return !this.node.fullscreen || this.browserWidth < 800
-    },
-    pageNavStyle() {
-      return {
-        height: this.node.fullscreen ? "100vh" : `${this.dimensions.height}px`,
-      }
     },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
@@ -134,24 +139,9 @@ export default {
               : undefined,
         },
       })
-      this.$root.$emit("page-nav-bar::view", this.$refs.container)
     }
   },
-  beforeDestroy() {
-    window.removeEventListener("resize", Helpers.debounce(this.setBrowserWidth, 300))
-    this.$router.push({
-      ...this.$route,
-      query: { ...this.$route.query, row: undefined },
-    })
-  },
   methods: {
-    setBrowserWidth() {
-      let browserWidth = Helpers.getBrowserWidth()
-      this.browserWidth = browserWidth
-      this.$nextTick(() => {
-        this.$root.$emit("page-nav-bar::view", this.$refs.container)
-      })
-    },
     /**
      * This callback is called whenever any section cross 50% visibility.
      *  - If a page enters from above, set it to the active page.
@@ -217,13 +207,6 @@ export default {
 
 <style lang="scss">
 .page-nav-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 11;
-  transform: translateX(0);
-  transition: all 0.2s ease-in-out;
-
   .page-nav {
     position: relative;
     color: white;
@@ -237,15 +220,28 @@ export default {
     overflow-y: auto;
     min-width: 200px;
 
-    &.closed {
-      min-width: 0px;
-    }
-
     &.lightbox {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 11;
       border-radius: 15px 0 0 15px;
 
       &.closed {
         background: transparent;
+      }
+    }
+
+    &.fullscreen {
+      height: "100vh";
+      margin: -24px 24px 0 -24px;
+      z-index: 11;
+
+      &.closed {
+        @media screen and (max-width: 800px) {
+          min-width: calc(16.33px + 3rem);
+          width: calc(16.33px + 3rem);
+        }
       }
     }
 
@@ -261,14 +257,42 @@ export default {
       background-color: transparent;
       padding: 0;
       margin-bottom: 1em;
+
+      &.fullscreen {
+        @media screen and (min-width: 801px) {
+          display: none;
+        }
+      }
     }
 
     .page-nav-title {
       margin-bottom: 1em;
+
+      &:hover {
+        font-weight: bold;
+      }
     }
 
     .page-nav-container {
       text-align: left;
+    }
+
+    .page-nav-content {
+      &.fullscreen {
+        &.closed {
+          @media screen and (max-width: 800px) {
+            display: none;
+          }
+
+          @media screen and (min-width: 801px) {
+            display: block;
+          }
+        }
+      }
+
+      &.closed {
+        display: none;
+      }
     }
   }
 }

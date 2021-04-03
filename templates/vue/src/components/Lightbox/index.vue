@@ -22,13 +22,12 @@
     />
     <page-navigation-bar
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      class="page-nav-bar"
       :node="node"
       :parentRefs="$refs"
       :dimensions="dimensions"
     />
     <tapestry-media
-      v-else
+      v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
@@ -118,6 +117,9 @@ export default {
       }
 
       if (this.node.mediaType === "multi-content") {
+        styles.display = "flex"
+        // Reversed because PageNavigationBar is placed after MultiContentMedia for refs to correctly render
+        styles.flexDirection = "row-reverse"
         return Object.assign(styles, { padding: "24px" })
       }
 

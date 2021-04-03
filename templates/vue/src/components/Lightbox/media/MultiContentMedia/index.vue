@@ -69,7 +69,6 @@ import TapestryModal from "../../TapestryModal"
 import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
 import { names } from "@/config/routes"
-import Helpers from "@/utils/Helpers"
 
 export default {
   name: "multi-content-media",
@@ -149,20 +148,6 @@ export default {
   mounted() {
     this.isMounted = true
     this.activeIndex = this.node.presentationStyle === "page" ? -1 : 0
-
-    if (
-      this.node.presentationStyle === "page" &&
-      this.node.fullscreen &&
-      this.node.typeData.showNavBar
-    ) {
-      this.$root.$on("page-nav-bar::view", navBar => {
-        // The navigation bar size changes twice when browser moves from fully-expanded to burger view.
-        // setTimeout was added to capture the final change.
-        setTimeout(() => {
-          this.resizeOn(navBar)
-        }, 1)
-      })
-    }
   },
   methods: {
     ...mapMutations(["updateNode"]),
@@ -230,21 +215,6 @@ export default {
     observeRows(refs) {
       this.$emit("observe-rows", refs)
     },
-    resizeOn(navBar) {
-      let gap = 0
-      const widthOffset = 24
-      let navBarWidth = 0
-      if (navBar) {
-        gap = navBar.scrollHeight > navBar.clientHeight ? 20 : 0
-        navBarWidth = navBar.clientWidth
-      }
-      this.navBarStyle = {
-        position: "relative",
-        left: `${navBarWidth + gap}px`,
-        width: `${Helpers.getBrowserWidth() - (navBarWidth + gap) - widthOffset}px`,
-        paddingRight: `${widthOffset}px`,
-      }
-    },
   },
 }
 </script>
@@ -262,6 +232,7 @@ button[disabled] {
 
 .media-container {
   height: 100%;
+  width: 100%;
   overflow: auto;
   scrollbar-color: auto black;
   scrollbar-width: none;
