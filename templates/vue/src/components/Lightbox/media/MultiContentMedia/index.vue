@@ -26,7 +26,6 @@
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
-      @observe-rows="observeRows"
     ></accordion-rows>
     <page-rows
       v-else-if="node.presentationStyle === 'page'"
@@ -38,7 +37,6 @@
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
-      @observe-rows="observeRows"
     ></page-rows>
     <tapestry-modal
       v-if="showCompletion"
@@ -211,9 +209,6 @@ export default {
           query: this.$route.query,
         })
       }
-    },
-    observeRows(refs) {
-      this.$emit("observe-rows", refs)
     },
   },
 }

@@ -18,12 +18,11 @@
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
-      @observe-rows="observeRows"
     />
     <page-navigation-bar
       v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
       :node="node"
-      :parentRefs="$refs"
+      :rowRefs="rowRefs"
       :dimensions="dimensions"
     />
     <tapestry-media
@@ -82,6 +81,7 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
+      rowRefs: [],
     }
   },
   computed: {
@@ -238,6 +238,11 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
+    if (this.node.mediaType === "multi-content") {
+      this.$root.$on("observe-rows", refs => {
+        this.rowRefs = this.rowRefs.concat(refs)
+      })
+    }
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
@@ -282,9 +287,6 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
-    },
-    observeRows(refs) {
-      this.$refs.rowRefs = refs
     },
   },
 }

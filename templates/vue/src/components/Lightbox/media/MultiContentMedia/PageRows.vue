@@ -59,7 +59,6 @@
               :rows="row.children"
               :row-id="subRowId"
               @load="handleLoad"
-              @observe-rows="observeRows"
             ></sub-page>
           </div>
           <button
@@ -118,7 +117,7 @@ export default {
     }
   },
   mounted() {
-    this.$emit("observe-rows", this.$refs.rowRefs)
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
@@ -160,10 +159,6 @@ export default {
         row.node.mediaType === "multi-content" &&
         row.node.typeData.showTitle !== false
       )
-    },
-    observeRows(refs) {
-      const allRefs = [...this.$refs.rowRefs, ...refs]
-      this.$emit("observe-rows", allRefs)
     },
   },
 }

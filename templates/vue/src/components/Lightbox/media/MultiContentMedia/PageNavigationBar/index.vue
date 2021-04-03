@@ -65,7 +65,7 @@ export default {
       type: Object,
       required: true,
     },
-    parentRefs: {
+    rowRefs: {
       type: Object,
       required: true,
     },
@@ -119,11 +119,11 @@ export default {
     },
   },
   mounted() {
-    if (this.parentRefs.rowRefs) {
+    if (this.rowRefs) {
       const observer = new IntersectionObserver(this.handleObserve, {
         threshold: [0.5],
       })
-      for (const ref of this.parentRefs.rowRefs) {
+      for (const ref of this.rowRefs) {
         observer.observe(ref)
       }
       this.$router.push({
@@ -185,8 +185,8 @@ export default {
     },
     scrollToRef(nodeId) {
       this.$nextTick(() => {
-        if (this.parentRefs.rowRefs) {
-          let el = this.parentRefs.rowRefs.find(ref => ref.id === `row-${nodeId}`)
+        if (this.rowRefs) {
+          let el = this.rowRefs.find(ref => ref.id === `row-${nodeId}`)
           if (el && el.hasOwnProperty("$el")) {
             el = el.$el
           }

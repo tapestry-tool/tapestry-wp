@@ -76,7 +76,7 @@ export default {
     ...mapGetters(["isFavourite"]),
   },
   mounted() {
-    this.$emit("observe-rows", this.$refs.rowRefs)
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapActions(["completeNode", "toggleFavourite"]),

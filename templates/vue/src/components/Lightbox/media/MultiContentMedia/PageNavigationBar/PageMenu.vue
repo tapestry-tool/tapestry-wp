@@ -26,6 +26,7 @@
         :lockRows="lockRows"
         :shouldDisable="shouldDisable || disableRow(row.node.id)"
         :isBase="false"
+        @scroll-to="scrollToRow"
       />
     </div>
   </ul>
