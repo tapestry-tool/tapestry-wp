@@ -79,6 +79,7 @@ export default {
     return {
       opened: false || this.browserWidth > 800,
       browserWidth: Helpers.getBrowserWidth(),
+      observer: null,
     }
   },
   computed: {
@@ -118,13 +119,23 @@ export default {
       return this.getRowOrder(this.node)
     },
   },
+  watch: {
+    rowRefs: {
+      immediate: true,
+      handler(refs) {
+        for (const ref of refs) {
+          this.observer.observe(ref)
+        }
+      },
+    },
+  },
   mounted() {
+    this.observer = new IntersectionObserver(this.handleObserve, {
+      threshold: [0.5],
+    })
     if (this.rowRefs) {
-      const observer = new IntersectionObserver(this.handleObserve, {
-        threshold: [0.5],
-      })
       for (const ref of this.rowRefs) {
-        observer.observe(ref)
+        this.observer.observe(ref)
       }
       this.$router.push({
         ...this.$route,
