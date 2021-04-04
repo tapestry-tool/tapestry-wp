@@ -101,7 +101,7 @@ export default {
 
       if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
-        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
+        let fitHeight = window.innerHeight
         if (this.hasMultiContentContext) {
           // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
