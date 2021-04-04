@@ -11,7 +11,7 @@
         required
       />
       <b-form-checkbox
-        v-if="showTitleCheckbox"
+        v-if="isMultiContentChild"
         v-model="shouldShowTitle"
         class="small title-checkbox"
         data-qa="node-show-page-title"
@@ -19,6 +19,25 @@
         Show title in page
       </b-form-checkbox>
     </b-form-group>
+    <div v-if="isMultiContentChild">
+      <b-form-group
+        v-if="addMenuTitle || node.typeData.menuTitle"
+        label="Custom Menu Title"
+      >
+        <b-form-input
+          id="node-nav-title"
+          v-model="node.typeData.menuTitle"
+          data-qa="node-nav-title"
+          placeholder="Enter custom menu title"
+          autofocus
+        />
+      </b-form-group>
+      <div v-else class="text-right mt-n3 mb-2">
+        <a href="#" class="small" @click="addMenuTitle = true">
+          Add Custom Menu Title
+        </a>
+      </div>
+    </div>
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
@@ -65,6 +84,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
@@ -119,17 +139,23 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "multi-content", text: "Multi-content Presentation" },
+        { value: "gravity-form", text: "Gravity Form", disabled: true },
+        { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
+      addMenuTitle: false,
     }
   },
   computed: {
+    ...mapGetters(["isMultiContentRow"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
-    showTitleCheckbox() {
-      return this.node.isMultiContentChild || this.node.isSubMultiContent
+    isMultiContentChild() {
+      return (
+        (this.parent && this.parent.mediaType === "multi-content") ||
+        this.isMultiContentRow(this.node.id)
+      )
     },
   },
   watch: {
@@ -142,11 +168,14 @@ export default {
   },
   mounted() {
     GravityFormsApi.exists().then(exists => {
-      this.mediaTypes.push({
-        value: "gravity-form",
-        text: "Gravity Form",
-        disabled: !exists,
-      })
+      const i = this.mediaTypes.findIndex(
+        mediaType => mediaType.value == "gravity-form"
+      )
+      if (exists) {
+        this.mediaTypes[i].disabled = false
+      } else {
+        this.mediaTypes[i].text += " (plugin unavailable)"
+      }
     })
   },
   methods: {

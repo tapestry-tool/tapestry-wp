@@ -321,9 +321,6 @@ describe("Multi-content", () => {
             childOrdering: [videoNode.id, textNode.id],
           })
 
-          console.log(pageNode)
-          console.log(textNode)
-
           cy.openLightbox(pageNode.id).within(() => {
             cy.get("iframe[id^=youtube]").should("exist")
             cy.contains(textNode.title).should("exist")

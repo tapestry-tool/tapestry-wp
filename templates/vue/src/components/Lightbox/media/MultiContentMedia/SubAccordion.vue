@@ -9,6 +9,7 @@
         <div>
           <div
             v-for="(row, index) in rows"
+            :id="`row-${row.id}`"
             ref="rowRefs"
             :key="row.id"
             class="sub-accordion-row"
@@ -73,6 +74,9 @@ export default {
   },
   computed: {
     ...mapGetters(["isFavourite", "getParent"]),
+  },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapActions(["completeNode", "toggleFavourite"]),

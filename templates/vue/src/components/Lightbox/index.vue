@@ -19,8 +19,14 @@
       @close="handleAutoClose"
       @complete="complete"
     />
+    <page-navigation-bar
+      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+      :node="node"
+      :rowRefs="rowRefs"
+      :dimensions="dimensions"
+    />
     <tapestry-media
-      v-else
+      v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
@@ -38,6 +44,7 @@ import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
 import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
+import PageNavigationBar from "./media/MultiContentMedia/PageNavigationBar"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
@@ -49,6 +56,7 @@ export default {
     MultiContentMedia,
     TapestryMedia,
     TapestryModal,
+    PageNavigationBar,
   },
   props: {
     nodeId: {
@@ -73,6 +81,7 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
+      rowRefs: [],
     }
   },
   computed: {
@@ -99,9 +108,18 @@ export default {
         styles.width = "100vw"
         styles.height = "100vh"
         styles.position = "relative"
+
+        const adminBar = document.getElementById("wpadminbar")
+        if (adminBar) {
+          styles.top = `${adminBar.clientHeight}px`
+          styles.height = `calc(100vh - ${styles.top})`
+        }
       }
 
       if (this.node.mediaType === "multi-content") {
+        styles.display = "flex"
+        // Reversed because PageNavigationBar is placed after MultiContentMedia for refs to correctly render
+        styles.flexDirection = "row-reverse"
         return Object.assign(styles, { padding: "24px" })
       }
 
@@ -220,6 +238,11 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
+    if (this.node.mediaType === "multi-content") {
+      this.$root.$on("observe-rows", refs => {
+        this.rowRefs = this.rowRefs.concat(refs)
+      })
+    }
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")

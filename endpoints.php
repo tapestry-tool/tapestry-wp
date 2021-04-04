@@ -337,6 +337,9 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
 function exportTapestry($request) {
     $postId = $request['tapestryPostId'];
     try {
+        if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+            throw new TapestryError('INVALID_POST_ID');
+        }
         $tapestry = new Tapestry($postId);
         return $tapestry->export();
     } catch (TapestryError $e) {

@@ -8,6 +8,7 @@
       <div data-qa="page-rows">
         <div
           v-for="(row, index) in rows"
+          :id="`row-${row.node.id}`"
           :key="row.node.id"
           ref="rowRefs"
           class="page-row"
@@ -129,6 +130,9 @@ export default {
     return {
       showCompletion: false,
     }
+  },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),

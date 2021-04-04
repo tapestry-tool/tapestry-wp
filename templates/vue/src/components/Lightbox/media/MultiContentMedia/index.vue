@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="media-container" data-qa="multi-content">
+  <div
+    ref="container"
+    class="media-container"
+    :style="navBarStyle"
+    data-qa="multi-content"
+  >
     <header>
       <h1
         v-if="showTitle"
@@ -103,6 +108,7 @@ export default {
       activeIndex: -1,
       showCompletion: false,
       isMounted: false,
+      navBarStyle: {},
     }
   },
   computed: {
@@ -308,6 +314,7 @@ button[disabled] {
 
 .media-container {
   height: 100%;
+  width: 100%;
   overflow: auto;
   scrollbar-color: auto black;
   scrollbar-width: none;

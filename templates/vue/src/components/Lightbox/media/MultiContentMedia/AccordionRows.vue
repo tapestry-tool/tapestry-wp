@@ -127,6 +127,9 @@ export default {
       showCompletion: false,
     }
   },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
+  },
   computed: {
     ...mapGetters([
       "getDirectChildren",
