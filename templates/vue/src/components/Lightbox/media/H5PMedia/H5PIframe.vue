@@ -65,7 +65,6 @@ export default {
       loading: true,
       requiresRefresh: false,
       playedOnce: false,
-      firstPlay: true,
     }
   },
   computed: {
@@ -310,14 +309,6 @@ export default {
               h5pVideo.on("stateChange", event => {
                 switch (event.data) {
                   case h5pObj.Video.PLAYING: {
-                    // Disable Autoplay For Youtube Workaround:
-                    // Unhide iframe when playing
-                    if (this.firstPlay && !this.autoplay) {
-                      const h5pDoc = this.$refs.h5p.contentDocument
-                      h5pDoc.getElementsByTagName("iframe")[0].style.display = ""
-                    }
-                    this.firstPlay = false
-
                     const updateVideoInterval = setInterval(() => {
                       if (
                         currentPlayedTime !== h5pVideo.getCurrentTime() &&
@@ -349,16 +340,6 @@ export default {
                     h5pIframeComponent.handlePause(h5pIframeComponent.node)
                     break
                   }
-
-                  case h5pObj.Video.BUFFERING: {
-                    // Disable Autoplay For Youtube Workaround:
-                    // Hide iframe when buffering due to an endless spinner from the pause below.
-                    if (this.firstPlay && !this.autoplay) {
-                      const h5pDoc = this.$refs.h5p.contentDocument
-                      h5pDoc.getElementsByTagName("iframe")[0].style.display = "none"
-                    }
-                    break
-                  }
                 }
               })
               if (h5pIframeComponent.autoplay) {
@@ -376,10 +357,12 @@ export default {
                 // There's a bug with the Youtube Video API such that you cannot disable autoplay.
                 // This is a workaround to stop the video upon loading.
                 if (!this.autoplay) {
-                  // As of Feb 2021, H5P has not implemented a stop functionality,
+                  // As of April 2021, H5P has not implemented a stop functionality,
                   // so there is no way to avoid the "More Videos" when paused.
-                  // Because this pause is immediate, there is an endless buffer that is hidden and unhidden in stateChange.
-                  h5pVideo.pause()
+                  // This pause requires a timeout to avoid a spinner.
+                  setTimeout(() => {
+                    h5pVideo.pause()
+                  }, 1000)
                 }
               }
             }
