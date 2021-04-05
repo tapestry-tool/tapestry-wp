@@ -25,25 +25,36 @@
             </a>
           </div>
           <div :data-qa="`row-content-${slide.node.id}`">
-            <!-- TODO: Add nested behaviour from 971 -->
-            <tapestry-media
-              :node-id="slide.node.id"
-              :dimensions="dimensions"
-              context="slideshow"
-              :autoplay="false"
-              style="color: white; margin-bottom: 24px;"
-              @complete="updateProgress(slide.node.id)"
-            />
-            <p v-if="slide.children.length > 0" style="color: white;">
-              {{ slide.node.typeData.subAccordionText }}
-            </p>
-            <sub-accordion
-              v-if="slide.children.length > 0"
-              :dimensions="dimensions"
-              :rows="slide.children"
+            <div v-if="slide.node.mediaType !== 'multi-content'">
+              <tapestry-media
+                :node-id="slide.node.id"
+                :dimensions="dimensions"
+                context="slideshow"
+                :autoplay="false"
+                style="color: white; margin-bottom: 24px;"
+                @complete="updateProgress(slide.node.id)"
+              />
+              <!-- @load="handleLoad($refs.rowRefs[index])" -->
+              <p v-if="slide.children.length > 0" style="color: white;">
+                {{ slide.node.typeData.subAccordionText }}
+              </p>
+              <sub-accordion
+                v-if="slide.children.length > 0"
+                :dimensions="dimensions"
+                :rows="slide.children"
+                :row-id="subRowId"
+                @load="handleLoad"
+              />
+            </div>
+            <multi-content-media
+              v-else-if="slide.children.length > 0"
+              :node="getNode(slide.node.id)"
               :row-id="subRowId"
-              @load="handleLoad"
-            ></sub-accordion>
+              context="page"
+              :level="level + 1"
+              @close="handleAutoClose"
+              @complete="updateProgress"
+            />
           </div>
         </div>
         <footer class="slideshow-footer">
@@ -75,6 +86,7 @@ export default {
   components: {
     TapestryMedia,
     HeadlessMultiContent,
+    MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
   },
   props: {
@@ -167,6 +179,9 @@ export default {
       if (this.hasPrev) {
         this.changeRow(this.rows[--this.index].node.id)
       }
+    },
+    handleAutoClose() {
+      this.$emit("close")
     },
   },
 }
