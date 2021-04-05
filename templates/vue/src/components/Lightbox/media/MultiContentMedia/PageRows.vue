@@ -190,6 +190,14 @@ export default {
     handleAutoClose() {
       this.$emit("close")
     },
+    showTitle(row) {
+      return (
+        this.context === "slideshow" ||
+        (this.node.presentationStyle === "page" &&
+          row.node.mediaType === "multi-content" &&
+          row.node.typeData.showTitle !== false)
+      )
+    },
   },
 }
 </script>

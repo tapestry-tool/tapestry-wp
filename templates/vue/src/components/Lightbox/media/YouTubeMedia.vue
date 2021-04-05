@@ -76,6 +76,11 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -95,9 +100,6 @@ export default {
         return this.node.typeData.progress[0].value
       }
       return 0
-    },
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
     },
     isMultiContentContext() {
       return this.context === "page" || this.context === "multi-content"

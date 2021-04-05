@@ -30,10 +30,10 @@ export default {
       required: false,
       default: "",
     },
-  },
-  computed: {
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   mounted() {

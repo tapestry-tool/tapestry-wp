@@ -72,6 +72,11 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -103,9 +108,6 @@ export default {
         }
       }
       return { width: "100%" }
-    },
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   watch: {
