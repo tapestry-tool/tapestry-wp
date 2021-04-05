@@ -29,7 +29,7 @@
             <tapestry-media
               :node-id="slide.node.id"
               :dimensions="dimensions"
-              context="slide"
+              context="slideshow"
               :autoplay="false"
               style="color: white; margin-bottom: 24px;"
               @complete="updateProgress(slide.node.id)"
@@ -71,7 +71,7 @@ import HeadlessMultiContent from "./HeadlessMultiContent"
 import SubAccordion from "./SubAccordion"
 
 export default {
-  name: "slideshow-slide",
+  name: "slideshow",
   components: {
     TapestryMedia,
     HeadlessMultiContent,
@@ -246,5 +246,16 @@ button[disabled] {
   font-size: 40px;
   color: white;
   margin-right: 32px;
+}
+
+.sub-multicontent-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: white;
+
+  :before {
+    display: none;
+  }
 }
 </style>

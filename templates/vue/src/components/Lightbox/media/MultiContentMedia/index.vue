@@ -40,7 +40,7 @@
       @changeRow="changeRow"
       @updateProgress="updateProgress"
     ></page-rows>
-    <slideshow-page
+    <slideshow
       v-else-if="node.presentationStyle === 'slideshow'"
       :dimensions="dimensions"
       :node="node"
@@ -50,7 +50,7 @@
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
-    ></slideshow-page>
+    ></slideshow>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -79,7 +79,7 @@ import client from "@/services/TapestryAPI"
 import TapestryModal from "../../TapestryModal"
 import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
-import SlideshowPage from "./SlideshowPage"
+import Slideshow from "./Slideshow"
 import { names } from "@/config/routes"
 
 export default {
@@ -88,7 +88,7 @@ export default {
     TapestryModal,
     AccordionRows,
     PageRows,
-    SlideshowPage,
+    Slideshow,
   },
   props: {
     node: {
