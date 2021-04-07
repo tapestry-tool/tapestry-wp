@@ -48,6 +48,7 @@ import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "../common/EndScreen"
 import PlayScreen from "../common/PlayScreen"
+import client from "@/services/TapestryAPI"
 
 /**
  * Video states and events as defined by the state machine diagram on Notion.
@@ -157,6 +158,19 @@ export default {
             case VideoEvents.Load: {
               this.lastTime = context.currentTime
               this.state = this.getLoadState()
+
+              if (this.state === VideoStates.Playing) {
+                client.recordAnalyticsEvent(
+                  "app",
+                  "auto-play",
+                  context.type,
+                  this.node.id,
+                  {
+                    time: context.currentTime,
+                  }
+                )
+              }
+
               break
             }
           }

@@ -25,11 +25,6 @@ export default {
       type: Object,
       required: true,
     },
-    autoplay: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     dimensions: {
       type: Object,
       required: true,
@@ -116,28 +111,12 @@ export default {
       video.currentTime = currentTime
 
       /**
-       * If the `playing` prop is set to true when the video's loaded, the video
-       * will autoplay so we should record it accordingly in analytics.
-       */
-      if (this.playing) {
-        client.recordAnalyticsEvent(
-          "app",
-          "auto-play",
-          "html5-video",
-          this.node.id,
-          {
-            time: video.currentTime,
-          }
-        )
-        video.play()
-      }
-
-      /**
        * Adjust the lightbox height to fit the video
        */
       const aspectRatio = video.videoHeight / video.videoWidth
       this.$emit("load", {
         height: aspectRatio * this.dimensions.width,
+        type: "html5-video",
         currentTime,
       })
     },

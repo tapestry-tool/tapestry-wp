@@ -28,8 +28,6 @@
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
-const ALLOW_SKIP_THRESHOLD = 0.95
-
 export default {
   name: "h5p-iframe",
   props: {
@@ -50,10 +48,9 @@ export default {
       required: false,
       default: () => ({}),
     },
-    autoplay: {
+    playing: {
       type: Boolean,
-      required: false,
-      default: true,
+      required: true,
     },
   },
   data() {
@@ -65,6 +62,7 @@ export default {
       loading: true,
       requiresRefresh: false,
       playedOnce: false,
+      loaded: false,
     }
   },
   computed: {
@@ -79,6 +77,27 @@ export default {
     node(newNode, oldNode) {
       if (newNode.id !== oldNode.id) {
         this.handlePause(oldNode)
+      }
+    },
+    playing(isPlaying) {
+      const video = this.getInstance()
+      if (video) {
+        if (isPlaying) {
+          video.play()
+        } else {
+          video.pause()
+        }
+      }
+    },
+    loaded(loaded) {
+      if (loaded) {
+        const video = this.getInstance()
+        if (video) {
+          this.$emit("load", {
+            currentTime: video.getCurrentTime(),
+            type: "h5p-video",
+          })
+        }
       }
     },
   },
@@ -118,18 +137,19 @@ export default {
         }
       }
 
-      if (this.loading) {
+      /**
+       * TODO: Make sure getting rid of this doesn't break other H5P content types
+       */
+      /* if (this.loading) {
         if (this.requiresRefresh) {
           this.$refs.h5p.contentWindow.location.reload()
           setTimeout(() => {
             this.loading = false
-            this.$emit("is-loaded")
           }, 2000)
         } else {
           this.loading = false
-          this.$emit("is-loaded")
         }
-      }
+      } */
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
@@ -146,33 +166,9 @@ export default {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       return h5pObj.instances[0].video
     },
-    /**
-     * Don't really think this is best practice, but these methods are meant to be
-     * used by parent components to play/pause the video, returning true if the
-     * particular action was successful and false otherwise.
-     *
-     * The goal here is to create a unified interface between Videos and H5Ps.
-     */
-    play() {
-      const h5pVideo = this.getInstance()
-      if (h5pVideo) {
-        h5pVideo.play()
-        return true
-      }
-      return false
-    },
-    pause() {
-      const h5pVideo = this.getInstance()
-      if (h5pVideo) {
-        h5pVideo.pause()
-        return true
-      }
-      return false
-    },
-    rewatch() {
+    reset() {
       const h5pVideo = this.getInstance()
       h5pVideo.seek(0)
-      h5pVideo.play()
     },
     close() {
       this.pause()
@@ -238,22 +234,35 @@ export default {
       }
     },
     handlePlay() {
-      this.$emit("show-play-screen", false)
-      if (!this.playedOnce && this.autoplay) {
-        this.playedOnce = true
-        return
-      }
       const { id, progress, mediaDuration } = this.node
       client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
         time: progress * mediaDuration,
       })
+      this.$emit("play")
     },
     handlePause() {
-      this.$emit("show-play-screen", true)
-      const { id, progress, mediaDuration } = this.node
-      client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-        time: progress * mediaDuration,
-      })
+      const video = this.getInstance()
+      if (video) {
+        /**
+         * When an H5PInteractiveVideo ends, it emits a Pause event BEFORE an Ended
+         * event. This breaks our state machine since our machine doesn't allow
+         * transitioning from a Paused state to a Finished state. As a work around,
+         * we listen to the Pause event and manually check if the video is done at
+         * this point. If it is, we emit the corresponding `timeupdate` event.
+         */
+        if (video.getCurrentTime() === video.getDuration()) {
+          this.$emit("timeupdate", {
+            amountViewed: 1,
+            currentTime: video.getDuration(),
+          })
+        } else {
+          const { id, progress, mediaDuration } = this.node
+          client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+            time: progress * mediaDuration,
+          })
+          this.$emit("pause")
+        }
+      }
     },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -281,6 +290,7 @@ export default {
         case "H5P.InteractiveVideo":
           {
             const h5pVideo = h5pInstance.video
+            this.loading = false
             const h5pIframeComponent = this
 
             const handleH5pAfterLoad = () => {
@@ -304,17 +314,10 @@ export default {
                 h5pIframeComponent.setFrameDimensions
               )
 
-              h5pIframeComponent.$emit("load", { el: h5pVideo })
-
               let currentPlayedTime
 
               const videoDuration = h5pVideo.getDuration()
               h5pVideo.seek(mediaProgress * videoDuration)
-
-              const viewedAmount = mediaProgress * videoDuration
-              if (viewedAmount === videoDuration) {
-                h5pIframeComponent.$emit("show-end-screen")
-              }
 
               h5pIframeComponent.applySettings(h5pVideo)
 
@@ -335,39 +338,34 @@ export default {
                         })
 
                         h5pIframeComponent.updateSettings(h5pVideo)
-
-                        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-                          h5pIframeComponent.$emit("complete")
-                        }
-
-                        if (amountViewed >= 1) {
-                          h5pIframeComponent.$emit("show-end-screen")
-                        }
                       } else {
                         clearInterval(updateVideoInterval)
                       }
-                    }, 1000)
+                    }, 200)
                     h5pIframeComponent.handlePlay(h5pIframeComponent.node)
                     break
                   }
 
                   case h5pObj.Video.PAUSED: {
-                    h5pIframeComponent.handlePause(h5pIframeComponent.node)
+                    /**
+                     * When an H5PInteractiveVideo loads, it goes through two state
+                     * changes — Playing, then Paused. If we emit a load event
+                     * before these state changes occur, a race condition can occur
+                     * where the node won't play even if autoplay is true.
+                     *
+                     * To work around this, we want to listen to the first instance
+                     * of the Paused event and emit the load event only AFTER that
+                     * first Paused event happens.
+                     */
+                    if (!this.loaded) {
+                      this.loaded = true
+                    } else {
+                      this.handlePause()
+                    }
                     break
                   }
                 }
               })
-              if (h5pIframeComponent.autoplay) {
-                setTimeout(() => {
-                  h5pVideo.play()
-                  client.recordAnalyticsEvent(
-                    "app",
-                    "auto-play",
-                    "h5p-video",
-                    h5pIframeComponent.node.id
-                  )
-                }, 1000)
-              }
             }
 
             if (h5pVideo.getDuration() !== undefined) {
@@ -402,14 +400,14 @@ export default {
                 }
               }
               this.loading = false
-              this.$emit("is-loaded")
+              this.$emit("load")
             }, 500)
           }
           break
         default:
           {
             this.loading = false
-            this.$emit("is-loaded")
+            this.$emit("load")
           }
           break
       }

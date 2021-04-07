@@ -1,32 +1,21 @@
 <template>
   <div class="container">
-    <end-screen
-      v-if="showEndScreen"
-      :node="node"
-      @rewatch="rewatch"
-      @close="close"
-      @show-quiz="openQuiz"
-    />
-    <activity-screen
-      v-else-if="showActivityScreen"
-      :id="node.id"
-      @back="back"
-      @close="close"
-    />
     <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
       ref="h5pIframe"
-      :autoplay="autoplay"
+      :playing="playing"
       :dimensions="dimensions"
       :node="node"
       :context="context"
       :settings="h5pSettings"
       @complete="$emit('complete')"
+      @play="$emit('play')"
+      @pause="$emit('pause')"
+      @seeking="$emit('seeking')"
+      @seeked="$emit('seeked', $event)"
       @change:dimensions="$emit('change:dimensions', $event)"
-      @is-loaded="handleLoad"
+      @load="handleLoad"
       @timeupdate="$emit('timeupdate', $event)"
-      @show-end-screen="showEndScreen = true"
-      @show-play-screen="showPlayScreen = $event"
       @update-settings="updateSettings"
     />
   </div>
@@ -36,17 +25,13 @@
 import { mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
-import EndScreen from "@/components/Lightbox/media/common/EndScreen"
-import ActivityScreen from "@/components/Lightbox/media/common/ActivityScreen"
 import H5PIframe from "./H5PIframe"
 
 export default {
   name: "h5p-media",
   components: {
-    EndScreen,
     "h5p-iframe": H5PIframe,
     Loading,
-    ActivityScreen,
   },
   props: {
     node: {
@@ -61,18 +46,14 @@ export default {
       type: String,
       required: true,
     },
-    autoplay: {
+    playing: {
       type: Boolean,
-      required: false,
-      default: true,
+      required: true,
     },
   },
   data() {
     return {
       isLoading: true,
-      showEndScreen: false,
-      showActivityScreen: false,
-      showPlayScreen: !this.autoplay,
     }
   },
   computed: {
@@ -80,32 +61,12 @@ export default {
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
-    play() {
-      this.$refs.h5pIframe.play()
+    reset() {
+      this.$refs.h5pIframe.reset()
     },
-    pause() {
-      this.$refs.h5pIframe.pause()
-    },
-    openQuiz() {
-      this.showEndScreen = false
-      this.showActivityScreen = true
-    },
-    rewatch() {
-      this.showEndScreen = false
-      this.$refs.h5pIframe.rewatch()
-    },
-    close() {
-      this.showEndScreen = false
-      this.$refs.h5pIframe.close()
-      this.$emit("close")
-    },
-    back() {
-      this.showActivityScreen = false
-      this.showEndScreen = true
-    },
-    handleLoad() {
+    handleLoad(evt) {
       this.isLoading = false
-      this.$emit("load")
+      this.$emit("load", evt)
     },
     updateSettings(settings) {
       client.recordAnalyticsEvent(
