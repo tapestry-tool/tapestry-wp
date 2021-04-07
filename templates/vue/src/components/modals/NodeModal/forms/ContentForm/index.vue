@@ -131,7 +131,10 @@ export default {
      */
     isPopupCandidate() {
       if (this.parent) {
-        return ["video", "h5p"].includes(this.parent.mediaType)
+        if (this.parent.mediaType === "h5p") {
+          return this.parent.mediaDuration > 0
+        }
+        return this.parent.mediaType === "video"
       }
       return false
     },
