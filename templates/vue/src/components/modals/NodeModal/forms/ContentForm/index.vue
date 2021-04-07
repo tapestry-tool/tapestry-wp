@@ -127,10 +127,13 @@ export default {
     },
     /**
      * If we're currently editing, a node is a popup candidate if its parent is a
-     * video node.
+     * video node AND it's not a popup itself.
      */
     isPopupCandidate() {
       if (this.parent) {
+        if (this.parent.popup) {
+          return false
+        }
         if (this.parent.mediaType === "h5p") {
           return this.parent.mediaDuration > 0
         }
