@@ -58,12 +58,20 @@
           </div>
         </div>
         <footer class="slideshow-footer">
-          <p class="slideshow-step">{{ currentSlideText }}</p>
-          <button class="button-nav" :disabled="!hasPrev" @click="prev">
+          <p class="slideshow-step" data-qa="slideshow-step">
+            {{ currentSlideText }}
+          </p>
+          <button
+            class="button-nav"
+            data-qa="slideshow-prev-button"
+            :disabled="!hasPrev"
+            @click="prev"
+          >
             <i class="fas fa-arrow-left"></i>
           </button>
           <button
             class="button-nav"
+            data-qa="slideshow-next-button"
             :disabled="!hasNext || disableNext"
             @click="next"
           >
