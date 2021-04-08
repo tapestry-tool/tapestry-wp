@@ -60,7 +60,7 @@ export default {
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
-  margin-bottom: 0.9em;
+  margin-bottom: 0.5em;
 
   :before {
     display: none;
