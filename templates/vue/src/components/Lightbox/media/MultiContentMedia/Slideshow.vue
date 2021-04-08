@@ -34,7 +34,6 @@
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(slide.node.id)"
               />
-              <!-- @load="handleLoad($refs.rowRefs[index])" -->
               <p v-if="slide.children.length > 0" style="color: white;">
                 {{ slide.node.typeData.subAccordionText }}
               </p>
@@ -119,6 +118,11 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    level: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   data() {

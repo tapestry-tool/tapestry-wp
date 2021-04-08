@@ -50,6 +50,7 @@
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
+      :level="level"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
