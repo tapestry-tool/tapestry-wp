@@ -8,10 +8,13 @@
     <header>
       <h1
         v-if="showTitle"
-        :class="{
-          title: true,
-          'nested-media-title': isMultiContentContext,
-        }"
+        :class="[
+          'title',
+          {
+            'slideshow-title': node.presentationStyle === 'slideshow',
+            'nested-media-title': isMultiContentContext,
+          },
+        ]"
       >
         {{ node.title }}
       </h1>
@@ -160,6 +163,10 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     showTitle() {
+      if (this.node.presentationStyle === "slideshow") {
+        return this.node.typeData.showSlideshowTitle
+      }
+
       return (
         this.level == 0 ||
         (this.context !== "accordion" && this.node.typeData.showTitle !== false)
@@ -323,6 +330,21 @@ button[disabled] {
 .title {
   color: #fff;
   margin-bottom: 1em;
+
+  &.nested-media-title {
+    text-align: left;
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 0.9em;
+
+    :before {
+      display: none;
+    }
+  }
+
+  &.slideshow-title {
+    margin-bottom: 0.3em;
+  }
 }
 
 .media-container {
@@ -334,17 +356,6 @@ button[disabled] {
 
   ::-webkit-scrollbar-track {
     background-color: black;
-  }
-}
-
-.nested-media-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
-
-  :before {
-    display: none;
   }
 }
 

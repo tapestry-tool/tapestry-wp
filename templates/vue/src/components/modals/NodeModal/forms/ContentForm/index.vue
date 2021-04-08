@@ -11,6 +11,14 @@
         required
       />
       <b-form-checkbox
+        v-if="node.presentationStyle == 'slideshow'"
+        v-model="node.typeData.showSlideshowTitle"
+        class="small title-checkbox"
+        data-qa="node-show-page-title"
+      >
+        Show slideshow title
+      </b-form-checkbox>
+      <b-form-checkbox
         v-if="isMultiContentChild"
         v-model="shouldShowTitle"
         class="small title-checkbox"
