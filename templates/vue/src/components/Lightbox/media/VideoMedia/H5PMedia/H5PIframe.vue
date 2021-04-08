@@ -6,8 +6,8 @@
       'context-accordion': context === 'accordion',
     }"
     :style="{
-      height: frameHeight ? frameHeight + 'px' : 'auto',
-      width: frameWidth ? frameWidth + 'px' : '100%',
+      height: `${dimensions.height}px`,
+      width: '100%',
       opacity: loading ? 0 : 1,
     }"
   >
@@ -57,8 +57,8 @@ export default {
     return {
       instance: null,
       library: null,
-      frameHeight: 0,
-      frameWidth: "100%",
+      frameHeight: null,
+      frameWidth: null,
       loading: true,
       requiresRefresh: false,
       playedOnce: false,
@@ -96,6 +96,9 @@ export default {
           this.$emit("load", {
             currentTime: video.getCurrentTime(),
             type: "h5p-video",
+          })
+          this.$nextTick(() => {
+            this.setFrameDimensions()
           })
         }
       }
@@ -295,8 +298,6 @@ export default {
 
             const handleH5pAfterLoad = () => {
               h5pIframeComponent.instance = h5pVideo
-
-              h5pIframeComponent.setFrameDimensions()
               window.addEventListener(
                 "resize",
                 h5pIframeComponent.setFrameDimensions

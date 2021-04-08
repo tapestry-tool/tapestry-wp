@@ -245,9 +245,9 @@ export default {
         query: this.$route.query,
       })
     },
-    handleLoad(dimensions) {
-      if (dimensions) {
-        const { width, height } = dimensions
+    handleLoad(dimensions = {}) {
+      const { width, height } = dimensions
+      if (width && height) {
         this.updateDimensions({ width, height })
       }
     },
