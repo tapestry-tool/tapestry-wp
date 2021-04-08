@@ -308,7 +308,7 @@ describe("Multi-content", () => {
     })
   })
 
-  describe.only("Page", () => {
+  describe("Page", () => {
     it("should render text content, more content and hide locked content", () => {
       cy.setup("@page")
 
