@@ -1,5 +1,6 @@
 <template>
   <div>
+    <loading v-if="state === states.Loading" style="color: white;" />
     <component
       :is="videoComponent"
       v-show="showVideo"
@@ -48,6 +49,7 @@ import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "../common/EndScreen"
 import PlayScreen from "../common/PlayScreen"
+import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 
 /**
@@ -82,6 +84,7 @@ export default {
     UrlVideoMedia,
     EndScreen,
     PlayScreen,
+    Loading,
   },
   props: {
     nodeId: {

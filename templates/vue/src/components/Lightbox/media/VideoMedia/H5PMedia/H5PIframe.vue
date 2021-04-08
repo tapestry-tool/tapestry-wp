@@ -8,7 +8,6 @@
     :style="{
       height: `${dimensions.height}px`,
       width: '100%',
-      opacity: loading ? 0 : 1,
     }"
   >
     <iframe
@@ -62,7 +61,6 @@ export default {
       loading: true,
       requiresRefresh: false,
       playedOnce: false,
-      loaded: false,
     }
   },
   computed: {
@@ -89,8 +87,8 @@ export default {
         }
       }
     },
-    loaded(loaded) {
-      if (loaded) {
+    loading(loading) {
+      if (!loading) {
         const video = this.getInstance()
         if (video) {
           this.$emit("load", {
@@ -293,7 +291,6 @@ export default {
         case "H5P.InteractiveVideo":
           {
             const h5pVideo = h5pInstance.video
-            this.loading = false
             const h5pIframeComponent = this
 
             const handleH5pAfterLoad = () => {
@@ -358,8 +355,8 @@ export default {
                      * of the Paused event and emit the load event only AFTER that
                      * first Paused event happens.
                      */
-                    if (!this.loaded) {
-                      this.loaded = true
+                    if (this.loading) {
+                      this.loading = false
                     } else {
                       this.handlePause()
                     }

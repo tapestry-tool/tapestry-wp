@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
       ref="h5pIframe"
       :playing="playing"
@@ -14,7 +13,7 @@
       @seeking="$emit('seeking')"
       @seeked="$emit('seeked', $event)"
       @change:dimensions="$emit('change:dimensions', $event)"
-      @load="handleLoad"
+      @load="$emit('load', $event)"
       @timeupdate="$emit('timeupdate', $event)"
       @update-settings="updateSettings"
     />
@@ -24,14 +23,12 @@
 <script>
 import { mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
-import Loading from "@/components/common/Loading"
 import H5PIframe from "./H5PIframe"
 
 export default {
   name: "h5p-media",
   components: {
     "h5p-iframe": H5PIframe,
-    Loading,
   },
   props: {
     node: {
@@ -51,11 +48,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      isLoading: true,
-    }
-  },
   computed: {
     ...mapState(["h5pSettings"]),
   },
@@ -63,10 +55,6 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     reset() {
       this.$refs.h5pIframe.reset()
-    },
-    handleLoad(evt) {
-      this.isLoading = false
-      this.$emit("load", evt)
     },
     updateSettings(settings) {
       client.recordAnalyticsEvent(
