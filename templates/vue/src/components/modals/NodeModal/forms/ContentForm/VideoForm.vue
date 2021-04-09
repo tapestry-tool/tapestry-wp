@@ -7,6 +7,7 @@
         input-test-id="node-video-url"
         placeholder="Enter URL for MP4 or YouTube video"
         required
+        :isVideoUpload="true"
         @isUploading="handleUploadChange"
       />
     </b-form-group>

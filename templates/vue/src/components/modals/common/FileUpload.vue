@@ -83,8 +83,10 @@
               required
               data-qa="import-file-input"
               @dragover.prevent
-              @drop.prevent="uploadFile"
-              @change="uploadFile"
+              @drop.prevent="
+                isVideoUpload ? uploadVideoFile($event) : uploadFile($event)
+              "
+              @change="isVideoUpload ? uploadVideoFile($event) : uploadFile($event)"
             ></b-form-file>
           </b-col>
           <template v-if="showUrlUpload">
@@ -169,6 +171,11 @@ export default {
       required: false,
       default: "",
     },
+    isVideoUpload: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -193,6 +200,77 @@ export default {
   },
   methods: {
     uploadFile(event) {
+      const formData = new FormData()
+      formData.append("action", "upload-attachment")
+      formData.append(
+        "async-upload",
+        event.dataTransfer && event.dataTransfer.files
+          ? event.dataTransfer.files[0]
+          : event.target.files[0]
+      )
+      formData.append(
+        "name",
+        event.dataTransfer && event.dataTransfer.files
+          ? event.dataTransfer.files[0]
+          : event.target.files[0].name
+      )
+      formData.append("_wpnonce", wpData.file_upload_nonce)
+
+      this.error = null
+      this.confirmedUpload = true
+
+      let CancelToken = axios.CancelToken
+      this.uploadSource = CancelToken.source()
+
+      axios
+        .post(wpData.upload_url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          cancelToken: this.uploadSource.token,
+          onUploadProgress: progressEvent => {
+            this.isUploading = true
+            this.$emit("isUploading", this.isUploading)
+            setTimeout(() => {
+              this.uploadPercentage = parseInt(
+                Math.round((progressEvent.loaded / progressEvent.total) * 95)
+              )
+              if (this.uploadPercentage == 95) {
+                this.uploadBarInterval = setInterval(() => {
+                  if (this.uploadPercentage < 99) {
+                    this.uploadPercentage++
+                  }
+                }, 500)
+              }
+            }, 1000)
+          },
+        })
+        .then(response => {
+          setTimeout(() => {
+            if (response.data.success) {
+              this.$emit("input", response.data.data.url)
+              if (this.thumbnailType) {
+                this.$root.$emit("fileID", {
+                  thumbnailType: this.thumbnailType,
+                  data: response.data.data.id,
+                })
+              }
+            } else {
+              this.handleError(response.data)
+            }
+          }, 800)
+        })
+        .catch(response => this.handleError(response))
+        .finally(() => {
+          if (this.isUploading) {
+            this.isUploading = false
+            this.confirmedUpload = false
+            this.$emit("isUploading", this.isUploading)
+          }
+          clearInterval(this.uploadBarInterval)
+        })
+    },
+    async uploadVideoFile(event) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
       formData.append(
