@@ -19,7 +19,7 @@
         Show slideshow title
       </b-form-checkbox>
       <b-form-checkbox
-        v-if="isMultiContentChild"
+        v-if="isPageChild"
         v-model="shouldShowTitle"
         class="small title-checkbox"
         data-qa="node-show-page-title"
@@ -27,7 +27,7 @@
         Show title in page
       </b-form-checkbox>
     </b-form-group>
-    <div v-if="isMultiContentChild">
+    <div v-if="isPageChild">
       <b-form-group
         v-if="addMenuTitle || node.typeData.menuTitle"
         label="Custom Menu Title"
@@ -159,10 +159,13 @@ export default {
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
-    isMultiContentChild() {
+    isPageChild() {
       return (
-        (this.parent && this.parent.mediaType === "multi-content") ||
-        this.isMultiContentRow(this.node.id)
+        this.parent &&
+        this.parent.mediaType === "multi-content" &&
+        this.isMultiContentRow(this.node.id, undefined, node => {
+          return node.presentationStyle === "page"
+        })
       )
     },
   },
