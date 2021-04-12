@@ -48,9 +48,5 @@ module.exports = {
     hints: false,
   },
   plugins: [new VueLoaderPlugin()],
-  node: {
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-  }
+  target: 'node'
 }
