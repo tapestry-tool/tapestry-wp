@@ -85,15 +85,14 @@ export default {
       this.player = event.target
 
       const currentTime = this.progress * this.player.getDuration()
+      this.lastTime = currentTime
       this.player.seekTo(currentTime, true)
       this.applySettings()
 
       this.$emit("load", { currentTime })
     },
     reset() {
-      if (this.player) {
-        this.player.seekTo(0, true)
-      }
+      this.player.seekTo(0, true)
     },
     close() {
       this.updateVideoProgress()
@@ -102,13 +101,18 @@ export default {
     },
     updateVideoProgress(ended = false) {
       if (this.player) {
-        const amountViewed = this.player.getCurrentTime() / this.player.getDuration()
-        this.$emit("timeupdate", {
-          amountViewed: ended ? 1 : amountViewed,
-          currentTime: ended
-            ? this.player.getDuration()
-            : this.player.getCurrentTime(),
-        })
+        const currentTime = this.player.getCurrentTime()
+        const duration = this.player.getDuration()
+
+        if (Math.abs(currentTime - this.lastTime) > 1) {
+          this.$emit("seeked", { currentTime })
+        } else {
+          this.$emit("timeupdate", {
+            amountViewed: ended ? 1 : currentTime / duration,
+            currentTime: ended ? duration : currentTime,
+          })
+        }
+        this.lastTime = currentTime
       }
     },
     handlePause() {

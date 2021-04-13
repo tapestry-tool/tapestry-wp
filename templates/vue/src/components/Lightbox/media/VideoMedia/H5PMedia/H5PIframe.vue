@@ -109,6 +109,39 @@ export default {
     document.removeEventListener("mozfullscreenchange", this.setFrameDimensions)
   },
   methods: {
+    startTimeupdateHandler() {
+      this.stopTimeupdateHandler()
+      this.interval = setInterval(() => this.updateVideoProgress(), 200)
+    },
+    stopTimeupdateHandler() {
+      if (this.interval) {
+        clearInterval(this.interval)
+      }
+    },
+    updateVideoProgress() {
+      const video = this.getInstance()
+
+      /**
+       * An H5P video is just one of the many types H5Ps can be, so we only want to
+       * trigger this if the H5P is in fact a video.
+       */
+      if (video) {
+        const currentTime = video.getCurrentTime()
+        const duration = video.getDuration
+
+        if (Math.abs(currentTime - this.lastTime) > 1) {
+          this.$emit("seeked", { currentTime })
+        } else {
+          this.$emit("timeupdate", {
+            amountViewed: currentTime / duration,
+            currentTime,
+          })
+        }
+
+        this.lastTime = currentTime
+        this.updateSettings(video)
+      }
+    },
     setFrameDimensions() {
       const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
 
@@ -312,35 +345,16 @@ export default {
                 h5pIframeComponent.setFrameDimensions
               )
 
-              let currentPlayedTime
-
               const videoDuration = h5pVideo.getDuration()
               h5pVideo.seek(mediaProgress * videoDuration)
+              this.lastTime = mediaProgress * videoDuration
 
               h5pIframeComponent.applySettings(h5pVideo)
 
               h5pVideo.on("stateChange", event => {
                 switch (event.data) {
                   case h5pObj.Video.PLAYING: {
-                    const updateVideoInterval = setInterval(() => {
-                      if (
-                        currentPlayedTime !== h5pVideo.getCurrentTime() &&
-                        h5pVideo.getCurrentTime() > 0
-                      ) {
-                        currentPlayedTime = h5pVideo.getCurrentTime()
-                        const amountViewed = currentPlayedTime / videoDuration
-
-                        h5pIframeComponent.$emit("timeupdate", {
-                          amountViewed,
-                          currentTime: currentPlayedTime,
-                        })
-
-                        h5pIframeComponent.updateSettings(h5pVideo)
-                      } else {
-                        clearInterval(updateVideoInterval)
-                      }
-                    }, 200)
-                    h5pIframeComponent.handlePlay(h5pIframeComponent.node)
+                    this.handlePlay()
                     break
                   }
 
