@@ -9,7 +9,6 @@
       :dimensions="dimensions"
       :playing="state === states.Playing"
       :context="context"
-      v-on="$listeners"
       @change:dimensions="$emit('change:dimensions', $event)"
       @complete="$emit('complete', nodeId)"
       @close="$emit('close')"
@@ -295,7 +294,9 @@ export default {
       return VideoStates.Finished
     },
     handlePopupComplete() {
-      this.completing = true
+      if (!this.isPopupComplete) {
+        this.completing = true
+      }
       this.$emit("complete", this.activePopupId)
     },
   },

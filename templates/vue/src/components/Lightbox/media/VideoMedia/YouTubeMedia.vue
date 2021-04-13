@@ -112,8 +112,6 @@ export default {
       }
     },
     handlePause() {
-      this.stopInterval()
-
       this.updateVideoProgress()
       this.updateSettings()
       const { id, progress, mediaDuration } = this.node
@@ -123,7 +121,6 @@ export default {
       this.$emit("pause")
     },
     handlePlay() {
-      this.startInterval()
       const { id, progress, mediaDuration } = this.node
       client.recordAnalyticsEvent("user", "play", "yt-video", id, {
         time: progress * mediaDuration,
@@ -146,7 +143,6 @@ export default {
       }
     },
     handleEnd() {
-      this.stopInterval()
       // Video current time may be a few milliseconds short and so won't mark it as complete
       this.updateVideoProgress(true)
       this.updateSettings()
