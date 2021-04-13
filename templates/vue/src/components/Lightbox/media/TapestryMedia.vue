@@ -134,8 +134,8 @@ export default {
     updateProgress({ amountViewed }) {
       this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
-    complete() {
-      this.$emit("complete")
+    complete(nodeId) {
+      this.$emit("complete", nodeId)
     },
   },
 }

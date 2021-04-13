@@ -227,8 +227,8 @@ export default {
   },
   methods: {
     ...mapActions(["completeNode"]),
-    complete() {
-      this.completeNode(this.nodeId)
+    complete(nodeId) {
+      this.completeNode(nodeId || this.nodeId)
     },
     handleUserClose() {
       client.recordAnalyticsEvent("user", "close", "lightbox", this.nodeId)

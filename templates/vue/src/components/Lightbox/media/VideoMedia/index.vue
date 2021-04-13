@@ -8,8 +8,11 @@
       :node="node"
       :dimensions="dimensions"
       :playing="state === states.Playing"
-      v-bind="$attrs"
+      :context="context"
       v-on="$listeners"
+      @change:dimensions="$emit('change:dimensions', $event)"
+      @complete="$emit('complete', nodeId)"
+      @close="$emit('close')"
       @load="transition(events.Load, $event)"
       @play="transition(events.Play)"
       @pause="transition(events.Pause)"
@@ -21,9 +24,18 @@
       v-if="state === states.Popup"
       :dimensions="dimensions"
       :node-id="activePopupId"
-      @complete="$emit('complete')"
+      :context="context"
+      :autoplay="autoplay"
+      @complete="handlePopupComplete"
     />
-    <button v-if="isPopupComplete" @click="transition(events.Continue)">
+    <div v-if="completing" class="aside">
+      <b-spinner variant="light"></b-spinner>
+    </div>
+    <button
+      v-if="isPopupComplete"
+      class="aside"
+      @click="transition(events.Continue)"
+    >
       Continue
     </button>
     <play-screen
@@ -99,12 +111,21 @@ export default {
       type: Boolean,
       required: true,
     },
+    context: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       state: VideoStates.Loading,
       activePopupId: null,
       seeking: false,
+      /**
+       * Completing a node is done asynchronously, and we want to show a small
+       * spinner on the bottom right of the node when this is currently in progress.
+       */
+      completing: false,
     }
   },
   computed: {
@@ -149,6 +170,18 @@ export default {
       return [VideoStates.Paused, VideoStates.Playing].includes(this.state)
     },
   },
+  watch: {
+    /**
+     * Since the completing function is done in the parent lightbox container, the
+     * only way we know if the popup is successfully completed is if the
+     * `isPopupComplete` computed property changes.
+     */
+    isPopupComplete(isComplete) {
+      if (isComplete && this.completing) {
+        this.completing = false
+      }
+    },
+  },
   methods: {
     /**
      * This function calculates the next state given the current state and the event
@@ -174,6 +207,7 @@ export default {
                 )
               }
 
+              this.$emit("load")
               break
             }
           }
@@ -260,6 +294,10 @@ export default {
       }
       return VideoStates.Finished
     },
+    handlePopupComplete() {
+      this.completing = true
+      this.$emit("complete", this.activePopupId)
+    },
   },
 }
 </script>
@@ -269,12 +307,14 @@ div {
   height: 100%;
 }
 
-button {
+.aside {
   position: absolute;
   border-radius: 0.5rem;
   right: 1rem;
   bottom: 1rem;
+}
 
+button {
   &:hover {
     background: var(--tapestry-light-gray);
   }
