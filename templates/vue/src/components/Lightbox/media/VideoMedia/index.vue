@@ -8,8 +8,8 @@
     <loading v-if="state === states.Loading" style="color: white;" />
     <component
       :is="videoComponent"
-      v-show="showVideo"
       ref="video"
+      :style="{ opacity: showVideo ? 1 : 0 }"
       :node="node"
       :dimensions="dimensions"
       :playing="state === states.Playing"
@@ -24,14 +24,15 @@
       @seeking="seeking = true"
       @seeked="handleSeek"
     />
-    <tapestry-media
-      v-if="state === states.Popup"
-      :dimensions="dimensions"
-      :node-id="activePopupId"
-      :context="context"
-      :autoplay="autoplay"
-      @complete="handlePopupComplete"
-    />
+    <div v-if="state === states.Popup" class="popup">
+      <tapestry-media
+        :dimensions="dimensions"
+        :node-id="activePopupId"
+        :context="context"
+        :autoplay="autoplay"
+        @complete="handlePopupComplete"
+      />
+    </div>
     <div v-if="completing" class="aside">
       <b-spinner variant="light"></b-spinner>
     </div>
@@ -329,5 +330,13 @@ button {
 
 .screen {
   border-radius: 15px;
+}
+
+.popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 </style>

@@ -129,7 +129,7 @@ export default {
        */
       if (video) {
         const currentTime = video.getCurrentTime()
-        const duration = video.getDuration
+        const duration = video.getDuration()
 
         if (Math.abs(currentTime - this.lastTime) > 1) {
           this.$emit("seeked", { currentTime })
@@ -239,7 +239,13 @@ export default {
       try {
         newSettings.caption = h5pVideo.getCaptionsTrack()
       } catch (Error) {
-        console.error("H5P caption selection not saved", Error)
+        /**
+         * In H5P YouTube videos, the caption track can be undefined which leads to
+         * this throwing. Since this function is called on timeupdate, the console
+         * can get bloated quite quickly. Instead, if we fail to set a caption we're
+         * going to default it to an empty object.
+         */
+        newSettings.caption = {}
       }
 
       if (Helpers.isDifferent(newSettings, this.settings)) {
@@ -353,6 +359,14 @@ export default {
 
               h5pIframeComponent.applySettings(h5pVideo)
 
+              this.$emit("load", {
+                currentTime: mediaProgress * videoDuration,
+                type: "h5p-video",
+              })
+              this.$nextTick(() => {
+                this.setFrameDimensions()
+              })
+
               h5pVideo.on("stateChange", event => {
                 switch (event.data) {
                   case h5pObj.Video.PLAYING: {
@@ -371,11 +385,10 @@ export default {
                      * of the Paused event and emit the load event only AFTER that
                      * first Paused event happens.
                      */
-                    if (this.loading) {
+                    /* if (this.loading) {
                       this.loading = false
-                    } else {
-                      this.handlePause()
-                    }
+                    } else { */
+                    this.handlePause()
                     break
                   }
                 }
