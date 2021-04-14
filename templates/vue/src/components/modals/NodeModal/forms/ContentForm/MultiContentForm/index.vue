@@ -66,6 +66,7 @@ export default {
       confirmationBodyText: "Would you like to continue?",
       continueButtonText: "Continue",
       cancelLinkText: "Cancel",
+      showNavBar: true,
       ...this.node.typeData,
     }
   },

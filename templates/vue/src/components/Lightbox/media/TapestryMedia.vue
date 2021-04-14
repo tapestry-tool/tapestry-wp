@@ -171,7 +171,6 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  background: inherit;
   outline: none;
   border-radius: 15px;
   overflow: auto;

@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="media-container" data-qa="multi-content">
+  <div
+    ref="container"
+    class="media-container"
+    :style="navBarStyle"
+    data-qa="multi-content"
+  >
     <header>
       <h1
         v-if="showTitle"
@@ -18,6 +23,7 @@
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
+      :level="level"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -29,6 +35,7 @@
       :rowId="rowId"
       :subRowId="subRowId"
       :context="context"
+      :level="level"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -90,17 +97,29 @@ export default {
       required: false,
       default: "",
     },
+    level: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
       activeIndex: -1,
       showCompletion: false,
       isMounted: false,
+      navBarStyle: {},
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
-    ...mapState(["favourites"]),
+    ...mapGetters([
+      "getDirectChildren",
+      "getNode",
+      "getParent",
+      "isFavourite",
+      "isMultiContent",
+    ]),
+    ...mapState(["favourites", "rootId"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -129,12 +148,16 @@ export default {
     },
     showTitle() {
       return (
-        this.context !== "multi-content" ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
+        this.level == 0 ||
+        (this.context !== "accordion" && this.node.typeData.showTitle !== false)
       )
     },
     isMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page"
+      return (
+        this.context === "multi-content" ||
+        this.context === "page" ||
+        this.context === "accordion"
+      )
     },
   },
   mounted() {
@@ -184,24 +207,94 @@ export default {
       return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
     },
     updateProgress(rowId) {
-      this.completeNode(rowId)
-      if (this.rows.every(row => row.node.completed)) {
-        this.$emit("complete")
-      }
+      this.completeNode(rowId).then(() => {
+        if (this.rows.every(row => row.node.completed)) {
+          this.$emit("complete", this.node.id)
+        }
+      })
     },
     changeRow(rowId) {
-      if (rowId) {
-        this.$router.push({
-          name: names.MULTICONTENT,
-          params: { nodeId: this.node.id, rowId },
-          query: this.$route.query,
-        })
+      if (this.isMultiContentContext) {
+        if (rowId) {
+          this.$router.push({
+            name: names.SUBMULTICONTENT,
+            params: {
+              nodeId: this.$route.params.nodeId,
+              ...this.getRouteToParent(
+                rowId,
+                this.$route.params.rowId || this.node.id
+              ),
+            },
+            query: this.$route.query,
+          })
+        } else {
+          if (this.$route.params.subRowId) {
+            let updatedSubRowIds = this.$route.params.subRowId.split(",")
+            updatedSubRowIds.pop()
+            this.$router.push({
+              name: names.SUBMULTICONTENT,
+              params: {
+                nodeId: this.$route.params.nodeId,
+                rowId: this.$route.params.rowId,
+                subRowId: updatedSubRowIds.join(","),
+              },
+              query: this.$route.query,
+            })
+          }
+        }
       } else {
-        this.$router.push({
-          name: names.LIGHTBOX,
-          params: { nodeId: this.node.id },
-          query: this.$route.query,
-        })
+        if (rowId) {
+          this.$router.push({
+            name: names.MULTICONTENT,
+            params: { nodeId: this.node.id, rowId },
+            query: this.$route.query,
+          })
+        } else {
+          this.$router.push({
+            name: names.LIGHTBOX,
+            params: { nodeId: this.node.id },
+            query: this.$route.query,
+          })
+        }
+      }
+    },
+    getRouteToParent(childId, parentId) {
+      let path = [childId]
+      let subRowIds = []
+
+      if (this.$route.params.subRowId) {
+        const subRowIdString = this.$route.params.subRowId.toString()
+        subRowIds = subRowIdString.split(",")
+      }
+
+      while (childId !== this.rootId) {
+        const pid = this.getParent(childId)
+
+        // Handling shared parent in subRowIds
+        if (subRowIds.includes(pid.toString())) {
+          const sharedPath = subRowIds.slice(
+            0,
+            subRowIds.indexOf(pid.toString()) + 1
+          )
+          return {
+            rowId: parentId,
+            subRowId: sharedPath.concat(path).join(","),
+          }
+        }
+        if (pid == this.$route.params.nodeId) {
+          const rowId = path[0]
+          path.shift()
+          return {
+            rowId: rowId,
+            subRowId: path.join(","),
+          }
+        }
+        path.unshift(pid)
+        childId = pid
+      }
+      return {
+        rowId: parentId,
+        subRowId: path.join(","),
       }
     },
   },
@@ -221,6 +314,7 @@ button[disabled] {
 
 .media-container {
   height: 100%;
+  width: 100%;
   overflow: auto;
   scrollbar-color: auto black;
   scrollbar-width: none;

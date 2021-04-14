@@ -11,7 +11,7 @@
         required
       />
       <b-form-checkbox
-        v-if="showTitleCheckbox"
+        v-if="isMultiContentChild"
         v-model="shouldShowTitle"
         class="small title-checkbox"
         data-qa="node-show-page-title"
@@ -19,6 +19,25 @@
         Show title in page
       </b-form-checkbox>
     </b-form-group>
+    <div v-if="isMultiContentChild">
+      <b-form-group
+        v-if="addMenuTitle || node.typeData.menuTitle"
+        label="Custom Menu Title"
+      >
+        <b-form-input
+          id="node-nav-title"
+          v-model="node.typeData.menuTitle"
+          data-qa="node-nav-title"
+          placeholder="Enter custom menu title"
+          autofocus
+        />
+      </b-form-group>
+      <div v-else class="text-right mt-n3 mb-2">
+        <a href="#" class="small" @click="addMenuTitle = true">
+          Add Custom Menu Title
+        </a>
+      </div>
+    </div>
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
@@ -124,6 +143,7 @@ export default {
         { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
       shouldShowTitle: this.node.typeData.showTitle !== false,
+      addMenuTitle: false,
     }
   },
   computed: {
@@ -131,7 +151,7 @@ export default {
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
     },
-    showTitleCheckbox() {
+    isMultiContentChild() {
       return (
         (this.parent && this.parent.mediaType === "multi-content") ||
         this.isMultiContentRow(this.node.id)
