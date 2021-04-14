@@ -237,6 +237,8 @@ export default {
 
       &.closed {
         background: transparent;
+        min-width: 20px;
+        max-width: 20px;
       }
     }
 
