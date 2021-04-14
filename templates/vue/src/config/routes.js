@@ -39,7 +39,7 @@ const multiContent = {
 }
 
 const subMultiContent = {
-  path: `${ROOT_PATH}/view/:rowId/row/:subRowId`,
+  path: `${ROOT_PATH}/view/:rowId/rows/:subRowId`,
   name: "sub_multi_content",
   components: {
     lightbox: Lightbox,

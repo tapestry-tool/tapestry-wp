@@ -73,7 +73,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["isFavourite"]),
+    ...mapGetters(["isFavourite", "getParent"]),
   },
   mounted() {
     this.$root.$emit("observe-rows", this.$refs.rowRefs)
@@ -86,11 +86,19 @@ export default {
     changeRow(subRowId) {
       const { nodeId, rowId } = this.$route.params
       if (subRowId) {
-        this.$router.push({
-          name: names.SUBMULTICONTENT,
-          params: { nodeId, rowId, subRowId },
-          query: this.$route.query,
-        })
+        if (rowId !== undefined) {
+          this.$router.push({
+            name: names.SUBMULTICONTENT,
+            params: { nodeId, rowId, subRowId },
+            query: this.$route.query,
+          })
+        } else {
+          this.$router.push({
+            name: names.SUBMULTICONTENT,
+            params: { nodeId, rowId: this.getParent(subRowId), subRowId },
+            query: this.$route.query,
+          })
+        }
       } else {
         this.$router.push({
           name: names.MULTICONTENT,

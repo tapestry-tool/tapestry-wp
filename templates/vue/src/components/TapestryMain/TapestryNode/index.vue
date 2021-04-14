@@ -93,7 +93,7 @@
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="
-                !isSubMultiContentRow &&
+                (node.mediaType === 'multi-content' || !isSubMultiContentRow) &&
                   (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
@@ -102,7 +102,9 @@
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="isSubMultiContentRow ? 0 : 35"
+              :x="
+                isSubMultiContentRow && node.mediaType !== 'multi-content' ? 0 : 35
+              "
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
