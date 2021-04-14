@@ -24,7 +24,7 @@
         :active="active"
         :depth="depth + 1"
         :lockRows="lockRows"
-        :shouldDisable="shouldDisable || disableRow(row.node.id)"
+        :shouldDisable="shouldDisable || disableRow(row.node)"
         :isBase="false"
         @scroll-to="scrollToRow"
       />
@@ -99,9 +99,12 @@ export default {
     },
   },
   methods: {
-    disableRow(nodeId) {
-      const index = this.rows.findIndex(row => row.node.id === nodeId)
-      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    disableRow(node) {
+      const index = this.rows.findIndex(row => row.node.id === node.id)
+      return (
+        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
+        !node.unlocked
+      )
     },
     handleTitleClick() {
       this.scrollToRow()
