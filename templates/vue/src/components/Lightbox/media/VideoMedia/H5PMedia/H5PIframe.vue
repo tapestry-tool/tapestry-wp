@@ -81,8 +81,10 @@ export default {
       const video = this.getInstance()
       if (video) {
         if (isPlaying) {
+          this.startTimeupdateHandler()
           video.play()
         } else {
+          this.stopTimeupdateHandler()
           video.pause()
         }
       }

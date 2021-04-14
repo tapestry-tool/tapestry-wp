@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div
+    :style="{
+      height: `${dimensions.height}px`,
+      width: '100%',
+    }"
+  >
     <loading v-if="state === states.Loading" style="color: white;" />
     <component
       :is="videoComponent"
@@ -306,6 +311,7 @@ export default {
 <style scoped lang="scss">
 div {
   height: 100%;
+  position: relative;
 }
 
 .aside {
