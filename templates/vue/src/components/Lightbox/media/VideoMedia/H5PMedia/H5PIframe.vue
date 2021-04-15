@@ -58,9 +58,7 @@ export default {
       library: null,
       frameHeight: null,
       frameWidth: null,
-      loading: true,
-      requiresRefresh: false,
-      playedOnce: false,
+      refreshed: false,
     }
   },
   computed: {
@@ -86,20 +84,6 @@ export default {
         } else {
           this.stopTimeupdateHandler()
           video.pause()
-        }
-      }
-    },
-    loading(loading) {
-      if (!loading) {
-        const video = this.getInstance()
-        if (video) {
-          this.$emit("load", {
-            currentTime: video.getCurrentTime(),
-            type: "h5p-video",
-          })
-          this.$nextTick(() => {
-            this.setFrameDimensions()
-          })
         }
       }
     },
@@ -172,20 +156,6 @@ export default {
           this.frameHeight = h5pDimensions.height * scaleFactor
         }
       }
-
-      /**
-       * TODO: Make sure getting rid of this doesn't break other H5P content types
-       */
-      /* if (this.loading) {
-        if (this.requiresRefresh) {
-          this.$refs.h5p.contentWindow.location.reload()
-          setTimeout(() => {
-            this.loading = false
-          }, 2000)
-        } else {
-          this.loading = false
-        }
-      } */
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
@@ -398,8 +368,17 @@ export default {
             }
 
             if (h5pVideo.getDuration() !== undefined) {
-              this.requiresRefresh = this.context === "accordion"
-              handleH5pAfterLoad()
+              /**
+               * When an H5P video appears in an accordion, it can sometimes appear
+               * cut off. To work around this, we refresh the h5p content window and
+               * wait for that to load.
+               */
+              if (this.context === "accordion" && !this.refreshed) {
+                this.$refs.h5p.contentWindow.location.reload()
+                this.refreshed = true
+              } else {
+                handleH5pAfterLoad()
+              }
             } else {
               h5pVideo.on("loaded", handleH5pAfterLoad)
             }
@@ -428,16 +407,12 @@ export default {
                   h5pInstance.reDraw()
                 }
               }
-              this.loading = false
               this.$emit("load")
             }, 500)
           }
           break
         default:
-          {
-            this.loading = false
-            this.$emit("load")
-          }
+          this.$emit("load")
           break
       }
     },
