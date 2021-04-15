@@ -16,15 +16,28 @@
           <div class="button-row">
             <button
               class="button-row-trigger"
-              :disabled="disableRow(index)"
+              :disabled="disableRow(index, row.node)"
               @click="toggle(row.node.id)"
             >
               <i
+                v-if="!disableRow(index, row.node)"
                 :class="isVisible(row.node.id) ? 'fas fa-minus' : 'fas fa-plus'"
               ></i>
+              <i
+                v-else
+                class="fas fa-lock fa-sm title-row-icon"
+                style="color:white;"
+              ></i>
               {{ row.node.title }}
+              <locked-content
+                v-if="disableRow(index, row.node)"
+                :node="row.node"
+              ></locked-content>
             </button>
-            <a v-if="!disableRow(index)" @click="toggleFavourite(row.node.id)">
+            <a
+              v-if="!disableRow(index, row.node)"
+              @click="toggleFavourite(row.node.id)"
+            >
               <i
                 v-if="isFavourite(row.node.id)"
                 class="fas fa-heart fa-sm"
@@ -84,6 +97,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import SubAccordion from "./SubAccordion"
+import LockedContent from "./common/LockedContent"
 
 export default {
   name: "accordion-rows",
@@ -92,6 +106,7 @@ export default {
     HeadlessMultiContent,
     MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
+    LockedContent,
   },
   props: {
     node: {
@@ -180,8 +195,11 @@ export default {
     handleLoad(el) {
       this.$emit("load", el)
     },
-    disableRow(index) {
-      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    disableRow(index, node) {
+      return (
+        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
+        !node.unlocked
+      )
     },
     updateProgress(rowId) {
       this.$emit("updateProgress", rowId)
