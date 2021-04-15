@@ -306,6 +306,15 @@ export default {
         }
       }
     },
+    handleVideoLoad(currentTime) {
+      this.$emit("load", {
+        type: "h5p-video",
+        currentTime,
+      })
+      this.$nextTick(() => {
+        this.setFrameDimensions()
+      })
+    },
     handleLoad() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const h5pInstance = h5pObj.instances[0]
@@ -359,13 +368,19 @@ export default {
 
               h5pIframeComponent.applySettings(h5pVideo)
 
-              this.$emit("load", {
-                currentTime: mediaProgress * videoDuration,
-                type: "h5p-video",
-              })
-              this.$nextTick(() => {
-                this.setFrameDimensions()
-              })
+              /**
+               * When a regular H5PInteractiveVideo (i.e. not created using a
+               * YouTube link) loads, it goes through two state changes —
+               * Playing, then Paused. If we emit a load event before these
+               * state changes occur, a race condition can occur where the
+               * node won't play even if autoplay is true.
+               *
+               * To work around this, we delay the load by some time to make room
+               * for the pause event to occur.
+               */
+              setTimeout(() => {
+                this.handleVideoLoad(mediaProgress * videoDuration)
+              }, 500)
 
               h5pVideo.on("stateChange", event => {
                 switch (event.data) {
@@ -375,19 +390,6 @@ export default {
                   }
 
                   case h5pObj.Video.PAUSED: {
-                    /**
-                     * When an H5PInteractiveVideo loads, it goes through two state
-                     * changes — Playing, then Paused. If we emit a load event
-                     * before these state changes occur, a race condition can occur
-                     * where the node won't play even if autoplay is true.
-                     *
-                     * To work around this, we want to listen to the first instance
-                     * of the Paused event and emit the load event only AFTER that
-                     * first Paused event happens.
-                     */
-                    /* if (this.loading) {
-                      this.loading = false
-                    } else { */
                     this.handlePause()
                     break
                   }
