@@ -13,6 +13,7 @@ require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
+require_once __DIR__.'/services/class.kaltura-api.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -240,6 +241,14 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'postUserAudio',
+        ],
+    ],
+    'POST_KALTURA_VIDEO' => (object) [
+        'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/video',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'postKalturaVideo',
+            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
     'GET_ALL_H5P' => (object) [
@@ -1421,6 +1430,38 @@ function getUserAudio($request)
         $TapestryAudio = new TapestryAudio($postId, $nodeMetaId, $questionId);
 
         return $TapestryAudio->get();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+/**
+ * Upload a video file to Kaltura.
+ *
+ * @param object $request HTTP request
+ *
+ * @return object $response HTTP response
+ */
+function postKalturaVideo($request)
+{
+    $postId = $request['tapestryPostId'];
+    $file = $_FILES['async-upload'];
+    $user = new TapestryUser();
+
+    try {
+        if (!$user->canEdit($postId)) {
+            throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
+        }
+
+        $kalturaApi = new KalturaApi();
+
+        $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'),'/'));
+        $title = get_the_title($postId);
+        $category = $url.'/'.$title;
+
+        $result = $kalturaApi->uploadKalturaVideo($file, $category);
+
+        return $result;
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
