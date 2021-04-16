@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/../vendor/autoload.php';
 
 use Kaltura\Client\Client;
 use Kaltura\Client\Configuration;
+use Kaltura\Client\Enum\FlavorAssetStatus;
 use Kaltura\Client\Enum\MediaType;
 use Kaltura\Client\Enum\SessionType;
 use Kaltura\Client\Type\Category;
@@ -99,6 +100,13 @@ class KalturaApi {
         $resource = new UploadedFileTokenResource();
         $resource->token = $token->id;
         $result = $kclient->media->addContent($entry->id, $resource);
+        $status = $result->status;
+
+        while ($status != FlavorAssetStatus::READY && $status != FlavorAssetStatus::ERROR) {
+            sleep(5);
+            $result = $kclient->media->get($entry->id);
+            $status = $result->status;
+        }
 
         return $result;
     }
