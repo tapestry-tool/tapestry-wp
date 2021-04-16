@@ -347,7 +347,7 @@ export default {
     linkHasThumbnailData() {
       return (
         (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
-        this.node.mediaFormat === "youtube"
+        this.node.mediaType === "video"
       )
     },
     canPublish() {
@@ -478,6 +478,9 @@ export default {
         this.node.lockedThumbnailFileId = fileId.data
       } else if (fileId.thumbnailType == "thumbnail") {
         this.node.thumbnailFileId = fileId.data
+      }
+      if (fileId.thumbnailURL) {
+        this.node.typeData.thumbnailURL = fileId.thumbnailURL
       }
     })
     this.$root.$on("add-node", () => {
@@ -674,7 +677,11 @@ export default {
         this.updateNodeCoordinates()
 
         if (this.linkHasThumbnailData) {
-          await this.setLinkData()
+          if (this.node.typeData.thumbnailURL) {
+            this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL)
+          } else {
+            await this.setLinkData()
+          }
         }
 
         if (this.shouldReloadDuration()) {
@@ -856,7 +863,9 @@ export default {
     isValidVideo(typeData) {
       return (
         typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
+        (typeData.hasOwnProperty("youtubeID") ||
+          typeData.mediaURL.endsWith(".mp4") ||
+          typeData.mediaURL.includes("playManifest"))
       )
     },
     validateQuiz(quiz) {
@@ -882,21 +891,24 @@ export default {
 
         if (data) {
           this.node.typeData.linkMetadata = data
-          if (
-            confirm(
-              "Would you like to use the link preview image as the thumbnail image?"
-            )
-          ) {
-            this.node.imageURL = data.image
-          }
-          if (
-            confirm(
-              "Would you like to use the link preview image as the locked thumbnail image?"
-            )
-          ) {
-            this.node.lockedImageURL = data.image
-          }
+          this.confirmThumbnailsPopup(data.image)
         }
+      }
+    },
+    confirmThumbnailsPopup(imageURL) {
+      if (
+        confirm(
+          "Would you like to use the link preview image as the thumbnail image?"
+        )
+      ) {
+        this.node.imageURL = imageURL
+      }
+      if (
+        confirm(
+          "Would you like to use the link preview image as the locked thumbnail image?"
+        )
+      ) {
+        this.node.lockedImageURL = imageURL
       }
     },
     setVideoDuration() {

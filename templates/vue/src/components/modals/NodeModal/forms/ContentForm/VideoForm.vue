@@ -6,6 +6,7 @@
         v-model="node.typeData.mediaURL"
         input-test-id="node-video-url"
         placeholder="Enter URL for MP4 or YouTube video"
+        thumbnailType="thumbnail"
         required
         :isVideoUpload="true"
         @isUploading="handleUploadChange"
