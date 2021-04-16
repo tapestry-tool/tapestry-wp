@@ -131,6 +131,7 @@
 <script>
 import axios from "axios"
 import { data as wpData } from "@/services/wp"
+import kclient from "@/services/KalturaAPI"
 
 export default {
   name: "file-upload",
@@ -271,59 +272,42 @@ export default {
         })
     },
     async uploadVideoFile(event) {
-      const formData = new FormData()
-      formData.append("action", "upload-attachment")
-      formData.append(
-        "async-upload",
-        event.dataTransfer && event.dataTransfer.files
-          ? event.dataTransfer.files[0]
-          : event.target.files[0]
-      )
-      formData.append(
-        "name",
-        event.dataTransfer && event.dataTransfer.files
-          ? event.dataTransfer.files[0]
-          : event.target.files[0].name
-      )
-      formData.append("_wpnonce", wpData.file_upload_nonce)
-
       this.error = null
       this.confirmedUpload = true
 
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
-
-      axios
-        .post(wpData.upload_url, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          cancelToken: this.uploadSource.token,
-          onUploadProgress: progressEvent => {
-            this.isUploading = true
-            this.$emit("isUploading", this.isUploading)
-            setTimeout(() => {
-              this.uploadPercentage = parseInt(
-                Math.round((progressEvent.loaded / progressEvent.total) * 95)
-              )
-              if (this.uploadPercentage == 95) {
-                this.uploadBarInterval = setInterval(() => {
-                  if (this.uploadPercentage < 99) {
-                    this.uploadPercentage++
-                  }
-                }, 500)
+      const onUploadProgress = progressEvent => {
+        this.isUploading = true
+        this.$emit("isUploading", this.isUploading)
+        setTimeout(() => {
+          this.uploadPercentage = parseInt(
+            Math.round((progressEvent.loaded / progressEvent.total) * 95)
+          )
+          if (this.uploadPercentage == 95) {
+            this.uploadBarInterval = setInterval(() => {
+              if (this.uploadPercentage < 99) {
+                this.uploadPercentage++
               }
-            }, 1000)
-          },
-        })
+            }, 500)
+          }
+        }, 1000)
+      }
+
+      kclient
+        .uploadVideo(event, this.uploadSource.token, onUploadProgress)
         .then(response => {
           setTimeout(() => {
-            if (response.data.success) {
-              this.$emit("input", response.data.data.url)
+            if (response.status === 200) {
+              this.$emit("input", `${response.data.dataUrl}/flavorParamId/7`)
               if (this.thumbnailType) {
+                const thumbnailSize = 420
                 this.$root.$emit("fileID", {
                   thumbnailType: this.thumbnailType,
-                  data: response.data.data.id,
+                  data: response.data.id,
+                  thumbnailURL:
+                    response.data.thumbnailUrl +
+                    `/width/${thumbnailSize}/height/${thumbnailSize}/type/1`,
                 })
               }
             } else {
