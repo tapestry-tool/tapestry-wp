@@ -105,6 +105,7 @@ export default {
         { value: "h5p", text: "H5P" },
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
+        { value: "question", text: "Question" },
         { value: "activity", text: "Activity" },
         { value: "gravity-form", text: "Gravity Form", disabled: true },
         { value: "multi-content", text: "Multi-Content" }, // must be last item
@@ -123,6 +124,9 @@ export default {
     },
   },
   mounted() {
+    if (this.node.mediaType !== "activity") {
+      this.mediaTypes = this.mediaTypes.filter(type => type.value !== "activity")
+    }
     GravityFormsApi.exists().then(exists => {
       const i = this.mediaTypes.findIndex(
         mediaType => mediaType.value == "gravity-form"
