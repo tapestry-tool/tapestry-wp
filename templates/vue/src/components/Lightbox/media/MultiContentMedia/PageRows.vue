@@ -15,11 +15,11 @@
           :style="rowBackground"
         >
           <div class="title-row">
-            <div v-if="disableRow(index)" class="title">
+            <div v-if="disableRow(index, row.node)" class="title">
               {{ row.node.title }}
             </div>
             <i
-              v-if="disableRow(index)"
+              v-if="disableRow(index, row.node)"
               class="fas fa-lock fa-sm title-row-icon"
               style="color:white;"
             ></i>
@@ -38,7 +38,10 @@
               ></i>
             </a>
           </div>
-          <div v-if="!disableRow(index)" :data-qa="`row-content-${row.node.id}`">
+          <div
+            v-if="!disableRow(index, row.node)"
+            :data-qa="`row-content-${row.node.id}`"
+          >
             <div v-if="row.node.mediaType !== 'multi-content'">
               <tapestry-media
                 :node-id="row.node.id"
@@ -70,6 +73,7 @@
               @complete="updateProgress"
             />
           </div>
+          <locked-content v-else :node="row.node"></locked-content>
           <button
             v-if="row.node.completed && isVisible(row)"
             class="mt-2"
@@ -88,6 +92,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import SubAccordion from "./SubAccordion"
+import LockedContent from "./common/LockedContent"
 
 export default {
   name: "page-rows",
@@ -96,6 +101,7 @@ export default {
     HeadlessMultiContent,
     MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
+    LockedContent,
   },
   props: {
     node: {
@@ -178,8 +184,11 @@ export default {
     handleLoad(el) {
       this.$emit("load", el)
     },
-    disableRow(index) {
-      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    disableRow(index, node) {
+      return (
+        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
+        !node.unlocked
+      )
     },
     updateProgress(rowId) {
       this.$emit("updateProgress", rowId)
@@ -189,14 +198,6 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
-    },
-    showTitle(row) {
-      return (
-        this.context === "slideshow" ||
-        (this.node.presentationStyle === "page" &&
-          row.node.mediaType === "multi-content" &&
-          row.node.typeData.showTitle !== false)
-      )
     },
   },
 }

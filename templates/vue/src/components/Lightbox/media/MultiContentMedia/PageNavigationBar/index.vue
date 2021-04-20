@@ -41,7 +41,7 @@
           :node="row.node"
           :active="Number(active)"
           :lockRows="lockRows"
-          :shouldDisable="disableRow(row.node.id)"
+          :shouldDisable="disableRow(row.node)"
           :isBase="true"
           @scroll-to="scrollToRef"
         />
@@ -177,9 +177,12 @@ export default {
       }
       return this.active
     },
-    disableRow(nodeId) {
-      const index = this.rows.findIndex(row => row.node.id === nodeId)
-      return this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom
+    disableRow(node) {
+      const index = this.rows.findIndex(row => row.node.id === node.id)
+      return (
+        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
+        !node.unlocked
+      )
     },
     getRowOrder(node, nodes = [], visited = new Set()) {
       nodes.push(node.id)
@@ -237,6 +240,8 @@ export default {
 
       &.closed {
         background: transparent;
+        min-width: 20px;
+        max-width: 20px;
       }
     }
 
