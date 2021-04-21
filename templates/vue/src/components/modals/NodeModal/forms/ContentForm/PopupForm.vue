@@ -9,7 +9,8 @@
         id="popup-time"
         v-model.number="node.popup.time"
         type="number"
-        placeholder="60"
+        required
+        min="0"
       ></b-form-input>
     </div>
   </div>
