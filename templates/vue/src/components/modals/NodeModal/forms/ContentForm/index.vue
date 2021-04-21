@@ -93,7 +93,8 @@ export default {
     },
     parent: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     actionType: {
       type: String,
@@ -102,6 +103,7 @@ export default {
     maxDescriptionLength: {
       type: Number,
       required: false,
+      default: null,
     },
   },
   data() {
