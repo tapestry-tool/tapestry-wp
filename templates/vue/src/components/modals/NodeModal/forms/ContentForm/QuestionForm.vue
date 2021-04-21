@@ -23,7 +23,7 @@
             <combobox
               v-model="question.previousEntry"
               class="mb-0"
-              :options="getPreviousOptions(node.quiz)"
+              :options="questionOptions"
               item-text="text"
               item-value="id"
               empty-message="There are no activities yet."
@@ -142,15 +142,10 @@ export default {
     question() {
       return this.node.quiz[0]
     },
-    activities() {
-      const questions = Object.values(this.nodes)
-        .filter(node => Boolean(node.quiz))
+    questionOptions() {
+      let questions = Object.values(this.nodes)
+        .filter(node => Boolean(node.quiz) && node.quiz.id !== this.question.id)
         .flatMap(node => node.quiz)
-      this.questions.forEach(q => {
-        if (!questions.find(qn => qn.id === q.id)) {
-          questions.push(q)
-        }
-      })
       return questions
     },
   },
@@ -185,11 +180,6 @@ export default {
       options: {},
       ...this.node.typeData,
     }
-  },
-  methods: {
-    getPreviousOptions(currentQuestion) {
-      return this.activities.filter(qn => qn !== currentQuestion)
-    },
   },
 }
 </script>
