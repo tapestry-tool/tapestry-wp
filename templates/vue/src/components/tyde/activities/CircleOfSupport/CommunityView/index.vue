@@ -28,10 +28,12 @@
 </template>
 
 <script>
+import { interpret } from "xstate"
 import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
+import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 
 const States = {
   Home: 0,
@@ -60,6 +62,10 @@ export default {
     return {
       state: States.Home,
       lastState: States.Home,
+      onboarding: {
+        service: interpret(onboardingMachine),
+        current: onboardingMachine.initialState,
+      },
       community: {
         name: "",
         icon: "👨‍👩‍👦",
@@ -83,7 +89,22 @@ export default {
       this.lastState = lastState
     },
   },
+  created() {
+    this.onboarding.service
+      .onTransition(state => (this.onboarding.current = state))
+      .start()
+    this.initializeOnboarding()
+  },
   methods: {
+    send(event) {
+      this.onboarding.service.send(event)
+    },
+    initializeOnboarding() {
+      // For now, always initialize the onboarding process at the start
+      this.send(OnboardingEvents.Empty)
+
+      // TODO: Switch to onboarding state on initial load
+    },
     toggleCommunityTab() {
       if (this.isCommunityTabOpen) {
         this.state = States.Home
