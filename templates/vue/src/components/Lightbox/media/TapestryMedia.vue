@@ -69,7 +69,7 @@
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
-      v-if="node.mediaType === 'activity'"
+      v-if="node.mediaType === 'activity' || node.mediaType === 'question'"
       :node="node"
       @complete="complete"
       @close="$emit('close')"

@@ -41,14 +41,14 @@
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
           <answer-button
-            v-if="hasId('textId')"
+            v-if="showText"
             :completed="textFormCompleted"
             @click="openForm(question.answers.textId, 'textId')"
           >
             text
           </answer-button>
           <answer-button
-            v-if="hasId('audioId')"
+            v-if="showAudio"
             :completed="audioRecorderCompleted"
             icon="microphone"
             @click="openRecorder(question.answers.audioId)"
@@ -142,6 +142,12 @@ export default {
     },
     audioRecorderCompleted() {
       return !!(this.question.entries && this.question.entries.audioId)
+    },
+    showText() {
+      return this.hasId("textId") || Boolean(this.node.typeData.options?.text)
+    },
+    showAudio() {
+      return this.hasId("audioId") || this.node.typeData.options?.audio
     },
   },
   created() {
@@ -266,7 +272,7 @@ button {
   width: 100%;
 
   &.question-gf {
-    overflow: scroll;
+    overflow: auto;
     .image-choices-choice-image-wrap img.image-choices-choice-image {
       max-width: 100px;
     }
