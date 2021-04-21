@@ -84,7 +84,7 @@ const onboardingMachine = createMachine({
         AddMoreConfirmation: {
           on: {
             [Events.AddAnother]: OnboardingStates.AddAnotherTooltip,
-            [Events.AddLater]: OnboardingStates.Complete,
+            [Events.AddLater]: "#Complete",
           },
         },
         AddAnotherTooltip: {

@@ -24,6 +24,11 @@
       @add-community="$emit('add-community', $event)"
       @toggle="toggleCommunityTab"
     />
+    <welcome-screen
+      v-if="isState('Communities.Welcome')"
+      class="welcome-screen"
+      @continue="handleContinue"
+    />
   </div>
 </template>
 
@@ -33,7 +38,9 @@ import AddCommunityTab from "./AddCommunityTab"
 import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
+
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
+import WelcomeScreen from "./onboarding/WelcomeScreen"
 
 const States = {
   Home: 0,
@@ -47,6 +54,7 @@ export default {
     AddCommunityTab,
     CommunitiesList,
     ConnectionsTab,
+    WelcomeScreen,
   },
   props: {
     connections: {
@@ -99,11 +107,18 @@ export default {
     send(event) {
       this.onboarding.service.send(event)
     },
+    isState(state) {
+      return this.onboarding.current.matches(state)
+    },
     initializeOnboarding() {
       // For now, always initialize the onboarding process at the start
       this.send(OnboardingEvents.Empty)
 
       // TODO: Switch to onboarding state on initial load
+    },
+    handleContinue(communities) {
+      communities.forEach(community => this.$emit("add-community", community))
+      this.send(OnboardingEvents.Continue)
     },
     toggleCommunityTab() {
       if (this.isCommunityTabOpen) {
@@ -143,6 +158,14 @@ export default {
 </script>
 
 <style scoped>
+.welcome-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .tab {
   width: 100%;
   position: absolute;
