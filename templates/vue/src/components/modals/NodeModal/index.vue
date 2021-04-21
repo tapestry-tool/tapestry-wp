@@ -746,8 +746,26 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
+
+      /**
+       * Sometimes changes in the parent node causes changes in child nodes. For
+       * example, when a node goes from a video to a non-video, all child popups
+       * should be invalidated.
+       */
+      this.updateChildren()
       if (!this.hasSubmissionError) {
         this.close()
+      }
+    },
+    updateChildren() {
+      if (!["h5p", "video"].includes(this.node.mediaType)) {
+        const children = this.getDirectChildren(this.node.id)
+        children.forEach(childId => {
+          const childNode = this.getNode(childId)
+          if (childNode && childNode.popup) {
+            this.updateNode({ id: childId, newNode: { popup: null } })
+          }
+        })
       }
     },
     getRandomNumber(min, max) {
