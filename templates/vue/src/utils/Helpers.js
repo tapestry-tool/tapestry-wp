@@ -432,7 +432,7 @@ export default class Helpers {
    * 3. The tooltip is clipped on BOTH the bottom and the right (when the
    *    connection is on the bottom-right of the CoS)
    */
-  static positionTooltip(target, tooltip, container) {
+  static positionTooltip(target, tooltip, container, { dryRun = false } = {}) {
     const {
       height: tooltipHeight,
       width: tooltipWidth,
@@ -483,6 +483,10 @@ export default class Helpers {
       }
     }
 
-    tooltip.style.transform = `translate(${x}px, ${y}px)`
+    if (dryRun) {
+      return { x, y }
+    } else {
+      tooltip.style.transform = `translate(${x}px, ${y}px)`
+    }
   }
 }

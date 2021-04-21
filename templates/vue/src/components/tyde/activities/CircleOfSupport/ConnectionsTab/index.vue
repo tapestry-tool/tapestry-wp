@@ -1,6 +1,11 @@
 <template>
   <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
-    <cos-popup-button style="left: 2rem" aria-label="Connections" @click="toggle">
+    <cos-popup-button
+      id="connections-tab-popup-trigger"
+      style="left: 2rem"
+      aria-label="Connections"
+      @click="toggle"
+    >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>😊</span>
     </cos-popup-button>

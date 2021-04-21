@@ -29,6 +29,29 @@
       class="welcome-screen"
       @continue="handleContinue"
     />
+    <add-confirmation
+      v-if="isState('Communities.AddMoreConfirmation')"
+      @later="send('AddLater')"
+      @another="send('AddAnother')"
+    />
+    <tooltip
+      v-if="isState('Communities.AddLaterTooltip')"
+      ref-id="community-tab-popup-trigger"
+    >
+      <p>
+        Remember - you can click this button whenever you'd like to add another
+        community!
+      </p>
+      <button>Got it</button>
+    </tooltip>
+    <tooltip
+      v-if="isState('Communities.AddAnotherTooltip')"
+      ref-id="community-tab-popup-trigger"
+    >
+      <p>
+        Click here to add another community!
+      </p>
+    </tooltip>
   </div>
 </template>
 
@@ -41,6 +64,8 @@ import { MAX_COMMUNITIES } from "../cos.config"
 
 import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeScreen from "./onboarding/WelcomeScreen"
+import AddConfirmation from "./onboarding/AddConfirmation"
+import Tooltip from "./onboarding/Tooltip"
 
 const States = {
   Home: 0,
@@ -55,6 +80,8 @@ export default {
     CommunitiesList,
     ConnectionsTab,
     WelcomeScreen,
+    AddConfirmation,
+    Tooltip,
   },
   props: {
     connections: {
@@ -126,6 +153,7 @@ export default {
       } else {
         this.resetCommunity()
         this.state = States.AddCommunity
+        this.send("Communities.Add")
       }
     },
     editCommunity(community) {
