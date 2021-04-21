@@ -4,13 +4,13 @@
       <h1>
         {{ question.confirmationTitle ? question.confirmationTitle : "Thanks!" }}
       </h1>
-      <p>
-        {{
+      <p
+        v-html="
           question.confirmationMessage
             ? question.confirmationMessage
-            : "Your response has been recorded."
-        }}
-      </p>
+            : 'Your response has been recorded.'
+        "
+      ></p>
     </header>
     <div>
       <slot></slot>
