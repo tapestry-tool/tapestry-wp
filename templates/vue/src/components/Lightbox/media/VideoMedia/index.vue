@@ -34,10 +34,10 @@
       />
     </div>
     <div v-if="completing" class="aside">
-      <b-spinner variant="light"></b-spinner>
+      <b-spinner></b-spinner>
     </div>
     <button
-      v-if="isPopupComplete"
+      v-else-if="isPopupComplete"
       class="aside"
       @click="transition(events.Continue)"
     >
@@ -316,6 +316,7 @@ div {
 }
 
 .aside {
+  height: auto;
   position: absolute;
   border-radius: 0.5rem;
   right: 1rem;

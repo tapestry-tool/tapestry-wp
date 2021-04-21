@@ -1,10 +1,10 @@
 <?php
 
-require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
-require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
-require_once dirname(__FILE__).'/../interfaces/interface.tapestry-node.php';
-require_once dirname(__FILE__).'/../classes/class.tapestry-user-progress.php';
-require_once dirname(__FILE__).'/../classes/class.constants.php';
+require_once dirname(__FILE__) . '/../utilities/class.tapestry-errors.php';
+require_once dirname(__FILE__) . '/../utilities/class.tapestry-helpers.php';
+require_once dirname(__FILE__) . '/../interfaces/interface.tapestry-node.php';
+require_once dirname(__FILE__) . '/../classes/class.tapestry-user-progress.php';
+require_once dirname(__FILE__) . '/../classes/class.constants.php';
 
 /**
  * Add/update/retrieve Tapestry post and its child nodes.
@@ -230,7 +230,7 @@ class TapestryNode implements ITapestryNode
         if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
             $this->mapCoordinates = $node->mapCoordinates;
         }
-        if (isset($node->popup) && is_object($node->popup)) {
+        if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
         }
     }
@@ -301,12 +301,12 @@ class TapestryNode implements ITapestryNode
                     }
                     break;
                 case ConditionTypes::DATE_NOT_PASSED:
-                    if (new DateTime() <= new DateTime($condition->date.' '.$condition->time, new DateTimeZone($condition->timezone))) {
+                    if (new DateTime() <= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
                         $condition->fulfilled = true;
                     }
                     break;
                 case ConditionTypes::DATE_PASSED:
-                    if (new DateTime() >= new DateTime($condition->date.' '.$condition->time, new DateTimeZone($condition->timezone))) {
+                    if (new DateTime() >= new DateTime($condition->date . ' ' . $condition->time, new DateTimeZone($condition->timezone))) {
                         $condition->fulfilled = true;
                     }
                     break;
