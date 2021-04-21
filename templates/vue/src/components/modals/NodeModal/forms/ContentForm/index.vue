@@ -60,6 +60,7 @@
 import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
+import QuestionForm from "./QuestionForm"
 import MultiContentForm from "./MultiContentForm"
 import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
@@ -72,6 +73,7 @@ import WpPostForm from "./WpPostForm"
 export default {
   components: {
     ActivityForm,
+    QuestionForm,
     MultiContentForm,
     GravityFormForm,
     H5pForm,
