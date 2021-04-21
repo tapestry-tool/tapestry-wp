@@ -9,23 +9,19 @@
           class="mb-3"
         >
           <b-form-group>
-            <b-form-checkbox v-model="node.typeData.isFollowUp" switch>
-              {{ node.typeData.isFollowUp ? "Yes" : "No" }}
+            <b-form-checkbox v-model="question.isFollowUp" switch>
+              {{ question.isFollowUp ? "Yes" : "No" }}
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group
-            v-if="node.typeData.isFollowUp"
-            label="Show this text first:"
-          >
-            <!--  -->
-            <b-form-input v-model="node.typeData.followUpText"></b-form-input>
+          <b-form-group v-if="question.isFollowUp" label="Show this text first:">
+            <b-form-input v-model="question.followUpText"></b-form-input>
           </b-form-group>
           <b-form-group
-            v-if="node.typeData.isFollowUp"
+            v-if="question.isFollowUp"
             label="Then show user answer to the following activity:"
           >
             <combobox
-              v-model="node.typeData.previousEntry"
+              v-model="question.previousEntry"
               class="mb-0"
               :options="getPreviousOptions(node.quiz)"
               item-text="text"
@@ -47,10 +43,7 @@
           class="mb-3"
         >
           <b-form-group label="Question text">
-            <b-form-input
-              v-model="node.typeData.questionText"
-              data-qa="question-text"
-            />
+            <b-form-input v-model="question.text" data-qa="question-text" />
           </b-form-group>
 
           <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
@@ -96,13 +89,13 @@
         >
           <b-form-group label="Title">
             <b-form-input
-              v-model="node.typeData.confirmationTitle"
+              v-model="question.confirmationTitle"
               data-testid="question-confirmation-title"
               placeholder="Thanks!"
             />
           </b-form-group>
           <rich-text-form
-            v-model="node.typeData.confirmationMessage"
+            v-model="question.confirmationMessage"
             data-testid="question-confirmation-message"
             placeholder="Your response has been recorded."
           />
@@ -116,6 +109,15 @@
 import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./RichTextForm"
+import Helpers from "@/utils/Helpers"
+
+const defaultQuestion = {
+  text: "",
+  answers: {
+    textId: "",
+    audioId: "",
+  },
+}
 
 export default {
   components: {
@@ -130,15 +132,16 @@ export default {
   },
   data() {
     return {
-      hasTextOption: Boolean(this.node.typeData.options.text),
-      hasTextMultiLineOption: Boolean(
-        this.node.typeData.options.text && this.node.typeData.options.text.multi
-      ),
+      hasTextOption: Boolean(this.node.typeData.options?.text),
+      hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
       questions: this.node.quiz,
     }
   },
   computed: {
     ...mapState(["nodes"]),
+    question() {
+      return this.node.quiz[0]
+    },
     activities() {
       const questions = Object.values(this.nodes)
         .filter(node => Boolean(node.quiz))
@@ -152,9 +155,6 @@ export default {
     },
   },
   watch: {
-    questions(newQuestions) {
-      this.$set(this.node, "quiz", newQuestions)
-    },
     hasTextOption(textSelected) {
       if (textSelected) {
         this.node.typeData.options.text = {}
@@ -170,6 +170,17 @@ export default {
     },
   },
   created() {
+    this.node.quiz = [
+      {
+        id: Helpers.createUUID(),
+        isFollowUp: false,
+        previousEntry: null,
+        followUpText: "Previously, you said:",
+        text: "",
+        answers: { ...defaultQuestion.answers },
+        completed: false,
+      },
+    ]
     this.node.typeData = {
       options: {},
       ...this.node.typeData,
