@@ -90,13 +90,13 @@
           <b-form-group label="Title">
             <b-form-input
               v-model="question.confirmationTitle"
-              data-testid="question-confirmation-title"
+              data-qa="question-confirmation-title"
               placeholder="Thanks!"
             />
           </b-form-group>
           <rich-text-form
             v-model="question.confirmationMessage"
-            data-testid="question-confirmation-message"
+            data-qa="question-confirmation-message"
             placeholder="Your response has been recorded."
           />
         </b-card>
