@@ -220,6 +220,7 @@ export default {
         case "text":
           return "text"
         case "activity":
+        case "question":
         case "gravity-form":
           return "tasks"
         case "url-embed":
