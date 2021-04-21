@@ -2,6 +2,7 @@
   <activity-screen
     :id="node.id"
     style="position: relative;"
+    :showNavigation="node.mediaType === 'activity'"
     @submit="handleSubmit"
     @back="$emit('close')"
     @close="$emit('close')"

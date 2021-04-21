@@ -17,7 +17,7 @@
       @submit="handleSubmit"
       @back="$emit('back')"
     ></question>
-    <footer v-if="!showCompletionScreen" class="question-footer">
+    <footer v-if="showNavigation && !showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
       <button class="button-nav" :disabled="!hasPrev" @click="prev">
         <i class="fas fa-arrow-left"></i>
@@ -45,6 +45,11 @@ export default {
     id: {
       type: [Number, String],
       required: true,
+    },
+    showNavigation: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
