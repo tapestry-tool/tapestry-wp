@@ -26,12 +26,35 @@
         {{ question.text }}
       </h1>
       <p v-if="!isLoggedIn">Please login to have your answers saved.</p>
-      <gravity-form
-        v-if="formOpened"
-        :id="formId"
-        class="answer"
-        @submit="handleFormSubmit"
-      ></gravity-form>
+      <b-form-group v-if="formOpened">
+        <gravity-form
+          v-if="node.mediaType === 'activity'"
+          :id="formId"
+          class="answer"
+          @submit="handleFormSubmit"
+        ></gravity-form>
+        <b-form-textarea
+          v-else-if="
+            Boolean(node.typeData.options.text) && node.typeData.options.text.multi
+          "
+          rows="5"
+        ></b-form-textarea>
+        <b-form-input
+          v-else-if="
+            Boolean(node.typeData.options.text) && !node.typeData.options.text.multi
+          "
+          v-model="text"
+          :placeholder="node.typeData.options.text.placeholder"
+        ></b-form-input>
+        <b-button
+          v-if="node.mediaType === 'question'"
+          class="submit-btn mt-3"
+          variant="primary"
+          @click="handleFormSubmit"
+        >
+          Submit
+        </b-button>
+      </b-form-group>
       <audio-recorder
         v-else-if="recorderOpened"
         :id="question.id"
@@ -310,6 +333,10 @@ button {
     &:last-child {
       margin-right: 0;
     }
+  }
+
+  .submit-btn {
+    float: right;
   }
 
   .loading {
