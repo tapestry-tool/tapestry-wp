@@ -860,6 +860,10 @@ export default {
       )
     },
     validateQuiz(quiz) {
+      if (this.node.mediaType === "question") {
+        return Object.keys(this.node.typeData.options).length > 0
+      }
+
       return quiz.every(question => {
         return Object.values(question.answers).some(
           value => value && value.length > 0
