@@ -48,10 +48,20 @@
 
           <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
           <b-form-group label="Answer Types">
-            <b-form-checkbox v-model="hasTextOption" switch>
+            <b-form-checkbox
+              v-model="hasTextOption"
+              data-qa="question-answer-text"
+              switch
+              @input="setId($event, 'textId')"
+            >
               Text
             </b-form-checkbox>
-            <b-form-checkbox v-model="node.typeData.options.audio" switch>
+            <b-form-checkbox
+              v-model="node.typeData.options.audio"
+              data-qa="question-answer-audio"
+              switch
+              @input="setId($event, 'audioId')"
+            >
               Audio Recorder
             </b-form-checkbox>
           </b-form-group>
@@ -154,6 +164,7 @@ export default {
         this.node.typeData.options.text = {}
         this.hasTextMultiLineOption = true
       } else {
+        this.hasTextMultiLineOption = false
         delete this.node.typeData.options.text
       }
     },
@@ -181,6 +192,11 @@ export default {
         ...this.node.typeData,
       }
     }
+  },
+  methods: {
+    setId(event, type) {
+      this.question.answers[type] = event ? "1" : ""
+    },
   },
 }
 </script>
