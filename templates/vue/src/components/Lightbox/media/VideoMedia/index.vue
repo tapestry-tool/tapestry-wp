@@ -319,6 +319,7 @@ div {
   border-radius: 0.5rem;
   right: 1rem;
   bottom: 1rem;
+  z-index: 50;
 }
 
 button {
