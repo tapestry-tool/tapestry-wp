@@ -134,7 +134,6 @@ export default {
     return {
       hasTextOption: Boolean(this.node.typeData.options?.text),
       hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
-      questions: this.node.quiz,
     }
   },
   computed: {
@@ -165,20 +164,22 @@ export default {
     },
   },
   created() {
-    this.node.quiz = [
-      {
-        id: Helpers.createUUID(),
-        isFollowUp: false,
-        previousEntry: null,
-        followUpText: "Previously, you said:",
-        text: "",
-        answers: { ...defaultQuestion.answers },
-        completed: false,
-      },
-    ]
-    this.node.typeData = {
-      options: {},
-      ...this.node.typeData,
+    if (this.node.quiz.length == 0) {
+      this.node.quiz = [
+        {
+          id: Helpers.createUUID(),
+          isFollowUp: false,
+          previousEntry: null,
+          followUpText: "Previously, you said:",
+          text: "",
+          answers: { ...defaultQuestion.answers },
+          completed: false,
+        },
+      ]
+      this.node.typeData = {
+        options: {},
+        ...this.node.typeData,
+      }
     }
   },
 }
