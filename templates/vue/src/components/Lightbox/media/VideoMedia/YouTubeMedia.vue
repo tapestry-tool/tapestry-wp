@@ -25,6 +25,8 @@ import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
+import { SEEK_THRESHOLD } from "./video.config"
+
 export default {
   name: "video-media",
   props: {
@@ -104,7 +106,7 @@ export default {
         const currentTime = this.player.getCurrentTime()
         const duration = this.player.getDuration()
 
-        if (Math.abs(currentTime - this.lastTime) > 1) {
+        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
         } else {
           this.$emit("timeupdate", {

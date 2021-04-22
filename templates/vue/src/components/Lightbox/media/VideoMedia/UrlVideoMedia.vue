@@ -17,6 +17,7 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import { SEEK_THRESHOLD } from "./video.config"
 
 export default {
   name: "url-video-media",
@@ -109,12 +110,14 @@ export default {
       }
       const currentTime = this.node.progress * video.duration
       video.currentTime = currentTime
+      this.lastTime = currentTime
 
       /**
        * Adjust the lightbox height to fit the video
        */
       const aspectRatio = video.videoHeight / video.videoWidth
       this.$emit("load", {
+        width: this.dimensions.width,
         height: aspectRatio * this.dimensions.width,
         type: "html5-video",
         currentTime,
@@ -123,8 +126,14 @@ export default {
     updateVideoProgress() {
       const video = this.$refs.video
       if (video) {
-        const amountViewed = video.currentTime / video.duration
-        this.$emit("timeupdate", { amountViewed, currentTime: video.currentTime })
+        const currentTime = video.currentTime
+        const amountViewed = currentTime / video.duration
+        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
+          this.$emit("seeked", { currentTime })
+        } else {
+          this.$emit("timeupdate", { amountViewed, currentTime })
+        }
+        this.lastTime = currentTime
       }
     },
   },

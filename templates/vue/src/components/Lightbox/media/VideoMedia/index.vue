@@ -21,7 +21,6 @@
       @play="transition(events.Play)"
       @pause="transition(events.Pause)"
       @timeupdate="transition(events.Timeupdate, $event)"
-      @seeking="seeking = true"
       @seeked="handleSeek"
     />
     <div v-if="state === states.Popup" class="popup">
@@ -66,6 +65,7 @@ import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "../common/EndScreen"
 import PlayScreen from "../common/PlayScreen"
+import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 
@@ -125,7 +125,6 @@ export default {
     return {
       state: VideoStates.Loading,
       activePopupId: null,
-      seeking: false,
       /**
        * Completing a node is done asynchronously, and we want to show a small
        * spinner on the bottom right of the node when this is currently in progress.
@@ -212,7 +211,7 @@ export default {
                 )
               }
 
-              this.$emit("load")
+              this.$emit("load", context)
               break
             }
           }
@@ -240,11 +239,11 @@ export default {
                 popup =>
                   popup.time > (this.lastTime || 0) && popup.time < currentTime
               )
-              if (activePopup && !this.seeking) {
+              if (activePopup) {
                 this.state = VideoStates.Popup
                 this.activePopupId = activePopup.id
               } else {
-                if (amountViewed >= 0.95) {
+                if (amountViewed >= COMPLETION_THRESHOLD) {
                   this.$emit("complete")
                 }
 
@@ -291,7 +290,6 @@ export default {
      */
     handleSeek({ currentTime }) {
       this.lastTime = currentTime
-      this.seeking = false
     },
     getLoadState() {
       if (this.node.progress < 1) {

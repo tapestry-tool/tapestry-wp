@@ -26,6 +26,7 @@
 <script>
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
+import { SEEK_THRESHOLD } from "../video.config"
 
 export default {
   name: "h5p-iframe",
@@ -115,7 +116,7 @@ export default {
         const currentTime = video.getCurrentTime()
         const duration = video.getDuration()
 
-        if (Math.abs(currentTime - this.lastTime) > 1) {
+        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
         } else {
           this.$emit("timeupdate", {
