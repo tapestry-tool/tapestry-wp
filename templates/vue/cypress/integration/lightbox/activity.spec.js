@@ -4,6 +4,12 @@ describe("Activity", () => {
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {
+      cy.store()
+        .its("state.nodes")
+        .then(nodes => {
+          const [node] = Object.values(nodes)
+          node.mediaType = "activity"
+        })
       cy.openModal("edit", node.id)
       cy.changeMediaType("activity")
 
