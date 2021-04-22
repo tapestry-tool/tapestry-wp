@@ -845,7 +845,7 @@ export default {
 
       if (this.node.popup) {
         const { time } = this.node.popup
-        if (time == undefined) {
+        if (time === "") {
           errMsgs.push(`Please enter a time for your popup.`)
         } else if (time <= 0) {
           errMsgs.push(`Please enter a time greater than 0.`)
