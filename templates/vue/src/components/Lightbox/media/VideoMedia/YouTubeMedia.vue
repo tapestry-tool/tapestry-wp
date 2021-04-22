@@ -95,6 +95,7 @@ export default {
     },
     reset() {
       this.player.seekTo(0, true)
+      setTimeout(() => this.$emit("play"), 200)
     },
     close() {
       this.updateVideoProgress()
@@ -108,6 +109,7 @@ export default {
 
         if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
+          setTimeout(() => this.$emit("play"), 200)
         } else {
           this.$emit("timeupdate", {
             amountViewed: ended ? 1 : currentTime / duration,

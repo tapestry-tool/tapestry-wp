@@ -30,6 +30,7 @@
         :context="context"
         :autoplay="autoplay"
         @complete="handlePopupComplete"
+        @close="transition(events.Continue)"
       />
     </div>
     <div v-if="completing" class="aside">
