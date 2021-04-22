@@ -187,7 +187,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else-if="this.settings.submitNodesEnabled"
+              v-else-if="settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
@@ -825,8 +825,18 @@ export default {
       }
 
       const quiz = this.node.quiz
-      if (!this.validateQuiz(quiz)) {
-        errMsgs.push("Please enter at least one answer ID for each question")
+      if (this.node.mediaType === "activity") {
+        if (!this.validateQuiz(quiz)) {
+          errMsgs.push("Please enter at least one answer ID for each question")
+        }
+      } else if (this.node.mediaType === "question") {
+        const question = quiz[0]
+        if (question.text === "") {
+          errMsgs.push("Please enter a Question")
+        }
+        if (!this.validateQuestion()) {
+          errMsgs.push("Please select at least one answer type")
+        }
       }
 
       if (!this.node.mediaType) {
@@ -860,15 +870,15 @@ export default {
       )
     },
     validateQuiz(quiz) {
-      if (this.node.mediaType === "question") {
-        return Object.keys(this.node.typeData.options).length > 0
-      }
-
       return quiz.every(question => {
         return Object.values(question.answers).some(
           value => value && value.length > 0
         )
       })
+    },
+    validateQuestion() {
+      let options = Object.keys(this.node.typeData.options)
+      return options.filter(option => option != false).length > 0
     },
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
