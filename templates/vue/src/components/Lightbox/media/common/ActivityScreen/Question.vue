@@ -33,27 +33,30 @@
           class="answer"
           @submit="handleFormSubmit"
         ></gravity-form>
-        <b-form-textarea
-          v-else-if="
-            Boolean(node.typeData.options.text) && node.typeData.options.text.multi
-          "
-          rows="5"
-        ></b-form-textarea>
-        <b-form-input
-          v-else-if="
-            Boolean(node.typeData.options.text) && !node.typeData.options.text.multi
-          "
-          v-model="text"
-          :placeholder="node.typeData.options.text.placeholder"
-        ></b-form-input>
-        <b-button
-          v-if="node.mediaType === 'question'"
-          class="submit-btn mt-3"
-          variant="primary"
-          @click="handleFormSubmit"
+        <b-form
+          v-else-if="Boolean(node.typeData.options.text)"
+          @submit="handleTextSubmit"
         >
-          Submit
-        </b-button>
+          <b-form-textarea
+            v-if="node.typeData.options.text.multi"
+            v-model="textAnswer"
+            rows="5"
+          ></b-form-textarea>
+          <b-form-input
+            v-else
+            v-model="textAnswer"
+            :placeholder="node.typeData.options.text.placeholder"
+          ></b-form-input>
+
+          <b-button
+            v-if="node.mediaType === 'question'"
+            class="submit-btn mt-3"
+            variant="primary"
+            type="submit"
+          >
+            Submit
+          </b-button>
+        </b-form>
       </b-form-group>
       <audio-recorder
         v-else-if="recorderOpened"
@@ -128,6 +131,7 @@ export default {
       formType: "",
       recorderOpened: false,
       loading: false,
+      textAnswer: "",
     }
   },
   computed: {
@@ -183,7 +187,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["completeQuestion", "saveAudio"]),
+    ...mapActions(["completeQuestion", "saveAudio", "updateNode"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       const wasOpened = this.formOpened || this.recorderOpened
@@ -220,51 +224,60 @@ export default {
       this.formType = answerType
       this.formOpened = true
     },
-    async handleFormSubmit() {
-      this.formOpened = false
-      if (!this.isLoggedIn) {
-        return this.$emit("submit")
-      }
-      this.loading = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType: this.formType,
-        formId: this.formId,
-        questionId: this.question.id,
-      })
-      this.loading = false
-      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
-        type: this.formType,
-        id: this.formId,
-      })
-      this.$emit("submit")
-    },
-    async handleAudioSubmit(audioFile) {
-      this.recorderOpened = false
-      if (!this.isLoggedIn) {
-        return this.$emit("submit")
-      }
-      this.loading = true
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        answerType: "audio",
-        formId: this.formId,
-        questionId: this.question.id,
-      })
-      await this.saveAudio({
-        audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
-        nodeId: this.node.id,
-        questionId: this.question.id,
-      })
-      this.loading = false
-      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
-        type: "audio",
-      })
-      this.$emit("submit")
-    },
     hasId(label) {
       const id = this.question.answers[label]
       return id && id.length > 0
+    },
+    async handleFormSubmit() {
+      this.formOpened = false
+      this.handleSubmit(this.formType)
+    },
+    async handleAudioSubmit(audioFile) {
+      this.recorderOpened = false
+      this.handleSubmit(
+        "audio",
+        async () =>
+          await this.saveAudio({
+            audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
+            nodeId: this.node.id,
+            questionId: this.question.id,
+          })
+      )
+    },
+    async handleTextSubmit() {
+      const question = this.node.quiz[0]
+      if (!question.entries) {
+        question.entries = {}
+      }
+      question.entries.textId = {
+        [this.formId]: this.textAnswer,
+      }
+      this.handleSubmit(
+        "text",
+        async () =>
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+      )
+    },
+    async handleSubmit(type, updateNodeFunc = async () => {}) {
+      if (!this.isLoggedIn) {
+        return this.$emit("submit")
+      }
+      this.loading = true
+      await this.completeQuestion({
+        nodeId: this.node.id,
+        answerType: type,
+        formId: this.formId,
+        questionId: this.question.id,
+      })
+      await updateNodeFunc()
+      this.loading = false
+      client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
+        type: type,
+      })
+      this.$emit("submit")
     },
   },
 }
