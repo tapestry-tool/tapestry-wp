@@ -33,30 +33,11 @@
           class="answer"
           @submit="handleFormSubmit"
         ></gravity-form>
-        <b-form
+        <text-form
           v-else-if="Boolean(node.typeData.options.text)"
+          :node="node"
           @submit="handleTextSubmit"
-        >
-          <b-form-textarea
-            v-if="node.typeData.options.text.multi"
-            v-model="textAnswer"
-            rows="5"
-          ></b-form-textarea>
-          <b-form-input
-            v-else
-            v-model="textAnswer"
-            :placeholder="node.typeData.options.text.placeholder"
-          ></b-form-input>
-
-          <b-button
-            v-if="node.mediaType === 'question'"
-            class="submit-btn mt-3"
-            variant="primary"
-            type="submit"
-          >
-            Submit
-          </b-button>
-        </b-form>
+        ></text-form>
       </b-form-group>
       <audio-recorder
         v-else-if="recorderOpened"
@@ -69,6 +50,7 @@
           <answer-button
             v-if="showText"
             :completed="textFormCompleted"
+            data-qa="text"
             @click="openForm(question.answers.textId, 'textId')"
           >
             text
@@ -101,6 +83,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
+import TextForm from "../TextForm"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -111,6 +94,7 @@ export default {
     AnswerButton,
     AudioRecorder,
     GravityForm,
+    TextForm,
     Loading,
     TapestryActivity,
   },
@@ -131,7 +115,6 @@ export default {
       formType: "",
       recorderOpened: false,
       loading: false,
-      textAnswer: "",
     }
   },
   computed: {
@@ -244,13 +227,13 @@ export default {
           })
       )
     },
-    async handleTextSubmit() {
+    async handleTextSubmit(event) {
       const question = this.node.quiz[0]
       if (!question.entries) {
         question.entries = {}
       }
       question.entries.textId = {
-        [this.formId]: this.textAnswer,
+        [this.formId]: event,
       }
       this.handleSubmit(
         "text",
@@ -346,10 +329,6 @@ button {
     &:last-child {
       margin-right: 0;
     }
-  }
-
-  .submit-btn {
-    float: right;
   }
 
   .loading {
