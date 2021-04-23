@@ -40,6 +40,19 @@ export default {
       isAnswerValid: true,
     }
   },
+  computed: {
+    question() {
+      return this.node.quiz[0]
+    },
+    textId() {
+      return this.question.answers.textId
+    },
+  },
+  mounted() {
+    this.textAnswer = this.question.entries.textId
+      ? this.question.entries.textId[this.textId]
+      : ""
+  },
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
