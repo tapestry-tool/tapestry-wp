@@ -10,6 +10,9 @@
       v-model="textAnswer"
       :placeholder="node.typeData.options.text.placeholder"
     ></b-form-input>
+    <b-form-invalid-feedback :state="isAnswerValid">
+      Please enter a response.
+    </b-form-invalid-feedback>
 
     <b-button
       v-if="node.mediaType === 'question'"
@@ -34,11 +37,15 @@ export default {
   data() {
     return {
       textAnswer: "",
+      isAnswerValid: true,
     }
   },
   methods: {
     handleTextSubmit() {
-      this.$emit("submit", this.textAnswer)
+      this.isAnswerValid = this.textAnswer !== ""
+      if (this.isAnswerValid) {
+        this.$emit("submit", this.textAnswer)
+      }
     },
   },
 }
