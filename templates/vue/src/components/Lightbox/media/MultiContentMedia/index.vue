@@ -315,6 +315,8 @@ button[disabled] {
 .media-container {
   height: 100%;
   width: 100%;
+  max-width: 150vh;
+  margin: 0 auto;
   overflow: auto;
   scrollbar-color: auto black;
   scrollbar-width: none;

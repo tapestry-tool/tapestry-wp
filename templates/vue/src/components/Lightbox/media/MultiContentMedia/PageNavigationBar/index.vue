@@ -35,16 +35,17 @@
           },
         ]"
       >
-        <page-menu
-          v-for="row in rows"
-          :key="row.node.id"
-          :node="row.node"
-          :active="Number(active)"
-          :lockRows="lockRows"
-          :shouldDisable="disableRow(row.node)"
-          :isBase="true"
-          @scroll-to="scrollToRef"
-        />
+        <ul class="page-menu fa-ul">
+          <page-menu
+            v-for="row in rows"
+            :key="row.node.id"
+            :node="row.node"
+            :active="Number(active)"
+            :lockRows="lockRows"
+            :disabled="disableRow(row.node)"
+            @scroll-to="scrollToRef"
+          />
+        </ul>
       </div>
     </aside>
   </div>
@@ -280,10 +281,6 @@ export default {
 
     .page-nav-title {
       margin-bottom: 1em;
-
-      &:hover {
-        font-weight: bold;
-      }
     }
 
     .page-nav-container {

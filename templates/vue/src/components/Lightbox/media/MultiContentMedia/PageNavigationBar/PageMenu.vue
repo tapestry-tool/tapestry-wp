@@ -1,22 +1,25 @@
 <template>
-  <ul class="page-menu fa-ul">
-    <li class="page-menu-item">
+  <li :class="{ disabled: disabled }">
+    <div @mouseover="hovered = true" @mouseleave="hovered = false">
       <span class="page-menu-title fa-li">
-        <i v-if="shouldDisable" class="fas fa-lock page-menu-disabled" />
-        <i v-else-if="isBase" class="far fa-circle" :style="bulletStyle" />
-        <i v-else class="fas fa-circle" :style="bulletStyle" />
+        <i
+          :class="
+            disabled
+              ? 'fas fa-lock'
+              : active === node.id || hovered
+              ? 'fas fa-circle'
+              : 'far fa-circle'
+          "
+        />
       </span>
       <span
-        :class="[
-          'page-nav-title',
-          { active: active === node.id, 'page-menu-disabled': shouldDisable },
-        ]"
+        :class="['page-nav-title', { active: active === node.id }]"
         @click="handleTitleClick"
       >
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
-    </li>
-    <div v-if="!shouldDisable" class="page-menu-wrapper">
+    </div>
+    <ul class="page-menu fa-ul">
       <page-menu
         v-for="row in rows"
         :key="row.node.id"
@@ -24,12 +27,11 @@
         :active="active"
         :depth="depth + 1"
         :lockRows="lockRows"
-        :shouldDisable="shouldDisable || disableRow(row.node)"
-        :isBase="false"
+        :disabled="disabled || disableRow(row.node)"
         @scroll-to="scrollToRow"
       />
-    </div>
-  </ul>
+    </ul>
+  </li>
 </template>
 
 <script>
@@ -46,6 +48,11 @@ export default {
       type: Object,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     active: {
       type: Number,
       required: false,
@@ -61,20 +68,11 @@ export default {
       required: false,
       default: false,
     },
-    shouldDisable: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    isBase: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {
       showChildren: false,
+      hovered: false,
     }
   },
   computed: {
@@ -90,12 +88,6 @@ export default {
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
-    },
-    bulletStyle() {
-      return {
-        verticalAlign: "middle",
-        fontSize: "0.5rem",
-      }
     },
   },
   methods: {
@@ -122,22 +114,27 @@ export default {
 <style lang="scss" scoped>
 .page-menu {
   &.fa-ul {
+    margin-top: 1.5em;
     margin-bottom: 1.5em;
   }
 
-  .page-menu-item {
+  li {
     margin-bottom: 1.5em;
-  }
-
-  .active {
-    font-weight: bold;
-    text-decoration-line: underline;
-  }
-  .page-menu-disabled {
-    opacity: 0.5;
-  }
-  .page-nav-title {
-    cursor: pointer;
+    &.disabled {
+      opacity: 0.5;
+    }
+    &-item {
+      > i {
+        vertical-align: middle;
+        font-size: 0.5rem;
+      }
+    }
+    .page-nav-title {
+      cursor: pointer;
+      .active {
+        font-weight: bold;
+      }
+    }
   }
 }
 </style>
