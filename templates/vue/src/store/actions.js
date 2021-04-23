@@ -227,7 +227,7 @@ export async function completeQuestion(
 ) {
   try {
     await client.completeQuestion(nodeId, questionId)
-    if (answerType !== "audioId") {
+    if (answerType === "textId" || answerType === "checklistId") {
       const entry = await client.getUserEntry(formId)
       commit("updateEntry", { answerType, entry, nodeId, questionId })
     }
