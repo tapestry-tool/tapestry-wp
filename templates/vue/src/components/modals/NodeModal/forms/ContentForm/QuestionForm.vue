@@ -156,8 +156,9 @@ export default {
     },
     questionOptions() {
       let questions = Object.values(this.nodes)
-        .filter(node => Boolean(node.quiz) && node.quiz.id !== this.question.id)
+        .filter(node => Boolean(node.quiz))
         .flatMap(node => node.quiz)
+      questions = questions.filter(qn => qn.id !== this.question.id)
       return questions
     },
   },
