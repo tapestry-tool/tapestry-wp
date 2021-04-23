@@ -117,7 +117,7 @@ export function getQuestion(state) {
 export function getEntry(_, { getQuestion }) {
   return (questionId, answerType) => {
     const question = getQuestion(questionId)
-    if (!question) {
+    if (!question || !question.entries) {
       return null
     }
     const entry = question.entries[answerType]
