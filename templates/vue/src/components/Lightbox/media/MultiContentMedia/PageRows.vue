@@ -14,34 +14,30 @@
           class="page-row"
           :style="rowBackground"
         >
-          <div class="title-row">
-            <div v-if="disableRow(index, row.node)" class="title">
-              {{ row.node.title }}
-            </div>
+          <div class="title-row-icon">
             <i
               v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm title-row-icon"
+              class="fas fa-lock fa-sm"
               style="color:white;"
             ></i>
-            <a v-else class="title-row-icon">
+            <a v-else>
               <i
-                v-if="isFavourite(row.node.id)"
                 class="fas fa-heart fa-sm"
-                style="color:red; cursor:pointer;"
-                @click="toggleFavourite(row.node.id)"
-              ></i>
-              <i
-                v-else
-                class="fas fa-heart fa-sm"
-                style="color:white; cursor:pointer;"
+                :style="{
+                  color: isFavourite(row.node.id) ? 'red' : 'white',
+                  cursor: 'pointer',
+                }"
                 @click="toggleFavourite(row.node.id)"
               ></i>
             </a>
           </div>
-          <div
-            v-if="!disableRow(index, row.node)"
-            :data-qa="`row-content-${row.node.id}`"
-          >
+          <div v-if="disableRow(index, row.node)">
+            <h1 class="title">
+              {{ row.node.title }}
+            </h1>
+            <locked-content :node="row.node"></locked-content>
+          </div>
+          <div v-else :data-qa="`row-content-${row.node.id}`">
             <div v-if="row.node.mediaType !== 'multi-content'">
               <tapestry-media
                 :node-id="row.node.id"
@@ -73,7 +69,6 @@
               @complete="updateProgress"
             />
           </div>
-          <locked-content v-else :node="row.node"></locked-content>
           <button
             v-if="row.node.completed && isVisible(row)"
             class="mt-2"
@@ -209,14 +204,6 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  width: 100%;
-  border-radius: 4px;
-}
-
 .title-row-icon {
   flex: 1;
   text-align: right;
@@ -227,8 +214,12 @@ button[disabled] {
   width: 100%;
   text-align: left;
   color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 500;
+
+  :before {
+    display: none;
+  }
 }
 
 .page-row {
