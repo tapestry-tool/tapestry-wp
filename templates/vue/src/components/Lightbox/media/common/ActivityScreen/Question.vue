@@ -129,7 +129,7 @@ export default {
       return null
     },
     answers() {
-      if (this.question.previousEntry) {
+      if (this.lastQuestion) {
         const answeredTypes = Object.entries(this.lastQuestion.answers)
           .filter(entry => entry[1] && entry[1].length > 0)
           .map(i => i[0])
