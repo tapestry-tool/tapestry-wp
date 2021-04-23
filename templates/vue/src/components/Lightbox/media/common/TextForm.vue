@@ -41,7 +41,8 @@ export default {
     }
   },
   methods: {
-    handleTextSubmit() {
+    handleTextSubmit(event) {
+      event.preventDefault()
       this.isAnswerValid = this.textAnswer !== ""
       if (this.isAnswerValid) {
         this.$emit("submit", this.textAnswer)

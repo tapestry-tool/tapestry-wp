@@ -69,6 +69,7 @@
           <b-form-group v-if="node.typeData.options.text" label="Text">
             <b-form-radio
               v-model="hasTextMultiLineOption"
+              data-qa="question-answer-text-multi"
               name="multi-line"
               :value="true"
             >
@@ -76,6 +77,7 @@
             </b-form-radio>
             <b-form-radio
               v-model="hasTextMultiLineOption"
+              data-qa="question-answer-text-single"
               name="single-line"
               :value="false"
             >
@@ -88,6 +90,7 @@
             <b-form-input
               id="placeholder"
               v-model="node.typeData.options.text.placeholder"
+              data-qa="question-answer-text-single-placeholder"
             ></b-form-input>
           </b-form-group>
         </b-card>
