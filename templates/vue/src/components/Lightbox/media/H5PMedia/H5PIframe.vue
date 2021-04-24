@@ -359,10 +359,7 @@ export default {
                 if (!this.autoplay) {
                   // As of April 2021, H5P has not implemented a stop functionality,
                   // so there is no way to avoid the "More Videos" when paused.
-                  // This pause requires a timeout to avoid a spinner.
-                  setTimeout(() => {
-                    h5pVideo.pause()
-                  }, 1000)
+                  h5pVideo.pause()
                 }
               }
             }
