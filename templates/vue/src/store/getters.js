@@ -115,7 +115,7 @@ export function getQuestion(state) {
 }
 
 export function getEntry(_, { getQuestion }) {
-  return (questionId, answerType) => {
+  return (questionId, answerType, mediaType = "") => {
     const question = getQuestion(questionId)
     if (!question || !question.entries) {
       return null
@@ -128,6 +128,14 @@ export function getEntry(_, { getQuestion }) {
     if (answerType === "audioId") {
       return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
     }
+
+    if (mediaType === "question" && answerType === "textId") {
+      return {
+        type: "text",
+        entry: Object.values(entry)[0],
+      }
+    }
+
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
   }

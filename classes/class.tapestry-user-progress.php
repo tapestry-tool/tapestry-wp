@@ -289,6 +289,8 @@ class TapestryUserProgress implements ITapestryUserProgress
                             }
                         } elseif (property_exists($entries, $gfOrH5pId)) {
                             $quiz[$question->id][$type] = $entries->$gfOrH5pId;
+                        } else {
+                            $quiz[$question->id][$type] = get_object_vars($nodeMetadata->quiz[0]->entries)[$type];
                         }
                     }
                 }

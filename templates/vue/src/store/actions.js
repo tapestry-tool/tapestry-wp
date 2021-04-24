@@ -222,14 +222,17 @@ export async function getTapestryExport({ dispatch }) {
 }
 
 export async function completeQuestion(
-  { commit, dispatch },
+  { commit, dispatch, getters },
   { answerType, formId, nodeId, questionId }
 ) {
   try {
     await client.completeQuestion(nodeId, questionId)
     if (answerType === "textId" || answerType === "checklistId") {
-      const entry = await client.getUserEntry(formId)
-      commit("updateEntry", { answerType, entry, nodeId, questionId })
+      const node = getters.getNode(nodeId)
+      if (node.mediaType === "activity") {
+        const entry = await client.getUserEntry(formId)
+        commit("updateEntry", { answerType, entry, nodeId, questionId })
+      }
     }
     commit("completeQuestion", { nodeId, questionId })
   } catch (error) {

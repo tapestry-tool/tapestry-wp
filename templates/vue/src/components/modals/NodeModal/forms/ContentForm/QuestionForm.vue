@@ -165,9 +165,11 @@ export default {
   watch: {
     hasTextOption(textSelected) {
       if (textSelected) {
+        this.question.answers.textId = Helpers.createUUID()
         this.node.typeData.options.text = {}
         this.hasTextMultiLineOption = true
       } else {
+        this.question.answers.textId = ""
         this.hasTextMultiLineOption = false
         delete this.node.typeData.options.text
       }
