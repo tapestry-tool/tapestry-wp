@@ -652,7 +652,10 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
-        } else if (this.isMultiContentNodeChild) {
+        } else if (
+          this.isMultiContentNodeChild &&
+          this.$route.query.nav === "modal"
+        ) {
           // Prevent NodeModal from closing
           if (event) event.preventDefault()
 
@@ -666,7 +669,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: this.$route.query,
+            query: { ...this.$route.query, nav: undefined },
           })
         }
       }

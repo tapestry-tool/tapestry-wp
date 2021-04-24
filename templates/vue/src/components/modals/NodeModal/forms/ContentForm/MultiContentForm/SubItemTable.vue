@@ -85,7 +85,7 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: nodeId, type: "edit", tab: "content" },
-        query: this.$route.query,
+        query: { ...this.$route.query, nav: "modal" },
       })
     },
     handleSave() {
