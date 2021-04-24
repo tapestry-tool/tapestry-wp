@@ -6,16 +6,13 @@
           :class="
             disabled
               ? 'fas fa-lock'
-              : active === node.id || hovered
+              : hovered || contentHovered
               ? 'fas fa-circle'
               : 'far fa-circle'
           "
         />
       </span>
-      <span
-        :class="['page-nav-title', { active: active === node.id }]"
-        @click="handleTitleClick"
-      >
+      <span class="page-nav-title" @click="handleTitleClick">
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
@@ -24,7 +21,6 @@
         v-for="row in rows"
         :key="row.node.id"
         :node="row.node"
-        :active="active"
         :depth="depth + 1"
         :lockRows="lockRows"
         :disabled="disabled || disableRow(row.node)"
@@ -39,7 +35,7 @@
  * The `<page-menu>` component is a child component used in PageNavigationBar used recursively
  * for nested navigation.
  */
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 
 export default {
   name: "page-menu",
@@ -52,11 +48,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    active: {
-      type: Number,
-      required: false,
-      default: -1,
     },
     depth: {
       type: Number,
@@ -77,6 +68,7 @@ export default {
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
+    ...mapState(["hoveredNodeId"]),
     rows() {
       return this.node.childOrdering.map(id => {
         const node = this.getNode(id)
@@ -85,6 +77,9 @@ export default {
           : this.getDirectChildren(id).map(this.getNode)
         return { node, children }
       })
+    },
+    contentHovered() {
+      return this.node.id === this.hoveredNodeId
     },
     disabledFrom() {
       return this.rows.findIndex(row => !row.node.completed)
@@ -131,9 +126,6 @@ export default {
     }
     .page-nav-title {
       cursor: pointer;
-      .active {
-        font-weight: bold;
-      }
     }
   }
 }

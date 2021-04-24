@@ -10,6 +10,7 @@
           node.mediaFormat === 'youtube',
       },
     ]"
+    @mouseenter="setHovered"
   >
     <text-media
       v-if="node.mediaType === 'text'"
@@ -88,7 +89,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapMutations } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
 import ExternalMedia from "./ExternalMedia"
@@ -152,6 +153,10 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
+    ...mapMutations(["updateHoveredNode"]),
+    setHovered() {
+      this.updateHoveredNode(this.nodeId)
+    },
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()

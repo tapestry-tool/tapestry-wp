@@ -40,9 +40,8 @@
             v-for="row in rows"
             :key="row.node.id"
             :node="row.node"
-            :active="Number(active)"
             :lockRows="lockRows"
-            :disabled="disableRow(row.node)"
+            :disabled="disabledRow(row.node)"
             @scroll-to="scrollToRef"
           />
         </ul>
@@ -80,24 +79,10 @@ export default {
     return {
       opened: false || this.browserWidth > 800,
       browserWidth: Helpers.getBrowserWidth(),
-      observer: null,
     }
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isMultiContent"]),
-    active: {
-      get() {
-        return this.$route.query.row
-      },
-      set(nodeId) {
-        if (nodeId !== this.active) {
-          this.$router.push({
-            ...this.$route,
-            query: { ...this.$route.query, row: nodeId },
-          })
-        }
-      },
-    },
     nodeId() {
       return parseInt(this.$route.params.nodeId, 10)
     },
@@ -120,24 +105,8 @@ export default {
       return this.getRowOrder(this.node)
     },
   },
-  watch: {
-    rowRefs: {
-      immediate: true,
-      handler(refs) {
-        for (const ref of refs) {
-          this.observer.observe(ref)
-        }
-      },
-    },
-  },
   mounted() {
-    this.observer = new IntersectionObserver(this.handleObserve, {
-      threshold: [0.5],
-    })
     if (this.rowRefs) {
-      for (const ref of this.rowRefs) {
-        this.observer.observe(ref)
-      }
       this.$router.push({
         ...this.$route,
         query: {
@@ -151,34 +120,7 @@ export default {
     }
   },
   methods: {
-    /**
-     * This callback is called whenever any section cross 50% visibility.
-     *  - If a page enters from above, set it to the active page.
-     *  - If a page leaves from above, set the next page to the active page.
-     */
-    handleObserve(entries) {
-      for (const entry of entries) {
-        // Page visibility from above
-        if (entry.boundingClientRect.top <= 0) {
-          if (entry.isIntersecting) {
-            // Page entering
-            const nodeId = Number(entry.target.id.split("-")[1])
-            this.active = nodeId
-          } else {
-            // Page leaving
-            this.active = this.nextPage()
-          }
-        }
-      }
-    },
-    nextPage() {
-      const nextTabIndex = this.rowOrder.indexOf(this.active)
-      if (nextTabIndex >= 0 && nextTabIndex < this.rowOrder.length - 1) {
-        return this.rowOrder[nextTabIndex + 1]
-      }
-      return this.active
-    },
-    disableRow(node) {
+    disabledRow(node) {
       const index = this.rows.findIndex(row => row.node.id === node.id)
       return (
         (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
