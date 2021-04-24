@@ -3,7 +3,7 @@ describe("Question", () => {
     cy.fixture("one-node.json").as("oneNode")
   })
 
-  it("should be able to complete with an text-based answer", () => {
+  it("should be able to complete with a text-based answer", () => {
     cy.setup("@oneNode")
 
     cy.getSelectedNode().then(node => {
@@ -24,7 +24,6 @@ describe("Question", () => {
       cy.openLightbox(node.id)
 
       cy.route("POST", "**/quiz*").as("submit")
-      cy.route("GET", "**/entries*").as("entries")
 
       cy.lightbox().within(() => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
@@ -34,7 +33,6 @@ describe("Question", () => {
         cy.contains(/submitting/i).should("be.visible")
 
         cy.wait("@submit")
-        cy.wait("@entries")
 
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
@@ -78,7 +76,6 @@ describe("Question", () => {
       cy.contains("1:00:05").should("be.visible")
 
       cy.route("POST", "**/quiz*").as("submit")
-      cy.route("GET", "**/entries*").as("entries")
 
       cy.contains(/done/i).click()
       cy.lightbox().within(() => {
@@ -87,7 +84,6 @@ describe("Question", () => {
         cy.contains(/submitting/i).should("be.visible")
 
         cy.wait("@submit")
-        cy.wait("@entries")
 
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()

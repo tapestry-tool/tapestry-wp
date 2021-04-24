@@ -43,7 +43,6 @@ describe("Activity", () => {
       cy.contains("1:00:05").should("be.visible")
 
       cy.route("POST", "**/quiz*").as("submit")
-      cy.route("GET", "**/entries*").as("entries")
 
       cy.contains(/done/i).click()
       cy.lightbox().within(() => {
@@ -52,7 +51,6 @@ describe("Activity", () => {
         cy.contains(/submitting/i).should("be.visible")
 
         cy.wait("@submit")
-        cy.wait("@entries")
 
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
