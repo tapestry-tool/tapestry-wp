@@ -319,6 +319,10 @@ describe("Multi-content", () => {
 
           cy.editNode(pageNode.id, {
             childOrdering: [videoNode.id, textNode.id],
+            typeData: {
+              ...pageNode.typeData,
+              showNavBar: false,
+            },
           })
 
           cy.openLightbox(pageNode.id).within(() => {
