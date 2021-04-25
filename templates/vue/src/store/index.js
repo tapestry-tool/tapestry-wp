@@ -18,7 +18,6 @@ export const store = {
     selection: [],
     h5pSettings: {},
     selectedNodeId: null,
-    hoveredNodeId: null,
     favourites: [],
     visibleNodes: [],
     apiError: null,

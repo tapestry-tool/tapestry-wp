@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
 import ExternalMedia from "./ExternalMedia"
@@ -153,9 +153,14 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
-    ...mapMutations(["updateHoveredNode"]),
     setHovered() {
-      this.updateHoveredNode(this.nodeId)
+      this.$router.push({
+        ...this.$route,
+        query: {
+          ...this.$route.query,
+          row: this.nodeId,
+        },
+      })
     },
     handleFormSubmit() {
       this.showCompletionScreen = true
