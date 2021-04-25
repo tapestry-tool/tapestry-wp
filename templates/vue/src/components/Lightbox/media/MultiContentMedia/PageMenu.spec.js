@@ -1,8 +1,8 @@
 import { render } from "@/utils/test"
-import PageNavigationBar from "./PageNavigationBar"
+import PageMenu from "./PageMenu"
 import pageTapestry from "@/fixtures/deep-page.json"
 
-describe("PageNavigationBar", () => {
+describe("PageMenu", () => {
   beforeEach(() => {
     // https://stackoverflow.com/questions/44249985/js-testing-code-that-uses-an-intersectionobserver
     // IntersectionObserver isn't available in test environment
@@ -20,7 +20,7 @@ describe("PageNavigationBar", () => {
     const childNames = pageTapestry.nodes
       .slice(1, pageTapestry.nodes.length)
       .map(node => node.title)
-    const screen = render(PageNavigationBar, {
+    const screen = render(PageMenu, {
       fixture: pageTapestry,
       props: {
         node: node,
@@ -42,7 +42,7 @@ describe("PageNavigationBar", () => {
     global.dispatchEvent(new Event("resize"))
 
     const node = pageTapestry.nodes[0]
-    const screen = render(PageNavigationBar, {
+    const screen = render(PageMenu, {
       fixture: pageTapestry,
       props: {
         node: node,

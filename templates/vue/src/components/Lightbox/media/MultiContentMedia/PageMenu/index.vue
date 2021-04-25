@@ -35,8 +35,8 @@
           },
         ]"
       >
-        <ul class="page-menu fa-ul">
-          <page-menu
+        <ul class="page-menu-item fa-ul">
+          <page-menu-item
             v-for="row in rows"
             :key="row.node.id"
             :node="row.node"
@@ -52,13 +52,13 @@
 
 <script>
 import { mapGetters } from "vuex"
-import PageMenu from "./PageMenu"
+import PageMenuItem from "./PageMenuItem"
 import Helpers from "@/utils/Helpers"
 
 export default {
-  name: "page-navigation-bar",
+  name: "page-menu",
   components: {
-    PageMenu,
+    PageMenuItem,
   },
   props: {
     node: {

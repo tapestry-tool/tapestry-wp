@@ -1,7 +1,7 @@
 <template>
   <li :class="{ disabled: disabled }">
     <div @mouseover="hovered = true" @mouseleave="hovered = false">
-      <span class="page-menu-title fa-li">
+      <span class="page-menu-item-title fa-li">
         <i
           :class="
             disabled
@@ -16,8 +16,8 @@
         {{ node.typeData.menuTitle ? node.typeData.menuTitle : node.title }}
       </span>
     </div>
-    <ul class="page-menu fa-ul">
-      <page-menu
+    <ul class="page-menu-item fa-ul">
+      <page-menu-item
         v-for="row in rows"
         :key="row.node.id"
         :node="row.node"
@@ -32,13 +32,13 @@
 
 <script>
 /**
- * The `<page-menu>` component is a child component used in PageNavigationBar used recursively
+ * The `<page-menu-item>` component is a child component used in PageMenu used recursively
  * for nested navigation.
  */
 import { mapGetters, mapState } from "vuex"
 
 export default {
-  name: "page-menu",
+  name: "page-menu-item",
   props: {
     node: {
       type: Object,
@@ -107,7 +107,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page-menu {
+.page-menu-item {
   &.fa-ul {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
