@@ -60,6 +60,7 @@ export default {
     return {
       instance: null,
       library: null,
+      isYouTube: false,
       frameHeight: 0,
       frameWidth: "100%",
       loading: true,
@@ -125,18 +126,16 @@ export default {
         if (this.requiresRefresh) {
           this.$refs.h5p.contentWindow.location.reload()
           setTimeout(() => {
-            this.loading = false
-            this.$emit("is-loaded")
+            this.isLoaded()
           }, 2000)
         } else {
-          this.loading = false
-          this.$emit("is-loaded")
+          this.isLoaded()
         }
       }
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
-        this.frameHeight += 15
+        this.frameHeight += 2
       }
 
       let updatedDimensions = { height: this.frameHeight }
@@ -144,6 +143,13 @@ export default {
         updatedDimensions.width = this.frameWidth
       }
       this.$emit("change:dimensions", updatedDimensions)
+    },
+    isLoaded() {
+      this.loading = false
+      this.$emit("is-loaded", {
+        library: this.library,
+        isYouTube: this.isYouTube,
+      })
     },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -265,6 +271,9 @@ export default {
 
       const mediaProgress = this.node.progress
 
+      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
+      this.$emit("change:dimensions", { height: this.frameHeight })
+
       switch (this.library) {
         case "H5P.InteractiveVideo":
           {
@@ -365,6 +374,7 @@ export default {
             }
 
             if (h5pVideo.getDuration() !== undefined) {
+              this.isYouTube = true
               this.requiresRefresh = this.hasMultiContentContext
               handleH5pAfterLoad()
             } else {
@@ -374,19 +384,6 @@ export default {
           break
         case "H5P.ThreeImage":
           {
-            let threeSixtySizingInterval = setInterval(() => {
-              if (typeof h5pInstance.threeSixty !== "undefined") {
-                clearInterval(threeSixtySizingInterval)
-                const h5pDocument = h5pInstance.threeSixty.element.ownerDocument
-                if (h5pDocument) {
-                  this.frameHeight = h5pDocument.querySelector(
-                    "body > div"
-                  ).clientHeight
-                  this.$emit("change:dimensions", { height: this.frameHeight })
-                }
-              }
-            }, 500)
-
             let threeSixtyLoadInterval = setInterval(() => {
               if (typeof h5pInstance.reDraw !== "undefined") {
                 clearInterval(threeSixtyLoadInterval)
@@ -395,15 +392,13 @@ export default {
                   h5pInstance.reDraw()
                 }
               }
-              this.loading = false
-              this.$emit("is-loaded")
+              this.isLoaded()
             }, 500)
           }
           break
         default:
           {
-            this.loading = false
-            this.$emit("is-loaded")
+            this.isLoaded()
           }
           break
       }
