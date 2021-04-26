@@ -103,7 +103,9 @@
             <node-button
               v-if="hasPermission('edit')"
               :x="
-                isNestedMultiContentRow && node.mediaType !== 'multi-content' ? 0 : 35
+                isNestedMultiContentRow && node.mediaType !== 'multi-content'
+                  ? 0
+                  : 35
               "
               :y="radius"
               :data-qa="`edit-node-${node.id}`"

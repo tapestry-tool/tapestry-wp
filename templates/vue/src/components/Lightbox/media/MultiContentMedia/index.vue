@@ -217,7 +217,7 @@ export default {
       if (this.isMultiContentContext) {
         if (rowId) {
           this.$router.push({
-            name: names.SUBMULTICONTENT,
+            name: names.NESTEDMULTICONTENT,
             params: {
               nodeId: this.$route.params.nodeId,
               ...this.getRouteToParent(
@@ -232,7 +232,7 @@ export default {
             let updatedSubRowIds = this.$route.params.subRowId.split(",")
             updatedSubRowIds.pop()
             this.$router.push({
-              name: names.SUBMULTICONTENT,
+              name: names.NESTEDMULTICONTENT,
               params: {
                 nodeId: this.$route.params.nodeId,
                 rowId: this.$route.params.rowId,

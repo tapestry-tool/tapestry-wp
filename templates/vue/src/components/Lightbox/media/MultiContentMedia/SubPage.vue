@@ -76,13 +76,13 @@ export default {
       if (subRowId) {
         if (rowId !== undefined) {
           this.$router.push({
-            name: names.SUBMULTICONTENT,
+            name: names.NESTEDMULTICONTENT,
             params: { nodeId, rowId, subRowId },
             query: this.$route.query,
           })
         } else {
           this.$router.push({
-            name: names.SUBMULTICONTENT,
+            name: names.NESTEDMULTICONTENT,
             params: { nodeId, rowId: this.getParent(subRowId), subRowId },
             query: this.$route.query,
           })

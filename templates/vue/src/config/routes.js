@@ -38,9 +38,9 @@ const multiContent = {
   },
 }
 
-const subMultiContent = {
+const nestedMultiContent = {
   path: `${ROOT_PATH}/view/:rowId/rows/:subRowId`,
-  name: "sub_multi_content",
+  name: "nested_multi_content",
   components: {
     lightbox: Lightbox,
   },
@@ -80,7 +80,7 @@ const routes = {
   lightbox,
   modal,
   settings,
-  subMultiContent,
+  nestedMultiContent,
   redirects,
 }
 

@@ -10,7 +10,7 @@ export const routes = [
   routeConfig.app,
   routeConfig.lightbox,
   routeConfig.multiContent,
-  routeConfig.subMultiContent,
+  routeConfig.nestedMultiContent,
   routeConfig.settings,
   ...routeConfig.redirects,
   routeConfig.modal,
