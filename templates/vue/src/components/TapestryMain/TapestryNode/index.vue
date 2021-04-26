@@ -93,7 +93,7 @@
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="
-                (node.mediaType === 'multi-content' || !isNestedMultiContentRow) &&
+                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
                   (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
@@ -102,11 +102,7 @@
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="
-                isNestedMultiContentRow && node.mediaType !== 'multi-content'
-                  ? 0
-                  : 35
-              "
+              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
@@ -115,7 +111,7 @@
             </node-button>
             <node-button
               v-else-if="canReview"
-              :x="isNestedMultiContentRow ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : 35"
               :y="radius"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
@@ -184,13 +180,7 @@ export default {
   },
   computed: {
     ...mapState(["selection", "settings", "visibleNodes"]),
-    ...mapGetters([
-      "getNode",
-      "getDirectChildren",
-      "isVisible",
-      "getParent",
-      "isMultiContentRow",
-    ]),
+    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -206,10 +196,16 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isNestedMultiContentRow() {
+    hasTooManyLevels() {
       const parent = this.getParent(this.node.id)
-      if (parent) {
-        return this.isMultiContentRow(parent)
+      const grandparent = this.getParent(parent)
+      if (parent && grandparent) {
+        const parentNode = this.getNode(parent)
+        const gpNode = this.getNode(grandparent)
+        return (
+          parentNode.mediaType !== "multi-content" &&
+          gpNode.mediaType === "multi-content"
+        )
       }
       return false
     },
