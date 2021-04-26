@@ -24,14 +24,14 @@ export function getParent(state) {
   }
 }
 
-export function isMultiContent(_, { getNode, isSubMultiContent }) {
+export function isMultiContent(_, { getNode, isNestedMultiContent }) {
   return id => {
     const node = getNode(id)
-    return node.mediaType === "multi-content" || isSubMultiContent(id)
+    return node.mediaType === "multi-content" || isNestedMultiContent(id)
   }
 }
 
-export function isSubMultiContent(_, { getNode, getParent }) {
+export function isNestedMultiContent(_, { getNode, getParent }) {
   return id => {
     const parent = getParent(id)
     if (parent) {
@@ -55,7 +55,7 @@ export function isMultiContentRow(_, { getParent, isMultiContent }) {
   }
 }
 
-export function hasMultiContentAncestor(_, { getParent, isSubMultiContent }) {
+export function hasMultiContentAncestor(_, { getParent, isNestedMultiContent }) {
   return id => {
     const visited = new Set()
     let nodeId = id
@@ -64,7 +64,7 @@ export function hasMultiContentAncestor(_, { getParent, isSubMultiContent }) {
 
       let parent = getParent(nodeId)
       if (!parent) return false
-      if (isSubMultiContent(nodeId)) return true
+      if (isNestedMultiContent(nodeId)) return true
 
       if (visited.has(parent)) {
         break
