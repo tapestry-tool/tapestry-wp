@@ -100,7 +100,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'multi-content' || node.hasSubMultiContent"
+            v-if="node.hasMultiContentChild"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -544,7 +544,7 @@ export default {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
       }
-      copy.hasSubMultiContent = this.hasSubMultiContent(copy)
+      copy.hasMultiContentChild = this.hasMultiContentChild(copy)
       if (!copy.mapCoordinates) {
         copy.mapCoordinates = {
           lat: "",
@@ -580,20 +580,18 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return (
-            this.node.mediaType === "multi-content" || this.node.hasSubMultiContent
-          )
+          return this.node.hasMultiContentChild
         }
       }
 
       return false
     },
-    hasSubMultiContent(node) {
+    hasMultiContentChild(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return this.parent.presentationStyle === "accordion" && children.length > 0
+        return children.length > 0
       }
-      return false
+      return node.mediaType === "multi-content"
     },
     setDisabledMessage(msg) {
       this.deleteWarningText = msg
