@@ -93,7 +93,7 @@
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="
-                (node.mediaType === 'multi-content' || !isSubMultiContentRow) &&
+                (node.mediaType === 'multi-content' || !isNestedMultiContentRow) &&
                   (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
@@ -103,7 +103,7 @@
             <node-button
               v-if="hasPermission('edit')"
               :x="
-                isSubMultiContentRow && node.mediaType !== 'multi-content' ? 0 : 35
+                isNestedMultiContentRow && node.mediaType !== 'multi-content' ? 0 : 35
               "
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
@@ -113,7 +113,7 @@
             </node-button>
             <node-button
               v-else-if="canReview"
-              :x="isSubMultiContentRow ? 0 : 35"
+              :x="isNestedMultiContentRow ? 0 : 35"
               :y="radius"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
@@ -204,7 +204,7 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isSubMultiContentRow() {
+    isNestedMultiContentRow() {
       const parent = this.getParent(this.node.id)
       if (parent) {
         return this.isMultiContentRow(parent)
