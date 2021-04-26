@@ -61,13 +61,17 @@
               <p v-if="row.children.length > 0" style="color: white;">
                 {{ row.node.typeData.subAccordionText }}
               </p>
-              <sub-accordion
+              <accordion-rows
                 v-if="row.children.length > 0"
                 :dimensions="dimensions"
-                :rows="row.children"
-                :row-id="subRowId"
+                :node="row.node"
+                :rowId="subRowId"
+                context="accordion"
+                :level="level + 1"
+                @changeRow="changeRow"
                 @load="handleLoad"
-              />
+                @updateProgress="updateProgress"
+              ></accordion-rows>
             </div>
             <multi-content-media
               v-else-if="row.children.length > 0"
@@ -96,7 +100,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
-import SubAccordion from "./SubAccordion"
+import AccordionRows from "./AccordionRows"
 import LockedContent from "./common/LockedContent"
 
 export default {
@@ -105,7 +109,7 @@ export default {
     TapestryMedia,
     HeadlessMultiContent,
     MultiContentMedia: () => import("../MultiContentMedia"),
-    SubAccordion,
+    AccordionRows,
     LockedContent,
   },
   props: {
@@ -204,8 +208,8 @@ export default {
     updateProgress(rowId) {
       this.$emit("updateProgress", rowId)
     },
-    changeRow(rowId) {
-      this.$emit("changeRow", rowId)
+    changeRow(rowInfo) {
+      this.$emit("changeRow", { context: this.context, ...rowInfo })
     },
     handleAutoClose() {
       this.$emit("close")

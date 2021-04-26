@@ -153,11 +153,7 @@ export default {
       )
     },
     isMultiContentContext() {
-      return (
-        this.context === "multi-content" ||
-        this.context === "page" ||
-        this.context === "accordion"
-      )
+      return this.isNestedMultiContent(this.context)
     },
   },
   mounted() {
@@ -213,8 +209,9 @@ export default {
         }
       })
     },
-    changeRow(rowId) {
-      if (this.isMultiContentContext) {
+    changeRow(rowInfo) {
+      const { rowId, context } = rowInfo
+      if (this.isNestedMultiContent(context)) {
         if (rowId) {
           this.$router.push({
             name: names.NESTEDMULTICONTENT,
@@ -257,6 +254,11 @@ export default {
           })
         }
       }
+    },
+    isNestedMultiContent(context) {
+      return (
+        context === "multi-content" || context === "page" || context === "accordion"
+      )
     },
     getRouteToParent(childId, parentId) {
       let path = [childId]

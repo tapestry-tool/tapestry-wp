@@ -30,7 +30,7 @@ export default {
       return false
     },
     toggle(row) {
-      this.$emit("input", this.isVisible(row) ? null : row)
+      this.$emit("input", { rowId: this.isVisible(row) ? null : row })
     },
     next() {
       if (this.hasNext) {
