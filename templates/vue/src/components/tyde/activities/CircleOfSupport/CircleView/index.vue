@@ -161,8 +161,8 @@ export default {
   },
   methods: {
     getCircleBackground(index) {
-      if (this.activeCircle === index && this.draggingConnection) {
-        return `#ececec`
+      if (this.activeCircle === index) {
+        return `hsl(0, 0%, 93%)`
       }
       return "white"
     },
