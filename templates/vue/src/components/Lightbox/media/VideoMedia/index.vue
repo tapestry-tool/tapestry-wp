@@ -271,6 +271,7 @@ export default {
             case VideoEvents.Continue:
               this.state = VideoStates.Playing
               this.activePopupId = null
+              this.completing = false
           }
           break
         }
