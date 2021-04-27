@@ -215,8 +215,9 @@ export default {
                     }
                   )
                 }
+              } else {
+                this.state = VideoStates.H5P
               }
-              this.state = VideoStates.H5P
               this.$emit("load", context)
               break
             }
