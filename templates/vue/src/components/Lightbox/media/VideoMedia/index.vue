@@ -81,6 +81,7 @@ const VideoStates = {
   Playing: "playing",
   Finished: "finished",
   Popup: "popup",
+  H5P: "h5p",
 }
 
 const VideoEvents = {
@@ -172,7 +173,9 @@ export default {
       return false
     },
     showVideo() {
-      return [VideoStates.Paused, VideoStates.Playing].includes(this.state)
+      return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
+        this.state
+      )
     },
   },
   watch: {
@@ -197,21 +200,23 @@ export default {
         case VideoStates.Loading: {
           switch (eventName) {
             case VideoEvents.Load: {
-              this.lastTime = context.currentTime
-              this.state = this.getLoadState()
+              if (context && "currentTime" in context) {
+                this.lastTime = context.currentTime
+                this.state = this.getLoadState()
 
-              if (this.state === VideoStates.Playing) {
-                client.recordAnalyticsEvent(
-                  "app",
-                  "auto-play",
-                  context.type,
-                  this.node.id,
-                  {
-                    time: context.currentTime,
-                  }
-                )
+                if (this.state === VideoStates.Playing) {
+                  client.recordAnalyticsEvent(
+                    "app",
+                    "auto-play",
+                    context.type,
+                    this.node.id,
+                    {
+                      time: context.currentTime,
+                    }
+                  )
+                }
               }
-
+              this.state = VideoStates.H5P
               this.$emit("load", context)
               break
             }
