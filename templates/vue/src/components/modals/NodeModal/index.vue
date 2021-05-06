@@ -1078,6 +1078,9 @@ table {
 }
 
 .error-wrapper {
+  position: sticky;
+  z-index: 2;
+  top: 0;
   background: #f8d7da;
   color: #721c24;
   padding: 1em 1em 1px 2em;
