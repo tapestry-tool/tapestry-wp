@@ -1,8 +1,8 @@
 <template>
   <b-form-group label="TYDE Node Type">
     <b-form-select
-      data-qa="tyde-node-type"
       v-model="node.tydeType"
+      data-qa="tyde-node-type"
       :options="tydeTypeOptions"
     ></b-form-select>
     <b-form-text v-if="disableModuleChange">

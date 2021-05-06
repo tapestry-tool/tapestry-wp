@@ -126,6 +126,7 @@
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
+import client from "@/services/TapestryAPI"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "@/components/common/TapestryModal"
 import HeadlessAccordion from "@/components/common/HeadlessAccordion"
@@ -135,7 +136,6 @@ import TydeIcon from "@/components/tyde/common/TydeIcon"
 import Helpers from "@/utils/Helpers"
 import AccordionHeader from "@/assets/accordion-header.png"
 import AccordionConfirmation from "@/assets/accordion-confirmation.png"
-import client from "@/services/TapestryAPI"
 import { names } from "@/config/routes"
 
 export default {

@@ -70,7 +70,11 @@ describe("TYDE", () => {
       })
     })
 
-    it("Should allow creation of a regular node (subtopic) from a question set", () => {
+    /**
+     * Known issue:
+     *  - https://app.asana.com/0/1126491658233864/1199668085092541
+     */
+    it.skip("Should allow creation of a regular node (subtopic) from a question set", () => {
       cy.fixture("tyde/one-question-set.json").as("oneQuestionSet")
       cy.setup("@oneQuestionSet")
       cy.getNodeByTitle("Question Set 1").then(node => {

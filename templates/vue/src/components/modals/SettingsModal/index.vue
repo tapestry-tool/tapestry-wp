@@ -58,6 +58,14 @@
               You will need to refresh the page to see this change applied.
             </p>
           </b-form-group>
+          <b-form-group
+            label="Highlight accepted nodes"
+            description="If enabled, accepted nodes will be highlighted in green."
+          >
+            <b-form-checkbox v-model="showAcceptedHighlight" switch>
+              {{ showAcceptedHighlight ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group label="Default Depth" class="mb-0">
             <b-form-input
               v-model="defaultDepth"
@@ -283,6 +291,15 @@
               </b-col>
             </b-row>
           </b-form-group>
+          <b-form-group
+            class="mt-4"
+            label="Enable analytics"
+            description="When enabled, analytics such as mouse clicks will be saved."
+          >
+            <b-form-checkbox v-model="analyticsEnabled" switch>
+              {{ analyticsEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
         </b-tab>
         <b-tab
           title="Access"
@@ -303,6 +320,36 @@
           >
             <b-form-checkbox v-model="showAccess" switch>
               {{ showAccess ? "Show" : "Hide" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            label="Allow users to add draft nodes"
+            description="When enabled, users will be able to add draft nodes that are only visible to 
+              them to any node in the tapestry. These nodes will not be viewable by anyone else, 
+              including administrators."
+          >
+            <b-form-checkbox
+              v-model="draftNodesEnabled"
+              switch
+              :data-qa="`enable-draft`"
+              @change="handleSubmitNodesEnabled"
+            >
+              {{ draftNodesEnabled ? "Enabled" : "Disabled" }}
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group
+            v-if="draftNodesEnabled"
+            label="Allow users to submit draft nodes"
+            description="When enabled, users will be able to submit their nodes to administrators 
+              for review. Administrators can add a submitted node to the main tapestry by accepting 
+              the submission."
+          >
+            <b-form-checkbox
+              v-model="submitNodesEnabled"
+              :data-qa="`enable-submit-review`"
+              switch
+            >
+              {{ submitNodesEnabled ? "Enabled" : "Disabled" }}
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
@@ -328,7 +375,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState, mapActions } from "vuex"
 import FileUpload from "../common/FileUpload"
 import DuplicateTapestryButton from "./DuplicateTapestryButton"
 import PermissionsTable from "../common/PermissionsTable"
@@ -384,9 +431,13 @@ export default {
       fileUploading: false,
       superuserOverridePermissions: true,
       showRejected: false,
+      showAcceptedHighlight: true,
       defaultDepth: 3,
       isExporting: false,
       renderImages: true,
+      analyticsEnabled: false,
+      draftNodesEnabled: true,
+      submitNodesEnabled: true,
       renderMap: false,
       mapBounds: { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       hasExported: false,
@@ -448,6 +499,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(["getTapestryExport"]),
     closeModal() {
       this.$emit("close")
     },
@@ -461,9 +513,13 @@ export default {
         profileActivities = [],
         superuserOverridePermissions = true,
         showRejected = false,
+        showAcceptedHighlight = true,
         defaultDepth = 3,
         renderImages = true,
         renderMap = false,
+        analyticsEnabled = false,
+        draftNodesEnabled = true,
+        submitNodesEnabled = true,
         mapBounds = { neLat: 90, neLng: 180, swLat: -90, swLng: -180 },
       } = this.settings
       this.backgroundUrl = backgroundUrl
@@ -474,9 +530,13 @@ export default {
       this.profileActivities = profileActivities
       this.superuserOverridePermissions = superuserOverridePermissions
       this.showRejected = showRejected
+      this.showAcceptedHighlight = showAcceptedHighlight
       this.defaultDepth = defaultDepth
       this.renderImages = renderImages
       this.renderMap = renderMap
+      this.analyticsEnabled = analyticsEnabled
+      this.draftNodesEnabled = draftNodesEnabled
+      this.submitNodesEnabled = submitNodesEnabled
       this.mapBounds = mapBounds
     },
     async updateSettings() {
@@ -489,9 +549,13 @@ export default {
         profileActivities: this.profileActivities,
         superuserOverridePermissions: this.superuserOverridePermissions,
         showRejected: this.showRejected,
+        showAcceptedHighlight: this.showAcceptedHighlight,
         defaultDepth: parseInt(this.defaultDepth),
         renderImages: this.renderImages,
         renderMap: this.renderMap,
+        analyticsEnabled: this.analyticsEnabled,
+        draftNodesEnabled: this.draftNodesEnabled,
+        submitNodesEnabled: this.submitNodesEnabled,
         mapBounds: this.mapBounds,
       })
       await this.$store.dispatch("updateSettings", settings)
@@ -500,15 +564,10 @@ export default {
     isUploading(status) {
       this.fileUploading = status
     },
-    exportTapestry() {
+    async exportTapestry() {
       this.isExporting = true
-      let filteredTapestry = this.tapestryJson
-      filteredTapestry.nodes = filteredTapestry.nodes.filter(
-        node => node.status === "publish"
-      )
-      const tapestry = filteredTapestry
-      tapestry["site-url"] = wpData.wpUrl
-      const blob = new Blob([JSON.stringify(tapestry, null, 2)], {
+      const exportedTapestry = await this.getTapestryExport()
+      const blob = new Blob([JSON.stringify(exportedTapestry, null, 2)], {
         type: "application/json",
       })
       const fileUrl = URL.createObjectURL(blob)
@@ -520,6 +579,7 @@ export default {
       a.click()
       URL.revokeObjectURL(fileUrl)
       document.body.removeChild(a)
+
       this.isExporting = false
       this.hasExported = true
     },
@@ -567,6 +627,9 @@ export default {
     },
     getCoord(coord, coordIfEmpty) {
       return coord === "" ? coordIfEmpty : coord
+    },
+    handleSubmitNodesEnabled(event) {
+      this.submitNodesEnabled = event
     },
   },
 }
