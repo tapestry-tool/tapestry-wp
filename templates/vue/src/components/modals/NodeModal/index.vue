@@ -816,7 +816,7 @@ export default {
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
       }
-      if (this.node.description.length > this.maxDescriptionLength) {
+      if (this.node.description.replace(/<[^>]*>?/gm, '').length > this.maxDescriptionLength) {
         errMsgs.push(
           "Please limit your description to under " +
             this.maxDescriptionLength +
