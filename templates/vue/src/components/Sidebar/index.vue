@@ -474,6 +474,7 @@ export default {
 
           a {
             color: #becddc;
+            font-style: italic;
           }
 
           .license-link {
