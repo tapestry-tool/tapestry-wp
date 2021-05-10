@@ -8,11 +8,11 @@
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
     </button>
-    <button @click="handleClick($event, 'close')">
+    <button v-if="!hasNext" @click="handleClick($event, 'close')">
       <i class="far fa-times-circle fa-4x"></i>
       <p>Close</p>
     </button>
-    <button @click="handleClick($event, 'next')">
+    <button v-if="hasNext" @click="handleClick($event, 'next')">
       <i class="fas fa-arrow-right"></i>
       <p>Next</p>
     </button>
@@ -29,9 +29,10 @@ export default {
       type: Object,
       required: true,
     },
-    isLastSlide: {
+    hasNext: {
       type: Boolean,
       required: true,
+      default: false,
     },
   },
   computed: {

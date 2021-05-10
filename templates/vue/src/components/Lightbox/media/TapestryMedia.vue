@@ -26,6 +26,7 @@
       :showTitle="showTitle()"
       :dimensions="dimensions"
       :context="context"
+      :hasNext="hasNext"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -38,6 +39,7 @@
       :showTitle="showTitle()"
       :dimensions="dimensions"
       :context="context"
+      :hasNext="hasNext"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -142,6 +144,7 @@ export default {
     hasNext: {
       type: Boolean,
       required: true,
+      default: false,
     },
   },
   data() {

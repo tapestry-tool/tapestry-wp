@@ -26,7 +26,7 @@
       <tapestry-media
         :node-id="row.id"
         :dimensions="dimensions"
-        :hasNext="hasNext"
+        :hasNext="false"
         context="page"
         :autoplay="false"
         @complete="completeNode(row.id)"

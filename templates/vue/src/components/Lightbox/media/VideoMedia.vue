@@ -11,6 +11,7 @@
       <end-screen
         v-if="showEndScreen"
         :node="node"
+        :hasNext="hasNext"
         @rewatch="rewatch"
         @close="close"
         @show-quiz="openQuiz"
@@ -75,6 +76,11 @@ export default {
     showTitle: {
       type: Boolean,
       required: false,
+      default: false,
+    },
+    hasNext: {
+      type: Boolean,
+      required: true,
       default: false,
     },
   },

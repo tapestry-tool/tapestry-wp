@@ -4,6 +4,7 @@
     <end-screen
       v-if="showEndScreen"
       :node="node"
+      :hasNext="false"
       @rewatch="rewatch"
       @close="close"
       @show-quiz="openQuiz"
