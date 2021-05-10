@@ -46,6 +46,7 @@
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
+                :hasNext="hasNext"
                 context="page"
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"

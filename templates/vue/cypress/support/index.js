@@ -20,3 +20,8 @@ import "./commands"
 beforeEach(() => {
   cy.deleteTapestry()
 })
+
+Cypress.on("uncaught:exception", err => {
+  console.log(err)
+  return false
+})

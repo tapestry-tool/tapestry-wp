@@ -12,6 +12,10 @@
       <i class="far fa-times-circle fa-4x"></i>
       <p>Close</p>
     </button>
+    <button @click="handleClick($event, 'next')">
+      <i class="fas fa-arrow-right"></i>
+      <p>Next</p>
+    </button>
   </div>
 </template>
 
@@ -23,6 +27,10 @@ export default {
   props: {
     node: {
       type: Object,
+      required: true,
+    },
+    isLastSlide: {
+      type: Boolean,
       required: true,
     },
   },

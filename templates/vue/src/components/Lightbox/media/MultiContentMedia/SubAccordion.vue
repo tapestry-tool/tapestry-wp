@@ -5,7 +5,7 @@
       :value="rowId"
       @input="changeRow"
     >
-      <template v-slot="{ isVisible, toggle }">
+      <template v-slot="{ isVisible, toggle, hasNext }">
         <div>
           <div
             v-for="(row, index) in rows"
@@ -32,6 +32,7 @@
               v-if="isVisible(row.id)"
               :node-id="row.id"
               :dimensions="dimensions"
+              :hasNext="hasNext"
               context="multi-content"
               :autoplay="false"
               @complete="completeNode(row.id)"

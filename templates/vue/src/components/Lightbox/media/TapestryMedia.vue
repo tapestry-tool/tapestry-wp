@@ -139,6 +139,10 @@ export default {
       required: false,
       default: true,
     },
+    hasNext: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

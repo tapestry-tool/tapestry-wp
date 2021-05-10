@@ -29,6 +29,7 @@
       v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
       :dimensions="dimensions"
+      :hasNext="false"
       context="lightbox"
       @load="handleLoad"
       @close="handleAutoClose"

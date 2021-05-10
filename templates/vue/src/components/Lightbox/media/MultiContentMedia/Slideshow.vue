@@ -29,6 +29,7 @@
               <tapestry-media
                 :node-id="slide.node.id"
                 :dimensions="dimensions"
+                :hasNext="hasNext"
                 context="slideshow"
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
