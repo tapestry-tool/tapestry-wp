@@ -4,6 +4,7 @@
     :value="rowId"
     presentationStyle="slideshow"
     @input="changeRow"
+    @close="handleAutoClose"
   >
     <template>
       <div>
@@ -35,6 +36,7 @@
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(slide.node.id)"
                 @next="next"
+                @close="handleAutoClose"
               />
               <p v-if="slide.children.length > 0" style="color: white;">
                 {{ slide.node.typeData.subAccordionText }}

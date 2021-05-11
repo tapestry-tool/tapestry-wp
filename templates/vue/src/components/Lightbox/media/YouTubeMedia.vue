@@ -10,7 +10,7 @@
         :node="node"
         :hasNext="hasNext"
         @rewatch="rewatch"
-        @close="close"
+        @close="close()"
         @show-quiz="openQuiz"
         @next="next"
       />

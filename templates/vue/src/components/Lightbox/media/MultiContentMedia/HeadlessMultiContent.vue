@@ -43,6 +43,12 @@ export default {
         this.toggle(this.rows[currIndex + 1])
       }
     },
+    close() {
+      this.$emit("close")
+    },
+    handleAutoClose() {
+      this.$emit("close")
+    },
   },
   render() {
     return this.$scopedSlots.default({
