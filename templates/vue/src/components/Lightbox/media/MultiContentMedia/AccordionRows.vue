@@ -144,9 +144,6 @@ export default {
       showCompletion: false,
     }
   },
-  mounted() {
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
-  },
   computed: {
     ...mapGetters([
       "getDirectChildren",
@@ -190,6 +187,9 @@ export default {
         return null
       }
     },
+  },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapMutations(["updateNode"]),

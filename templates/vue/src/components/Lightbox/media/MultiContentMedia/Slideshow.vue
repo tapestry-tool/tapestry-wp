@@ -4,7 +4,6 @@
     :value="rowId"
     presentationStyle="slideshow"
     @input="changeRow"
-    @close="handleAutoClose"
   >
     <template>
       <div>
@@ -92,8 +91,6 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import SubAccordion from "./SubAccordion"
-import client from "@/services/TapestryAPI"
-import { names } from "@/config/routes"
 
 export default {
   name: "slideshow",
@@ -200,15 +197,7 @@ export default {
       }
     },
     handleAutoClose() {
-      client.recordAnalyticsEvent("app", "close", "slideshow", this.nodeId)
-      this.close()
-    },
-    close() {
-      this.$router.push({
-        name: names.APP,
-        params: { nodeId: this.nodeId },
-        query: this.$route.query,
-      })
+      this.$emit("close")
     },
   },
 }

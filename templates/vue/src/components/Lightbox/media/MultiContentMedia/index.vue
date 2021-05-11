@@ -51,6 +51,7 @@
       :subRowId="subRowId"
       :context="context"
       :level="level"
+      @close="close"
       @load="handleLoad"
       @changeRow="changeRow"
       @updateProgress="updateProgress"
@@ -203,6 +204,9 @@ export default {
           this.$refs.container.scrollTop = el.offsetTop - 12
         }
       })
+    },
+    close() {
+      this.$emit("close")
     },
     handleClose(evt) {
       client.recordAnalyticsEvent("user", "close", "multi-content", this.node.id, {
