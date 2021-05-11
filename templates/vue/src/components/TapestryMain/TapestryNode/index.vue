@@ -257,7 +257,6 @@ export default {
           return `url(#node-image-${this.node.id})`
         } else {
           return this.node.backgroundColor
-          // return this.node.backgroundColor
         }
       } else if (this.selected) {
         return "#11a6d8"
