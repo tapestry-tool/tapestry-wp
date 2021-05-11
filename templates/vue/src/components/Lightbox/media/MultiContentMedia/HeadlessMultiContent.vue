@@ -46,9 +46,6 @@ export default {
     close() {
       this.$emit("close")
     },
-    handleAutoClose() {
-      this.$emit("close")
-    },
   },
   render() {
     return this.$scopedSlots.default({
