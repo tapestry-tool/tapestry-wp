@@ -399,6 +399,7 @@ export default {
     background: #5d656c;
     color: white;
     height: 100vh;
+    height: -webkit-fill-available;
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
     transition: all 0.2s ease-out;
