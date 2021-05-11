@@ -2,6 +2,9 @@
   <div id="modal-appearance">
     <h6 class="mb-3">Node Appearance</h6>
     <b-card class="px-3 pt-3" bg-variant="light" no-body>
+      <b-container fluid class="bv-example-row">
+      <b-row>
+        <b-col sm>
       <b-form-group>
         <b-form-checkbox v-model="addThumbnail" data-qa="node-appearance-thumbnail">
           Add a thumbnail
@@ -55,6 +58,14 @@
           Hide media button
         </b-form-checkbox>
       </b-form-group>
+      </b-col>
+      <b-col lg>
+        <color-picker content="Background Color" :currentColor="node.backgroundColor" @change = "handleBackgroundColorChange"/>
+        <color-picker content="Text Color" :currentColor="node.textColor" @change = "handleTextColorChange"/>    
+      </b-col>
+      </b-row>
+      </b-container>
+      
     </b-card>
     <h6 class="mt-4 mb-3">Content Appearance</h6>
     <b-card class="px-3 pt-3" bg-variant="light" no-body>
@@ -86,10 +97,12 @@
 
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
+import ColorPicker from "@/components/modals/common/ColorPicker"
 
 export default {
   components: {
     FileUpload,
+    ColorPicker,
   },
   props: {
     node: {
@@ -124,6 +137,12 @@ export default {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
+     handleBackgroundColorChange(color) {
+      this.node.backgroundColor = color
+     },
+     handleTextColorChange(color) {
+      this.node.textColor = color
   },
+  }
 }
 </script>

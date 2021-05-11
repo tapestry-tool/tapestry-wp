@@ -71,7 +71,7 @@
             :x="-(140 * 5) / 6"
             :y="-(140 * 5) / 6"
           >
-            <div class="meta">
+            <div class="meta" :style="{color: node.textColor}">
               <p class="title">{{ node.title }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -255,10 +255,9 @@ export default {
       if (this.node.nodeType !== "grandchild") {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
-        } else if (!this.node.accessible) {
-          return "#8a8a8c"
         } else {
-          return "#8396a1"
+          return this.node.backgroundColor
+          // return this.node.backgroundColor
         }
       } else if (this.selected) {
         return "#11a6d8"
@@ -512,8 +511,19 @@ export default {
 }
 
 .meta {
+  color: white;
+  min-height: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction:column;
+  text-align: center;
+  font-size: 30px;
   .title {
-    text-shadow: 0 0 5px #000;
+    padding-left: 0;
+    margin-top: 12px;
+    margin-bottom: 0;
     font-weight: bold;
   }
 }
