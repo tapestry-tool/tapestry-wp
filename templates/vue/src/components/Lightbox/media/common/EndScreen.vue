@@ -13,7 +13,7 @@
       <p>Close</p>
     </button>
     <button v-if="hasNext" @click="handleClick($event, 'next')">
-      <i class="fas fa-arrow-right"></i>
+      <i class="fas fa-arrow-right fa-4x"></i>
       <p>Next</p>
     </button>
   </div>

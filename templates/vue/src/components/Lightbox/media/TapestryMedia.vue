@@ -31,6 +31,7 @@
       @complete="complete"
       @timeupdate="updateProgress"
       @close="$emit('close')"
+      @next="$emit('next')"
     />
     <youtube-media
       v-if="node.mediaFormat === 'youtube'"
@@ -44,6 +45,7 @@
       @complete="complete"
       @timeupdate="updateProgress"
       @close="$emit('close')"
+      @next="$emit('next')"
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"

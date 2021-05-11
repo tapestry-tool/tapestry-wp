@@ -34,6 +34,7 @@
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
                 @complete="updateProgress(slide.node.id)"
+                @next="next"
               />
               <p v-if="slide.children.length > 0" style="color: white;">
                 {{ slide.node.typeData.subAccordionText }}

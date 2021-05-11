@@ -12,6 +12,7 @@
         @rewatch="rewatch"
         @close="close"
         @show-quiz="openQuiz"
+        @next="next"
       />
       <activity-screen
         v-else-if="showActivityScreen"
@@ -153,6 +154,9 @@ export default {
         this.updateSettings()
       }
       this.$emit("close")
+    },
+    next() {
+      this.$emit("next")
     },
     getInitialEndScreenState() {
       if (this.progress >= 1) {

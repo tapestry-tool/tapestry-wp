@@ -14,6 +14,7 @@
         :hasNext="hasNext"
         @rewatch="rewatch"
         @close="close"
+        @next="next"
         @show-quiz="openQuiz"
       />
       <activity-screen
@@ -152,6 +153,9 @@ export default {
         this.updateVideoProgress()
       }
       this.$emit("close")
+    },
+    next() {
+      this.$emit("next")
     },
     getInitialEndScreenState() {
       const progress = this.node.progress
