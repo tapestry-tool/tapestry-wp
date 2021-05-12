@@ -1,16 +1,35 @@
 <template>
   <div>
-    <h1>Welcome to your circle of connections!</h1>
-    <p>Let's start with you — what communities are you a part of?</p>
-    <p>Here are a few ideas to get you started.</p>
-    <button @click="addCommunities">Continue</button>
-    <ul>
-      <li v-for="community in communities" :key="community.name">
-        <input v-model="communitiesToAdd" type="checkbox" :value="community.name" />
-        <h1>{{ community.name }}</h1>
-        <p>{{ community.icon }}</p>
-      </li>
-    </ul>
+    <b-container fluid class="center">
+        <b-row align-h="center">
+          <h1>Welcome to your <br /> circle of connections!</h1>
+        </b-row >
+
+        <b-row align-h="center">
+          <p>Let's start with you — what communities are you a part of?</p>
+        </b-row>
+        
+        <b-row align-h="center">
+          <p>Here are a few ideas to get you started.</p>
+        </b-row>
+
+        <b-row align-h="center" class="mt-2 mb-2">
+          <b-button pill variant="secondary" @click="addCommunities" :disabled="canContinue()">CONTINUE &#8594 </b-button>
+        </b-row>
+        
+        <b-row align-h="center">
+          <b-container hor>
+            <b-row>
+              <b-col v-for="community in communities" :key="community.name">
+                <input v-model="communitiesToAdd" type="checkbox" :value="community.name" />
+                <h3>{{ community.name }}</h3>
+                <h1>{{ community.icon }}</h1>
+              </b-col>
+            </b-row>
+          </b-container>
+        </b-row>
+
+    </b-container>
   </div>
 </template>
 
@@ -38,6 +57,9 @@ export default {
     isChecked(community) {
       return this.communitiesToAdd.has(community)
     },
+    canContinue(){
+      return this.communitiesToAdd.length === 0 ? true : false;
+    },
     async addCommunities() {
       const results = []
       if (this.communitiesToAdd.length > 0) {
@@ -54,3 +76,39 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+
+* {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+
+button {
+  letter-spacing: 1px;
+  padding: 1px 25px;
+}
+
+h1, h3{
+  color: black;
+}
+
+p {
+  color: #7F88AF;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+
+  z-index: 10;
+  background-color: white;
+
+  padding:10px 0;
+  width: 75vw;
+
+  border: #D8D8D8 solid;
+  border-radius:  15px;
+}
+</style>
