@@ -38,7 +38,7 @@ describe("Node Appearance", () => {
             cy.getByTestId(`node-title-${node.id}`).should("not.exist")
             cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
             cy.getByTestId(`open-node-${node.id}`).should("not.exist")
-            cy.get("circle").should("have.attr", "fill")
+            cy.get("circle").should("have.attr", "fill")  // this works
             cy.getByTestId("nodeImage").should("have.attr", "href")
           })
         })
@@ -69,8 +69,9 @@ describe("Node Appearance", () => {
       cy.getNodeById(node.id).within(() => {
             cy.get('.meta').should('have.css', 'color', 'rgb(232, 75, 60)')
             // rgb(232, 75, 60) is same as #E84B3C
+            cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", "#1FBC9C")
           })
-      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill")    
+          
     })
   })
 })
