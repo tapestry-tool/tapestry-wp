@@ -78,6 +78,19 @@
           Open content in fullscreen
         </b-form-checkbox>
       </b-form-group>
+      <b-form-group v-if="node.presentationStyle === 'page'">
+        <b-form-checkbox
+          :checked="
+            node.typeData.hasOwnProperty('showNavBar')
+              ? node.typeData.showNavBar
+              : true
+          "
+          data-qa="nav-checkbox"
+          @change="node.typeData.showNavBar = $event"
+        >
+          Add navigation bar
+        </b-form-checkbox>
+      </b-form-group>
       <b-form-group
         v-if="
           node.fullscreen && (node.mediaType === 'video' || node.mediaType === 'h5p')

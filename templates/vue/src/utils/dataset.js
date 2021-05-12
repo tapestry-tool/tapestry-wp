@@ -56,16 +56,13 @@ function parseToStore(dataset) {
   }
 
   for (const node of dataset.nodes.filter(
-    node => node.presentationStyle === "accordion"
+    node => node.mediaType === "multi-content"
   )) {
-    const accordionRowIds = getChildIds({ links: dataset.links }, node.id)
-    accordionRowIds.forEach(accordionRowId => {
-      const accordionRow = getNode(dataset, accordionRowId)
-      accordionRow.isMultiContentChild = true
-      const subRows = getChildIds({ links: dataset.links }, accordionRowId)
-      if (subRows.length) {
-        accordionRow.isSubAccordion = true
-      }
+    const multiContentRowIds = getChildIds({ links: dataset.links }, node.id)
+    multiContentRowIds.forEach(multiContentRowId => {
+      const multiContentRow = getNode(dataset, multiContentRowId)
+      multiContentRow.isMultiContentChild = true
+      const subRows = getChildIds({ links: dataset.links }, multiContentRowId)
       subRows.forEach(id => {
         const subRow = getNode(dataset, id)
         subRow.isMultiContentChild = true
@@ -79,9 +76,7 @@ function parseToStore(dataset) {
     store.settings.defaultDepth = DEFAULT_DEPTH
   }
 
-  dataset.nodes
-    .filter(n => n.presentationStyle === "accordion" || n.isSubAccordion)
-    .forEach(n => initializeOrdering(dataset, n))
+  dataset.nodes.forEach(n => initializeOrdering(dataset, n))
 
   store.selectedNodeId = dataset.rootId
   store.visibleNodes = dataset.nodes.map(node => parseInt(node.id, 10))

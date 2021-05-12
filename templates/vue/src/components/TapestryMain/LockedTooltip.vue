@@ -2,29 +2,7 @@
   <g :transform="`translate(${node.coordinates.x}, ${node.coordinates.y})`">
     <foreignObject :width="width" :height="height" :x="x" :y="y">
       <div class="tapestry-tooltip" :style="flexPosition">
-        <div class="tapestry-tooltip-content">
-          <span v-if="isLoggedIn || !hasCompleteCondition">
-            This node will be unlocked:
-            <br />
-            <ul>
-              <li v-if="isParentLocked">When {{ parent.title }} is unlocked.</li>
-              <li v-for="(cond, index) in conditions" :key="index">
-                <span v-if="cond.type === conditionTypes.NODE_COMPLETED">
-                  When {{ cond.node.title }} is completed.
-                </span>
-                <span v-if="cond.type === conditionTypes.DATE_PASSED">
-                  After {{ formatDate(cond) }}.
-                </span>
-                <span v-if="cond.type === conditionTypes.DATE_NOT_PASSED">
-                  Until {{ formatDate(cond) }}.
-                </span>
-              </li>
-            </ul>
-          </span>
-          <span v-else>
-            Please login to unlock this node.
-          </span>
-        </div>
+        <locked-text class="tapestry-tooltip-content" :node="node" />
       </div>
     </foreignObject>
     <polygon class="tooltip-pointer" :points="points" fill="black"></polygon>
@@ -32,12 +10,12 @@
 </template>
 
 <script>
-import moment from "moment-timezone"
-import { mapGetters } from "vuex"
-import { conditionTypes } from "@/utils/constants"
-import * as wp from "@/services/wp"
+import LockedText from "@/components/common/LockedText"
 
 export default {
+  components: {
+    LockedText,
+  },
   props: {
     node: {
       type: Object,
@@ -49,10 +27,6 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDirectParents", "getNode"]),
-    selectedNodeId() {
-      return this.$route.params.nodeId
-    },
     radius() {
       if (this.node.nodeType === "") {
         return 0
@@ -94,23 +68,6 @@ export default {
           ]
       return points.map(point => point.join(",")).join(" ")
     },
-    parent() {
-      const parentId = this.getDirectParents(this.node.id)[0]
-      return parentId && this.getNode(parentId)
-    },
-    conditions() {
-      return this.node.conditions
-        .filter(cond => !cond.fulfilled)
-        .map(cond => {
-          if (cond.nodeId) {
-            cond.node = this.getNode(cond.nodeId)
-          }
-          return cond
-        })
-    },
-    conditionTypes() {
-      return conditionTypes
-    },
     startY() {
       return this.viewBox.split(" ")[1]
     },
@@ -122,30 +79,6 @@ export default {
     },
     flexPosition() {
       return this.onBottom ? "align-items: flex-start;" : "align-items: flex-end;"
-    },
-    hasCompleteCondition() {
-      return this.conditions.find(
-        cond => cond.type === conditionTypes.NODE_COMPLETED
-      )
-    },
-    isParentLocked() {
-      return (
-        (this.node.conditions.length === 0 ||
-          this.node.conditions.every(cond => cond.fulfilled)) &&
-        this.parent
-      )
-    },
-    isLoggedIn() {
-      return wp.isLoggedIn()
-    },
-  },
-  methods: {
-    formatDate({ date, time, timezone }) {
-      const formatStr = `MMM D YYYY [at] h:mm a [(${timezone})]`
-      if (!time) {
-        return moment.tz(date, timezone).format(formatStr)
-      }
-      return moment.tz(`${date} ${time}`, timezone).format(formatStr)
     },
   },
 }
