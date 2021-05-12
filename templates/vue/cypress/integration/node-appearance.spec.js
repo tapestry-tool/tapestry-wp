@@ -72,7 +72,6 @@ describe("Node Appearance", () => {
             cy.get("#nodeCircle").should('have.attr', 'fill', '#1FBC9C') 
           })
        //cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", "#1FBC9C")    
-          
     })
   })
 })
