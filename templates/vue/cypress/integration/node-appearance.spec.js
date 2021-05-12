@@ -38,7 +38,7 @@ describe("Node Appearance", () => {
             cy.getByTestId(`node-title-${node.id}`).should("not.exist")
             cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
             cy.getByTestId(`open-node-${node.id}`).should("not.exist")
-            //cy.get("circle").should("have.attr", "fill")  
+            cy.get("#nodeCircle").should("have.attr", "fill")  
             cy.getByTestId("nodeImage").should("have.attr", "href")
           })
         })
