@@ -66,11 +66,11 @@ describe("Node Appearance", () => {
 
       cy.submitModal()
       
-      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", '#1FBC9C')
       cy.getNodeById(node.id).within(() => {
             cy.get('.meta').should('have.css', 'color', 'rgb(232, 75, 60)')
             // rgb(232, 75, 60) is same as #E84B3C
           })
+      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill")    
     })
   })
 })
