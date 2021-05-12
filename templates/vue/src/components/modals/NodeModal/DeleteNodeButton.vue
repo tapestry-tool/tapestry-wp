@@ -77,10 +77,10 @@ export default {
   },
   methods: {
     ...mapActions(["deleteNode", "deleteLink", "getNodeHasDraftChildren"]),
-    ...mapMutations(["updateSelectedNode", "updateNode"]),
+    ...mapMutations(["updateNode"]),
     async handleRemoveNode() {
       this.$emit("setLoading", true)
-      this.updateSelectedNode(this.rootId)
+      const root = this.rootId
       const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
       if (nodeHasDraftChildren.hasDraft) {
         this.$bvModal

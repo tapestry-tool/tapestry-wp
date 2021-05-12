@@ -488,7 +488,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -739,7 +739,9 @@ export default {
             })
           }
           if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
+            this.$router.replace({
+              path: `/nodes/${id}`
+            })
           }
         } else {
           this.updateRootNode(id)

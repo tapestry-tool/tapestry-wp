@@ -378,7 +378,7 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
-    ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
         this.$router.push({
@@ -386,7 +386,7 @@ export default {
           params: { nodeId: this.node.id },
           query: this.$route.query,
         })
-        this.updateSelectedNode(this.node.id)
+        // this.updateSelectedNode(this.node.id)
       }
     },
     openNode(id) {
