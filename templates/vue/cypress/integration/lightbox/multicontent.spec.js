@@ -3,6 +3,7 @@ describe("Multi-content", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.fixture("accordion.json").as("accordion")
     cy.fixture("deep-accordion.json").as("deep-accordion")
+    cy.fixture("page.json").as("page")
   })
 
   describe("In-place", () => {
@@ -136,7 +137,7 @@ describe("Multi-content", () => {
         cy.submitModal()
 
         cy.openLightbox(node.id).within(() => {
-          cy.getByTestId("accordion").should("be.visible")
+          cy.getByTestId("multi-content").should("be.visible")
           cy.contains(node.title).should("be.visible")
         })
       })
@@ -303,6 +304,46 @@ describe("Multi-content", () => {
           cy.contains(accordion.title).should("be.visible")
           cy.contains(child.title).should("not.be.visible")
           cy.contains(grandchild.title).should("not.be.visible")
+        })
+    })
+  })
+
+  describe("Page", () => {
+    it("should render text content, more content and hide locked content", () => {
+      cy.setup("@page")
+
+      cy.store()
+        .its("state.nodes")
+        .then(nodes => {
+          const [pageNode, videoNode, textNode, moreNode] = Object.values(nodes)
+
+          cy.editNode(pageNode.id, {
+            childOrdering: [videoNode.id, textNode.id],
+            typeData: {
+              ...pageNode.typeData,
+              showNavBar: false,
+            },
+          })
+
+          cy.openLightbox(pageNode.id).within(() => {
+            cy.get("iframe[id^=youtube]").should("exist")
+            cy.contains(textNode.title).should("exist")
+            cy.contains(textNode.typeData.textContent).should("exist")
+            cy.contains(moreNode.title).should("exist")
+          })
+          cy.closeLightbox()
+
+          cy.openModal("edit", pageNode.id)
+          cy.getByTestId("lock-checkbox").click({ force: true })
+          cy.submitModal()
+
+          cy.openLightbox(pageNode.id).within(() => {
+            cy.get("iframe[id^=youtube]").should("exist")
+            cy.contains(textNode.title).should("exist")
+            cy.contains(textNode.typeData.textContent).should("not.exist")
+            cy.contains(moreNode.title).should("not.exist")
+            cy.contains(moreNode.typeData.textContent).should("not.exist")
+          })
         })
     })
   })
