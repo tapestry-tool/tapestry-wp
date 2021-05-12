@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     ...mapState(["visibleNodes", "rootId"]),
-    ...mapGetters(["getNeighbours", "isAccordion", "isVisible"]),
+    ...mapGetters(["getNeighbours", "isMultiContent", "isVisible"]),
     show() {
       return this.isVisible(this.source.id) && this.isVisible(this.target.id)
     },
@@ -84,7 +84,7 @@ export default {
       if (userConfirmDelete) {
         if (this.canDelete()) {
           await this.deleteLink({ source: this.source.id, target: this.target.id })
-          if (this.isAccordion(this.source.id)) {
+          if (this.isMultiContent(this.source.id)) {
             this.source.childOrdering = this.source.childOrdering.filter(
               id => id !== this.target.id
             )

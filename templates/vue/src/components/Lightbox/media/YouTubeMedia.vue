@@ -1,35 +1,41 @@
 <template>
-  <div class="embed-responsive embed-responsive-16by9">
-    <end-screen
-      v-if="showEndScreen"
-      :node="node"
-      @rewatch="rewatch"
-      @close="close"
-      @show-quiz="openQuiz"
-    />
-    <activity-screen
-      v-else-if="showActivityScreen"
-      :id="node.id"
-      @back="back"
-      @close="close"
-    />
-    <youtube
-      class="embed-responsive-item"
-      :video-id="node.typeData.youtubeID"
-      :player-width="dimensions.width - 15"
-      :player-height="dimensions.height - 40"
-      :player-vars="{
-        autoplay: autoplay,
-        modestbranding: 1,
-        rel: 0,
-        iv_load_policy: 3,
-        enablejsapi: 1,
-      }"
-      @ready="ready"
-      @paused="handlePause"
-      @playing="handlePlay"
-      @ended="handleEnd"
-    />
+  <div>
+    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <div
+      class="embed-responsive embed-responsive-16by9"
+      :style="isMultiContentContext ? '' : 'top: 1.75em'"
+    >
+      <end-screen
+        v-if="showEndScreen"
+        :node="node"
+        @rewatch="rewatch"
+        @close="close"
+        @show-quiz="openQuiz"
+      />
+      <activity-screen
+        v-else-if="showActivityScreen"
+        :id="node.id"
+        @back="back"
+        @close="close"
+      />
+      <youtube
+        class="embed-responsive-item"
+        :video-id="node.typeData.youtubeID"
+        :player-width="dimensions.width - 15"
+        :player-height="dimensions.height - 40"
+        :player-vars="{
+          autoplay: autoplay,
+          modestbranding: 1,
+          rel: 0,
+          iv_load_policy: 3,
+          enablejsapi: 1,
+        }"
+        @ready="ready"
+        @paused="handlePause"
+        @playing="handlePlay"
+        @ended="handleEnd"
+      />
+    </div>
   </div>
 </template>
 
@@ -65,6 +71,11 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -85,6 +96,12 @@ export default {
       }
       return 0
     },
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
+    },
+    isMultiContentContext() {
+      return this.context === "page" || this.context === "multi-content"
+    },
   },
   beforeDestroy() {
     if (this.player) {
@@ -101,6 +118,9 @@ export default {
       this.applySettings()
       if (this.autoplay) {
         client.recordAnalyticsEvent("app", "auto-play", "yt-video", this.node.id)
+      } else {
+        // To prevent autoplay on video states other than "not started"
+        this.player.stopVideo()
       }
     },
     openQuiz() {
@@ -205,5 +225,16 @@ export default {
 .embed-responsive {
   max-height: calc(100vh - 120px);
   height: 100%;
+}
+
+.video-title {
+  text-align: left;
+  margin-bottom: 0.9em;
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
+  }
 }
 </style>
