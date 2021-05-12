@@ -80,7 +80,6 @@ export default {
     ...mapMutations(["updateNode"]),
     async handleRemoveNode() {
       this.$emit("setLoading", true)
-      const root = this.rootId
       const nodeHasDraftChildren = await this.getNodeHasDraftChildren(this.nodeId)
       if (nodeHasDraftChildren.hasDraft) {
         this.$bvModal

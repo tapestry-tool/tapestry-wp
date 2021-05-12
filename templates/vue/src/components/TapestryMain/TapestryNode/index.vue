@@ -385,8 +385,8 @@ export default {
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
+          path: `/nodes/${this.node.id}`
         })
-        // this.updateSelectedNode(this.node.id)
       }
     },
     openNode(id) {
