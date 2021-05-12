@@ -21,7 +21,7 @@
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
-      <circle :data-qa="`node-circle-${node.id}`" ref="circle" :fill="fill"></circle>
+      <circle id ="nodeCircle" :data-qa="`node-circle-${node.id}`" ref="circle" :fill="fill"></circle>
       <transition name="fade">
         <circle
           v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
