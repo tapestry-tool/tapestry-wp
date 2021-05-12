@@ -120,6 +120,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 .cos {
   --cos-color-primary: #000;
   --cos-color-secondary: #c4c4c4;

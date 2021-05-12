@@ -1,19 +1,25 @@
 <template>
   <cos-modal show @change="$emit('later')">
-    <div class="confirm">
-      <h1>Great job! Here are all your communities.</h1>
-      <p>Would you like to add another community?</p>
-      <ul class="controls">
-        <li>
-          <button class="secondary" @click="$emit('later')">Maybe later</button>
-        </li>
-        <li>
-          <button class="primary" @click="$emit('another')">
-            Add another
-          </button>
-        </li>
-      </ul>
-    </div>
+    <b-container class="confirm">
+      <b-row align-h="center">
+        <h2 class="ob-title">Great job! Here are all your communities.</h2>
+      </b-row>
+      <b-row align-h="center">
+        <p class="ob-secondary">Would you like to add another community?</p>
+      </b-row>
+      <b-row>
+        <b-container>
+          <b-row class="controls">
+            <b-col>
+              <b-button pill variant="secondary" class="secondary" @click="$emit('later')">Maybe later &#8594</b-button>
+            </b-col>
+            <b-col>
+              <b-button pill variant="secondary" class="primary" @click="$emit('another')">Add another &#8594</b-button>   
+            </b-col>
+          </b-row>
+        </b-container>
+      </b-row>
+    </b-container>
   </cos-modal>
 </template>
 

@@ -1,15 +1,15 @@
 <template>
-  <div>
+    <div class="modal ob-font">
     <b-container fluid class="center">
         <b-row align-h="center">
           <h1>Welcome to your <br /> circle of connections!</h1>
         </b-row >
 
         <b-row align-h="center">
-          <p>Let's start with you — what communities are you a part of?</p>
+          <p class="ob-secondary">Let's start with you — what communities are you a part of?</p>
         </b-row>
         
-        <b-row align-h="center">
+        <b-row align-h="center" class="ob-secondary">
           <p>Here are a few ideas to get you started.</p>
         </b-row>
 
@@ -17,8 +17,8 @@
           <b-button pill variant="secondary" @click="addCommunities" :disabled="canContinue()">CONTINUE &#8594 </b-button>
         </b-row>
         
-        <b-row align-h="center">
-          <b-container hor>
+        <b-row >
+          <b-container>
             <b-row>
               <b-col v-for="community in communities" :key="community.name">
                 <input v-model="communitiesToAdd" type="checkbox" :value="community.name" />
@@ -30,7 +30,7 @@
         </b-row>
 
     </b-container>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -77,38 +77,32 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
 * {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
-
 button {
   letter-spacing: 1px;
   padding: 1px 25px;
 }
 
 h1, h3{
-  color: black;
+  color: $onbording-title-color;
 }
 
-p {
-  color: #7F88AF;
-}
-
-.center {
+.modal {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 
-  z-index: 10;
+  z-index: 999;
   background-color: white;
 
-  padding:10px 0;
-  width: 75vw;
-
-  border: #D8D8D8 solid;
+  border: $onbording-border-color solid;
   border-radius:  15px;
 }
+
 </style>
