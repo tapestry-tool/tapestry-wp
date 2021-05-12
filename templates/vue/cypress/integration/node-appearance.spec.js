@@ -23,9 +23,6 @@ describe("Node Appearance", () => {
       cy.contains(/progress bar/i).click()
       cy.contains(/add a thumbnail/i).click()
       
-      cy.contains(/Background Color/i).get("#textColorID").click().click()
-      cy.contains(/Text Color/i).get("#backgroundColorID").click().click()
-      
       cy.server()
       cy.route("POST", "**/async-upload.php").as("upload")
 
@@ -45,6 +42,35 @@ describe("Node Appearance", () => {
             cy.getByTestId("nodeImage").should("have.attr", "href")
           })
         })
+    })
+  })
+
+  it("should be able to edit a node's appearance using the node modal's Color Picker Component", () => {
+    // Check initial settings for render images
+    cy.store()
+      .its("state.settings")
+      .then(
+        settings =>
+          expect(!settings.hasOwnProperty("renderImages") || settings.renderImages)
+            .to.be.true
+      )
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.contains(/appearance/i).click()
+      
+      cy.contains(/Background Color/i).get("#textColorID").click().click()
+      cy.contains(/Text Color/i).get("#backgroundColorID").click().click()
+      cy.get("#backgroundColorID").click().find(`[aria-label="#1FBC9C"]`).click()
+      cy.get("#textColorID").click().find(`[aria-label="#E84B3C"]`).click()
+
+      cy.submitModal()
+      
+      cy.getNodeById(node.id).within(() => {
+            cy.get('.meta').should('have.css', 'color', 'rgb(232, 75, 60)')
+            cy.get("circle").should("have.attr", "fill", '#1FBC9C')
+            // rgb(232, 75, 60) is same as #E84B3C
+          })
     })
   })
 })
