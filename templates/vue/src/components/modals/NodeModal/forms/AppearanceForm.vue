@@ -60,8 +60,8 @@
       </b-form-group>
       </b-col>
       <b-col lg>
-        <color-picker content="Background Color" :currentColor="node.backgroundColor" @change = "handleBackgroundColorChange" testId="backgroundColorID"/>
-        <color-picker content="Text Color" :currentColor="node.textColor" @change = "handleTextColorChange" testId="textColorID"/>    
+        <color-picker content="Background Color" :currentColor="node.backgroundColor" @change = "handleBackgroundColorChange" :data-qa="`node-backgroundcolor-${node.id}`"/>
+        <color-picker content="Text Color" :currentColor="node.textColor" @change = "handleTextColorChange" :data-qa="`node-textcolor-${node.id}`"/>    
       </b-col>
       </b-row>
       </b-container>

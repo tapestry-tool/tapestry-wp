@@ -38,7 +38,7 @@ describe("Node Appearance", () => {
             cy.getByTestId(`node-title-${node.id}`).should("not.exist")
             cy.getByTestId(`node-progress-${node.id}`).should("not.exist")
             cy.getByTestId(`open-node-${node.id}`).should("not.exist")
-            // cy.get("circle").should("have.attr", "fill")  
+            cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill")  
             cy.getByTestId("nodeImage").should("have.attr", "href")
           })
         })
@@ -59,10 +59,10 @@ describe("Node Appearance", () => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
       
-      cy.contains(/Background Color/i).get("#textColorID").click().click()
-      cy.contains(/Text Color/i).get("#backgroundColorID").click().click()
-      cy.get("#backgroundColorID").click().find(`[aria-label="#1FBC9C"]`).click()
-      cy.get("#textColorID").click().find(`[aria-label="#E84B3C"]`).click()
+      cy.contains(/Background Color/i).getByTestId(`node-backgroundcolor-${node.id}`).click().click()
+      cy.contains(/Text Color/i).getByTestId(`node-textcolor-${node.id}`).click().click()
+      cy.getByTestId(`node-backgroundcolor-${node.id}`).find('.swatch').click().find(`[aria-label="#1FBC9C"]`).click()
+      cy.getByTestId(`node-textcolor-${node.id}`).find('.swatch').click().find(`[aria-label="#E84B3C"]`).click()
 
       cy.submitModal()
       

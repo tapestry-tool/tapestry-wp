@@ -16,7 +16,6 @@
         
         popover-x="left"
         class = "swatch"
-        :id="testId"
       ></v-swatches>
     </div>
     </b-row>
@@ -41,11 +40,6 @@ export default {
     currentColor: {
       type: String,
       required: true,
-      default: "",
-    },
-    testId:{
-      type: String,
-      required: false,
       default: "",
     }
  },
