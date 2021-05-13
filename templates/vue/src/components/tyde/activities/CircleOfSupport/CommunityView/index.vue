@@ -24,11 +24,15 @@
       @add-community="$emit('add-community', $event)"
       @toggle="toggleCommunityTab"
     />
-    <welcome-screen
+    <welcome-communities
       v-if="isState('Communities.Welcome')"
-      class="welcome-screen"
+      class="welcome-communities"
       @continue="handleContinue"
     />
+    <welcome-connections 
+      v-if="isState('Connection.Welcome')"
+      class="welcome-connections"
+      />
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
       @later="send('AddLater')"
@@ -38,19 +42,20 @@
       v-if="isState('Communities.AddLaterTooltip')"
       ref-id="community-tab-popup-trigger"
     >
-      <p>
+      <h3>
         Remember - you can click this button whenever you'd like to add another
         community!
-      </p>
-      <button>Got it</button>
+      </h3>
+      <b-button pill variant="secondary" @click="send('Continue')">Got it &#8594 </b-button>
     </tooltip>
     <tooltip
       v-if="isState('Communities.AddAnotherTooltip')"
       ref-id="community-tab-popup-trigger"
     >
-      <p>
+      <h3>
         Click here to add another community!
-      </p>
+      </h3>
+      <b-button pill variant="secondary" @click="send('Add')">Got it &#8594 </b-button>
     </tooltip>
   </div>
 </template>
@@ -62,8 +67,8 @@ import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
 
-import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
-import WelcomeScreen from "./onboarding/WelcomeScreen"
+import onboardingMachine, { OnboardingEvents, OnboardingStates } from "./onboardingMachine"
+import WelcomeCommunities from "./onboarding/WelcomeCommunities"
 import AddConfirmation from "./onboarding/AddConfirmation"
 import Tooltip from "./onboarding/Tooltip"
 
@@ -79,7 +84,7 @@ export default {
     AddCommunityTab,
     CommunitiesList,
     ConnectionsTab,
-    WelcomeScreen,
+    WelcomeCommunities,
     AddConfirmation,
     Tooltip,
   },
@@ -150,10 +155,19 @@ export default {
     toggleCommunityTab() {
       if (this.isCommunityTabOpen) {
         this.state = States.Home
+
+        if(this.onboarding.current.matches("Communities.Form")) {
+          this.send('Added');
+        }
+
       } else {
         this.resetCommunity()
         this.state = States.AddCommunity
-        this.send("Communities.Add")
+
+        // Check to avoid opening confirmation if user hit Later
+        if (!this.onboarding.current.matches('Communities.Form')){
+          this.send("Communities.Add")
+        }
       }
     },
     editCommunity(community) {
@@ -186,7 +200,11 @@ export default {
 </script>
 
 <style scoped>
-.welcome-screen {
+* {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+
+.welcome-communities {
   position: absolute;
   top: 0;
   left: 0;

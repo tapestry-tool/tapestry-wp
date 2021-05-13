@@ -1,11 +1,11 @@
 <template>
-  <cos-modal show @change="$emit('later')">
+  <cos-modal show>
     <b-container class="confirm">
       <b-row align-h="center">
-        <h2 class="ob-title">Great job! Here are all your communities.</h2>
+        <h2 class="ob-title">Now that we have your communities <hr /> we can Add Your connections.</h2>
       </b-row>
       <b-row align-h="center">
-        <h4 class="ob-secondary">Would you like to add another community?</h4>
+        <h4 class="ob-secondary"></h4>
       </b-row>
       <b-row>
         <b-container>

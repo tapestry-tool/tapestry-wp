@@ -1,12 +1,12 @@
 <template>
-    <div class="modal ob-font">
+    <div class="modal">
     <b-container fluid class="center">
         <b-row align-h="center">
           <h1>Welcome to your <br /> circle of connections!</h1>
         </b-row >
 
         <b-row align-h="center">
-          <p class="ob-secondary">Let's start with you — what communities are you a part of?</p>
+          <p>Let's start with you — what communities are you a part of?</p>
         </b-row>
         
         <b-row align-h="center" class="ob-secondary">
