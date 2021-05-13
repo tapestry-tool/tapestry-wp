@@ -1,16 +1,16 @@
 <template>
-    <div class="modal">
+    <div class="modal ob-font">
     <b-container fluid class="center">
         <b-row align-h="center">
           <h1>Welcome to your <br /> circle of connections!</h1>
         </b-row >
 
         <b-row align-h="center">
-          <p>Let's start with you — what communities are you a part of?</p>
+          <h4 class="ob-secondary">Let's start with you — what communities are you a part of?</h4>
         </b-row>
         
-        <b-row align-h="center" class="ob-secondary">
-          <p>Here are a few ideas to get you started.</p>
+        <b-row align-h="center" >
+          <h5 class="ob-secondary">Here are a few ideas to get you started.</h5>
         </b-row>
 
         <b-row align-h="center" class="mt-2 mb-2">

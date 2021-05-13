@@ -1,22 +1,41 @@
 export const STARTER_COMMUNITIES = [
   {
-    name: "Family",
+    name: "FAMILY",
     icon: "💛",
     color: "#FF7878",
   },
   {
-    name: "School",
+    name: "SCHOOL",
     icon: "🎒",
     color: "#FDAB96",
   },
   {
-    name: "Sports",
+    name: "SPORTS",
     icon: "👟",
     color: "#FF9A3E",
   },
   {
-    name: "Volunteer",
+    name: "VOLUNTEER",
     icon: "🤲",
     color: "#FDDC80",
   },
+]
+
+export const STARTER_CONNECTIONS = [
+  {
+    name:"PARENT",
+    icon: "👩‍🎨"
+  },
+  {
+    name:"TEACHER",
+    icon: "🧑‍🏫"
+  },
+  {
+    name:"FRIEND",
+    icon: "👩‍🔬"
+  },
+  {
+    name:"TEAMMATE",
+    icon: "🤾🏻‍♂️"
+  }
 ]

@@ -17,8 +17,12 @@ export default {
      */
     refId: {
       type: String,
-      required: true,
+      required: false,
     },
+    position: {
+      type: String,
+      required: true,
+    }
   },
   data() {
     return {
@@ -31,8 +35,17 @@ export default {
     const tooltip = this.$refs.tooltip
 
     // Temporary fix of positioning
-    tooltip.style.right = "22px";
-    tooltip.style.bottom = "95px";
+    if (this.position === "right") {
+      tooltip.style.right = "22px";
+      tooltip.style.bottom = "95px";
+      tooltip.classList.add("tooltip-container-right")
+    } 
+    else if (this.position === "left") {
+      tooltip.style.left = "22px";
+      tooltip.style.bottom = "95px";
+      tooltip.classList.add("tooltip-container-left")
+    }
+    
     // const { x, y } = Helpers.positionTooltip(target, tooltip, container, {
     //   dryRun: true,
     // })
@@ -61,8 +74,7 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-top: 24px solid #fff;
-  bottom: -23px;
-  right: 25px;
+ bottom: -23px;
   z-index: 5;
 }
 
@@ -76,6 +88,19 @@ export default {
   border-right: 24px solid transparent;
   border-top: 24px solid #bbb;
   bottom:-24px;
+  
+}
+
+.tooltip-container-right::before,
+.tooltip-container-right::after {
+ 
   right: 25px;
 }
+
+.tooltip-container-left::before,
+.tooltip-container-left::after {
+
+  left: 25px;
+}
+
 </style>

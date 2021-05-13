@@ -15,6 +15,8 @@
       @add-connection="$emit('add-connection', $event)"
       @edit-connection="handleEditConnection"
       @add-community="$emit('add-community', $event)"
+      @connection-submitted="handleConnectionSubmitted"
+      @connection-closed="handleConnectionClosed"
     />
     <add-community-tab
       v-model="community"
@@ -30,17 +32,22 @@
       @continue="handleContinue"
     />
     <welcome-connections 
-      v-if="isState('Connection.Welcome')"
+      v-if="isState('Connections.Welcome')"
       class="welcome-connections"
+      @continue="handleContinue"
       />
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
       @later="send('AddLater')"
       @another="send('AddAnother')"
     />
+      <complete-view 
+        v-if="isState('Complete')"
+        :connections="connections"
+      />
     <tooltip
       v-if="isState('Communities.AddLaterTooltip')"
-      ref-id="community-tab-popup-trigger"
+      position="right"
     >
       <h3>
         Remember - you can click this button whenever you'd like to add another
@@ -50,10 +57,19 @@
     </tooltip>
     <tooltip
       v-if="isState('Communities.AddAnotherTooltip')"
-      ref-id="community-tab-popup-trigger"
+      position="right"
     >
       <h3>
         Click here to add another community!
+      </h3>
+      <b-button pill variant="secondary" @click="send('Add')">Got it &#8594 </b-button>
+    </tooltip>
+    <tooltip
+      v-if="isState('Connections.AddAnotherTooltip')"
+      position="left"
+    >
+      <h3>
+        Click here to add some <br /> of your connections!
       </h3>
       <b-button pill variant="secondary" @click="send('Add')">Got it &#8594 </b-button>
     </tooltip>
@@ -70,6 +86,8 @@ import { MAX_COMMUNITIES } from "../cos.config"
 import onboardingMachine, { OnboardingEvents, OnboardingStates } from "./onboardingMachine"
 import WelcomeCommunities from "./onboarding/WelcomeCommunities"
 import AddConfirmation from "./onboarding/AddConfirmation"
+import WelcomeConnections from "./onboarding/WelcomeConnections"
+import CompleteView from "./onboarding/CompleteView"
 import Tooltip from "./onboarding/Tooltip"
 
 const States = {
@@ -77,6 +95,7 @@ const States = {
   AddCommunity: 1,
   EditCommunity: 2,
   EditConnection: 3,
+  AddConnection: 4
 }
 
 export default {
@@ -86,6 +105,8 @@ export default {
     ConnectionsTab,
     WelcomeCommunities,
     AddConfirmation,
+    WelcomeConnections,
+    CompleteView,
     Tooltip,
   },
   props: {
@@ -149,7 +170,10 @@ export default {
       // TODO: Switch to onboarding state on initial load
     },
     handleContinue(communities) {
-      communities.forEach(community => this.$emit("add-community", community))
+      if(this.onboarding.current.matches('Communities.Welcome')) {
+        communities.forEach(community => this.$emit("add-community", community))
+      }
+      
       this.send(OnboardingEvents.Continue)
     },
     toggleCommunityTab() {
@@ -166,8 +190,22 @@ export default {
 
         // Check to avoid opening confirmation if user hit Later
         if (!this.onboarding.current.matches('Communities.Form')){
-          this.send("Communities.Add")
+          this.send("Add")
         }
+      }
+    },
+    handleConnectionSubmitted() { 
+      
+        if(this.onboarding.current.matches("Connections.Form") ||
+            this.onboarding.current.matches("Connections.AddAnotherTooltip")) {
+          this.send("Added")
+        }
+      
+    },
+    handleConnectionClosed(){
+      
+    if(this.onboarding.current.matches("Connections.Closed")) {
+        this.send("Done")
       }
     },
     editCommunity(community) {

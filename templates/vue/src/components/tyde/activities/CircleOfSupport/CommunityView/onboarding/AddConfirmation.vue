@@ -32,3 +32,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.row {
+    padding: 5px 0;
+}
+</style>
