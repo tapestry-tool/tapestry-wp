@@ -62,6 +62,7 @@ export default {
   opacity: 1;
   transition: opacity 0.4s ease-out;
   z-index: 10;
+  border-radius: 1px;
 
   button {
     background: none;
