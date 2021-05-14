@@ -41,9 +41,10 @@
       @later="send('AddLater')"
       @another="send('AddAnother')"
     />
-      <complete-view 
-        v-if="isState('Complete')"
+      <ob-finish-view 
+        v-if="isState('Connections.Finish')"
         :connections="connections"
+        @ob-finish="send('Done')"
       />
     <tooltip
       v-if="isState('Communities.AddLaterTooltip')"
@@ -87,7 +88,7 @@ import onboardingMachine, { OnboardingEvents, OnboardingStates } from "./onboard
 import WelcomeCommunities from "./onboarding/WelcomeCommunities"
 import AddConfirmation from "./onboarding/AddConfirmation"
 import WelcomeConnections from "./onboarding/WelcomeConnections"
-import CompleteView from "./onboarding/CompleteView"
+import ObFinishView from "./onboarding/ObFinishView"
 import Tooltip from "./onboarding/Tooltip"
 
 const States = {
@@ -106,7 +107,7 @@ export default {
     WelcomeCommunities,
     AddConfirmation,
     WelcomeConnections,
-    CompleteView,
+    ObFinishView,
     Tooltip,
   },
   props: {
@@ -120,6 +121,12 @@ export default {
     },
   },
   data() {
+    let startingState = onboardingMachine.initialState
+
+    if(Object.values(this.connections).length > 0){
+      
+    }
+
     return {
       state: States.Home,
       lastState: States.Home,
@@ -203,9 +210,8 @@ export default {
       
     },
     handleConnectionClosed(){
-      
-    if(this.onboarding.current.matches("Connections.Closed")) {
-        this.send("Done")
+    if(this.onboarding.current.matches("Connections.FormClosed")) {
+        this.send("Continue")
       }
     },
     editCommunity(community) {
