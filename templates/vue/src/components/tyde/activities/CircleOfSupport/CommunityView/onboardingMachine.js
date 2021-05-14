@@ -39,6 +39,7 @@ const onboardingMachine = createMachine({
         [Events.Empty]: "#Communities.Welcome",
         [Events.NoUserCommunities]: "#Communities.AddMoreConfirmation",
         [Events.NoConnections]: "#Connections.AddMoreConfirmation",
+        [Events.Continue]: "#Connections",
         [Events.Done]: OnboardingStates.Complete,
       },
     },

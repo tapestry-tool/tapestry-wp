@@ -23,7 +23,7 @@
       :show="isCommunityTabOpen"
       :disabled="!canAddCommunity"
       @back="state = lastState"
-      @add-community="$emit('add-community', $event)"
+      @add-community="obHandleAdded($event)"
       @toggle="toggleCommunityTab"
     />
     <welcome-communities
@@ -38,13 +38,13 @@
       />
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
-      @later="send('AddLater')"
-      @another="send('AddAnother')"
+      @later="send(OnboardingEvents.AddLater)"
+      @another="send(OnboardingEvents.AddAnother)"
     />
       <ob-finish-view 
         v-if="isState('Connections.Finish')"
         :connections="connections"
-        @ob-finish="send('Done')"
+        @ob-finish="send(OnboardingEvents.Done)"
       />
     <tooltip
       v-if="isState('Communities.AddLaterTooltip')"
@@ -54,7 +54,7 @@
         Remember - you can click this button whenever you'd like to add another
         community!
       </h3>
-      <b-button pill variant="secondary" @click="send('Continue')">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Continue)">Got it &#8594 </b-button>
     </tooltip>
     <tooltip
       v-if="isState('Communities.AddAnotherTooltip')"
@@ -63,7 +63,7 @@
       <h3>
         Click here to add another community!
       </h3>
-      <b-button pill variant="secondary" @click="send('Add')">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">Got it &#8594 </b-button>
     </tooltip>
     <tooltip
       v-if="isState('Connections.AddAnotherTooltip')"
@@ -72,7 +72,7 @@
       <h3>
         Click here to add some <br /> of your connections!
       </h3>
-      <b-button pill variant="secondary" @click="send('Add')">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">Got it &#8594 </b-button>
     </tooltip>
   </div>
 </template>
@@ -121,12 +121,6 @@ export default {
     },
   },
   data() {
-    let startingState = onboardingMachine.initialState
-
-    if(Object.values(this.connections).length > 0){
-      
-    }
-
     return {
       state: States.Home,
       lastState: States.Home,
@@ -171,10 +165,18 @@ export default {
       return this.onboarding.current.matches(state)
     },
     initializeOnboarding() {
+      let startingEvent = OnboardingEvents.Empty;
       // For now, always initialize the onboarding process at the start
-      this.send(OnboardingEvents.Empty)
+      if(Object.values(this.communities).length > 0){
+       startingEvent = OnboardingEvents.Continue
 
-      // TODO: Switch to onboarding state on initial load
+       if(Object.values(this.connections).length > 0)
+       {
+         startingEvent = OnboardingEvents.Done
+       }
+      }
+      this.send(startingEvent)
+
     },
     handleContinue(communities) {
       if(this.onboarding.current.matches('Communities.Welcome')) {
@@ -186,32 +188,29 @@ export default {
     toggleCommunityTab() {
       if (this.isCommunityTabOpen) {
         this.state = States.Home
-
-        if(this.onboarding.current.matches("Communities.Form")) {
-          this.send('Added');
-        }
-
       } else {
         this.resetCommunity()
         this.state = States.AddCommunity
+      }
+    },
+    obHandleAdded($event) {
+        this.$emit('add-community', $event)
 
-        // Check to avoid opening confirmation if user hit Later
-        if (!this.onboarding.current.matches('Communities.Form')){
-          this.send("Add")
-        }
+        if(this.onboarding.current.matches("Communities.Form")) {
+              this.send(OnboardingEvents.Added);
       }
     },
     handleConnectionSubmitted() { 
       
         if(this.onboarding.current.matches("Connections.Form") ||
             this.onboarding.current.matches("Connections.AddAnotherTooltip")) {
-          this.send("Added")
+          this.send(OnboardingEvents.Added)
         }
       
     },
     handleConnectionClosed(){
     if(this.onboarding.current.matches("Connections.FormClosed")) {
-        this.send("Continue")
+        this.send(OnboardingEvents.Continue)
       }
     },
     editCommunity(community) {

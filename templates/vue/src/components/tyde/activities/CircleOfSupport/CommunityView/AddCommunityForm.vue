@@ -181,6 +181,7 @@ export default {
         this.isLoading = false
         this.isInputTouched = false
         this.$emit("add-community", community)
+        
       })
     },
     /**
