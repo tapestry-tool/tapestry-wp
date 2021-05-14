@@ -32,6 +32,7 @@ describe("Sidebar", () => {
     cy.sidebar().within(() => cy.contains(/edit/i).click())
     cy.getByTestId("node-modal").should("be.visible")
     cy.contains(/cancel/i).click()
+    cy.contains(/close/i).click()
 
     cy.findByLabelText("copyright").click()
     assertActive("copyright")
