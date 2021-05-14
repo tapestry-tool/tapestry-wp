@@ -12,6 +12,7 @@ require_once __DIR__ . '/classes/class.tapestry-audio.php';
 require_once __DIR__ . '/classes/class.tapestry-form.php';
 require_once __DIR__ . '/classes/class.tapestry-h5p.php';
 require_once __DIR__ . '/classes/class.constants.php';
+require_once __DIR__ . '/endpoints/endpoints.circle-of-support.php';
 require_once __DIR__ . '/utilities/class.tapestry-user.php';
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
@@ -322,6 +323,62 @@ $REST_API_ENDPOINTS = [
             'callback' => 'optimizeTapestryNodeThumbnails',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
+    ],
+    'GET_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::get',
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT' => (object) [
+        'ROUTE' => '/activities/cos',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::save'
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_CONNECTIONS' => (object) [
+        'ROUTE' => '/activities/cos/connections',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnection'
+        ]
+    ],
+    'PUT_CIRCLE_OF_SUPPORT_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::updateConnection'
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
+        'ROUTE' => '/activities/cos/communities',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addCommunity'
+        ]
+    ],
+    'PUT_CIRCLE_OF_SUPPORT_COMMUNITIES' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::updateCommunity'
+        ]
+    ],
+    'POST_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_POST_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::addConnectionToCommunity'
+        ]
+    ],
+    'DELETE_CIRCLE_OF_SUPPORT_COMMUNITIES_CONNECTION' => (object) [
+        'ROUTE' => '/activities/cos/communities/(?P<communityId>[a-zA-Z0-9]+)/connections/(?P<connectionId>[a-zA-Z0-9]+)',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_DELETE_METHOD,
+            'callback' => 'CircleOfSupportEndpoints::removeConnectionFromCommunity'
+        ]
     ],
 ];
 
@@ -754,8 +811,10 @@ function addTapestryLink($request)
         if (!TapestryHelpers::userIsAllowed('ADD', $link->source, $postId)) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
-        if (!TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
-            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)) {
+        if (
+            !TapestryHelpers::userIsAllowed('ADD', $link->target, $postId)
+            && (!isset($link->addedOnNodeCreation) || !$link->addedOnNodeCreation)
+        ) {
             throw new TapestryError('ADD_LINK_PERMISSION_DENIED');
         }
         $tapestry = new Tapestry($postId);
@@ -849,8 +908,10 @@ function updateTapestryNode($request)
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
             throw new TapestryError('INVALID_CHILD_NODE');
         }
-        if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
-            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
+        if (
+            TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
+            !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)
+        ) {
             throw new TapestryError('NODE_APPROVAL_DENIED');
         }
 
@@ -1198,8 +1259,10 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) && 
-            !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
+        if (
+            !TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
+            !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)
+        ) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
         if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {

@@ -353,6 +353,10 @@ export default class Helpers {
     return out
   }
 
+  static clamp(min, val, max) {
+    return Math.max(min, Math.min(val, max))
+  }
+
   static createDefaultNode({ settings = {}, ...overrides } = {}) {
     const baseNode = {
       type: "tapestry_node",
