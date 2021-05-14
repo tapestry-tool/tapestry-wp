@@ -3,15 +3,36 @@
     v-if="node"
     id="node-modal"
     :visible="show"
-    :title="title"
     size="lg"
     class="text-muted"
     scrollable
+    :header-class="isMultiContentNodeChild ? 'modal-header-small' : ''"
     body-class="p-0"
     @hide="handleClose"
   >
+    <template #modal-title>
+      <b-link
+        v-if="isMultiContentNodeChild"
+        class="nav-item modal-header-link"
+        data-qa="node-modal-header-back"
+        @click="handleClose"
+      >
+        <i class="fas fa-chevron-left fa-xs" />
+        Back to "{{ parent.title }}"
+      </b-link>
+      <div v-else data-qa="node-modal-header">
+        {{ title }}
+      </div>
+    </template>
     <b-container fluid class="px-0" data-qa="node-modal">
       <b-overlay :show="loading" variant="white">
+        <h4
+          v-if="isMultiContentNodeChild"
+          data-qa="node-modal-title"
+          class="modal-header"
+        >
+          {{ title }}
+        </h4>
         <div v-if="hasSubmissionError" class="error-wrapper">
           <h5>Node cannot be saved due to the following error(s):</h5>
           <ul>
@@ -22,16 +43,25 @@
           <b-tab
             title="Content"
             :active="tab === 'content'"
-            style="overflow-x: hidden;"
+            style="overflow: hidden;"
             @click="changeTab('content')"
           >
             <content-form
+              :parent="parent"
               :node="node"
+              :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
             />
+          </b-tab>
+          <b-tab
+            title="References"
+            :active="tab === 'references'"
+            @click="changeTab('references')"
+          >
+            <references-form :node="node" />
           </b-tab>
           <b-tab
             title="Appearance"
@@ -70,7 +100,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'accordion' || node.hasSubAccordion"
+            v-if="node.hasMultiContentChild"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -104,11 +134,11 @@
             <coordinates-form :node="node" />
           </b-tab>
           <b-tab
-            title="More Information"
-            :active="tab === 'more-information'"
-            @click="changeTab('more-information')"
+            title="Copyright"
+            :active="tab === 'copyright'"
+            @click="changeTab('copyright')"
           >
-            <more-information-form :node="node" />
+            <copyright-form :node="node" />
           </b-tab>
         </b-tabs>
       </b-overlay>
@@ -121,8 +151,11 @@
               v-if="type === 'edit'"
               :node-id="Number(nodeId)"
               :disabled="loading || fileUploading"
+              :isMultiContentNodeChild="isMultiContentNodeChild"
+              @submit="loading = true"
               @setLoading="setLoading"
               @message="setDisabledMessage"
+              @complete="loading = false"
             ></delete-node-button>
             <span style="flex-grow:1;"></span>
             <b-button
@@ -155,7 +188,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else-if="this.settings.submitNodesEnabled"
+              v-else-if="settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
@@ -223,7 +256,8 @@ import BehaviourForm from "./forms/BehaviourForm"
 import ConditionsForm from "./forms/ConditionsForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
-import MoreInformationForm from "./forms/MoreInformationForm"
+import CopyrightForm from "./forms/CopyrightForm"
+import ReferencesForm from "./forms/ReferencesForm"
 import PermissionsTable from "../common/PermissionsTable"
 import DeleteNodeButton from "./DeleteNodeButton"
 import { names } from "@/config/routes"
@@ -251,7 +285,8 @@ export default {
     ActivityForm,
     ConditionsForm,
     CoordinatesForm,
-    MoreInformationForm,
+    CopyrightForm,
+    ReferencesForm,
     SlickItem,
     SlickList,
     PermissionsTable,
@@ -269,6 +304,7 @@ export default {
       loadDuration: false,
       warningText: "",
       deleteWarningText: "",
+      keepOpen: false,
     }
   },
   computed: {
@@ -383,6 +419,9 @@ export default {
     hasSubmissionError() {
       return this.errors.length
     },
+    isMultiContentNodeChild() {
+      return this.parent && this.parent.mediaType == "multi-content"
+    },
   },
   watch: {
     nodeId: {
@@ -441,6 +480,10 @@ export default {
       } else if (fileId.thumbnailType == "thumbnail") {
         this.node.thumbnailFileId = fileId.data
       }
+    })
+    this.$root.$on("add-node", () => {
+      this.keepOpen = true
+      this.handlePublish()
     })
     this.initialize()
   },
@@ -501,7 +544,7 @@ export default {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
       }
-      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      copy.hasMultiContentChild = this.hasMultiContentChild(copy)
       if (!copy.mapCoordinates) {
         copy.mapCoordinates = {
           lat: "",
@@ -513,7 +556,13 @@ export default {
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
-      const okTabs = ["content", "appearance", "more-information", "coordinates"]
+      const okTabs = [
+        "content",
+        "references",
+        "appearance",
+        "copyright",
+        "coordinates",
+      ]
       if (okTabs.includes(requestedTab)) {
         return true
       }
@@ -531,18 +580,18 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return this.node.mediaType === "accordion" || this.node.hasSubAccordion
+          return this.node.hasMultiContentChild
         }
       }
 
       return false
     },
-    hasSubAccordion(node) {
+    hasMultiContentChild(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return this.parent.mediaType === "accordion" && children.length > 0
+        return children.length > 0
       }
-      return false
+      return node.mediaType === "multi-content"
     },
     setDisabledMessage(msg) {
       this.deleteWarningText = msg
@@ -580,13 +629,20 @@ export default {
           })
           .catch(err => console.log(err))
       } else {
-        this.close()
+        this.close(event)
       }
     },
-    close() {
+    close(event = null) {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
+        } else if (this.keepOpen) {
+          // Switch to edit mode if multi-content just added
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.node.id, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
         } else if (this.rootId && !this.nodeId) {
           // We just added a root node
           this.$router.push({
@@ -594,14 +650,28 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
+        } else if (
+          this.isMultiContentNodeChild &&
+          this.$route.query.nav === "modal"
+        ) {
+          // Prevent NodeModal from closing
+          if (event) event.preventDefault()
+
+          // Return to modal of parent node
+          this.$router.push({
+            name: names.MODAL,
+            params: { nodeId: this.parent.id, type: "edit", tab: "content" },
+            query: this.$route.query,
+          })
         } else {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: this.$route.query,
+            query: { ...this.$route.query, nav: undefined },
           })
         }
       }
+      this.keepOpen = false
       this.setTapestryErrorReporting(true)
     },
     async handleSubmit() {
@@ -659,12 +729,12 @@ export default {
             addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
+          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {
-                childOrdering: [...this.parent.childOrdering, id],
+                childOrdering: [...this.parent.childOrdering],
               },
             })
           }
@@ -806,10 +876,11 @@ export default {
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
     },
-    handleTypeChange() {
+    handleTypeChange(evt) {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
       )
+      if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
       if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
@@ -1001,6 +1072,16 @@ table {
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+.modal-header-small {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.modal-header-link {
+  font-weight: normal;
+  font-size: 16px;
 }
 
 .error-wrapper {

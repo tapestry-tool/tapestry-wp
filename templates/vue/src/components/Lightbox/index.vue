@@ -11,16 +11,22 @@
     :allow-close="canSkip"
     @close="handleUserClose"
   >
-    <accordion-media
-      v-if="node.mediaType === 'accordion'"
+    <multi-content-media
+      v-if="node.mediaType === 'multi-content'"
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
       @close="handleAutoClose"
       @complete="complete"
     />
+    <page-menu
+      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+      :node="node"
+      :rowRefs="rowRefs"
+      :dimensions="dimensions"
+    />
     <tapestry-media
-      v-else
+      v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
       :dimensions="dimensions"
       context="lightbox"
@@ -36,8 +42,9 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import TapestryModal from "./TapestryModal"
-import AccordionMedia from "./media/AccordionMedia"
+import MultiContentMedia from "./media/MultiContentMedia"
 import TapestryMedia from "./media/TapestryMedia"
+import PageMenu from "./media/MultiContentMedia/PageMenu"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
@@ -46,9 +53,10 @@ import DragSelectModular from "@/utils/dragSelectModular"
 export default {
   name: "lightbox",
   components: {
-    AccordionMedia,
+    MultiContentMedia,
     TapestryMedia,
     TapestryModal,
+    PageMenu,
   },
   props: {
     nodeId: {
@@ -73,11 +81,12 @@ export default {
         left: 50,
       },
       showCompletionScreen: false,
+      rowRefs: [],
     }
   },
   computed: {
     ...mapState(["h5pSettings", "rootId"]),
-    ...mapGetters(["getNode", "isAccordion", "isAccordionRow"]),
+    ...mapGetters(["getNode", "isMultiContent", "isMultiContentRow"]),
     node() {
       const node = this.getNode(this.nodeId)
       return node
@@ -99,9 +108,18 @@ export default {
         styles.width = "100vw"
         styles.height = "100vh"
         styles.position = "relative"
+
+        const adminBar = document.getElementById("wpadminbar")
+        if (adminBar) {
+          styles.top = `${adminBar.clientHeight}px`
+          styles.height = `calc(100vh - ${styles.top})`
+        }
       }
 
-      if (this.node.mediaType === "accordion") {
+      if (this.node.mediaType === "multi-content") {
+        styles.display = "flex"
+        // Reversed because PageMenu is placed after MultiContentMedia for refs to correctly render
+        styles.flexDirection = "row-reverse"
         return Object.assign(styles, { padding: "24px" })
       }
 
@@ -190,8 +208,8 @@ export default {
       handler(rowId) {
         if (rowId) {
           if (
-            !this.isAccordion(this.nodeId) ||
-            !this.isAccordionRow(rowId, this.nodeId)
+            !this.isMultiContent(this.nodeId) ||
+            !this.isMultiContentRow(rowId, this.nodeId)
           ) {
             this.$router.replace({
               name: names.LIGHTBOX,
@@ -206,7 +224,7 @@ export default {
       immediate: true,
       handler(subRowId) {
         if (subRowId) {
-          if (!this.isAccordionRow(subRowId, this.rowId)) {
+          if (!this.isMultiContentRow(subRowId, this.rowId)) {
             this.$router.replace({
               name: names.ACCORDION,
               params: { nodeId: this.nodeId, rowId: this.rowId },
@@ -220,10 +238,19 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tapestry-lightbox-open")
     DragSelectModular.removeDragSelectListener()
+    if (this.node.mediaType === "multi-content") {
+      this.$root.$on("observe-rows", refs => {
+        this.rowRefs = this.rowRefs.concat(refs)
+      })
+    }
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
     DragSelectModular.addDragSelectListener()
+    this.$router.push({
+      ...this.$route,
+      query: { ...this.$route.query, row: undefined },
+    })
   },
   methods: {
     ...mapActions(["completeNode"]),
@@ -278,7 +305,7 @@ body.tapestry-lightbox-open {
 <style lang="scss" scoped>
 .content-text {
   .media-wrapper {
-    overflow: scroll;
+    overflow: auto;
   }
 }
 

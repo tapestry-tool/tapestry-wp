@@ -39,14 +39,6 @@
         ></rich-text-form>
       </b-form-group>
     </b-form-group>
-    <b-form-group label="References">
-      <rich-text-form
-        id="node-references"
-        v-model="node.references"
-        data-testid="node-references"
-        placeholder="Enter your references here"
-      ></rich-text-form>
-    </b-form-group>
   </div>
 </template>
 

@@ -24,51 +24,59 @@ export function getParent(state) {
   }
 }
 
-export function isAccordion(_, { getNode, isSubAccordion }) {
+export function isMultiContent(_, { getNode, isNestedMultiContent }) {
   return id => {
     const node = getNode(id)
-    return node.mediaType === "accordion" || isSubAccordion(id)
+    return node.mediaType === "multi-content" || isNestedMultiContent(id)
   }
 }
 
-export function isSubAccordion(_, { getNode, getParent }) {
+export function isNestedMultiContent(_, { getNode, getParent }) {
   return id => {
     const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
-      return parentNode.mediaType === "accordion"
+      return parentNode.mediaType === "multi-content"
     }
     return false
   }
 }
 
-export function isAccordionRow(_, { getParent, isAccordion }) {
-  return (id, accordion) => {
+export function isMultiContentRow(_, { getParent, isMultiContent }) {
+  return (id, multiContent) => {
     const parent = getParent(id)
     if (!parent) {
       return false
     }
-    if (accordion !== undefined) {
-      return parent === accordion
+    if (multiContent !== undefined) {
+      return parent === multiContent
     }
-    return isAccordion(parent)
+    return isMultiContent(parent)
   }
 }
 
-export function hasAccordionAncestor(_, { getParent, isSubAccordion }) {
+export function hasMultiContentAncestor(_, { getParent, isNestedMultiContent }) {
   return id => {
+    const visited = new Set()
     let nodeId = id
     while (nodeId) {
+      visited.add(nodeId)
+
       let parent = getParent(nodeId)
       if (!parent) return false
-      if (isSubAccordion(nodeId)) return true
+      if (isNestedMultiContent(nodeId)) return true
+
+      if (visited.has(parent)) {
+        break
+      }
+
       nodeId = parent
     }
     return false
   }
 }
 
-export function isVisible(state, { getNode, hasAccordionAncestor }) {
+export function isVisible(state, { getNode, hasMultiContentAncestor }) {
   const { showRejected } = state.settings
   return id => {
     const node = getNode(id)
@@ -79,7 +87,7 @@ export function isVisible(state, { getNode, hasAccordionAncestor }) {
       return false
     }
     if (!Helpers.hasPermission(node, "edit", showRejected)) {
-      return !hasAccordionAncestor(node.id)
+      return !hasMultiContentAncestor(node.id)
     }
     return true
   }
