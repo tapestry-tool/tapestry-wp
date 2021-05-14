@@ -155,6 +155,8 @@ export default {
       this.$emit("close")
     },
     next() {
+      this.showEndScreen = false
+      this.showActivityScreen = false
       this.$emit("next")
     },
     getInitialEndScreenState() {

@@ -10,7 +10,7 @@
         :node="node"
         :hasNext="hasNext"
         @rewatch="rewatch"
-        @close="close()"
+        @close="close"
         @show-quiz="openQuiz"
         @next="next"
       />
@@ -156,6 +156,8 @@ export default {
       this.$emit("close")
     },
     next() {
+      this.showEndScreen = false
+      this.showActivityScreen = false
       this.$emit("next")
     },
     getInitialEndScreenState() {
