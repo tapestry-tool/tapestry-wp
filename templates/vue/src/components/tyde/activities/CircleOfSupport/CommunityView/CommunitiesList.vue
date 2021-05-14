@@ -193,7 +193,14 @@ export default {
 
       const [communityRef] = this.$refs[`${communityId}-icon`]
       const tooltipRef = this.$refs["community-tooltip"]
-      this.$nextTick(() => Helpers.positionTooltip(communityRef, tooltipRef,document.getElementById("cos")))
+
+      this.$nextTick(() =>
+        Helpers.positionTooltip(
+          communityRef,
+          tooltipRef,
+          document.getElementById("cos")
+        )
+      )
     },
     toggleConnectionInfo(connectionId, communityId) {
       const refName = `${connectionId}-${communityId}`

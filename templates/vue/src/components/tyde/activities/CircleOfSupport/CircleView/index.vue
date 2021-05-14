@@ -161,8 +161,8 @@ export default {
   },
   methods: {
     getCircleBackground(index) {
-      if (this.activeCircle === index && this.draggingConnection) {
-        return `#ececec`
+      if (this.activeCircle === index) {
+        return `hsl(0, 0%, 93%)`
       }
       return "white"
     },
@@ -187,14 +187,16 @@ export default {
 
       if (this.draggingConnection) {
         const oldCircle = this.getCircle(this.draggingConnection.id)
-        if (oldCircle != null) {
-          await this.removeConnectionFromCircle(
-            oldCircle,
-            this.draggingConnection.id
-          )
-        }
-
-        if (this.activeCircle !== CircleStates.All) {
+        if (
+          oldCircle != this.activeCircle &&
+          this.activeCircle !== CircleStates.All
+        ) {
+          if (oldCircle != null) {
+            await this.removeConnectionFromCircle(
+              oldCircle,
+              this.draggingConnection.id
+            )
+          }
           this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
           this.activeCircle = CircleStates.All
         }

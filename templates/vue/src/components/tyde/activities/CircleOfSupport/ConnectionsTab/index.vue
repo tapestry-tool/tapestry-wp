@@ -224,7 +224,7 @@ export default {
   max-height: 80%;
   display: flex;
   flex-direction: column;
-  z-index: 50;
+  z-index: 9;
 
   &.show {
     z-index: 75;
