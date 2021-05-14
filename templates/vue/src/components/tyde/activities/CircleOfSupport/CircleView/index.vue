@@ -187,14 +187,16 @@ export default {
 
       if (this.draggingConnection) {
         const oldCircle = this.getCircle(this.draggingConnection.id)
-        if (oldCircle != null) {
-          await this.removeConnectionFromCircle(
-            oldCircle,
-            this.draggingConnection.id
-          )
-        }
-
-        if (this.activeCircle !== CircleStates.All) {
+        if (
+          oldCircle != this.activeCircle &&
+          this.activeCircle !== CircleStates.All
+        ) {
+          if (oldCircle != null) {
+            await this.removeConnectionFromCircle(
+              oldCircle,
+              this.draggingConnection.id
+            )
+          }
           this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
           this.activeCircle = CircleStates.All
         }
