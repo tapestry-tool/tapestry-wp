@@ -133,6 +133,7 @@ export default {
         icon: "👨‍👩‍👦",
         color: "",
       },
+      OnboardingEvents: OnboardingEvents
     }
   },
   computed: {
@@ -196,7 +197,8 @@ export default {
     obHandleAdded($event) {
         this.$emit('add-community', $event)
 
-        if(this.onboarding.current.matches("Communities.Form")) {
+        if(this.onboarding.current.matches("Communities.Form") || 
+            this.onboarding.current.matches("Communities.AddAnotherTooltip")) {
               this.send(OnboardingEvents.Added);
       }
     },
