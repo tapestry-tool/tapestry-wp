@@ -12,6 +12,7 @@
         v-model="color"
         
         show-fallback
+        show-border
         fallback-input-type="color"
         
         popover-x="left"
@@ -59,5 +60,8 @@ export default {
 <style lang="scss" scoped>
 .swatch {
   margin-left: 10px;
+  border-radius: 11px;
+  border: 1px solid black;
+  height: 44px;
 }
 </style>
