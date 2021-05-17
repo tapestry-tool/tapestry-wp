@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     ...mapState(["links"]),
-    ...mapGetters(["getNode", "isAccordion"]),
+    ...mapGetters(["getNode", "isMultiContent"]),
   },
   mounted() {
     bus.$on("mouseover", id => {
@@ -94,22 +94,22 @@ export default {
             if (shouldAddLink) {
               const getLinkState = link => {
                 if (
-                  this.isAccordion(link.source.id) &&
-                  this.isAccordion(link.target.id)
+                  this.isMultiContent(link.source.id) &&
+                  this.isMultiContent(link.target.id)
                 ) {
                   return { state: "NORMAL", data: link }
                 }
                 if (
-                  this.isAccordion(link.source.id) ||
-                  this.isAccordion(link.target.id)
+                  this.isMultiContent(link.source.id) ||
+                  this.isMultiContent(link.target.id)
                 ) {
                   return {
                     state: "ADD-ROW",
                     data: {
-                      source: this.isAccordion(link.source.id)
+                      source: this.isMultiContent(link.source.id)
                         ? link.source
                         : link.target,
-                      target: this.isAccordion(link.source.id)
+                      target: this.isMultiContent(link.source.id)
                         ? link.target
                         : link.source,
                     },
