@@ -10,10 +10,12 @@
           node.mediaFormat === 'youtube',
       },
     ]"
+    @mouseenter="setHovered"
   >
     <text-media
       v-if="node.mediaType === 'text'"
       :node="node"
+      :context="context"
       @complete="complete"
       @load="handleLoad"
     />
@@ -22,6 +24,7 @@
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -32,6 +35,7 @@
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -41,6 +45,7 @@
       v-if="node.mediaType === 'url-embed'"
       :dimensions="dimensions"
       :node="node"
+      :context="context"
       @load="handleLoad"
       @complete="complete"
     />
@@ -59,18 +64,22 @@
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
+      :node="node"
+      :context="context"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
+      :context="context"
       @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
       v-if="node.mediaType === 'activity' || node.mediaType === 'question'"
       :node="node"
+      :context="context"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -144,6 +153,15 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
+    setHovered() {
+      this.$router.push({
+        ...this.$route,
+        query: {
+          ...this.$route.query,
+          row: this.nodeId,
+        },
+      })
+    },
     handleFormSubmit() {
       this.showCompletionScreen = true
       this.complete()
@@ -163,10 +181,9 @@ export default {
 
 <style lang="scss" scoped>
 .media-wrapper {
-  background: inherit;
   outline: none;
   border-radius: 15px;
-  overflow: scroll;
+  overflow: auto;
   height: 100%;
   padding: 0;
 
