@@ -19,6 +19,7 @@ To get started with developing locally:
 - Setup your local dev environment. You have 2 options for your local development:
   1. *Using LAMP/MAMP/WAMP:* Follow the detailed instruction for [Mac, Windows](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-(Mac-&-Windows)), or [Linux](https://github.com/wynnset/tapestry-wp/wiki/Getting-Started-on-Arch-Linux).
   2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
+- Duplicate the .env.example file in the root directory and name it .env
 - Follow the steps below under "Getting external links to work"
 - Follow the steps below under "Getting video uploads to work"
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
@@ -54,15 +55,7 @@ Videos are being uploaded to Kaltura. To set this up locally:
 
 *Using LAMP/MAMP/WAMP:*
 
-1. In the `tapestry-wp` directory, run `composer install` to install the `kaltura-api-client`. If successful, you will be able to see a `vendor` folder containing `kaltura`.
-2. Go to your Apache configurations and add the following:
-    ```
-    SetEnv KALTURA_ADMIN_SECRET "<secret-admin>"
-    SetEnv KALTURA_PARTNER_ID "<secret-id>"
-    SetEnv KALTURA_SERVICE_URL "<secret-url>"
-    ```
-    where `<secret-*>` are the secrets retrieved from your team.
-
-    If you're already running Apache, restart Apache to update the environment variables.
+1. In the `tapestry-wp` directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura` and a few other folders.
+2. Go to the .env file in your root and add values for the lines starting with KALTURA. These values can be obtained from the Kaltura developer dashboard.
 
 You should now be able to upload videos onto Kaltura.

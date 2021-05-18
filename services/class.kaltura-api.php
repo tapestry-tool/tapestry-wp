@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/../vendor/autoload.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/autoload.php';
 
 use Kaltura\Client\Client;
 use Kaltura\Client\Configuration;
@@ -13,9 +13,8 @@ use Kaltura\Client\Type\MediaEntry;
 use Kaltura\Client\Type\UploadedFileTokenResource;
 use Kaltura\Client\Type\UploadToken;
 
-define("KALTURA_ADMIN_SECRET", getenv("KALTURA_ADMIN_SECRET"));
-define("KALTURA_PARTNER_ID", getenv("KALTURA_PARTNER_ID"));
-define("KALTURA_SERVICE_URL", getenv("KALTURA_SERVICE_URL"));
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
 
 class KalturaApi {
 
@@ -27,10 +26,10 @@ class KalturaApi {
     function getKClient($type = SessionType::USER) 
     {
         $user = wp_get_current_user()->ID;
-        $kconf = new Configuration(KALTURA_PARTNER_ID);
-        $kconf->setServiceUrl(KALTURA_SERVICE_URL);
+        $kconf = new Configuration($_ENV['KALTURA_PARTNER_ID']);
+        $kconf->setServiceUrl($_ENV['KALTURA_SERVICE_URL']);
         $kclient = new Client($kconf);
-        $ksession = $kclient->session->start(KALTURA_ADMIN_SECRET, $user, $type, KALTURA_PARTNER_ID);
+        $ksession = $kclient->session->start($_ENV['KALTURA_ADMIN_SECRET'], $user, $type, $_ENV['KALTURA_PARTNER_ID']);
 
         if (!isset($ksession)) {
             throw new TapestryError("Unable to establish Kaltura session.");
