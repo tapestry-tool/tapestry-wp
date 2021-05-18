@@ -1,11 +1,14 @@
 <template>
-  <activity-screen
-    :id="node.id"
-    style="position: relative;"
-    @submit="handleSubmit"
-    @back="$emit('close')"
-    @close="$emit('close')"
-  />
+  <div>
+    <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
+    <activity-screen
+      :id="node.id"
+      style="position: relative;"
+      @submit="handleSubmit"
+      @back="$emit('close')"
+      @close="$emit('close')"
+    />
+  </div>
 </template>
 
 <script>
@@ -21,6 +24,16 @@ export default {
     node: {
       type: Object,
       required: true,
+    },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
+  },
+  computed: {
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   mounted() {
@@ -41,3 +54,16 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.media-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.9em;
+
+  :before {
+    display: none;
+  }
+}
+</style>
