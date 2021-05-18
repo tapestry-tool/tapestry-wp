@@ -1,5 +1,13 @@
 <template>
   <div class="container">
+    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <loading v-if="isLoading" label="Loading H5P media..." />
+    <play-screen
+      v-if="showPlayScreen && !isLoading"
+      class="play-screen"
+      :hide-video="isYouTube"
+      @play="handlePlay"
+    />
     <end-screen
       v-if="showEndScreen"
       :node="node"
@@ -13,7 +21,6 @@
       @back="back"
       @close="close"
     />
-    <loading v-if="isLoading" label="Loading H5P media..." />
     <h5p-iframe
       ref="h5pIframe"
       :autoplay="autoplay"
@@ -23,7 +30,7 @@
       :settings="h5pSettings"
       @complete="$emit('complete')"
       @change:dimensions="$emit('change:dimensions', $event)"
-      @is-loaded="handleLoad"
+      @is-loaded="handleLoad($event)"
       @timeupdate="$emit('timeupdate', $event)"
       @show-end-screen="showEndScreen = true"
       @show-play-screen="showPlayScreen = $event"
@@ -36,6 +43,7 @@
 import { mapActions, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import Loading from "@/components/common/Loading"
+import PlayScreen from "../common/PlayScreen"
 import EndScreen from "../common/EndScreen"
 import H5PIframe from "./H5PIframe"
 import ActivityScreen from "../common/ActivityScreen"
@@ -44,6 +52,7 @@ export default {
   name: "h5p-media",
   components: {
     EndScreen,
+    PlayScreen,
     "h5p-iframe": H5PIframe,
     Loading,
     ActivityScreen,
@@ -70,6 +79,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      isYouTube: false,
       showEndScreen: false,
       showActivityScreen: false,
       showPlayScreen: !this.autoplay,
@@ -77,6 +87,9 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
+    },
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
@@ -97,9 +110,18 @@ export default {
       this.showActivityScreen = false
       this.showEndScreen = true
     },
-    handleLoad() {
+    handleLoad(h5p) {
       this.isLoading = false
       this.$emit("load")
+      this.isYouTube = h5p.isYouTube
+      if (h5p.library !== "H5P.InteractiveVideo") {
+        this.showPlayScreen = false
+      }
+    },
+    handlePlay() {
+      this.showPlayScreen = false
+      this.showEndScreen = false
+      this.$refs.h5pIframe.play()
     },
     updateSettings(settings) {
       client.recordAnalyticsEvent(
@@ -122,5 +144,21 @@ export default {
   height: 100%;
   max-width: 100vw;
   padding: 0;
+
+  .video-title {
+    text-align: left;
+    margin-bottom: 0.9em;
+    font-weight: 500;
+    font-size: 1.75rem;
+
+    :before {
+      display: none;
+    }
+  }
+
+  .play-screen {
+    margin-bottom: 37px;
+    max-width: 100vw;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "headless-accordion",
+  name: "headless-multi-content",
   props: {
     rows: {
       type: Array,
@@ -18,10 +18,19 @@ export default {
   },
   methods: {
     isVisible(row) {
-      return this.value === row
+      if (this.value === row) {
+        return true
+      } else if (this.$route.params.subRowId) {
+        // To handle multiple rows
+        const subRowId = this.$route.params.subRowId.toString()
+        return subRowId.includes(",")
+          ? subRowId.split(",").includes(row.toString())
+          : row === this.$route.params.subRowId
+      }
+      return false
     },
     toggle(row) {
-      this.$emit("input", this.isVisible(row) ? null : row)
+      this.$emit("input", { rowId: this.isVisible(row) ? null : row })
     },
     next() {
       if (this.hasNext) {
