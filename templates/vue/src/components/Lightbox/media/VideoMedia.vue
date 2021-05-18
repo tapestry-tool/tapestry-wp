@@ -1,34 +1,37 @@
 <template>
-  <div
-    :class="[
-      'video-container',
-      { fullscreen: node.fullscreen, 'allow-scroll': showActivityScreen },
-    ]"
-  >
-    <play-screen v-if="showPlayScreen" @play="handlePlay" />
-    <end-screen
-      v-if="showEndScreen"
-      :node="node"
-      @rewatch="rewatch"
-      @close="close"
-      @show-quiz="openQuiz"
-    />
-    <activity-screen
-      v-else-if="showActivityScreen"
-      :id="node.id"
-      @back="back"
-      @close="close"
-    />
-    <video
-      ref="video"
-      controls
-      :src="node.typeData.mediaURL"
-      :style="videoStyles"
-      @loadeddata="handleLoad"
-      @play="handlePlay(node)"
-      @pause="handlePause(node)"
-      @timeupdate="updateVideoProgress"
-    ></video>
+  <div>
+    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <div
+      :class="[
+        'video-container',
+        { fullscreen: node.fullscreen, 'allow-scroll': showActivityScreen },
+      ]"
+    >
+      <play-screen v-if="showPlayScreen" @play="handlePlay" />
+      <end-screen
+        v-if="showEndScreen"
+        :node="node"
+        @rewatch="rewatch"
+        @close="close"
+        @show-quiz="openQuiz"
+      />
+      <activity-screen
+        v-else-if="showActivityScreen"
+        :id="node.id"
+        @back="back"
+        @close="close"
+      />
+      <video
+        ref="video"
+        controls
+        :src="node.typeData.mediaURL"
+        :style="videoStyles"
+        @loadeddata="handleLoad"
+        @play="handlePlay(node)"
+        @pause="handlePause(node)"
+        @timeupdate="updateVideoProgress"
+      ></video>
+    </div>
   </div>
 </template>
 
@@ -64,6 +67,11 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -95,6 +103,9 @@ export default {
         }
       }
       return { width: "100%" }
+    },
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   watch: {
@@ -238,6 +249,17 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.video-title {
+  text-align: left;
+  margin-bottom: 0.9em;
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
   }
 }
 </style>
