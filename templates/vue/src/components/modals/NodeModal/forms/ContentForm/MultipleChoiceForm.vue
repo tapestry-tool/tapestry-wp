@@ -12,10 +12,11 @@
     :index="index"
     :node="node" 
     :multipleChoiceSelected="multipleChoiceSelected"
-    :multipleAnswerSelected="multipleAnswerSelected">
+    :multipleAnswerSelected="multipleAnswerSelected"
+    v-on:remove="choiceRows.splice(index,1)" >
     </choice-row>
     
-    <b-button v-on:click="addRadioButton">Add a choice</b-button>
+    <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
   </b-form-group>
 </div>
 </template>
@@ -57,14 +58,24 @@ export default {
           title: '3rd Choice'
         },
       ],
-      nextChoiceRowId: 4
+      nextChoiceRowId: 4,
+      newChoiceRowTitle: '',
     }
   },
   methods: {
-     addRadioButton: function(event) {
-       alert("hello")
-       document.getElementById("radio-group").appendChild(node);
+     addNewChoice: function() {
+       this.choiceRows.push({
+         id: this.nextChoiceRowId++,
+         title: this.newChoiceRowTitle
+       })
+       this.newChoiceRowTitle=''
      }
   },
 }
 </script>
+
+<style lang="scss">
+.addButton {
+  margin-top: 20px;
+}
+</style>

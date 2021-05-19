@@ -1,10 +1,15 @@
 <template>
 <div>
   <b-form-checkbox
-    v-if="multipleChoiceSelected && multipleAnswerSelected" 
-    :value="key"><b-form-input :placeholder="placeholder" ></b-form-input></b-form-checkbox>  
+    v-if="multipleChoiceSelected && multipleAnswerSelected" :value="key" class="container">
+    <b-form-input :placeholder="placeholder" ></b-form-input>
+    <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
+    </b-form-checkbox>  
   <b-form-radio v-else-if="multipleChoiceSelected && !multipleAnswerSelected" 
-  :value="key" name="radios"><b-form-input :placeholder="placeholder" ></b-form-input></b-form-radio> 
+  :value="key" name="radios">
+  <b-form-input :placeholder="placeholder" ></b-form-input>
+  <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
+  </b-form-radio> 
 </div>
 </template>
 
@@ -40,3 +45,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.container {
+  display: inline-block;
+}
+
+</style>
