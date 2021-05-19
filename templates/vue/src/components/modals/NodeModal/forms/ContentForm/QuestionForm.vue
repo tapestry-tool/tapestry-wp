@@ -100,7 +100,7 @@
               name="multiple-answer"
               :value="true"
             >
-              Select Multiple Answer
+              Select Multiple Answer(Checkbox)
             </b-form-radio>
             <b-form-radio
               v-model="hasMultipleChoiceMultiAnswerOption"
@@ -108,7 +108,7 @@
               name="one-answer"
               :value="false"
             >
-              Select One Answer
+              Select One Answer(Radio Button)
             </b-form-radio>
           </b-form-group>
 
