@@ -120,9 +120,12 @@
               Select One Answer(Radio Button)
             </b-form-radio>
           </b-form-group>
+          <b-form-group v-if="node.typeData.options.multipleChoice" label="">
+            <multiple-choice-form :node="node" 
+            :multipleChoiceSelected="hasMultipleChoiceOption"
+            :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"/>
+          </b-form-group>
         </b-card>
-
-
         <b-card
           sub-title="Confirmation Page Customization"
           bg-variant="light"
@@ -151,6 +154,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./RichTextForm"
 import Helpers from "@/utils/Helpers"
+import MultipleChoiceForm from './MultipleChoiceForm.vue'
 
 const defaultQuestion = {
   text: "",
@@ -165,6 +169,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    MultipleChoiceForm,
   },
   props: {
     node: {
