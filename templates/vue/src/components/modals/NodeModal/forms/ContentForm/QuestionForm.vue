@@ -93,6 +93,25 @@
             </b-form-radio>
           </b-form-group>
 
+          <b-form-group v-if="node.typeData.options.multipleChoice" label="Multiple Choice">
+            <b-form-radio
+              v-model="hasMultipleAnswerOption"
+              data-qa="question-answer-multipleChoice-multi"
+              name="multiple-answer"
+              :value="true"
+            >
+              Select Multiple Answer
+            </b-form-radio>
+            <b-form-radio
+              v-model="hasMultipleAnswerOption"
+              data-qa="question-answer-multipleChoice-single"
+              name="one-answer"
+              :value="false"
+            >
+              Select One Answer
+            </b-form-radio>
+          </b-form-group>
+
           <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
             <label for="placeholder">Placeholder (optional):</label>
             <b-form-input
@@ -137,6 +156,7 @@ const defaultQuestion = {
   answers: {
     textId: "",
     audioId: "",
+    multipleChoiceId: "",
   },
 }
 
@@ -155,6 +175,8 @@ export default {
     return {
       hasTextOption: Boolean(this.node.typeData.options?.text),
       hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
+      hasMultipleChoiceOption: Boolean(this.node.typeData.options?.multipleChoice),
+      hasMultipleChoiceMultiAnswerOption: Boolean(this.node.typeData.options?.multipleChoice?.multiAnswer),
     }
   },
   computed: {
@@ -185,6 +207,22 @@ export default {
     hasTextMultiLineOption(multiLineSelected) {
       if (this.node.typeData.options.text) {
         this.node.typeData.options.text.multi = multiLineSelected
+      }
+    }, 
+    hasMultipleChoiceOption(multipleChoiceSelected) {
+      if (multipleChoiceSelected) {
+        this.question.answers.multipleChoiceId = Helpers.createUUID()
+        this.node.typeData.options.multipleChoice = {}
+        this.hasMultipleChoiceMultiAnswerOption = true
+      } else {
+        this.question.answers.multipleChoiceId = ""
+        this.hasMultipleChoiceMultiAnswerOption = false
+        delete this.node.typeData.options.multipleChoice
+      }
+    }, 
+    hasMultipleChoiceMultiAnswerOption(multiAnswerSelected) {
+      if (this.node.typeData.options.multipleChoice) {
+        this.node.typeData.options.multipleChoice.multiAnswer = multiAnswerSelected
       }
     },
   },
