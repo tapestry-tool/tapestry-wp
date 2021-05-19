@@ -149,12 +149,17 @@ class TapestryNode implements ITapestryNode
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
         }
-        if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
-            $this->thumbnailFileId = $node->thumbnailFileId;
-            set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
-            if ($post_thumbnail_url) {
-                $this->imageURL = $post_thumbnail_url;
+        if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId)) {
+            if (is_string($node->thumbnailFileId) && $node->thumbnailFileId == "") {
+                $this->imageURL = "";
+                $this->thumbnailFileId = "";
+            } else {
+                $this->thumbnailFileId = $node->thumbnailFileId;
+                set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
+                $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
+                if ($post_thumbnail_url) {
+                    $this->imageURL = $post_thumbnail_url;
+                }
             }
         }
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {

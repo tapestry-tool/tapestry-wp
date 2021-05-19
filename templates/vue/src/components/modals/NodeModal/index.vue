@@ -485,6 +485,10 @@ export default {
       this.keepOpen = true
       this.handlePublish()
     })
+    this.$root.$on("remove-thumbnail", () => {
+      this.node.imageURL = ""
+      this.node.thumbnailFileId = ""
+    })
     this.initialize()
   },
   methods: {
