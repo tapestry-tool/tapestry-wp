@@ -166,7 +166,7 @@ class TapestryNode implements ITapestryNode
             $this->lockedImageURL = $node->lockedImageURL;
         }
         if (isset($node->lockedThumbnailFileId) && is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId)) {
-            if (is_string($node->lockedThumbnailFileId) && $node->lockedThumbnailFileId == "") {
+            if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
                 $this->lockedImageURL = '';
                 $this->lockedThumbnailFileId = '';
             } else {
