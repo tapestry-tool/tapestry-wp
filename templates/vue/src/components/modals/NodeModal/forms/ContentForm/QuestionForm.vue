@@ -95,7 +95,7 @@
 
           <b-form-group v-if="node.typeData.options.multipleChoice" label="Multiple Choice">
             <b-form-radio
-              v-model="hasMultipleAnswerOption"
+              v-model="hasMultipleChoiceMultiAnswerOption"
               data-qa="question-answer-multipleChoice-multi"
               name="multiple-answer"
               :value="true"
@@ -103,7 +103,7 @@
               Select Multiple Answer
             </b-form-radio>
             <b-form-radio
-              v-model="hasMultipleAnswerOption"
+              v-model="hasMultipleChoiceMultiAnswerOption"
               data-qa="question-answer-multipleChoice-single"
               name="one-answer"
               :value="false"
