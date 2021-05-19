@@ -286,7 +286,7 @@ export default {
         .then(close => {
           if (close) {
             this.$emit("input", null)
-            this.$root.$emit("remove-thumbnail")
+            this.$root.$emit("remove-thumbnail", this.thumbnailType)
           }
         })
         .catch(err => console.log(err))
