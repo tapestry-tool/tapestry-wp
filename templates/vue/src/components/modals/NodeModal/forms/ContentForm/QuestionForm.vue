@@ -64,6 +64,14 @@
             >
               Audio Recorder
             </b-form-checkbox>
+             <b-form-checkbox
+              v-model="hasMultipleChoiceOption"
+              data-qa="question-answer-multiple-choice"
+              switch
+              @input="setId($event, 'multipleChoiceId')"
+            >
+              Multiple Choice
+            </b-form-checkbox>
           </b-form-group>
 
           <b-form-group v-if="node.typeData.options.text" label="Text">
