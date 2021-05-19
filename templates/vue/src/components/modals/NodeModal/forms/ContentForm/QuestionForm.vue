@@ -93,7 +93,16 @@
             </b-form-radio>
           </b-form-group>
 
-          <b-form-group v-if="node.typeData.options.multipleChoice" label="Multiple Choice">
+          <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
+            <label for="placeholder">Placeholder (optional):</label>
+            <b-form-input
+              id="placeholder"
+              v-model="node.typeData.options.text.placeholder"
+              data-qa="question-answer-text-single-placeholder"
+            ></b-form-input>
+          </b-form-group>
+
+           <b-form-group v-if="node.typeData.options.multipleChoice" label="Multiple Choice">
             <b-form-radio
               v-model="hasMultipleChoiceMultiAnswerOption"
               data-qa="question-answer-multipleChoice-multi"
@@ -111,16 +120,8 @@
               Select One Answer(Radio Button)
             </b-form-radio>
           </b-form-group>
-
-          <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
-            <label for="placeholder">Placeholder (optional):</label>
-            <b-form-input
-              id="placeholder"
-              v-model="node.typeData.options.text.placeholder"
-              data-qa="question-answer-text-single-placeholder"
-            ></b-form-input>
-          </b-form-group>
         </b-card>
+
 
         <b-card
           sub-title="Confirmation Page Customization"
