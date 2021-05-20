@@ -1,6 +1,5 @@
 {
     "require": {
-        "kaltura/api-client-library": "^16.14",
-        "vlucas/phpdotenv": "^5.3"
+        "kaltura/api-client-library": "^16.14"
     }
 }

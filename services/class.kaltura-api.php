@@ -13,9 +13,6 @@ use Kaltura\Client\Type\MediaEntry;
 use Kaltura\Client\Type\UploadedFileTokenResource;
 use Kaltura\Client\Type\UploadToken;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
-
 class KalturaApi {
 
     /**
@@ -26,10 +23,15 @@ class KalturaApi {
     function getKClient($type = SessionType::USER) 
     {
         $user = wp_get_current_user()->ID;
-        $kconf = new Configuration($_ENV['KALTURA_PARTNER_ID']);
-        $kconf->setServiceUrl($_ENV['KALTURA_SERVICE_URL']);
+        $kconf = new Configuration(KALTURA_PARTNER_ID);
+        $kconf->setServiceUrl(KALTURA_SERVICE_URL);
         $kclient = new Client($kconf);
-        $ksession = $kclient->session->start($_ENV['KALTURA_ADMIN_SECRET'], $user, $type, $_ENV['KALTURA_PARTNER_ID']);
+        try {
+            $ksession = $kclient->session->start(KALTURA_ADMIN_SECRET, $user, $type, KALTURA_PARTNER_ID);
+        }
+        catch (Exception $e) {
+            error_log("Kaltura Client Error: " . $e);
+        }
 
         if (!isset($ksession)) {
             throw new TapestryError("Unable to establish Kaltura session.");

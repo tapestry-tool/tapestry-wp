@@ -21,7 +21,7 @@ To get started with developing locally:
   2. *Using Docker:* Follow the detailed [Docker Installation & Usage](https://github.com/wynnset/tapestry-wp/wiki/Docker-Installation-&-Usage) wiki page.
 - Duplicate the .env.example file in the root directory and name it .env
 - Follow the steps below under "Getting external links to work"
-- Follow the steps below under "Getting video uploads to work"
+- Optional: Follow the steps below under "Changing videos to upload to Kaltura instead of localhost"
 - Make sure `$TAPESTRY_USE_DEV_MODE` is set to `TRUE` in `tapestry.php`
 - In the `templates/vue` directory, run `npm start` to serve with hot reload at localhost:8080
 
@@ -49,13 +49,18 @@ It's strongly recommended you complete this to get link previews working for the
 
 If you complete these steps before running `npm run build`, you will have link previews working.
 
-### Getting video uploads to work
+### Changing videos to upload to Kaltura instead of localhost
 
-Videos are being uploaded to Kaltura. To set this up locally:
+You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you have access to the Kaltura platform) by following these instructions:
 
-*Using LAMP/MAMP/WAMP:*
+1. In your wordpress root directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura`.
+2. Edit your Wordpress `wp-config.php` file and add the following lines right above the comment "That's all, stop editing! Happy publishing":
+    ```
+    define('KALTURA_ADMIN_SECRET', '');
+    define('KALTURA_PARTNER_ID', '');
+    define('KALTURA_SERVICE_URL', 'https://admin.video.ubc.ca');
+    ```
 
-1. In the `tapestry-wp` directory, run `composer install`. If successful, you will be able to see a `vendor` folder containing `kaltura` and a few other folders.
-2. Go to the .env file in your root and add values for the lines starting with KALTURA. These values can be obtained from the Kaltura developer dashboard.
+The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
 
 You should now be able to upload videos onto Kaltura.
