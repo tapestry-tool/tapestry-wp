@@ -9,9 +9,10 @@
           Use Images
         </b-form-checkbox>
       </b-form-group>
-      <slick-list lockAxis="y" v-model="choiceRows">
+      <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
+    :item="choiceRow"
     :key="choiceRow.id"
     :placeholder="choiceRow.title"
     :index="index"
@@ -21,7 +22,7 @@
     :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" >
     </choice-row>
-      </slick-list>
+      </SortableList>
     <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
   </b-form-group>
 </div>
@@ -30,14 +31,21 @@
 <script>
 import ChoiceRow from "./ChoiceRow.vue"
 import FileUpload from "@/components/modals/common/FileUpload"
-import { SlickList, SlickItem } from 'vue-slicksort';
+import { ContainerMixin,} from 'vue-slicksort';
+const SortableList = {
+  mixins: [ContainerMixin],
+  template: `
+    <ul class="list">
+      <slot />
+    </ul>
+  `,
+};
 
 export default {
   components: {
   ChoiceRow,
   FileUpload,
-  SlickList,
-  SlickItem,
+  SortableList
   },
   props: {
     node: {
@@ -88,6 +96,7 @@ export default {
 
 <style lang="scss">
 .addButton {
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-left: 30px;
 }
 </style>
