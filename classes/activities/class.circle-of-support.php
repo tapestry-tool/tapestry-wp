@@ -145,13 +145,67 @@ class CircleOfSupport
         return $this->current;
     }
 
+    /**
+     * Deletes the entire CoS from the db. Currently not called anywhere other than
+     * for development/testing.
+     */
+    public function delete()
+    {
+        return delete_user_meta($this->userId, CircleOfSupport::META_KEY);
+    }
+
+    public function addConnectionToCircle($circleIndex, $connectionId)
+    {
+        // Check if circle exists
+        if (!isset($this->current['circles'][$circleIndex])) {
+            return;
+        }
+
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            return;
+        }
+
+        $circle = $this->current['circles'][$circleIndex];
+        array_push($circle, $connectionId);
+        $this->current['circles'][$circleIndex] = $circle;
+
+        return $circle;
+    }
+
+    public function removeConnectionFromCircle($circleIndex, $connectionId)
+    {
+        // Check if circle exists
+        if (!isset($this->current['circles'][$circleIndex])) {
+            throw new TapestryError('CIRCLE_DOESNT_EXIST', sprintf('Cannot find circle with index %d', $circleIndex), 404);
+        }
+
+        // Check if connection exists
+        if (!isset($this->current['connections']->$connectionId)) {
+            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf('Cannot find connection with id %s', $connectionId), 404);
+        }
+
+        $circle = $this->current['circles'][$circleIndex];
+        $index = array_search($connectionId, $circle);
+
+        // This circle doesn't contain the connection
+        if (!is_numeric($index)) {
+            throw new TapestryError('CONNECTION_DOESNT_EXIST', sprintf("Circle %d doesn't contain connection %s", $circleIndex, $connectionId), 404);
+        }
+
+        array_splice($circle, $index, 1);
+        $this->current['circles'][$circleIndex] = $circle;
+
+        return $circle;
+    }
+
     private function _getDefaultCos()
     {
         return [
             'id' => $this->userId,
             'connections' => new stdClass(),
             'communities' => new stdClass(),
-            'circles' => [],
+            'circles' => [[], [], []],
             'members' => new stdClass(),
             'timestamp' => date_format(new DateTime(), DateTime::ISO8601),
         ];
