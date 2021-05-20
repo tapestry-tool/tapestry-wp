@@ -1,7 +1,22 @@
 <template>
-<div>
+<slick-item 
+  :index="index"
+  :key="key"
+  style="z-index: 9999 !important;"
+  >
   <b-form-checkbox
     v-if="multipleChoiceSelected && multipleAnswerSelected" :value="key" class="container">
+    <b-form-group v-if="useImages">
+        <file-upload
+          v-model="node.imageURL"
+          input-test-id="node-choiceRow-thumbnail-url"
+          :show-url-upload="false"
+          thumbnail-type="thumbnail"
+          :show-image-preview="true"
+          file-types="image/*"
+          @isUploading="handleUploadChange"
+        />
+      </b-form-group>
     <b-form-input :placeholder="placeholder" ></b-form-input>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
@@ -10,12 +25,18 @@
   <b-form-input :placeholder="placeholder" ></b-form-input>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   </b-form-radio> 
-</div>
+</slick-item>
 </template>
 
 <script>
-
+import FileUpload from "@/components/modals/common/FileUpload"
+import { SlickList, SlickItem } from "vue-slicksort"
 export default {
+  components: {
+  FileUpload,
+  SlickItem,
+  SlickList,
+  },
   props: {
     node: {
       type: Object,
@@ -41,6 +62,10 @@ export default {
       type: String,
       required: false,
       default: "",
+    },
+    useImages: {
+      type: Boolean,
+      required: true,
     }
   },
 }

@@ -4,7 +4,12 @@
     <!-- create choiceRow component(prop to determine radio or checkbox), add dragable(multi content node ordering), also include delete this option part of this choiceRow component
     button functionality(not required for now) just put a button there
     //adding imaging to choiceRow is thumbnail component -->
-    
+    <b-form-group>
+        <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
+          Use Images
+        </b-form-checkbox>
+      </b-form-group>
+      <slick-list lockAxis="y" v-model="choiceRows">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
     :key="choiceRow.id"
@@ -13,9 +18,10 @@
     :node="node" 
     :multipleChoiceSelected="multipleChoiceSelected"
     :multipleAnswerSelected="multipleAnswerSelected"
+    :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" >
     </choice-row>
-    
+      </slick-list>
     <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
   </b-form-group>
 </div>
@@ -23,9 +29,15 @@
 
 <script>
 import ChoiceRow from "./ChoiceRow.vue"
+import FileUpload from "@/components/modals/common/FileUpload"
+import { SlickList, SlickItem } from 'vue-slicksort';
+
 export default {
   components: {
-  ChoiceRow
+  ChoiceRow,
+  FileUpload,
+  SlickList,
+  SlickItem,
   },
   props: {
     node: {
@@ -43,7 +55,7 @@ export default {
   },
   data() {
     return {
-      selected: '',
+      useImages: false,
       choiceRows: [
         {
           id: 1,
