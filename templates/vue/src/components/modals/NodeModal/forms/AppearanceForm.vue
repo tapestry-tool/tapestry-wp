@@ -120,11 +120,13 @@ export default {
     addThumbnail(addThumbnail) {
       if (!addThumbnail) {
         this.node.imageURL = ""
+        this.node.thumbnailFileId = ""
       }
     },
     addLockedThumbnail(addLockedThumbnail) {
       if (!addLockedThumbnail) {
         this.node.lockedImageURL = ""
+        this.node.lockedThumbnailFileId = ""
       }
     },
   },
