@@ -1,6 +1,5 @@
 .php_cs.cache
 .DS_Store
-.env
 
 cypress/videos
 cypress/screenshots
