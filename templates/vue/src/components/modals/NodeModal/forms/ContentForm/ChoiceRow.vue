@@ -5,7 +5,7 @@
     v-if="multipleChoiceSelected && multipleAnswerSelected" :value=item.id>
     <b-form-group v-if="useImages">
         <file-upload
-          v-model="node.imageURL" 
+          v-model="item.imageurl" 
           input-test-id="node-choiceRow-thumbnail-url"
           :show-url-upload="false"
           thumbnail-type="thumbnail"
@@ -20,7 +20,7 @@
   <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
     <b-form-group v-if="useImages">
         <file-upload
-          v-model="node.imageURL" 
+          v-model="item.imageurl" 
           input-test-id="node-choiceRow-thumbnail-url"
           :show-url-upload="false"
           thumbnail-type="thumbnail"
@@ -84,6 +84,11 @@ export default {
     selectedRadioChoice: {
       type: Number,
       required: false,
+    },
+  },
+  methods: {
+    handleUploadChange(state) {
+      this.$root.$emit("node-modal::uploading", state)
     },
   },
 }

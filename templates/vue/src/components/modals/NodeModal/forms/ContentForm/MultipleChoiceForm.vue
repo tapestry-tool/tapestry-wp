@@ -10,7 +10,7 @@
         </b-form-checkbox>
       </b-form-group>
       <b-form-group v-if="multipleAnswerSelected">
-      <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true">
+      <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true" @input="updateOrderingCheckBoxArray">
         <b-form-checkbox-group v-model="selectedCheckBoxForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
@@ -31,7 +31,7 @@
       </b-form-group>
 
       <b-form-group v-else-if="!multipleAnswerSelected">
-      <SortableList lockAxis="y" v-model="choiceRowsRadio" :useDragHandle="true">
+      <SortableList lockAxis="y" v-model="choiceRowsRadio" :useDragHandle="true" @input="updateOrderingRadioArray">
         <b-form-checkbox-group v-model="selectedRadioForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRowsRadio"
@@ -97,14 +97,17 @@ export default {
       choiceRows: [
         {
           id: 1,
+          imageurl: '',
           title: '1st Choice',
         },
         {
           id: 2,
+          imageurl: '',
           title: '2nd Choice',
         },
         {
           id: 3,
+          imageurl: '',
           title: '3rd Choice',
         },
       ],
@@ -113,14 +116,17 @@ export default {
       choiceRowsRadio: [
         {
           id: 50,
+          imageurl: '',
           title: '1st Choice'
         },
         {
           id: 51,
+          imageurl: '',
           title: '2nd Choice'
         },
         {
           id: 52,
+          imageurl: '',
           title: '3rd Choice'
         },
       ],
@@ -132,6 +138,7 @@ export default {
      addNewChoice: function() {
        this.choiceRows.push({
          id: this.nextChoiceRowId++,
+         imageurl: '',
          title: this.newChoiceRowTitle,
        })
        this.newChoiceRowTitle=''
@@ -139,10 +146,17 @@ export default {
      addNewChoiceRadio: function() {
        this.choiceRowsRadio.push({
          id: this.nextChoiceRowRadioId++,
+         imageurl: '',
          title: this.newChoiceRowRadioTitle
        })
        this.newChoiceRowRadioTitle=''
      },
+     updateOrderingCheckBoxArray(arr) {
+      this.node.typeData.options.multipleChoice.checkboxArray = arr
+    },
+    updateOrderingRadioArray(arr) {
+      this.node.typeData.options.multipleChoice.radioArray = arr
+    },
   },
   computed: {
     getUniqueID: function(index) {
