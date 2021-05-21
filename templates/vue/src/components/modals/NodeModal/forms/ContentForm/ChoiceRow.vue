@@ -17,10 +17,21 @@
     <b-form-input :placeholder="placeholder" ></b-form-input>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
-  <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" v-model="selectedRadio" :disabled="isDisabled && selectedRadio!= item.id">
+  <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
+    <b-form-group v-if="useImages">
+        <file-upload
+          v-model="node.imageURL" 
+          input-test-id="node-choiceRow-thumbnail-url"
+          :show-url-upload="false"
+          thumbnail-type="thumbnail"
+          :show-image-preview="true"
+          file-types="image/*"
+          @isUploading="handleUploadChange"
+        />
+      </b-form-group>
   <b-form-input :placeholder="placeholder" ></b-form-input>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
-  <div>SelectedRadio: <strong>{{ selectedRadio }}</strong></div>
+  <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div>
   </b-form-checkbox> 
 </div>
 </template>
@@ -49,10 +60,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    key: {
-      type: Number,
-      required: false,
-    },
     index: {
       type: Number,
       required: true,
@@ -74,12 +81,11 @@ export default {
       required: false,
       default: false,
     },
-  },
-  data() {
-      return {
-        selectedRadio: -1
-      }
+    selectedRadioChoice: {
+      type: Number,
+      required: false,
     },
+  },
 }
 </script>
 

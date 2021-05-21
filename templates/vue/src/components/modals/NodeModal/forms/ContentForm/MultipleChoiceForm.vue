@@ -44,6 +44,7 @@
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
     :isDisabled="selectedRadioForm.length > 0"
+    :selectedRadioChoice="selectedRadioForm[0]"
     v-on:remove="choiceRowsRadio.splice(index,1)" >
     </choice-row>
     </b-form-checkbox-group>
