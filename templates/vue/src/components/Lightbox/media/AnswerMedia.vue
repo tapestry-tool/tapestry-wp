@@ -9,7 +9,6 @@
     />
     <h3 class="mb-4">{{ question.followUpText }}</h3>
     <tapestry-activity
-      v-for="answer in answers"
       :key="answer.type"
       :type="answer.type"
       :entry="answer.entry"
@@ -34,40 +33,18 @@ export default {
       type: Object,
       required: true,
     },
-    questionIndex: {
-      type: Number,
-      required: true,
-    },
   },
   computed: {
     ...mapGetters(["getNode", "getEntry", "getQuestion"]),
     quiz() {
+      console.log(this.node.quiz)
       return this.node.quiz
     },
-    activeQuestion() {
-      return this.quiz[0]
+    question() {
+      return this.node.quiz[0]
     },
-    lastQuestion() {
-      if (this.question.previousEntry) {
-        return this.getQuestion(this.question.previousEntry)
-      }
-      return null
-    },
-    answers() {
-      if (this.question.previousEntry) {
-        const answeredTypes = Object.entries(this.lastQuestion.answers)
-          .filter(entry => entry[1] && entry[1].length > 0)
-          .map(i => i[0])
-        return answeredTypes
-          .map(type => this.getEntry(this.question.previousEntry, type))
-          .filter(Boolean)
-      }
-      return []
-    },
-    options() {
-      return Object.entries(this.question.answers).filter(
-        opt => opt[1] && opt[1].length > 0
-      )
+    answer() {
+      return this.question.answers
     },
   },
   mounted() {

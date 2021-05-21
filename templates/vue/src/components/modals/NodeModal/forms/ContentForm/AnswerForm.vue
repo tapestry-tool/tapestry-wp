@@ -114,6 +114,12 @@ export default {
         }
       })
     },
+    // set the Answer node's quiz to have the selected question
+    selectedQuestion(question) {
+      let questionArray = []
+      questionArray.push(question)
+      this.node.quiz = questionArray
+    },
     // currentActivityTitle(title) {
     //   this.currentActivityNodes.forEach(node => {
     //     if (node.title == title) {
