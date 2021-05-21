@@ -1,6 +1,6 @@
 <template>
 <div>
-  <b-form-group label="Multiple Choice Form">
+  <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
     <!-- create choiceRow component(prop to determine radio or checkbox), add dragable(multi content node ordering), also include delete this option part of this choiceRow component
     button functionality(not required for now) just put a button there
     //adding imaging to choiceRow is thumbnail component -->
@@ -9,6 +9,7 @@
           Use Images
         </b-form-checkbox>
       </b-form-group>
+      <b-form-group v-if="multipleAnswerSelected">
       <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
@@ -24,6 +25,25 @@
     </choice-row>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
+      </b-form-group>
+
+      <b-form-group v-else-if="!multipleAnswerSelected">
+      <SortableList lockAxis="y" v-model="choiceRowsRadio" :useDragHandle="true">
+    <choice-row 
+    v-for="(choiceRow, index) in choiceRowsRadio"
+    :item="choiceRow"
+    :key="choiceRow.id"
+    :placeholder="choiceRow.title"
+    :index="index"
+    :node="node" 
+    :multipleChoiceSelected="multipleChoiceSelected"
+    :multipleAnswerSelected="multipleAnswerSelected"
+    :useImages="useImages"
+    v-on:remove="choiceRowsRadio.splice(index,1)" >
+    </choice-row>
+      </SortableList>
+    <b-button class="addButton" v-on:click="addNewChoiceRadio" variant="primary" squared>Add a choice</b-button>
+      </b-form-group>
   </b-form-group>
 </div>
 </template>
@@ -67,29 +87,52 @@ export default {
       choiceRows: [
         {
           id: 1,
-          title: '1st Choice'
+          title: '1st Choice',
         },
         {
           id: 2,
-          title: '2nd Choice'
+          title: '2nd Choice',
         },
         {
           id: 3,
-          title: '3rd Choice'
+          title: '3rd Choice',
         },
       ],
       nextChoiceRowId: 4,
       newChoiceRowTitle: '',
+      choiceRowsRadio: [
+        {
+          id: 50,
+          title: '1st Choice'
+        },
+        {
+          id: 51,
+          title: '2nd Choice'
+        },
+        {
+          id: 52,
+          title: '3rd Choice'
+        },
+      ],
+      nextChoiceRowRadioId: 53,
+      newChoiceRowRadioTitle: '',
     }
   },
   methods: {
      addNewChoice: function() {
        this.choiceRows.push({
          id: this.nextChoiceRowId++,
-         title: this.newChoiceRowTitle
+         title: this.newChoiceRowTitle,
        })
        this.newChoiceRowTitle=''
-     }
+     },
+     addNewChoiceRadio: function() {
+       this.choiceRowsRadio.push({
+         id: this.nextChoiceRowRadioId++,
+         title: this.newChoiceRowRadioTitle
+       })
+       this.newChoiceRowRadioTitle=''
+     },
   },
 }
 </script>

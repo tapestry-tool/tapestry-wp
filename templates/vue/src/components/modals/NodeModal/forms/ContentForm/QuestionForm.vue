@@ -120,7 +120,7 @@
               Select One Answer(Radio Button)
             </b-form-radio>
           </b-form-group>
-          <b-form-group v-if="node.typeData.options.multipleChoice" label="">
+          <b-form-group v-if="hasMultipleChoiceOption" label="Multiple Choice Form">
             <multiple-choice-form :node="node" 
             :multipleChoiceSelected="hasMultipleChoiceOption"
             :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"/>

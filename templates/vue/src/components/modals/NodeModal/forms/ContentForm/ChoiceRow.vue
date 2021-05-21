@@ -2,7 +2,7 @@
 <div style="z-index: 9999 !important;" class="container">
   <span v-handle class="fas fa-bars fa-xs" id="handle"></span>
   <b-form-checkbox 
-    v-if="multipleChoiceSelected && multipleAnswerSelected" :value="key" class="container">
+    v-if="multipleChoiceSelected && multipleAnswerSelected" :value="key">
     <b-form-group v-if="useImages">
         <file-upload
           v-model="node.imageURL" 
@@ -17,11 +17,10 @@
     <b-form-input :placeholder="placeholder" ></b-form-input>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
-  <b-form-radio v-else-if="multipleChoiceSelected && !multipleAnswerSelected" 
-  :value="key" name="radios">
+  <b-form-checkbox v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :value="key">
   <b-form-input :placeholder="placeholder" ></b-form-input>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
-  </b-form-radio> 
+  </b-form-checkbox> 
 </div>
 </template>
 
