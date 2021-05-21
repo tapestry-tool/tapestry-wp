@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>Answer Form</h1>
     <!-- <p>{{ activities }}</p> -->
     <p>{{ currentQuestionID }}</p>
     <b-form-group label="Show this text first:">
@@ -57,11 +56,10 @@
 <script>
 import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
-// import RichTextForm from "./RichTextForm"
+
 export default {
   components: {
     Combobox,
-    // RichTextForm,
   },
   props: {
     node: {
