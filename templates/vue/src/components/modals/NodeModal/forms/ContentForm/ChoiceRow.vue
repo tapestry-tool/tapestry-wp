@@ -2,7 +2,7 @@
 <div style="z-index: 9999 !important;" class="container">
   <span v-handle class="fas fa-bars fa-xs" id="handle"></span>
   <b-form-checkbox 
-    v-if="multipleChoiceSelected && multipleAnswerSelected" :value="key">
+    v-if="multipleChoiceSelected && multipleAnswerSelected" :value=item.id>
     <b-form-group v-if="useImages">
         <file-upload
           v-model="node.imageURL" 
@@ -17,9 +17,10 @@
     <b-form-input :placeholder="placeholder" ></b-form-input>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
-  <b-form-checkbox v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :value="key">
+  <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" v-model="selectedRadio" :disabled="isDisabled && selectedRadio!= item.id">
   <b-form-input :placeholder="placeholder" ></b-form-input>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
+  <div>SelectedRadio: <strong>{{ selectedRadio }}</strong></div>
   </b-form-checkbox> 
 </div>
 </template>
@@ -50,7 +51,7 @@ export default {
     },
     key: {
       type: Number,
-      required: true,
+      required: false,
     },
     index: {
       type: Number,
@@ -68,7 +69,17 @@ export default {
     item: {
       required: true,
     },
+    isDisabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
+  data() {
+      return {
+        selectedRadio: -1
+      }
+    },
 }
 </script>
 

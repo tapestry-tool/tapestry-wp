@@ -11,6 +11,7 @@
       </b-form-group>
       <b-form-group v-if="multipleAnswerSelected">
       <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true">
+        <b-form-checkbox-group v-model="selectedCheckBoxForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
     :item="choiceRow"
@@ -23,12 +24,15 @@
     :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" >
     </choice-row>
+        </b-form-checkbox-group>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
+    <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div>
       </b-form-group>
 
       <b-form-group v-else-if="!multipleAnswerSelected">
       <SortableList lockAxis="y" v-model="choiceRowsRadio" :useDragHandle="true">
+        <b-form-checkbox-group v-model="selectedRadioForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRowsRadio"
     :item="choiceRow"
@@ -39,10 +43,13 @@
     :multipleChoiceSelected="multipleChoiceSelected"
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
+    :isDisabled="selectedRadioForm.length > 0"
     v-on:remove="choiceRowsRadio.splice(index,1)" >
     </choice-row>
+    </b-form-checkbox-group>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoiceRadio" variant="primary" squared>Add a choice</b-button>
+    <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div>
       </b-form-group>
   </b-form-group>
 </div>
@@ -83,6 +90,8 @@ export default {
   },
   data() {
     return {
+      selectedCheckBoxForm: [],
+      selectedRadioForm: [],
       useImages: false,
       choiceRows: [
         {
@@ -133,6 +142,11 @@ export default {
        })
        this.newChoiceRowRadioTitle=''
      },
+  },
+  computed: {
+    getUniqueID: function(index) {
+      return index+50;
+    }
   },
 }
 </script>
