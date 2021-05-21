@@ -2,14 +2,15 @@
   <div>
     <!-- <p>{{ activities }}</p> -->
     <p>{{ currentQuestionID }}</p>
+    <p>{{ currentActivityID }}</p>
     <b-form-group label="Show this text first:">
       <b-form-input v-model="followUpText"></b-form-input>
     </b-form-group>
-    <!-- <b-form-group label="Select an activity:">
+    <b-form-group label="Select an activity:">
       <combobox
-        v-model="currentActivityTitle"
+        v-model="currentActivityID"
         :options="currentActivityNodes"
-        item-text="text"
+        item-text="title"
         item-value="title"
         empty-message="There are no activities yet."
       >
@@ -19,7 +20,7 @@
           </p>
         </template>
       </combobox>
-    </b-form-group> -->
+    </b-form-group>
     <!-- <b-form-group label="Select a question from that activity:">
       <combobox
         v-model="currentQuestion"
@@ -70,9 +71,11 @@ export default {
   data() {
     return {
       currentQuestionID: "",
-      currentActivityTitle: "",
-      currentQuestions2: [],
+      currentActivityID: "",
+      activityNodes: [],
+      allQuestions: [],
       selectedQuestion: {},
+      selectedActivity: {},
       answer: {},
       // questions: [],
       followUpText: "",
@@ -85,6 +88,7 @@ export default {
       const activityNodes = Object.values(this.nodes).filter(
         node => node.mediaType == "activity"
       )
+      console.log(activityNodes)
       return activityNodes
     },
     // returns all questions in the tapestry
@@ -92,6 +96,7 @@ export default {
       const questions = Object.values(this.nodes)
         .filter(node => Boolean(node.quiz))
         .flatMap(node => node.quiz)
+      console.log(questions)
       return questions
     },
     // get the selectedQuestion's answers
@@ -104,11 +109,18 @@ export default {
     },
   },
   watch: {
-    // when the user selects a different question, set  this.selectedQuestion
+    // when the user selects a different question, set this.selectedQuestion
     currentQuestionID(id) {
       this.currentQuestions.forEach(question => {
         if (question.id == id) {
           this.selectedQuestion = question
+        }
+      })
+    },
+    currentActivityID(id) {
+      this.currentActivityNodes.forEach(node => {
+        if (node.id == id) {
+          this.selectedActivity = node
         }
       })
     },
