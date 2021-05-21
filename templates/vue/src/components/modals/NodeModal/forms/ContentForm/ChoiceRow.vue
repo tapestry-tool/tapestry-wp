@@ -14,7 +14,7 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-    <b-form-input :placeholder="placeholder" ></b-form-input>
+    <b-form-input :placeholder="placeholder" v-model="checkBoxQuestion"></b-form-input>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
   <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
@@ -47,6 +47,17 @@ export default {
   },
   directives: { handle: HandleDirective },
   mixins: [ElementMixin],
+  data() {
+    return {
+    checkBoxQuestion: '',
+    radioQuestion: '',
+    }
+  },
+  watch: {
+    checkBoxQuestion: function(newCheckBoxQuestion) {
+      this.$emit("newCheckBoxQuestion",{newQuestion: newCheckBoxQuestion, choiceIndex: index})
+    }
+  },
   props: {
     node: {
       type: Object,

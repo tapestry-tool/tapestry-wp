@@ -1,5 +1,6 @@
 <template>
 <div>
+  <div>current data for multiple choice answer type is: {{this.node.typeData.options.multipleChoice}}</div>
   <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
     <!-- create choiceRow component(prop to determine radio or checkbox), add dragable(multi content node ordering), also include delete this option part of this choiceRow component
     button functionality(not required for now) just put a button there
@@ -22,7 +23,8 @@
     :multipleChoiceSelected="multipleChoiceSelected"
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
-    v-on:remove="choiceRows.splice(index,1)" >
+    v-on:remove="choiceRows.splice(index,1)" 
+    >
     </choice-row>
         </b-form-checkbox-group>
       </SortableList>
@@ -45,7 +47,8 @@
     :useImages="useImages"
     :isDisabled="selectedRadioForm.length > 0"
     :selectedRadioChoice="selectedRadioForm[0]"
-    v-on:remove="choiceRowsRadio.splice(index,1)" >
+    v-on:remove="choiceRowsRadio.splice(index,1)" 
+    @newCheckBoxQuestion="handleNewCheckBoxQuestion">
     </choice-row>
     </b-form-checkbox-group>
       </SortableList>
@@ -98,16 +101,19 @@ export default {
         {
           id: 1,
           imageurl: '',
+          question: '',
           title: '1st Choice',
         },
         {
           id: 2,
           imageurl: '',
+          question: '',
           title: '2nd Choice',
         },
         {
           id: 3,
           imageurl: '',
+          question: '',
           title: '3rd Choice',
         },
       ],
@@ -117,16 +123,19 @@ export default {
         {
           id: 50,
           imageurl: '',
+          question: '',
           title: '1st Choice'
         },
         {
           id: 51,
           imageurl: '',
+          question: '',
           title: '2nd Choice'
         },
         {
           id: 52,
           imageurl: '',
+          question: '',
           title: '3rd Choice'
         },
       ],
@@ -134,11 +143,34 @@ export default {
       newChoiceRowRadioTitle: '',
     }
   },
+  watch: {
+    choiceRows(newChoiceRows) {
+      this.node.typeData.options.multipleChoice.checkboxArray = newChoiceRows
+    },
+    choiceRowsRadio(newChoiceRowsRadio) {
+      this.node.typeData.options.multipleChoice.radioArray = newChoiceRowsRadio
+    },
+    useImages(newUseImages) {
+      this.node.typeData.options.multipleChoice.useImages = newUseImages
+    },
+    selectedCheckBoxForm(newSelectedCheckBoxForm) {
+      this.node.typeData.options.multipleChoice.selectedCheckBoxArray = newSelectedCheckBoxForm
+    },
+    selectedRadioForm(newSelectedRadioForm) {
+      this.node.typeData.options.multipleChoice.selectedRadioArray = newSelectedRadioForm
+    },
+  },
+  created() {
+      this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
+      this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
+      this.node.typeData.options.multipleChoice.useImages = this.useImages
+  },
   methods: {
      addNewChoice: function() {
        this.choiceRows.push({
          id: this.nextChoiceRowId++,
          imageurl: '',
+         question: '',
          title: this.newChoiceRowTitle,
        })
        this.newChoiceRowTitle=''
@@ -147,6 +179,7 @@ export default {
        this.choiceRowsRadio.push({
          id: this.nextChoiceRowRadioId++,
          imageurl: '',
+         question: '',
          title: this.newChoiceRowRadioTitle
        })
        this.newChoiceRowRadioTitle=''
@@ -157,11 +190,9 @@ export default {
     updateOrderingRadioArray(arr) {
       this.node.typeData.options.multipleChoice.radioArray = arr
     },
-  },
-  computed: {
-    getUniqueID: function(index) {
-      return index+50;
-    }
+    handleNewCheckBoxQuestion({newQuestion, choiceIndex}){
+      this.choiceRows[choiceIndex].question = newQuestion
+    },
   },
 }
 </script>
