@@ -34,19 +34,11 @@ export default {
   computed: {
     ...mapGetters(["getEntry"]),
     quiz() {
-      // console.log(this.node.quiz)
       return this.node.quiz
     },
     question() {
-      // console.log(this.node.quiz[0])
       return this.node.quiz[0]
     },
-    // answers() {
-    //   console.log(this.question.answers)
-    //   let answerArray = []
-    //   answerArray.push(this.question.answers)
-    //   return answerArray
-    // },
     answers() {
       const answeredTypes = Object.entries(this.question.answers)
         .filter(entry => entry[1] && entry[1].length > 0)
