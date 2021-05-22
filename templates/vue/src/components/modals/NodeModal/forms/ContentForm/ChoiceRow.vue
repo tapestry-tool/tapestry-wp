@@ -30,7 +30,8 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <b-form-input :placeholder="placeholder" ></b-form-input>
+  <b-form-input :placeholder="placeholder" v-model="radioQuestion"></b-form-input>
+  <p>new question is: {{radioQuestion}}</p>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div>
   </b-form-checkbox> 
@@ -58,7 +59,11 @@ export default {
     checkBoxQuestion: function(newCheckBoxQuestion) {
       this.$emit("newCheckBoxQuestion",{newQuestion: newCheckBoxQuestion, 
       choiceIndex: this.index, choiceRowItem: this.item})
-    }
+    },
+    radioQuestion: function(newRadioQuestion) {
+      this.$emit("newRadioQuestion",{newQuestion: newRadioQuestion, 
+      choiceIndex: this.index, choiceRowItem: this.item})
+    },
   },
   props: {
     node: {

@@ -24,8 +24,7 @@
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" 
-    @newCheckBoxQuestion="handleNewCheckBoxQuestion"
-    >
+    @newCheckBoxQuestion="handleNewCheckBoxQuestion">
     </choice-row>
         </b-form-checkbox-group>
       </SortableList>
@@ -48,7 +47,8 @@
     :useImages="useImages"
     :isDisabled="selectedRadioForm.length > 0"
     :selectedRadioChoice="selectedRadioForm[0]"
-    v-on:remove="choiceRowsRadio.splice(index,1)" >
+    v-on:remove="choiceRowsRadio.splice(index,1)" 
+    @newRadioQuestion="handleNewRadioQuestion">
     </choice-row>
     </b-form-checkbox-group>
       </SortableList>
@@ -193,7 +193,10 @@ export default {
     handleNewCheckBoxQuestion({newQuestion, choiceIndex, choiceRowItem}){
       this.choiceRows[choiceIndex].question = newQuestion
       choiceRowItem.question = newQuestion
-      //console.log("Yay")
+    },
+    handleNewRadioQuestion({newQuestion, choiceIndex, choiceRowItem}){
+      this.choiceRows[choiceIndex].question = newQuestion
+      choiceRowItem.question = newQuestion
     },
   },
 }
