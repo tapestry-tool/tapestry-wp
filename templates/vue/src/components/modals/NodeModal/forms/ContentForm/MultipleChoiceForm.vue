@@ -24,6 +24,7 @@
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" 
+    @newCheckBoxQuestion="handleNewCheckBoxQuestion"
     >
     </choice-row>
         </b-form-checkbox-group>
@@ -47,8 +48,7 @@
     :useImages="useImages"
     :isDisabled="selectedRadioForm.length > 0"
     :selectedRadioChoice="selectedRadioForm[0]"
-    v-on:remove="choiceRowsRadio.splice(index,1)" 
-    @newCheckBoxQuestion="handleNewCheckBoxQuestion">
+    v-on:remove="choiceRowsRadio.splice(index,1)" >
     </choice-row>
     </b-form-checkbox-group>
       </SortableList>
@@ -190,8 +190,10 @@ export default {
     updateOrderingRadioArray(arr) {
       this.node.typeData.options.multipleChoice.radioArray = arr
     },
-    handleNewCheckBoxQuestion({newQuestion, choiceIndex}){
+    handleNewCheckBoxQuestion({newQuestion, choiceIndex, choiceRowItem}){
       this.choiceRows[choiceIndex].question = newQuestion
+      choiceRowItem.question = newQuestion
+      //console.log("Yay")
     },
   },
 }
