@@ -44,6 +44,10 @@
         :id="question.id"
         @submit="handleAudioSubmit"
       />
+      <user-multiple-choice-form
+          v-else-if="userMultipleChoiceFormOpened"
+          :node="node"  
+        ></user-multiple-choice-form>
       <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
@@ -62,6 +66,14 @@
             @click="openRecorder(question.answers.audioId)"
           >
             audio
+          </answer-button>
+          <answer-button
+            v-if="showMultipleChoice"
+            :completed="textFormCompleted"
+            data-qa="multiplechoice"
+            @click="openMultipleChoice(question.answers.multipleChoiceId)"
+          >
+            multiple choice
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
@@ -84,6 +96,7 @@ import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
 import TextForm from "../TextForm"
+import userMultipleChoiceForm from "../UserMultipleChoiceForm"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -95,6 +108,7 @@ export default {
     AudioRecorder,
     GravityForm,
     TextForm,
+    userMultipleChoiceForm,
     Loading,
     TapestryActivity,
   },
@@ -114,6 +128,7 @@ export default {
       formId: null,
       formType: "",
       recorderOpened: false,
+      userMultipleChoiceFormOpened: false,
       loading: false,
     }
   },
@@ -155,11 +170,17 @@ export default {
     audioRecorderCompleted() {
       return !!(this.question.entries && this.question.entries.audioId)
     },
+    multipleChoiceFormCompleted() {
+      return !!(this.question.entries && this.question.entries.multipleChoiceId)
+    },
     showText() {
       return this.hasId("textId") || Boolean(this.node.typeData.options?.text)
     },
     showAudio() {
       return this.hasId("audioId") || this.node.typeData.options?.audio
+    },
+    showMultipleChoice() {
+      return this.hasId("multipleChoiceId") || Boolean(this.node.typeData.options?.multipleChoice)
     },
   },
   created() {
@@ -175,12 +196,13 @@ export default {
     ...mapActions(["completeQuestion", "saveAudio", "updateNode"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
-      const wasOpened = this.formOpened || this.recorderOpened
+      const wasOpened = this.formOpened || this.recorderOpened || this.userMultipleChoiceFormOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }
       this.formOpened = false
       this.recorderOpened = false
+      this.userMultipleChoiceFormOpened = false
     },
     openRecorder() {
       client.recordAnalyticsEvent(
@@ -208,6 +230,18 @@ export default {
       this.formId = id
       this.formType = answerType
       this.formOpened = true
+    },
+    openMultipleChoice() {
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: "user-multiple-choice",
+        }
+      )
+      this.userMultipleChoiceFormOpened = true
     },
     hasId(label) {
       const id = this.question.answers[label]
