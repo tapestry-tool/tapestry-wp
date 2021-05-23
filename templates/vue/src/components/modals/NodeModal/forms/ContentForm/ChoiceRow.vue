@@ -14,8 +14,8 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-    <b-form-input :placeholder="placeholder" v-model="checkBoxQuestion"></b-form-input>
-    <p>newquestion is: {{checkBoxQuestion}}</p>
+    <b-form-input :placeholder="placeholder" v-model="checkBoxValue"></b-form-input>
+    <p>new value is: {{checkBoxValue}}</p>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
   <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
@@ -30,8 +30,8 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <b-form-input :placeholder="placeholder" v-model="radioQuestion"></b-form-input>
-  <p>new question is: {{radioQuestion}}</p>
+  <b-form-input :placeholder="placeholder" v-model="radioValue"></b-form-input>
+  <p>new value radio is: {{radioValue}}</p>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div>
   </b-form-checkbox> 
@@ -51,17 +51,17 @@ export default {
   mixins: [ElementMixin],
   data() {
     return {
-    checkBoxQuestion: '',
-    radioQuestion: '',
+    checkBoxValue: '',
+    radioValue: '',
     }
   },
   watch: {
-    checkBoxQuestion: function(newCheckBoxQuestion) {
-      this.$emit("newCheckBoxQuestion",{newQuestion: newCheckBoxQuestion, 
+    checkBoxValue: function(newCheckBoxValue) {
+      this.$emit("newCheckBoxValue",{newValue: newCheckBoxValue, 
       choiceIndex: this.index, choiceRowItem: this.item})
     },
-    radioQuestion: function(newRadioQuestion) {
-      this.$emit("newRadioQuestion",{newQuestion: newRadioQuestion, 
+    radioValue: function(newRadioValue) {
+      this.$emit("newRadioValue",{newValue: newRadioValue, 
       choiceIndex: this.index, choiceRowItem: this.item})
     },
   },

@@ -24,7 +24,7 @@
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
     v-on:remove="choiceRows.splice(index,1)" 
-    @newCheckBoxQuestion="handleNewCheckBoxQuestion">
+    @newCheckBoxValue="handleNewCheckBoxValue">
     </choice-row>
         </b-form-checkbox-group>
       </SortableList>
@@ -48,7 +48,7 @@
     :isDisabled="selectedRadioForm.length > 0"
     :selectedRadioChoice="selectedRadioForm[0]"
     v-on:remove="choiceRowsRadio.splice(index,1)" 
-    @newRadioQuestion="handleNewRadioQuestion">
+    @newRadioValue="handleNewRadioValue">
     </choice-row>
     </b-form-checkbox-group>
       </SortableList>
@@ -101,19 +101,19 @@ export default {
         {
           id: 1,
           imageurl: '',
-          question: '',
+          value: '',
           title: '1st Choice',
         },
         {
           id: 2,
           imageurl: '',
-          question: '',
+          value: '',
           title: '2nd Choice',
         },
         {
           id: 3,
           imageurl: '',
-          question: '',
+          value: '',
           title: '3rd Choice',
         },
       ],
@@ -123,19 +123,19 @@ export default {
         {
           id: 50,
           imageurl: '',
-          question: '',
+          value: '',
           title: '1st Choice'
         },
         {
           id: 51,
           imageurl: '',
-          question: '',
+          value: '',
           title: '2nd Choice'
         },
         {
           id: 52,
           imageurl: '',
-          question: '',
+          value: '',
           title: '3rd Choice'
         },
       ],
@@ -170,7 +170,7 @@ export default {
        this.choiceRows.push({
          id: this.nextChoiceRowId++,
          imageurl: '',
-         question: '',
+         value: '',
          title: this.newChoiceRowTitle,
        })
        this.newChoiceRowTitle=''
@@ -179,7 +179,7 @@ export default {
        this.choiceRowsRadio.push({
          id: this.nextChoiceRowRadioId++,
          imageurl: '',
-         question: '',
+         value: '',
          title: this.newChoiceRowRadioTitle
        })
        this.newChoiceRowRadioTitle=''
@@ -190,13 +190,13 @@ export default {
     updateOrderingRadioArray(arr) {
       this.node.typeData.options.multipleChoice.radioArray = arr
     },
-    handleNewCheckBoxQuestion({newQuestion, choiceIndex, choiceRowItem}){
-      this.choiceRows[choiceIndex].question = newQuestion
-      choiceRowItem.question = newQuestion
+    handleNewCheckBoxValue({newValue, choiceIndex, choiceRowItem}){
+      this.choiceRows[choiceIndex].value = newValue
+      choiceRowItem.value = newValue
     },
-    handleNewRadioQuestion({newQuestion, choiceIndex, choiceRowItem}){
-      this.choiceRows[choiceIndex].question = newQuestion
-      choiceRowItem.question = newQuestion
+    handleNewRadioValue({newValue, choiceIndex, choiceRowItem}){
+      this.choiceRowsRadio[choiceIndex].value = newValue
+      choiceRowItem.value = newValue
     },
   },
 }

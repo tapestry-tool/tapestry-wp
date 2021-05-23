@@ -1,18 +1,35 @@
 <template>
   <b-form @submit="handleTextSubmit">
       <b-form-group v-if="node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-checkbox-group v-model="userSelected">
+        <b-form-checkbox-group v-model="userSelectedCheckbox">
     <p>
-        checkbox list here user form
+        checkbox list here user form and preselected is {{this.getPreSelectedCheckBoxValue}}
     </p>
+    <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.checkboxArray" 
+    :key="userChoiceRow.id"
+    :item="userChoiceRow"
+    :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
+    :hasImage="node.typeData.options.multipleChoice.useImages">
+    </user-choice-row>
+    <p> {{node.typeData.options.multipleChoice.checkboxArray}}</p>
+    <p> {{node.typeData.options.multipleChoice.checkboxArray}}</p>
         </b-form-checkbox-group>
+        <p> selected checkbox is: {{userSelectedCheckbox}}</p>
       </b-form-group>
       <b-form-group v-else-if="!node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-checkbox-group v-model="userSelected">
+        <b-form-radio-group v-model="userSelectedRadio">
     <p>
-        radio list here user form
+        radio list here user form and preselected is {{this.getPreSelectedRadioValue}}
     </p>
-        </b-form-checkbox-group>
+    <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.radioArray" 
+    :key="userChoiceRow.id"
+    :item="userChoiceRow"
+    :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
+    :hasImage="node.typeData.options.multipleChoice.useImages">
+    </user-choice-row>
+    <p> {{node.typeData.options.multipleChoice.radioArray}}</p>
+        </b-form-radio-group>
+        <p> You Selected: {{userSelectedRadio}}</p>
       </b-form-group>
     <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
@@ -30,8 +47,13 @@
 </template>
 
 <script>
+import UserChoiceRow from "./UserChoiceRow"
+
 export default {
-  name: "text-form",
+  components: {
+  UserChoiceRow,
+  },
+  name: "user-multiple-choice-form",
   props: {
     node: {
       type: Object,
@@ -40,7 +62,8 @@ export default {
   },
   data() {
     return {
-      userSelected: [],
+      userSelectedCheckbox: [],
+      userSelectedRadio: "",
       textAnswer: "",
       isAnswerValid: true,
     }
@@ -52,11 +75,48 @@ export default {
     textId() {
       return this.question.answers.textId
     },
+    getPreSelectedRadioValue() {
+      if (this.node.typeData.options.multipleChoice.selectedRadioArray.length > 0) {
+        var matchingID = this.node.typeData.options.multipleChoice.selectedRadioArray[0]
+        var radioArray = this.node.typeData.options.multipleChoice.radioArray
+        var selectedValue = ""
+        for (var i = 0; i < radioArray.length; i++) {
+            if (radioArray[i].id === matchingID) {
+              selectedValue = radioArray[i].value
+            }
+        }
+        return selectedValue
+      } else {
+      return ""
+      }
+    },
+    getPreSelectedCheckBoxValue() {
+      var selectedCheckBoxIDs = this.node.typeData.options.multipleChoice.selectedCheckBoxArray
+      if (selectedCheckBoxIDs.length > 0) {
+        var checkboxArray = this.node.typeData.options.multipleChoice.checkboxArray
+        var selectedValue = []
+        for (var i = 0; i < selectedCheckBoxIDs.length; i++) {
+          for (var j = 0; j < checkboxArray.length; j++) {
+            if (checkboxArray[j].id === selectedCheckBoxIDs[i]) {
+              selectedValue.push(checkboxArray[j].value)
+            }
+           }
+        }
+        return selectedValue
+      } else {
+      return []
+      }
+    },
   },
   mounted() {
     this.textAnswer = this.question.entries.textId
       ? this.question.entries.textId[this.textId]
       : ""
+  },
+  created() {
+      this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue
+      this.userSelectedRadio = this.getPreSelectedRadioValue
+      
   },
   methods: {
     handleTextSubmit(event) {
