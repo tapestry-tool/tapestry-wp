@@ -161,9 +161,14 @@ export default {
     },
   },
   created() {
-      this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
-      this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
-      this.node.typeData.options.multipleChoice.useImages = this.useImages
+      //this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
+      //this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
+      //this.node.typeData.options.multipleChoice.useImages = this.useImages
+      this.useImages = this.node.typeData.options.multipleChoice.useImages
+      this.choiceRowsRadio = this.node.typeData.options.multipleChoice.radioArray
+      this.choiceRows = this.node.typeData.options.multipleChoice.checkboxArray
+      this.selectedCheckBoxForm = this.node.typeData.options.multipleChoice.selectedCheckBoxArray
+      this.selectedRadioForm = this.node.typeData.options.multipleChoice.selectedRadioArray
   },
   methods: {
      addNewChoice: function() {

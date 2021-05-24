@@ -14,8 +14,11 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-    <b-form-input :placeholder="placeholder" v-model="checkBoxValue"></b-form-input>
+    <b-form-input :placeholder="placeholder"
+    v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
+    ></b-form-input>
     <p>new value is: {{checkBoxValue}}</p>
+    <p> this value previous is: {{node.typeData.options.multipleChoice.checkboxArray[index].value}}</p>
     <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
   <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
@@ -30,7 +33,9 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <b-form-input :placeholder="placeholder" v-model="radioValue"></b-form-input>
+  <b-form-input :placeholder="placeholder"
+  v-model="node.typeData.options.multipleChoice.radioArray[index].value"
+  ></b-form-input>
   <p>new value radio is: {{radioValue}}</p>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div>
