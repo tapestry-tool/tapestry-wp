@@ -167,6 +167,8 @@ export default {
         this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
         this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
         this.node.typeData.options.multipleChoice.useImages = this.useImages
+        this.node.typeData.options.multipleChoice.selectedCheckBoxArray = this.selectedCheckBoxForm
+        this.node.typeData.options.multipleChoice.selectedRadioArray = this.selectedRadioForm
       } else {
       this.useImages = this.node.typeData.options.multipleChoice.useImages
       this.choiceRowsRadio = this.node.typeData.options.multipleChoice.radioArray
