@@ -1,35 +1,27 @@
 <template>
   <b-form @submit="handleTextSubmit">
       <b-form-group v-if="node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-checkbox-group v-model="userSelectedCheckbox">
-    <p>
-        checkbox list here user form and preselected is {{this.getPreSelectedCheckBoxValue}}
-    </p>
+        <b-form-checkbox-group v-model="userSelectedCheckbox" class="checkbox-group">
     <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.checkboxArray" 
     :key="userChoiceRow.id"
     :item="userChoiceRow"
     :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
-    :hasImage="node.typeData.options.multipleChoice.useImages">
+    :hasImage="node.typeData.options.multipleChoice.useImages"
+    >
     </user-choice-row>
-    <p> {{node.typeData.options.multipleChoice.checkboxArray}}</p>
-    <p> {{node.typeData.options.multipleChoice.checkboxArray}}</p>
         </b-form-checkbox-group>
-        <p> selected checkbox is: {{userSelectedCheckbox}}</p>
+        <p style="margin-top: 70px"> You Selected: {{userSelectedCheckbox}}</p>
       </b-form-group>
       <b-form-group v-else-if="!node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-radio-group v-model="userSelectedRadio">
-    <p>
-        radio list here user form and preselected is {{this.getPreSelectedRadioValue}}
-    </p>
+        <b-form-radio-group v-model="userSelectedRadio" class="radio-group">
     <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.radioArray" 
     :key="userChoiceRow.id"
     :item="userChoiceRow"
     :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
     :hasImage="node.typeData.options.multipleChoice.useImages">
     </user-choice-row>
-    <p> {{node.typeData.options.multipleChoice.radioArray}}</p>
         </b-form-radio-group>
-        <p> You Selected: {{userSelectedRadio}}</p>
+        <p style="margin-top: 70px"> You Selected: {{userSelectedRadio}}</p>
       </b-form-group>
     <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
@@ -132,6 +124,18 @@ export default {
 
 <style lang="scss" scoped>
 .submit-btn {
-  float: right;
+  float: left;
+}
+
+.radio-group {
+  // border:solid;
+  display:flex;
+  justify-content: space-between;
+}
+
+.checkbox-group {
+  display: flex;
+  justify-content: space-between;
+  // border:solid;
 }
 </style>

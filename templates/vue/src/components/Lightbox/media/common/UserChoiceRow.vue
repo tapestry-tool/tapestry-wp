@@ -1,11 +1,11 @@
 <template >
 <div>
     <b-form-checkbox v-if="isCheckBox" :value="item.value">
-        <b-img v-if="hasImage" :src="item.imageurl" fluid></b-img>
+        <b-img v-if="hasImage" :src="item.imageurl" class="imageChoice"></b-img>
         {{item.value}}
     </b-form-checkbox>
    <b-form-radio v-else-if="!isCheckBox" :value="item.value">
-       <b-img v-if="hasImage" :src="item.imageurl" fluid></b-img>
+       <b-img v-if="hasImage" :src="item.imageurl" class="imageChoice"></b-img>
        {{item.value}}
    </b-form-radio>
 </div>
@@ -36,8 +36,7 @@ export default {
   //border-style:solid;
 }
 .imageChoice{
-    height: 200px;
-    width: 300px;
+    height: 150px;
 }
 
 </style>
