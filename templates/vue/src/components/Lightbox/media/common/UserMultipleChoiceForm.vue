@@ -101,9 +101,9 @@ export default {
     },
   },
   mounted() {
-    this.textAnswer = this.question.entries.textId
-      ? this.question.entries.textId[this.textId]
-      : ""
+    //this.textAnswer = this.question.entries.textId
+     // ? this.question.entries.textId[this.textId]
+     // : ""
   },
   created() {
       this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue

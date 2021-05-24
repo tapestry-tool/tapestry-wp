@@ -33,8 +33,8 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <b-form-input :placeholder="placeholder"
-  v-model="node.typeData.options.multipleChoice.radioArray[index].value"
+  <b-form-input :placeholder="placeholder" 
+   v-model="node.typeData.options.multipleChoice.radioArray[index].value"
   ></b-form-input>
   <p>new value radio is: {{radioValue}}</p>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>

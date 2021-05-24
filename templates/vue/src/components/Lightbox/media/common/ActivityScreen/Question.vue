@@ -69,7 +69,7 @@
           </answer-button>
           <answer-button
             v-if="showMultipleChoice"
-            :completed="textFormCompleted"
+            :completed="multipleChoiceFormCompleted"
             data-qa="multiplechoice"
             @click="openMultipleChoice(question.answers.multipleChoiceId)"
           >
@@ -187,6 +187,8 @@ export default {
     if (this.options.length === 1) {
       if (this.options[0][0] === "audioId") {
         this.openRecorder()
+      } else if (this.options[0][0] === "multipleChoiceId") {
+        this.openMultipleChoice()
       } else {
         this.openForm(this.options[0][1], this.options[0][0])
       }
