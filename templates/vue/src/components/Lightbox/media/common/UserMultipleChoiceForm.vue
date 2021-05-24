@@ -68,6 +68,7 @@ export default {
       return this.question.answers.textId
     },
     getPreSelectedRadioValue() {
+      if (!this.node.typeData.options.multipleChoice.multiAnswer) {
       if (this.node.typeData.options.multipleChoice.selectedRadioArray.length > 0) {
         var matchingID = this.node.typeData.options.multipleChoice.selectedRadioArray[0]
         var radioArray = this.node.typeData.options.multipleChoice.radioArray
@@ -78,11 +79,13 @@ export default {
             }
         }
         return selectedValue
+      }
       } else {
       return ""
       }
     },
     getPreSelectedCheckBoxValue() {
+      if (this.node.typeData.options.multipleChoice.multiAnswer) {
       var selectedCheckBoxIDs = this.node.typeData.options.multipleChoice.selectedCheckBoxArray
       if (selectedCheckBoxIDs.length > 0) {
         var checkboxArray = this.node.typeData.options.multipleChoice.checkboxArray
@@ -95,6 +98,7 @@ export default {
            }
         }
         return selectedValue
+      }
       } else {
       return []
       }
