@@ -2,7 +2,9 @@
   <b-overlay class="loading" bg-color="#5d656c" :show="loading">
     <review-log :events="events" :aria-hidden="loading"></review-log>
     <div v-if="isReviewFormVisible" class="comment-form" :aria-hidden="loading">
-      <p class="commenter-name">{{ username }}</p>
+      <p class="commenter-name">
+        {{ username }}
+      </p>
       <textarea
         v-model="comment"
         aria-label="comment"
@@ -12,6 +14,7 @@
       <review-buttons
         v-if="isReviewer"
         class="review-buttons"
+        :disableAccept="!hasPublishedNeighbour"
         :aria-hidden="loading"
         @accept="submitReview"
         @reject="handleReject"
@@ -25,12 +28,16 @@
       >
         {{ submitText }}
       </b-button>
+      <p v-if="!hasPublishedNeighbour" class="my-2 p-0 small">
+        <strong>Note:</strong>
+        Child nodes can only be added once the parent node has been added.
+      </p>
     </div>
   </b-overlay>
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapState, mapGetters, mapActions } from "vuex"
 
 import { nodeStatus } from "@/utils/constants"
 import * as Comment from "@/utils/comments"
@@ -57,6 +64,8 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getNode", "getNeighbours"]),
+    ...mapState(["settings"]),
     events() {
       return this.node.reviewComments
     },
@@ -68,6 +77,8 @@ export default {
     isReviewFormVisible() {
       if (this.isReviewer) {
         return this.node.reviewStatus === nodeStatus.SUBMIT
+      } else if (!this.settings.submitNodesEnabled) {
+        return false
       }
       return this.node.status === nodeStatus.DRAFT
     },
@@ -88,6 +99,14 @@ export default {
         return `Add comment`
       }
       return `Submit for review`
+    },
+    hasPublishedNeighbour() {
+      const neighbourIds = this.getNeighbours(this.node.id)
+      for (const neighbourId of neighbourIds) {
+        const neighbour = this.getNode(neighbourId)
+        if (neighbour.status == nodeStatus.PUBLISH) return true
+      }
+      return false
     },
   },
   methods: {

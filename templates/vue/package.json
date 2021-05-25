@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --progress",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --watch-poll",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "build:stats": "webpack --mode production --json > stats.json",
     "lint": "eslint \"src/**/*.{js,vue}\"",

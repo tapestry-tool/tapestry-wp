@@ -71,6 +71,7 @@ class TapestryNode implements ITapestryNode
         $this->imageURL = '';
         $this->lockedImageURL = '';
         $this->mediaType = '';
+        $this->presentationStyle = '';
         $this->mediaFormat = '';
         $this->mediaDuration = 0;
         $this->description = '';
@@ -151,7 +152,7 @@ class TapestryNode implements ITapestryNode
         if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
             $this->thumbnailFileId = $node->thumbnailFileId;
             set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, [300, 300]);
+            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
             if ($post_thumbnail_url) {
                 $this->imageURL = $post_thumbnail_url;
             }
@@ -161,7 +162,7 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->lockedThumbnailFileId) && is_numeric($node->lockedThumbnailFileId)) {
             $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
-            $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, [300, 300]);
+            $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumb');
             if ($image_url) {
                 $this->lockedImageURL = $image_url;
             }
@@ -169,6 +170,9 @@ class TapestryNode implements ITapestryNode
 
         if (isset($node->mediaType) && is_string($node->mediaType)) {
             $this->mediaType = $node->mediaType;
+        }
+        if (isset($node->presentationStyle) && is_string($node->presentationStyle)) {
+            $this->presentationStyle = $node->presentationStyle;
         }
         if (isset($node->mediaFormat) && is_string($node->mediaFormat)) {
             $this->mediaFormat = $node->mediaFormat;
@@ -518,6 +522,14 @@ class TapestryNode implements ITapestryNode
 
     private function _formNode()
     {
+        if ('video' == $this->mediaType && 'h5p' == $this->mediaFormat) {
+            $this->mediaType = 'h5p';
+        }
+        if ('accordion' == $this->mediaType) {
+            $this->mediaType = 'multi-content';
+            $this->presentationStyle = 'accordion';
+        }
+
         return (object) [
             'id' => $this->nodeMetaId,
             'postId' => $this->nodePostId,
@@ -532,6 +544,7 @@ class TapestryNode implements ITapestryNode
             'imageURL' => $this->imageURL,
             'lockedImageURL' => $this->lockedImageURL,
             'mediaType' => $this->mediaType,
+            'presentationStyle' => $this->presentationStyle,
             'mediaFormat' => $this->mediaFormat,
             'mediaDuration' => $this->mediaDuration,
             'description' => $this->description,

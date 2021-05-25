@@ -2,7 +2,7 @@
   <div id="modal-behaviour">
     <b-form-group>
       <b-form-checkbox
-        v-if="node.mediaType !== 'accordion'"
+        v-if="node.mediaType !== 'multi-content'"
         v-model="node.skippable"
         data-testid="node-behaviour-skippable"
       >

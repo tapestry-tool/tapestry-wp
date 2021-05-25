@@ -12,7 +12,10 @@
         'has-title': !node.hideTitle,
       }"
       :style="{
-        cursor: node.accessible || hasPermission('edit') ? 'pointer' : 'not-allowed',
+        cursor:
+          node.accessible || hasPermission('edit') || hasPermission('move')
+            ? 'pointer'
+            : 'not-allowed',
       }"
       @click="handleClick"
       @mouseover="handleMouseover"
@@ -89,14 +92,17 @@
           </node-button>
           <template v-if="isLoggedIn">
             <add-child-button
-              v-if="!isSubAccordionRow"
+              v-if="
+                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
+                  (hasPermission('add') || settings.draftNodesEnabled)
+              "
               :node="node"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
@@ -105,7 +111,7 @@
             </node-button>
             <node-button
               v-else-if="canReview"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : 35"
               :y="radius"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
@@ -174,13 +180,7 @@ export default {
   },
   computed: {
     ...mapState(["selection", "settings", "visibleNodes"]),
-    ...mapGetters([
-      "getNode",
-      "getDirectChildren",
-      "isVisible",
-      "getParent",
-      "isAccordionRow",
-    ]),
+    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -196,10 +196,16 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isSubAccordionRow() {
+    hasTooManyLevels() {
       const parent = this.getParent(this.node.id)
-      if (parent) {
-        return this.isAccordionRow(parent)
+      const grandparent = this.getParent(parent)
+      if (parent && grandparent) {
+        const parentNode = this.getNode(parent)
+        const gpNode = this.getNode(grandparent)
+        return (
+          parentNode.mediaType !== "multi-content" &&
+          gpNode.mediaType === "multi-content"
+        )
       }
       return false
     },
@@ -218,7 +224,7 @@ export default {
           return "tasks"
         case "url-embed":
           return "window-maximize"
-        case "accordion":
+        case "multi-content":
           return "bars"
         case "wp-post":
           return "post"
@@ -277,12 +283,14 @@ export default {
       return this.selection.includes(this.node.id)
     },
     progress() {
-      if (this.node.mediaType !== "accordion") {
+      if (this.node.mediaType !== "multi-content") {
         return this.node.progress
       }
       const rows = this.getDirectChildren(this.node.id)
         .map(this.getNode)
         .filter(n => n.status !== "draft")
+
+      if (rows.length === 0) return 0
       return rows.filter(row => row.completed).length / rows.length
     },
     highlightNode() {
@@ -355,7 +363,7 @@ export default {
               continue
             }
             this.$emit("dragend")
-            if (this.hasPermission("edit")) {
+            if (this.hasPermission("edit") || this.hasPermission("move")) {
               this.updateNodeCoordinates({
                 id,
                 coordinates,

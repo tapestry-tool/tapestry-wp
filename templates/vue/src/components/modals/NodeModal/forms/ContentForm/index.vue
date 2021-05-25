@@ -10,7 +10,34 @@
         autofocus
         required
       />
+      <b-form-checkbox
+        v-if="isMultiContentChild"
+        v-model="shouldShowTitle"
+        class="small title-checkbox"
+        data-qa="node-show-page-title"
+      >
+        Show title in page
+      </b-form-checkbox>
     </b-form-group>
+    <div v-if="isMultiContentChild">
+      <b-form-group
+        v-if="addMenuTitle || node.typeData.menuTitle"
+        label="Custom Menu Title"
+      >
+        <b-form-input
+          id="node-nav-title"
+          v-model="node.typeData.menuTitle"
+          data-qa="node-nav-title"
+          placeholder="Enter custom menu title"
+          autofocus
+        />
+      </b-form-group>
+      <div v-else class="text-right mt-n3 mb-2">
+        <a href="#" class="small" @click="addMenuTitle = true">
+          Add Custom Menu Title
+        </a>
+      </div>
+    </div>
     <b-form-group v-if="addDesc || node.description.length" label="Description">
       <rich-text-form
         id="node-description"
@@ -47,6 +74,7 @@
           :is="activeForm"
           v-if="activeForm"
           :node="node"
+          :actionType="actionType"
           @load="$emit('load')"
           @unload="$emit('unload')"
         ></component>
@@ -59,7 +87,7 @@
 import { mapGetters } from "vuex"
 import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
-import AccordionForm from "./AccordionForm"
+import MultiContentForm from "./MultiContentForm"
 import GravityFormForm from "./GravityFormForm"
 import H5pForm from "./H5pForm"
 import TextForm from "./TextForm"
@@ -71,7 +99,7 @@ import WpPostForm from "./WpPostForm"
 export default {
   components: {
     ActivityForm,
-    AccordionForm,
+    MultiContentForm,
     GravityFormForm,
     H5pForm,
     TextForm,
@@ -81,13 +109,23 @@ export default {
     WpPostForm,
   },
   props: {
+    parent: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     node: {
       type: Object,
+      required: true,
+    },
+    actionType: {
+      type: String,
       required: true,
     },
     maxDescriptionLength: {
       type: Number,
       required: false,
+      default: 1000,
     },
   },
   data() {
@@ -101,28 +139,43 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "activity", text: "Activity" },
-        { value: "accordion", text: "Accordion" },
+        { value: "gravity-form", text: "Gravity Form", disabled: true },
+        { value: "multi-content", text: "Multi-Content" }, // must be last item
       ],
+      shouldShowTitle: this.node.typeData.showTitle !== false,
+      addMenuTitle: false,
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["isMultiContentRow"]),
     activeForm() {
       return this.node.mediaType ? this.node.mediaType + "-form" : null
+    },
+    isMultiContentChild() {
+      return (
+        (this.parent && this.parent.mediaType === "multi-content") ||
+        this.isMultiContentRow(this.node.id)
+      )
     },
   },
   watch: {
     activeForm() {
       this.$emit("unload")
     },
+    shouldShowTitle(shouldShowTitle) {
+      this.node.typeData.showTitle = shouldShowTitle
+    },
   },
   mounted() {
     GravityFormsApi.exists().then(exists => {
-      this.mediaTypes.push({
-        value: "gravity-form",
-        text: "Gravity Form",
-        disabled: !exists,
-      })
+      const i = this.mediaTypes.findIndex(
+        mediaType => mediaType.value == "gravity-form"
+      )
+      if (exists) {
+        this.mediaTypes[i].disabled = false
+      } else {
+        this.mediaTypes[i].text += " (plugin unavailable)"
+      }
     })
   },
   methods: {
@@ -132,8 +185,15 @@ export default {
       if (evt === "video" || evt === "h5p") {
         this.node.mediaFormat = evt === "video" ? "mp4" : "h5p"
       }
-      this.$emit("type-changed")
+      this.$emit("type-changed", evt)
     },
   },
 }
 </script>
+
+<style lang="scss">
+.title-checkbox {
+  padding-top: 3px;
+  text-align: right;
+}
+</style>

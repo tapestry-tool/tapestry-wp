@@ -9,8 +9,8 @@ Vue.use(VueRouter)
 export const routes = [
   routeConfig.app,
   routeConfig.lightbox,
-  routeConfig.accordion,
-  routeConfig.subAccordion,
+  routeConfig.multiContent,
+  routeConfig.nestedMultiContent,
   routeConfig.settings,
   ...routeConfig.redirects,
   routeConfig.modal,
@@ -19,6 +19,14 @@ export const routes = [
 const router = new VueRouter({
   routes,
 })
+
+// sourced from https://stackoverflow.com/questions/58634914
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => {
+    if (err.name !== "NavigationDuplicated") throw err
+  })
+}
 
 router.beforeEach((to, from, next) => {
   const nodes = Object.keys(store.state.nodes)

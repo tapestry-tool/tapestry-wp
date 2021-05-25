@@ -65,8 +65,8 @@ class TapestryApi {
   }
 
   async getTapestryExport() {
-    const url = `${apiUrl}/tapestries/${this.postId}/export`
-    const response = await axios.get(url)
+    const url = `/tapestries/${this.postId}/export`
+    const response = await this.client.get(url)
     return response.data
   }
 
@@ -132,6 +132,12 @@ class TapestryApi {
   async updateNodeCoordinates(id, coordinates) {
     const url = `/tapestries/${this.postId}/nodes/${id}/coordinates`
     return await this.client.put(url, coordinates)
+  }
+
+  async getNodeHasDraftChildren(id) {
+    const url = `/tapestries/${this.postId}/nodes/${id}/nodeHasDraftChildren`
+    const response = await this.client.get(url)
+    return response.data
   }
 
   async optimizeNodeThumbnails() {

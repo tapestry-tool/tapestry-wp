@@ -230,6 +230,9 @@ class TapestryHelpers
         }
         elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
+        }
+        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE'){
+            return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
             if (
@@ -285,5 +288,26 @@ class TapestryHelpers
     {
         $node = new TapestryNode($tapestryPostId, $nodeMetaId);
         return $node->getMeta()->status == "draft";
+    }
+
+    /**
+     * Check if neighbour node is published
+     *
+     * @param Number $nodeMetaId     node meta ID
+     * @param Number $tapestryPostId post ID
+     *
+     * @return bool
+     */
+    public static function nodeNeighbourIsPublished($nodeMetaId, $tapestryPostId)
+    {
+        $tapestry = new Tapestry($tapestryPostId);
+        foreach ($tapestry->getLinks() as $link) {
+            if (($link->target == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->source, $tapestryPostId))||
+                ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -3,7 +3,7 @@
     ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
-      'context-accordion': context === 'accordion',
+      'context-multi-content': hasMultiContentContext,
     }"
     :style="{
       height: frameHeight ? frameHeight + 'px' : 'auto',
@@ -18,7 +18,7 @@
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="type === 'H5P.InteractiveVideo' && 'no'"
+      :scrolling="scrollingValue"
       @load="handleLoad"
     ></iframe>
   </div>
@@ -59,13 +59,25 @@ export default {
   data() {
     return {
       instance: null,
+      library: null,
+      isYouTube: false,
       frameHeight: 0,
       frameWidth: "100%",
-      type: null,
       loading: true,
       requiresRefresh: false,
       playedOnce: false,
     }
+  },
+  computed: {
+    scrollingValue() {
+      const noscroll = ["H5P.InteractiveVideo", "H5P.ThreeImage"]
+      if (noscroll.includes(this.library)) {
+        return "no"
+      } else return "auto"
+    },
+    hasMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
+    },
   },
   watch: {
     node(newNode, oldNode) {
@@ -88,11 +100,11 @@ export default {
       this.frameHeight = h5pDimensions.height
       this.frameWidth = 0
 
-      if (this.node.fitWindow || this.context === "accordion") {
+      if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
-        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
-        if (this.context === "accordion") {
-          // Count for the accordion header
+        let fitHeight = window.innerHeight
+        if (this.hasMultiContentContext) {
+          // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
           fitHeight -= 100
         }
@@ -114,18 +126,16 @@ export default {
         if (this.requiresRefresh) {
           this.$refs.h5p.contentWindow.location.reload()
           setTimeout(() => {
-            this.loading = false
-            this.$emit("is-loaded")
+            this.isLoaded()
           }, 2000)
         } else {
-          this.loading = false
-          this.$emit("is-loaded")
+          this.isLoaded()
         }
       }
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
-        this.frameHeight += 15
+        this.frameHeight += 2
       }
 
       let updatedDimensions = { height: this.frameHeight }
@@ -133,6 +143,13 @@ export default {
         updatedDimensions.width = this.frameWidth
       }
       this.$emit("change:dimensions", updatedDimensions)
+    },
+    isLoaded() {
+      this.loading = false
+      this.$emit("is-loaded", {
+        library: this.library,
+        isYouTube: this.isYouTube,
+      })
     },
     play() {
       const h5pObj = this.$refs.h5p.contentWindow.H5P
@@ -237,10 +254,9 @@ export default {
       const h5pInstance = h5pObj.instances[0]
       const loadedH5PId = h5pInstance.contentId
 
-      const h5pLibraryName = h5pInstance.libraryInfo.machineName
-      this.type = h5pLibraryName
+      this.library = h5pInstance.libraryInfo.machineName
 
-      if (h5pLibraryName !== "H5P.InteractiveVideo") {
+      if (this.library !== "H5P.InteractiveVideo") {
         this.frameHeight = this.dimensions.height
       }
 
@@ -255,100 +271,136 @@ export default {
 
       const mediaProgress = this.node.progress
 
-      if (h5pLibraryName === "H5P.InteractiveVideo") {
-        const h5pVideo = h5pInstance.video
-        const h5pIframeComponent = this
+      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
+      this.$emit("change:dimensions", { height: this.frameHeight })
 
-        const handleH5pAfterLoad = () => {
-          h5pIframeComponent.instance = h5pVideo
+      switch (this.library) {
+        case "H5P.InteractiveVideo":
+          {
+            const h5pVideo = h5pInstance.video
+            const h5pIframeComponent = this
 
-          h5pIframeComponent.setFrameDimensions()
-          window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
-          document.addEventListener(
-            "fullscreenchange",
-            h5pIframeComponent.setFrameDimensions
-          )
-          document.addEventListener(
-            "webkitfullscreenchange",
-            h5pIframeComponent.setFrameDimensions
-          )
-          document.addEventListener(
-            "mozfullscreenchange",
-            h5pIframeComponent.setFrameDimensions
-          )
+            const handleH5pAfterLoad = () => {
+              h5pIframeComponent.instance = h5pVideo
 
-          h5pIframeComponent.$emit("load", { el: h5pVideo })
+              h5pIframeComponent.setFrameDimensions()
+              window.addEventListener(
+                "resize",
+                h5pIframeComponent.setFrameDimensions
+              )
+              document.addEventListener(
+                "fullscreenchange",
+                h5pIframeComponent.setFrameDimensions
+              )
+              document.addEventListener(
+                "webkitfullscreenchange",
+                h5pIframeComponent.setFrameDimensions
+              )
+              document.addEventListener(
+                "mozfullscreenchange",
+                h5pIframeComponent.setFrameDimensions
+              )
 
-          let currentPlayedTime
+              h5pIframeComponent.$emit("load", { el: h5pVideo })
 
-          const videoDuration = h5pVideo.getDuration()
-          h5pVideo.seek(mediaProgress * videoDuration)
+              let currentPlayedTime
 
-          const viewedAmount = mediaProgress * videoDuration
-          if (viewedAmount === videoDuration) {
-            h5pIframeComponent.$emit("show-end-screen")
-          }
+              const videoDuration = h5pVideo.getDuration()
+              h5pVideo.seek(mediaProgress * videoDuration)
 
-          h5pIframeComponent.applySettings(h5pVideo)
-
-          h5pVideo.on("stateChange", event => {
-            switch (event.data) {
-              case h5pObj.Video.PLAYING: {
-                const updateVideoInterval = setInterval(() => {
-                  if (
-                    currentPlayedTime !== h5pVideo.getCurrentTime() &&
-                    h5pVideo.getCurrentTime() > 0
-                  ) {
-                    currentPlayedTime = h5pVideo.getCurrentTime()
-                    const amountViewed = currentPlayedTime / videoDuration
-
-                    h5pIframeComponent.$emit("timeupdate", amountViewed)
-
-                    h5pIframeComponent.updateSettings(h5pVideo)
-
-                    if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-                      h5pIframeComponent.$emit("complete")
-                    }
-
-                    if (amountViewed >= 1) {
-                      h5pIframeComponent.$emit("show-end-screen")
-                    }
-                  } else {
-                    clearInterval(updateVideoInterval)
-                  }
-                }, 1000)
-                h5pIframeComponent.handlePlay(h5pIframeComponent.node)
-                break
+              const viewedAmount = mediaProgress * videoDuration
+              if (viewedAmount === videoDuration) {
+                h5pIframeComponent.$emit("show-end-screen")
               }
 
-              case h5pObj.Video.PAUSED: {
-                h5pIframeComponent.handlePause(h5pIframeComponent.node)
-                break
+              h5pIframeComponent.applySettings(h5pVideo)
+
+              h5pVideo.on("stateChange", event => {
+                switch (event.data) {
+                  case h5pObj.Video.PLAYING: {
+                    const updateVideoInterval = setInterval(() => {
+                      if (
+                        currentPlayedTime !== h5pVideo.getCurrentTime() &&
+                        h5pVideo.getCurrentTime() > 0
+                      ) {
+                        currentPlayedTime = h5pVideo.getCurrentTime()
+                        const amountViewed = currentPlayedTime / videoDuration
+
+                        h5pIframeComponent.$emit("timeupdate", amountViewed)
+
+                        h5pIframeComponent.updateSettings(h5pVideo)
+
+                        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
+                          h5pIframeComponent.$emit("complete")
+                        }
+
+                        if (amountViewed >= 1) {
+                          h5pIframeComponent.$emit("show-end-screen")
+                        }
+                      } else {
+                        clearInterval(updateVideoInterval)
+                      }
+                    }, 1000)
+                    h5pIframeComponent.handlePlay(h5pIframeComponent.node)
+                    break
+                  }
+
+                  case h5pObj.Video.PAUSED: {
+                    h5pIframeComponent.handlePause(h5pIframeComponent.node)
+                    break
+                  }
+                }
+              })
+              if (h5pIframeComponent.autoplay) {
+                setTimeout(() => {
+                  h5pVideo.play()
+                  client.recordAnalyticsEvent(
+                    "app",
+                    "auto-play",
+                    "h5p-video",
+                    h5pIframeComponent.node.id
+                  )
+                }, 1000)
+              } else {
+                // Disable Autoplay For Youtube Workaround:
+                // There's a bug with the Youtube Video API such that you cannot disable autoplay.
+                // This is a workaround to stop the video upon loading.
+                if (!this.autoplay) {
+                  // As of April 2021, H5P has not implemented a stop functionality,
+                  // so there is no way to avoid the "More Videos" when paused.
+                  h5pVideo.pause()
+                }
               }
             }
-          })
-          if (h5pIframeComponent.autoplay) {
-            setTimeout(() => {
-              h5pVideo.play()
-              client.recordAnalyticsEvent(
-                "app",
-                "auto-play",
-                "h5p-video",
-                h5pIframeComponent.node.id
-              )
-            }, 1000)
-          }
-        }
 
-        if (h5pVideo.getDuration() !== undefined) {
-          this.requiresRefresh = this.context === "accordion"
-          handleH5pAfterLoad()
-        } else {
-          h5pVideo.on("loaded", handleH5pAfterLoad)
-        }
-      } else {
-        this.loading = false
-        this.$emit("is-loaded")
+            if (h5pVideo.getDuration() !== undefined) {
+              this.isYouTube = true
+              this.requiresRefresh = this.hasMultiContentContext
+              handleH5pAfterLoad()
+            } else {
+              h5pVideo.on("loaded", handleH5pAfterLoad)
+            }
+          }
+          break
+        case "H5P.ThreeImage":
+          {
+            let threeSixtyLoadInterval = setInterval(() => {
+              if (typeof h5pInstance.reDraw !== "undefined") {
+                clearInterval(threeSixtyLoadInterval)
+                if (this.node.typeData && this.node.typeData.scene) {
+                  h5pInstance.currentScene = this.node.typeData.scene
+                  h5pInstance.reDraw()
+                }
+              }
+              this.isLoaded()
+            }, 500)
+          }
+          break
+        default:
+          {
+            this.isLoaded()
+          }
+          break
       }
     },
     toggleMuteIcon() {
@@ -364,7 +416,7 @@ export default {
   margin: auto;
   overflow: hidden;
   border-radius: 15px;
-  &:not(.context-accordion) {
+  &:not(.context-multi-content) {
     position: absolute;
     top: 0;
     bottom: 0;
