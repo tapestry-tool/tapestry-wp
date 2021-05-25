@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="handleTextSubmit">
+  <b-form @submit="handleMultipleChoiceSubmit">
       <b-form-group v-if="node.typeData.options.multipleChoice.multiAnswer">
         <b-form-checkbox-group v-model="userSelectedCheckbox" class="checkbox-group">
     <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.checkboxArray" 
@@ -10,7 +10,10 @@
     >
     </user-choice-row>
         </b-form-checkbox-group>
-        <p style="margin-top: 70px"> You Selected: {{userSelectedCheckbox}}</p>
+        <b-form-invalid-feedback :state="checkBoxValidAnswerState" style="margin-top: 70px">
+          Please Select a choice.
+        </b-form-invalid-feedback>
+        <p> You Selected: {{userSelectedCheckbox}}</p>
       </b-form-group>
       <b-form-group v-else-if="!node.typeData.options.multipleChoice.multiAnswer">
         <b-form-radio-group v-model="userSelectedRadio" class="radio-group">
@@ -21,12 +24,12 @@
     :hasImage="node.typeData.options.multipleChoice.useImages">
     </user-choice-row>
         </b-form-radio-group>
-        <p style="margin-top: 70px"> You Selected: {{userSelectedRadio}}</p>
+        <b-form-invalid-feedback :state="radioValidAnswerState" style="margin-top: 70px">
+          Please Select a choice.
+        </b-form-invalid-feedback>
+        <p> You Selected: {{userSelectedRadio}}</p>
+       
       </b-form-group>
-    <b-form-invalid-feedback :state="isAnswerValid">
-      Please enter a response.
-    </b-form-invalid-feedback>
-
     <b-button
       v-if="node.mediaType === 'question'"
       class="submit-btn mt-3"
@@ -55,17 +58,24 @@ export default {
   data() {
     return {
       userSelectedCheckbox: [],
-      userSelectedRadio: "",
-      textAnswer: "",
-      isAnswerValid: true,
+      userSelectedRadio: null,
+      multipleChoiceAnswer: "",
     }
   },
   computed: {
+    radioValidAnswerState() {
+      return Boolean(this.userSelectedRadio)
+    },
+    checkBoxValidAnswerState() {
+      if (this.userSelectedCheckbox) {
+      return this.userSelectedCheckbox.length > 0
+      } 
+    },
     question() {
       return this.node.quiz[0]
     },
-    textId() {
-      return this.question.answers.textId
+    multipleChoiceId() {
+      return this.question.answers.multipleChoiceId
     },
     getPreSelectedRadioValue() {
       if (!this.node.typeData.options.multipleChoice.multiAnswer) {
@@ -98,28 +108,44 @@ export default {
            }
         }
         return selectedValue
-      }
       } else {
-      return []
+        return []
+      }
       }
     },
   },
-  mounted() {
-    //this.textAnswer = this.question.entries.textId
-     // ? this.question.entries.textId[this.textId]
-     // : ""
-  },
-  created() {
+  mounted() { 
+      if (this.question.hasOwnProperty('entries')) {
+        if (this.question.entries.hasOwnProperty('multipleChoiceId') && 
+        this.question.entries.multipleChoiceId !== null) {
+          this.multipleChoiceAnswer = this.question.entries.multipleChoiceId[this.multipleChoiceId]
+        }
+      } else {
+        this.multipleChoiceAnswer = ""
+      }
       this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue
-      this.userSelectedRadio = this.getPreSelectedRadioValue
-      
+      this.userSelectedRadio = this.getPreSelectedRadioValue 
   },
   methods: {
-    handleTextSubmit(event) {
+    handleMultipleChoiceSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.textAnswer !== ""
+      if(this.node.typeData.options.multipleChoice.multiAnswer) {
+        if (this.checkBoxValidAnswerState) {
+          this.isAnswerValid = true
+        } else {
+          this.isAnswerValid = false
+        }
+        this.multipleChoiceAnswer = this.userSelectedCheckbox
+      } else {
+        if (this.radioValidAnswerState) {
+          this.isAnswerValid = true
+        } else {
+          this.isAnswerValid = false
+        }
+        this.multipleChoiceAnswer = this.userSelectedRadio
+      }
       if (this.isAnswerValid) {
-        this.$emit("submit", this.textAnswer)
+        this.$emit("submit", this.multipleChoiceAnswer)
       }
     },
   },

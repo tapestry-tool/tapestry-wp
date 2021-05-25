@@ -46,7 +46,8 @@
       />
       <user-multiple-choice-form
           v-else-if="userMultipleChoiceFormOpened"
-          :node="node"  
+          :node="node" 
+          @submit="handleMultipleChoiceSubmit" 
         ></user-multiple-choice-form>
       <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
@@ -71,9 +72,10 @@
             v-if="showMultipleChoice"
             :completed="multipleChoiceFormCompleted"
             data-qa="multiplechoice"
+            icon="tasks"
             @click="openMultipleChoice(question.answers.multipleChoiceId)"
           >
-            multiple choice
+            {{this.multipleChoiceLabel}}
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
@@ -136,6 +138,13 @@ export default {
     ...mapGetters(["getEntry", "getQuestion"]),
     isLoggedIn() {
       return wp.isLoggedIn()
+    },
+    multipleChoiceLabel() {
+       if (this.node.typeData.options?.multipleChoice.multiAnswer) {
+         return "Checkbox"
+       } else {
+         return "Radio"
+       }
     },
     lastQuestion() {
       if (this.question.previousEntry) {
@@ -275,6 +284,23 @@ export default {
       }
       this.handleSubmit(
         "text",
+        async () =>
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+      )
+    },
+    async handleMultipleChoiceSubmit(event) {
+      const question = this.node.quiz[0]
+      if (!question.entries) {
+        question.entries = {}
+      }
+      question.entries.multipleChoiceId = {
+        [this.question.answers.multipleChoiceId]: event,
+      }
+      this.handleSubmit(
+        "multipleChoice",
         async () =>
           await this.updateNode({
             id: this.node.id,
