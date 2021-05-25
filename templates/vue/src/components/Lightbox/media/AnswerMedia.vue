@@ -5,7 +5,7 @@
       <h3>{{ question.text }}</h3>
       <h3 class="mb-4">{{ question.followUpText }}</h3>
       <tapestry-activity
-        v-for="answer in answers"
+        v-for="answer in getAnswers"
         :key="answer.type"
         :type="answer.type"
         :entry="answer.entry"
@@ -34,17 +34,16 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntry"]),
-    quiz() {
-      return this.node.quiz
+    answers() {
+      return this.node.answers
     },
     question() {
-      return this.node.quiz[0]
+      return this.node.answers[0].question
     },
-    answers() {
+    getAnswers() {
       const answeredTypes = Object.entries(this.question.answers)
         .filter(entry => entry[1] && entry[1].length > 0)
         .map(i => i[0])
-      // console.log(answeredTypes)
       return answeredTypes
         .map(type => this.getEntry(this.question.previousEntry, type))
         .filter(Boolean)

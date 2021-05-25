@@ -18,7 +18,7 @@
     <b-form-group label="Select a question from that activity:">
       <combobox
         v-model="currentQuestion"
-        :options="currentQuestions"
+        :options="getCurrentQuestions"
         item-text="text"
         item-value="id"
         empty-message="There is no activity selected yet."
@@ -52,10 +52,10 @@ export default {
   },
   data() {
     return {
-      currentActivityID: "",
-      currentQuestions: [],
-      currentQuestion: "",
-      followUpText: "",
+      currentActivityID: this.node.answers[0].activityID,
+      // currentQuestions: this.getCurrentQuestions,
+      currentQuestion: this.node.answers[0].question.id,
+      followUpText: this.node.answers[0].question.followUpText,
     }
   },
   computed: {
@@ -66,34 +66,12 @@ export default {
       )
       return activityNodes
     },
-    // computedActivityID: {
-    //   get() {
-    //     if (this.node.quiz[0].length > 0) {
-    //       for (const activity of this.currentActivityNodes) {
-    //         for (const question of activity.quiz) {
-    //           if (question.id == this.node.quiz[0].id) {
-    //             return activity.id
-    //           }
-    //         }
-    //       }
-    //     }
-    //     return this.currentActivityID
-    //   },
-    //   set(newID) {
-    //     this.currentActivityID = newID
-    //   },
-    // },
-    // computedQuestion: {
-    //   get() {
-    //     if (this.node.quiz[0].length > 0) {
-    //       return this.node.quiz[0].id
-    //     }
-    //     return this.currentActivityID
-    //   },
-    //   set(newQuestion) {
-    //     this.currentQuestion = newQuestion
-    //   },
-    // },
+    getCurrentQuestions() {
+      const questions = Object.values(this.currentActivityNodes)
+        .filter(node => node.id == this.currentActivityID)
+        .flatMap(node => node.quiz)
+      return questions
+    },
   },
   watch: {
     currentActivityID(activityID) {
@@ -101,15 +79,28 @@ export default {
         .filter(node => node.id == activityID)
         .flatMap(node => node.quiz)
       this.currentQuestions = questions
+      this.currentQuestion = ""
     },
     currentQuestion(id) {
+      // if (id == "") {
+      //   return
+      // }
+      console.log("currentQuestion was changed")
+      console.log("currentQuestions" + this.currentQuestions)
       let selectedQuestion = []
-      selectedQuestion = this.currentQuestions.filter(question => question.id == id)
-      this.node.quiz = selectedQuestion
+      selectedQuestion = this.getCurrentQuestions.filter(
+        question => question.id == id
+      )
+      // this.node.quiz = selectedQuestion
+      const answerObject = {
+        activityID: this.currentActivityID,
+        question: selectedQuestion[0],
+      }
+      this.node.answers = [answerObject]
     },
-    followUpText(text) {
-      this.node.quiz[0].followUpText = text
-    },
+  },
+  followUpText(text) {
+    this.node.answers[0].question.followUpText = text
   },
 }
 </script>

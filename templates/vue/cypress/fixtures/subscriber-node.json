@@ -68,6 +68,7 @@
       "hideMedia": false,
       "skippable": true,
       "quiz": [],
+      "answers": [],
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [],

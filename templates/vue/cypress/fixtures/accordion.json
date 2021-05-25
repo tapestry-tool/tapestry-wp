@@ -66,6 +66,7 @@
       "hideMedia": false,
       "skippable": true,
       "quiz": [],
+      "answers": [],
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [
@@ -146,6 +147,7 @@
       "hideMedia": false,
       "skippable": true,
       "quiz": [],
+      "answers": [],
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [],
@@ -210,6 +212,7 @@
       "hideMedia": false,
       "skippable": true,
       "quiz": [],
+      "answers": [],
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [],
