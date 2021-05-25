@@ -193,7 +193,7 @@ export default {
 .media-wrapper {
   outline: none;
   border-radius: 15px;
-  overflow: visible;
+  overflow: auto;
   height: 100%;
   padding: 0;
 
