@@ -66,6 +66,34 @@ export default {
       )
       return activityNodes
     },
+    // computedActivityID: {
+    //   get() {
+    //     if (this.node.quiz[0].length > 0) {
+    //       for (const activity of this.currentActivityNodes) {
+    //         for (const question of activity.quiz) {
+    //           if (question.id == this.node.quiz[0].id) {
+    //             return activity.id
+    //           }
+    //         }
+    //       }
+    //     }
+    //     return this.currentActivityID
+    //   },
+    //   set(newID) {
+    //     this.currentActivityID = newID
+    //   },
+    // },
+    // computedQuestion: {
+    //   get() {
+    //     if (this.node.quiz[0].length > 0) {
+    //       return this.node.quiz[0].id
+    //     }
+    //     return this.currentActivityID
+    //   },
+    //   set(newQuestion) {
+    //     this.currentQuestion = newQuestion
+    //   },
+    // },
   },
   watch: {
     currentActivityID(activityID) {
