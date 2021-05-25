@@ -2,6 +2,7 @@
   <div class="answers">
     <h1>{{ node.title }}</h1>
     <div v-if="answers.length" class="answer-container mx-auto mb-3">
+      <h3>{{ question.text }}</h3>
       <h3 class="mb-4">{{ question.followUpText }}</h3>
       <tapestry-activity
         v-for="answer in answers"

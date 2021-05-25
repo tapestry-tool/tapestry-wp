@@ -30,7 +30,7 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group label="Show this text first: ">
+    <b-form-group v-show="currentQuestion" label="Show this text first: ">
       <b-form-input v-model="followUpText"></b-form-input>
     </b-form-group>
   </div>
@@ -77,8 +77,10 @@ export default {
     currentQuestion(id) {
       let selectedQuestion = []
       selectedQuestion = this.currentQuestions.filter(question => question.id == id)
-      console.log(selectedQuestion)
       this.node.quiz = selectedQuestion
+    },
+    followUpText(text) {
+      this.node.quiz[0].followUpText = text
     },
   },
 }
