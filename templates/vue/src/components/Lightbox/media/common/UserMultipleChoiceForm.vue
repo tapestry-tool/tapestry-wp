@@ -89,10 +89,10 @@ export default {
             }
         }
         return selectedValue
-      }
       } else {
       return ""
       }
+      } 
     },
     getPreSelectedCheckBoxValue() {
       if (this.node.typeData.options.multipleChoice.multiAnswer) {
