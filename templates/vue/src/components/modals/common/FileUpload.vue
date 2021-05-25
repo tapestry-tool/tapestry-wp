@@ -83,10 +83,8 @@
               required
               data-qa="import-file-input"
               @dragover.prevent
-              @drop.prevent="
-                isVideoUpload ? uploadVideoFile($event) : uploadFile($event)
-              "
-              @change="isVideoUpload ? uploadVideoFile($event) : uploadFile($event)"
+              @drop.prevent="handleFileUpload($event)"
+              @change="handleFileUpload($event)"
             ></b-form-file>
           </b-col>
           <template v-if="showUrlUpload">
@@ -129,6 +127,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 import axios from "axios"
 import { data as wpData } from "@/services/wp"
 import kclient from "@/services/KalturaAPI"
@@ -199,7 +198,18 @@ export default {
           .substring(9)
     }
   },
+  computed: {
+    ...mapState(["useKaltura"]),
+  },
   methods: {
+    handleFileUpload($event){
+      if(this.isVideoUpload && this.useKaltura) {
+        this.uploadVideoFile($event)
+      } 
+      else{
+        this.uploadFile($event)
+      }
+    },
     uploadFile(event) {
       const formData = new FormData()
       formData.append("action", "upload-attachment")
