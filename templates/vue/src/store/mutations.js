@@ -45,6 +45,10 @@ export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
+export function updateKalturaUse(state, newUse){
+  state.useKaltura = newUse
+}
+
 // nodes
 export function addNode(state, node) {
   Vue.set(state.nodes, node.id, node)

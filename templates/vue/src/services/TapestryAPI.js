@@ -294,6 +294,10 @@ class TapestryApi {
       comments,
     })
   }
+
+  async kalturaExists() {
+    return this.client.get('/kaltura/exists')
+  }
 }
 
 export default new TapestryApi(postId)

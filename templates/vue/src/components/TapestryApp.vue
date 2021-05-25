@@ -32,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId","useKaltura"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
@@ -49,6 +49,13 @@ export default {
     },
   },
   mounted() {
+    
+    client.kalturaExists().then(response => {
+      this.updateKalturaUse(response.data)
+    }).then(()=>console.log(this.useKaltura))
+
+    
+
     this.$root.$on("open-node", id => {
       this.openNode(id)
     })
@@ -58,7 +65,7 @@ export default {
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection","updateKalturaUse"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5

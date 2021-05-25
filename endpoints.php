@@ -243,6 +243,14 @@ $REST_API_ENDPOINTS = [
             'callback' => 'postUserAudio',
         ],
     ],
+    'GET_KALTURA_EXISTS' => (object) [
+        'ROUTE' => '/kaltura/exists',
+        'ARGUMENTS'=> [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getKalturaExists',
+
+        ],
+    ],
     'POST_KALTURA_VIDEO' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/video',
         'ARGUMENTS' => [
@@ -1433,6 +1441,28 @@ function getUserAudio($request)
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
+}
+
+/**
+ * Checks if the Kaltura API varaibles are defined
+ */
+function getKalturaExists()
+{
+    if(empty(KALTURA_ADMIN_SECRET) || empty(KALTURA_PARTNER_ID) || empty(KALTURA_SERVICE_URL)) {
+        return false;
+    } 
+    else {
+        // Use getKalturaClient to check working credentials
+        try {
+            $kalturaApi = new KalturaApi();
+            $kClient = $kalturaApi->getKClient();
+        }
+        catch(TapestryError $e){
+            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+        }
+        return true;
+    }
+
 }
 
 /**
