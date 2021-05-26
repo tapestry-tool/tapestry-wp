@@ -1,6 +1,5 @@
 <template>
 <div>
-  <div>current data for multiple choice answer type is: {{this.node.typeData.options.multipleChoice}}</div>
   <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
     <b-form-group>
         <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
@@ -27,7 +26,7 @@
         </b-form-checkbox-group>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
-    <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div>
+    <!-- <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div> -->
       </b-form-group>
 
       <b-form-group v-else-if="!multipleAnswerSelected">
@@ -52,7 +51,7 @@
     </b-form-checkbox-group>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoiceRadio" variant="primary" squared>Add a choice</b-button>
-    <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div>
+    <!-- <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div> -->
       </b-form-group>
   </b-form-group>
 </div>

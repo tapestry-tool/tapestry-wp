@@ -15,7 +15,7 @@
         data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
-        <p> You Selected: {{userSelectedCheckbox}}</p>
+        <!-- <p> You Selected: {{userSelectedCheckbox}}</p> -->
       </b-form-group>
       <b-form-group v-else-if="!node.typeData.options.multipleChoice.multiAnswer">
         <b-form-radio-group v-model="userSelectedRadio" class="radio-group">
@@ -32,8 +32,7 @@
         data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
-        <p> You Selected: {{userSelectedRadio}}</p>
-       
+        <!-- <p> You Selected: {{userSelectedRadio}}</p> -->
       </b-form-group>
     <b-button
       v-if="node.mediaType === 'question'"
