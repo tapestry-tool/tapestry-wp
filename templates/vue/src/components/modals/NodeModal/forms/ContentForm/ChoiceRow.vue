@@ -124,10 +124,8 @@ export default {
 <style lang="scss">
 .container {
   display: flex;
-  //border-style:solid;
 }
 #handle{
-  //border-style: solid;
   margin-right: 5px;
   margin-top: 7px;
 }

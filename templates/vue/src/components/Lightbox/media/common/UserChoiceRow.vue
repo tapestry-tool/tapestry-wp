@@ -39,7 +39,8 @@ export default {
   //border-style:solid;
 }
 .imageChoice{
-    height: 90px;
+    height: 100px;
+   
 }
 
 </style>

@@ -2,9 +2,6 @@
 <div>
   <div>current data for multiple choice answer type is: {{this.node.typeData.options.multipleChoice}}</div>
   <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
-    <!-- create choiceRow component(prop to determine radio or checkbox), add dragable(multi content node ordering), also include delete this option part of this choiceRow component
-    button functionality(not required for now) just put a button there
-    //adding imaging to choiceRow is thumbnail component -->
     <b-form-group>
         <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
           Use Images

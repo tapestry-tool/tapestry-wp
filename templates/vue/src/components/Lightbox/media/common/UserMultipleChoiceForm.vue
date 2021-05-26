@@ -163,7 +163,6 @@ export default {
 }
 
 .radio-group {
-  // border:solid;
   display:flex;
   justify-content: space-between;
 }
@@ -171,6 +170,5 @@ export default {
 .checkbox-group {
   display: flex;
   justify-content: space-between;
-  // border:solid;
 }
 </style>
