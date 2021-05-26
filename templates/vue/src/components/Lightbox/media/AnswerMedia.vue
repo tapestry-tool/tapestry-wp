@@ -1,10 +1,14 @@
 <template>
   <div class="answers">
     <h1>{{ node.title }}</h1>
-    <div v-if="answers.length" class="answer-container mx-auto mb-3">
+    <div
+      v-if="answers.length"
+      class="answer-container mx-auto mb-3"
+      data-qa="answer-display"
+    >
       <h3>{{ question.text }}</h3>
       <h4 v-if="followUpText" class="mb-4">
-        {{ node.answers[0].question.followUpText }}
+        {{ answers[0].question.followUpText }}
       </h4>
       <h4 v-else class="mb-4">{{ question.followUpText }}</h4>
       <tapestry-activity

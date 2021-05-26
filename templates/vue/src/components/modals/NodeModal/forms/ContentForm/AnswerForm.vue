@@ -1,9 +1,10 @@
 <template>
   <div>
-    <b-form-group label="Select an activity:">
+    <b-form-group data-qa="activity-combobox" label="Select an activity:">
       <combobox
         v-model="currentActivityID"
         :options="currentActivityNodes"
+        data-qa="choose-activity-node"
         item-text="title"
         item-value="id"
         empty-message="There are no activities yet."
@@ -19,6 +20,7 @@
       <combobox
         v-model="currentQuestion"
         :options="getCurrentQuestions"
+        data-qa="choose-question"
         item-text="text"
         item-value="id"
         empty-message="There is no activity selected yet."
@@ -30,8 +32,12 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group v-show="currentQuestion" label="Show this text first: ">
-      <b-form-input v-model="followUpText"></b-form-input>
+    <b-form-group
+      v-show="currentQuestion"
+      label="Show this text first: "
+      description="If empty, will default to the follow-up text of the activity form."
+    >
+      <b-form-input v-model="followUpText" data-qa="follow-up-text"></b-form-input>
     </b-form-group>
   </div>
 </template>

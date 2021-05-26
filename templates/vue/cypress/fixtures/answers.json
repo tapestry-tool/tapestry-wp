@@ -1,0 +1,325 @@
+{
+    "nodes": [
+      {
+        "id": 7044,
+        "author": {
+          "id": "1",
+          "name": "admin"
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Activity Node",
+        "status": "publish",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "activity",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "embed",
+        "typeData": {
+          "linkMetadata": null,
+          "progress": [
+            {
+              "group": "viewed",
+              "value": 0,
+              "extra": {
+                "nodeType": "root",
+                "unlocked": true
+              }
+            },
+            {
+              "group": "unviewed",
+              "value": 1,
+              "extra": {
+                "nodeType": "root",
+                "unlocked": true
+              }
+            }
+          ],
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": ""
+        },
+        "coordinates": {
+          "x": 120.73933792114258,
+          "y": 2835.18701171875
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [
+            {
+                "answers": {
+                    "audioId": "",
+                    "checklistId": "4",
+                    "textId": "3"      
+                },
+                "completed": true,
+                "confirmationTitle": "Thanks.",
+                "entries": {
+                    "checklistId": {
+                        "2.1": "",
+                        "2.2": "Second Choice",
+                        "2.3": "",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 06:41:49",
+                        "date_updated": "2021-05-26 06:41:49",
+                        "form_id": "4",
+                        "id": "45",
+                        "ip": "127.0.0.1",
+                        "is_fulfilled": null,
+                        "is_read": "0",
+                        "is_starred": "0",
+                        "payment_amount": null,
+                        "payment_date": null,
+                        "payment_method": null,
+                        "payment_status": null,
+                        "post_id": null,
+                        "source_url": "http://localhost:8000/wp-admin/admin-ajax.php?action=gf_button_get_form&form_id=4",
+                        "status": "active",
+                        "transaction_id": null,
+                        "transaction_type": null,
+                        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+                    },
+                    "textId": {
+                        "1": "34",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 07:14:51",
+                        "date_updated": "2021-05-26 07:14:51",
+                        "form_id": "3",
+                        "id": "49",
+                        "ip": "127.0.0.1"
+                    }
+                },
+                "followUpText": "Previously, you said:",
+                "id": "1a34c960-bcc5-4057-9db6-78e8ed6a8552",
+                "isFollowUp": true,
+                "previousEntry": "1a34c960-bcc5-4057-9db6-78e8ed6a8552",
+                "text": "What is the meaning of life?"
+            },
+            {
+                "answers": {
+                    "audioId": "",
+                    "checklistId": "5",
+                    "textId": "3"      
+                },
+                "completed": true,
+                "confirmationTitle": "Thanks!",
+                "entries": {
+                    "checklistId": {
+                        "1": "2",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 06:00:07",
+                        "date_updated": "2021-05-26 06:00:07",
+                        "form_id": "5",
+                        "id": "43",
+                        "ip": "127.0.0.1"
+                    },
+                    "textId": {
+                        "1": "34",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 07:14:51",
+                        "date_updated": "2021-05-26 07:14:51",
+                        "form_id": "3",
+                        "id": "49",
+                        "ip": "127.0.0.1"
+                    }
+                },
+                "followUpText": "Previously, you said:",
+                "id": "6deb1f1c-5215-476a-836b-d138764c2f33",
+                "isFollowUp": true,
+                "previousEntry": "6deb1f1c-5215-476a-836b-d138764c2f33",
+                "text": "How many pidgeons does it take to change a lightbulb?"
+            }
+        ],
+        "answers": [],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "fx": 2939.49951171875,
+        "fy": 3116.346923828125,
+        "completed": false,
+        "accordionProgress": [],
+        "mayUnlockNodes": [],
+        "permissionsOrder": [
+          "public",
+          "authenticated",
+          "contributor",
+          "subscriber"
+        ],
+        "index": 0,
+        "x": 2939.49951171875,
+        "y": 3116.346923828125,
+        "vy": 0,
+        "vx": 0,
+        "nodeType": "root",
+        "unlocked": true,
+        "depth": 0,
+        "accessible": true
+      },
+      {
+        "id": 7045,
+        "author": {
+          "id": "1",
+          "name": "admin"
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Sample Answer",
+        "status": "publish",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "answer",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "embed",
+        "typeData": {
+          "linkMetadata": null,
+          "progress": 1,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "",
+          "textContent": ""
+        },
+        "coordinates": {
+          "x": -444.71843299984664,
+          "y": 3313.13887715537,
+          "fx": -359.76533851742477,
+          "fy": 2940.515586139745
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [],
+        "answers": [{
+            "activityID": 7044,
+            "question": {
+                "answers": {
+                    "audioId": "",
+                    "checklistId": "4",
+                    "textId": "3"      
+                },
+                "completed": true,
+                "confirmationTitle": "Thanks.",
+                "entries": {
+                    "checklistId": {
+                        "2.1": "",
+                        "2.2": "Second Choice",
+                        "2.3": "",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 06:41:49",
+                        "date_updated": "2021-05-26 06:41:49",
+                        "form_id": "4",
+                        "id": "45",
+                        "ip": "127.0.0.1",
+                        "is_fulfilled": null,
+                        "is_read": "0",
+                        "is_starred": "0",
+                        "payment_amount": null,
+                        "payment_date": null,
+                        "payment_method": null,
+                        "payment_status": null,
+                        "post_id": null,
+                        "source_url": "http://localhost:8000/wp-admin/admin-ajax.php?action=gf_button_get_form&form_id=4",
+                        "status": "active",
+                        "transaction_id": null,
+                        "transaction_type": null,
+                        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+                    },
+                    "textId": {
+                        "1": "34",
+                        "created_by": "1",
+                        "currency": "USD",
+                        "date_created": "2021-05-26 07:14:51",
+                        "date_updated": "2021-05-26 07:14:51",
+                        "form_id": "3",
+                        "id": "49",
+                        "ip": "127.0.0.1"
+                    }
+                },
+                "followUpText": "Previously, you said:",
+                "id": "1a34c960-bcc5-4057-9db6-78e8ed6a8552",
+                "isFollowUp": true,
+                "previousEntry": "1a34c960-bcc5-4057-9db6-78e8ed6a8552",
+                "text": "What is the meaning of life?"
+
+            }
+        }],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "completed": true,
+        "accordionProgress": [],
+        "mayUnlockNodes": [],
+        "permissionsOrder": [
+          "public",
+          "authenticated",
+          "contributor",
+          "subscriber"
+        ],
+        "index": 0,
+        "x": 2939.49951171875,
+        "y": 3116.346923828125,
+        "vy": 0,
+        "vx": 0,
+        "nodeType": "child",
+        "unlocked": true,
+        "depth": 0,
+        "accessible": true
+      }
+    ],
+    "links": [
+        {
+            "source": 7044,
+            "target": 7045,
+            "value": 1,
+            "type": "",
+            "appearsAt": 0,
+            "index": 0
+        }
+    ],
+    "groups": [],
+    "site-url": "http://localhost:8000"
+  }
