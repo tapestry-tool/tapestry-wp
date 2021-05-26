@@ -128,8 +128,6 @@ describe("Question", () => {
                     cy.lightbox().within(() => {
                     cy.getByTestId(`invalid-feedback`).should("be.visible")
                     cy.getByTestId(`user-choicerow-checkbox-2`).getByTestId(`user-choicerow-checkbox-checked-2`).click({ force: true })
-                    cy.getByTestId('user-choicerow-checkbox-thumbnail-1').should("be.visible")
-                    cy.getByTestId('user-choicerow-checkbox-thumbnail-2').should("be.visible")
 
                     cy.contains(/submit/i).click()
                     cy.contains(/submitting/i).should("be.visible")
@@ -198,8 +196,6 @@ describe("Question", () => {
                     cy.lightbox().within(() => {
                     cy.getByTestId(`invalid-feedback`).should("be.visible")
                     cy.getByTestId(`user-choicerow-radio-52`).getByTestId(`user-choicerow-radio-checked-52`).click({ force: true })
-                    cy.getByTestId('user-choicerow-radio-thumbnail-50').should("be.visible")
-                    cy.getByTestId('user-choicerow-radio-thumbnail-51').should("be.visible")
 
                     cy.contains(/submit/i).click()
                     cy.contains(/submitting/i).should("be.visible")
