@@ -562,7 +562,7 @@ class TapestryNode implements ITapestryNode
             'hideMedia' => $this->hideMedia,
             'skippable' => $this->skippable,
             'quiz' => $this->quiz,
-            'answers' =>  $this->answers,
+            'answers' => $this->answers,
             'fullscreen' => $this->fullscreen,
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,

@@ -52,10 +52,9 @@ export default {
   },
   data() {
     return {
-      currentActivityID: this.node.answers[0].activityID,
-      // currentQuestions: this.getCurrentQuestions,
-      currentQuestion: this.node.answers[0].question.id,
-      followUpText: this.node.answers[0].question.followUpText,
+      currentActivityID: this.initializeActivityID(),
+      currentQuestion: this.initializeCurrentQuestion(),
+      followUpText: this.initializeFollowUpText(),
     }
   },
   computed: {
@@ -82,25 +81,42 @@ export default {
       this.currentQuestion = ""
     },
     currentQuestion(id) {
-      // if (id == "") {
-      //   return
-      // }
-      console.log("currentQuestion was changed")
-      console.log("currentQuestions" + this.currentQuestions)
+      if (this.currentQuestion == "") {
+        return
+      }
       let selectedQuestion = []
       selectedQuestion = this.getCurrentQuestions.filter(
         question => question.id == id
       )
-      // this.node.quiz = selectedQuestion
       const answerObject = {
         activityID: this.currentActivityID,
         question: selectedQuestion[0],
       }
       this.node.answers = [answerObject]
     },
+    followUpText(text) {
+      this.node.answers[0].question.followUpText = text
+    },
   },
-  followUpText(text) {
-    this.node.answers[0].question.followUpText = text
+  methods: {
+    initializeActivityID() {
+      if (this.node.answers.length > 0) {
+        return this.node.answers[0].activityID
+      }
+      return ""
+    },
+    initializeCurrentQuestion() {
+      if (this.node.answers.length > 0) {
+        return this.node.answers[0].question.id
+      }
+      return ""
+    },
+    initializeFollowUpText() {
+      if (this.node.answers.length > 0) {
+        return this.node.answers[0].question.followUpText
+      }
+      return ""
+    },
   },
 }
 </script>

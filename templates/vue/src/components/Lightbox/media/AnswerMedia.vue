@@ -3,7 +3,7 @@
     <h1>{{ node.title }}</h1>
     <div v-if="answers.length" class="answer-container mx-auto mb-3">
       <h3>{{ question.text }}</h3>
-      <h3 class="mb-4">{{ question.followUpText }}</h3>
+      <h4 class="mb-4">{{ question.followUpText }}</h4>
       <tapestry-activity
         v-for="answer in getAnswers"
         :key="answer.type"
@@ -12,7 +12,7 @@
       ></tapestry-activity>
     </div>
     <div v-else>
-      <p>You haven't done the previous activity yet.</p>
+      <p>You haven't done this activity yet.</p>
     </div>
   </div>
 </template>
