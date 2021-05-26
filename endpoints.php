@@ -1,5 +1,7 @@
 <?php
 
+$load_kaltura = file_exists('vendor/autoload.php');
+
 /**
  * Tapestry Endpoints.
  */
@@ -13,7 +15,11 @@ require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
-require_once __DIR__.'/services/class.kaltura-api.php';
+
+if ($load_kaltura) {
+    require_once __DIR__.'/services/class.kaltura-api.php';
+}
+
 
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
@@ -1443,60 +1449,58 @@ function getUserAudio($request)
     }
 }
 
-/**
- * Checks if the Kaltura API varaibles are defined
- */
-function getKalturaExists()
-{
-    if(empty(KALTURA_ADMIN_SECRET) || empty(KALTURA_PARTNER_ID) || empty(KALTURA_SERVICE_URL)) {
-        return false;
-    } 
-    else {
-        // Use getKalturaClient to check working credentials
-        try {
-            $kalturaApi = new KalturaApi();
-            $kClient = $kalturaApi->getKClient();
+if ($load_kaltura) {
+    /**
+     * Checks if the Kaltura API varaibles are defined
+     */
+    function getKalturaExists()
+    {
+        if (empty(KALTURA_ADMIN_SECRET) || empty(KALTURA_PARTNER_ID) || empty(KALTURA_SERVICE_URL)) {
+            return false;
+        } else {
+            // Use getKalturaClient to check working credentials
+            try {
+                $kalturaApi = new KalturaApi();
+                $kClient = $kalturaApi->getKClient();
+            } catch (TapestryError $e) {
+                return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+            }
+            return true;
         }
-        catch(TapestryError $e){
+    }
+
+    /**
+     * Upload a video file to Kaltura.
+     *
+     * @param object $request HTTP request
+     *
+     * @return object $response HTTP response
+     */
+    function postKalturaVideo($request)
+    {
+        $postId = $request['tapestryPostId'];
+        $file = $_FILES['async-upload'];
+        $user = new TapestryUser();
+
+        try {
+            if (!$user->canEdit($postId)) {
+                throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
+            }
+
+            $kalturaApi = new KalturaApi();
+
+            $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'), '/'));
+            $title = get_the_title($postId);
+            $category = $url.'/'.$title;
+
+            $result = $kalturaApi->uploadKalturaVideo($file, $category);
+
+            return $result;
+        } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
-        return true;
-    }
-
-}
-
-/**
- * Upload a video file to Kaltura.
- *
- * @param object $request HTTP request
- *
- * @return object $response HTTP response
- */
-function postKalturaVideo($request)
-{
-    $postId = $request['tapestryPostId'];
-    $file = $_FILES['async-upload'];
-    $user = new TapestryUser();
-
-    try {
-        if (!$user->canEdit($postId)) {
-            throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
-        }
-
-        $kalturaApi = new KalturaApi();
-
-        $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'),'/'));
-        $title = get_the_title($postId);
-        $category = $url.'/'.$title;
-
-        $result = $kalturaApi->uploadKalturaVideo($file, $category);
-
-        return $result;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
 }
-
 /**
  * Get user favourite nodes on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44.
