@@ -122,6 +122,7 @@
           </b-form-group>
           <b-form-group v-if="hasMultipleChoiceOption" label="">
             <multiple-choice-form :node="node" 
+            data-qa="authoring-multiplechoice-form"
             :multipleChoiceSelected="hasMultipleChoiceOption"
             :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"/>
           </b-form-group>

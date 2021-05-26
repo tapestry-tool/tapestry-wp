@@ -15,6 +15,7 @@
         <b-form-checkbox-group v-model="selectedCheckBoxForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRows"
+    :data-qa="`choicerow-checkbox-${choiceRow.id}`"
     :item="choiceRow"
     :key="choiceRow.id"
     :placeholder="choiceRow.title"
@@ -37,6 +38,7 @@
         <b-form-checkbox-group v-model="selectedRadioForm">
     <choice-row 
     v-for="(choiceRow, index) in choiceRowsRadio"
+    :data-qa="`choicerow-radio-${choiceRow.id}`"
     :item="choiceRow"
     :key="choiceRow.id"
     :placeholder="choiceRow.title"

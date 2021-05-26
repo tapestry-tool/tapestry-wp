@@ -7,6 +7,7 @@
         <file-upload
           v-model="item.imageurl" 
           input-test-id="node-choiceRow-thumbnail-url"
+          :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
           :show-url-upload="false"
           thumbnail-type="thumbnail"
           :show-image-preview="true"
@@ -16,6 +17,7 @@
       </b-form-group>
     <b-form-input :placeholder="placeholder"
     v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
+    :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
     <p>new value is: {{checkBoxValue}}</p>
     <p> this value previous is: {{node.typeData.options.multipleChoice.checkboxArray[index].value}}</p>
@@ -26,6 +28,7 @@
         <file-upload
           v-model="item.imageurl" 
           input-test-id="node-choiceRow-thumbnail-url"
+          :data-qa="`choicerow-radio-thumbnail-${item.id}`"
           :show-url-upload="false"
           thumbnail-type="thumbnail"
           :show-image-preview="true"
@@ -35,6 +38,7 @@
       </b-form-group>
   <b-form-input :placeholder="placeholder" 
    v-model="node.typeData.options.multipleChoice.radioArray[index].value"
+   :data-qa="`choicerow-radio-input-${item.id}`"
   ></b-form-input>
   <p>new value radio is: {{radioValue}}</p>
   <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>

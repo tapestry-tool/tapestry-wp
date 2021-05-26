@@ -7,10 +7,12 @@
     :item="userChoiceRow"
     :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
     :hasImage="node.typeData.options.multipleChoice.useImages"
+    :data-qa="`user-choicerow-checkbox-${userChoiceRow.id}`"
     >
     </user-choice-row>
         </b-form-checkbox-group>
-        <b-form-invalid-feedback :state="checkBoxValidAnswerState" style="margin-top: 70px">
+        <b-form-invalid-feedback :state="checkBoxValidAnswerState" style="margin-top: 70px"
+        data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
         <p> You Selected: {{userSelectedCheckbox}}</p>
@@ -21,10 +23,13 @@
     :key="userChoiceRow.id"
     :item="userChoiceRow"
     :isCheckBox="node.typeData.options.multipleChoice.multiAnswer"
-    :hasImage="node.typeData.options.multipleChoice.useImages">
+    :hasImage="node.typeData.options.multipleChoice.useImages"
+    :data-qa="`user-choicerow-radio-${userChoiceRow.id}`"
+    >
     </user-choice-row>
         </b-form-radio-group>
-        <b-form-invalid-feedback :state="radioValidAnswerState" style="margin-top: 70px">
+        <b-form-invalid-feedback :state="radioValidAnswerState" style="margin-top: 70px"
+        data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
         <p> You Selected: {{userSelectedRadio}}</p>
