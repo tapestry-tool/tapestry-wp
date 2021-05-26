@@ -81,9 +81,6 @@ export default {
       this.currentQuestion = ""
     },
     currentQuestion(id) {
-      if (this.currentQuestion == "") {
-        return
-      }
       let selectedQuestion = []
       selectedQuestion = this.getCurrentQuestions.filter(
         question => question.id == id

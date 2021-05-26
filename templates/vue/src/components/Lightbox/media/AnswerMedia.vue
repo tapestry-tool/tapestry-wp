@@ -3,7 +3,10 @@
     <h1>{{ node.title }}</h1>
     <div v-if="answers.length" class="answer-container mx-auto mb-3">
       <h3>{{ question.text }}</h3>
-      <h4 class="mb-4">{{ question.followUpText }}</h4>
+      <h4 v-if="followUpText" class="mb-4">
+        {{ node.answers[0].question.followUpText }}
+      </h4>
+      <h4 v-else class="mb-4">{{ question.followUpText }}</h4>
       <tapestry-activity
         v-for="answer in getAnswers"
         :key="answer.type"
@@ -33,12 +36,19 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getEntry"]),
+    ...mapGetters(["getEntry", "getQuestion"]),
     answers() {
       return this.node.answers
     },
     question() {
-      return this.node.answers[0].question
+      let questionID = this.node.answers[0].question.id
+      return this.getQuestion(questionID)
+    },
+    followUpText() {
+      if (this.node.answers[0].question.followUpText !== "") {
+        return true
+      }
+      return false
     },
     getAnswers() {
       const answeredTypes = Object.entries(this.question.answers)
