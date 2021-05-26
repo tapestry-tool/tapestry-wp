@@ -103,6 +103,8 @@ describe("Question", () => {
       cy.wait("@upload")
         .its("response.body.data.url")
         .then(() => {
+          cy.get("No image").should("not.exist")
+          cy.get(".alert-success").should("exist")
           cy.server()
           cy.route("POST", "**/async-upload.php").as("upload")
           cy.getByTestId("choicerow-checkbox-thumbnail-2").getByTestId("import-file-input").attachFile("reddit.png")
@@ -110,6 +112,8 @@ describe("Question", () => {
             cy.wait("@upload")
                .its("response.body.data.url")
                .then(() => {
+                  cy.get("No image").should("not.exist")
+                  cy.get(".alert-success").should("exist")
                   cy.server()
                   cy.route("POST", "**/async-upload.php").as("upload")
                   cy.getByTestId("choicerow-checkbox-thumbnail-3").getByTestId("import-file-input").attachFile("reddit.png")
@@ -126,6 +130,7 @@ describe("Question", () => {
                     cy.route("POST", "**/quiz*").as("submit")
 
                     cy.lightbox().within(() => {
+                    cy.getByTestId('user-choicerow-checkbox-thumbnail-1').should("be.visible")
                     cy.getByTestId(`invalid-feedback`).should("be.visible")
                     cy.getByTestId(`user-choicerow-checkbox-2`).getByTestId(`user-choicerow-checkbox-checked-2`).click({ force: true })
 
@@ -171,6 +176,8 @@ describe("Question", () => {
       cy.wait("@upload")
         .its("response.body.data.url")
         .then(() => {
+          cy.get("No image").should("not.exist")
+          cy.get(".alert-success").should("exist")
           cy.server()
           cy.route("POST", "**/async-upload.php").as("upload")
           cy.getByTestId("choicerow-radio-thumbnail-51").getByTestId("import-file-input").attachFile("reddit.png")
@@ -178,6 +185,8 @@ describe("Question", () => {
             cy.wait("@upload")
                .its("response.body.data.url")
                .then(() => {
+                  cy.get("No image").should("not.exist")
+                  cy.get(".alert-success").should("exist")
                   cy.server()
                   cy.route("POST", "**/async-upload.php").as("upload")
                   cy.getByTestId("choicerow-radio-thumbnail-52").getByTestId("import-file-input").attachFile("reddit.png")
@@ -194,6 +203,7 @@ describe("Question", () => {
                     cy.route("POST", "**/quiz*").as("submit")
 
                     cy.lightbox().within(() => {
+                    cy.getByTestId('user-choicerow-radio-thumbnail-50').should("be.visible")
                     cy.getByTestId(`invalid-feedback`).should("be.visible")
                     cy.getByTestId(`user-choicerow-radio-52`).getByTestId(`user-choicerow-radio-checked-52`).click({ force: true })
 
