@@ -65,7 +65,9 @@ export default {
   computed: {
     ...mapGetters(["getNode"]),
     requiresSaving() {
-      return this.actionType === "add"
+      // Require saving if node is changing from non-multi-content to multi-content
+      const node = this.getNode(this.node.id)
+      return this.actionType === "add" || node.mediaType !== "multi-content"
     },
     buttonContainerStyle() {
       return this.node.childOrdering.length > 0 ? "margin-top: 20px" : ""
@@ -76,14 +78,14 @@ export default {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: this.node.id, type: "add", tab: "content" },
-        query: this.$route.query,
+        query: { ...this.$route.query, nav: "modal" },
       })
     },
     handleEdit(nodeId) {
       this.$router.push({
         name: names.MODAL,
         params: { nodeId: nodeId, type: "edit", tab: "content" },
-        query: this.$route.query,
+        query: { ...this.$route.query, nav: "modal" },
       })
     },
     handleSave() {

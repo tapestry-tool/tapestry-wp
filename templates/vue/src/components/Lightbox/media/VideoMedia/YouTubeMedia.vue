@@ -1,5 +1,8 @@
 <template>
-  <div class="embed-responsive embed-responsive-16by9">
+  <div
+    class="embed-responsive embed-responsive-16by9"
+    :style="isMultiContentContext ? '' : 'top: 1.75em'"
+  >
     <youtube
       class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
@@ -45,6 +48,11 @@ export default {
         return ["width", "height"].every(prop => val.hasOwnProperty(prop))
       },
     },
+    context: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -61,6 +69,12 @@ export default {
         return this.node.typeData.progress[0].value
       }
       return 0
+    },
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
+    },
+    isMultiContentContext() {
+      return this.context === "page" || this.context === "multi-content"
     },
   },
   watch: {
@@ -182,5 +196,16 @@ export default {
 .embed-responsive {
   max-height: calc(100vh - 120px);
   height: 100%;
+}
+
+.video-title {
+  text-align: left;
+  margin-bottom: 0.9em;
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
+  }
 }
 </style>

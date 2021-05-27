@@ -3,7 +3,7 @@
     ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
-      'context-accordion': context === 'accordion',
+      'context-multi-content': hasMultiContentContext,
     }"
     :style="{
       height: `${dimensions.height}px`,
@@ -68,6 +68,9 @@ export default {
       if (noscroll.includes(this.library)) {
         return "no"
       } else return "auto"
+    },
+    hasMultiContentContext() {
+      return this.context === "multi-content" || this.context === "page"
     },
   },
   watch: {
@@ -136,11 +139,11 @@ export default {
       this.frameHeight = h5pDimensions.height
       this.frameWidth = 0
 
-      if (this.node.fitWindow || this.context === "accordion") {
+      if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
-        let fitHeight = Math.min(window.innerHeight, this.dimensions.height)
-        if (this.context === "accordion") {
-          // Count for the accordion header
+        let fitHeight = window.innerHeight
+        if (this.hasMultiContentContext) {
+          // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
           fitHeight -= 100
         }
@@ -160,7 +163,7 @@ export default {
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
-        this.frameHeight += 15
+        this.frameHeight += 2
       }
 
       let updatedDimensions = { height: this.frameHeight }
@@ -308,6 +311,9 @@ export default {
 
       const mediaProgress = this.node.progress
 
+      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
+      this.$emit("change:dimensions", { height: this.frameHeight })
+
       switch (this.library) {
         case "H5P.InteractiveVideo":
           {
@@ -387,19 +393,6 @@ export default {
           break
         case "H5P.ThreeImage":
           {
-            let threeSixtySizingInterval = setInterval(() => {
-              if (typeof h5pInstance.threeSixty !== "undefined") {
-                clearInterval(threeSixtySizingInterval)
-                const h5pDocument = h5pInstance.threeSixty.element.ownerDocument
-                if (h5pDocument) {
-                  this.frameHeight = h5pDocument.querySelector(
-                    "body > div"
-                  ).clientHeight
-                  this.$emit("change:dimensions", { height: this.frameHeight })
-                }
-              }
-            }, 500)
-
             let threeSixtyLoadInterval = setInterval(() => {
               if (typeof h5pInstance.reDraw !== "undefined") {
                 clearInterval(threeSixtyLoadInterval)
@@ -430,7 +423,7 @@ export default {
   margin: auto;
   overflow: hidden;
   border-radius: 15px;
-  &:not(.context-accordion) {
+  &:not(.context-multi-content) {
     position: absolute;
     top: 0;
     bottom: 0;

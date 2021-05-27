@@ -13,7 +13,7 @@
       @seeking="$emit('seeking')"
       @seeked="$emit('seeked', $event)"
       @change:dimensions="$emit('change:dimensions', $event)"
-      @load="$emit('load', $event)"
+      @load="$emit('load')"
       @timeupdate="$emit('timeupdate', $event)"
       @update-settings="updateSettings"
     />
@@ -50,6 +50,9 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
+    },
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),

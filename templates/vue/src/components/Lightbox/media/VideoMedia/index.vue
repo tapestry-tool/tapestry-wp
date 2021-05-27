@@ -1,60 +1,64 @@
 <template>
-  <div
-    :style="{
-      height: `${dimensions.height}px`,
-      width: '100%',
-    }"
-  >
-    <loading v-if="state === states.Loading" style="color: white;" />
-    <component
-      :is="videoComponent"
-      ref="video"
-      :style="{ opacity: showVideo ? 1 : 0 }"
-      :node="node"
-      :dimensions="dimensions"
-      :playing="state === states.Playing"
-      :context="context"
-      @change:dimensions="$emit('change:dimensions', $event)"
-      @complete="$emit('complete', nodeId)"
-      @close="$emit('close')"
-      @load="transition(events.Load, $event)"
-      @play="transition(events.Play)"
-      @pause="transition(events.Pause)"
-      @timeupdate="transition(events.Timeupdate, $event)"
-      @seeked="handleSeek"
-    />
-    <div v-if="state === states.Popup" class="popup">
-      <tapestry-media
+  <div>
+    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
+    <div
+      :style="{
+        height: `${dimensions.height}px`,
+        width: '100%',
+      }"
+    >
+      <loading v-if="state === states.Loading" style="color: white;" />
+      <component
+        :is="videoComponent"
+        ref="video"
+        :style="{ opacity: showVideo ? 1 : 0 }"
+        :node="node"
         :dimensions="dimensions"
-        :node-id="activePopupId"
+        :playing="state === states.Playing"
         :context="context"
-        :autoplay="autoplay"
-        @complete="handlePopupComplete"
-        @close="transition(events.Continue)"
+        @change:dimensions="$emit('change:dimensions', $event)"
+        @complete="$emit('complete', nodeId)"
+        @close="$emit('close')"
+        @load="transition(events.Load, $event)"
+        @play="transition(events.Play)"
+        @pause="transition(events.Pause)"
+        @timeupdate="transition(events.Timeupdate, $event)"
+        @seeked="handleSeek"
+      />
+      <div v-if="state === states.Popup" class="popup">
+        <tapestry-media
+          :dimensions="dimensions"
+          :node-id="activePopupId"
+          :context="context"
+          :autoplay="autoplay"
+          @complete="handlePopupComplete"
+          @close="transition(events.Continue)"
+        />
+      </div>
+      <div v-if="completing" class="aside">
+        <b-spinner></b-spinner>
+      </div>
+      <button
+        v-else-if="isPopupComplete"
+        class="aside"
+        @click="transition(events.Continue)"
+      >
+        Continue
+      </button>
+      <play-screen
+        v-if="state === states.Paused"
+        class="screen"
+        :hide-video="hideVideo"
+        @play="transition(events.Play)"
+      />
+      <end-screen
+        v-if="state === states.Finished"
+        class="screen"
+        :node="node"
+        @rewatch="transition(events.Rewatch)"
+        @close="transition(events.Close)"
       />
     </div>
-    <div v-if="completing" class="aside">
-      <b-spinner></b-spinner>
-    </div>
-    <button
-      v-else-if="isPopupComplete"
-      class="aside"
-      @click="transition(events.Continue)"
-    >
-      Continue
-    </button>
-    <play-screen
-      v-if="state === states.Paused"
-      class="screen"
-      @play="transition(events.Play)"
-    />
-    <end-screen
-      v-if="state === states.Finished"
-      class="screen"
-      :node="node"
-      @rewatch="transition(events.Rewatch)"
-      @close="transition(events.Close)"
-    />
   </div>
 </template>
 
@@ -126,6 +130,7 @@ export default {
   data() {
     return {
       state: VideoStates.Loading,
+      hideVideo: false,
       activePopupId: null,
       /**
        * Completing a node is done asynchronously, and we want to show a small
@@ -176,6 +181,9 @@ export default {
       return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
         this.state
       )
+    },
+    showTitle() {
+      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   watch: {
@@ -241,7 +249,6 @@ export default {
             }
             case VideoEvents.Timeupdate: {
               const { amountViewed, currentTime } = context
-
               const activePopup = this.popups.find(
                 popup =>
                   popup.time > (this.lastTime || 0) && popup.time < currentTime
@@ -316,6 +323,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.video-title {
+  text-align: left;
+  margin-bottom: 0.9em;
+  font-weight: 500;
+  font-size: 1.75rem;
+
+  :before {
+    display: none;
+  }
+}
+
 div {
   height: 100%;
   position: relative;
