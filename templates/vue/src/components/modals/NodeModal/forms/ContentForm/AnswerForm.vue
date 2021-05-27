@@ -36,7 +36,6 @@
       </combobox>
     </b-form-group>
     <b-form-group
-      v-show="currentQuestion"
       label="Show this text first: "
       description="If empty, will default to the follow-up text of the activity form."
     >
@@ -61,9 +60,9 @@ export default {
   },
   data() {
     return {
-      currentActivityID: this.initializeActivityID(),
-      currentQuestion: this.initializeCurrentQuestion(),
-      followUpText: this.initializeFollowUpText(),
+      currentActivityID: "",
+      currentQuestion: "",
+      followUpText: "",
     }
   },
   computed: {
@@ -87,22 +86,30 @@ export default {
         .filter(node => node.id == activityID)
         .flatMap(node => node.quiz)
       this.currentQuestions = questions
-      this.currentQuestion = ""
     },
     currentQuestion(id) {
       let selectedQuestion = []
       selectedQuestion = this.getCurrentQuestions.filter(
         question => question.id == id
       )
-      const answerObject = {
-        activityID: this.currentActivityID,
-        question: selectedQuestion[0],
-      }
-      this.node.answers = [answerObject]
+      this.currentQuestion = selectedQuestion[0].id
     },
     followUpText(text) {
-      this.node.answers[0].question.followUpText = text
+      this.followUpText = text
     },
+  },
+  mounted() {
+    this.currentActivityID = this.initializeActivityID()
+    this.currentQuestion = this.initializeCurrentQuestion()
+    this.followUpText = this.initializeFollowUpText()
+  },
+  updated() {
+    const answerObject = {
+      activityID: this.currentActivityID,
+      questionID: this.currentQuestion,
+      followUpText: this.followUpText,
+    }
+    this.node.answers = [answerObject]
   },
   methods: {
     initializeActivityID() {
@@ -113,13 +120,13 @@ export default {
     },
     initializeCurrentQuestion() {
       if (this.node.answers.length > 0) {
-        return this.node.answers[0].question.id
+        return this.node.answers[0].questionID
       }
       return ""
     },
     initializeFollowUpText() {
       if (this.node.answers.length > 0) {
-        return this.node.answers[0].question.followUpText
+        return this.node.answers[0].followUpText
       }
       return ""
     },

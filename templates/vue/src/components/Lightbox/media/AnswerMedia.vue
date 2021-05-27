@@ -8,7 +8,7 @@
     >
       <h3>{{ question.text }}</h3>
       <h4 v-if="followUpText" class="mb-4">
-        {{ answers[0].question.followUpText }}
+        {{ answers[0].followUpText }}
       </h4>
       <h4 v-else class="mb-4">{{ question.followUpText }}</h4>
       <tapestry-activity
@@ -17,9 +17,12 @@
         :type="answer.type"
         :entry="answer.entry"
       ></tapestry-activity>
+      <div v-show="getAnswers.length == 0">
+        You have not completed this question yet, or the answer is undefined.
+      </div>
     </div>
     <div v-else>
-      <p>You haven't done this activity yet.</p>
+      <p>Please fill in the answer form.</p>
     </div>
   </div>
 </template>
@@ -45,22 +48,25 @@ export default {
       return this.node.answers
     },
     question() {
-      let questionID = this.node.answers[0].question.id
-      return this.getQuestion(questionID)
+      return this.getQuestion(this.answers[0].questionID)
     },
     followUpText() {
-      if (this.node.answers[0].question.followUpText !== "") {
+      if (this.answers[0].followUpText !== "") {
         return true
       }
       return false
     },
     getAnswers() {
-      const answeredTypes = Object.entries(this.question.answers)
-        .filter(entry => entry[1] && entry[1].length > 0)
-        .map(i => i[0])
-      return answeredTypes
-        .map(type => this.getEntry(this.question.id, type))
-        .filter(Boolean)
+      try {
+        const answeredTypes = Object.entries(this.question.answers)
+          .filter(entry => entry[1] && entry[1].length > 0)
+          .map(i => i[0])
+        return answeredTypes
+          .map(type => this.getEntry(this.question.id, type))
+          .filter(Boolean)
+      } catch (error) {
+        return []
+      }
     },
   },
   mounted() {
