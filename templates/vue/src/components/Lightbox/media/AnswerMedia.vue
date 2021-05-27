@@ -59,7 +59,7 @@ export default {
         .filter(entry => entry[1] && entry[1].length > 0)
         .map(i => i[0])
       return answeredTypes
-        .map(type => this.getEntry(this.question.previousEntry, type))
+        .map(type => this.getEntry(this.question.id, type))
         .filter(Boolean)
     },
   },

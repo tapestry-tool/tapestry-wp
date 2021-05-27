@@ -45,9 +45,6 @@ describe("Answers", () => {
             `How many pidgeons does it take to change a lightbulb?`
           ).should("be.visible")
           cy.contains(`Your past answer: `).should("be.visible")
-          cy.get("[class=tapestry-activity]").should($answers => {
-            expect($answers).to.have.length(2)
-          })
           cy.contains(`34`).should("be.visible")
         })
       })
@@ -74,9 +71,6 @@ describe("Answers", () => {
               cy.get("h4").should($h4 => {
                 expect($h4).to.have.length(1)
                 expect($h4.first()).to.contain("Previously, you said:")
-              })
-              cy.get("[class=tapestry-activity]").should($answers => {
-                expect($answers).to.have.length(2)
               })
               cy.contains(`34`).should("be.visible")
             })
