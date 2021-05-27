@@ -49,10 +49,7 @@ export default {
 </script>
 
 <style lang="scss">
-.container {
-  display: flex;
-}
 .imageChoice {
-  height: 100px;
+  width: 200px;
 }
 </style>

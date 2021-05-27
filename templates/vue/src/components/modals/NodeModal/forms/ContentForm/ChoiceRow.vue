@@ -1,8 +1,8 @@
 <template >
-<div style="z-index: 9999 !important;" class="container">
-  <span v-handle class="fas fa-bars fa-xs" id="handle"></span>
+<div style="z-index: 9999 !important;" class="container" v-if="multipleChoiceSelected && multipleAnswerSelected">
+  <span v-handle class="fas fa-bars fa-s" id="handle"></span>
   <b-form-checkbox 
-    v-if="multipleChoiceSelected && multipleAnswerSelected" :value=item.id>
+     :value=item.id>
     <b-form-group v-if="useImages">
         <file-upload
           v-model="item.imageurl" 
@@ -19,9 +19,13 @@
     v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
     :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
+    </b-form-checkbox> 
     <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
-    </b-form-checkbox>  
-  <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
+    </div> 
+
+  <div style="z-index: 9999 !important;" class="container" v-else-if="multipleChoiceSelected && !multipleAnswerSelected">
+  <span v-handle class="fas fa-bars fa-s" id="handle"></span>
+  <b-form-checkbox :value=item.id  :disabled="isDisabled && selectedRadioChoice!= item.id">
     <b-form-group v-if="useImages">
         <file-upload
           v-model="item.imageurl" 
@@ -38,10 +42,11 @@
    v-model="node.typeData.options.multipleChoice.radioArray[index].value"
    :data-qa="`choicerow-radio-input-${item.id}`"
   ></b-form-input>
-  <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
   </b-form-checkbox> 
+  <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
 </div>
+
 </template>
 
 <script>
@@ -127,9 +132,10 @@ export default {
 .container {
   display: flex;
 }
+
 #handle{
   margin-right: 5px;
-  margin-top: 7px;
+  margin-top: 4px;
 }
 
 </style>

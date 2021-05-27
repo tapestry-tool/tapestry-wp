@@ -163,11 +163,11 @@ export default {
 
 .radio-group {
   display:flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 .checkbox-group {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 </style>
