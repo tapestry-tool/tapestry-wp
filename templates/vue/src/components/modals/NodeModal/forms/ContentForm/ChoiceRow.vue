@@ -19,7 +19,7 @@
     v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
     :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
-    <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
+    <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </b-form-checkbox>  
   <b-form-checkbox :value=item.id v-else-if="multipleChoiceSelected && !multipleAnswerSelected" :disabled="isDisabled && selectedRadioChoice!= item.id">
     <b-form-group v-if="useImages">
@@ -38,7 +38,7 @@
    v-model="node.typeData.options.multipleChoice.radioArray[index].value"
    :data-qa="`choicerow-radio-input-${item.id}`"
   ></b-form-input>
-  <b-button squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
+  <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
   <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
   </b-form-checkbox> 
 </div>
@@ -108,6 +108,11 @@ export default {
     selectedRadioChoice: {
       type: Number,
       required: false,
+    },
+    removeButtonDisabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   methods: {

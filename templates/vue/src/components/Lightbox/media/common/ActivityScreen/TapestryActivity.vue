@@ -1,6 +1,7 @@
 <template>
   <div class="tapestry-activity">
-    <div class="icon"><tapestry-icon :icon="type" /></div>
+    <div v-if="type === 'multiple choice'" class="icon"><tapestry-icon icon="tasks" /></div>
+    <div v-else class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ entry }}</div>
     <ul v-if="type === 'checklist'" class="checklist">
       <li v-for="(choice, index) in entry" :key="index">
@@ -11,6 +12,7 @@
       </li>
     </ul>
     <audio v-if="type === 'audio'" controls :src="entry"></audio>
+    <div v-if="type === 'multiple choice'" class="text">{{ entry }}</div>
   </div>
 </template>
 
@@ -26,7 +28,7 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "checklist", "audio"].includes(val),
+      validator: val => ["text", "checklist", "audio", "multiple choice"].includes(val),
     },
     entry: {
       type: [String, Array],

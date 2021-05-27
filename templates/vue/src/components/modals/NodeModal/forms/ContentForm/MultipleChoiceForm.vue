@@ -20,6 +20,7 @@
     :multipleChoiceSelected="multipleChoiceSelected"
     :multipleAnswerSelected="multipleAnswerSelected"
     :useImages="useImages"
+    :removeButtonDisabled="isRemoveButtonDisabled"
     v-on:remove="choiceRows.splice(index,1)" 
     @newCheckBoxValue="handleNewCheckBoxValue">
     </choice-row>
@@ -45,6 +46,7 @@
     :useImages="useImages"
     :isDisabled="selectedRadioForm.length > 0"
     :selectedRadioChoice="selectedRadioForm[0]"
+    :removeButtonDisabled="isRemoveButtonDisabled"
     v-on:remove="choiceRowsRadio.splice(index,1)" 
     @newRadioValue="handleNewRadioValue">
     </choice-row>
@@ -140,6 +142,15 @@ export default {
       nextChoiceRowRadioId: 53,
       newChoiceRowRadioTitle: '',
     }
+  },
+  computed: {
+      isRemoveButtonDisabled() {
+        if (this.multipleAnswerSelected) {
+          return this.choiceRows.length === 1
+        } else {
+          return this.choiceRowsRadio.length === 1
+        }
+      }
   },
   watch: {
     choiceRows(newChoiceRows) {
