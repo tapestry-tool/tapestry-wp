@@ -44,6 +44,7 @@ describe("Answers", () => {
           cy.contains(
             `How many pidgeons does it take to change a lightbulb?`
           ).should("be.visible")
+          cy.contains("Your past answer: ").should("be.visible")
         })
       })
 
