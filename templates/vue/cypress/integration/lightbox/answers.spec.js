@@ -45,7 +45,6 @@ describe("Answers", () => {
             `How many pidgeons does it take to change a lightbulb?`
           ).should("be.visible")
           cy.contains(`Your past answer: `).should("be.visible")
-          cy.pause()
           cy.get("[class=tapestry-activity]").should($answers => {
             expect($answers).to.have.length(2)
           })
