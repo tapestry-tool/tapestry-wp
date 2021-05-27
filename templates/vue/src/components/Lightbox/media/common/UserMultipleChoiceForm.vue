@@ -1,7 +1,7 @@
 <template>
-  <b-form @submit="handleMultipleChoiceSubmit">
+  <b-form @submit="handleMultipleChoiceSubmit" class="container">
       <b-form-group v-if="node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-checkbox-group v-model="userSelectedCheckbox" class="checkbox-group">
+        <b-form-checkbox-group v-model="userSelectedCheckbox" >
     <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.checkboxArray" 
     :key="userChoiceRow.id"
     :item="userChoiceRow"
@@ -11,14 +11,15 @@
     >
     </user-choice-row>
         </b-form-checkbox-group>
-        <b-form-invalid-feedback :state="checkBoxValidAnswerState" style="margin-top: 70px"
+        <b-form-invalid-feedback :state="checkBoxValidAnswerState" style="clear:both"
         data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
         <!-- <p> You Selected: {{userSelectedCheckbox}}</p> -->
       </b-form-group>
+
       <b-form-group v-else-if="!node.typeData.options.multipleChoice.multiAnswer">
-        <b-form-radio-group v-model="userSelectedRadio" class="radio-group">
+        <b-form-radio-group v-model="userSelectedRadio">
     <user-choice-row  v-for="(userChoiceRow) in node.typeData.options.multipleChoice.radioArray" 
     :key="userChoiceRow.id"
     :item="userChoiceRow"
@@ -28,7 +29,7 @@
     >
     </user-choice-row>
         </b-form-radio-group>
-        <b-form-invalid-feedback :state="radioValidAnswerState" style="margin-top: 70px"
+        <b-form-invalid-feedback :state="radioValidAnswerState" style="clear:both"
         data-qa="invalid-feedback">
           Please Select a choice.
         </b-form-invalid-feedback>
@@ -157,17 +158,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.submit-btn {
-  float: left;
-}
-
-.radio-group {
+.container {
   display:flex;
   flex-direction: column;
 }
 
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
+.submit-btn {
+  float:left;
 }
+
 </style>

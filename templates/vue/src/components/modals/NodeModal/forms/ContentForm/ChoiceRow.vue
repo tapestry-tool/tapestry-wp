@@ -2,7 +2,7 @@
 <div style="z-index: 9999 !important;" class="container" v-if="multipleChoiceSelected && multipleAnswerSelected">
   <span v-handle class="fas fa-bars fa-s" id="handle"></span>
   <b-form-checkbox 
-     :value=item.id>
+     :value=item.id class="choiceCheckbox">
     <b-form-group v-if="useImages">
         <file-upload
           v-model="item.imageurl" 
@@ -15,11 +15,13 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-    <b-form-input :placeholder="placeholder"
+    </b-form-checkbox> 
+    <b-form-input 
+    style="width: 50%; margin-left: -20px;"
+    :placeholder="placeholder"
     v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
     :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
-    </b-form-checkbox> 
     <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
     </div> 
 
@@ -38,12 +40,14 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <b-form-input :placeholder="placeholder" 
-   v-model="node.typeData.options.multipleChoice.radioArray[index].value"
-   :data-qa="`choicerow-radio-input-${item.id}`"
-  ></b-form-input>
   <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
   </b-form-checkbox> 
+  <b-form-input 
+  style="width: 50%; margin-left: -20px;"
+  :placeholder="placeholder" 
+  v-model="node.typeData.options.multipleChoice.radioArray[index].value"
+  :data-qa="`choicerow-radio-input-${item.id}`"
+  ></b-form-input>
   <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
 </div>
 
@@ -129,13 +133,19 @@ export default {
 </script>
 
 <style lang="scss">
+
+.inputchoice {
+  width: 50%;
+}
+
 .container {
   display: flex;
+  //border: solid;
+  align-items: center;
 }
 
 #handle{
   margin-right: 5px;
-  margin-top: 4px;
 }
 
 </style>

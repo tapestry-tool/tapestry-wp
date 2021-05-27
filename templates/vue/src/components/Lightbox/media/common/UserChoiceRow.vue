@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="float:left; clear:both;">
     <b-form-checkbox
       v-if="isCheckBox"
       :value="item.value"

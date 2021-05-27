@@ -26,7 +26,8 @@
     </choice-row>
         </b-form-checkbox-group>
       </SortableList>
-    <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
+      <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
+      <p class="message">Tick any options that should be selected by default in the question</p>
     <!-- <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div> -->
       </b-form-group>
 
@@ -53,6 +54,7 @@
     </b-form-checkbox-group>
       </SortableList>
     <b-button class="addButton" v-on:click="addNewChoiceRadio" variant="primary" squared>Add a choice</b-button>
+    <p class="message">Tick any options that should be selected by default in the question</p>
     <!-- <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div> -->
       </b-form-group>
   </b-form-group>
@@ -227,5 +229,11 @@ export default {
 .addButton {
   margin-top: 10px;
   margin-left: 30px;
+}
+
+.message {
+  font-size: 15px;
+  color: #6c757d;
+  margin-top: 10px;
 }
 </style>
