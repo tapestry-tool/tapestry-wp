@@ -16,7 +16,10 @@
         </template>
       </combobox>
     </b-form-group>
-    <b-form-group label="Select a question from that activity:">
+    <b-form-group
+      data-qa="question-select"
+      label="Select a question from that activity:"
+    >
       <combobox
         v-model="currentQuestion"
         :options="getCurrentQuestions"
