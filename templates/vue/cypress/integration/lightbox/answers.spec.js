@@ -16,11 +16,10 @@ describe("Answers", () => {
       cy.getByTestId(`add-node-${node.id}`).click()
       cy.getByTestId(`node-title`).type(answerNode.title)
       cy.getByTestId(`node-media-type`).select(answerNode.mediaType)
-      //   cy.pause()
       cy.getByTestId(`activity-combobox`).within(() => {
         cy.getByTestId(`choose-activity-node`).click()
-        cy.contains(/activity node/i).should("be.visible")
-        cy.contains(/activity node/i).click()
+        cy.contains(/Questions/i).should("be.visible")
+        cy.contains(/Questions/i).click()
       })
 
       cy.get(`[class="modal-body p-0"]`).as("scrollbar")
@@ -79,6 +78,7 @@ describe("Answers", () => {
               cy.get("div.tapestry-activity").should($activity => {
                 expect($activity).to.have.length(2)
               })
+              cy.contains(`34`).should("be.visible")
             })
           })
         })
