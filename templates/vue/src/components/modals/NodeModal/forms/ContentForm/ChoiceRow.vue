@@ -2,7 +2,7 @@
 <div style="z-index: 9999 !important;" class="container" v-if="multipleChoiceSelected && multipleAnswerSelected">
   <span v-handle class="fas fa-bars fa-s" id="handle"></span>
   <b-form-checkbox 
-     :value=item.id class="choiceCheckbox">
+     :value=item.id>
     <b-form-group v-if="useImages">
         <file-upload
           v-model="item.imageurl" 
@@ -140,7 +140,6 @@ export default {
 
 .container {
   display: flex;
-  //border: solid;
   align-items: center;
 }
 
