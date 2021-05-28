@@ -205,6 +205,7 @@ export default {
     updateProgress(rowId) {
       this.completeNode(rowId).then(() => {
         if (this.rows.every(row => row.node.completed)) {
+          console.log("completed")
           this.$emit("complete", this.node.id)
         }
       })
@@ -212,6 +213,7 @@ export default {
     changeRow(rowInfo) {
       const { rowId, context } = rowInfo
       if (this.isNestedMultiContent(context)) {
+        console.log("this is true")
         if (rowId) {
           this.$router.push({
             name: names.NESTEDMULTICONTENT,

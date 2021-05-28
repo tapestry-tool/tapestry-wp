@@ -1,7 +1,7 @@
 <template>
   <div
     class="embed-responsive embed-responsive-16by9"
-    :style="isMultiContentContext ? '' : 'top: 1.75em'"
+    
   >
     <youtube
       class="embed-responsive-item"

@@ -27,10 +27,19 @@
       />
       <div v-if="state === states.Popup" class="popup">
         <tapestry-media
+          v-if="getNode(this.activePopupId).mediaType !== 'multi-content'"
           :dimensions="dimensions"
           :node-id="activePopupId"
           :context="context"
           :autoplay="autoplay"
+          @complete="handlePopupComplete"
+          @close="transition(events.Continue)"
+        />
+        <multi-content-media
+          v-if="getNode(this.activePopupId).mediaType === 'multi-content'"
+          :dimensions="dimensions"
+          :context="context"
+          :node="getNode(this.activePopupId)"
           @complete="handlePopupComplete"
           @close="transition(events.Continue)"
         />
@@ -108,6 +117,7 @@ export default {
     EndScreen,
     PlayScreen,
     Loading,
+    MultiContentMedia : () => import("../MultiContentMedia/index") ,
   },
   props: {
     nodeId: {
@@ -313,6 +323,7 @@ export default {
       return VideoStates.Finished
     },
     handlePopupComplete() {
+      console.log("completed submited")
       if (!this.isPopupComplete) {
         this.completing = true
       }
