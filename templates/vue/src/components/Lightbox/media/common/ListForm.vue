@@ -1,9 +1,24 @@
 <template>
-  <b-form @submit="handleTextSubmit">
+  <b-form @submit="handleListSubmit">
+    <header>Answers</header>
+    <ul>
+      <ul v-for="(answer, index) in answerList" :key="answer.index">
+        <button @click="deleteAnswer(index)">X</button>
+        {{
+          answer
+        }}
+      </ul>
+    </ul>
     <b-form-input
       v-model="listAnswer"
-      :placeholder="node.typeData.options.list.placeholder"
+      :placeholder="
+        node.typeData.options.list.placeholder
+          ? node.typeData.options.list.placeholder
+          : 'Enter text and press Enter'
+      "
+      @keypress.enter="addAnswer"
     ></b-form-input>
+    <button @click="addAnswer">Add Answer</button>
     <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
     </b-form-invalid-feedback>
@@ -32,6 +47,7 @@ export default {
     return {
       listAnswer: "",
       isAnswerValid: true,
+      answerList: ["100"],
     }
   },
   computed: {
@@ -48,12 +64,22 @@ export default {
       : ""
   },
   methods: {
-    handleTextSubmit(event) {
+    handleListSubmit(event) {
       event.preventDefault()
       this.isAnswerValid = this.listAnswer !== ""
       if (this.isAnswerValid) {
         this.$emit("submit", this.listAnswer)
       }
+    },
+    addAnswer() {
+      this.isAnswerValid = this.listAnswer !== ""
+      if (this.isAnswerValid) {
+        this.answerList.push(this.listAnswer)
+      }
+      this.listAnswer = ""
+    },
+    deleteAnswer(index) {
+      this.answerList.splice(index, 1)
     },
   },
 }
