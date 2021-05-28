@@ -475,6 +475,10 @@ export default {
 
           a {
             color: #becddc;
+            text-decoration: underline;
+            &:hover {
+              color: #fff;
+            }
           }
 
           .license-link {
