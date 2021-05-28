@@ -15,32 +15,35 @@
           </button>
         </ul>
       </div>
-      <b-form-input
-        v-model="listAnswer"
-        class="textInput"
-        :placeholder="
-          node.typeData.options.list.placeholder
-            ? node.typeData.options.list.placeholder
-            : 'Enter text and press Enter'
-        "
-        @keypress.enter="addAnswer"
-      ></b-form-input>
-      <button class="add-button" @click="addAnswer">Add</button>
+      <div class="input">
+        <b-form-input
+          v-model="listAnswer"
+          class="textInput"
+          :placeholder="
+            node.typeData.options.list.placeholder
+              ? node.typeData.options.list.placeholder
+              : 'Enter text and press Enter'
+          "
+          @keypress.enter="addAnswer"
+        ></b-form-input>
+        <button class="btn btn-primary" @click="addAnswer">Add</button>
+      </div>
+      <div class="submission">
+        <b-button
+          v-if="node.mediaType === 'question'"
+          class="submit-btn"
+          variant="primary"
+          @click="handleListSubmit"
+        >
+          Submit
+        </b-button>
+      </div>
       <b-form-invalid-feedback :state="isAnswerValid">
         Please enter a response.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback :state="isSubmitValid">
         Please enter at least one answer.
       </b-form-invalid-feedback>
-
-      <b-button
-        v-if="node.mediaType === 'question'"
-        class="submit-btn mt-3"
-        variant="primary"
-        @click="handleListSubmit"
-      >
-        Submit
-      </b-button>
     </div>
   </b-form>
 </template>
@@ -123,35 +126,7 @@ export default {
 }
 .list {
   position: relative;
-  background-color: gray;
-}
-.list ul {
-  position: relative;
-  padding: 20px;
-}
-
-.textInput {
-  margin-right: 30px;
-}
-.submit-btn {
-  float: right;
-}
-.add-button {
-  margin-top: 10px;
-  margin-left: 30px;
-  float: right;
-}
-.delete-button {
-  float: right;
-  background-color: #f44336;
-  height: 30px;
-  width: 100px;
-  text-align: center;
-  display: block;
-  border-radius: 5px;
-  padding-bottom: 20px;
-  display: flex;
-  margin: auto;
+  margin-top: 20px;
 }
 
 .answerItem {
@@ -159,6 +134,48 @@ export default {
   border-radius: 6px;
   margin: 5px;
   padding: 10px 20px;
-  border-left: 5px solid green;
+}
+
+.list ul {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding: 8px;
+}
+
+.list ul button {
+  float: right;
+  position: relative;
+  padding: 20px;
+  background-color: #f44336;
+  height: 30px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.textInput {
+  float: left;
+  width: 90%;
+}
+
+.add-button {
+  margin-top: 10px;
+  margin-left: 30px;
+  float: right;
+}
+
+.submit-btn {
+  float: center;
+  margin-top: 30px;
 }
 </style>
