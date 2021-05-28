@@ -64,6 +64,14 @@
             >
               Audio Recorder
             </b-form-checkbox>
+            <b-form-checkbox
+              v-model="hasListOption"
+              data-qa="question-answer-list"
+              switch
+              @input="setId($event, 'listId')"
+            >
+              List
+            </b-form-checkbox>
           </b-form-group>
 
           <b-form-group v-if="node.typeData.options.text" label="Text">
@@ -90,6 +98,15 @@
             <b-form-input
               id="placeholder"
               v-model="node.typeData.options.text.placeholder"
+              data-qa="question-answer-text-single-placeholder"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group v-if="hasListOption">
+            <label for="placeholder">Placeholder (optional):</label>
+            <b-form-input
+              id="placeholder"
+              v-model="node.typeData.options.list.placeholder"
               data-qa="question-answer-text-single-placeholder"
             ></b-form-input>
           </b-form-group>
@@ -129,6 +146,7 @@ const defaultQuestion = {
   answers: {
     textId: "",
     audioId: "",
+    listId: "",
   },
 }
 
@@ -147,6 +165,7 @@ export default {
     return {
       hasTextOption: Boolean(this.node.typeData.options?.text),
       hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
+      hasListOption: Boolean(this.node.typeData.options?.list),
     }
   },
   computed: {
@@ -177,6 +196,18 @@ export default {
     hasTextMultiLineOption(multiLineSelected) {
       if (this.node.typeData.options.text) {
         this.node.typeData.options.text.multi = multiLineSelected
+      }
+    },
+    hasListOption(listSelected) {
+      if (listSelected) {
+        this.question.answers.listId = Helpers.createUUID()
+        this.node.typeData.options.list = {
+          list: true,
+          placeholder: "",
+        }
+      } else {
+        this.question.answers.listId = ""
+        delete this.node.typeData.options.list
       }
     },
   },

@@ -64,6 +64,14 @@
             audio
           </answer-button>
           <answer-button
+            v-if="showList"
+            :completed="listFormCompleted"
+            icon="list"
+            @click="openForm(question.answers.listId, 'listId')"
+          >
+            list
+          </answer-button>
+          <answer-button
             v-if="hasId('checklistId')"
             :completed="checklistFormCompleted"
             icon="tasks"
@@ -155,11 +163,17 @@ export default {
     audioRecorderCompleted() {
       return !!(this.question.entries && this.question.entries.audioId)
     },
+    listFormCompleted() {
+      return !!(this.question.entries && this.question.entries.listId)
+    },
     showText() {
       return this.hasId("textId") || Boolean(this.node.typeData.options?.text)
     },
     showAudio() {
       return this.hasId("audioId") || this.node.typeData.options?.audio
+    },
+    showList() {
+      return this.hasId("listId") || this.node.typeData.options?.list
     },
   },
   created() {
@@ -167,6 +181,8 @@ export default {
       if (this.options[0][0] === "audioId") {
         this.openRecorder()
       } else {
+        console.log(this.options[0][1])
+        console.log(this.options[0][0])
         this.openForm(this.options[0][1], this.options[0][0])
       }
     }
@@ -239,6 +255,23 @@ export default {
       }
       this.handleSubmit(
         "text",
+        async () =>
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+      )
+    },
+    async handleListSubmit(event) {
+      const question = this.node.quiz[0]
+      if (!question.entries) {
+        question.entries = {}
+      }
+      question.entries.textId = {
+        [this.formId]: event,
+      }
+      this.handleSubmit(
+        "list",
         async () =>
           await this.updateNode({
             id: this.node.id,
