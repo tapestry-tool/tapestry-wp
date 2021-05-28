@@ -203,7 +203,7 @@ export default {
         new BulletList(),
         new CodeBlock(),
         new HardBreak(),
-        new Heading({ levels: [1, 2, 3] }),
+        new Heading({ levels: [2, 3, 4] }),
         new HorizontalRule(),
         new ListItem(),
         new OrderedList(),
