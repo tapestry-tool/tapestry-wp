@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="handleListSubmit">
+  <b-form>
     <header>Answers</header>
     <ul>
       <ul v-for="(answer, index) in answerList" :key="answer.index">
@@ -19,16 +19,20 @@
       @keypress.enter="addAnswer"
     ></b-form-input>
     <button @click="addAnswer">Add Answer</button>
-    <b-form-invalid-feedback :state="isAnswerValid">
+    <!-- <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
-    </b-form-invalid-feedback>
+    </b-form-invalid-feedback> -->
+    <!-- <b-form-invalid-feedback :state="isSubmitValid">
+      Please enter at least one answer.
+    </b-form-invalid-feedback> -->
 
     <b-button
       v-if="node.mediaType === 'question'"
       class="submit-btn mt-3"
       variant="primary"
-      type="submit"
+      @click="handleListSubmit"
     >
+      <!-- type="submit" -->
       Submit
     </b-button>
   </b-form>
@@ -46,8 +50,9 @@ export default {
   data() {
     return {
       listAnswer: "",
-      isAnswerValid: true,
-      answerList: ["100"],
+      isAnswerValid: false,
+      isSubmitValid: false,
+      answerList: [],
     }
   },
   computed: {
@@ -59,16 +64,26 @@ export default {
     },
   },
   mounted() {
-    this.listAnswer = this.question.entries.listId
-      ? this.question.entries.listId[this.listId]
-      : ""
+    if (this.question.hasOwnProperty("entries")) {
+      if (
+        this.question.entries.hasOwnProperty("listId") &&
+        this.question.entries.listId !== null
+      ) {
+        this.answerList = this.question.entries.listId[this.listId]
+      }
+    } else {
+      this.answerList = []
+    }
+    // this.answerList = this.question.entries
+    //   ? this.question.entries.listId[this.listId]
+    //   : []
   },
   methods: {
     handleListSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.listAnswer !== ""
-      if (this.isAnswerValid) {
-        this.$emit("submit", this.listAnswer)
+      this.isSubmitValid = this.answerList.length > 0
+      if (this.isSubmitValid) {
+        this.$emit("submit", this.answerList)
       }
     },
     addAnswer() {
