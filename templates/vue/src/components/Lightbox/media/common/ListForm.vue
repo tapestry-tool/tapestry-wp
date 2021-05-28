@@ -10,7 +10,11 @@
           {{
             answer
           }}
-          <button class="delete-button" @click="deleteAnswer(index)">
+          <button
+            class="btn btn-primary"
+            variant="danger"
+            @click="deleteAnswer(index)"
+          >
             Delete
           </button>
         </ul>
@@ -26,7 +30,9 @@
           "
           @keypress.enter="addAnswer"
         ></b-form-input>
-        <button class="btn btn-primary" @click="addAnswer">Add</button>
+        <b-button class="btn" variant="primary" @click="addAnswer">
+          Add
+        </b-button>
       </div>
       <div class="submission">
         <b-button
@@ -168,9 +174,11 @@ export default {
   width: 90%;
 }
 
-.add-button {
+.btn btn-primary {
   margin-top: 10px;
   margin-left: 30px;
+  height: 30px;
+  width: 100px;
   float: right;
 }
 
