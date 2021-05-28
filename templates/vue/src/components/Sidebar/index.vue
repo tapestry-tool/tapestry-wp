@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="node"
     ref="wrapper"
     data-qa="sidebar"
     :class="['sidebar-container', { closed: closed }]"
