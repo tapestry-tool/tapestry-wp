@@ -136,6 +136,13 @@ export function getEntry(_, { getQuestion }) {
       }
     }
 
+    if (mediaType === "question" && answerType === "listId") {
+      return {
+        type: "list",
+        entry: Object.values(entry)[0],
+      }
+    }
+
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
   }
