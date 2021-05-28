@@ -11,7 +11,7 @@
     </b-form-group>
     <sub-item-table :actionType="actionType" :node="node"></sub-item-table>
     <b-form-group>
-      <b-form-checkbox v-model="node.typeData.lockRows">
+      <b-form-checkbox v-model="node.typeData.lockRows" data-qa="lock-checkbox">
         Lock rows until previous row is completed
       </b-form-checkbox>
     </b-form-group>
@@ -51,7 +51,10 @@ export default {
   },
   data() {
     return {
-      presentationStyles: [{ value: "accordion", text: "Accordion" }],
+      presentationStyles: [
+        { value: "accordion", text: "Accordion" },
+        { value: "page", text: "Page" },
+      ],
     }
   },
   mounted() {
@@ -63,6 +66,7 @@ export default {
       confirmationBodyText: "Would you like to continue?",
       continueButtonText: "Continue",
       cancelLinkText: "Cancel",
+      showNavBar: true,
       ...this.node.typeData,
     }
   },

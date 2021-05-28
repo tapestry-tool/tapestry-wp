@@ -47,6 +47,7 @@
             @click="changeTab('content')"
           >
             <content-form
+              :parent="parent"
               :node="node"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
@@ -99,7 +100,7 @@
             <activity-form :node="node" />
           </b-tab>
           <b-tab
-            v-if="node.mediaType === 'multi-content' || node.hasSubAccordion"
+            v-if="node.hasMultiContentChild"
             title="Ordering"
             :active="tab === 'ordering'"
             @click="changeTab('ordering')"
@@ -187,7 +188,7 @@
               <span>Publish</span>
             </b-button>
             <b-button
-              v-else-if="this.settings.submitNodesEnabled"
+              v-else-if="settings.submitNodesEnabled"
               data-qa="submit-node-modal"
               size="sm"
               variant="primary"
@@ -543,7 +544,7 @@ export default {
         const node = this.getNode(this.nodeId)
         copy = Helpers.deepCopy(node)
       }
-      copy.hasSubAccordion = this.hasSubAccordion(copy)
+      copy.hasMultiContentChild = this.hasMultiContentChild(copy)
       if (!copy.mapCoordinates) {
         copy.mapCoordinates = {
           lat: "",
@@ -579,18 +580,18 @@ export default {
           return this.node.mediaType === "h5p" || this.node.mediaType === "video"
         }
         case "ordering": {
-          return this.node.mediaType === "multi-content" || this.node.hasSubAccordion
+          return this.node.hasMultiContentChild
         }
       }
 
       return false
     },
-    hasSubAccordion(node) {
+    hasMultiContentChild(node) {
       if (this.parent) {
         const children = this.getDirectChildren(node.id)
-        return this.parent.presentationStyle === "accordion" && children.length > 0
+        return children.length > 0
       }
-      return false
+      return node.mediaType === "multi-content"
     },
     setDisabledMessage(msg) {
       this.deleteWarningText = msg
@@ -628,10 +629,10 @@ export default {
           })
           .catch(err => console.log(err))
       } else {
-        this.close()
+        this.close(event)
       }
     },
-    close() {
+    close(event = null) {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
           this.$router.push({ path: "/", query: this.$route.query })
@@ -649,7 +650,13 @@ export default {
             params: { nodeId: this.rootId },
             query: this.$route.query,
           })
-        } else if (this.isMultiContentNodeChild) {
+        } else if (
+          this.isMultiContentNodeChild &&
+          this.$route.query.nav === "modal"
+        ) {
+          // Prevent NodeModal from closing
+          if (event) event.preventDefault()
+
           // Return to modal of parent node
           this.$router.push({
             name: names.MODAL,
@@ -660,7 +667,7 @@ export default {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: this.$route.query,
+            query: { ...this.$route.query, nav: undefined },
           })
         }
       }
@@ -722,7 +729,7 @@ export default {
             addedOnNodeCreation: true,
           }
           await this.addLink(newLink)
-          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in accordions
+          // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
@@ -816,7 +823,7 @@ export default {
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
       }
-      if (this.node.description.length > this.maxDescriptionLength) {
+      if (this.node.description.replace(/<[^>]*>?/gm, '').length > this.maxDescriptionLength) {
         errMsgs.push(
           "Please limit your description to under " +
             this.maxDescriptionLength +
@@ -1078,6 +1085,9 @@ table {
 }
 
 .error-wrapper {
+  position: sticky;
+  z-index: 2;
+  top: 0;
   background: #f8d7da;
   color: #721c24;
   padding: 1em 1em 1px 2em;
