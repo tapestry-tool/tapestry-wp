@@ -103,7 +103,7 @@
           </b-form-group>
 
           <b-form-group v-if="hasListOption">
-            <label for="placeholder">Placeholder (optional):</label>
+            <label for="placeholder">List Placeholder (optional):</label>
             <b-form-input
               id="placeholder"
               v-model="node.typeData.options.list.placeholder"

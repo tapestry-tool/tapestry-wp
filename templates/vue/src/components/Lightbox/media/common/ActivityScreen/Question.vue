@@ -44,6 +44,11 @@
         :id="question.id"
         @submit="handleAudioSubmit"
       />
+      <list-form
+        v-else-if="listFormOpened"
+        :node="node"
+        @submit="handleListSubmit"
+      ></list-form>
       <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
@@ -67,7 +72,7 @@
             v-if="showList"
             :completed="listFormCompleted"
             icon="list"
-            @click="openForm(question.answers.listId, 'listId')"
+            @click="openList()"
           >
             list
           </answer-button>
@@ -92,6 +97,7 @@ import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
 import TextForm from "../TextForm"
+import ListForm from "../ListForm"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -103,6 +109,7 @@ export default {
     AudioRecorder,
     GravityForm,
     TextForm,
+    ListForm,
     Loading,
     TapestryActivity,
   },
@@ -122,6 +129,7 @@ export default {
       formId: null,
       formType: "",
       recorderOpened: false,
+      listFormOpened: false,
       loading: false,
     }
   },
@@ -173,16 +181,16 @@ export default {
       return this.hasId("audioId") || this.node.typeData.options?.audio
     },
     showList() {
-      return this.hasId("listId") || this.node.typeData.options?.list
+      return this.hasId("listId") || Boolean(this.node.typeData.options?.list)
     },
   },
   created() {
     if (this.options.length === 1) {
       if (this.options[0][0] === "audioId") {
         this.openRecorder()
+      } else if (this.options[0][0] == "listId") {
+        this.openList()
       } else {
-        console.log(this.options[0][1])
-        console.log(this.options[0][0])
         this.openForm(this.options[0][1], this.options[0][0])
       }
     }
@@ -191,12 +199,13 @@ export default {
     ...mapActions(["completeQuestion", "saveAudio", "updateNode"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
-      const wasOpened = this.formOpened || this.recorderOpened
+      const wasOpened = this.formOpened || this.recorderOpened || this.listFormOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }
       this.formOpened = false
       this.recorderOpened = false
+      this.listFormOpened = false
     },
     openRecorder() {
       client.recordAnalyticsEvent(
@@ -210,7 +219,20 @@ export default {
       )
       this.recorderOpened = true
     },
+    openList() {
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: "list",
+        }
+      )
+      this.listFormOpened = true
+    },
     openForm(id, answerType) {
+      console.log("In open form")
       client.recordAnalyticsEvent(
         "user",
         "click",
@@ -267,8 +289,8 @@ export default {
       if (!question.entries) {
         question.entries = {}
       }
-      question.entries.textId = {
-        [this.formId]: event,
+      question.entries.listId = {
+        [this.question.answers.listId]: event,
       }
       this.handleSubmit(
         "list",

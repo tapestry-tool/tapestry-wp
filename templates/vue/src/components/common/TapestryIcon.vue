@@ -29,6 +29,7 @@ const textContent = {
   pen: "\uf304",
   plus: "\uf067",
   play: "\uf04b",
+  list: "\uf0cb",
   text: "Aa",
   "comment-dots": "\uf4ad",
 }
