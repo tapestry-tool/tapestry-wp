@@ -18,13 +18,13 @@
       "
       @keypress.enter="addAnswer"
     ></b-form-input>
-    <button @click="addAnswer">Add Answer</button>
-    <!-- <b-form-invalid-feedback :state="isAnswerValid">
+    <button @click="addAnswer">Add</button>
+    <b-form-invalid-feedback :state="isAnswerValid">
       Please enter a response.
-    </b-form-invalid-feedback> -->
-    <!-- <b-form-invalid-feedback :state="isSubmitValid">
+    </b-form-invalid-feedback>
+    <b-form-invalid-feedback :state="isSubmitValid">
       Please enter at least one answer.
-    </b-form-invalid-feedback> -->
+    </b-form-invalid-feedback>
 
     <b-button
       v-if="node.mediaType === 'question'"
@@ -32,7 +32,6 @@
       variant="primary"
       @click="handleListSubmit"
     >
-      <!-- type="submit" -->
       Submit
     </b-button>
   </b-form>
@@ -50,8 +49,8 @@ export default {
   data() {
     return {
       listAnswer: "",
-      isAnswerValid: false,
-      isSubmitValid: false,
+      isAnswerValid: true,
+      isSubmitValid: true,
       answerList: [],
     }
   },
@@ -74,9 +73,6 @@ export default {
     } else {
       this.answerList = []
     }
-    // this.answerList = this.question.entries
-    //   ? this.question.entries.listId[this.listId]
-    //   : []
   },
   methods: {
     handleListSubmit(event) {
@@ -94,7 +90,19 @@ export default {
       this.listAnswer = ""
     },
     deleteAnswer(index) {
-      this.answerList.splice(index, 1)
+      this.$bvModal
+        .msgBoxConfirm("This answer will be removed.", {
+          modalClass: "node-modal-confirmation",
+          title: "Are you sure you want to delete this answer?",
+          okTitle: "Yes, delete!",
+          okVariant: "danger",
+        })
+        .then(close => {
+          if (close) {
+            this.answerList.splice(index, 1)
+          }
+        })
+        .catch(err => console.log(err))
     },
   },
 }
