@@ -173,8 +173,11 @@ export default {
       this.$emit("change:dimensions", updatedDimensions)
     },
     getInstance() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P
-      return h5pObj.instances[0].video
+      if (this.$refs.h5p) {
+        const h5pObj = this.$refs.h5p.contentWindow.H5P
+        return h5pObj.instances[0].video
+      }
+      return null
     },
     reset() {
       const h5pVideo = this.getInstance()
