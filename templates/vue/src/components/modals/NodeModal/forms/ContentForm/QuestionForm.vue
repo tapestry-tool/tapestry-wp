@@ -94,7 +94,7 @@
           </b-form-group>
 
           <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
-            <label for="placeholder">Placeholder (optional):</label>
+            <label for="placeholder">Text Placeholder (optional):</label>
             <b-form-input
               id="placeholder"
               v-model="node.typeData.options.text.placeholder"
@@ -107,7 +107,7 @@
             <b-form-input
               id="placeholder"
               v-model="node.typeData.options.list.placeholder"
-              data-qa="question-answer-text-single-placeholder"
+              data-qa="question-answer-list-placeholder"
             ></b-form-input>
           </b-form-group>
         </b-card>

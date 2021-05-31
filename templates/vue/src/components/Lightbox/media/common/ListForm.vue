@@ -28,9 +28,9 @@
               ? node.typeData.options.list.placeholder
               : 'Enter text and press Enter'
           "
-          @keypress.enter="addAnswer"
+          @keydown.enter.prevent="addAnswer()"
         ></b-form-input>
-        <b-button class="btn" variant="primary" @click="addAnswer">
+        <b-button class="btn" variant="primary" @click="addAnswer()">
           Add
         </b-button>
       </div>
@@ -149,6 +149,7 @@ export default {
   align-items: center;
   padding-left: 10px;
   padding: 8px;
+  font-size: 25px;
 }
 
 .list ul button {
