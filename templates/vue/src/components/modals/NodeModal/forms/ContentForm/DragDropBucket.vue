@@ -1,33 +1,56 @@
 <template>
-<div class="container">
-  <b-form-group :class="bucketClass">
-    <b> New Bucket</b>
-   <b-form-group v-if="isFromBucket">
-    <drag-drop-bucket-item 
-    v-for="(item, index) in bucket.itemArray"
-    :key="item.id"
-    :node="node"
-    :bucketItem="item"
-    :removeItemDisabled="removeButtonItemDisabled"
-    @remove="bucket.itemArray.splice(index,1)"
-    />
-   </b-form-group>
-   <b-button v-if="isFromBucket" class="addButton" v-on:click="$emit('add')" variant="primary" squared>Add a item</b-button>
-  </b-form-group>
-  <b-form-group>
-  <b-form-input v-if="isFromBucket" placeholder="Enter From Bucket Label" v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"></b-form-input>
-  <b-form-input v-else placeholder="Enter To Bucket Label" v-model="node.typeData.options.dragDrop.toBucketArray[index].value"></b-form-input>
-  <b-button :disabled="isFromBucket? removeFromDisabled: removeToDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove Bucket</b-button>
-  </b-form-group>
-</div>
+  <div class="container">
+    <b-form-group :class="bucketClass">
+      <b>New Bucket</b>
+      <b-form-group v-if="isFromBucket">
+        <drag-drop-bucket-item
+          v-for="(item, index) in bucket.itemArray"
+          :key="item.id"
+          :node="node"
+          :bucketItem="item"
+          :removeItemDisabled="removeButtonItemDisabled"
+          @remove="bucket.itemArray.splice(index, 1)"
+        />
+      </b-form-group>
+      <b-button
+        v-if="isFromBucket"
+        class="addButton"
+        variant="primary"
+        squared
+        @click="$emit('add')"
+      >
+        Add a item
+      </b-button>
+    </b-form-group>
+    <b-form-group>
+      <b-form-input
+        v-if="isFromBucket"
+        v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
+        placeholder="Enter From Bucket Label"
+      ></b-form-input>
+      <b-form-input
+        v-else
+        v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
+        placeholder="Enter To Bucket Label"
+      ></b-form-input>
+      <b-button
+        :disabled="isFromBucket ? removeFromDisabled : removeToDisabled"
+        squared
+        variant="outline-danger"
+        @click="$emit('remove')"
+      >
+        Remove Bucket
+      </b-button>
+    </b-form-group>
+  </div>
 </template>
 
 <script>
-import DragDropBucketItem from './DragDropBucketItem'
+import DragDropBucketItem from "./DragDropBucketItem"
 
 export default {
-  components:{ 
-      DragDropBucketItem,
+  components: {
+    DragDropBucketItem,
   },
   props: {
     node: {
@@ -56,23 +79,21 @@ export default {
     },
   },
   data() {
-    return {
-    }
+    return {}
   },
   computed: {
-   bucketClass() {
-     if (this.isFromBucket) {
-       return "fromBucketContainer"
-     } else {
-       return "toBucketContainer"
-     }
-   },
-   removeButtonItemDisabled() {
+    bucketClass() {
+      if (this.isFromBucket) {
+        return "fromBucketContainer"
+      } else {
+        return "toBucketContainer"
+      }
+    },
+    removeButtonItemDisabled() {
       return this.bucket.itemArray.length === 1
     },
   },
-  methods: {
-  },
+  methods: {},
 }
 </script>
 
@@ -90,7 +111,7 @@ export default {
 .toBucketContainer {
   background-color: #e8eaf6;
   width: 80%;
-  height:100px;
+  height: 100px;
   margin-bottom: 15px;
 }
 </style>

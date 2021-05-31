@@ -101,11 +101,9 @@
               data-qa="question-answer-text-single-placeholder"
             ></b-form-input>
           </b-form-group>
-          
-           <b-form-group v-if="node.typeData.options.dragDrop" label="Drag and Drop">
-            <drag-drop-form 
-            :node="node"
-            />
+
+          <b-form-group v-if="node.typeData.options.dragDrop" label="Drag and Drop">
+            <drag-drop-form :node="node" />
           </b-form-group>
         </b-card>
 
@@ -197,7 +195,7 @@ export default {
         this.node.typeData.options.text.multi = multiLineSelected
       }
     },
-     hasDragDropOption(dragDropSelected) {
+    hasDragDropOption(dragDropSelected) {
       if (dragDropSelected) {
         this.question.answers.dragdropId = Helpers.createUUID()
         this.node.typeData.options.dragDrop = {}
@@ -205,7 +203,7 @@ export default {
         this.question.answers.dragdropId = ""
         delete this.node.typeData.options.dragDrop
       }
-    }, 
+    },
   },
   created() {
     if (this.node.quiz.length == 0) {

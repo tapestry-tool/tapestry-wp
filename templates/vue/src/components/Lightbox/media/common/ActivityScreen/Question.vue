@@ -44,6 +44,11 @@
         :id="question.id"
         @submit="handleAudioSubmit"
       />
+      <user-drag-drop-form
+        v-else-if="userDragDropFormOpened"
+        :node="node"
+        @submit="handleDragDropSubmit"
+      />
       <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
@@ -71,6 +76,14 @@
           >
             checklist
           </answer-button>
+          <answer-button
+            v-if="showDragDrop"
+            :completed="dragDropFormCompleted"
+            icon="mouse-pointer"
+            @click="openDragDrop(question.answers.dragDropId, 'dragDropId')"
+          >
+            drag and drop
+          </answer-button>
         </div>
       </div>
     </div>
@@ -84,6 +97,7 @@ import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import GravityForm from "../GravityForm"
 import TextForm from "../TextForm"
+import UserDragDropForm from "../UserDragDropForm"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -95,6 +109,7 @@ export default {
     AudioRecorder,
     GravityForm,
     TextForm,
+    UserDragDropForm,
     Loading,
     TapestryActivity,
   },
@@ -114,6 +129,7 @@ export default {
       formId: null,
       formType: "",
       recorderOpened: false,
+      userDragDropFormOpened: false,
       loading: false,
     }
   },
@@ -155,17 +171,27 @@ export default {
     audioRecorderCompleted() {
       return !!(this.question.entries && this.question.entries.audioId)
     },
+    dragDropFormCompleted() {
+      return !!(this.question.entries && this.question.entries.dragDropId)
+    },
     showText() {
       return this.hasId("textId") || Boolean(this.node.typeData.options?.text)
     },
     showAudio() {
       return this.hasId("audioId") || this.node.typeData.options?.audio
     },
+    showDragDrop() {
+      return (
+        this.hasId("dragDropId") || Boolean(this.node.typeData.options?.dragDrop)
+      )
+    },
   },
   created() {
     if (this.options.length === 1) {
       if (this.options[0][0] === "audioId") {
         this.openRecorder()
+      } else if (this.options[0][0] === "dragDropId") {
+        this.openDragDrop(this.options[0][1], this.options[0][0])
       } else {
         this.openForm(this.options[0][1], this.options[0][0])
       }
@@ -175,12 +201,14 @@ export default {
     ...mapActions(["completeQuestion", "saveAudio", "updateNode"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
-      const wasOpened = this.formOpened || this.recorderOpened
+      const wasOpened =
+        this.formOpened || this.recorderOpened || this.userDragDropFormOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }
       this.formOpened = false
       this.recorderOpened = false
+      this.userDragDropFormOpened = false
     },
     openRecorder() {
       client.recordAnalyticsEvent(
@@ -208,6 +236,19 @@ export default {
       this.formId = id
       this.formType = answerType
       this.formOpened = true
+    },
+    openDragDrop(id, answerType) {
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: answerType,
+          id,
+        }
+      )
+      this.userDragDropFormOpened = true
     },
     hasId(label) {
       const id = this.question.answers[label]
@@ -239,6 +280,23 @@ export default {
       }
       this.handleSubmit(
         "text",
+        async () =>
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+      )
+    },
+    async handleDragDropSubmit(event) {
+      const question = this.node.quiz[0]
+      if (!question.entries) {
+        question.entries = {}
+      }
+      question.entries.dragDropId = {
+        [this.question.answers.dragDropId]: event,
+      }
+      this.handleSubmit(
+        "dragDrop",
         async () =>
           await this.updateNode({
             id: this.node.id,
