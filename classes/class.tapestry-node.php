@@ -38,6 +38,7 @@ class TapestryNode implements ITapestryNode
     private $hideMedia;
     private $skippable;
     private $quiz;
+    private $answer;
     private $fullscreen;
     private $childOrdering;
     private $fitWindow;
@@ -85,6 +86,7 @@ class TapestryNode implements ITapestryNode
         $this->hideMedia = false;
         $this->skippable = true;
         $this->quiz = [];
+        $this->answer = (object) [];
         $this->fullscreen = false;
         $this->childOrdering = [];
         $this->fitWindow = true;
@@ -203,6 +205,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->quiz) && is_array($node->quiz)) {
             $this->quiz = $node->quiz;
+        }
+        if (isset($node->answer) && is_object($node->answer)) {
+            $this->answer = $node->answer;
         }
         if (isset($node->fullscreen) && is_bool($node->fullscreen)) {
             $this->fullscreen = $node->fullscreen;
@@ -557,6 +562,7 @@ class TapestryNode implements ITapestryNode
             'hideMedia' => $this->hideMedia,
             'skippable' => $this->skippable,
             'quiz' => $this->quiz,
+            'answer' => $this->answer,
             'fullscreen' => $this->fullscreen,
             'conditions' => $this->conditions,
             'childOrdering' => $this->childOrdering,

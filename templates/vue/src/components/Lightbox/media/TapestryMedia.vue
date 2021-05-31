@@ -84,6 +84,14 @@
       @close="$emit('close')"
       @load="handleLoad"
     />
+    <answer-media
+      v-if="node.mediaType === 'answer'"
+      :node="node"
+      :context="context"
+      @complete="complete"
+      @close="$emit('close')"
+      @load="handleLoad"
+    />
     <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
@@ -99,6 +107,7 @@ import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
 import GravityForm from "./common/GravityForm"
 import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
+import AnswerMedia from "./AnswerMedia"
 
 export default {
   name: "tapestry-media",
@@ -112,6 +121,7 @@ export default {
     CompletionScreen,
     ActivityMedia,
     "youtube-media": YouTubeMedia,
+    AnswerMedia,
   },
   props: {
     nodeId: {

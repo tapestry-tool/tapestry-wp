@@ -96,6 +96,7 @@ import RichTextForm from "./RichTextForm"
 import UrlEmbedForm from "./UrlEmbedForm"
 import VideoForm from "./VideoForm"
 import WpPostForm from "./WpPostForm"
+import AnswerForm from "./AnswerForm"
 
 export default {
   components: {
@@ -109,6 +110,7 @@ export default {
     UrlEmbedForm,
     VideoForm,
     WpPostForm,
+    AnswerForm,
   },
   props: {
     parent: {
@@ -141,6 +143,10 @@ export default {
         { value: "url-embed", text: "External Link" },
         { value: "wp-post", text: "Wordpress Post" },
         { value: "question", text: "Question" },
+        {
+          label: "Advanced",
+          options: [{ value: "answer", text: "Answer" }],
+        },
         { value: "activity", text: "Activity" },
         { value: "gravity-form", text: "Gravity Form", disabled: true },
         { value: "multi-content", text: "Multi-Content" }, // must be last item

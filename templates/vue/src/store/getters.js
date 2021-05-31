@@ -129,7 +129,10 @@ export function getEntry(_, { getQuestion }) {
       return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
     }
 
-    if (mediaType === "question" && answerType === "textId") {
+    if (
+      (mediaType === "question" || mediaType == "answer") &&
+      answerType === "textId"
+    ) {
       return {
         type: "text",
         entry: Object.values(entry)[0],
