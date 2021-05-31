@@ -64,7 +64,7 @@
             >
               Audio Recorder
             </b-form-checkbox>
-             <b-form-checkbox
+            <b-form-checkbox
               v-model="hasMultipleChoiceOption"
               data-qa="question-answer-multiple-choice"
               switch
@@ -102,7 +102,10 @@
             ></b-form-input>
           </b-form-group>
 
-           <b-form-group v-if="node.typeData.options.multipleChoice" label="Multiple Choice">
+          <b-form-group
+            v-if="node.typeData.options.multipleChoice"
+            label="Multiple Choice"
+          >
             <b-form-radio
               v-model="hasMultipleChoiceMultiAnswerOption"
               data-qa="question-answer-multipleChoice-multi"
@@ -121,10 +124,12 @@
             </b-form-radio>
           </b-form-group>
           <b-form-group v-if="hasMultipleChoiceOption" label="">
-            <multiple-choice-form :node="node" 
-            data-qa="authoring-multiplechoice-form"
-            :multipleChoiceSelected="hasMultipleChoiceOption"
-            :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"/>
+            <multiple-choice-form
+              :node="node"
+              data-qa="authoring-multiplechoice-form"
+              :multipleChoiceSelected="hasMultipleChoiceOption"
+              :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"
+            />
           </b-form-group>
         </b-card>
         <b-card
@@ -155,7 +160,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./RichTextForm"
 import Helpers from "@/utils/Helpers"
-import MultipleChoiceForm from './MultipleChoiceForm.vue'
+import MultipleChoiceForm from "./MultipleChoiceForm.vue"
 
 const defaultQuestion = {
   text: "",
@@ -183,7 +188,9 @@ export default {
       hasTextOption: Boolean(this.node.typeData.options?.text),
       hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
       hasMultipleChoiceOption: Boolean(this.node.typeData.options?.multipleChoice),
-      hasMultipleChoiceMultiAnswerOption: Boolean(this.node.typeData.options?.multipleChoice?.multiAnswer),
+      hasMultipleChoiceMultiAnswerOption: Boolean(
+        this.node.typeData.options?.multipleChoice?.multiAnswer
+      ),
     }
   },
   computed: {
@@ -215,7 +222,7 @@ export default {
       if (this.node.typeData.options.text) {
         this.node.typeData.options.text.multi = multiLineSelected
       }
-    }, 
+    },
     hasMultipleChoiceOption(multipleChoiceSelected) {
       if (multipleChoiceSelected) {
         this.question.answers.multipleChoiceId = Helpers.createUUID()
@@ -226,7 +233,7 @@ export default {
         this.hasMultipleChoiceMultiAnswerOption = false
         delete this.node.typeData.options.multipleChoice
       }
-    }, 
+    },
     hasMultipleChoiceMultiAnswerOption(multiAnswerSelected) {
       if (this.node.typeData.options.multipleChoice) {
         this.node.typeData.options.multipleChoice.multiAnswer = multiAnswerSelected

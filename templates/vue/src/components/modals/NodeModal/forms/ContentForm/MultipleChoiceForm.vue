@@ -1,70 +1,95 @@
 <template>
-<div>
-  <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
-    <b-form-group>
+  <div>
+    <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
+      <b-form-group>
         <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
           Use Images
         </b-form-checkbox>
       </b-form-group>
       <b-form-group v-if="multipleAnswerSelected">
-      <SortableList lockAxis="y" v-model="choiceRows" :useDragHandle="true" @input="updateOrderingCheckBoxArray">
-        <b-form-checkbox-group v-model="selectedCheckBoxForm">
-    <choice-row 
-    v-for="(choiceRow, index) in choiceRows"
-    :data-qa="`choicerow-checkbox-${choiceRow.id}`"
-    :item="choiceRow"
-    :key="choiceRow.id"
-    placeholder="answer option text"
-    :index="index"
-    :node="node" 
-    :multipleChoiceSelected="multipleChoiceSelected"
-    :multipleAnswerSelected="multipleAnswerSelected"
-    :useImages="useImages"
-    :removeButtonDisabled="isRemoveButtonDisabled"
-    v-on:remove="choiceRows.splice(index,1)" 
-    @newCheckBoxValue="handleNewCheckBoxValue">
-    </choice-row>
-        </b-form-checkbox-group>
-      </SortableList>
-      <b-button class="addButton" v-on:click="addNewChoice" variant="primary" squared>Add a choice</b-button>
-      <p class="message">Tick any options that should be selected by default in the question</p>
-    <!-- <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div> -->
+        <sortable-list
+          v-model="choiceRows"
+          lockAxis="y"
+          :useDragHandle="true"
+          @input="updateOrderingCheckBoxArray"
+        >
+          <b-form-checkbox-group v-model="selectedCheckBoxForm">
+            <choice-row
+              v-for="(choiceRow, index) in choiceRows"
+              :key="choiceRow.id"
+              :data-qa="`choicerow-checkbox-${choiceRow.id}`"
+              :item="choiceRow"
+              placeholder="answer option text"
+              :index="index"
+              :node="node"
+              :multipleChoiceSelected="multipleChoiceSelected"
+              :multipleAnswerSelected="multipleAnswerSelected"
+              :useImages="useImages"
+              :removeButtonDisabled="isRemoveButtonDisabled"
+              @remove="choiceRows.splice(index, 1)"
+              @newCheckBoxValue="handleNewCheckBoxValue"
+            ></choice-row>
+          </b-form-checkbox-group>
+        </sortable-list>
+        <b-button class="addButton" variant="primary" squared @click="addNewChoice">
+          Add a choice
+        </b-button>
+        <p class="message">
+          Tick any options that should be selected by default in the question
+        </p>
+        <!-- <div class="mt-3">SelectedCheckBoxForm: <strong>{{ selectedCheckBoxForm }}</strong></div> -->
       </b-form-group>
 
       <b-form-group v-else-if="!multipleAnswerSelected">
-      <SortableList lockAxis="y" v-model="choiceRowsRadio" :useDragHandle="true" @input="updateOrderingRadioArray">
-        <b-form-checkbox-group v-model="selectedRadioForm">
-    <choice-row 
-    v-for="(choiceRow, index) in choiceRowsRadio"
-    :data-qa="`choicerow-radio-${choiceRow.id}`"
-    :item="choiceRow"
-    :key="choiceRow.id"
-    placeholder="answer option text"
-    :index="index"
-    :node="node" 
-    :multipleChoiceSelected="multipleChoiceSelected"
-    :multipleAnswerSelected="multipleAnswerSelected"
-    :useImages="useImages"
-    :isDisabled="selectedRadioForm.length > 0"
-    :selectedRadioChoice="selectedRadioForm[0]"
-    :removeButtonDisabled="isRemoveButtonDisabled"
-    v-on:remove="choiceRowsRadio.splice(index,1)" 
-    @newRadioValue="handleNewRadioValue">
-    </choice-row>
-    </b-form-checkbox-group>
-      </SortableList>
-    <b-button class="addButton" v-on:click="addNewChoiceRadio" variant="primary" squared>Add a choice</b-button>
-    <p class="message">Tick any options that should be selected by default in the question</p>
-    <!-- <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div> -->
+        <sortable-list
+          v-model="choiceRowsRadio"
+          lockAxis="y"
+          :useDragHandle="true"
+          @input="updateOrderingRadioArray"
+        >
+          <b-form-checkbox-group v-model="selectedRadioForm">
+            <choice-row
+              v-for="(choiceRow, index) in choiceRowsRadio"
+              :key="choiceRow.id"
+              :data-qa="`choicerow-radio-${choiceRow.id}`"
+              :item="choiceRow"
+              placeholder="answer option text"
+              :index="index"
+              :node="node"
+              :multipleChoiceSelected="multipleChoiceSelected"
+              :multipleAnswerSelected="multipleAnswerSelected"
+              :useImages="useImages"
+              :isDisabled="selectedRadioForm.length > 0"
+              :selectedRadioChoice="selectedRadioForm[0]"
+              :removeButtonDisabled="isRemoveButtonDisabled"
+              @remove="choiceRowsRadio.splice(index, 1)"
+              @newRadioValue="handleNewRadioValue"
+            >
+              >
+            </choice-row>
+          </b-form-checkbox-group>
+        </sortable-list>
+        <b-button
+          class="addButton"
+          variant="primary"
+          squared
+          @click="addNewChoiceRadio"
+        >
+          Add a choice
+        </b-button>
+        <p class="message">
+          Tick any options that should be selected by default in the question
+        </p>
+        <!-- <div class="mt-3">SelectedRadioForm: <strong>{{ selectedRadioForm }}</strong></div> -->
       </b-form-group>
-  </b-form-group>
-</div>
+    </b-form-group>
+  </div>
 </template>
 
 <script>
 import ChoiceRow from "./ChoiceRow.vue"
 import FileUpload from "@/components/modals/common/FileUpload"
-import { ContainerMixin,} from 'vue-slicksort';
+import { ContainerMixin } from "vue-slicksort"
 const SortableList = {
   mixins: [ContainerMixin],
   template: `
@@ -72,13 +97,13 @@ const SortableList = {
       <slot />
     </ul>
   `,
-};
+}
 
 export default {
   components: {
-  ChoiceRow,
-  FileUpload,
-  SortableList
+    ChoiceRow,
+    FileUpload,
+    SortableList,
   },
   props: {
     node: {
@@ -102,57 +127,57 @@ export default {
       choiceRows: [
         {
           id: 1,
-          imageurl: '',
-          value: '',
-          title: '1st Choice',
+          imageurl: "",
+          value: "",
+          title: "1st Choice",
         },
         {
           id: 2,
-          imageurl: '',
-          value: '',
-          title: '2nd Choice',
+          imageurl: "",
+          value: "",
+          title: "2nd Choice",
         },
         {
           id: 3,
-          imageurl: '',
-          value: '',
-          title: '3rd Choice',
+          imageurl: "",
+          value: "",
+          title: "3rd Choice",
         },
       ],
       nextChoiceRowId: 4,
-      newChoiceRowTitle: '',
+      newChoiceRowTitle: "",
       choiceRowsRadio: [
         {
           id: 50,
-          imageurl: '',
-          value: '',
-          title: '1st Choice'
+          imageurl: "",
+          value: "",
+          title: "1st Choice",
         },
         {
           id: 51,
-          imageurl: '',
-          value: '',
-          title: '2nd Choice'
+          imageurl: "",
+          value: "",
+          title: "2nd Choice",
         },
         {
           id: 52,
-          imageurl: '',
-          value: '',
-          title: '3rd Choice'
+          imageurl: "",
+          value: "",
+          title: "3rd Choice",
         },
       ],
       nextChoiceRowRadioId: 53,
-      newChoiceRowRadioTitle: '',
+      newChoiceRowRadioTitle: "",
     }
   },
   computed: {
-      isRemoveButtonDisabled() {
-        if (this.multipleAnswerSelected) {
-          return this.choiceRows.length === 1
-        } else {
-          return this.choiceRowsRadio.length === 1
-        }
+    isRemoveButtonDisabled() {
+      if (this.multipleAnswerSelected) {
+        return this.choiceRows.length === 1
+      } else {
+        return this.choiceRowsRadio.length === 1
       }
+    },
   },
   watch: {
     choiceRows(newChoiceRows) {
@@ -172,52 +197,54 @@ export default {
     },
   },
   created() {
-      if (!this.node.typeData.options.multipleChoice.hasOwnProperty('checkboxArray') &&
-      !this.node.typeData.options.multipleChoice.hasOwnProperty('radioArray') &&
-      !this.node.typeData.options.multipleChoice.hasOwnProperty('useImages')) {
-        this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
-        this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
-        this.node.typeData.options.multipleChoice.useImages = this.useImages
-        this.node.typeData.options.multipleChoice.selectedCheckBoxArray = this.selectedCheckBoxForm
-        this.node.typeData.options.multipleChoice.selectedRadioArray = this.selectedRadioForm
-      } else {
+    if (
+      !this.node.typeData.options.multipleChoice.hasOwnProperty("checkboxArray") &&
+      !this.node.typeData.options.multipleChoice.hasOwnProperty("radioArray") &&
+      !this.node.typeData.options.multipleChoice.hasOwnProperty("useImages")
+    ) {
+      this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
+      this.node.typeData.options.multipleChoice.radioArray = this.choiceRowsRadio
+      this.node.typeData.options.multipleChoice.useImages = this.useImages
+      this.node.typeData.options.multipleChoice.selectedCheckBoxArray = this.selectedCheckBoxForm
+      this.node.typeData.options.multipleChoice.selectedRadioArray = this.selectedRadioForm
+    } else {
       this.useImages = this.node.typeData.options.multipleChoice.useImages
       this.choiceRowsRadio = this.node.typeData.options.multipleChoice.radioArray
       this.choiceRows = this.node.typeData.options.multipleChoice.checkboxArray
       this.selectedCheckBoxForm = this.node.typeData.options.multipleChoice.selectedCheckBoxArray
       this.selectedRadioForm = this.node.typeData.options.multipleChoice.selectedRadioArray
-      }
+    }
   },
   methods: {
-     addNewChoice: function() {
-       this.choiceRows.push({
-         id: this.nextChoiceRowId++,
-         imageurl: '',
-         value: '',
-         title: this.newChoiceRowTitle,
-       })
-       this.newChoiceRowTitle=''
-     },
-     addNewChoiceRadio: function() {
-       this.choiceRowsRadio.push({
-         id: this.nextChoiceRowRadioId++,
-         imageurl: '',
-         value: '',
-         title: this.newChoiceRowRadioTitle
-       })
-       this.newChoiceRowRadioTitle=''
-     },
-     updateOrderingCheckBoxArray(arr) {
+    addNewChoice: function() {
+      this.choiceRows.push({
+        id: this.nextChoiceRowId++,
+        imageurl: "",
+        value: "",
+        title: this.newChoiceRowTitle,
+      })
+      this.newChoiceRowTitle = ""
+    },
+    addNewChoiceRadio: function() {
+      this.choiceRowsRadio.push({
+        id: this.nextChoiceRowRadioId++,
+        imageurl: "",
+        value: "",
+        title: this.newChoiceRowRadioTitle,
+      })
+      this.newChoiceRowRadioTitle = ""
+    },
+    updateOrderingCheckBoxArray(arr) {
       this.node.typeData.options.multipleChoice.checkboxArray = arr
     },
     updateOrderingRadioArray(arr) {
       this.node.typeData.options.multipleChoice.radioArray = arr
     },
-    handleNewCheckBoxValue({newValue, choiceIndex, choiceRowItem}){
+    handleNewCheckBoxValue({ newValue, choiceIndex, choiceRowItem }) {
       this.choiceRows[choiceIndex].value = newValue
       choiceRowItem.value = newValue
     },
-    handleNewRadioValue({newValue, choiceIndex, choiceRowItem}){
+    handleNewRadioValue({ newValue, choiceIndex, choiceRowItem }) {
       this.choiceRowsRadio[choiceIndex].value = newValue
       choiceRowItem.value = newValue
     },

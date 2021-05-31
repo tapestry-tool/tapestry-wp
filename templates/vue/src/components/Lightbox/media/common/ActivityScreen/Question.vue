@@ -45,10 +45,10 @@
         @submit="handleAudioSubmit"
       />
       <user-multiple-choice-form
-          v-else-if="userMultipleChoiceFormOpened"
-          :node="node" 
-          @submit="handleMultipleChoiceSubmit" 
-        ></user-multiple-choice-form>
+        v-else-if="userMultipleChoiceFormOpened"
+        :node="node"
+        @submit="handleMultipleChoiceSubmit"
+      ></user-multiple-choice-form>
       <div v-else class="question-content">
         <p class="question-answer-text">I want to answer with...</p>
         <div class="button-container">
@@ -75,7 +75,7 @@
             icon="tasks"
             @click="openMultipleChoice(question.answers.multipleChoiceId)"
           >
-            {{this.multipleChoiceLabel}}
+            {{ this.multipleChoiceLabel }}
           </answer-button>
           <answer-button
             v-if="hasId('checklistId')"
@@ -140,11 +140,11 @@ export default {
       return wp.isLoggedIn()
     },
     multipleChoiceLabel() {
-       if (this.node.typeData.options?.multipleChoice.multiAnswer) {
-         return "Checkbox"
-       } else {
-         return "Radio"
-       }
+      if (this.node.typeData.options?.multipleChoice.multiAnswer) {
+        return "Checkbox"
+      } else {
+        return "Radio"
+      }
     },
     lastQuestion() {
       if (this.question.previousEntry) {
@@ -189,7 +189,10 @@ export default {
       return this.hasId("audioId") || this.node.typeData.options?.audio
     },
     showMultipleChoice() {
-      return this.hasId("multipleChoiceId") || Boolean(this.node.typeData.options?.multipleChoice)
+      return (
+        this.hasId("multipleChoiceId") ||
+        Boolean(this.node.typeData.options?.multipleChoice)
+      )
     },
   },
   created() {
@@ -207,7 +210,8 @@ export default {
     ...mapActions(["completeQuestion", "saveAudio", "updateNode"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
-      const wasOpened = this.formOpened || this.recorderOpened || this.userMultipleChoiceFormOpened
+      const wasOpened =
+        this.formOpened || this.recorderOpened || this.userMultipleChoiceFormOpened
       if (!wasOpened || this.options.length === 1) {
         this.$emit("back")
       }

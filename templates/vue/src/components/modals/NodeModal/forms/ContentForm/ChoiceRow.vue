@@ -1,11 +1,14 @@
-<template >
-<div style="z-index: 9999 !important;" class="container" v-if="multipleChoiceSelected && multipleAnswerSelected">
-  <span v-handle class="fas fa-bars fa-s" id="handle"></span>
-  <b-form-checkbox 
-     :value=item.id>
-    <b-form-group v-if="useImages">
+<template>
+  <div
+    v-if="multipleChoiceSelected && multipleAnswerSelected"
+    style="z-index: 9999 !important;"
+    class="container"
+  >
+    <span id="handle" v-handle class="fas fa-bars fa-s"></span>
+    <b-form-checkbox :value="item.id">
+      <b-form-group v-if="useImages">
         <file-upload
-          v-model="item.imageurl" 
+          v-model="item.imageurl"
           input-test-id="node-choiceRow-thumbnail-url"
           :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
           :show-url-upload="false"
@@ -15,22 +18,36 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-    </b-form-checkbox> 
-    <b-form-input 
-    style="width: 50%; margin-left: -20px;"
-    :placeholder="placeholder"
-    v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
-    :data-qa="`choicerow-checkbox-input-${item.id}`"
+    </b-form-checkbox>
+    <b-form-input
+      v-model="node.typeData.options.multipleChoice.checkboxArray[index].value"
+      style="width: 50%; margin-left: -20px;"
+      :placeholder="placeholder"
+      :data-qa="`choicerow-checkbox-input-${item.id}`"
     ></b-form-input>
-    <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
-    </div> 
+    <b-button
+      :disabled="removeButtonDisabled"
+      squared
+      variant="outline-danger"
+      @click="$emit('remove')"
+    >
+      Remove
+    </b-button>
+  </div>
 
-  <div style="z-index: 9999 !important;" class="container" v-else-if="multipleChoiceSelected && !multipleAnswerSelected">
-  <span v-handle class="fas fa-bars fa-s" id="handle"></span>
-  <b-form-checkbox :value=item.id  :disabled="isDisabled && selectedRadioChoice!= item.id">
-    <b-form-group v-if="useImages">
+  <div
+    v-else-if="multipleChoiceSelected && !multipleAnswerSelected"
+    style="z-index: 9999 !important;"
+    class="container"
+  >
+    <span id="handle" v-handle class="fas fa-bars fa-s"></span>
+    <b-form-checkbox
+      :value="item.id"
+      :disabled="isDisabled && selectedRadioChoice != item.id"
+    >
+      <b-form-group v-if="useImages">
         <file-upload
-          v-model="item.imageurl" 
+          v-model="item.imageurl"
           input-test-id="node-choiceRow-thumbnail-url"
           :data-qa="`choicerow-radio-thumbnail-${item.id}`"
           :show-url-upload="false"
@@ -40,46 +57,42 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-  <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
-  </b-form-checkbox> 
-  <b-form-input 
-  style="width: 50%; margin-left: -20px;"
-  :placeholder="placeholder" 
-  v-model="node.typeData.options.multipleChoice.radioArray[index].value"
-  :data-qa="`choicerow-radio-input-${item.id}`"
-  ></b-form-input>
-  <b-button :disabled="removeButtonDisabled" squared variant="outline-danger" v-on:click="$emit('remove')">Remove</b-button>
-</div>
-
+      <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
+    </b-form-checkbox>
+    <b-form-input
+      v-model="node.typeData.options.multipleChoice.radioArray[index].value"
+      style="width: 50%; margin-left: -20px;"
+      :placeholder="placeholder"
+      :data-qa="`choicerow-radio-input-${item.id}`"
+    ></b-form-input>
+    <b-button
+      :disabled="removeButtonDisabled"
+      squared
+      variant="outline-danger"
+      @click="$emit('remove')"
+    >
+      Remove
+    </b-button>
+  </div>
 </template>
 
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
-import { SlickList, SlickItem, HandleDirective, ContainerMixin, ElementMixin} from "vue-slicksort"
+import {
+  SlickList,
+  SlickItem,
+  HandleDirective,
+  ContainerMixin,
+  ElementMixin,
+} from "vue-slicksort"
 export default {
   components: {
-  FileUpload,
-  SlickItem,
-  SlickList,
+    FileUpload,
+    SlickItem,
+    SlickList,
   },
   directives: { handle: HandleDirective },
   mixins: [ElementMixin],
-  data() {
-    return {
-    checkBoxValue: '',
-    radioValue: '',
-    }
-  },
-  watch: {
-    checkBoxValue: function(newCheckBoxValue) {
-      this.$emit("newCheckBoxValue",{newValue: newCheckBoxValue, 
-      choiceIndex: this.index, choiceRowItem: this.item})
-    },
-    radioValue: function(newRadioValue) {
-      this.$emit("newRadioValue",{newValue: newRadioValue, 
-      choiceIndex: this.index, choiceRowItem: this.item})
-    },
-  },
   props: {
     node: {
       type: Object,
@@ -124,6 +137,28 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      checkBoxValue: "",
+      radioValue: "",
+    }
+  },
+  watch: {
+    checkBoxValue: function(newCheckBoxValue) {
+      this.$emit("newCheckBoxValue", {
+        newValue: newCheckBoxValue,
+        choiceIndex: this.index,
+        choiceRowItem: this.item,
+      })
+    },
+    radioValue: function(newRadioValue) {
+      this.$emit("newRadioValue", {
+        newValue: newRadioValue,
+        choiceIndex: this.index,
+        choiceRowItem: this.item,
+      })
+    },
+  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
@@ -133,7 +168,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 .inputchoice {
   width: 50%;
 }
@@ -143,8 +177,7 @@ export default {
   align-items: center;
 }
 
-#handle{
+#handle {
   margin-right: 5px;
 }
-
 </style>

@@ -35,17 +35,17 @@ export default {
   props: {
     isCheckBox: {
       type: Boolean,
-      required: true
+      required: true,
     },
     hasImage: {
       type: Boolean,
-      required: true
+      required: true,
     },
     item: {
-      required: true
-    }
-  }
-};
+      required: true,
+    },
+  },
+}
 </script>
 
 <style lang="scss">
