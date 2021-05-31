@@ -64,6 +64,14 @@
             >
               Audio Recorder
             </b-form-checkbox>
+            <b-form-checkbox
+              v-model="hasDragDropOption"
+              data-qa="question-answer-dragdrop"
+              switch
+              @input="setId($event, 'dragdropId')"
+            >
+              Drag and Drop
+            </b-form-checkbox>
           </b-form-group>
 
           <b-form-group v-if="node.typeData.options.text" label="Text">
@@ -92,6 +100,12 @@
               v-model="node.typeData.options.text.placeholder"
               data-qa="question-answer-text-single-placeholder"
             ></b-form-input>
+          </b-form-group>
+          
+           <b-form-group v-if="node.typeData.options.dragDrop" label="Drag and Drop">
+            <drag-drop-form 
+            :node="node"
+            />
           </b-form-group>
         </b-card>
 
@@ -123,12 +137,14 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./RichTextForm"
 import Helpers from "@/utils/Helpers"
+import DragDropForm from "./DragDropForm"
 
 const defaultQuestion = {
   text: "",
   answers: {
     textId: "",
     audioId: "",
+    dragdropId: "",
   },
 }
 
@@ -136,6 +152,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    DragDropForm,
   },
   props: {
     node: {
@@ -147,6 +164,7 @@ export default {
     return {
       hasTextOption: Boolean(this.node.typeData.options?.text),
       hasTextMultiLineOption: Boolean(this.node.typeData.options?.text?.multi),
+      hasDragDropOption: Boolean(this.node.typeData.options?.dragDrop),
     }
   },
   computed: {
@@ -179,6 +197,15 @@ export default {
         this.node.typeData.options.text.multi = multiLineSelected
       }
     },
+     hasDragDropOption(dragDropSelected) {
+      if (dragDropSelected) {
+        this.question.answers.dragdropId = Helpers.createUUID()
+        this.node.typeData.options.dragDrop = {}
+      } else {
+        this.question.answers.dragdropId = ""
+        delete this.node.typeData.options.dragDrop
+      }
+    }, 
   },
   created() {
     if (this.node.quiz.length == 0) {
