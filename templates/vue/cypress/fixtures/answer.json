@@ -1,0 +1,201 @@
+
+{
+    "nodes": [
+      {
+        "id": 7044,
+        "author": {
+          "id": "1",
+          "name": "admin"
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Question Node",
+        "status": "publish",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "question",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "embed",
+        "typeData": {
+          "linkMetadata": null,
+          "progress": 0,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": ""
+        },
+        "coordinates": {
+          "x": 120.73933792114258,
+          "y": 2835.18701171875
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [
+            {
+                "answers": {
+                    "audioId":"",
+                    "textId":"dac98d8f-948f-4733-9f38-f0d2f6233d2c"
+                },
+                "completed": true,
+                "entries": {
+                   "textId": {
+                    "dac98d8f-948f-4733-9f38-f0d2f6233d2c": "To do whatever."
+                   }
+                },
+                "followUpText": "Previously, you said:",
+                "id": "292f980b-a70b-4de6-880f-3dac55737ac6",
+                "isFollowUp": false,
+                "previousEntry": null,
+                "text": "What is the meaning of life?"
+            }
+        ],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "fx": 2939.49951171875,
+        "fy": 3116.346923828125,
+        "completed": false,
+        "accordionProgress": [],
+        "mayUnlockNodes": [],
+        "permissionsOrder": [
+          "public",
+          "authenticated",
+          "contributor",
+          "subscriber"
+        ],
+        "index": 0,
+        "x": 2939.49951171875,
+        "y": 3116.346923828125,
+        "vy": 0,
+        "vx": 0,
+        "nodeType": "root",
+        "unlocked": true,
+        "depth": 0,
+        "accessible": true
+      },
+      {
+        "id": 7045,
+        "author": {
+          "id": "1",
+          "name": "admin"
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Another Question",
+        "status": "publish",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "question",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "embed",
+        "typeData": {
+          "linkMetadata": null,
+          "progress": 1,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "",
+          "textContent": ""
+        },
+        "coordinates": {
+          "x": -444.71843299984664,
+          "y": 3313.13887715537,
+          "fx": -359.76533851742477,
+          "fy": 2940.515586139745
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [
+            {
+                "answers": {
+                    "audioId":"",
+                    "textId":"bd4e32c6-f8a0-45e8-bed4-281767a57459"
+                },
+                "completed": true,
+                "entries": {
+                   "textId": {
+                    "bd4e32c6-f8a0-45e8-bed4-281767a57459": "51"
+                   }
+                },
+                "followUpText": "Previously, you said:",
+                "id": "94f1da1d-6cb9-4c0d-9f7c-8b6521a31151",
+                "isFollowUp": false,
+                "previousEntry": null,
+                "text": "How many pigeons does it take to change a lightbulb?"
+            }
+        ],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "completed": true,
+        "accordionProgress": [],
+        "mayUnlockNodes": [],
+        "permissionsOrder": [
+          "public",
+          "authenticated",
+          "contributor",
+          "subscriber"
+        ],
+        "index": 0,
+        "x": 2939.49951171875,
+        "y": 3116.346923828125,
+        "vy": 0,
+        "vx": 0,
+        "nodeType": "child",
+        "unlocked": true,
+        "depth": 0,
+        "accessible": true
+      }
+    ],
+    "links": [
+        {
+            "source": 7044,
+            "target": 7045,
+            "value": 1,
+            "type": "",
+            "appearsAt": 0,
+            "index": 0
+        }
+    ],
+    "groups": [],
+    "site-url": "http://localhost:8000"
+  }
