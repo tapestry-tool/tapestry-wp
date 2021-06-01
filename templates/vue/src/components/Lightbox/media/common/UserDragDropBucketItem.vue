@@ -68,9 +68,6 @@ export default {
       console.log(item)
       console.log(parentBucket)
       console.log(isFromBucketItem)
-      //setTimeout(() => {
-      //  target.style.display = "none"
-      //}, 0)
     },
   },
 }

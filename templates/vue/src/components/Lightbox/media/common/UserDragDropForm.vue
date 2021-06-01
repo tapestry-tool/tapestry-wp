@@ -1,5 +1,5 @@
 <template>
-  <b-form>
+  <b-form @submit="handleDragDropSubmit">
     <p>Current data is {{ node.typeData.options.dragDrop }}</p>
     <b-row align-h="between">
       <b-col cols="5">
@@ -28,10 +28,11 @@
       </b-col>
     </b-row>
 
-    <b-form-invalid-feedback :state="isAnswerValid">
-      Please enter a response.
+    <b-form-invalid-feedback :state="toBucketValidAnswerState">
+      Please drag a item to a "to bucket"
     </b-form-invalid-feedback>
     <p>to bucket array is currently {{ toBucketArray }}</p>
+    <p>to bucket answer is currently {{ toBucketAnswer }}</p>
     <p>
       <b-button
         v-if="node.mediaType === 'question'"
@@ -63,9 +64,19 @@ export default {
       isAnswerValid: true,
       toBucketArray: this.node.typeData.options.dragDrop.toBucketArray,
       fromBucketArray: this.node.typeData.options.dragDrop.fromBucketArray,
+      toBucketAnswer: {},
     }
   },
-  computed: {},
+  computed: {
+    toBucketValidAnswerState() {
+      for (let i = 0; i < this.toBucketArray.length; i++) {
+        if (this.toBucketArray[i].itemArray.length > 0) {
+          return true
+        }
+      }
+      return false
+    },
+  },
   watch: {
     toBucketArray(newToBucketArray) {
       this.toBucketArray = newToBucketArray
@@ -77,7 +88,28 @@ export default {
     },
   },
   created() {},
-  methods: {},
+  methods: {
+    updateToBucketAnswer() {
+      for (let i = 0; i < this.toBucketArray.length; i++) {
+        let bucketValue = this.toBucketArray[i].value
+        this.toBucketAnswer[bucketValue] = this.toBucketArray[i].itemArray
+      }
+    },
+    handleDragDropSubmit(event) {
+      event.preventDefault()
+      if (this.toBucketValidAnswerState) {
+        this.isAnswerValid = true
+      } else {
+        this.isAnswerValid = false
+      }
+      this.updateToBucketAnswer()
+      console.log("submitted result", this.toBucketAnswer)
+
+      if (this.isAnswerValid) {
+        this.$emit("submit", this.toBucketAnswer)
+      }
+    },
+  },
 }
 </script>
 

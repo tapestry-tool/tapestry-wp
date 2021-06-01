@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div v-if="isFromBucket" class="fromBucketContainer">
+    <div
+      v-if="isFromBucket"
+      class="fromBucketContainer"
+      @dragover.prevent
+      @dragenter.prevent
+      @drop.prevent="drop($event, bucket)"
+    >
       <b style="font-size: 28px">{{ bucket.value }}</b>
       <user-drag-drop-bucket-item
         v-for="item in bucket.itemArray"
@@ -71,13 +77,6 @@ export default {
         return "toBucketContainer"
       }
     },
-    getFromBucketArray() {
-      if (this.node.typeData.options.dragDrop.fromBucketArray) {
-        return this.node.typeData.options.dragDrop.fromBucketArray
-      } else {
-        return this.fromBucketArray
-      }
-    },
   },
   created() {
     if (
@@ -105,6 +104,11 @@ export default {
         bucket.itemArray.push(item)
       } else {
         console.log("move items within to buckets")
+        let parentBucket = this.findBucketInToBucketArray(parentBucketId)
+        console.log("parent to bucket is", parentBucket)
+        let item = this.findItemInParentBucketArray(parentBucket, itemId)
+        console.log("about to be added item is", item)
+        bucket.itemArray.push(item)
       }
     },
     findBucketInFromBucketArray: function(parentBucketId) {
@@ -133,6 +137,19 @@ export default {
         }
       }
       return foundItem
+    },
+    findBucketInToBucketArray: function(parentBucketId) {
+      console.log("passed in parent bucket id is", parentBucketId)
+      let foundBucket = ""
+      for (let i = 0; i < this.toBucketArray.length; i++) {
+        console.log("current to bucket is", this.toBucketArray[i])
+        console.log("current to bucket id is", this.toBucketArray[i].id)
+        if (this.toBucketArray[i].id === Number(parentBucketId)) {
+          console.log("got here")
+          foundBucket = this.toBucketArray[i]
+        }
+      }
+      return foundBucket
     },
   },
 }

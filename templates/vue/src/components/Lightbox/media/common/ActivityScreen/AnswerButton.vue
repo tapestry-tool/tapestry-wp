@@ -4,6 +4,9 @@
     <div v-if="isFaIcon" class="icon">
       <i :class="`fas fa-${icon} icon-fa`"></i>
     </div>
+    <div v-else-if="isDragAndDropIcon" class="container">
+      <img :src="dragDropIcon" class="dragDropIcon" />
+    </div>
     <img v-else :src="textIcon" class="icon" />
     <div>
       <slot></slot>
@@ -13,6 +16,7 @@
 
 <script>
 import TextIcon from "@/assets/Aa.svg"
+import DragDropIcon from "@/assets/icons/drag_drop.svg"
 import { data } from "@/services/wp"
 
 export default {
@@ -36,14 +40,16 @@ export default {
   },
   computed: {
     isFaIcon() {
-      return (
-        this.icon === "tasks" ||
-        this.icon === "microphone" ||
-        this.icon === "mouse-pointer"
-      )
+      return this.icon === "tasks" || this.icon === "microphone"
     },
     textIcon() {
       return `${data.vue_uri}/${TextIcon.split("dist")[1]}`
+    },
+    isDragAndDropIcon() {
+      return this.icon === "drag and drop"
+    },
+    dragDropIcon() {
+      return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
   },
 }
@@ -96,5 +102,16 @@ button {
   &-fa {
     font-size: 56px;
   }
+}
+
+.container {
+  //border: solid;
+  height: 56px;
+}
+
+.dragDropIcon {
+  //height: 96px;
+  //border: solid;
+  margin-top: -30px;
 }
 </style>

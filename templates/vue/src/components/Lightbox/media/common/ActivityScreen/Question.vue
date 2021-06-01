@@ -79,10 +79,10 @@
           <answer-button
             v-if="showDragDrop"
             :completed="dragDropFormCompleted"
-            icon="mouse-pointer"
+            icon="drag and drop"
             @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
           >
-            drag and drop
+            drag/drop
           </answer-button>
         </div>
       </div>

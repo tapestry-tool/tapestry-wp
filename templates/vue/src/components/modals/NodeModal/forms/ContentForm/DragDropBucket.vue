@@ -2,7 +2,7 @@
   <div class="container">
     <b-form-group :class="bucketClass">
       <b>New bucket</b>
-      <b-form-group v-if="isFromBucket">
+      <b-form-group>
         <drag-drop-bucket-item
           v-for="(item, index) in bucket.itemArray"
           :key="item.id"
@@ -23,16 +23,18 @@
       </b-button>
     </b-form-group>
     <b-form-group>
-      <b-form-input
-        v-if="isFromBucket"
-        v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
-        placeholder="Enter from bucket label"
-      ></b-form-input>
-      <b-form-input
-        v-else
-        v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
-        placeholder="Enter to bucket label"
-      ></b-form-input>
+      <b-form-group v-if="isFromBucket">
+        <b-form-input
+          v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
+          placeholder="Enter from bucket label"
+        ></b-form-input>
+      </b-form-group>
+      <b-form-group v-else>
+        <b-form-input
+          v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
+          placeholder="Enter to bucket label"
+        ></b-form-input>
+      </b-form-group>
       <b-button
         :disabled="isFromBucket ? removeFromDisabled : removeToDisabled"
         squared
@@ -108,6 +110,7 @@ export default {
   margin-bottom: 15px;
   border-radius: 15px;
   text-align: center;
+  min-height: 130px;
 }
 
 .toBucketContainer {
