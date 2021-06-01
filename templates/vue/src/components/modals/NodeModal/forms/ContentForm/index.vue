@@ -196,4 +196,7 @@ export default {
   padding-top: 3px;
   text-align: right;
 }
+#node-title:focus {
+  box-shadow: 0 0 10px 5px LightSkyBlue;
+}
 </style>

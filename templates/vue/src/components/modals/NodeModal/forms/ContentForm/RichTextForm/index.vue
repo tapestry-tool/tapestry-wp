@@ -307,9 +307,15 @@ h2:after {
 h2:before {
   content: none !important;
 }
+
 .ProseMirror:focus {
   outline: none;
 }
+
+.editor:focus-within:not(:focus-visible) {
+  box-shadow: 0 0 10px 5px LightSkyBlue;
+}
+
 .editor {
   border: 1px solid #ccc;
 }
@@ -364,7 +370,6 @@ h2:before {
     &:focus {
       background-color: rgba($color-black, 0.2);
       background: rgba($color-black, 0.2);
-      outline: unset;
     }
   }
 

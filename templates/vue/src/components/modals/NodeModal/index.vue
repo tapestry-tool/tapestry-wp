@@ -1024,10 +1024,6 @@ table {
   font-weight: 600;
 }
 
-.form-control:focus:not(:focus-visible) {
-  outline: none !important;
-}
-
 :focus-visible:not(div):not(p):not(input) {
   outline: black solid 4px !important;
   outline-offset: 5px;
