@@ -497,7 +497,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -746,9 +746,6 @@ export default {
                 childOrdering: [...this.parent.childOrdering],
               },
             })
-          }
-          if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
           }
         } else {
           this.updateRootNode(id)

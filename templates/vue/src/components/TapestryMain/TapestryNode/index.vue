@@ -420,15 +420,15 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
-    ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
         this.$router.push({
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
+          path: `/nodes/${this.node.id}`
         })
-        this.updateSelectedNode(this.node.id)
       }
     },
     openNode(id) {
