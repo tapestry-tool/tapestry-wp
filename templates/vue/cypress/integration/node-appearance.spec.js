@@ -18,9 +18,9 @@ describe("Node Appearance", () => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
 
-      cy.contains(/node title/i).click()
-      cy.contains(/media button/i).click()
-      cy.contains(/progress bar/i).click()
+      cy.contains(/hide title/i).click()
+      cy.contains(/hide media button/i).click()
+      cy.contains(/hide progress bar/i).click()
       cy.contains(/background image/i).click()
 
       cy.server()
