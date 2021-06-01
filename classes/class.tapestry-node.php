@@ -36,6 +36,8 @@ class TapestryNode implements ITapestryNode
     private $hideTitle;
     private $hideProgress;
     private $hideMedia;
+    private $backgroundColor;
+    private $textColor;
     private $skippable;
     private $quiz;
     private $fullscreen;
@@ -83,6 +85,8 @@ class TapestryNode implements ITapestryNode
         $this->hideTitle = false;
         $this->hideProgress = false;
         $this->hideMedia = false;
+        $this->backgroundColor = '#8396a1';
+        $this->textColor = 'white';
         $this->skippable = true;
         $this->quiz = [];
         $this->fullscreen = false;
@@ -197,6 +201,12 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->hideMedia) && is_bool($node->hideMedia)) {
             $this->hideMedia = $node->hideMedia;
+        }
+        if (isset($node->backgroundColor) && is_string($node->backgroundColor)) {
+            $this->backgroundColor = $node->backgroundColor;
+        }
+        if (isset($node->textColor) && is_string($node->textColor)) {
+            $this->textColor = $node->textColor;
         }
         if (isset($node->skippable) && is_bool($node->skippable)) {
             $this->skippable = $node->skippable;
@@ -555,6 +565,8 @@ class TapestryNode implements ITapestryNode
             'hideTitle' => $this->hideTitle,
             'hideProgress' => $this->hideProgress,
             'hideMedia' => $this->hideMedia,
+            'backgroundColor' => $this->backgroundColor,
+            'textColor' => $this->textColor,
             'skippable' => $this->skippable,
             'quiz' => $this->quiz,
             'fullscreen' => $this->fullscreen,
