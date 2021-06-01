@@ -451,6 +451,7 @@ function getGfEntry($request)
  */
 function getTapestry($request)
 {
+    error_log(print_r($load_kaltura,true));
     $postId = $request['tapestryPostId'];
     $filterUserId = $request['filter_user_id'];
     try {
@@ -1499,6 +1500,12 @@ if ($load_kaltura) {
         } catch (TapestryError $e) {
             return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
         }
+    }
+}
+else {
+    function getKalturaExists()
+    {
+        return false;
     }
 }
 /**
