@@ -101,4 +101,7 @@ export default {
     }
   }
 }
+input:focus {
+  box-shadow: 0 0 10px 5px LightSkyBlue;
+}
 </style>

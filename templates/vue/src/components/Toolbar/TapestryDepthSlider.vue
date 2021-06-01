@@ -233,7 +233,6 @@ export default {
 
 .slider {
   -webkit-appearance: none;
-  outline: none;
   background: #d3d3d3;
   height: 10px;
   opacity: 0.8;
@@ -241,6 +240,11 @@ export default {
   position: relative;
   align-items: center;
   margin: 0 38px;
+
+  &:focus-visible {
+    outline: black solid 4px !important;
+    outline-offset: 5px;
+  }
 
   &:before,
   &:after {
@@ -299,7 +303,6 @@ export default {
 
   &:focus {
     border-color: transparent !important;
-    outline: none !important;
   }
 }
 
