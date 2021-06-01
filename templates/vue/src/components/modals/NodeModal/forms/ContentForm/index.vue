@@ -161,7 +161,8 @@ export default {
      * video node AND it's not a popup itself.
      */
     isPopupCandidate() {
-      if (this.parent) {
+      // NOTE: Currently we do not want to allow a multi-content popup
+      if (this.parent && this.node.mediaType !== "multi-content") {
         if (this.parent.popup) {
           return false
         }
