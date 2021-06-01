@@ -3,69 +3,101 @@
     <h6 class="mb-3">Node Appearance</h6>
     <b-card class="px-3 pt-3" bg-variant="light" no-body>
       <b-container fluid class="bv-example-row">
-      <b-row>
-        <b-col sm>
-      <b-form-group>
-        <b-form-checkbox v-model="addThumbnail" data-qa="node-appearance-thumbnail">
-          Add a thumbnail
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group v-if="addThumbnail">
-        <file-upload
-          v-model="node.imageURL"
-          input-test-id="node-appearance-thumbnail-url"
-          :show-url-upload="false"
-          thumbnail-type="thumbnail"
-          :show-image-preview="true"
-          file-types="image/*"
-          @isUploading="handleUploadChange"
-        />
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox
-          v-model="addLockedThumbnail"
-          data-qa="node-appearance-lockedThumbnail"
-        >
-          Show a different thumbnail when locked
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group v-if="addLockedThumbnail">
-        <file-upload
-          v-model="node.lockedImageURL"
-          input-test-id="node-appearance-lockedThumbnail-url"
-          :show-url-upload="false"
-          thumbnail-type="locked"
-          :show-image-preview="true"
-          file-types="image/*"
-          @isUploading="handleUploadChange"
-        />
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox v-model="node.hideTitle" data-qa="node-appearance-title">
-          Hide node title
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox
-          v-model="node.hideProgress"
-          data-qa="node-appearance-progress"
-        >
-          Hide progress bar
-        </b-form-checkbox>
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox v-model="node.hideMedia" data-qa="node-appearance-media">
-          Hide media button
-        </b-form-checkbox>
-      </b-form-group>
-      </b-col>
-      <b-col lg>
-        <color-picker content="Background Color" :currentColor="node.backgroundColor" @change = "handleBackgroundColorChange" :data-qa="`node-backgroundcolor-${node.id}`"/>
-        <color-picker content="Text Color" :currentColor="node.textColor" @change = "handleTextColorChange" :data-qa="`node-textcolor-${node.id}`"/>    
-      </b-col>
-      </b-row>
+        <b-row>
+          <b-col lg class="pl-0">
+            <h6 class="mb-3">Node Background</h6>
+            <color-picker
+              label="Background color"
+              :currentColor="node.backgroundColor"
+              :data-qa="`node-backgroundcolor-${node.id}`"
+              @change="handleBackgroundColorChange"
+            />
+            <b-form-group>
+              <b-form-checkbox
+                v-model="addThumbnail"
+                data-qa="node-appearance-thumbnail"
+              >
+                Background image
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="addThumbnail">
+              <file-upload
+                v-model="node.imageURL"
+                input-test-id="node-appearance-thumbnail-url"
+                :show-url-upload="false"
+                thumbnail-type="thumbnail"
+                :show-image-preview="true"
+                file-types="image/*"
+                @isUploading="handleUploadChange"
+              />
+            </b-form-group>
+            <b-form-group v-if="addThumbnail || addLockedThumbnail">
+              <b-form-checkbox
+                v-model="addLockedThumbnail"
+                data-qa="node-appearance-lockedThumbnail"
+              >
+                Show a different background image when locked
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="addLockedThumbnail">
+              <file-upload
+                v-model="node.lockedImageURL"
+                input-test-id="node-appearance-lockedThumbnail-url"
+                :show-url-upload="false"
+                thumbnail-type="locked"
+                :show-image-preview="true"
+                file-types="image/*"
+                @isUploading="handleUploadChange"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col lg class="pr-0">
+            <h6 class="mb-3">Node Title</h6>
+            <color-picker
+              label="Text color"
+              :currentColor="node.textColor"
+              :data-qa="`node-textcolor-${node.id}`"
+              @change="handleTextColorChange"
+            />
+            <b-form-group>
+              <b-form-checkbox
+                v-model="node.hideTitle"
+                data-qa="node-appearance-title"
+              >
+                Hide title
+              </b-form-checkbox>
+            </b-form-group>
+            <b-badge
+              v-if="!node.imageURL"
+              class="readability-badge"
+              :variant="readabilityVariant"
+            >
+              Readability: {{ readability }}%
+            </b-badge>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col lg class="pl-0">
+            <h6 class="mb-3">Other</h6>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="node.hideProgress"
+                data-qa="node-appearance-progress"
+              >
+                Hide progress bar
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="node.hideMedia"
+                data-qa="node-appearance-media"
+              >
+                Hide media button
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-row>
       </b-container>
-      
     </b-card>
     <h6 class="mt-4 mb-3">Content Appearance</h6>
     <b-card class="px-3 pt-3" bg-variant="light" no-body>
@@ -111,6 +143,7 @@
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
 import ColorPicker from "@/components/modals/common/ColorPicker"
+import TinyColor from "tinycolor2"
 
 export default {
   components: {
@@ -128,6 +161,26 @@ export default {
       addThumbnail: false,
       addLockedThumbnail: false,
     }
+  },
+  computed: {
+    readability() {
+      return Math.round(
+        (Math.log(
+          TinyColor.readability(this.node.textColor, this.node.backgroundColor)
+        ) /
+          Math.log(21)) *
+          100
+      )
+    },
+    readabilityVariant() {
+      if (this.readability < 20) {
+        return "danger"
+      }
+      if (this.readability < 40) {
+        return "warning"
+      }
+      return "success"
+    },
   },
   watch: {
     addThumbnail(addThumbnail) {
@@ -150,12 +203,20 @@ export default {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
-     handleBackgroundColorChange(color) {
+    handleBackgroundColorChange(color) {
       this.node.backgroundColor = color
-     },
-     handleTextColorChange(color) {
+    },
+    handleTextColorChange(color) {
       this.node.textColor = color
+    },
   },
-  }
 }
 </script>
+
+<style lang="scss" scoped>
+.readability-badge {
+  font-size: 0.9em;
+  font-weight: normal;
+  margin-bottom: 1em;
+}
+</style>

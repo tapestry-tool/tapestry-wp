@@ -22,7 +22,7 @@ describe("Node Appearance", () => {
       cy.contains(/media button/i).click()
       cy.contains(/progress bar/i).click()
       cy.contains(/add a thumbnail/i).click()
-      
+
       cy.server()
       cy.route("POST", "**/async-upload.php").as("upload")
 
@@ -58,19 +58,33 @@ describe("Node Appearance", () => {
     cy.getSelectedNode().then(node => {
       cy.openModal("edit", node.id)
       cy.contains(/appearance/i).click()
-      
-      cy.contains(/Background Color/i).getByTestId(`node-backgroundcolor-${node.id}`).click().click()
-      cy.contains(/Text Color/i).getByTestId(`node-textcolor-${node.id}`).click().click()
-      cy.getByTestId(`node-backgroundcolor-${node.id}`).find('.swatch').click().find(`[aria-label="#1FBC9C"]`).click()
-      cy.getByTestId(`node-textcolor-${node.id}`).find('.swatch').click().find(`[aria-label="#E84B3C"]`).click()
+
+      cy.contains(/Background Color/i)
+        .getByTestId(`node-backgroundcolor-${node.id}`)
+        .click()
+        .click()
+      cy.contains(/Text Color/i)
+        .getByTestId(`node-textcolor-${node.id}`)
+        .click()
+        .click()
+      cy.getByTestId(`node-backgroundcolor-${node.id}`)
+        .find(".swatch")
+        .click()
+        .find(`[aria-label="#1FBC9C"]`)
+        .click()
+      cy.getByTestId(`node-textcolor-${node.id}`)
+        .find(".swatch")
+        .click()
+        .find(`[aria-label="#E84B3C"]`)
+        .click()
 
       cy.submitModal()
-      
+
       cy.getNodeById(node.id).within(() => {
-            cy.get('.meta').should('have.css', 'color', 'rgb(232, 75, 60)')
-            // rgb(232, 75, 60) is same as #E84B3C
-          })
-      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", "#1FBC9C")    
+        cy.get(".meta").should("have.css", "color", "rgb(232, 75, 60)")
+        // rgb(232, 75, 60) is same as #E84B3C
+      })
+      cy.getByTestId(`node-circle-${node.id}`).should("have.attr", "fill", "#1FBC9C")
     })
   })
 })

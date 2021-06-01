@@ -21,7 +21,12 @@
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
-      <circle :data-qa="`node-circle-${node.id}`" ref="circle" :fill="fill"></circle>
+      <circle
+        ref="circle"
+        :data-qa="`node-circle-${node.id}`"
+        :fill="fill"
+        :stroke="progressBackgroundColor"
+      ></circle>
       <transition name="fade">
         <circle
           v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
@@ -40,6 +45,7 @@
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"
+        :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
         :locked="!node.accessible"
@@ -71,7 +77,7 @@
             :x="-(140 * 5) / 6"
             :y="-(140 * 5) / 6"
           >
-            <div class="meta" :style="{color: node.textColor}">
+            <div class="meta" :style="{ color: node.textColor }">
               <p class="title">{{ node.title }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -84,6 +90,7 @@
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
+            :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
@@ -97,6 +104,7 @@
                   (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
+              :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
             ></add-child-button>
@@ -104,6 +112,7 @@
               v-if="hasPermission('edit')"
               :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
+              :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
             >
@@ -113,6 +122,7 @@
               v-else-if="canReview"
               :x="hasTooManyLevels ? 0 : 35"
               :y="radius"
+              :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
             >
@@ -152,6 +162,7 @@ import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
 import StatusBar from "./StatusBar"
 import NodeButton from "./NodeButton"
+import TinyColor from "tinycolor2"
 
 export default {
   name: "tapestry-node",
@@ -261,7 +272,7 @@ export default {
       } else if (this.selected) {
         return "#11a6d8"
       } else {
-        return "#8396a1"
+        return TinyColor(this.node.backgroundColor)
       }
     },
     overlayFill() {
@@ -271,6 +282,39 @@ export default {
         return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
+    },
+    // NOTE: This function is currently not used, but we may want to use it in the future for accessibility
+    /*
+    textColorReadable() {
+      let color = this.node.textColor
+      let tries = 0
+      while (!TinyColor.isReadable(this.node.backgroundColor, color, {level:"AA",size:"large"}) && tries++ < 2) {
+        if (TinyColor(this.node.backgroundColor).isDark()) {
+          color = TinyColor(color).lighten().toString()
+        }
+        else {
+          color = TinyColor(color).darken().toString()
+        }
+      }
+      return color
+    },
+    */
+    progressBackgroundColor() {
+      let color = TinyColor(this.node.backgroundColor)
+        .darken()
+        .toString()
+      while (!TinyColor(color).isDark()) {
+        color = TinyColor(color)
+          .darken()
+          .toString()
+      }
+      return color
+    },
+    buttonBackgroundColor() {
+      return TinyColor(this.progressBackgroundColor)
+        .darken()
+        .desaturate()
+        .toString()
     },
     thumbnailURL() {
       return !this.node.accessible && this.node.lockedImageURL
@@ -518,7 +562,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction:column;
+  flex-direction: column;
   text-align: center;
   font-size: 30px;
   .title {
