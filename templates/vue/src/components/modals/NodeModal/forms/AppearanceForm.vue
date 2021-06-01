@@ -36,7 +36,7 @@
                 v-model="addLockedThumbnail"
                 data-qa="node-appearance-lockedThumbnail"
               >
-                Show a different background image when locked
+                Show a different background when locked
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="addLockedThumbnail">

@@ -21,7 +21,7 @@ describe("Node Appearance", () => {
       cy.contains(/node title/i).click()
       cy.contains(/media button/i).click()
       cy.contains(/progress bar/i).click()
-      cy.contains(/add a thumbnail/i).click()
+      cy.contains(/background image/i).click()
 
       cy.server()
       cy.route("POST", "**/async-upload.php").as("upload")
