@@ -985,6 +985,7 @@ export default {
 h6 {
   font-weight: 400;
 }
+
 </style>
 
 <style lang="scss">
@@ -1011,10 +1012,6 @@ table {
     position: absolute;
     top: 15px;
     right: 12px;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 
@@ -1027,9 +1024,14 @@ table {
   font-weight: 600;
 }
 
-.nav-link:focus {
-  outline: none;
+:focus-visible:not(input[type='text']):not(p):not(div) {
+  outline: black solid 3px !important;
 }
+
+input[type='checkbox']{
+  outline: black solid 3px !important;
+}
+
 </style>
 
 <style lang="scss" scoped>
