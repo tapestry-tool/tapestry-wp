@@ -80,7 +80,7 @@
             v-if="showDragDrop"
             :completed="dragDropFormCompleted"
             icon="mouse-pointer"
-            @click="openDragDrop(question.answers.dragDropId, 'dragDropId')"
+            @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
           >
             drag and drop
           </answer-button>
@@ -172,7 +172,7 @@ export default {
       return !!(this.question.entries && this.question.entries.audioId)
     },
     dragDropFormCompleted() {
-      return !!(this.question.entries && this.question.entries.dragDropId)
+      return !!(this.question.entries && this.question.entries.dragdropId)
     },
     showText() {
       return this.hasId("textId") || Boolean(this.node.typeData.options?.text)
@@ -182,7 +182,7 @@ export default {
     },
     showDragDrop() {
       return (
-        this.hasId("dragDropId") || Boolean(this.node.typeData.options?.dragDrop)
+        this.hasId("dragdropId") || Boolean(this.node.typeData.options?.dragDrop)
       )
     },
   },
@@ -190,7 +190,7 @@ export default {
     if (this.options.length === 1) {
       if (this.options[0][0] === "audioId") {
         this.openRecorder()
-      } else if (this.options[0][0] === "dragDropId") {
+      } else if (this.options[0][0] === "dragdropId") {
         this.openDragDrop(this.options[0][1], this.options[0][0])
       } else {
         this.openForm(this.options[0][1], this.options[0][0])
@@ -292,8 +292,8 @@ export default {
       if (!question.entries) {
         question.entries = {}
       }
-      question.entries.dragDropId = {
-        [this.question.answers.dragDropId]: event,
+      question.entries.dragdropId = {
+        [this.question.answers.dragdropId]: event,
       }
       this.handleSubmit(
         "dragDrop",

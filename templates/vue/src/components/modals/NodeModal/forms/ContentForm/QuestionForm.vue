@@ -70,7 +70,7 @@
               switch
               @input="setId($event, 'dragdropId')"
             >
-              Drag and Drop
+              Drag and drop
             </b-form-checkbox>
           </b-form-group>
 

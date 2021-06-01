@@ -47,7 +47,8 @@ export default {
   border: solid;
   margin-top: 0px;
   margin-bottom: 0px;
-  background-size: 300px 200px;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   text-align: center;
 }

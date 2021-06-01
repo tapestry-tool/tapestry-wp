@@ -1,8 +1,10 @@
 <template>
   <div>
     <p>currently data is {{ node.typeData.options.dragDrop }}</p>
+    <p>next from bucket item id is {{ nextFromBucketItemId }}</p>
+    <p>next from bucket id is {{ nextFromBucketId }}</p>
     <b-form-group>
-      From Buckets
+      From buckets
       <drag-drop-bucket
         v-for="(bucket, bucketIndex) in fromBuckets"
         :key="bucket.id"
@@ -24,7 +26,7 @@
       </b-button>
     </b-form-group>
     <b-form-group>
-      To Buckets
+      To buckets
       <drag-drop-bucket
         v-for="(bucket, index) in toBuckets"
         :key="bucket.id"
@@ -73,8 +75,8 @@ export default {
           ],
         },
       ],
-      nextFromBucketItemId: 2,
       nextFromBucketId: 2,
+      nextFromBucketItemId: 2,
       nextFromBucketValue: "",
       toBuckets: [
         {
@@ -82,7 +84,7 @@ export default {
           value: "",
         },
       ],
-      nextToBucketId: 201,
+      nextToBucketId: 2,
       nextToBucketValue: "",
     }
   },
@@ -101,17 +103,32 @@ export default {
     toBuckets(newToBuckets) {
       this.node.typeData.options.dragDrop.toBucketArray = newToBuckets
     },
+    nextFromBucketItemId(newNextFromBucketItemId) {
+      this.node.typeData.options.dragDrop.nextFromBucketItemId = newNextFromBucketItemId
+    },
+    nextFromBucketId(newNextFromBucketId) {
+      this.node.typeData.options.dragDrop.nextFromBucketId = newNextFromBucketId
+    },
+    nextToBucketId(newNextToBucketId) {
+      this.node.typeData.options.dragDrop.nextToBucketId = newNextToBucketId
+    },
   },
   created() {
     if (
-      !this.node.typeData.options.dragDrop.hasOwnProperty("fromBucketArray") &&
+      !this.node.typeData.options.dragDrop.hasOwnProperty("fromBucketArray") ||
       !this.node.typeData.options.dragDrop.hasOwnProperty("toBucketArray")
     ) {
       this.node.typeData.options.dragDrop.fromBucketArray = this.fromBuckets
       this.node.typeData.options.dragDrop.toBucketArray = this.toBuckets
+      this.node.typeData.options.dragDrop.nextFromBucketItemId = this.nextFromBucketItemId
+      this.node.typeData.options.dragDrop.nextFromBucketId = this.nextFromBucketId
+      this.node.typeData.options.dragDrop.nextToBucketId = this.nextToBucketId
     } else {
       this.fromBuckets = this.node.typeData.options.dragDrop.fromBucketArray
       this.toBuckets = this.node.typeData.options.dragDrop.toBucketArray
+      this.nextFromBucketItemId = this.node.typeData.options.dragDrop.nextFromBucketItemId
+      this.nextFromBucketId = this.node.typeData.options.dragDrop.nextFromBucketId
+      this.nextToBucketId = this.node.typeData.options.dragDrop.nextToBucketId
     }
   },
   methods: {

@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <b-form-group class="contents">
-      <b>New Bucket Item</b>
+      <b>New bucket item</b>
       <p>Text Value is:{{ bucketItem.text }}</p>
       <p>Color picker component here</p>
       <b-form-checkbox v-model="addBackgroundImage" data-qa="bucketItem-useImage">
-        Background Image
+        Background image
       </b-form-checkbox>
       <b-form-group v-if="addBackgroundImage">
         <file-upload
@@ -38,7 +38,7 @@
       variant="outline-danger"
       @click="$emit('remove')"
     >
-      Remove Item
+      Remove item
     </b-button>
   </div>
 </template>

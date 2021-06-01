@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <b-form-group :class="bucketClass">
-      <b>New Bucket</b>
+      <b>New bucket</b>
       <b-form-group v-if="isFromBucket">
         <drag-drop-bucket-item
           v-for="(item, index) in bucket.itemArray"
@@ -39,7 +39,7 @@
         variant="outline-danger"
         @click="$emit('remove')"
       >
-        Remove Bucket
+        Remove bucket
       </b-button>
     </b-form-group>
   </div>
