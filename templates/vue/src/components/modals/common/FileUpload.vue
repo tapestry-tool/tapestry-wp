@@ -214,7 +214,6 @@ export default {
 
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
-
       axios
         .post(wpData.upload_url, formData, {
           headers: {
@@ -287,6 +286,7 @@ export default {
         .then(close => {
           if (close) {
             this.$emit("input", null)
+            this.$root.$emit("remove-thumbnail", this.thumbnailType)
           }
         })
         .catch(err => console.log(err))
