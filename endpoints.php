@@ -1,7 +1,5 @@
 <?php
 
-$load_kaltura = file_exists('vendor/autoload.php');
-
 /**
  * Tapestry Endpoints.
  */
@@ -16,7 +14,7 @@ require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
-if ($load_kaltura) {
+if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
     require_once __DIR__.'/services/class.kaltura-api.php';
 }
 
@@ -451,7 +449,6 @@ function getGfEntry($request)
  */
 function getTapestry($request)
 {
-    error_log(print_r($load_kaltura,true));
     $postId = $request['tapestryPostId'];
     $filterUserId = $request['filter_user_id'];
     try {
@@ -1450,7 +1447,7 @@ function getUserAudio($request)
     }
 }
 
-if ($load_kaltura) {
+if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
     /**
      * Checks if the Kaltura API varaibles are defined
      */

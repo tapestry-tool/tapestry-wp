@@ -52,9 +52,7 @@ export default {
     
     client.kalturaExists().then(response => {
       this.updateKalturaUse(response.data)
-    }).then(()=>console.log(this.useKaltura))
-
-    
+    })
 
     this.$root.$on("open-node", id => {
       this.openNode(id)
