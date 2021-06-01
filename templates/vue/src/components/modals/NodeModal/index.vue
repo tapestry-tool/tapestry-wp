@@ -1024,13 +1024,16 @@ table {
   font-weight: 600;
 }
 
-:focus-visible:not(input[type='text']):not(p):not(div) {
-  outline: black solid 3px !important;
+.form-control:focus:not(:focus-visible) {
+  outline: none !important;
 }
 
-input[type='checkbox']{
-  outline: black solid 3px !important;
+:focus-visible:not(div):not(p):not(input) {
+  outline: black solid 4px !important;
+  outline-offset: 5px;
 }
+
+
 
 </style>
 

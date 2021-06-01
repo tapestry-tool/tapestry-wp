@@ -132,10 +132,6 @@ html {
       }
     }
 
-    button:focus {
-      outline: none;
-    }
-
     .btn {
       &:disabled,
       &.disabled {
