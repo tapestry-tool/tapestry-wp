@@ -8,7 +8,7 @@
     <circle
       ref="addButton"
       r="27"
-      fill="#666"
+      :fill="fill"
       stroke="white"
       stroke-width="3"
     ></circle>
@@ -38,6 +38,11 @@ export default {
       type: Number,
       required: false,
       default: 0,
+    },
+    fill: {
+      type: String,
+      required: false,
+      default: "#666",
     },
   },
 }
