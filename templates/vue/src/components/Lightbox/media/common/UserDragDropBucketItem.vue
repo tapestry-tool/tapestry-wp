@@ -55,5 +55,6 @@ export default {
 .container {
   margin-top: 30px;
   margin-bottom: 30px;
+  cursor: pointer;
 }
 </style>

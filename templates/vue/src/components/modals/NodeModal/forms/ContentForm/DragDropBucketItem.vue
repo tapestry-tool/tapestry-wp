@@ -118,6 +118,7 @@ export default {
   align-items: center;
   background-color: #add8e6;
   margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 .contents {

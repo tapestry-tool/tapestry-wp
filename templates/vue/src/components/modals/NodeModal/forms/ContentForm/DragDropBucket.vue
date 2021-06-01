@@ -26,12 +26,12 @@
       <b-form-input
         v-if="isFromBucket"
         v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
-        placeholder="Enter From Bucket Label"
+        placeholder="Enter from bucket label"
       ></b-form-input>
       <b-form-input
         v-else
         v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
-        placeholder="Enter To Bucket Label"
+        placeholder="Enter to bucket label"
       ></b-form-input>
       <b-button
         :disabled="isFromBucket ? removeFromDisabled : removeToDisabled"
@@ -106,6 +106,8 @@ export default {
 .fromBucketContainer {
   background-color: #e0f2f1;
   margin-bottom: 15px;
+  border-radius: 15px;
+  text-align: center;
 }
 
 .toBucketContainer {
@@ -113,5 +115,7 @@ export default {
   width: 80%;
   height: 100px;
   margin-bottom: 15px;
+  border-radius: 15px;
+  text-align: center;
 }
 </style>

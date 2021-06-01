@@ -3,7 +3,7 @@
     <p>Current data is {{ node.typeData.options.dragDrop }}</p>
     <b-row align-h="between">
       <b-col cols="5">
-        <p>From Buckets</p>
+        <p>From buckets</p>
         <user-drag-drop-bucket
           v-for="bucket in node.typeData.options.dragDrop.fromBucketArray"
           :key="bucket.id"
@@ -13,7 +13,7 @@
         />
       </b-col>
       <b-col cols="5">
-        <p>To Buckets</p>
+        <p>To buckets</p>
         <user-drag-drop-bucket
           v-for="bucket in node.typeData.options.dragDrop.toBucketArray"
           :key="bucket.id"

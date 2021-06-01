@@ -54,11 +54,13 @@ export default {
   background-color: #009688;
   margin-bottom: 15px;
   padding-bottom: 80px;
+  border-radius: 25px;
 }
 
 .toBucketContainer {
   background-color: #3f51b5;
   margin-bottom: 15px;
   padding-bottom: 150px;
+  border-radius: 25px;
 }
 </style>
