@@ -323,7 +323,6 @@ export default {
       return VideoStates.Finished
     },
     handlePopupComplete() {
-      console.log("completed submited")
       if (!this.isPopupComplete) {
         this.completing = true
       }
