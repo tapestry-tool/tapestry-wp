@@ -1,14 +1,33 @@
 <template>
-  <div :class="bucketClass">
-    <b style="font-size: 28px">{{ bucket.value }}</b>
-    <b-form-group v-if="isFromBucket">
+  <div>
+    <div v-if="isFromBucket" class="fromBucketContainer">
+      <b style="font-size: 28px">{{ bucket.value }}</b>
       <user-drag-drop-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
         :node="node"
         :bucketItem="item"
+        :parentBucket="bucket"
+        :isFromBucketItem="true"
       />
-    </b-form-group>
+    </div>
+    <div
+      v-else
+      class="toBucketContainer"
+      @dragover.prevent
+      @dragenter.prevent
+      @drop.prevent="drop($event, bucket)"
+    >
+      <b style="font-size: 28px">{{ bucket.value }}</b>
+      <user-drag-drop-bucket-item
+        v-for="item in bucket.itemArray"
+        :key="item.id"
+        :node="node"
+        :bucketItem="item"
+        :parentBucket="bucket"
+        :isFromBucketItem="false"
+      />
+    </div>
   </div>
 </template>
 
@@ -32,6 +51,14 @@ export default {
       type: Object,
       required: false,
     },
+    fromBucketArray: {
+      type: Array,
+      required: false,
+    },
+    toBucketArray: {
+      type: Array,
+      required: false,
+    },
   },
   data() {
     return {}
@@ -44,8 +71,70 @@ export default {
         return "toBucketContainer"
       }
     },
+    getFromBucketArray() {
+      if (this.node.typeData.options.dragDrop.fromBucketArray) {
+        return this.node.typeData.options.dragDrop.fromBucketArray
+      } else {
+        return this.fromBucketArray
+      }
+    },
   },
-  methods: {},
+  created() {
+    if (
+      !this.node.typeData.options.dragDrop.hasOwnProperty("fromBucketArray") ||
+      !this.node.typeData.options.dragDrop.hasOwnProperty("toBucketArray")
+    ) {
+      this.node.typeData.options.dragDrop.fromBucketArray = this.fromBucketArray
+      this.node.typeData.options.dragDrop.toBucketArray = this.toBucketArray
+    } else {
+      this.fromBucketArray = this.node.typeData.options.dragDrop.fromBucketArray
+      this.toBucketArray = this.node.typeData.options.dragDrop.toBucketArray
+    }
+  },
+  methods: {
+    drop: function(e, bucket) {
+      const itemId = e.dataTransfer.getData("itemId")
+      const parentBucketId = e.dataTransfer.getData("parentBucketId")
+      const booleanValue = e.dataTransfer.getData("isFromBucketItem")
+      const isFromBucket = booleanValue === "true"
+      if (isFromBucket) {
+        let parentBucket = this.findBucketInFromBucketArray(parentBucketId)
+        console.log("parent bucket is", parentBucket)
+        let item = this.findItemInParentBucketArray(parentBucket, itemId)
+        console.log("about to be added item is", item)
+        bucket.itemArray.push(item)
+      } else {
+        console.log("move items within to buckets")
+      }
+    },
+    findBucketInFromBucketArray: function(parentBucketId) {
+      console.log("passed in parent bucket id is", parentBucketId)
+      let foundBucket = ""
+      for (let i = 0; i < this.fromBucketArray.length; i++) {
+        console.log("current from bucket is", this.fromBucketArray[i])
+        console.log("current from bucket id is", this.fromBucketArray[i].id)
+        if (this.fromBucketArray[i].id === Number(parentBucketId)) {
+          console.log("got here")
+          foundBucket = this.fromBucketArray[i]
+        }
+      }
+      return foundBucket
+    },
+    findItemInParentBucketArray: function(parentBucket, itemId) {
+      console.log("passed in parent bucket id is", parentBucket)
+      let foundItem = ""
+      for (let i = 0; i < parentBucket.itemArray.length; i++) {
+        console.log("current parent bucket item is", parentBucket.itemArray[i])
+        console.log("current parent bucket item id is", parentBucket.itemArray[i].id)
+        if (parentBucket.itemArray[i].id === Number(itemId)) {
+          console.log("got here")
+          foundItem = parentBucket.itemArray[i]
+          parentBucket.itemArray.splice(i, 1)
+        }
+      }
+      return foundItem
+    },
+  },
 }
 </script>
 
@@ -53,14 +142,16 @@ export default {
 .fromBucketContainer {
   background-color: #009688;
   margin-bottom: 15px;
-  padding-bottom: 80px;
+  min-height: 350px;
+  padding-bottom: 100px;
   border-radius: 25px;
 }
 
 .toBucketContainer {
   background-color: #3f51b5;
   margin-bottom: 15px;
-  padding-bottom: 150px;
+  min-height: 350px;
+  padding-bottom: 100px;
   border-radius: 25px;
 }
 </style>

@@ -1,5 +1,9 @@
 <template>
-  <div class="container">
+  <div
+    class="container"
+    draggable="true"
+    @dragstart="dragStart($event, bucketItem, parentBucket, isFromBucketItem)"
+  >
     <div
       class="circle"
       :style="{
@@ -22,6 +26,24 @@ export default {
     bucketItem: {
       type: Object,
       required: false,
+      default() {
+        return {
+          id: 1,
+          color: "#808080",
+          imageurl: "",
+          text: "",
+          useImage: false,
+          useText: false,
+        }
+      },
+    },
+    parentBucket: {
+      type: Object,
+      required: false,
+    },
+    isFromBucketItem: {
+      type: Boolean,
+      required: false,
     },
   },
   data() {
@@ -36,7 +58,21 @@ export default {
       }
     },
   },
-  methods: {},
+  methods: {
+    dragStart: function(e, item, parentBucket, isFromBucketItem) {
+      e.dataTransfer.dropEffect = "move"
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData("itemId", item.id)
+      e.dataTransfer.setData("parentBucketId", parentBucket.id)
+      e.dataTransfer.setData("isFromBucketItem", isFromBucketItem)
+      console.log(item)
+      console.log(parentBucket)
+      console.log(isFromBucketItem)
+      //setTimeout(() => {
+      //  target.style.display = "none"
+      //}, 0)
+    },
+  },
 }
 </script>
 

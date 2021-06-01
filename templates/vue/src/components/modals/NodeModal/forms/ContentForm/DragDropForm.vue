@@ -82,6 +82,7 @@ export default {
         {
           id: 200,
           value: "",
+          itemArray: [],
         },
       ],
       nextToBucketId: 2,
@@ -154,6 +155,7 @@ export default {
       this.toBuckets.push({
         id: this.nextToBucketId++,
         value: this.nextToBucketValue,
+        itemArray: [],
       })
       this.nextToBucketValue = ""
     },
