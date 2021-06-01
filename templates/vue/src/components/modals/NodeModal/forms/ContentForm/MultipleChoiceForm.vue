@@ -88,7 +88,6 @@
 
 <script>
 import ChoiceRow from "./ChoiceRow.vue"
-import FileUpload from "@/components/modals/common/FileUpload"
 import { ContainerMixin } from "vue-slicksort"
 const SortableList = {
   mixins: [ContainerMixin],
@@ -102,7 +101,6 @@ const SortableList = {
 export default {
   components: {
     ChoiceRow,
-    FileUpload,
     SortableList,
   },
   props: {
@@ -195,11 +193,17 @@ export default {
     selectedRadioForm(newSelectedRadioForm) {
       this.node.typeData.options.multipleChoice.selectedRadioArray = newSelectedRadioForm
     },
+    nextChoiceRowId(newNextChoiceRowId) {
+      this.node.typeData.options.multipleChoice.nextChoiceRowId = newNextChoiceRowId
+    },
+    nextChoiceRowRadioId(newNextChoiceRowRadioId) {
+      this.node.typeData.options.multipleChoice.nextChoiceRowRadioId = newNextChoiceRowRadioId
+    },
   },
   created() {
     if (
-      !this.node.typeData.options.multipleChoice.hasOwnProperty("checkboxArray") &&
-      !this.node.typeData.options.multipleChoice.hasOwnProperty("radioArray") &&
+      !this.node.typeData.options.multipleChoice.hasOwnProperty("checkboxArray") ||
+      !this.node.typeData.options.multipleChoice.hasOwnProperty("radioArray") ||
       !this.node.typeData.options.multipleChoice.hasOwnProperty("useImages")
     ) {
       this.node.typeData.options.multipleChoice.checkboxArray = this.choiceRows
@@ -207,12 +211,16 @@ export default {
       this.node.typeData.options.multipleChoice.useImages = this.useImages
       this.node.typeData.options.multipleChoice.selectedCheckBoxArray = this.selectedCheckBoxForm
       this.node.typeData.options.multipleChoice.selectedRadioArray = this.selectedRadioForm
+      this.node.typeData.options.multipleChoice.nextChoiceRowId = this.nextChoiceRowId
+      this.node.typeData.options.multipleChoice.nextChoiceRowRadioId = this.nextChoiceRowRadioId
     } else {
       this.useImages = this.node.typeData.options.multipleChoice.useImages
       this.choiceRowsRadio = this.node.typeData.options.multipleChoice.radioArray
       this.choiceRows = this.node.typeData.options.multipleChoice.checkboxArray
       this.selectedCheckBoxForm = this.node.typeData.options.multipleChoice.selectedCheckBoxArray
       this.selectedRadioForm = this.node.typeData.options.multipleChoice.selectedRadioArray
+      this.nextChoiceRowId = this.node.typeData.options.multipleChoice.nextChoiceRowId
+      this.nextChoiceRowRadioId = this.node.typeData.options.multipleChoice.nextChoiceRowRadioId
     }
   },
   methods: {
