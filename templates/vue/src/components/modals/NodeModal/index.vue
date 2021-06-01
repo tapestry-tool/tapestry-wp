@@ -747,11 +747,6 @@ export default {
               },
             })
           }
-          if (this.node.status == "draft") {
-            this.$router.replace({
-              path: `/nodes/${id}`
-            })
-          }
         } else {
           this.updateRootNode(id)
         }
