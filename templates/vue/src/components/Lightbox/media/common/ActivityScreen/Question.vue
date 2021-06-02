@@ -3,7 +3,7 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button class="button-nav" @click="back">
+    <button v-if="formOpened || recorderOpened" class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -25,52 +25,61 @@
       <h1 class="question-title">
         {{ question.text }}
       </h1>
-      <p v-if="!isLoggedIn">Please login to have your answers saved.</p>
-      <b-form-group v-if="formOpened">
-        <gravity-form
-          v-if="node.mediaType === 'activity'"
-          :id="formId"
-          class="answer"
-          @submit="handleFormSubmit"
-        ></gravity-form>
-        <text-form
-          v-else-if="Boolean(node.typeData.options.text)"
-          :node="node"
-          @submit="handleTextSubmit"
-        ></text-form>
-      </b-form-group>
-      <audio-recorder
-        v-else-if="recorderOpened"
-        :id="question.id"
-        @submit="handleAudioSubmit"
-      />
-      <div v-else class="question-content">
-        <p class="question-answer-text">I want to answer with...</p>
-        <div class="button-container">
-          <answer-button
-            v-if="showText"
-            :completed="textFormCompleted"
-            data-qa="text"
-            @click="openForm(question.answers.textId, 'textId')"
-          >
-            text
-          </answer-button>
-          <answer-button
-            v-if="showAudio"
-            :completed="audioRecorderCompleted"
-            icon="microphone"
-            @click="openRecorder(question.answers.audioId)"
-          >
-            audio
-          </answer-button>
-          <answer-button
-            v-if="hasId('checklistId')"
-            :completed="checklistFormCompleted"
-            icon="tasks"
-            @click="openForm(question.answers.checklistId, 'checklistId')"
-          >
-            checklist
-          </answer-button>
+      <b-alert
+        v-if="!isLoggedIn"
+        show
+        variant="warning"
+        class="loggedout-alert mx-auto"
+      >
+        Please login to have your answers saved.
+      </b-alert>
+      <div class="question-body">
+        <b-form-group v-if="formOpened" class="question-form">
+          <gravity-form
+            v-if="node.mediaType === 'activity'"
+            :id="formId"
+            class="answer"
+            @submit="handleFormSubmit"
+          ></gravity-form>
+          <text-form
+            v-else-if="Boolean(node.typeData.options.text)"
+            :node="node"
+            @submit="handleTextSubmit"
+          ></text-form>
+        </b-form-group>
+        <audio-recorder
+          v-else-if="recorderOpened"
+          :id="question.id"
+          @submit="handleAudioSubmit"
+        />
+        <div v-else class="question-answer-types">
+          <p class="question-answer-text">I want to answer with...</p>
+          <div class="button-container">
+            <answer-button
+              v-if="showText"
+              :completed="textFormCompleted"
+              data-qa="text"
+              @click="openForm(question.answers.textId, 'textId')"
+            >
+              text
+            </answer-button>
+            <answer-button
+              v-if="showAudio"
+              :completed="audioRecorderCompleted"
+              icon="microphone"
+              @click="openRecorder(question.answers.audioId)"
+            >
+              audio
+            </answer-button>
+            <answer-button
+              v-if="hasId('checklistId')"
+              :completed="checklistFormCompleted"
+              icon="tasks"
+              @click="openForm(question.answers.checklistId, 'checklistId')"
+            >
+              checklist
+            </answer-button>
+          </div>
         </div>
       </div>
     </div>
@@ -288,7 +297,7 @@ button {
 .question {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   height: 100%;
   width: 100%;
 
@@ -357,7 +366,20 @@ button {
     }
   }
 
-  &-content {
+  &-body {
+    min-height: 250px;
+  }
+
+  .loggedout-alert {
+    max-width: 500px;
+  }
+
+  &-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  &-answer-types {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -372,9 +394,12 @@ button {
     }
 
     .button-container {
-      width: 100%;
+      width: auto;
       display: flex;
       justify-content: center;
+      > * {
+        margin: 0 15px;
+      }
     }
   }
 }
