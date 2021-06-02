@@ -92,6 +92,8 @@
             >
               Audio recorder
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <b-form-checkbox
               v-model="hasListOption"
               data-qa="question-answer-list"
@@ -100,44 +102,17 @@
             >
               List
             </b-form-checkbox>
-          </b-form-group>
-          <b-form-group v-if="node.typeData.options.text" label="Text">
-            <b-form-radio
-              v-model="hasTextMultiLineOption"
-              data-qa="question-answer-text-multi"
-              name="multi-line"
-              :value="true"
-            >
-              Multi-line
-            </b-form-radio>
-            <b-form-radio
-              v-model="hasTextMultiLineOption"
-              data-qa="question-answer-text-single"
-              name="single-line"
-              :value="false"
-            >
-              Single Line
-            </b-form-radio>
-          </b-form-group>
-
-          <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
-            <label for="placeholder">Placeholder (optional):</label>
-            <b-form-input
-              id="placeholder"
-              v-model="node.typeData.options.text.placeholder"
-              data-qa="question-answer-text-single-placeholder"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-form-group v-if="hasListOption">
-            <label for="placeholder">List Placeholder (optional):</label>
-            <b-form-input
-              id="placeholder"
-              v-model="node.typeData.options.list.placeholder"
-              data-qa="question-answer-text-single-placeholder"
-            ></b-form-input>
+            <div v-if="hasListOption" class="mt-2 pl-4">
+              <label for="placeholder">List Placeholder (optional):</label>
+              <b-form-input
+                id="placeholder"
+                v-model="node.typeData.options.list.placeholder"
+                data-qa="question-answer-list-placeholder"
+              ></b-form-input>
+            </div>
           </b-form-group>
         </b-card>
+
         <b-card
           sub-title="Confirmation Page Customization"
           bg-variant="light"
@@ -166,7 +141,6 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import RichTextForm from "./RichTextForm"
 import Helpers from "@/utils/Helpers"
-
 const defaultQuestion = {
   text: "",
   answers: {
@@ -175,7 +149,6 @@ const defaultQuestion = {
     listId: "",
   },
 }
-
 export default {
   components: {
     Combobox,
@@ -263,7 +236,6 @@ export default {
   },
 }
 </script>
-
 <style scoped>
 .question {
   margin-bottom: 1em;
