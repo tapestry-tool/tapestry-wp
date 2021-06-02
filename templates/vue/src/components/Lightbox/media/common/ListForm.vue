@@ -28,7 +28,7 @@
               ? node.typeData.options.list.placeholder
               : 'Enter text and press Enter'
           "
-          @keypress.enter="addAnswer"
+          @keydown.enter.prevent="addAnswer()"
         ></b-form-input>
         <b-button class="btn" variant="primary" @click="addAnswer">
           Add
