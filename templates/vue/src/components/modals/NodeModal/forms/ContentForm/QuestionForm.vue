@@ -83,7 +83,7 @@
               </div>
             </div>
           </b-form-group>
-          <b-form-group>
+          <b-form-group class="mt-3">
             <b-form-checkbox
               v-model="node.typeData.options.audio"
               data-qa="question-answer-audio"
@@ -92,46 +92,42 @@
             >
               Audio recorder
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group class="mt-3">
             <b-form-checkbox
               v-model="hasMultipleChoiceOption"
               data-qa="question-answer-multiple-choice"
               switch
               @input="setId($event, 'multipleChoiceId')"
             >
-              Multiple Choice
+              Multiple choice
             </b-form-checkbox>
-          </b-form-group>
-        </b-card>
-
-
-          <b-form-group
-            v-if="node.typeData.options.multipleChoice"
-            label="Multiple Choice"
-          >
-            <b-form-radio
-              v-model="hasMultipleChoiceMultiAnswerOption"
-              data-qa="question-answer-multipleChoice-multi"
-              name="multiple-answer"
-              :value="true"
-            >
-              Select Multiple Answer(Checkbox)
-            </b-form-radio>
-            <b-form-radio
-              v-model="hasMultipleChoiceMultiAnswerOption"
-              data-qa="question-answer-multipleChoice-single"
-              name="one-answer"
-              :value="false"
-            >
-              Select One Answer(Radio Button)
-            </b-form-radio>
-          </b-form-group>
-          <b-form-group v-if="hasMultipleChoiceOption" label="">
-            <multiple-choice-form
-              :node="node"
-              data-qa="authoring-multiplechoice-form"
-              :multipleChoiceSelected="hasMultipleChoiceOption"
-              :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"
-            />
+            <div v-if="node.typeData.options.multipleChoice" class="mt-2 pl-4 ml-2">
+              <b-form-radio
+                v-model="hasMultipleChoiceMultiAnswerOption"
+                data-qa="question-answer-multipleChoice-multi"
+                name="multiple-answer"
+                :value="true"
+              >
+                Select Multiple Answer(Checkbox)
+              </b-form-radio>
+              <b-form-radio
+                v-model="hasMultipleChoiceMultiAnswerOption"
+                data-qa="question-answer-multipleChoice-single"
+                name="one-answer"
+                :value="false"
+              >
+                Select One Answer(Radio Button)
+              </b-form-radio>
+              <div v-if="hasMultipleChoiceOption" label="">
+                <multiple-choice-form
+                  :node="node"
+                  data-qa="authoring-multiplechoice-form"
+                  :multipleChoiceSelected="hasMultipleChoiceOption"
+                  :multipleAnswerSelected="hasMultipleChoiceMultiAnswerOption"
+                />
+              </div>
+            </div>
           </b-form-group>
         </b-card>
         <b-card
