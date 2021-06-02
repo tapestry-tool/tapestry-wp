@@ -52,6 +52,11 @@
           :id="question.id"
           @submit="handleAudioSubmit"
         />
+        <user-drag-drop-form
+          v-else-if="userDragDropFormOpened"
+          :node="node"
+          @submit="handleDragDropSubmit"
+        />
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
@@ -80,13 +85,13 @@
               checklist
             </answer-button>
             <answer-button
-            v-if="showDragDrop"
-            :completed="dragDropFormCompleted"
-            icon="drag and drop"
-            @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
-          >
-            drag/drop
-          </answer-button>
+              v-if="showDragDrop"
+              :completed="dragDropFormCompleted"
+              icon="drag and drop"
+              @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
+            >
+              drag/drop
+            </answer-button>
           </div>
         </div>
       </div>
