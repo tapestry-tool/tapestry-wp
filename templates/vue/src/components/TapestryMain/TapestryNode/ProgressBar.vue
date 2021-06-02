@@ -4,9 +4,14 @@
       ref="track"
       class="track"
       :stroke-width="width"
-      :stroke="locked ? '#999' : strokeColor"
+      :stroke="locked ? '#999' : backgroundColor"
     ></circle>
-    <path v-show="!locked && progress > 0" ref="path" class="bar"></path>
+    <path
+      v-show="!locked && progress > 0"
+      ref="path"
+      class="bar"
+      :style="pathStyle"
+    ></path>
   </g>
 </template>
 
@@ -28,6 +33,16 @@ export default {
       type: Number,
       required: true,
     },
+    backgroundColor: {
+      type: String,
+      required: false,
+      default: "#2c3e50",
+    },
+    fillColor: {
+      type: String,
+      required: false,
+      default: "#11a6d8",
+    },
     draft: {
       type: Boolean,
       required: false,
@@ -46,8 +61,8 @@ export default {
     width() {
       return 20
     },
-    strokeColor() {
-      return "#2c3e50"
+    pathStyle() {
+      return "fill: " + this.fillColor
     },
   },
   watch: {
@@ -112,10 +127,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.bar {
-  stroke: #11a6d8;
-}
-
 .track {
   fill-opacity: 0;
   pointer-events: none;
