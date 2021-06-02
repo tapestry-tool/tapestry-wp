@@ -214,7 +214,6 @@ export default {
 
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
-
       axios
         .post(wpData.upload_url, formData, {
           headers: {
@@ -258,7 +257,7 @@ export default {
           if (this.isUploading) {
             this.isUploading = false
             this.confirmedUpload = false
-            this.$emit("isUploading", this.isUploading)
+            setTimeout(() => {this.$emit("isUploading", this.isUploading)}, 1200)
           }
           clearInterval(this.uploadBarInterval)
         })
@@ -287,6 +286,7 @@ export default {
         .then(close => {
           if (close) {
             this.$emit("input", null)
+            this.$root.$emit("remove-thumbnail", this.thumbnailType)
           }
         })
         .catch(err => console.log(err))

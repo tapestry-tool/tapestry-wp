@@ -14,6 +14,7 @@
       :data-qa="`add-node-${node.id}`"
       :x="x"
       :y="y"
+      :fill="fill"
       @click="addNode"
     >
       <tapestry-icon icon="plus" svg></tapestry-icon>
@@ -47,6 +48,11 @@ export default {
     y: {
       type: Number,
       required: true,
+    },
+    fill: {
+      type: String,
+      required: false,
+      default: "#666",
     },
   },
   data() {
