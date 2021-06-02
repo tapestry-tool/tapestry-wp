@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="node"
     ref="wrapper"
     data-qa="sidebar"
     :class="['sidebar-container', { closed: closed }]"
@@ -399,6 +400,7 @@ export default {
     background: #5d656c;
     color: white;
     height: 100vh;
+    height: -apple-fill-available;
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
     transition: all 0.2s ease-out;
@@ -474,6 +476,10 @@ export default {
 
           a {
             color: #becddc;
+            text-decoration: underline;
+            &:hover {
+              color: #fff;
+            }
           }
 
           .license-link {
