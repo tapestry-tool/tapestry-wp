@@ -26,13 +26,13 @@
       <b-form-group v-if="isFromBucket">
         <b-form-input
           v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
-          placeholder="Enter from bucket label"
+          placeholder="Enter bucket label"
         ></b-form-input>
       </b-form-group>
       <b-form-group v-else>
         <b-form-input
           v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
-          placeholder="Enter to bucket label"
+          placeholder="Enter bucket label"
         ></b-form-input>
       </b-form-group>
       <b-button

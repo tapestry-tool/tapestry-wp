@@ -4,7 +4,7 @@
     <p>next from bucket item id is {{ nextFromBucketItemId }}</p>
     <p>next from bucket id is {{ nextFromBucketId }}</p>
     <b-form-group>
-      From buckets
+      <b>From buckets</b>
       <drag-drop-bucket
         v-for="(bucket, bucketIndex) in fromBuckets"
         :key="bucket.id"
@@ -26,7 +26,7 @@
       </b-button>
     </b-form-group>
     <b-form-group>
-      To buckets
+      <b>To buckets</b>
       <drag-drop-bucket
         v-for="(bucket, index) in toBuckets"
         :key="bucket.id"

@@ -2,7 +2,7 @@
   <b-form @submit="handleDragDropSubmit">
     <p>Current data is {{ node.typeData.options.dragDrop }}</p>
     <b-row align-h="between">
-      <b-col cols="5">
+      <b-col cols="4">
         <b style="color: #009688">From buckets</b>
         <user-drag-drop-bucket
           v-for="bucket in node.typeData.options.dragDrop.fromBucketArray"
@@ -14,7 +14,7 @@
           :isFromBucket="true"
         />
       </b-col>
-      <b-col cols="5">
+      <b-col cols="4">
         <b style="color: #3f51b5">To buckets</b>
         <user-drag-drop-bucket
           v-for="bucket in node.typeData.options.dragDrop.toBucketArray"

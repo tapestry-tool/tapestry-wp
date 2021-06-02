@@ -76,11 +76,8 @@ export default {
 <style scoped>
 .circle {
   border-radius: 100%;
-  height: 200px;
-  width: 200px;
+  min-height: 220px;
   border: solid;
-  margin-top: 0px;
-  margin-bottom: 0px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
