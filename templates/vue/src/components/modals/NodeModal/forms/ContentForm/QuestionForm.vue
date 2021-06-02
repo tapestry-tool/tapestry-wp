@@ -92,6 +92,8 @@
             >
               Audio recorder
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <b-form-checkbox
               v-model="hasDragDropOption"
               data-qa="question-answer-dragdrop"
@@ -100,10 +102,9 @@
             >
               Drag and drop
             </b-form-checkbox>
-          </b-form-group>
-          
-          <b-form-group v-if="node.typeData.options.dragDrop" label="Drag and Drop">
-            <drag-drop-form :node="node" />
+            <div v-if="node.typeData.options.dragDrop" label="Drag and Drop">
+              <drag-drop-form :node="node" />
+            </div>
           </b-form-group>
         </b-card>
 
