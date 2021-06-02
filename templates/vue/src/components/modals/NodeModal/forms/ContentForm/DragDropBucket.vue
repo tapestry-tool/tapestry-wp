@@ -109,15 +109,15 @@ export default {
   background-color: #e0f2f1;
   margin-bottom: 15px;
   border-radius: 15px;
-  text-align: center;
-  min-height: 130px;
+  margin-left: -15px;
+  min-height: 200px;
 }
 
 .toBucketContainer {
   background-color: #e8eaf6;
-  min-height: 130px;
+  min-height: 200px;
   margin-bottom: 15px;
+  margin-left: -15px;
   border-radius: 15px;
-  text-align: center;
 }
 </style>

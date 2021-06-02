@@ -77,6 +77,7 @@ export default {
 .circle {
   border-radius: 100%;
   height: 200px;
+  width: 200px;
   border: solid;
   margin-top: 0px;
   margin-bottom: 0px;
@@ -84,6 +85,7 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
+  margin: auto;
 }
 .container {
   margin-top: 30px;

@@ -64,7 +64,7 @@ export default {
       isAnswerValid: true,
       toBucketArray: this.node.typeData.options.dragDrop.toBucketArray,
       fromBucketArray: this.node.typeData.options.dragDrop.fromBucketArray,
-      toBucketAnswer: {},
+      toBucketAnswer: "",
     }
   },
   computed: {
@@ -91,9 +91,21 @@ export default {
   methods: {
     updateToBucketAnswer() {
       for (let i = 0; i < this.toBucketArray.length; i++) {
-        let bucketValue = this.toBucketArray[i].value
-        this.toBucketAnswer[bucketValue] = this.toBucketArray[i].itemArray
+        if (this.toBucketArray[i].itemArray.length > 0) {
+          let bucketValue = this.toBucketArray[i].value
+          let itemValueArray = this.getItemArray(this.toBucketArray[i])
+          this.toBucketAnswer = this.toBucketAnswer + String(bucketValue) + ": "
+          let itemValueArrayString = String(itemValueArray)
+          this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString + "\n"
+        }
       }
+    },
+    getItemArray(bucket) {
+      var itemArray = []
+      for (let i = 0; i < bucket.itemArray.length; i++) {
+        itemArray.push(bucket.itemArray[i].text)
+      }
+      return itemArray
     },
     handleDragDropSubmit(event) {
       event.preventDefault()

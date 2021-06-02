@@ -1,9 +1,13 @@
 <template>
   <div class="container">
-    <b-form-group class="contents">
+    <div>
       <b>New bucket item</b>
-      <p>Text Value is:{{ bucketItem.text }}</p>
-      <p>Color picker component here</p>
+      <color-picker
+        label="Background color"
+        :currentColor="bucketItem.color"
+        :data-qa="`node-backgroundcolor-${node.id}`"
+        @change="handleItemColorChange"
+      />
       <b-form-checkbox v-model="addBackgroundImage" data-qa="bucketItem-useImage">
         Background image
       </b-form-checkbox>
@@ -31,24 +35,26 @@
         v-model="bucketItem.text"
         placeholder="Enter Item Text"
       ></b-form-input>
-    </b-form-group>
-    <b-button
-      :disabled="removeItemDisabled"
-      squared
-      variant="outline-danger"
-      @click="$emit('remove')"
-    >
-      Remove item
-    </b-button>
+      <b-button
+        :disabled="removeItemDisabled"
+        squared
+        variant="outline-danger"
+        @click="$emit('remove')"
+      >
+        Remove item
+      </b-button>
+    </div>
   </div>
 </template>
 
 <script>
 import FileUpload from "@/components/modals/common/FileUpload"
+import ColorPicker from "@/components/modals/common/ColorPicker"
 
 export default {
   components: {
     FileUpload,
+    ColorPicker,
   },
   props: {
     node: {
@@ -108,20 +114,19 @@ export default {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)
     },
+    handleItemColorChange(color) {
+      this.bucketItem.color = color
+    },
   },
 }
 </script>
 
 <style scoped>
 .container {
-  display: flex;
-  align-items: center;
+  border: solid;
   background-color: #add8e6;
   margin-bottom: 15px;
   border-radius: 15px;
-}
-
-.contents {
-  flex-direction: column;
+  margin-left: 0px;
 }
 </style>
