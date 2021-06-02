@@ -115,8 +115,7 @@ export default {
 
 .toBucketContainer {
   background-color: #e8eaf6;
-  width: 80%;
-  height: 100px;
+  min-height: 130px;
   margin-bottom: 15px;
   border-radius: 15px;
   text-align: center;

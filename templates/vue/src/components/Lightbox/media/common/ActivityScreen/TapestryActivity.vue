@@ -11,6 +11,7 @@
       </li>
     </ul>
     <audio v-if="type === 'audio'" controls :src="entry"></audio>
+    <div v-if="type === 'drag drop'" class="text">{{ entry }}</div>
   </div>
 </template>
 
@@ -26,7 +27,7 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "checklist", "audio"].includes(val),
+      validator: val => ["text", "checklist", "audio", "drag drop"].includes(val),
     },
     entry: {
       type: [String, Array],
