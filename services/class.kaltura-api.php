@@ -1,6 +1,6 @@
 <?php
 
-    defined("LOAD_KALTURA") OR exit();
+    (defined("LOAD_KALTURA") && LOAD_KALTURA) OR exit();
     require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/autoload.php';
 
 
