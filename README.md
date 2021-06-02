@@ -60,6 +60,27 @@ You may optionally set uploaded videos in Tapestry to upload to Kaltura (if you 
     define('KALTURA_SERVICE_URL', '');
     define('LOAD_KALTURA', true);
     ```
+3.Note the following wp variables as they can effect file uploading and HTTP request execution time limits in the WordPress server. This might be relevant for Kaltura and regular file upload as well.
+  File: `php.ini` or `php.conf.ini`
+  Variables of interest:
+    ```
+    post_max_size = 
+    upload_max_filesize =
+    max_execution_time =
+
+    ```
+  In case of an HTTPS/SSL error troubleshoot with the following - https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate
+    ```
+    // Download the cacert.pem file from here: https://curl.se/docs/caextract.html and move it into C:/MAMP
+    // make sure this is uncommented
+    extension=php_openssl.dll
+
+    // Add these configuration lines
+    [SSL]
+    curl.cainfo="C:/MAMP/cacert.pem"
+    openssl.cafile="C:/MAMP/cacert.pem"
+    ```
+
 
 The Kaltura Admininstrator Secret and Partner ID can be found by going to your Kaltura Settings > Integration tab in the Kaltura admin. The service URL is simply the main domain where your Kaltura videos are hosted on.
 
