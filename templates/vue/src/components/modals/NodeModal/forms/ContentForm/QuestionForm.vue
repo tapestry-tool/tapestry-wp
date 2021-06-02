@@ -47,22 +47,50 @@
           </b-form-group>
 
           <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
-          <b-form-group label="Answer Types">
+          <b-form-group class="mt-3">
             <b-form-checkbox
               v-model="hasTextOption"
               data-qa="question-answer-text"
               switch
               @input="setId($event, 'textId')"
             >
-              Text
+              Text entry
             </b-form-checkbox>
+            <div v-if="node.typeData.options.text" class="mt-2 pl-4 ml-2">
+              <b-form-radio
+                v-model="hasTextMultiLineOption"
+                data-qa="question-answer-text-multi"
+                name="multi-line"
+                :value="true"
+              >
+                Multi-line
+              </b-form-radio>
+              <b-form-radio
+                v-model="hasTextMultiLineOption"
+                data-qa="question-answer-text-single"
+                name="single-line"
+                :value="false"
+              >
+                Single Line
+              </b-form-radio>
+              <div v-if="hasTextOption && !hasTextMultiLineOption" class="mt-2 pl-4">
+                <label for="placeholder">Placeholder (optional):</label>
+                <b-form-input
+                  id="placeholder"
+                  v-model="node.typeData.options.text.placeholder"
+                  data-qa="question-answer-text-single-placeholder"
+                ></b-form-input>
+              </div>
+            </div>
+          </b-form-group>
+          <b-form-group>
             <b-form-checkbox
               v-model="node.typeData.options.audio"
               data-qa="question-answer-audio"
               switch
               @input="setId($event, 'audioId')"
             >
-              Audio Recorder
+              Audio recorder
             </b-form-checkbox>
             <b-form-checkbox
               v-model="hasDragDropOption"
@@ -73,35 +101,7 @@
               Drag and drop
             </b-form-checkbox>
           </b-form-group>
-
-          <b-form-group v-if="node.typeData.options.text" label="Text">
-            <b-form-radio
-              v-model="hasTextMultiLineOption"
-              data-qa="question-answer-text-multi"
-              name="multi-line"
-              :value="true"
-            >
-              Multi-line
-            </b-form-radio>
-            <b-form-radio
-              v-model="hasTextMultiLineOption"
-              data-qa="question-answer-text-single"
-              name="single-line"
-              :value="false"
-            >
-              Single Line
-            </b-form-radio>
-          </b-form-group>
-
-          <b-form-group v-if="hasTextOption && !hasTextMultiLineOption">
-            <label for="placeholder">Placeholder (optional):</label>
-            <b-form-input
-              id="placeholder"
-              v-model="node.typeData.options.text.placeholder"
-              data-qa="question-answer-text-single-placeholder"
-            ></b-form-input>
-          </b-form-group>
-
+          
           <b-form-group v-if="node.typeData.options.dragDrop" label="Drag and Drop">
             <drag-drop-form :node="node" />
           </b-form-group>
