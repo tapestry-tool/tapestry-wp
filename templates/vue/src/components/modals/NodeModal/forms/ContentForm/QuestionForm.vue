@@ -102,7 +102,7 @@
             >
               Drag and drop
             </b-form-checkbox>
-            <div v-if="node.typeData.options.dragDrop" label="Drag and Drop">
+            <div v-if="node.typeData.options.dragDrop" class="mt-2 pl-4 ml-2">
               <drag-drop-form :node="node" />
             </div>
           </b-form-group>
