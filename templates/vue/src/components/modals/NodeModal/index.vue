@@ -693,7 +693,7 @@ export default {
         this.updateNodeCoordinates()
 
         if (this.linkHasThumbnailData) {
-          if (this.node.typeData.thumbnailURL) {
+          if (this.node.typeData.thumbnailURL && this.type === 'add') {
             this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL)
           } else {
             await this.setLinkData()
@@ -907,7 +907,10 @@ export default {
 
         if (data) {
           this.node.typeData.linkMetadata = data
-          this.confirmThumbnailsPopup(data.image)
+          
+          if(this.type === 'add'){
+            this.confirmThumbnailsPopup(data.image)
+          }
         }
       }
     },
