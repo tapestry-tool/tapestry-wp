@@ -96,7 +96,11 @@ export default {
           let itemValueArray = this.getItemArray(this.toBucketArray[i])
           this.toBucketAnswer = this.toBucketAnswer + String(bucketValue) + ": "
           let itemValueArrayString = String(itemValueArray)
-          this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString + "\n"
+          if (this.determineToFromBucketAnswerQuantity()) {
+            this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString
+          } else {
+            this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString + "\n"
+          }
         }
       }
     },
@@ -106,6 +110,15 @@ export default {
         itemArray.push(bucket.itemArray[i].text)
       }
       return itemArray
+    },
+    determineToFromBucketAnswerQuantity() {
+      var num = 0
+      for (let i = 0; i < this.toBucketArray.length; i++) {
+        if (this.toBucketArray[i].itemArray.length > 0) {
+          num++
+        }
+      }
+      return Boolean(num === 1)
     },
     handleDragDropSubmit(event) {
       event.preventDefault()
