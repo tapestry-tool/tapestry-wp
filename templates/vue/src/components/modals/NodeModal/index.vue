@@ -485,10 +485,19 @@ export default {
       this.keepOpen = true
       this.handlePublish()
     })
+    this.$root.$on("remove-thumbnail", thumbnailType => {
+      if (thumbnailType == "thumbnail") {
+        this.node.imageURL = ""
+        this.node.thumbnailFileId = ""
+      } else {
+        this.node.lockedImageURL = ""
+        this.node.lockedThumbnailFileId = ""
+      }
+    })
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -737,9 +746,6 @@ export default {
                 childOrdering: [...this.parent.childOrdering],
               },
             })
-          }
-          if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
           }
         } else {
           this.updateRootNode(id)
