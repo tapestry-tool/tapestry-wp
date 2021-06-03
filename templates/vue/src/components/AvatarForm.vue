@@ -1,10 +1,12 @@
 <template>
   <div>
     <b-button v-b-modal.my-modal>Show Avatar Form</b-button>
-    <b-modal id="my-modal">
-      <b-container>
+    <b-modal id="my-modal" class="avatar-modal">
+      <b-container class="container">
         <b-overlay variant="black">
+          <h2>Avatar Customizer</h2>
           <avataaars
+            class="avatar"
             style="max-width: 300px;"
             :isCircle="isCircle"
             :circleColor="circleColor"
@@ -19,22 +21,131 @@
             :hairColor="hairColor"
             :mouthType="mouthType"
             :skinColor="skinColor"
-            :topType="'NoHair'"
-            :topColor="'random'"
+            :topType="topType"
+            :topColor="topColor"
           ></avataaars>
-          <b-form-group class="selection">
-            <b-form-select v-model="selected" :options="options"></b-form-select>
-          </b-form-group>
-          <b-form-group>
-            <b-form-select
-              v-model="isCircle"
-              :options="isCircleOptions"
-            ></b-form-select>
-          </b-form-group>
-          <div class="mt-3">
-            Selected:
-            <strong>{{ selected }}</strong>
-          </div>
+          <b-card no-body>
+            <b-tabs pills card>
+              <b-tab title="Background" active>
+                <b-card-text>
+                  <b-form-group
+                    label="Background Shape"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-select
+                      v-model="isCircle"
+                      :options="isCircleOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Circle Colour" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="circleColor"
+                      :options="circleColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-card-text>
+              </b-tab>
+              <b-tab title="Clothing">
+                <b-card-text>
+                  <b-form-group label="Clothing Type" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="clotheType"
+                      :options="clotheTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Clothing Colour" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="clotheColor"
+                      :options="clotheColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Glasses" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="accessoriesType"
+                      :options="accessoriesTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group
+                    label="T-Shirt Graphics"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-select
+                      v-model="graphicType"
+                      :options="graphicTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-card-text>
+              </b-tab>
+              <b-tab title="Face">
+                <b-card-text>
+                  <b-form-group label="Eyebrow Type" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="eyebrowType"
+                      :options="eyebrowTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Eye Type" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="eyeType"
+                      :options="eyeTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Mouth Type" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="mouthType"
+                      :options="mouthTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Skin Colour" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="skinColor"
+                      :options="skinColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-card-text>
+              </b-tab>
+              <b-tab title="Hair">
+                <b-card-text>
+                  <b-form-group
+                    label="Facial Hair Colour"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-select
+                      v-model="facialHairColor"
+                      :options="facialHairColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group
+                    label="Facial Hair Type"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-select
+                      v-model="facialHairType"
+                      :options="facialHairTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Hair Colour" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="hairColor"
+                      :options="hairColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Hair Type" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="topType"
+                      :options="topTypeOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Hair Colour" label-for="input-horizontal">
+                    <b-form-select
+                      v-model="topColor"
+                      :options="topColorOptions"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-card-text>
+              </b-tab>
+            </b-tabs>
+          </b-card>
         </b-overlay>
       </b-container>
     </b-modal>
@@ -51,32 +162,222 @@ export default {
   },
   data() {
     return {
-      selected: null,
       isCircle: true,
       circleColor: "#6fb8e0",
-      topType: "random",
-      accessoriesType: "Prescription01",
-      facialHairType: "random",
-      clotheType: "random",
-      eyeType: "random",
-      eyebrowType: "random",
-      mouthType: "random",
-      skinColor: "random",
-      graphicType: "random",
-      hairColor: "random",
-      facialHairColor: "random",
-      topColor: "random",
-      clotheColor: "random",
-      options: [
-        { value: null, text: "Please select an option" },
-        { value: "a", text: "This is First option" },
-        { value: "b", text: "Selected Option" },
-        { value: { C: "3PO" }, text: "This is an option with object value" },
-        { value: "d", text: "This one is disabled", disabled: true },
-      ],
+      topType: "NoHair",
+      accessoriesType: "Blank",
+      facialHairType: "Blank",
+      clotheType: "BlazerSweater",
+      eyeType: "Happy",
+      eyebrowType: "Default",
+      mouthType: "Default",
+      skinColor: "Tanned",
+      graphicType: "Bat",
+      hairColor: "Black",
+      facialHairColor: "Black",
+      topColor: "Black",
+      clotheColor: "Black",
       isCircleOptions: [
         { value: true, text: "circle" },
         { value: false, text: "none" },
+      ],
+      circleColorOptions: [
+        { value: "#6fb8e0", text: "default" },
+        { value: "#C0392B", text: "red" },
+        { value: "#D35400", text: "orange" },
+        { value: "#F1C40F", text: "yellow" },
+        { value: "#27AE60", text: "green" },
+        { value: "#3498DB", text: "blue" },
+        { value: "#8E44AD", text: "purple" },
+        { value: "#000000", text: "black" },
+        { value: "#FFFFFF", text: "white" },
+      ],
+      accessoriesTypeOptions: [
+        { value: "Blank", text: "None" },
+        { value: "Kurt", text: "Kurt Cobain Style" },
+        { value: "Prescription01", text: "Glasses 1" },
+        { value: "Prescription02", text: "Glasses 2" },
+        { value: "Round", text: "Round" },
+        { value: "Sunglasses", text: "Sunglasses" },
+        { value: "Wayfarers", text: "Wayfarers" },
+      ],
+      clotheTypeOptions: [
+        { value: "BlazerShirt", text: "BlazerShirt" },
+        { value: "BlazerSweater", text: "BlazerSweater" },
+        { value: "CollarSweater", text: "CollarSweater" },
+        { value: "GraphicShirt", text: "GraphicShirt" },
+        { value: "Hoodie", text: "Hoodie" },
+        { value: "Overall", text: "Overall" },
+        { value: "ShirtCrewNeck", text: "ShirtCrewNeck" },
+        { value: "ShirtScoopNeck", text: "ShirtScoopNeck" },
+        { value: "ShirtVNeck", text: "ShirtVNeck" },
+      ],
+      clotheColorOptions: [
+        { value: "Black", text: "Black" },
+        { value: "Blue01", text: "Blue01" },
+        { value: "Blue02", text: "Blue02" },
+        { value: "Blue03", text: "Blue03" },
+        { value: "Gray01", text: "Gray01" },
+        { value: "Gray02", text: "Gray02" },
+        { value: "Heather", text: "Heather" },
+        { value: "PastelBlue", text: "PastelBlue" },
+        { value: "PastelGreen", text: "PastelGreen" },
+        { value: "PastelOrange", text: "PastelOrange" },
+        { value: "PastelRed", text: "PastelRed" },
+        { value: "PastelYellow", text: "PastelYellow" },
+        { value: "Pink", text: "Pink" },
+        { value: "Red", text: "Red" },
+        { value: "White", text: "White" },
+      ],
+      eyebrowTypeOptions: [
+        { value: "Angry", text: "Angry" },
+        { value: "AngryNatural", text: "AngryNatural" },
+        { value: "Default", text: "Default" },
+        { value: "DefaultNatural", text: "DefaultNatural" },
+        { value: "FlatNatural", text: "FlatNatural" },
+        { value: "RaisedExcited", text: "RaisedExcited" },
+        { value: "RaisedExcitedNatural", text: "RaisedExcitedNatural" },
+        { value: "SadConcerned", text: "SadConcerned" },
+        { value: "SadConcernedNatural", text: "SadConcernedNatural" },
+        { value: "UnibrowNatural", text: "UnibrowNatural" },
+        { value: "UpDown", text: "UpDown" },
+        { value: "UpDownNatural", text: "UpDownNatural" },
+      ],
+      eyeTypeOptions: [
+        { value: "Close", text: "Close" },
+        { value: "Cry", text: "Cry" },
+        { value: "Default", text: "Default" },
+        { value: "Dizzy", text: "Dizzy" },
+        { value: "EyeRoll", text: "EyeRoll" },
+        { value: "Happy", text: "Happy" },
+        { value: "Hearts", text: "Hearts" },
+        { value: "Side", text: "Side" },
+        { value: "Squint", text: "Squint" },
+        { value: "Surprised", text: "Surprised" },
+        { value: "Wink", text: "Wink" },
+        { value: "WinkWacky", text: "WinkWacky" },
+      ],
+      facialHairColorOptions: [
+        { value: "Auburn", text: "Auburn" },
+        { value: "Black", text: "Black" },
+        { value: "Blonde", text: "Blonde" },
+        { value: "BlondeGolden", text: "BlondeGolden" },
+        { value: "Brown", text: "Brown" },
+        { value: "BrownDark", text: "BrownDark" },
+        { value: "PastelPink", text: "PastelPink" },
+        { value: "Platinum", text: "Platinum" },
+        { value: "Red", text: "Red" },
+        { value: "SilverGray", text: "SilverGray" },
+      ],
+      facialHairTypeOptions: [
+        { value: "Blank", text: "Blank" },
+        { value: "BeardMedium", text: "BeardMedium" },
+        { value: "BeardLight", text: "BeardLight" },
+        { value: "BeardMagestic", text: "BeardMagestic" },
+        { value: "MoustacheFancy", text: "MoustacheFancy" },
+        { value: "MoustacheMagnum", text: "MoustacheMagnum" },
+      ],
+      graphicTypeOptions: [
+        { value: "Bat", text: "Bat" },
+        { value: "Cumbia", text: "Cumbia" },
+        { value: "Deer", text: "Deer" },
+        { value: "Diamond", text: "Diamond" },
+        { value: "Hola", text: "Hola" },
+        { value: "Pizza", text: "Pizza" },
+        { value: "Resist", text: "Resist" },
+        { value: "Selena", text: "Selena" },
+        { value: "Bear", text: "Bear" },
+        { value: "SkullOutline", text: "SkullOutline" },
+        { value: "Skull", text: "Skull" },
+      ],
+      hairColorOptions: [
+        { value: "Auburn", text: "Auburn" },
+        { value: "Black", text: "Black" },
+        { value: "Blonde", text: "Blonde" },
+        { value: "BlondeGolden", text: "BlondeGolden" },
+        { value: "Brown", text: "Brown" },
+        { value: "BrownDark", text: "BrownDark" },
+        { value: "PastelPink", text: "PastelPink" },
+        { value: "Platinum", text: "Platinum" },
+        { value: "Red", text: "Red" },
+        { value: "SilverGray", text: "SilverGray" },
+      ],
+      mouthTypeOptions: [
+        { value: "Concerned", text: "Concerned" },
+        { value: "Default", text: "Default" },
+        { value: "Disbelief", text: "Disbelief" },
+        { value: "Eating", text: "Eating" },
+        { value: "Grimace", text: "Grimace" },
+        { value: "Sad", text: "Sad" },
+        { value: "ScreamOpen", text: "ScreamOpen" },
+        { value: "Serious", text: "Serious" },
+        { value: "Smile", text: "Smile" },
+        { value: "Tongue", text: "Tongue" },
+        { value: "Twinkle", text: "Twinkle" },
+        { value: "Vomit", text: "Vomit" },
+      ],
+      skinColorOptions: [
+        { value: "Tanned", text: "Tanned" },
+        { value: "Yellow", text: "Yellow" },
+        { value: "Pale", text: "Pale" },
+        { value: "Light", text: "Light" },
+        { value: "Brown", text: "Brown" },
+        { value: "DarkBrown", text: "DarkBrown" },
+        { value: "Black", text: "Black" },
+      ],
+      topTypeOptions: [
+        { value: "NoHair", text: "NoHair" },
+        { value: "Eyepatch", text: "Eyepatch" },
+        { value: "Hat", text: "Hat" },
+        { value: "Hijab", text: "Hijab" },
+        { value: "Turban", text: "Turban" },
+        { value: "WinterHat1", text: "WinterHat1" },
+        { value: "WinterHat2", text: "WinterHat2" },
+        { value: "WinterHat3", text: "WinterHat3" },
+        { value: "WinterHat4", text: "WinterHat4" },
+        { value: "LongHairBigHair", text: "LongHairBigHair" },
+        { value: "LongHairBob", text: "LongHairBob" },
+        { value: "LongHairBun", text: "LongHairBun" },
+        { value: "LongHairCurly", text: "LongHairCurly" },
+        { value: "LongHairCurvy", text: "LongHairCurvy" },
+        { value: "LongHairDreads", text: "LongHairDreads" },
+        { value: "LongHairFrida", text: "LongHairFrida" },
+        { value: "LongHairFro", text: "LongHairFro" },
+        { value: "LongHairFroBand", text: "LongHairFroBand" },
+        { value: "LongHairNotTooLong", text: "LongHairNotTooLong" },
+        { value: "LongHairShavedSides", text: "LongHairShavedSides" },
+        { value: "LongHairMiaWallace", text: "LongHairMiaWallace" },
+        { value: "LongHairStraight", text: "LongHairStraight" },
+        { value: "LongHairStraight2", text: "LongHairStraight2" },
+        { value: "LongHairStraightStrand", text: "LongHairStraightStrand" },
+        { value: "ShortHairDreads01", text: "ShortHairDreads01" },
+        { value: "ShortHairDreads02", text: "ShortHairDreads02" },
+        { value: "ShortHairFrizzle", text: "ShortHairFrizzle" },
+        { value: "ShortHairShaggyMullet", text: "ShortHairShaggyMullet" },
+        { value: "ShortHairShortCurly", text: "ShortHairShortCurly" },
+        { value: "ShortHairShortFlat", text: "ShortHairShortFlat" },
+        { value: "ShortHairShortRound", text: "ShortHairShortRound" },
+        { value: "ShortHairShortWaved", text: "ShortHairShortWaved" },
+        { value: "ShortHairSides", text: "ShortHairSides" },
+        { value: "ShortHairTheCaesar", text: "ShortHairTheCaesar" },
+        { value: "ShortHairTheCaesarSidePart", text: "ShortHairTheCaesarSidePart" },
+      ],
+      topColorOptions: [
+        { value: "Black", text: "Black" },
+        { value: "Blue01", text: "Blue01" },
+        { value: "Blue02", text: "Blue02" },
+        { value: "Blue03", text: "Blue03" },
+        { value: "Gray01", text: "Gray01" },
+        { value: "Gray02", text: "Gray02" },
+        { value: "Heather", text: "Heather" },
+        { value: "PastelBlue", text: "PastelBlue" },
+        { value: "PastelGreen", text: "PastelGreen" },
+        { value: "PastelOrange", text: "PastelOrange" },
+        { value: "PastelRed", text: "PastelRed" },
+        { value: "PastelYellow", text: "PastelYellow" },
+        { value: "Pink", text: "Pink" },
+        { value: "Red", text: "Red" },
+        { value: "White", text: "White" },
       ],
     }
   },
