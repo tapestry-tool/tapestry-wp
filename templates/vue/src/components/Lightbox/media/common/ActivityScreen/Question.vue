@@ -3,7 +3,11 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button v-if="formOpened || recorderOpened" class="button-nav" @click="back">
+    <button
+      v-if="formOpened || recorderOpened || userMultipleChoiceFormOpened"
+      class="button-nav"
+      @click="back"
+    >
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />
@@ -53,10 +57,10 @@
           @submit="handleAudioSubmit"
         />
         <user-multiple-choice-form
-        v-else-if="userMultipleChoiceFormOpened"
-        :node="node"
-        @submit="handleMultipleChoiceSubmit"
-      ></user-multiple-choice-form>
+          v-else-if="userMultipleChoiceFormOpened"
+          :node="node"
+          @submit="handleMultipleChoiceSubmit"
+        ></user-multiple-choice-form>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
@@ -77,14 +81,14 @@
               audio
             </answer-button>
             <answer-button
-            v-if="showMultipleChoice"
-            :completed="multipleChoiceFormCompleted"
-            data-qa="multiplechoice"
-            icon="tasks"
-            @click="openMultipleChoice(question.answers.multipleChoiceId)"
-          >
-            {{ this.multipleChoiceLabel }}
-          </answer-button>
+              v-if="showMultipleChoice"
+              :completed="multipleChoiceFormCompleted"
+              data-qa="multiplechoice"
+              icon="tasks"
+              @click="openMultipleChoice(question.answers.multipleChoiceId)"
+            >
+              {{ multipleChoiceLabel }}
+            </answer-button>
             <answer-button
               v-if="hasId('checklistId')"
               :completed="checklistFormCompleted"

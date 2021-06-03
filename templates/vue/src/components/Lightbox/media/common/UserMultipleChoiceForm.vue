@@ -12,7 +12,7 @@
         ></user-choice-row>
       </b-form-checkbox-group>
       <b-form-invalid-feedback
-        :state="checkBoxValidAnswerState"
+        :state="checkBoxValidAnswerState()"
         style="clear:both"
         data-qa="invalid-feedback"
       >
@@ -77,16 +77,50 @@ export default {
     radioValidAnswerState() {
       return Boolean(this.userSelectedRadio)
     },
-    checkBoxValidAnswerState() {
-      if (this.userSelectedCheckbox) {
-        return this.userSelectedCheckbox.length > 0
-      }
-    },
     question() {
       return this.node.quiz[0]
     },
     multipleChoiceId() {
       return this.question.answers.multipleChoiceId
+    },
+  },
+  mounted() {
+    if (this.question.hasOwnProperty("entries")) {
+      if (
+        this.question.entries.hasOwnProperty("multipleChoiceId") &&
+        this.question.entries.multipleChoiceId !== null
+      ) {
+        this.multipleChoiceAnswer = this.question.entries.multipleChoiceId[
+          this.multipleChoiceId
+        ]
+      }
+    } else {
+      this.multipleChoiceAnswer = ""
+    }
+    this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
+    this.userSelectedRadio = this.getPreSelectedRadioValue()
+  },
+  methods: {
+    handleMultipleChoiceSubmit(event) {
+      event.preventDefault()
+      if (this.node.typeData.options.multipleChoice.multiAnswer) {
+        if (this.checkBoxValidAnswerState) {
+          this.isAnswerValid = true
+        } else {
+          this.isAnswerValid = false
+        }
+        this.multipleChoiceAnswer = this.userSelectedCheckbox
+      } else {
+        if (this.radioValidAnswerState) {
+          this.isAnswerValid = true
+        } else {
+          this.isAnswerValid = false
+        }
+        this.multipleChoiceAnswer = this.userSelectedRadio
+      }
+      if (this.isAnswerValid) {
+        this.$emit("submit", this.multipleChoiceAnswer)
+      }
     },
     getPreSelectedRadioValue() {
       if (!this.node.typeData.options.multipleChoice.multiAnswer) {
@@ -128,43 +162,9 @@ export default {
         }
       }
     },
-  },
-  mounted() {
-    if (this.question.hasOwnProperty("entries")) {
-      if (
-        this.question.entries.hasOwnProperty("multipleChoiceId") &&
-        this.question.entries.multipleChoiceId !== null
-      ) {
-        this.multipleChoiceAnswer = this.question.entries.multipleChoiceId[
-          this.multipleChoiceId
-        ]
-      }
-    } else {
-      this.multipleChoiceAnswer = ""
-    }
-    this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue
-    this.userSelectedRadio = this.getPreSelectedRadioValue
-  },
-  methods: {
-    handleMultipleChoiceSubmit(event) {
-      event.preventDefault()
-      if (this.node.typeData.options.multipleChoice.multiAnswer) {
-        if (this.checkBoxValidAnswerState) {
-          this.isAnswerValid = true
-        } else {
-          this.isAnswerValid = false
-        }
-        this.multipleChoiceAnswer = this.userSelectedCheckbox
-      } else {
-        if (this.radioValidAnswerState) {
-          this.isAnswerValid = true
-        } else {
-          this.isAnswerValid = false
-        }
-        this.multipleChoiceAnswer = this.userSelectedRadio
-      }
-      if (this.isAnswerValid) {
-        this.$emit("submit", this.multipleChoiceAnswer)
+    checkBoxValidAnswerState() {
+      if (this.userSelectedCheckbox) {
+        return this.userSelectedCheckbox.length > 0
       }
     },
   },
