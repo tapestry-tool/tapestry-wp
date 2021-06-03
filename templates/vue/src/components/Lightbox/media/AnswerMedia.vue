@@ -7,16 +7,26 @@
       data-qa="answer-display"
     >
       <h3>{{ question.text }}</h3>
-      <h4 v-if="followUpText" class="mb-4">
+      <h4 v-show="followUpText && hasAnswer" class="mb-4">
         {{ answer.followUpText }}
       </h4>
-      <h4 v-else class="mb-4">{{ question.followUpText }}</h4>
-      <tapestry-activity
-        v-for="questionAnswer in getAnswers"
-        :key="questionAnswer.type"
-        :type="questionAnswer.type"
-        :entry="questionAnswer.entry"
-      ></tapestry-activity>
+      <h4 v-show="!followUpText && hasAnswer" class="mb-4">
+        {{ question.followUpText }}
+      </h4>
+      <b-tabs>
+        <b-tab v-for="questionAnswer in getAnswers" :key="questionAnswer.type">
+          <template #title>
+            <div class="icon">
+              <tapestry-icon :icon="questionAnswer.type" />
+              | {{ questionAnswer.type }}
+            </div>
+          </template>
+          <tapestry-activity
+            :type="questionAnswer.type"
+            :entry="questionAnswer.entry"
+          ></tapestry-activity>
+        </b-tab>
+      </b-tabs>
       <div v-show="getAnswers.length == 0">
         You have not completed this question yet.
       </div>
@@ -30,10 +40,12 @@
 <script>
 import { mapGetters } from "vuex"
 import TapestryActivity from "./common/ActivityScreen/TapestryActivity"
+import TapestryIcon from "@/components/common/TapestryIcon"
 export default {
   name: "answer-media",
   components: {
     TapestryActivity,
+    TapestryIcon,
   },
   props: {
     node: {
@@ -50,10 +62,7 @@ export default {
       return this.getQuestion(this.answer.questionId)
     },
     followUpText() {
-      if (this.answer.followUpText !== "") {
-        return true
-      }
-      return false
+      return this.answer.followUpText !== ""
     },
     getAnswers() {
       try {
@@ -66,6 +75,9 @@ export default {
       } catch (error) {
         return []
       }
+    },
+    hasAnswer() {
+      return this.getAnswers.length > 0
     },
   },
   mounted() {
