@@ -3,6 +3,7 @@
     :transform="`translate(${x}, ${y})`"
     :data-qa="dataQa"
     tabindex="0"
+    :aria-disabled="disabled"
     @click.stop="$emit('click')"
     @keyup.enter.space="$emit('click')"
   >
