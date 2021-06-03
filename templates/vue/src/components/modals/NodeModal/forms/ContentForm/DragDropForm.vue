@@ -1,8 +1,8 @@
 <template>
   <div>
-    <p>currently data is {{ node.typeData.options.dragDrop }}</p>
+    <!-- <p>currently data is {{ node.typeData.options.dragDrop }}</p>
     <p>next from bucket item id is {{ nextFromBucketItemId }}</p>
-    <p>next from bucket id is {{ nextFromBucketId }}</p>
+    <p>next from bucket id is {{ nextFromBucketId }}</p> -->
     <b-form-group>
       <b>From buckets</b>
       <drag-drop-bucket
