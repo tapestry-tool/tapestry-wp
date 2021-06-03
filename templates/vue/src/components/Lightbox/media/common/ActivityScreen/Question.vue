@@ -3,7 +3,11 @@
     class="question"
     :class="{ 'question-audio': recorderOpened, 'question-gf': formOpened }"
   >
-    <button v-if="formOpened || recorderOpened" class="button-nav" @click="back">
+    <button
+      v-if="formOpened || recorderOpened || userDragDropFormOpened"
+      class="button-nav"
+      @click="back"
+    >
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="loading" label="Submitting..." />

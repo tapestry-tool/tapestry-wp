@@ -5,17 +5,20 @@
       <color-picker
         label="Background color"
         :currentColor="bucketItem.color"
-        :data-qa="`node-backgroundcolor-${node.id}`"
+        :data-qa="`bucket-item-backgroundcolor-${bucketItem.id}`"
         @change="handleItemColorChange"
       />
-      <b-form-checkbox v-model="addBackgroundImage" data-qa="bucketItem-useImage">
+      <b-form-checkbox
+        v-model="addBackgroundImage"
+        :data-qa="`bucket-item-useimage-${bucketItem.id}`"
+      >
         Background image
       </b-form-checkbox>
       <b-form-group v-if="addBackgroundImage">
         <file-upload
           v-model="bucketItem.imageurl"
           input-test-id="node-bucketitem-thumbnail-url"
-          :data-qa="`dragdrop-bucketitem-thumbnail-${bucketItem.id}`"
+          :data-qa="`bucket-item-thumbnail-${bucketItem.id}`"
           :show-url-upload="false"
           thumbnail-type="thumbnail"
           :show-image-preview="true"
@@ -26,7 +29,7 @@
       <b-form-checkbox
         v-if="addBackgroundImage"
         v-model="addText"
-        data-qa="bucketItem-addText"
+        :data-qa="`bucket-item-usetext-${bucketItem.id}`"
       >
         Text
       </b-form-checkbox>
@@ -34,6 +37,7 @@
         v-if="addText"
         v-model="bucketItem.text"
         placeholder="Enter Item Text"
+        :data-qa="`bucket-item-text-${bucketItem.id}`"
       ></b-form-input>
       <b-button
         :disabled="removeItemDisabled"

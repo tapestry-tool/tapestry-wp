@@ -3,11 +3,12 @@
     <div
       v-if="isFromBucket"
       class="fromBucketContainer"
+      :data-qa="`user-from-bucket-${bucket.id}`"
       @dragover.prevent
       @dragenter.prevent
       @drop.prevent="drop($event, bucket)"
     >
-      <b style="font-size: 28px">{{ bucket.value }}</b>
+      <b class="bucketLabel">{{ bucket.value }}</b>
       <user-drag-drop-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
@@ -15,16 +16,18 @@
         :bucketItem="item"
         :parentBucket="bucket"
         :isFromBucketItem="true"
+        :data-qa="`user-bucket-item-${item.id}`"
       />
     </div>
     <div
       v-else
       class="toBucketContainer"
+      :data-qa="`user-to-bucket-${bucket.id}`"
       @dragover.prevent
       @dragenter.prevent
       @drop.prevent="drop($event, bucket)"
     >
-      <b style="font-size: 28px">{{ bucket.value }}</b>
+      <b class="bucketLabel">{{ bucket.value }}</b>
       <user-drag-drop-bucket-item
         v-for="item in bucket.itemArray"
         :key="item.id"
@@ -32,6 +35,7 @@
         :bucketItem="item"
         :parentBucket="bucket"
         :isFromBucketItem="false"
+        :data-qa="`user-bucket-item-${item.id}`"
       />
     </div>
   </div>
@@ -162,6 +166,7 @@ export default {
   min-height: 350px;
   padding-bottom: 100px;
   border-radius: 25px;
+  overflow-wrap: break-word;
 }
 
 .toBucketContainer {
@@ -170,5 +175,10 @@ export default {
   min-height: 350px;
   padding-bottom: 100px;
   border-radius: 25px;
+  overflow-wrap: break-word;
+}
+
+.bucketLabel {
+  font-size: 28px;
 }
 </style>

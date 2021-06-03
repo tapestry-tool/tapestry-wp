@@ -13,6 +13,7 @@
         :bucket="bucket"
         :isFromBucket="true"
         :removeFromDisabled="removeButtonFromDisabled"
+        :data-qa="`from-bucket-${bucket.id}`"
         @remove="fromBuckets.splice(bucketIndex, 1)"
         @add="addNewFromBucketItem(bucketIndex)"
       />
@@ -20,6 +21,7 @@
         class="addButton"
         variant="primary"
         squared
+        data-qa="add-from-bucket-button"
         @click="addNewFromBucket"
       >
         Add a bucket
@@ -34,10 +36,17 @@
         :index="index"
         :bucket="bucket"
         :isFromBucket="false"
+        :data-qa="`to-bucket-${bucket.id}`"
         :removeToDisabled="removeButtonToDisabled"
         @remove="toBuckets.splice(index, 1)"
       />
-      <b-button class="addButton" variant="primary" squared @click="addNewToBucket">
+      <b-button
+        class="addButton"
+        variant="primary"
+        squared
+        data-qa="add-to-bucket-button"
+        @click="addNewToBucket"
+      >
         Add a bucket
       </b-button>
     </b-form-group>
@@ -85,7 +94,7 @@ export default {
           itemArray: [],
         },
       ],
-      nextToBucketId: 2,
+      nextToBucketId: 201,
       nextToBucketValue: "",
     }
   },

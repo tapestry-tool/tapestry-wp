@@ -8,6 +8,7 @@
           :key="item.id"
           :node="node"
           :bucketItem="item"
+          :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :removeItemDisabled="removeButtonItemDisabled"
           @remove="bucket.itemArray.splice(index, 1)"
         />
@@ -17,6 +18,7 @@
         class="addButton"
         variant="primary"
         squared
+        :data-qa="`add-bucket-item-button-${bucket.id}`"
         @click="$emit('add')"
       >
         Add a item
@@ -27,12 +29,14 @@
         <b-form-input
           v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
           placeholder="Enter bucket label"
+          :data-qa="`from-bucket-label-${bucket.id}`"
         ></b-form-input>
       </b-form-group>
       <b-form-group v-else>
         <b-form-input
           v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
           placeholder="Enter bucket label"
+          :data-qa="`to-bucket-label-${bucket.id}`"
         ></b-form-input>
       </b-form-group>
       <b-button
