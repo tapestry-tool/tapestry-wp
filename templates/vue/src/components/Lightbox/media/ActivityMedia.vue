@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="activity-wrapper">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <activity-screen
       :id="node.id"
@@ -57,14 +57,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.media-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
+.activity-wrapper {
+  display: flex;
+  flex-direction: row;
+  min-height: 100%;
 
-  :before {
-    display: none;
+  .media-title {
+    text-align: left;
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 0.9em;
+
+    :before {
+      display: none;
+    }
   }
 }
 </style>
