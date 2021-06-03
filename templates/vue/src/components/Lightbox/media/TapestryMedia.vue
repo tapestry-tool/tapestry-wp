@@ -14,17 +14,21 @@
   >
     <text-media
       v-if="node.mediaType === 'text'"
+      ref="text"
       :node="node"
       :context="context"
+      tabindex="0"
       @complete="complete"
       @load="handleLoad"
     />
     <video-media
       v-if="node.mediaFormat === 'mp4'"
+      ref="mp4"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
       :context="context"
+      tabindex="0"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -32,10 +36,12 @@
     />
     <youtube-media
       v-if="node.mediaFormat === 'youtube'"
+      ref="youtube"
       :autoplay="autoplay"
       :node="node"
       :dimensions="dimensions"
       :context="context"
+      tabindex="0"
       @load="handleLoad"
       @complete="complete"
       @timeupdate="updateProgress"
@@ -43,18 +49,22 @@
     />
     <external-media
       v-if="node.mediaType === 'url-embed'"
+      ref="url-embed"
       :dimensions="dimensions"
       :node="node"
       :context="context"
+      tabindex="0"
       @load="handleLoad"
       @complete="complete"
     />
     <h5p-media
       v-if="node.mediaFormat === 'h5p'"
+      ref="h5p"
       :autoplay="autoplay"
       :dimensions="dimensions"
       :context="context"
       :node="node"
+      tabindex="0"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
@@ -64,22 +74,28 @@
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
+      ref="gravity-form"
       :node="node"
       :context="context"
+      tabindex="0"
       @submit="handleFormSubmit"
       @load="handleLoad"
     ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
+      ref="wp-post"
       :node="node"
       :context="context"
+      tabindex="0"
       @complete="complete"
       @load="handleLoad"
     ></wp-post-media>
     <activity-media
       v-if="node.mediaType === 'activity'"
+      ref="activity"
       :node="node"
       :context="context"
+      tabindex="0"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
@@ -174,6 +190,12 @@ export default {
     },
     complete() {
       this.$emit("complete")
+      this.focusMedia()
+    },
+    focusMedia() {
+      const type = this.node.mediaType
+      console.log(this.$refs[type].$el)
+      this.$refs.text.$el.focus()
     },
   },
 }

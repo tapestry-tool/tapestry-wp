@@ -118,7 +118,17 @@
                   :index="index"
                   style="z-index: 9999 !important;"
                 >
-                  <span class="fas fa-bars fa-xs"></span>
+                  <span>
+                    <i class="fas fa-bars fa-xs"></i>
+                  </span>
+                  <span>
+                    <b-button size="sm" @click="moveUp(childId)">
+                      <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                    </b-button>
+                    <b-button size="sm" @click="moveDown(childId)">
+                      <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                    </b-button>
+                  </span>
                   <span>{{ getNode(childId).title }}</span>
                   <span style="color: grey;">id: {{ childId }}</span>
                 </slick-item>
@@ -823,7 +833,10 @@ export default {
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
       }
-      if (this.node.description.replace(/<[^>]*>?/gm, '').length > this.maxDescriptionLength) {
+      if (
+        this.node.description.replace(/<[^>]*>?/gm, "").length >
+        this.maxDescriptionLength
+      ) {
         errMsgs.push(
           "Please limit your description to under " +
             this.maxDescriptionLength +
@@ -971,6 +984,22 @@ export default {
       )
       this.loadDuration = false
     },
+    moveUp(childID) {
+      console.log(this.node.childOrdering)
+      const ordering = this.node.childOrdering
+      const index = ordering.indexOf(childID)
+      if (index <= 0) {
+        return false
+      } else {
+        const temp = ordering[index]
+        ordering[index] = ordering[index - 1]
+        ordering[index - 1] = temp
+        console.log(this.node.childOrdering)
+      }
+    },
+    moveDown(childID) {
+      console.log(childID)
+    },
   },
 }
 </script>
@@ -985,7 +1014,6 @@ export default {
 h6 {
   font-weight: 400;
 }
-
 </style>
 
 <style lang="scss">
@@ -1028,9 +1056,6 @@ table {
   outline: black solid 4px !important;
   outline-offset: 5px;
 }
-
-
-
 </style>
 
 <style lang="scss" scoped>

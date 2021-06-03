@@ -2,6 +2,7 @@
   <button
     class="modal-button"
     :style="buttonStyles"
+    tabindex="0"
     @click="$emit('clicked')"
     @mouseover="hovering = true"
     @mouseout="hovering = false"

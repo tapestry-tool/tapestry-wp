@@ -2,8 +2,9 @@
   <g
     :transform="`translate(${x}, ${y})`"
     :data-qa="dataQa"
-    :aria-disabled="disabled"
+    tabindex="0"
     @click.stop="$emit('click')"
+    @keyup.enter.space="$emit('click')"
   >
     <circle
       ref="addButton"
