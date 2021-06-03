@@ -153,22 +153,32 @@ class TapestryNode implements ITapestryNode
         if (isset($node->imageURL) && is_string($node->imageURL)) {
             $this->imageURL = $node->imageURL;
         }
-        if (isset($node->thumbnailFileId) && is_numeric($node->thumbnailFileId)) {
-            $this->thumbnailFileId = $node->thumbnailFileId;
-            set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
-            $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
-            if ($post_thumbnail_url) {
-                $this->imageURL = $post_thumbnail_url;
+        if (isset($node->thumbnailFileId) && (is_numeric($node->thumbnailFileId) || is_string($node->thumbnailFileId))) {
+            if (is_string($node->thumbnailFileId) && '' == $node->thumbnailFileId) {
+                $this->imageURL = '';
+                $this->thumbnailFileId = '';
+            } else {
+                $this->thumbnailFileId = $node->thumbnailFileId;
+                set_post_thumbnail($this->nodePostId, $this->thumbnailFileId);
+                $post_thumbnail_url = get_the_post_thumbnail_url($this->nodePostId, 'tapestry_thumb');
+                if ($post_thumbnail_url) {
+                    $this->imageURL = $post_thumbnail_url;
+                }
             }
         }
         if (isset($node->lockedImageURL) && is_string($node->lockedImageURL)) {
             $this->lockedImageURL = $node->lockedImageURL;
         }
-        if (isset($node->lockedThumbnailFileId) && is_numeric($node->lockedThumbnailFileId)) {
-            $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
-            $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumb');
-            if ($image_url) {
-                $this->lockedImageURL = $image_url;
+        if (isset($node->lockedThumbnailFileId) && (is_numeric($node->lockedThumbnailFileId) || is_string($node->lockedThumbnailFileId))) {
+            if (is_string($node->lockedThumbnailFileId) && '' == $node->lockedThumbnailFileId) {
+                $this->lockedImageURL = '';
+                $this->lockedThumbnailFileId = '';
+            } else {
+                $this->lockedThumbnailFileId = $node->lockedThumbnailFileId;
+                $image_url = wp_get_attachment_image_url($this->lockedThumbnailFileId, 'tapestry_thumb');
+                if ($image_url) {
+                    $this->lockedImageURL = $image_url;
+                }
             }
         }
 
