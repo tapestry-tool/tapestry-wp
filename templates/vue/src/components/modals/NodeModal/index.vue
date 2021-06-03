@@ -305,6 +305,7 @@ export default {
       warningText: "",
       deleteWarningText: "",
       keepOpen: false,
+      originalUrl: "",
     }
   },
   computed: {
@@ -471,6 +472,7 @@ export default {
     },
   },
   mounted() {
+
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
@@ -565,6 +567,7 @@ export default {
       }
       this.node = copy
       this.setTapestryErrorReporting(false)
+      this.originalUrl = this.node.typeData.mediaURL
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
@@ -693,7 +696,7 @@ export default {
         this.updateNodeCoordinates()
 
         if (this.linkHasThumbnailData) {
-          if (this.node.typeData.thumbnailURL && this.type === 'add') {
+          if (this.node.typeData.thumbnailURL && (this.type === 'add' || this.originalUrl !== this.node.typeData.mediaURL)) {
             this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL)
           } else {
             await this.setLinkData()
