@@ -12,8 +12,9 @@
           ref="rowRefs"
           class="accordion-row"
           :style="rowBackground"
+          v-if="row.node.popup === null"
         >
-          <div class="button-row">
+          <div class="button-row" >
             <button
               class="button-row-trigger"
               :disabled="disableRow(index, row.node)"
@@ -47,7 +48,7 @@
             </a>
           </div>
           <div v-if="isVisible(row.node.id)" :data-qa="`row-content-${row.node.id}`">
-            <div v-if="row.node.mediaType !== 'multi-content'">
+            <div v-if="row.node.mediaType !== 'multi-content' ">
               <tapestry-media
                 :node-id="row.node.id"
                 :dimensions="dimensions"
@@ -58,11 +59,11 @@
                 @close="toggle(row.node.id)"
                 @load="handleLoad($refs.rowRefs[index])"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
+              <p v-if="row.children.length > 0 && (!areAllPopup(row))" style="color: white;">
                 {{ row.node.typeData.subAccordionText }}
               </p>
               <accordion-rows
-                v-if="row.children.length > 0"
+                v-if="row.children.length > 0 "
                 :dimensions="dimensions"
                 :node="row.node"
                 :rowId="subRowId"
@@ -167,6 +168,7 @@ export default {
         return { node, children }
       })
     },
+
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -213,6 +215,19 @@ export default {
     },
     handleAutoClose() {
       this.$emit("close")
+    },
+    areAllPopup(row){
+      let popCount = 0
+      row.children.forEach(child => {
+        if(child.popup !== null) {
+          popCount++
+        }
+      })
+
+      if(popCount === row.children.length) {
+        return true
+      }
+      return false
     },
   },
 }

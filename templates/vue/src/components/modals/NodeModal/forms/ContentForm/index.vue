@@ -158,12 +158,12 @@ export default {
     },
     /**
      * If we're currently editing, a node is a popup candidate if its parent is a
-     * video node AND it's not a popup itself.
+     * video node AND it's not a popup itself AND is not part of a multi content.
      */
     isPopupCandidate() {
       // NOTE: Currently we do not want to allow a multi-content popup
       if (this.parent && this.node.mediaType !== "multi-content") {
-        if (this.parent.popup) {
+        if (this.parent.popup || this.parent.isMultiContentChild) {
           return false
         }
         if (this.parent.mediaType === "h5p") {
