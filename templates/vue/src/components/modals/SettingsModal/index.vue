@@ -283,6 +283,15 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
+        <b-tab
+          title="Avatar"
+          :active="tab === 'avatar'"
+          @click="$emit('change:tab', 'avatar')"
+        >
+          <b-form-group label="Change Avatar">
+            <avatar-form />
+          </b-form-group>
+        </b-tab>
       </b-tabs>
     </b-container>
     <template slot="modal-footer">
@@ -312,6 +321,7 @@ import PermissionsTable from "../common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
+import AvatarForm from "@/components/AvatarForm.vue"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -329,6 +339,7 @@ export default {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
+    AvatarForm,
   },
   props: {
     show: {
