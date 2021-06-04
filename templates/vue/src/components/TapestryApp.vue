@@ -1,7 +1,11 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <avatar-form />
+    <b-modal id="avatar-modal" :visible="true">
+      <b-container class="avatar=container">
+        <avatar-form />
+      </b-container>
+    </b-modal>
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
