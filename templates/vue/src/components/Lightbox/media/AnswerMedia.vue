@@ -1,12 +1,12 @@
 <template>
   <div class="answers">
-    <h1>{{ node.title }}</h1>
+    <h3>{{ node.title }}</h3>
     <div
       v-if="answer !== null"
       class="answer-container mx-auto mb-3"
       data-qa="answer-display"
     >
-      <h3>{{ question.text }}</h3>
+      <h2>{{ question.text }}</h2>
       <h4 v-show="followUpText && hasAnswer" class="mb-4">
         {{ answer.followUpText }}
       </h4>
@@ -31,7 +31,7 @@
           ></tapestry-activity>
         </b-tab>
       </b-tabs>
-      <div v-show="getAnswers.length == 0">
+      <div v-show="!hasAnswer" class="media-wrapper">
         You have not completed this question yet.
       </div>
     </div>
@@ -96,15 +96,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.media-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
-  :before {
-    display: none;
-  }
+.media-wrapper {
+  position: relative;
+  align-items: center;
+  background: #262626;
+  border-radius: 8px;
+  display: flex;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  padding: 8px 16px 8px 38px;
+  justify-content: center;
 }
+
 .answers {
   color: white;
   margin-top: 15px;
