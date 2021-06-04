@@ -2,8 +2,9 @@
  <div>
      <button
         aria-label="get help"
+        @click="showHelpIframe"
      >
-        <tapestry-icon icon="microphone" @click="showHelpIframe"/>
+        <tapestry-icon icon="microphone" />
         <!-- <router-link :to="{ name: 'lightbox' }"> im a link</router-link> -->
 
      </button>
@@ -12,7 +13,7 @@
 </template>
 
 <script>
-// import { mapState } from "vuex"
+import { mapState } from "vuex"
 
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
@@ -27,14 +28,17 @@ export default {
       showMenu: false,
     }
   },
+  computed: {
+    ...mapState(["settings", "nodes", "rootId"]),
+  },
   methods: {
-      showHelpIframe() {
-          this.$router.push({
-              name: names.LIGHTBOX,
-              params: { nodeId: this.$route.params.nodeId},
-              query: this.$route.query,
-          })
-      }
+    showHelpIframe() {
+        console.log("button working!");
+        this.$router.push({
+            name: names.LIGHTBOX,
+            query: { help: 'true'},
+        })
+    }
   }
 }
 </script>
