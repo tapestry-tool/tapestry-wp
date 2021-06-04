@@ -14,7 +14,11 @@
         {{ question.followUpText }}
       </h4>
       <b-tabs>
-        <b-tab v-for="questionAnswer in getAnswers" :key="questionAnswer.type">
+        <b-tab
+          v-for="questionAnswer in getAnswers"
+          :key="questionAnswer.type"
+          :active="questionAnswer.type === lastAnswerType"
+        >
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer.type" />
@@ -41,6 +45,7 @@
 import { mapGetters } from "vuex"
 import TapestryActivity from "./common/ActivityScreen/TapestryActivity"
 import TapestryIcon from "@/components/common/TapestryIcon"
+
 export default {
   name: "answer-media",
   components: {
@@ -60,6 +65,9 @@ export default {
     },
     question() {
       return this.getQuestion(this.answer.questionId)
+    },
+    lastAnswerType() {
+      return this.question.lastAnswerType
     },
     followUpText() {
       return this.answer.followUpText !== ""
@@ -99,8 +107,10 @@ export default {
 }
 .answers {
   color: white;
+  margin-top: 15px;
 }
 .answer-container {
   width: 75%;
+  margin-top: 20px;
 }
 </style>

@@ -262,6 +262,7 @@ export default {
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: type,
       })
+      this.question.lastAnswerType = type
       this.$emit("submit")
     },
   },

@@ -191,7 +191,7 @@ export default {
           text: "",
           answers: { ...defaultQuestion.answers },
           completed: false,
-          submissionTime: "",
+          lastAnswerType: "",
         },
       ]
       this.node.typeData = {
