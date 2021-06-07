@@ -130,7 +130,6 @@ class TapestryUserProgress implements ITapestryUserProgress
      */
     public function updateAvatar($avatarData)
     {
-        error_log("Entering _updateAvatar in user-progress.php");
         $this->_updateAvatar($avatarData);
     }
 
@@ -343,7 +342,7 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _updateAvatar($avatarData)
     {
-        error_log("updating user meta");
+        error_log('updating user meta');
         update_user_meta($this->_userId, 'avatar_'.$this->_userId, $avatarData);
     }
 

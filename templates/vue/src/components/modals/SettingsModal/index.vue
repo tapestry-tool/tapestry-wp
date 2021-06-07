@@ -288,13 +288,21 @@
           :active="tab === 'avatar'"
           @click="$emit('change:tab', 'avatar')"
         >
-          <b-form-group label="Change Avatar">
-            <avatar-form />
+          <b-form-group>
+            <avatar-form ref="AvatarForm" />
           </b-form-group>
         </b-tab>
       </b-tabs>
     </b-container>
-    <template slot="modal-footer">
+    <template v-if="tab === 'avatar'" slot="modal-footer">
+      <b-button size="sm" variant="secondary" @click="closeModal">
+        Cancel
+      </b-button>
+      <b-button size="sm" variant="success" @click="saveAvatar">
+        Save Avatar
+      </b-button>
+    </template>
+    <template v-else slot="modal-footer">
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
@@ -545,6 +553,10 @@ export default {
     },
     handleSubmitNodesEnabled(event) {
       this.submitNodesEnabled = event
+    },
+    saveAvatar() {
+      this.$refs.AvatarForm.saveAvatar()
+      this.closeModal()
     },
   },
 }

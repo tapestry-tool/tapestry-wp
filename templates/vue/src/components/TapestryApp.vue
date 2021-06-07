@@ -1,7 +1,20 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <avatar-form />
+    <b-modal id="avatar-modal" size="xl" :visible="true">
+      <!-- :visible="!hasAvatar" -->
+      <b-container class="avatar-container">
+        <avatar-form ref="AvatarForm" />
+      </b-container>
+      <template slot="modal-footer">
+        <b-button size="sm" variant="secondary" @click="cancel">
+          Cancel
+        </b-button>
+        <b-button size="sm" variant="success" @click="saveAvatar">
+          Save Avatar
+        </b-button>
+      </template>
+    </b-modal>
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
@@ -43,7 +56,8 @@ export default {
       return this.settings.analyticsEnabled
     },
     hasAvatar() {
-      return this.avatar !== {}
+      console.log(!this.avatar || Object.keys(this.avatar).length === 0)
+      return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
   },
   watch: {
@@ -61,10 +75,11 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
+    this.loadSavedAvatar()
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection", "addAvatar"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -153,6 +168,17 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
+    },
+    cancel() {
+      this.$refs["avatar-modal"].hide()
+    },
+    saveAvatar() {
+      this.$refs.AvatarForm.saveAvatar()
+      this.$refs["avatar-modal"].hide()
+    },
+    async loadSavedAvatar() {
+      const savedAvatar = await client.getAvatar()
+      this.addAvatar(savedAvatar.data)
     },
   },
 }
