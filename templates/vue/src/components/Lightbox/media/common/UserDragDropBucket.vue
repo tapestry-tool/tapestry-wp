@@ -59,15 +59,15 @@ export default {
     },
     bucket: {
       type: Object,
-      required: false,
+      required: true,
     },
     fromBucketArray: {
       type: Array,
-      required: false,
+      required: true,
     },
     toBucketArray: {
       type: Array,
-      required: false,
+      required: true,
     },
   },
   data() {

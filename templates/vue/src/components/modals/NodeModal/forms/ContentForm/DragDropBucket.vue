@@ -9,7 +9,7 @@
           :node="node"
           :bucketItem="item"
           :data-qa="`bucket-item-${bucket.id}-${item.id}`"
-          :removeItemDisabled="removeButtonItemDisabled"
+          :removeItemPresent="removeButtonItemPresent"
           @remove="bucket.itemArray.splice(index, 1)"
         />
       </b-form-group>
@@ -28,25 +28,37 @@
       <b-form-group v-if="isFromBucket">
         <b-form-input
           v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
-          placeholder="Enter bucket label"
+          placeholder="Enter from bucket label"
           :data-qa="`from-bucket-label-${bucket.id}`"
         ></b-form-input>
       </b-form-group>
       <b-form-group v-else>
         <b-form-input
           v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
-          placeholder="Enter bucket label"
+          placeholder="Enter to bucket label"
           :data-qa="`to-bucket-label-${bucket.id}`"
         ></b-form-input>
       </b-form-group>
-      <b-button
-        :disabled="isFromBucket ? removeFromDisabled : removeToDisabled"
-        squared
-        variant="outline-danger"
-        @click="$emit('remove')"
-      >
-        Remove bucket
-      </b-button>
+      <b-form-group v-if="isFromBucket">
+        <b-button
+          v-if="removeButtonFromBucketPresent"
+          squared
+          variant="outline-danger"
+          @click="$emit('remove')"
+        >
+          Remove bucket
+        </b-button>
+      </b-form-group>
+      <b-form-group v-else>
+        <b-button
+          v-if="removeButtonToBucketPresent"
+          squared
+          variant="outline-danger"
+          @click="$emit('remove')"
+        >
+          Remove bucket
+        </b-button>
+      </b-form-group>
     </b-form-group>
   </div>
 </template>
@@ -75,13 +87,13 @@ export default {
       type: Boolean,
       required: false,
     },
-    removeFromDisabled: {
-      type: Boolean,
-      required: false,
+    fromBucketArray: {
+      type: Array,
+      required: true,
     },
-    removeToDisabled: {
-      type: Boolean,
-      required: false,
+    toBucketArray: {
+      type: Array,
+      required: true,
     },
   },
   data() {
@@ -95,8 +107,14 @@ export default {
         return "toBucketContainer"
       }
     },
-    removeButtonItemDisabled() {
-      return this.bucket.itemArray.length === 1
+    removeButtonItemPresent() {
+      return this.bucket.itemArray.length > 1
+    },
+    removeButtonFromBucketPresent() {
+      return this.fromBucketArray.length > 1
+    },
+    removeButtonToBucketPresent() {
+      return this.toBucketArray.length > 1
     },
   },
   methods: {},

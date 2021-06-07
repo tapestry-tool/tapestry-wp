@@ -40,7 +40,7 @@
         :data-qa="`bucket-item-text-${bucketItem.id}`"
       ></b-form-input>
       <b-button
-        :disabled="removeItemDisabled"
+        v-if="removeItemPresent"
         squared
         variant="outline-danger"
         @click="$emit('remove')"
@@ -69,7 +69,7 @@ export default {
       type: Object,
       required: true,
     },
-    removeItemDisabled: {
+    removeItemPresent: {
       type: Boolean,
       required: true,
     },
@@ -107,12 +107,11 @@ export default {
     },
   },
   created() {
-    if (this.bucketItem.useText) {
-      this.addBackgroundImage = true
-    }
-    if (this.bucketItem.useImage) {
+    if (this.bucketItem.useText && this.bucketItem.text.length > 0) {
       this.addText = true
     }
+    this.addBackgroundImage =
+      this.bucketItem.imageurl !== null && this.bucketItem.imageurl !== ""
   },
   methods: {
     handleUploadChange(state) {

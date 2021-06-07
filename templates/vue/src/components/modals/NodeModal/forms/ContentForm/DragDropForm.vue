@@ -12,7 +12,8 @@
         :index="bucketIndex"
         :bucket="bucket"
         :isFromBucket="true"
-        :removeFromDisabled="removeButtonFromDisabled"
+        :fromBucketArray="fromBuckets"
+        :toBucketArray="toBuckets"
         :data-qa="`from-bucket-${bucket.id}`"
         @remove="fromBuckets.splice(bucketIndex, 1)"
         @add="addNewFromBucketItem(bucketIndex)"
@@ -36,8 +37,9 @@
         :index="index"
         :bucket="bucket"
         :isFromBucket="false"
+        :fromBucketArray="fromBuckets"
+        :toBucketArray="toBuckets"
         :data-qa="`to-bucket-${bucket.id}`"
-        :removeToDisabled="removeButtonToDisabled"
         @remove="toBuckets.splice(index, 1)"
       />
       <b-button

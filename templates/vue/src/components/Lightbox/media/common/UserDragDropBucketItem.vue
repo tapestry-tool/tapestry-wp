@@ -25,21 +25,11 @@ export default {
     },
     bucketItem: {
       type: Object,
-      required: false,
-      default() {
-        return {
-          id: 1,
-          color: "#808080",
-          imageurl: "",
-          text: "",
-          useImage: false,
-          useText: false,
-        }
-      },
+      required: true,
     },
     parentBucket: {
       type: Object,
-      required: false,
+      required: true,
     },
     isFromBucketItem: {
       type: Boolean,
@@ -76,7 +66,7 @@ export default {
 <style scoped>
 .circle {
   border-radius: 100%;
-  min-height: 220px;
+  min-height: 140px;
   border: solid;
   background-size: cover;
   background-position: center;
