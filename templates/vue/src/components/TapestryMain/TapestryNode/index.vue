@@ -20,6 +20,8 @@
       @click="handleClick"
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
+      @keyup.enter.space="handleClick"
+      tabindex=0
     >
       <circle ref="circle" :fill="fill"></circle>
       <transition name="fade">
