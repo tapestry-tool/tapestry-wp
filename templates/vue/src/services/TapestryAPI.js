@@ -234,6 +234,19 @@ class TapestryApi {
     return response
   }
 
+  async getAvatar() {
+    const url = `/users/avatar`
+    const response = await this.client.get(url)
+    return response
+  }
+
+  async updateAvatar(avatar) {
+    const url = `/users/avatar`
+    // const url = `/users/${this.userId}/avatar`
+    const response = await this.client.put(url, avatar)
+    return response
+  }
+
   async getUserFavourites() {
     const url = `/users/favourites?post_id=${this.postId}`
     const response = await this.client.get(url)

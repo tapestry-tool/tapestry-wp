@@ -228,6 +228,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserH5PSettingsByPostId',
         ],
     ],
+    'GET_USER_AVATAR' => (object) [
+        'ROUTE' => '/users/avatar',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserAvatar',
+        ],
+    ],
+    'UPDATE_USER_AVATAR' => (object) [
+        'ROUTE' => '/users/avatar',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateUserAvatar',
+        ],
+    ],
     'GET_USER_AUDIO' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio/(?P<questionId>[\d]+)',
         'ARGUMENTS' => [
@@ -334,7 +348,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function exportTapestry($request) {
+function exportTapestry($request)
+{
     $postId = $request['tapestryPostId'];
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -1073,13 +1088,13 @@ function optimizeTapestryNodeThumbnails($request)
             $protocol = is_ssl() ? "https:" : "http:";
     
             if ($nodeData->imageURL) {
-                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
                 $node->set((object) ['thumbnailFileId' => $attachmentId]);
                 $node->save();
             }
             if ($nodeData->lockedImageURL) {
-                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->lockedImageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
                 $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
                 $node->save();
@@ -1151,7 +1166,7 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) && 
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
             !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
@@ -1306,6 +1321,31 @@ function getUserH5PSettingsByPostId($request)
         $userProgress = new TapestryUserProgress($postId);
 
         return $userProgress->getH5PSettings();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function updateUserAvatar($request)
+{
+    // $userId = $request['userId'];
+    $avatarData = $request->get_body();
+    error_log("This is the request body, the avatarData: ".print_r($avatarData, true));
+    try {
+        $userProgress = new TapestryUserProgress();
+        $userProgress->updateAvatar($avatarData);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+function getUserAvatar($request)
+{
+    // $userId = $request['userId'];
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getAvatar();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

@@ -240,3 +240,7 @@ export function getNeighbouringLinks(state) {
     return state.links.filter(link => link.source == id || link.target == id)
   }
 }
+
+export function getAvatar(state) {
+  return state.avatar
+}

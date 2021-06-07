@@ -1,11 +1,7 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <b-modal id="avatar-modal" :visible="true">
-      <b-container class="avatar=container">
-        <avatar-form />
-      </b-container>
-    </b-modal>
+    <avatar-form />
     <tapestry-map
       v-if="settings.renderMap"
       :is-sidebar-open="isSidebarOpen"
@@ -39,12 +35,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
+    },
+    hasAvatar() {
+      return this.avatar !== {}
     },
   },
   watch: {

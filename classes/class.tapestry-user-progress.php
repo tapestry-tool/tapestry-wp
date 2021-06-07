@@ -13,6 +13,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     private $_userId = null;
     private $postId;
     private $nodeMetaId;
+    private $avatar;
 
     /**
      * Constructor.
@@ -22,11 +23,12 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function __construct($postId = null, $nodeMetaId = null)
+    public function __construct($postId = null, $nodeMetaId = null, $avatar = null)
     {
         $this->_userId = apply_filters('determine_current_user', false);
         $this->postId = $postId;
         $this->nodeMetaId = $nodeMetaId;
+        $this->avatar = $avatar;
     }
 
     /**
@@ -117,6 +119,29 @@ class TapestryUserProgress implements ITapestryUserProgress
         $this->_checkPostId();
 
         return $this->_getUserH5PSettings();
+    }
+
+    /**
+     * Update the user's avatar.
+     *
+     * @param string $avatarData stores avatar prop choices
+     *
+     * @return null
+     */
+    public function updateAvatar($avatarData)
+    {
+        error_log("Entering _updateAvatar in user-progress.php");
+        $this->_updateAvatar($avatarData);
+    }
+
+    /**
+     * Get the user's avatar.
+     *
+     * @return object avatar $avatar
+     */
+    public function getAvatar()
+    {
+        return $this->_getAvatar();
     }
 
     /**
@@ -314,6 +339,19 @@ class TapestryUserProgress implements ITapestryUserProgress
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
 
         return $settings ? json_decode($settings) : (object) [];
+    }
+
+    private function _updateAvatar($avatarData)
+    {
+        error_log("updating user meta");
+        update_user_meta($this->_userId, 'avatar_'.$this->_userId, $avatarData);
+    }
+
+    private function _getAvatar()
+    {
+        $storedAvatar = get_user_meta($this->_userId, 'avatar_'.$this->_userId, true);
+
+        return $storedAvatar ? json_decode($storedAvatar) : (object) [];
     }
 
     /**

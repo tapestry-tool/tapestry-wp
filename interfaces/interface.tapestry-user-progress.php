@@ -55,6 +55,23 @@ interface ITapestryUserProgress
     public function getH5PSettings();
 
     /**
+     * Update the user's avatar.
+     *
+     * @param string $avatarData stores avatar prop choices
+     *
+     *
+     * @return null
+     */
+    public function updateAvatar($avatarData);
+
+    /**
+     * Get the user's avatar.
+     *
+     * @return object avatar $avatar
+     */
+    public function getAvatar();
+
+    /**
      * Get all gravity form entries submitted by this user.
      * If $formId is passed, returns entries for only that form.
      *

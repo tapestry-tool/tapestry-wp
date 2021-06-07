@@ -314,6 +314,19 @@ export async function updateUserFavourites({ commit, dispatch }, favourites) {
   }
 }
 
+// avatars
+
+export async function updateAvatar({ commit, dispatch }, newAvatar) {
+  try {
+    console.log("This is the string saved to backend: ")
+    console.log(JSON.stringify(newAvatar))
+    await client.updateAvatar(JSON.stringify(newAvatar))
+    commit("addAvatar", newAvatar)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 export async function refetchTapestryData(
   { commit, state, dispatch },
   filterUserId = null

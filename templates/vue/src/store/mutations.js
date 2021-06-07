@@ -151,3 +151,9 @@ export function addApiError(state, error) {
 export function setTapestryErrorReporting(state, isEnabled) {
   state.displayErrors = isEnabled
 }
+
+// avatar
+
+export function addAvatar(state, newAvatar) {
+  state.avatar = newAvatar
+}

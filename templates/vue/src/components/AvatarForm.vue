@@ -1,157 +1,181 @@
 <template>
   <div>
-    <b-overlay variant="white">
-      <div class="title-and-avatar">
-        <h2>Avatar Customizer</h2>
-        <avataaars
-          class="avatar"
-          style="max-width: 300px;"
-          :isCircle="isCircle"
-          :circleColor="circleColor"
-          :accessoriesType="accessoriesType"
-          :clotheType="clotheType"
-          :clotheColor="clotheColor"
-          :eyebrowType="eyebrowType"
-          :eyeType="eyeType"
-          :facialHairColor="facialHairColor"
-          :facialHairType="facialHairType"
-          :graphicType="graphicType"
-          :hairColor="hairColor"
-          :mouthType="mouthType"
-          :skinColor="skinColor"
-          :topType="topType"
-          :topColor="topColor"
-        ></avataaars>
-      </div>
-      <div class="customizer">
-        <b-card no-body>
-          <b-tabs pills card fill>
-            <b-tab title="Background" active>
-              <b-card-text>
-                <b-form-group label="Background Shape" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="isCircle"
-                    :options="isCircleOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group
-                  v-if="isCircle"
-                  label="Circle Colour"
-                  label-for="input-horizontal"
-                >
-                  <b-form-select
-                    v-model="circleColor"
-                    :options="circleColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-              </b-card-text>
-            </b-tab>
-            <b-tab title="Face">
-              <b-card-text>
-                <b-form-group label="Skin Colour" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="skinColor"
-                    :options="skinColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Eyebrow Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="eyebrowType"
-                    :options="eyebrowTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Eye Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="eyeType"
-                    :options="eyeTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Mouth Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="mouthType"
-                    :options="mouthTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-              </b-card-text>
-            </b-tab>
-            <b-tab title="Hair">
-              <b-card-text>
-                <b-form-group label="Hair Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="topType"
-                    :options="topTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Hair Colour" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="hairColor"
-                    :options="hairColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Hat Colour" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="topColor"
-                    :options="topColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Facial Hair Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="facialHairType"
-                    :options="facialHairTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group
-                  label="Facial Hair Colour"
-                  label-for="input-horizontal"
-                >
-                  <b-form-select
-                    v-model="facialHairColor"
-                    :options="facialHairColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-              </b-card-text>
-            </b-tab>
-            <b-tab title="Clothing">
-              <b-card-text>
-                <b-form-group label="Glasses" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="accessoriesType"
-                    :options="accessoriesTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Clothing Type" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="clotheType"
-                    :options="clotheTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group
-                  v-if="clotheType == 'GraphicShirt'"
-                  label="T-Shirt Graphics"
-                  label-for="input-horizontal"
-                >
-                  <b-form-select
-                    v-model="graphicType"
-                    :options="graphicTypeOptions"
-                  ></b-form-select>
-                </b-form-group>
-                <b-form-group label="Clothing Colour" label-for="input-horizontal">
-                  <b-form-select
-                    v-model="clotheColor"
-                    :options="clotheColorOptions"
-                  ></b-form-select>
-                </b-form-group>
-              </b-card-text>
-            </b-tab>
-          </b-tabs>
-        </b-card>
-      </div>
-    </b-overlay>
+    <b-modal id="avatar-modal" size="xl" :visible="true">
+      <b-container class="avatar-container">
+        <b-overlay variant="white">
+          <div class="title-and-avatar">
+            <h2>Avatar Customizer</h2>
+            <avataaars
+              class="avatar"
+              style="max-width: 300px;"
+              :isCircle="isCircle"
+              :circleColor="circleColor"
+              :accessoriesType="accessoriesType"
+              :clotheType="clotheType"
+              :clotheColor="clotheColor"
+              :eyebrowType="eyebrowType"
+              :eyeType="eyeType"
+              :facialHairColor="facialHairColor"
+              :facialHairType="facialHairType"
+              :graphicType="graphicType"
+              :hairColor="hairColor"
+              :mouthType="mouthType"
+              :skinColor="skinColor"
+              :topType="topType"
+              :topColor="topColor"
+            ></avataaars>
+          </div>
+          <div class="customizer">
+            <b-card no-body>
+              <b-tabs pills card fill>
+                <b-tab title="Background" active>
+                  <b-card-text>
+                    <b-form-group
+                      label="Background Shape"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="isCircle"
+                        :options="isCircleOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group
+                      v-if="isCircle"
+                      label="Circle Colour"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="circleColor"
+                        :options="circleColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Face">
+                  <b-card-text>
+                    <b-form-group label="Skin Colour" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="skinColor"
+                        :options="skinColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Eyebrow Type" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="eyebrowType"
+                        :options="eyebrowTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Eye Type" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="eyeType"
+                        :options="eyeTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Mouth Type" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="mouthType"
+                        :options="mouthTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Hair">
+                  <b-card-text>
+                    <b-form-group label="Hair Type" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="topType"
+                        :options="topTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Hair Colour" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="hairColor"
+                        :options="hairColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Hat Colour" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="topColor"
+                        :options="topColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group
+                      label="Facial Hair Type"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="facialHairType"
+                        :options="facialHairTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group
+                      label="Facial Hair Colour"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="facialHairColor"
+                        :options="facialHairColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Clothing">
+                  <b-card-text>
+                    <b-form-group label="Glasses" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="accessoriesType"
+                        :options="accessoriesTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Clothing Type" label-for="input-horizontal">
+                      <b-form-select
+                        v-model="clotheType"
+                        :options="clotheTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group
+                      v-if="clotheType == 'GraphicShirt'"
+                      label="T-Shirt Graphics"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="graphicType"
+                        :options="graphicTypeOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-form-group
+                      label="Clothing Colour"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-select
+                        v-model="clotheColor"
+                        :options="clotheColorOptions"
+                      ></b-form-select>
+                    </b-form-group>
+                  </b-card-text>
+                </b-tab>
+              </b-tabs>
+            </b-card>
+          </div>
+        </b-overlay>
+      </b-container>
+      <template slot="modal-footer">
+        <b-button size="sm" variant="secondary" @click="cancel">
+          Cancel
+        </b-button>
+        <b-button size="sm" variant="success" @click="saveAvatar">
+          Save Avatar
+        </b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import Avataaars from "vuejs-avataaars"
+import { mapActions, mapState } from "vuex"
+// import client from "@/services/TapestryAPI"
+import Helpers from "@/utils/Helpers"
 
 export default {
   name: "avatar-form",
@@ -378,6 +402,56 @@ export default {
         { value: "White", text: "White" },
       ],
     }
+  },
+  computed: {
+    ...mapState(["avatar"]),
+  },
+  methods: {
+    ...mapActions(["updateAvatar"]),
+    setExistingAvatar() {
+      if (!this.avatar || Object.keys(this.avatar).length === 0) return
+      this.isCircle = this.avatar.isCircle
+      this.circleColor = this.avatar.circleColor
+      this.accessoriesType = this.avatatr.accessoriesType
+      this.clotheType = this.avatar.clotheType
+      this.clotheColor = this.avatar.clotheColor
+      this.eyebrowType = this.avatar.eyebrowType
+      this.eyeType = this.avatar.eyeType
+      this.facialHairColor = this.avatar.facialHairColor
+      this.facialHairType = this.avatar.facialHairType
+      this.graphicType = this.avatar.graphicType
+      this.hairColor = this.avatar.hairColor
+      this.mouthType = this.avatar.mouthType
+      this.skinColor = this.avatar.skinColor
+      this.topType = this.avatar.topType
+      this.topColor = this.avatar.topColor
+    },
+    saveAvatar() {
+      const newAvatar = {}
+      newAvatar.isCircle = this.isCircle
+      newAvatar.circleColor = this.circleColor
+      newAvatar.accessoriesType = this.accessoriesType
+      newAvatar.clotheType = this.clotheType
+      newAvatar.clotheColor = this.clotheColor
+      newAvatar.eyebrowType = this.eyebrowType
+      newAvatar.eyeType = this.eyeType
+      newAvatar.facialHairColor = this.facialHairColor
+      newAvatar.facialHairType = this.facialHairType
+      newAvatar.graphicType = this.graphicType
+      newAvatar.hairColor = this.hairColor
+      newAvatar.mouthType = this.mouthType
+      newAvatar.skinColor = this.skinColor
+      newAvatar.topType = this.topType
+      newAvatar.topColor = this.topColor
+      if (Helpers.isDifferent(this.avatar, newAvatar)) {
+        console.log("saveAvatar() triggered.")
+        console.log(newAvatar)
+        this.updateAvatar(newAvatar)
+      }
+    },
+    cancel() {
+      this.$refs["avatar-modal"].hide()
+    },
   },
 }
 </script>
