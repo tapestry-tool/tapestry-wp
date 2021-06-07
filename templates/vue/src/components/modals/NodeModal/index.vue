@@ -858,10 +858,6 @@ export default {
         }
       }
 
-      if (!this.validateActivity(this.node.typeData.activity)) {
-        errMsgs.push("Please enable at least one answer type for each question")
-      }
-
       if (!this.node.mediaType) {
         errMsgs.push("Please select a Content Type")
       } else if (this.node.mediaType === "video") {
@@ -882,6 +878,16 @@ export default {
         if (this.node.typeData.mediaURL === "") {
           errMsgs.push("Please enter an Embed URL")
         }
+      } else if (this.node.mediaType === "activity") {
+        const validActivity = this.node.typeData.activity.questions.every(
+          question => {
+            const answerTypes = Object.values(question.answerTypes)
+            return answerTypes.some(answerType => answerType.enabled)
+          }
+        )
+        if (!validActivity) {
+          errMsgs.push("Please enable at least one answer type for each question")
+        }
       }
 
       return errMsgs
@@ -891,13 +897,6 @@ export default {
         typeData.mediaURL !== "" &&
         (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
       )
-    },
-    validateActivity(activity) {
-      return activity.questions.every(question => {
-        return Object.values(question.answerTypes).some(
-          answerType => answerType.enabled
-        )
-      })
     },
     updateOrderingArray(arr) {
       this.node.childOrdering = arr
