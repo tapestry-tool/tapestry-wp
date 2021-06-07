@@ -184,8 +184,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
         const { accessible, unlocked, content, conditions } = nodeProgress
         const newNode = { accessible, unlocked, conditions }
         if (accessible) {
-          const { quiz, typeData } = content
-          newNode.quiz = quiz
+          const { typeData } = content
           newNode.typeData = typeData
         }
         commit("updateNode", { id, newNode })

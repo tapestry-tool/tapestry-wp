@@ -77,8 +77,7 @@ import { mapGetters } from "vuex"
 import UrlVideoMedia from "./UrlVideoMedia"
 import H5PMedia from "./H5PMedia"
 import YouTubeMedia from "./YouTubeMedia"
-import EndScreen from "../common/EndScreen"
-import PlayScreen from "../common/PlayScreen"
+import PlayScreen from "./PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -114,7 +113,6 @@ export default {
     "youtube-media": YouTubeMedia,
     "h5p-media": H5PMedia,
     UrlVideoMedia,
-    EndScreen,
     PlayScreen,
     Loading,
     MultiContentMedia : () => import("../MultiContentMedia/index") ,

@@ -39,14 +39,6 @@
       @load="handleLoad"
       @complete="complete"
     />
-    <gravity-form
-      v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
-      :id="node.typeData.mediaURL"
-      :node="node"
-      :context="context"
-      @submit="handleFormSubmit"
-      @load="handleLoad"
-    ></gravity-form>
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
@@ -56,13 +48,14 @@
     ></wp-post-media>
     <activity-media
       v-if="node.mediaType === 'activity'"
+      :dimensions="dimensions"
       :node="node"
       :context="context"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @complete="complete"
       @close="$emit('close')"
       @load="handleLoad"
     />
-    <completion-screen v-if="showCompletionScreen" />
   </div>
 </template>
 
@@ -73,8 +66,6 @@ import VideoMedia from "./VideoMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
-import GravityForm from "./common/GravityForm"
-import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
 
 export default {
   name: "tapestry-media",
@@ -82,9 +73,7 @@ export default {
     TextMedia,
     VideoMedia,
     ExternalMedia,
-    GravityForm,
     WpPostMedia,
-    CompletionScreen,
     ActivityMedia,
   },
   props: {
@@ -110,7 +99,6 @@ export default {
   },
   data() {
     return {
-      showCompletionScreen: false,
       timeSinceLastSaved: new Date(),
     }
   },
@@ -139,10 +127,6 @@ export default {
           row: this.nodeId,
         },
       })
-    },
-    handleFormSubmit() {
-      this.showCompletionScreen = true
-      this.complete()
     },
     handleLoad(args) {
       this.$emit("load", args)

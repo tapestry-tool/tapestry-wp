@@ -93,15 +93,6 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
   }
 }
 
-export function getActivities(state) {
-  return (options = {}) => {
-    const { exclude = [] } = options
-    return Object.values(state.nodes)
-      .filter(node => !exclude.includes(node.id) && Boolean(node.quiz))
-      .flatMap(node => node.quiz)
-  }
-}
-
 export function getQuestion(state) {
   return id => {
     const node = Object.values(state.nodes)
@@ -111,6 +102,12 @@ export function getQuestion(state) {
       return node.quiz.find(q => q.id == id)
     }
     return null
+  }
+}
+
+export function getAnswers(state) {
+  return (nodeId, questionId) => {
+    return state.progress[nodeId].activity[questionId].answers
   }
 }
 

@@ -858,9 +858,8 @@ export default {
         }
       }
 
-      const quiz = this.node.quiz
-      if (!this.validateQuiz(quiz)) {
-        errMsgs.push("Please enter at least one answer ID for each question")
+      if (!this.validateActivity(this.node.typeData.activity)) {
+        errMsgs.push("Please enable at least one answer type for each question")
       }
 
       if (!this.node.mediaType) {
@@ -893,10 +892,10 @@ export default {
         (typeData.hasOwnProperty("youtubeID") || typeData.mediaURL.endsWith(".mp4"))
       )
     },
-    validateQuiz(quiz) {
-      return quiz.every(question => {
-        return Object.values(question.answers).some(
-          value => value && value.length > 0
+    validateActivity(activity) {
+      return activity.questions.every(question => {
+        return Object.values(question.answerTypes).some(
+          answerType => answerType.enabled
         )
       })
     },
@@ -904,9 +903,9 @@ export default {
       this.node.childOrdering = arr
     },
     handleTypeChange(evt) {
-      this.node.quiz = this.node.quiz.filter(q =>
-        Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
-      )
+      // this.node.activity.questions = this.node.activity.questions.filter(q =>
+      //   Object.values(q.answerTypes).reduce((acc, { value }) => acc || value == "")
+      // )
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
