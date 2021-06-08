@@ -167,11 +167,11 @@ export default {
       })
     },
     cancel() {
-      this.$refs["avatar-modal"].hide()
+      this.$bvModal.hide("avatar-modal")
     },
     saveAvatar() {
       this.$refs.AvatarForm.saveAvatar()
-      this.$refs["avatar-modal"].hide()
+      this.$bvModal.hide("avatar-modal")
     },
   },
 }
