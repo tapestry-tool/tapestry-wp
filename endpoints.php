@@ -1328,9 +1328,7 @@ function getUserH5PSettingsByPostId($request)
 
 function updateUserAvatar($request)
 {
-    // $userId = $request['userId'];
     $avatarData = $request->get_body();
-    error_log("This is the request body, the avatarData: ".print_r($avatarData, true));
     try {
         $userProgress = new TapestryUserProgress();
         $userProgress->updateAvatar($avatarData);
@@ -1342,7 +1340,6 @@ function updateUserAvatar($request)
 
 function getUserAvatar($request)
 {
-    // $userId = $request['userId'];
     try {
         $userProgress = new TapestryUserProgress();
         return $userProgress->getAvatar();

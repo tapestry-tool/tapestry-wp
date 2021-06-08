@@ -13,7 +13,6 @@ class TapestryUserProgress implements ITapestryUserProgress
     private $_userId = null;
     private $postId;
     private $nodeMetaId;
-    private $avatar;
 
     /**
      * Constructor.
@@ -23,12 +22,11 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function __construct($postId = null, $nodeMetaId = null, $avatar = null)
+    public function __construct($postId = null, $nodeMetaId = null)
     {
         $this->_userId = apply_filters('determine_current_user', false);
         $this->postId = $postId;
         $this->nodeMetaId = $nodeMetaId;
-        $this->avatar = $avatar;
     }
 
     /**
