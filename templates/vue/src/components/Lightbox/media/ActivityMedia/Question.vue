@@ -48,7 +48,7 @@
         <text-question
           v-if="formOpened && formType === 'text'"
           :question="question"
-          :mult-line="question.answerTypes.text.isMultiLine"
+          :multiLine="question.answerTypes.text.isMultiLine"
           :placeholder="question.answerTypes.text.placeholder"
           :answer="answer"
           @submit="handleSubmit"
