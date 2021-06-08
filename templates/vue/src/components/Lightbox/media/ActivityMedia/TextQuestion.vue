@@ -8,7 +8,6 @@
       <b-form-invalid-feedback :state="isAnswerValid">
         Please enter a response.
       </b-form-invalid-feedback>
-
       <b-button class="submit-btn mt-3" variant="primary" type="submit">
         Submit
       </b-button>
@@ -53,7 +52,10 @@ export default {
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
-      this.$emit("submit", this.answer)
+      this.isAnswerValid = this.text !== ""
+      if (this.isAnswerValid) {
+        this.$emit("submit", this.answer)
+      }
     },
   },
 }
