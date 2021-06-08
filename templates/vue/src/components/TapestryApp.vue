@@ -1,7 +1,7 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar">
+    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar && avatarPopup">
       <b-container class="avatar-container">
         <avatar-form ref="AvatarForm" />
       </b-container>
@@ -56,6 +56,16 @@ export default {
     },
     hasAvatar() {
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
+    },
+    avatarPopup() {
+      if (
+        process.env.VUE_APP_AVATAR_POPUP === "true" ||
+        process.env.VUE_APP_AVATAR_POPUP === "TRUE" ||
+        process.env.VUE_APP_AVATAR_POPUP === 1
+      ) {
+        return true
+      }
+      return false
     },
   },
   watch: {
