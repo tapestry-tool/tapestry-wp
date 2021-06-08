@@ -78,6 +78,7 @@
                 :data-testid="`question-title-${index}`"
               />
             </b-form-group>
+            <p>Question data is {{ question }}</p>
             <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
             <b-form-group class="mt-3">
               <b-form-checkbox
@@ -88,22 +89,22 @@
                 Text entry
               </b-form-checkbox>
               <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
-                <b-form-radio
-                  v-model="question.answerTypes.text.isMultiLine"
-                  data-qa="question-answer-text-multi"
-                  name="multi-line"
-                  :value="true"
-                >
-                  Multi-line
-                </b-form-radio>
-                <b-form-radio
-                  v-model="question.answerTypes.text.isMultiLine"
-                  data-qa="question-answer-text-single"
-                  name="single-line"
-                  :value="false"
-                >
-                  Single Line
-                </b-form-radio>
+                <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
+                  <b-form-radio
+                    data-qa="question-answer-text-multi"
+                    name="multi-line"
+                    :value="true"
+                  >
+                    Multi-line
+                  </b-form-radio>
+                  <b-form-radio
+                    data-qa="question-answer-text-single"
+                    name="single-line"
+                    :value="false"
+                  >
+                    Single Line
+                  </b-form-radio>
+                </b-form-radio-group>
                 <div
                   v-if="
                     question.answerTypes.text.enabled &&
