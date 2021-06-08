@@ -423,8 +423,6 @@ export default {
       newAvatar.skinColor = this.skinColor
       newAvatar.topType = this.topType
       newAvatar.topColor = this.topColor
-      console.log("saveAvatar() triggered.")
-      console.log(newAvatar)
       this.updateAvatar(newAvatar)
     },
   },
