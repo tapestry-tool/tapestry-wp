@@ -57,7 +57,7 @@ interface ITapestryUserProgress
     /**
      * Update the user's avatar.
      *
-     * @param string $avatarData stores avatar prop choices
+     * @param string $avatarData stores avatar style choices
      *
      *
      * @return null

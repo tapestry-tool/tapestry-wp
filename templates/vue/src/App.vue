@@ -70,11 +70,10 @@ export default {
         })
       })
     }
-
-    window.addEventListener("click", this.recordAnalytics)
     Promise.resolve(client.getAvatar()).then(savedAvatar => {
       this.addAvatar(savedAvatar.data)
     })
+    window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })

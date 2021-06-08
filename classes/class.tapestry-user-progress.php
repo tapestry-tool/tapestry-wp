@@ -124,7 +124,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     /**
      * Update the user's avatar.
      *
-     * @param string $avatarData stores avatar prop choices
+     * @param string $avatarData stores avatar style choices
      *
      * @return null
      */
@@ -342,7 +342,6 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _updateAvatar($avatarData)
     {
-        error_log('updating user meta');
         update_user_meta($this->_userId, 'avatar_'.$this->_userId, $avatarData);
     }
 

@@ -55,7 +55,6 @@ export default {
       return this.settings.analyticsEnabled
     },
     hasAvatar() {
-      console.log(!this.avatar || Object.keys(this.avatar).length === 0)
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
   },
