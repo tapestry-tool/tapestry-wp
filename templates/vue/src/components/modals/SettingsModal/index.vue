@@ -298,7 +298,7 @@
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
-      <b-button size="sm" variant="success" @click="saveAvatar">
+      <b-button size="sm" variant="primary" @click="saveAvatar">
         Save Avatar
       </b-button>
     </template>

@@ -9,7 +9,7 @@
         <b-button size="sm" variant="secondary" @click="cancel">
           Cancel
         </b-button>
-        <b-button size="sm" variant="success" @click="saveAvatar">
+        <b-button size="sm" variant="primary" @click="saveAvatar">
           Save Avatar
         </b-button>
       </template>

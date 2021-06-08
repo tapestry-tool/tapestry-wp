@@ -32,6 +32,7 @@
                   <b-form-select
                     v-model="isCircle"
                     :options="isCircleOptions"
+                    data-qa="avatar-background-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group
@@ -58,6 +59,7 @@
                   <b-form-select
                     v-model="eyebrowType"
                     :options="eyebrowTypeOptions"
+                    data-qa="avatar-eyebrow-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Eye Type" label-for="input-horizontal">
@@ -80,6 +82,7 @@
                   <b-form-select
                     v-model="topType"
                     :options="topTypeOptions"
+                    data-qa="avatar-hair-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Hair Colour" label-for="input-horizontal">
@@ -117,6 +120,7 @@
                   <b-form-select
                     v-model="accessoriesType"
                     :options="accessoriesTypeOptions"
+                    data-qa="avatar-glasses-select"
                   ></b-form-select>
                 </b-form-group>
                 <b-form-group label="Clothing Type" label-for="input-horizontal">
