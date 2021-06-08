@@ -159,13 +159,6 @@ export default {
   components: {
     Avataaars,
   },
-  // props: {
-  //   avatar: {
-  //     type: Object,
-  //     required: false,
-  //     default: () => ({}),
-  //   },
-  // },
   data() {
     return {
       isCircle: true,

@@ -72,6 +72,9 @@ export default {
     }
 
     window.addEventListener("click", this.recordAnalytics)
+    Promise.resolve(client.getAvatar()).then(savedAvatar => {
+      this.addAvatar(savedAvatar.data)
+    })
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
       this.init({ dataset, progress })
@@ -88,7 +91,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "addAvatar"]),
     refresh() {
       this.$router.go()
     },

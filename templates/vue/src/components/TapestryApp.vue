@@ -1,8 +1,7 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar style="margin-bottom: 100px;" />
-    <b-modal id="avatar-modal" size="xl" :visible="true">
-      <!-- :visible="!hasAvatar" -->
+    <b-modal id="avatar-modal" size="xl" :visible="!hasAvatar">
       <b-container class="avatar-container">
         <avatar-form ref="AvatarForm" />
       </b-container>
@@ -75,7 +74,6 @@ export default {
     this.$root.$on("edit-node", id => {
       this.editNode(id)
     })
-    this.loadSavedAvatar()
     client.recordAnalyticsEvent("app", "load", "tapestry")
   },
   methods: {
@@ -175,10 +173,6 @@ export default {
     saveAvatar() {
       this.$refs.AvatarForm.saveAvatar()
       this.$refs["avatar-modal"].hide()
-    },
-    async loadSavedAvatar() {
-      const savedAvatar = await client.getAvatar()
-      this.addAvatar(savedAvatar.data)
     },
   },
 }
