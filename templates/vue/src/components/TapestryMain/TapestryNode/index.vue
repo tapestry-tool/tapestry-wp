@@ -447,6 +447,25 @@ export default {
       this.$emit("mouseleave")
     },
     handleClick(evt) {
+      const allNodes = document.querySelectorAll(`g[data-id]`)
+      allNodes.forEach(node => {
+        node.tabIndex = -1
+      })
+
+      const selectedNode = this.$el
+      selectedNode.tabIndex = 0
+
+      const childrenID = this.node.childOrdering
+      childrenID.forEach(childID => {
+        const childDOM = document.querySelector(`[data-qa="node-${childID}"]`)
+        childDOM.tabIndex = 0
+      })
+      const parentNodeID = this.getParent(this.node.id)
+      if (parentNodeID) {
+        const parentNode = document.querySelector(`[data-qa="node-${parentNodeID}"`)
+        parentNode.tabIndex = 0
+      }
+
       if (
         this.hasPermission("edit") &&
         (evt.ctrlKey || evt.metaKey || evt.shiftKey)
