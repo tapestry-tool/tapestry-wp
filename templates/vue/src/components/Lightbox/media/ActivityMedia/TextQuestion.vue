@@ -1,17 +1,10 @@
 <template>
   <b-form @submit="handleTextSubmit">
-    <p>answer is {{ answer }}</p>
+    <p>answerte is {{ answer }}</p>
+    <p>text is {{ text }}</p>
     <p>
-      <b-form-textarea
-        v-if="multiLine"
-        v-model="answer.text"
-        rows="5"
-      ></b-form-textarea>
-      <b-form-input
-        v-else
-        v-model="answer.text"
-        :placeholder="placeholder"
-      ></b-form-input>
+      <b-form-textarea v-if="multiLine" v-model="text" rows="5"></b-form-textarea>
+      <b-form-input v-else v-model="text" :placeholder="placeholder"></b-form-input>
       <b-form-invalid-feedback :state="isAnswerValid">
         Please enter a response.
       </b-form-invalid-feedback>
@@ -49,7 +42,13 @@ export default {
   data() {
     return {
       isAnswerValid: true,
+      text: this.answer.text,
     }
+  },
+  watch: {
+    text(newText) {
+      this.answer.text = newText
+    },
   },
   methods: {
     handleTextSubmit(event) {

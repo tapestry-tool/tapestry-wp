@@ -158,7 +158,6 @@ export default {
       }
       return {
         text: "",
-        hello: "sdlkfjsl",
       }
     },
   },
