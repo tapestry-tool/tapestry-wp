@@ -213,7 +213,10 @@ export default {
           break
         }
       }
-
+      console.log("node id is", this.node.id)
+      console.log("question id is", this.question.id)
+      console.log("answer type is", this.formType)
+      console.log("answer is", submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,

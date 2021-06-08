@@ -55,7 +55,7 @@ export default {
       event.preventDefault()
       this.isAnswerValid = this.text !== ""
       if (this.isAnswerValid) {
-        this.$emit("submit", this.answer)
+        this.$emit("submit", this.answer.text)
       }
     },
   },
