@@ -1,22 +1,25 @@
 <template>
   <b-form @submit="handleTextSubmit">
-    <b-form-textarea
-      v-if="multiLine"
-      v-model="answer.text"
-      rows="5"
-    ></b-form-textarea>
-    <b-form-input
-      v-else
-      v-model="answer.text"
-      :placeholder="placeholder"
-    ></b-form-input>
-    <b-form-invalid-feedback :state="isAnswerValid">
-      Please enter a response.
-    </b-form-invalid-feedback>
+    <p>answer is {{ answer }}</p>
+    <p>
+      <b-form-textarea
+        v-if="multiLine"
+        v-model="answer.text"
+        rows="5"
+      ></b-form-textarea>
+      <b-form-input
+        v-else
+        v-model="answer.text"
+        :placeholder="placeholder"
+      ></b-form-input>
+      <b-form-invalid-feedback :state="isAnswerValid">
+        Please enter a response.
+      </b-form-invalid-feedback>
 
-    <b-button class="submit-btn mt-3" variant="primary" type="submit">
-      Submit
-    </b-button>
+      <b-button class="submit-btn mt-3" variant="primary" type="submit">
+        Submit
+      </b-button>
+    </p>
   </b-form>
 </template>
 
@@ -40,8 +43,7 @@ export default {
     },
     answer: {
       type: Object,
-      required: false,
-      default: {},
+      required: true,
     },
   },
   data() {

@@ -60,6 +60,8 @@
         />
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
+          <p>question is {{ question }}</p>
+          <p>answer is {{ answer }}</p>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
@@ -84,7 +86,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
@@ -122,6 +124,7 @@ export default {
   },
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
+    ...mapGetters(["getAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -153,7 +156,10 @@ export default {
       if (this.formOpened && this.answers[this.formType] !== undefined) {
         return this.answers[this.formType]
       }
-      return null
+      return {
+        text: "",
+        hello: "sdlkfjsl",
+      }
     },
   },
   created() {
