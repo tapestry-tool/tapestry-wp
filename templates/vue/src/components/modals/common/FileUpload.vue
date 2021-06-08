@@ -94,6 +94,7 @@
             <b-col :class="{ 'pl-0': !showImagePreview }">
               <b-form-input
                 name="text-input"
+                class="text-input"
                 :placeholder="placeholder"
                 :value="value"
                 :data-qa="inputTestId"
@@ -310,6 +311,14 @@ export default {
 .image-file {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.image-file:focus {
+  box-shadow: 0 0 10px 5px LightSkyBlue;
+}
+
+.text-input:focus {
+  box-shadow: 0 0 10px 5px LightSkyBlue;
 }
 
 .divider {

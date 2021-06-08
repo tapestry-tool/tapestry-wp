@@ -544,6 +544,16 @@ export default {
   border: none;
   padding: 0;
   max-width: 350px;
+
+  &:focus-visible {
+    outline: black solid 5px;
+    outline-offset: 5px;
+  }
+}
+
+.background-url {
+  outline: black solid 5px;
+  display: none;
 }
 
 .depth-slider-description {
