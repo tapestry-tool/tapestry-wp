@@ -1,43 +1,51 @@
 <template>
- <div>
-     <button
-        aria-label="get help"
-        @click="showHelpIframe"
-     >
-        <tapestry-icon icon="microphone" />
-        <!-- <router-link :to="{ name: 'lightbox' }"> im a link</router-link> -->
-
+     <button aria-label="get help" @click="open">
+        <tapestry-icon icon="question-circle" />
+        <help-modal
+            :show="helpModalOpen"
+            @close="close" 
+        ></help-modal>
      </button>
- </div>
-  
 </template>
 
 <script>
-import { mapState } from "vuex"
-
+import HelpModal from "@/components/modals/HelpModal"
 import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
-// import { nodeStatus } from "@/utils/constants"
+import client from "@/services/TapestryAPI"
+
 
 export default {
   components: {
+    HelpModal,
     TapestryIcon,
   },
-  data() {
-      return {
-      showMenu: false,
-    }
-  },
   computed: {
-    ...mapState(["settings", "nodes", "rootId"]),
+ //   ...mapState(["settings", "nodes", "rootId"]),
+    helpModalOpen: {
+        get() {
+            return this.$route.name === names.HELP
+        },
+        set(open) {
+            this.$router.push({
+                name: open ? names.HELP : names.APP,
+                params: { nodeId: this.$route.params.nodeId },
+                query: this.$route.query,
+            })
+        },
+    },
   },
   methods: {
-    showHelpIframe() {
+    open() {
         console.log("button working!");
-        this.$router.push({
-            name: names.LIGHTBOX,
-            query: { help: 'true'},
-        })
+        this.helpModalOpen = true;
+        client.recordAnalyticsEvent("user", "open", "help")
+
+    },
+    close() {
+        this.helpModalOpen = false;
+        client.recordAnalyticsEvent("user", "close", "help")
+
     }
   }
 }
