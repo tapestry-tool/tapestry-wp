@@ -1,31 +1,57 @@
 <template>
-  <cos-modal show >
+  <cos-modal show>
     <b-container class="modal-cont">
-        <b-row align-h="center">
-            <b-col align-self="center" v-for="connection in threeConnections()" :key="connection.id" class="ob-connection-box">
-                <p class="ob-connection">{{ connection.name }}</p>
-                <h1>{{ connection.avatar }}</h1>
-            </b-col>
-        </b-row>
-        <b-row align-h="center">
-            <h3>Great job! Here are some of <br /> your connections.</h3>
-        </b-row>
-        <b-row align-h="center">
-            <h5 class="ob-secondary">You'll be able to edit and add more at any time.</h5>
-        </b-row>
-        <b-row align-h="center">
-            <b-col class="ob-connection-box" v-show="visibleConnections.length >= 4">
-                <p class="ob-connection">{{ (visibleConnections[3] && visibleConnections[3].name) || "" }}</p>
-                <h1>{{ (visibleConnections[3] && visibleConnections[3].avatar ) || "" }}</h1>
-            </b-col>
-            <b-col align-self="center">
-               <b-button pill variant="secondary" class="secondary" @click="$emit('ob-finish')">Connection &#8594</b-button> 
-            </b-col>
-            <b-col class="ob-connection-box" v-show="visibleConnections.length == 5">
-                <p class="ob-connection">{{ (visibleConnections[4] && visibleConnections[4].name) || "" }}</p>
-                <h1>{{ (visibleConnections[4] && visibleConnections[4].avatar ) || ""}}</h1>
-            </b-col>
-        </b-row>
+      <b-row align-h="center">
+        <b-col
+          v-for="connection in threeConnections()"
+          :key="connection.id"
+          align-self="center"
+          class="ob-connection-box"
+        >
+          <p class="ob-connection">{{ connection.name }}</p>
+          <h1>{{ connection.avatar }}</h1>
+        </b-col>
+      </b-row>
+      <b-row align-h="center">
+        <h3>
+          Great job! Here are some of
+          <br />
+          your connections.
+        </h3>
+      </b-row>
+      <b-row align-h="center">
+        <h5 class="ob-secondary">
+          You'll be able to edit and add more at any time.
+        </h5>
+      </b-row>
+      <b-row align-h="center">
+        <b-col v-show="visibleConnections.length >= 4" class="ob-connection-box">
+          <p class="ob-connection">
+            {{ (visibleConnections[3] && visibleConnections[3].name) || "" }}
+          </p>
+          <h1>
+            {{ (visibleConnections[3] && visibleConnections[3].avatar) || "" }}
+          </h1>
+        </b-col>
+        <b-col align-self="center">
+          <b-button
+            pill
+            variant="secondary"
+            class="secondary"
+            @click="$emit('ob-finish')"
+          >
+            Connection &#8594;
+          </b-button>
+        </b-col>
+        <b-col v-show="visibleConnections.length == 5" class="ob-connection-box">
+          <p class="ob-connection">
+            {{ (visibleConnections[4] && visibleConnections[4].name) || "" }}
+          </p>
+          <h1>
+            {{ (visibleConnections[4] && visibleConnections[4].avatar) || "" }}
+          </h1>
+        </b-col>
+      </b-row>
     </b-container>
   </cos-modal>
 </template>
@@ -38,37 +64,35 @@ export default {
     CosModal,
   },
   props: {
-      connections :{
-          require:true
-      }
+    connections: {
+      require: true,
+    },
   },
   computed: {
-      visibleConnections(){
-        let connectionsArray = Object.values(this.connections)
-        return connectionsArray.slice(0, Math.min(connectionsArray.length,5))
-      },
-      
+    visibleConnections() {
+      let connectionsArray = Object.values(this.connections)
+      return connectionsArray.slice(0, Math.min(connectionsArray.length, 5))
+    },
   },
   methods: {
     threeConnections() {
-            return this.visibleConnections.slice(0,3)
-        }
-  }
+      return this.visibleConnections.slice(0, 3)
+    },
+  },
 }
 </script>
 
 <style scoped>
 .modal-cont {
-    width: 50vw;
-    min-width: 300px;
-    max-width: 750px;
+  width: 50vw;
+  min-width: 300px;
+  max-width: 750px;
 }
 
 .row {
-    padding: 10px 0;
+  padding: 10px 0;
 }
 
 p {
-  
 }
 </style>

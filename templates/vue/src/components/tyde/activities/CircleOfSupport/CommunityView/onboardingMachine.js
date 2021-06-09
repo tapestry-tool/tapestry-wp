@@ -9,7 +9,6 @@ export const OnboardingStates = {
   FormClosed: "FormClosed",
   Finish: "Finish",
   Complete: "Complete",
-
 }
 
 const Events = {
@@ -84,7 +83,6 @@ const onboardingMachine = createMachine({
         Welcome: {
           on: {
             [Events.Continue]: OnboardingStates.AddAnotherTooltip,
-            
           },
         },
         AddMoreConfirmation: {
@@ -96,7 +94,7 @@ const onboardingMachine = createMachine({
         AddAnotherTooltip: {
           on: {
             [Events.Add]: OnboardingStates.Form,
-            [Events.Added]: OnboardingStates.FormClosed
+            [Events.Added]: OnboardingStates.FormClosed,
           },
         },
         Form: {
@@ -107,20 +105,19 @@ const onboardingMachine = createMachine({
         FormClosed: {
           on: {
             [Events.Continue]: OnboardingStates.Finish,
-          }
+          },
         },
         Finish: {
           on: {
-            [Events.Done]: "#Complete"
-          }
-        }
+            [Events.Done]: "#Complete",
+          },
+        },
       },
     },
     Complete: {
       id: OnboardingStates.Complete,
       type: "final",
     },
-
   },
 })
 

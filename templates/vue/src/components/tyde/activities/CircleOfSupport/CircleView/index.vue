@@ -112,6 +112,7 @@ export default {
   data() {
     return {
       activeCircle: CircleStates.All,
+      activeCircleOrig: null,
       state: States.Home,
       activeConnectionId: null,
       draggingConnection: null,
@@ -167,6 +168,7 @@ export default {
       return "white"
     },
     handleDragStart({ x, y, connection }) {
+      this.activeCircleOrig = this.activeCircle
       this.timeout = setTimeout(() => {
         this.draggingConnection = connection
         this.$refs.connectionsTab.hide()
@@ -199,6 +201,8 @@ export default {
           }
           this.addConnectionToCircle(this.activeCircle, this.draggingConnection.id)
           this.activeCircle = CircleStates.All
+        } else {
+          this.activeCircle = this.activeCircleOrig
         }
 
         const connectionRef = this.$refs["dragging-connection"]
@@ -207,6 +211,8 @@ export default {
         this.draggingConnection = null
 
         setTimeout(() => this.$refs.connectionsTab.show(), 300)
+      } else {
+        this.activeCircle = this.activeCircleOrig
       }
     },
     getCircle(connectionId) {

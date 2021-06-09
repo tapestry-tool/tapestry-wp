@@ -45,7 +45,8 @@ describe("Node Operations", () => {
       cy.getByTestId("node-modal").should("exist")
       cy.get(".node-modal-confirmation").should("be.visible")
 
-      cy.get(".node-modal-confirmation").contains("Cancel")
+      cy.get(".node-modal-confirmation")
+        .contains("Cancel")
         .click()
       cy.getByTestId("node-modal").should("be.visible")
       cy.get(".node-modal-confirmation").should("not.be.visible")

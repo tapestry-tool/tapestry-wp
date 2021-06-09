@@ -23,19 +23,19 @@ export const STARTER_COMMUNITIES = [
 
 export const STARTER_CONNECTIONS = [
   {
-    name:"PARENT",
-    icon: "👩‍🎨"
+    name: "PARENT",
+    icon: "👩‍🎨",
   },
   {
-    name:"TEACHER",
-    icon: "🧑‍🏫"
+    name: "TEACHER",
+    icon: "🧑‍🏫",
   },
   {
-    name:"FRIEND",
-    icon: "👩‍🔬"
+    name: "FRIEND",
+    icon: "👩‍🔬",
   },
   {
-    name:"TEAMMATE",
-    icon: "🤾🏻‍♂️"
-  }
+    name: "TEAMMATE",
+    icon: "🤾🏻‍♂️",
+  },
 ]

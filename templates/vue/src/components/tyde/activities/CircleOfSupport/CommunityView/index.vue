@@ -31,48 +31,47 @@
       class="welcome-communities"
       @continue="handleContinue"
     />
-    <welcome-connections 
+    <welcome-connections
       v-if="isState('Connections.Welcome')"
       class="welcome-connections"
       @continue="handleContinue"
-      />
+    />
     <add-confirmation
       v-if="isState('Communities.AddMoreConfirmation')"
       @later="send(OnboardingEvents.AddLater)"
       @another="send(OnboardingEvents.AddAnother)"
     />
-      <ob-finish-view 
-        v-if="isState('Connections.Finish')"
-        :connections="connections"
-        @ob-finish="send(OnboardingEvents.Done)"
-      />
-    <tooltip
-      v-if="isState('Communities.AddLaterTooltip')"
-      position="right"
-    >
+    <ob-finish-view
+      v-if="isState('Connections.Finish')"
+      :connections="connections"
+      @ob-finish="send(OnboardingEvents.Done)"
+    />
+    <tooltip v-if="isState('Communities.AddLaterTooltip')" position="right">
       <h3>
         Remember - you can click this button whenever you'd like to add another
         community!
       </h3>
-      <b-button pill variant="secondary" @click="send(OnboardingEvents.Continue)">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Continue)">
+        Got it &#8594;
+      </b-button>
     </tooltip>
-    <tooltip
-      v-if="isState('Communities.AddAnotherTooltip')"
-      position="right"
-    >
+    <tooltip v-if="isState('Communities.AddAnotherTooltip')" position="right">
       <h3>
         Click here to add another community!
       </h3>
-      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">
+        Got it &#8594;
+      </b-button>
     </tooltip>
-    <tooltip
-      v-if="isState('Connections.AddAnotherTooltip')"
-      position="left"
-    >
+    <tooltip v-if="isState('Connections.AddAnotherTooltip')" position="left">
       <h3>
-        Click here to add some <br /> of your connections!
+        Click here to add some
+        <br />
+        of your connections!
       </h3>
-      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">Got it &#8594 </b-button>
+      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">
+        Got it &#8594;
+      </b-button>
     </tooltip>
   </div>
 </template>
@@ -84,7 +83,7 @@ import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
 
-import onboardingMachine, { OnboardingEvents, OnboardingStates } from "./onboardingMachine"
+import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
 import WelcomeCommunities from "./onboarding/WelcomeCommunities"
 import AddConfirmation from "./onboarding/AddConfirmation"
 import WelcomeConnections from "./onboarding/WelcomeConnections"
@@ -96,7 +95,7 @@ const States = {
   AddCommunity: 1,
   EditCommunity: 2,
   EditConnection: 3,
-  AddConnection: 4
+  AddConnection: 4,
 }
 
 export default {
@@ -133,7 +132,7 @@ export default {
         icon: "👨‍👩‍👦",
         color: "",
       },
-      OnboardingEvents: OnboardingEvents
+      OnboardingEvents: OnboardingEvents,
     }
   },
   computed: {
@@ -166,24 +165,22 @@ export default {
       return this.onboarding.current.matches(state)
     },
     initializeOnboarding() {
-      let startingEvent = OnboardingEvents.Empty;
+      let startingEvent = OnboardingEvents.Empty
       // For now, always initialize the onboarding process at the start
-      if(Object.values(this.communities).length > 0){
-       startingEvent = OnboardingEvents.Continue
+      if (Object.values(this.communities).length > 0) {
+        startingEvent = OnboardingEvents.Continue
 
-       if(Object.values(this.connections).length > 0)
-       {
-         startingEvent = OnboardingEvents.Done
-       }
+        if (Object.values(this.connections).length > 0) {
+          startingEvent = OnboardingEvents.Done
+        }
       }
       this.send(startingEvent)
-
     },
     handleContinue(communities) {
-      if(this.onboarding.current.matches('Communities.Welcome')) {
+      if (this.onboarding.current.matches("Communities.Welcome")) {
         communities.forEach(community => this.$emit("add-community", community))
       }
-      
+
       this.send(OnboardingEvents.Continue)
     },
     toggleCommunityTab() {
@@ -195,23 +192,25 @@ export default {
       }
     },
     obHandleAdded($event) {
-        this.$emit('add-community', $event)
+      this.$emit("add-community", $event)
 
-        if(this.onboarding.current.matches("Communities.Form") || 
-            this.onboarding.current.matches("Communities.AddAnotherTooltip")) {
-              this.send(OnboardingEvents.Added);
+      if (
+        this.onboarding.current.matches("Communities.Form") ||
+        this.onboarding.current.matches("Communities.AddAnotherTooltip")
+      ) {
+        this.send(OnboardingEvents.Added)
       }
     },
-    handleConnectionSubmitted() { 
-      
-        if(this.onboarding.current.matches("Connections.Form") ||
-            this.onboarding.current.matches("Connections.AddAnotherTooltip")) {
-          this.send(OnboardingEvents.Added)
-        }
-      
+    handleConnectionSubmitted() {
+      if (
+        this.onboarding.current.matches("Connections.Form") ||
+        this.onboarding.current.matches("Connections.AddAnotherTooltip")
+      ) {
+        this.send(OnboardingEvents.Added)
+      }
     },
-    handleConnectionClosed(){
-    if(this.onboarding.current.matches("Connections.FormClosed")) {
+    handleConnectionClosed() {
+      if (this.onboarding.current.matches("Connections.FormClosed")) {
         this.send(OnboardingEvents.Continue)
       }
     },

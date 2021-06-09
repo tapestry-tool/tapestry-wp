@@ -9,20 +9,20 @@
 </template>
 
 <script>
-import Helpers from "@/utils/Helpers"
+// import Helpers from "@/utils/Helpers"
 export default {
   props: {
     /**
      * ID of the DOM element that we want to position this tooltip against.
      */
-    refId: {
-      type: String,
-      required: false,
-    },
+    // refId: {
+    //   type: String,
+    //   required: false,
+    // },
     position: {
       type: String,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -36,16 +36,15 @@ export default {
 
     // Temporary fix of positioning
     if (this.position === "right") {
-      tooltip.style.right = "22px";
-      tooltip.style.bottom = "95px";
+      tooltip.style.right = "22px"
+      tooltip.style.bottom = "95px"
       tooltip.classList.add("tooltip-container-right")
-    } 
-    else if (this.position === "left") {
-      tooltip.style.left = "22px";
-      tooltip.style.bottom = "95px";
+    } else if (this.position === "left") {
+      tooltip.style.left = "22px"
+      tooltip.style.bottom = "95px"
       tooltip.classList.add("tooltip-container-left")
     }
-    
+
     // const { x, y } = Helpers.positionTooltip(target, tooltip, container, {
     //   dryRun: true,
     // })
@@ -64,6 +63,7 @@ export default {
   background: white;
   border: var(--cos-border);
   border-radius: 1rem;
+  z-index: 100;
 }
 
 .tooltip-container::before {
@@ -74,7 +74,7 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-top: 24px solid #fff;
- bottom: -23px;
+  bottom: -23px;
   z-index: 5;
 }
 
@@ -87,20 +87,16 @@ export default {
   border-left: 24px solid transparent;
   border-right: 24px solid transparent;
   border-top: 24px solid #bbb;
-  bottom:-24px;
-  
+  bottom: -24px;
 }
 
 .tooltip-container-right::before,
 .tooltip-container-right::after {
- 
   right: 25px;
 }
 
 .tooltip-container-left::before,
 .tooltip-container-left::after {
-
   left: 25px;
 }
-
 </style>

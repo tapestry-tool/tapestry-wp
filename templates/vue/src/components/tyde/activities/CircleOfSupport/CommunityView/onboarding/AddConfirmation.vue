@@ -11,10 +11,24 @@
         <b-container>
           <b-row class="controls">
             <b-col>
-              <b-button pill variant="secondary" class="secondary" @click="$emit('later')">Maybe later &#8594</b-button>
+              <b-button
+                pill
+                variant="secondary"
+                class="secondary"
+                @click="$emit('later')"
+              >
+                Maybe later &#8594;
+              </b-button>
             </b-col>
             <b-col>
-              <b-button pill variant="secondary" class="primary" @click="$emit('another')">Add another &#8594</b-button>   
+              <b-button
+                pill
+                variant="secondary"
+                class="primary"
+                @click="$emit('another')"
+              >
+                Add another &#8594;
+              </b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -35,6 +49,6 @@ export default {
 
 <style scoped>
 .row {
-    padding: 5px 0;
+  padding: 5px 0;
 }
 </style>

@@ -4,7 +4,7 @@
       id="connections-tab-popup-trigger"
       style="left: 2rem"
       aria-label="Connections"
-      @click="$emit('toggle'); toggle()"
+      @click="toggle()"
     >
       <tapestry-icon v-if="isOpen" icon="chevron-down" />
       <span v-else>😊</span>
@@ -94,6 +94,7 @@ export default {
   },
   methods: {
     toggle() {
+      this.$emit("toggle")
       if (this.isOpen) {
         this.state = States.Home
         this.$emit("connection-closed")
@@ -146,7 +147,7 @@ export default {
       switch (this.state) {
         case States.Add:
           await this.addNewConnection()
-          this.$emit('connection-submitted')
+          this.$emit("connection-submitted")
           break
         case States.Edit:
           await this.updateConnection()

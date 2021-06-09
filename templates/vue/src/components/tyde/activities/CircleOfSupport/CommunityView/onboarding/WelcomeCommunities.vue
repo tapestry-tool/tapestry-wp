@@ -1,36 +1,50 @@
 <template>
-    <div class="modal ob-font">
+  <div class="modal ob-font">
     <b-container fluid class="center">
-        <b-row align-h="center">
-          <h1>Welcome to your <br /> circle of connections!</h1>
-        </b-row >
+      <b-row align-h="center">
+        <h1 style="max-width: 390px;">
+          Welcome to your circle of connections!
+        </h1>
+      </b-row>
 
-        <b-row align-h="center">
-          <h4 class="ob-secondary">Let's start with you — what communities are you a part of?</h4>
-        </b-row>
-        
-        <b-row align-h="center" >
-          <h5 class="ob-secondary">Here are a few ideas to get you started.</h5>
-        </b-row>
+      <b-row align-h="center">
+        <h4 class="ob-secondary">
+          Let's start with you — what communities are you a part of?
+        </h4>
+      </b-row>
 
-        <b-row align-h="center" class="mt-2 mb-2">
-          <b-button pill variant="secondary" @click="addCommunities" :disabled="canContinue()">CONTINUE &#8594 </b-button>
-        </b-row>
-        
-        <b-row >
-          <b-container>
-            <b-row>
-              <b-col v-for="community in communities" :key="community.name">
-                <input v-model="communitiesToAdd" type="checkbox" :value="community.name" />
-                <h3>{{ community.name }}</h3>
-                <h1>{{ community.icon }}</h1>
-              </b-col>
-            </b-row>
-          </b-container>
-        </b-row>
+      <b-row align-h="center">
+        <h5 class="ob-secondary">Here are a few ideas to get you started.</h5>
+      </b-row>
 
+      <b-row align-h="center" class="mt-2 mb-2">
+        <b-button
+          pill
+          variant="secondary"
+          :disabled="canContinue()"
+          @click="addCommunities"
+        >
+          CONTINUE &#8594;
+        </b-button>
+      </b-row>
+
+      <b-row>
+        <b-container>
+          <b-row>
+            <b-col v-for="community in communities" :key="community.name">
+              <input
+                v-model="communitiesToAdd"
+                type="checkbox"
+                :value="community.name"
+              />
+              <h3>{{ community.name }}</h3>
+              <h1>{{ community.icon }}</h1>
+            </b-col>
+          </b-row>
+        </b-container>
+      </b-row>
     </b-container>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -57,8 +71,8 @@ export default {
     isChecked(community) {
       return this.communitiesToAdd.has(community)
     },
-    canContinue(){
-      return this.communitiesToAdd.length === 0 ? true : false;
+    canContinue() {
+      return this.communitiesToAdd.length === 0 ? true : false
     },
     async addCommunities() {
       const results = []
@@ -86,7 +100,8 @@ button {
   padding: 1px 25px;
 }
 
-h1, h3{
+h1,
+h3 {
   color: $onbording-title-color;
 }
 
@@ -102,7 +117,6 @@ h1, h3{
   background-color: white;
 
   border: $onbording-border-color solid;
-  border-radius:  15px;
+  border-radius: 15px;
 }
-
 </style>
