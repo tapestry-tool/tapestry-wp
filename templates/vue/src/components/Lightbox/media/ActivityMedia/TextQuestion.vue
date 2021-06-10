@@ -48,6 +48,7 @@ export default {
   watch: {
     text(newText) {
       this.answer.text = newText
+      this.text = newText
     },
   },
   methods: {

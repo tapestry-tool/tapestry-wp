@@ -22,6 +22,8 @@ export const store = {
     visibleNodes: [],
     apiError: null,
     displayErrors: false,
+    userAnswers: {},
+    // create new property under state
   },
   getters,
   mutations,

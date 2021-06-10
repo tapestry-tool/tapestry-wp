@@ -194,8 +194,7 @@ class TapestryApi {
   async saveAudio(audio, nodeId, questionId) {
     const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio`
     const response = await this.client.post(url, { audio, questionId })
-    console.log("save Audio response", response)
-    return response
+    return response.data
   }
 
   /**

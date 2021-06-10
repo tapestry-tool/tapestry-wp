@@ -112,6 +112,7 @@ export function getQuestion(state) {
 export function getAnswers(state) {
   return (nodeId, questionId) => {
     console.log("state.progress is", state.progress)
+    // check if everything like nodeId, activity, question id exists
     return state.progress[nodeId].activity[questionId].answers
   }
 }

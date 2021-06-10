@@ -1,6 +1,7 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
+import Helpers from "@/utils/Helpers"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = parse(dataset, progress)
@@ -122,29 +123,27 @@ export function completeQuestion(state, { nodeId, questionId, answer, answerType
   //const question = node.quiz.find(question => question.id === questionId)
   //question.completed = true
   console.log("committing mutation method completeQuestion")
-  console.log("node id is", nodeId)
-  console.log("question id is", questionId)
-  console.log("answer is", answer)
-  console.log("answer type is", answerType)
-  if (!state.progress.hasOwnProperty("activity")) {
-    console.log("progress 1 is ", state.progress)
+  //console.log("node id is", nodeId)
+  //console.log("question id is", questionId)
+  //console.log("answer is", answer)
+  //console.log("answer type is", answerType)
+  console.log("initially state.progress is", Helpers.deepCopy(state.progress))
+  if (
+    state.progress[nodeId] === undefined ||
+    state.progress[nodeId].activity === undefined
+  ) {
+    console.log("if no activity property")
     state.progress[nodeId] = {}
-    console.log("progress 2 is ", state.progress)
     state.progress[nodeId].activity = {}
-    console.log("progress 3 is ", state.progress)
-    state.progress[nodeId].activity[questionId] = {}
-    console.log("progress 3 is ", state.progress)
-    console.log("if state.progress.activity didn't exist, come here")
-    state.progress[nodeId].activity[questionId].answers = {}
-    //state.progress[nodeId].activity[questionId].answers[answerType] = answer
-  } else {
+  }
+  if (state.progress[nodeId].activity[questionId] === undefined) {
     console.log(
       "if state.progress.activity already exist but a new question id, get here"
     )
     state.progress[nodeId].activity[questionId] = {}
     state.progress[nodeId].activity[questionId].answers = {}
-    //state.progress[nodeId].activity[questionId].answers[answerType] = answer
   }
+  //state.progress[nodeId].activity[questionId].answers[answerType] = answer
   console.log("add the new answer to state.progress")
   state.progress[nodeId].activity[questionId].answers[answerType] = answer
   console.log("final progress", state.progress)

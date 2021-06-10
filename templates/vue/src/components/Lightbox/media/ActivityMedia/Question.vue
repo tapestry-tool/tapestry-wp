@@ -69,14 +69,14 @@
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="Boolean(answers.text)"
+              :completed="textFormCompleted"
               @click="openForm('text')"
             >
               text
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="Boolean(answers.audio)"
+              :completed="audioFormCompleted"
               icon="microphone"
               @click="openForm('audio')"
             >
@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
@@ -129,6 +129,7 @@ export default {
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
     ...mapGetters(["getAnswers"]),
+    ...mapState(["progress"]),
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -165,7 +166,12 @@ export default {
       }
     },
     textFormCompleted() {
-      return this.answers.text !== ""
+      //return !!this.progress[this.node.id].activity[this.question.id].answers.text
+      return true
+    },
+    audioFormCompleted() {
+      //return !!this.progress[this.node.id].activity[this.question.id].answers.audio
+      return true
     },
   },
   created() {
@@ -209,15 +215,16 @@ export default {
       switch (this.formType) {
         case "audio": {
           const audioFile = formData
-          console.log("ksdlfjsdl")
-          console.log("audio file is", audioFile)
+          //console.log("ksdlfjsdl")
+          //console.log("audio file is", audioFile)
           const savedUrl = await this.saveAudio({
             audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
             nodeId: this.node.id,
             questionId: this.question.id,
           })
-          const userSavedUrl = JSON.parse(savedUrl.config.data).audio
-          submittedAnswer = { url: userSavedUrl }
+          console.log("saved url file is", savedUrl)
+          // const userSavedUrl = JSON.parse(savedUrl.config.data).audio
+          submittedAnswer = { url: savedUrl }
           //submittedAnswer = { url: savedUrl }
           break
         }
