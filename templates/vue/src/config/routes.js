@@ -27,9 +27,9 @@ const lightbox = {
   },
 }
 
-const accordion = {
+const multiContent = {
   path: `${ROOT_PATH}/view/:rowId`,
-  name: "accordion",
+  name: "multiContent",
   components: {
     lightbox: Lightbox,
   },
@@ -38,9 +38,9 @@ const accordion = {
   },
 }
 
-const subAccordion = {
-  path: `${ROOT_PATH}/view/:rowId/row/:subRowId`,
-  name: "sub_accordion",
+const nestedMultiContent = {
+  path: `${ROOT_PATH}/view/:rowId/rows/:subRowId`,
+  name: "nested_multi_content",
   components: {
     lightbox: Lightbox,
   },
@@ -81,11 +81,11 @@ const redirects = [
 
 const routes = {
   app,
-  accordion,
+  multiContent,
   lightbox,
   modal,
   settings,
-  subAccordion,
+  nestedMultiContent,
   redirects,
   help,
 }
