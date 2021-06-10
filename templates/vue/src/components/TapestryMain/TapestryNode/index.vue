@@ -377,7 +377,7 @@ export default {
       {
         this.uploadingKaltura = false
         clearInterval(inter)
-        this.$emit('kaltura-finished',this.node)
+        this.handleKalturaFinished()
       }
           
     }, 10000);
@@ -446,6 +446,25 @@ export default {
   methods: {
     ...mapActions(["updateNodeCoordinates","updateNode"]),
     ...mapMutations(["select", "unselect"]),
+    async handleKalturaFinished(){
+
+    const newNode = await client.getNode(this.node.id) 
+      
+     await this.$store.commit("updateNode",{
+          id: this.node.id,
+          newNode: newNode
+      })
+
+      const finishedNode = await client.getNode(this.node.id) 
+      finishedNode.kalturaUpload = ''
+     
+      this.updateNode({
+        id: this.node.id,
+        newNode: finishedNode
+      })
+
+
+    },
     updateRootNode() {
       if (!this.root) {
         this.$router.push({

@@ -780,7 +780,7 @@ export default {
       this.loading = false
 
       if(this.useKaltura &&
-         this.kaltura_info !== null){
+        this.kaltura_info !== null){
         kclient.uploadVideoToKaltura(this.node.id,this.kaltura_info)
       }
       if (!this.hasSubmissionError) {

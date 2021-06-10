@@ -26,7 +26,6 @@
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
-          @kaltura-finished="handleKalturaFinished"
         ></tapestry-node>
       </g>
       <locked-tooltip
@@ -120,29 +119,10 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
-    ...mapActions(["updateNode"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    async handleKalturaFinished(node){
-
-    const newNode = await client.getNode(node.id) 
-      
-     await this.$store.commit("updateNode",{
-          id: node.id,
-          newNode: newNode
-      })
-
-      const finishedNode = await client.getNode(node.id) 
-      finishedNode.kalturaUpload = ''
-     
-      this.updateNode({
-        id: node.id,
-        newNode: finishedNode
-      })
-
-
-    },
+    
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
     },
