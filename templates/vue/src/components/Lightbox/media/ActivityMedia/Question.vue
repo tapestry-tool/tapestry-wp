@@ -216,8 +216,8 @@ export default {
             nodeId: this.node.id,
             questionId: this.question.id,
           })
-          console.log("savedUrl is", savedUrl)
-          submittedAnswer = { url: "testingAudio" }
+          const userSavedUrl = JSON.parse(savedUrl.config.data).audio
+          submittedAnswer = { url: userSavedUrl }
           //submittedAnswer = { url: savedUrl }
           break
         }
