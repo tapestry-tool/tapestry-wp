@@ -194,6 +194,7 @@ class TapestryApi {
   async saveAudio(audio, nodeId, questionId) {
     const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio`
     const response = await this.client.post(url, { audio, questionId })
+    console.log("save Audio response", response)
     return response
   }
 
@@ -216,10 +217,10 @@ class TapestryApi {
     return response
   }
 
-  async completeQuestion(nodeId, questionId, answer) {
+  async completeQuestion(nodeId, questionId, answer, answerType) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
     console.log("valid url", url)
-    const response = await this.client.post(url, answer)
+    const response = await this.client.post(url, { answer, answerType })
     console.log("response here", response)
     return response
   }

@@ -116,7 +116,7 @@ export function deleteLink(state, { source, target }) {
 }
 
 // quizzes
-export function completeQuestion(state, { nodeId, questionId, answer }) {
+export function completeQuestion(state, { nodeId, questionId, answer, answerType }) {
   // OLD CODE
   //const node = getters.getNode(state)(nodeId)
   //const question = node.quiz.find(question => question.id === questionId)
@@ -125,6 +125,7 @@ export function completeQuestion(state, { nodeId, questionId, answer }) {
   console.log("node id is", nodeId)
   console.log("question id is", questionId)
   console.log("answer is", answer)
+  console.log("answer type is", answerType)
   if (!state.progress.hasOwnProperty("activity")) {
     console.log("progress 1 is ", state.progress)
     state.progress[nodeId] = {}
@@ -133,11 +134,19 @@ export function completeQuestion(state, { nodeId, questionId, answer }) {
     console.log("progress 3 is ", state.progress)
     state.progress[nodeId].activity[questionId] = {}
     console.log("progress 3 is ", state.progress)
-    state.progress[nodeId].activity[questionId].answers = []
-    state.progress[nodeId].activity[questionId].answers.push(answer)
+    console.log("if state.progress.activity didn't exist, come here")
+    state.progress[nodeId].activity[questionId].answers = {}
+    //state.progress[nodeId].activity[questionId].answers[answerType] = answer
   } else {
-    state.progress[nodeId].activity[questionId].answers.push(answer)
+    console.log(
+      "if state.progress.activity already exist but a new question id, get here"
+    )
+    state.progress[nodeId].activity[questionId] = {}
+    state.progress[nodeId].activity[questionId].answers = {}
+    //state.progress[nodeId].activity[questionId].answers[answerType] = answer
   }
+  console.log("add the new answer to state.progress")
+  state.progress[nodeId].activity[questionId].answers[answerType] = answer
   console.log("final progress", state.progress)
 }
 

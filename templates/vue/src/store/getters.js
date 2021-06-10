@@ -111,6 +111,7 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
+    console.log("state.progress is", state.progress)
     return state.progress[nodeId].activity[questionId].answers
   }
 }

@@ -50,7 +50,7 @@
           :question="question"
           :multiLine="question.answerTypes.text.isMultiLine"
           :placeholder="question.answerTypes.text.placeholder"
-          :answer="answers"
+          :answer="answer"
           @submit="handleSubmit"
         ></text-question>
         <audio-recorder
@@ -61,7 +61,7 @@
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <p>question is {{ question }}</p>
-          <p>answer is {{ answer }}</p>
+          <p>answer is {{ answers }}</p>
           <p>
             typeData is
             {{ node.typeData["activity"].questions[0].answerTypes["text"] }}
@@ -69,14 +69,14 @@
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
-              :completed="answers.text"
+              :completed="Boolean(answers.text)"
               @click="openForm('text')"
             >
               text
             </answer-button>
             <answer-button
               v-if="question.answerTypes.audio.enabled"
-              :completed="answers.audio"
+              :completed="Boolean(answers.audio)"
               icon="microphone"
               @click="openForm('audio')"
             >
@@ -164,9 +164,14 @@ export default {
         text: "",
       }
     },
+    textFormCompleted() {
+      return this.answers.text !== ""
+    },
   },
   created() {
+    console.log("created function")
     this.answers = this.getAnswers(this.node.id, this.question.id)
+    console.log("answers are", this.answers)
     if (this.enabledAnswerTypes.length === 1) {
       this.formType = Object.keys(this.enabledAnswerTypes).pop()
       this.formOpened = true
@@ -204,12 +209,16 @@ export default {
       switch (this.formType) {
         case "audio": {
           const audioFile = formData
+          console.log("ksdlfjsdl")
+          console.log("audio file is", audioFile)
           const savedUrl = await this.saveAudio({
             audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
             nodeId: this.node.id,
             questionId: this.question.id,
           })
-          submittedAnswer = { url: savedUrl }
+          console.log("savedUrl is", savedUrl)
+          submittedAnswer = { url: "testingAudio" }
+          //submittedAnswer = { url: savedUrl }
           break
         }
         default: {
@@ -221,8 +230,8 @@ export default {
       console.log("node id is", this.node.id)
       console.log("question id is", this.question.id)
       console.log("answer type is", this.formType)
-      console.log("answer is", submittedAnswer)
-      console.log("answer type is", typeof submittedAnswer)
+      console.log("submitted answer is", submittedAnswer)
+      console.log("submitted answer type is", typeof submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,

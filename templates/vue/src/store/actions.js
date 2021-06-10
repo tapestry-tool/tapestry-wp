@@ -227,34 +227,35 @@ export async function completeQuestion(
 ) {
   try {
     console.log("got here")
-    await client.completeQuestion(nodeId, questionId, answer)
+    await client.completeQuestion(nodeId, questionId, answer, answerType)
     if (answerType !== "audioId") {
-      // change here, no longer using formId, where to save answer to user meta?
       // remove here
       console.log("time to start implementing from here")
       // old code
       //const entry = await client.getUserEntry(formId)
       //commit("updateEntry", { answerType, entry, nodeId, questionId })
     }
-    commit("completeQuestion", { nodeId, questionId, answer })
+    commit("completeQuestion", { nodeId, questionId, answer, answerType })
   } catch (error) {
     console.log(error)
     dispatch("addApiError", error)
   }
 }
 
-export async function saveAudio(
-  { commit, dispatch },
-  { audio, nodeId, questionId }
-) {
+export async function saveAudio({ dispatch }, { audio, nodeId, questionId }) {
   try {
     await client.saveAudio(audio, nodeId, questionId)
-    commit("updateEntry", {
-      answerType: "audioId",
-      entry: { audio },
-      nodeId,
-      questionId,
-    })
+    console.log("failure here instead?")
+    console.log("audio parameter is", audio)
+    console.log("node id parameter is", nodeId)
+    console.log("question id parameter is", questionId)
+    // OLD CODE
+    // commit("updateEntry", {
+    //   answerType: "audio",
+    //   entry: { audio },
+    //   nodeId,
+    //   questionId,
+    // })
   } catch (error) {
     dispatch("addApiError", error)
   }
