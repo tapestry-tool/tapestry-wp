@@ -53,9 +53,9 @@ export default {
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.text !== ""
+      this.isAnswerValid = this.answer.text !== ""
       if (this.isAnswerValid) {
-        this.$emit("submit", this.answer.text)
+        this.$emit("submit", this.answer)
       }
     },
   },

@@ -6,6 +6,8 @@
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
+    <p>question is {{ question }}</p>
+    <p>id is {{ id }}</p>
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
     <button
       v-else

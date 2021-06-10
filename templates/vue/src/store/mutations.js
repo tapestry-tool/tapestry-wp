@@ -116,10 +116,29 @@ export function deleteLink(state, { source, target }) {
 }
 
 // quizzes
-export function completeQuestion(state, { nodeId, questionId }) {
-  const node = getters.getNode(state)(nodeId)
-  const question = node.quiz.find(question => question.id === questionId)
-  question.completed = true
+export function completeQuestion(state, { nodeId, questionId, answer }) {
+  // OLD CODE
+  //const node = getters.getNode(state)(nodeId)
+  //const question = node.quiz.find(question => question.id === questionId)
+  //question.completed = true
+  console.log("committing mutation method completeQuestion")
+  console.log("node id is", nodeId)
+  console.log("question id is", questionId)
+  console.log("answer is", answer)
+  if (!state.progress.hasOwnProperty("activity")) {
+    console.log("progress 1 is ", state.progress)
+    state.progress[nodeId] = {}
+    console.log("progress 2 is ", state.progress)
+    state.progress[nodeId].activity = {}
+    console.log("progress 3 is ", state.progress)
+    state.progress[nodeId].activity[questionId] = {}
+    console.log("progress 3 is ", state.progress)
+    state.progress[nodeId].activity[questionId].answers = []
+    state.progress[nodeId].activity[questionId].answers.push(answer)
+  } else {
+    state.progress[nodeId].activity[questionId].answers.push(answer)
+  }
+  console.log("final progress", state.progress)
 }
 
 export function updateEntry(state, { answerType, entry, nodeId, questionId }) {

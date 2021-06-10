@@ -96,10 +96,14 @@ export function isVisible(state, { getNode, hasMultiContentAncestor }) {
 export function getQuestion(state) {
   return id => {
     const node = Object.values(state.nodes)
-      .filter(node => node.quiz)
-      .find(node => node.quiz.find(q => q.id == id))
+      .filter(node => node.typeData.activity)
+      .find(node => node.typeData.activity.questions.find(q => q.id == id))
     if (node) {
-      return node.quiz.find(q => q.id == id)
+      console.log(
+        "success",
+        node.typeData.activity.questions.find(q => q.id == id)
+      )
+      return node.typeData.activity.questions.find(q => q.id == id)
     }
     return null
   }

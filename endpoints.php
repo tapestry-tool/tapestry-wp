@@ -208,7 +208,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
-        'ROUTE' => 'users/quiz',
+        'ROUTE' => 'users/activity',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'completeQuestionById',
@@ -334,7 +334,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function exportTapestry($request) {
+function exportTapestry($request)
+{
     $postId = $request['tapestryPostId'];
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -1073,13 +1074,13 @@ function optimizeTapestryNodeThumbnails($request)
             $protocol = is_ssl() ? "https:" : "http:";
     
             if ($nodeData->imageURL) {
-                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
                 $node->set((object) ['thumbnailFileId' => $attachmentId]);
                 $node->save();
             }
             if ($nodeData->lockedImageURL) {
-                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->lockedImageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
                 $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
                 $node->save();
@@ -1151,7 +1152,7 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) && 
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
             !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
@@ -1239,7 +1240,6 @@ function updateProgressByNodeId($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $progressValue = $request['progress_value'];
-
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
         $userProgress->updateUserProgress($progressValue);
@@ -1282,10 +1282,15 @@ function completeQuestionById($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $questionId = $request['question_id'];
+    $answerData = $request->get_body();
+    error_log($postId);
+    error_log($nodeMetaId);
+    error_log($questionId);
+    error_log($answerData);
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->completeQuestion($questionId);
+        $userProgress->completeQuestion($questionId, $answerData);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

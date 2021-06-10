@@ -50,7 +50,7 @@
           :question="question"
           :multiLine="question.answerTypes.text.isMultiLine"
           :placeholder="question.answerTypes.text.placeholder"
-          :answer="answer"
+          :answer="answers"
           @submit="handleSubmit"
         ></text-question>
         <audio-recorder
@@ -62,6 +62,10 @@
           <p class="question-answer-text">I want to answer with...</p>
           <p>question is {{ question }}</p>
           <p>answer is {{ answer }}</p>
+          <p>
+            typeData is
+            {{ node.typeData["activity"].questions[0].answerTypes["text"] }}
+          </p>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
@@ -213,17 +217,19 @@ export default {
           break
         }
       }
+      console.log("form data is", formData)
       console.log("node id is", this.node.id)
       console.log("question id is", this.question.id)
       console.log("answer type is", this.formType)
       console.log("answer is", submittedAnswer)
+      console.log("answer type is", typeof submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,
         answerType: this.formType,
         answer: submittedAnswer,
       })
-
+      console.log("back to here in question.vue")
       this.loading = false
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: this.formType,

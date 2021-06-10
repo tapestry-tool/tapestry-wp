@@ -32,10 +32,11 @@ interface ITapestryUserProgress
      * Set the question with the given id to be marked as 'completed'.
      *
      * @param int $questionId the question to mark
+     * @param string $answerData the user answer
      *
      * @return null
      */
-    public function completeQuestion($questionId);
+    public function completeQuestion($questionId, $answerData);
 
     /**
      * Update User's h5p video setting for a tapestry post.

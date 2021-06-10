@@ -30,7 +30,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     }
 
     /**
-     * Get User's video progress for a tapestry post.
+     * Get User's progress for a tapestry post.
      *
      * @return string progress   of each node in json format
      */
@@ -83,13 +83,14 @@ class TapestryUserProgress implements ITapestryUserProgress
      * Set the question with the given id to be marked as 'completed'.
      *
      * @param int $questionId the question to mark
+     * @param string $answerData the user answer
      *
      * @return null
      */
-    public function completeQuestion($questionId)
+    public function completeQuestion($questionId, $answerData)
     {
         $this->_checkPostId();
-        $this->_completeQuestion($questionId);
+        $this->_completeQuestion($questionId, $answerData);
     }
 
     /**
@@ -218,12 +219,37 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
     }
 
-    private function _completeQuestion($questionId)
+    private function _completeQuestion($questionId, $answerData)
     {
-        $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);
-        $quiz[$questionId]['completed'] = true;
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId, $quiz);
+        // OLD CODE
+        /* $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
+        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);*/ 
+
+        // save it to user meta
+        // call wordpress function update_user_meta to save the information from frontend to the user meta
+        // check in database in phpmyadmin
+        error_log("inside _complete question");
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $answerData);
+
+
+        //error_log(print_r($nodeMetadata, true));
+        //error_log(print_r($quiz, true));
+       /*  ob_start();                    // start buffer capture
+        var_dump($nodeMetadata);           // dump the values
+        $contents = ob_get_contents(); // put the buffer into a variable
+        ob_end_clean();
+        error_log("nodeMetadataa is");             // end capture
+        error_log($contents);
+        
+        ob_start();                    // start buffer capture
+        var_dump($quiz);           // dump the values
+        $contents = ob_get_contents(); // put the buffer into a variable
+        ob_end_clean();
+        error_log("quiz is");             // end capture
+        error_log($contents); */
+
+        // treating $quiz as a two dimensional array, and non empty
+        // $quiz[$questionId]['completed'] = true; // this line causes fatal error, old code
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
@@ -248,7 +274,18 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->accessible = $node->accessible;
             $progress->$nodeId->conditions = $node->conditions;
             $progress->$nodeId->unlocked = $node->unlocked;
+            //new code here
+            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            $nodeMetadata1 = get_metadata_by_mid('post', $nodeId);
 
+            ob_start();                    // start buffer capture
+            var_dump($nodeMetadata1);           // dump the values
+            $contents = ob_get_contents(); // put the buffer into a variable
+            ob_end_clean();                // end capture
+            error_log("node meta data1 is");
+            error_log($contents);
+
+            $progress->$nodeId->quizAnswers = [];
             if ($node->accessible) {
                 $progress->$nodeId->content = [
                     'quiz' => $node->quiz,
@@ -256,7 +293,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 ];
             }
 
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
+            // $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
 
@@ -270,10 +307,34 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
     {
         $quiz = [];
+        // if key does not exist,it will return a empty string, completed values is empty string
         $completed_values = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId, true);
+
+        ob_start();                    // start buffer capture
+        var_dump($nodeMetadata);           // dump the values
+        $contents = ob_get_contents(); // put the buffer into a variable
+        ob_end_clean();                // end capture
+        error_log("node meta data is");
+        error_log($contents);
+
+        // ob_start();                    // start buffer capture
+        // var_dump($completed_values);           // dump the values
+        // $contents = ob_get_contents(); // put the buffer into a variable
+        // ob_end_clean();                // end capture
+        // error_log("completed_values in _getQuizProgress");
+        // error_log($contents); 
+
+  
 
         $entries = $this->getUserEntries($userId);
 
+        /* ob_start();                    // start buffer capture
+        var_dump($entries);           // dump the values
+        $contents = ob_get_contents(); // put the buffer into a variable
+        ob_end_clean();                // end capture
+        error_log("entries in _getQuizProgress");
+        error_log($contents); */
+        // nodeMetadata->quiz is an empty array
         if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
             foreach ($nodeMetadata->quiz as $question) {
                 $quiz[$question->id] = [
@@ -294,7 +355,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                 }
             }
         }
-
+        // completed_values is a empty string
         if (isset($completed_values) && is_array($completed_values)) {
             foreach ($completed_values as $id => $info) {
                 $quiz[$id]['completed'] = $info['completed'];

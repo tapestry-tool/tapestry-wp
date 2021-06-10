@@ -220,18 +220,25 @@ export async function getTapestryExport({ dispatch }) {
   }
 }
 
+//{ answerType, answer, nodeId, questionId }
 export async function completeQuestion(
   { commit, dispatch },
-  { answerType, formId, nodeId, questionId }
+  { answerType, answer, nodeId, questionId }
 ) {
   try {
-    await client.completeQuestion(nodeId, questionId)
+    console.log("got here")
+    await client.completeQuestion(nodeId, questionId, answer)
     if (answerType !== "audioId") {
-      const entry = await client.getUserEntry(formId)
-      commit("updateEntry", { answerType, entry, nodeId, questionId })
+      // change here, no longer using formId, where to save answer to user meta?
+      // remove here
+      console.log("time to start implementing from here")
+      // old code
+      //const entry = await client.getUserEntry(formId)
+      //commit("updateEntry", { answerType, entry, nodeId, questionId })
     }
-    commit("completeQuestion", { nodeId, questionId })
+    commit("completeQuestion", { nodeId, questionId, answer })
   } catch (error) {
+    console.log(error)
     dispatch("addApiError", error)
   }
 }

@@ -216,9 +216,11 @@ class TapestryApi {
     return response
   }
 
-  async completeQuestion(nodeId, questionId) {
+  async completeQuestion(nodeId, questionId, answer) {
     const url = `/users/activity?post_id=${this.postId}&node_id=${nodeId}&question_id=${questionId}`
-    const response = await this.client.post(url)
+    console.log("valid url", url)
+    const response = await this.client.post(url, answer)
+    console.log("response here", response)
     return response
   }
 
