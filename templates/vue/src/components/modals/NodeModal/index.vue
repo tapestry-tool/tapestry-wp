@@ -920,7 +920,7 @@ export default {
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
-      if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+      if (this.kaltura_info === null && shouldFetch(this.node.typeData.mediaURL, this.node)) {
         const url = this.node.typeData.mediaURL
         const { data } = await getLinkMetadata(url)
 

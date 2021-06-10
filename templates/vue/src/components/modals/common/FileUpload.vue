@@ -126,7 +126,7 @@
     <b-alert v-else-if="!confirmedUploadToKaltura" show variant="success">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
-          File will now upload to Kaltura in the background! You can now publish the node and it will become available when the file is available.
+          File will now upload to Kaltura in the background! You can now publish the node and it will become available when the file is finish uploading.
         </b-col>
         <b-col cols="auto">
           <b-button size="sm" variant="secondary" @click="confirmUploadToKaltura">
