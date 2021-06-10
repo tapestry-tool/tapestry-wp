@@ -50,7 +50,7 @@
           :question="question"
           :multiLine="question.answerTypes.text.isMultiLine"
           :placeholder="question.answerTypes.text.placeholder"
-          :answer="answer"
+          :answer="answers"
           @submit="handleSubmit"
         ></text-question>
         <audio-recorder
@@ -62,10 +62,8 @@
           <p class="question-answer-text">I want to answer with...</p>
           <p>question is {{ question }}</p>
           <p>answer is {{ answers }}</p>
-          <p>
-            typeData is
-            {{ node.typeData["activity"].questions[0].answerTypes["text"] }}
-          </p>
+          <p>userAnswer is {{ userAnswers }}</p>
+          <p>state.userAnswers is {{ $store.state.userAnswers }}</p>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
@@ -129,7 +127,7 @@ export default {
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
     ...mapGetters(["getAnswers"]),
-    ...mapState(["progress"]),
+    ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
     },
@@ -166,12 +164,61 @@ export default {
       }
     },
     textFormCompleted() {
+      /* return !!(
+        this.userAnswers[this.node.id] &&
+        this.progress[this.node.id].activity &&
+        this.progress[this.node.id].activity[this.question.id] &&
+        this.progress[this.node.id].activity[this.question.id].answers &&
+        this.progress[this.node.id].activity[this.question.id].answers.text
+      ) */
       //return !!this.progress[this.node.id].activity[this.question.id].answers.text
-      return true
+      if (this.userAnswers.hasOwnProperty(this.node.id)) {
+        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+          if (
+            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+          ) {
+            if (
+              this.userAnswers[this.node.id].activity[
+                this.question.id
+              ].hasOwnProperty("answers")
+            ) {
+              if (
+                this.userAnswers[this.node.id].activity[
+                  this.question.id
+                ].answers.hasOwnProperty("text")
+              ) {
+                return true
+              }
+            }
+          }
+        }
+      }
+      return false
     },
     audioFormCompleted() {
       //return !!this.progress[this.node.id].activity[this.question.id].answers.audio
-      return true
+      if (this.userAnswers.hasOwnProperty(this.node.id)) {
+        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+          if (
+            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+          ) {
+            if (
+              this.userAnswers[this.node.id].activity[
+                this.question.id
+              ].hasOwnProperty("answers")
+            ) {
+              if (
+                this.userAnswers[this.node.id].activity[
+                  this.question.id
+                ].answers.hasOwnProperty("audio")
+              ) {
+                return true
+              }
+            }
+          }
+        }
+      }
+      return false
     },
   },
   created() {
@@ -233,19 +280,12 @@ export default {
           break
         }
       }
-      console.log("form data is", formData)
-      console.log("node id is", this.node.id)
-      console.log("question id is", this.question.id)
-      console.log("answer type is", this.formType)
-      console.log("submitted answer is", submittedAnswer)
-      console.log("submitted answer type is", typeof submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,
         answerType: this.formType,
         answer: submittedAnswer,
       })
-      console.log("back to here in question.vue")
       this.loading = false
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: this.formType,

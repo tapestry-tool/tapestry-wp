@@ -226,11 +226,9 @@ export async function completeQuestion(
   { answerType, answer, nodeId, questionId }
 ) {
   try {
-    console.log("got here")
     await client.completeQuestion(nodeId, questionId, answer, answerType)
     if (answerType !== "audioId") {
       // remove here
-      console.log("time to start implementing from here")
       // old code
       //const entry = await client.getUserEntry(formId)
       //commit("updateEntry", { answerType, entry, nodeId, questionId })

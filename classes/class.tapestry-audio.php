@@ -39,6 +39,7 @@ class TapestryAudio implements ITapestryAudio
             wp_mkdir_p($tapestry_upload_dir);
         }
         $tapestry_user_upload_dir = $tapestry_upload_dir.'/'.$this->userId;
+        $tapestry_user_upload_url = 'tapestry/'.$this->userId;
         if (!file_exists($tapestry_user_upload_dir)) {
             wp_mkdir_p($tapestry_user_upload_dir);
         }
@@ -48,7 +49,7 @@ class TapestryAudio implements ITapestryAudio
         $decodedAudio = base64_decode($audio);
 
         if (file_put_contents($tapestry_user_upload_dir.'/'.$filename, $decodedAudio)) {
-            return $filename;
+            return $tapestry_user_upload_url.'/'.$filename;
         } else {
             throw new TapestryError('FAILED_TO_SAVE_AUDIO');
         }

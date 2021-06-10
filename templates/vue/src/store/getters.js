@@ -111,9 +111,13 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
-    console.log("state.progress is", state.progress)
-    // check if everything like nodeId, activity, question id exists
-    return state.progress[nodeId].activity[questionId].answers
+    console.log("state.userAnswers is", state.userAnswers)
+    if (state.userAnswers[nodeId] === undefined) {
+      return {}
+    } else {
+      // check if everything like nodeId, activity, question id exists
+      return state.userAnswers[nodeId].activity[questionId].answers
+    }
   }
 }
 
