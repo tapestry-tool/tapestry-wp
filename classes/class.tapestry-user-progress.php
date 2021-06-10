@@ -87,10 +87,10 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function completeQuestion($questionId, $answerData)
+    public function completeQuestion($questionId, $answerData, $answerType)
     {
         $this->_checkPostId();
-        $this->_completeQuestion($questionId, $answerData);
+        $this->_completeQuestion($questionId, $answerData, $answerType);
     }
 
     /**
@@ -219,19 +219,30 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
     }
 
-    private function _completeQuestion($questionId, $answerData)
+    private function _completeQuestion($questionId, $answerData, $answerType)
     {
         // OLD CODE
         /* $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
         $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);*/ 
-
         // save it to user meta
         // call wordpress function update_user_meta to save the information from frontend to the user meta
         // check in database in phpmyadmin
         error_log("inside _complete question");
-        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $answerData);
-
-
+        error_log($answerData);
+        error_log($answerType);
+        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, true);
+        if ($userAnswer === "") {
+          error_log("success creating new user meta object");
+          //$newUserAnswer = new stdClass();
+          $newUserAnswer[$answerType] = $answerData;
+          error_log($newUserAnswer);
+          update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $newUserAnswer);
+        } else {
+          error_log("success using existing user meta object");
+          $userAnswer[$answerType] = $answerData;
+          error_log($userAnswer);
+          update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $userAnswer);
+        }
         //error_log(print_r($nodeMetadata, true));
         //error_log(print_r($quiz, true));
        /*  ob_start();                    // start buffer capture

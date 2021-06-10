@@ -33,10 +33,11 @@ interface ITapestryUserProgress
      *
      * @param int $questionId the question to mark
      * @param string $answerData the user answer
+     * @param string $answerType the user answer type
      *
      * @return null
      */
-    public function completeQuestion($questionId, $answerData);
+    public function completeQuestion($questionId, $answerData, $answerType);
 
     /**
      * Update User's h5p video setting for a tapestry post.
