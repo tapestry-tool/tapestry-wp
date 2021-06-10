@@ -163,9 +163,11 @@ class Tapestry implements ITapestry
             $userId = wp_get_current_user()->ID;
             $node->permissions->{'user-'.$userId} = ['read', 'add', 'edit'];
         }
+       
 
         $tapestryNode->set($node);
         $node = $tapestryNode->save($node);
+        
 
         array_push($this->nodes, $node->id);
 

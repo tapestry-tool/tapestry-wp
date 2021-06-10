@@ -90,7 +90,7 @@
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
-            :fill="buttonBackgroundColor"
+            :fill="uploadingKaltura ? 'red' : buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
@@ -112,7 +112,7 @@
               v-if="hasPermission('edit')"
               :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
-              :fill="buttonBackgroundColor"
+              :fill="uploadingKaltura ? 'red' : buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
             >
@@ -163,6 +163,7 @@ import ProgressBar from "./ProgressBar"
 import StatusBar from "./StatusBar"
 import NodeButton from "./NodeButton"
 import TinyColor from "tinycolor2"
+import kclient from "@/services/KalturaAPI"
 
 export default {
   name: "tapestry-node",
@@ -187,10 +188,11 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
+      uploadingKaltura: false
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes"]),
+    ...mapState(["selection", "settings", "visibleNodes","useKaltura"]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -358,6 +360,29 @@ export default {
     },
   },
   mounted() {
+
+    if( this.useKaltura &&
+       (this.node.kalturaUpload !== 'undefined' &&
+       this.node.kalturaUpload != '')){
+    this.uploadingKaltura = true
+    const inter = setInterval(async () => {
+      
+      const res = await kclient.getKalturaStatus(this.node.id)
+      console.log(res.data.status)
+        
+      if(res.data.status == ""){
+        clearInterval(inter)
+      }
+      else if(res.data.status == "finished")
+      {
+        this.uploadingKaltura = false
+        clearInterval(inter)
+        this.$emit('kaltura-finished',this.node)
+      }
+          
+    }, 10000);
+    }
+
     this.$emit("mounted")
     this.$refs.circle.setAttribute("r", this.radius)
     const nodeRef = this.$refs.node
@@ -419,7 +444,7 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates"]),
+    ...mapActions(["updateNodeCoordinates","updateNode"]),
     ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
@@ -436,8 +461,11 @@ export default {
       client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
-      this.$root.$emit("edit-node", id)
-      client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
+      if(!this.uploadingKaltura)
+      {
+        this.$root.$emit("edit-node", id)
+        client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
+      }
     },
     reviewNode() {
       this.$router.push({
@@ -467,7 +495,7 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (this.node.accessible || this.hasPermission("edit")) {
+      if (!this.uploadingKaltura && (this.node.accessible || this.hasPermission("edit"))) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)

@@ -15,7 +15,12 @@
     use Kaltura\Client\Type\UploadedFileTokenResource;
     use Kaltura\Client\Type\UploadToken;
 
+    use Spatie\Async\Pool;
+
     class KalturaApi {
+        
+        private $thread_pool;
+
 
         /**
          * Creates Kaltura Client and starts Kaltura Session.
@@ -24,6 +29,8 @@
          */
         function getKClient($type = SessionType::USER) 
         {
+            $this->thread_pool = POOL::create();
+
             $user = wp_get_current_user()->ID;
             $kconf = new Configuration(KALTURA_PARTNER_ID);
             $kconf->setServiceUrl(KALTURA_SERVICE_URL);
@@ -52,8 +59,9 @@
          */
         function uploadKalturaVideo($file, $categoryName)
         {
-            $filepath = $file['tmp_name'];
-            $filename = $file['name'];
+
+            $filepath = $file->tmp_name;
+            $filename = $file->name;
 
             $kclient = $this->getKClient();
 
@@ -89,11 +97,20 @@
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
 
-            $resume = false;
-            $finalChunk = true;
-            $resumeAt = -1;
-            $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
-
+            
+           $this->thread_pool[] = async(function() use ($kclient,$token,$filepath){
+                $resume = false;
+                $finalChunk = true;
+                $resumeAt = -1;
+                error_log("Starting to upload");
+                $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
+            })->then(function ($output)
+            {
+                error_log("finished upload");
+            });
+            error_log("Out of upload");           
+            
+    
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
@@ -107,10 +124,10 @@
 
             while ($status != FlavorAssetStatus::READY && $status != FlavorAssetStatus::ERROR) {
                 sleep(5);
-                $result = $kclient->media->get($entry->id);
-                $status = $result->status;
-            }
-
-            return $result;
+            $result = $kclient->media->get($entry->id);
+            $status = $result->status;
+        }
+        return $result;
+        
         }
     }

@@ -26,6 +26,7 @@
           @mouseover="handleMouseover(id)"
           @mouseleave="activeNode = null"
           @mounted="dragSelectEnabled ? updateSelectableNodes(node) : null"
+          @kaltura-finished="handleKalturaFinished"
         ></tapestry-node>
       </g>
       <locked-tooltip
@@ -39,7 +40,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapMutations, mapState } from "vuex"
+import { mapActions, mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -47,6 +48,7 @@ import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
+import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -118,10 +120,29 @@ export default {
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapActions(["updateNode"]),
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
+    async handleKalturaFinished(node){
 
+    const newNode = await client.getNode(node.id) 
+      
+     await this.$store.commit("updateNode",{
+          id: node.id,
+          newNode: newNode
+      })
+
+      const finishedNode = await client.getNode(node.id) 
+      finishedNode.kalturaUpload = ''
+     
+      this.updateNode({
+        id: node.id,
+        newNode: finishedNode
+      })
+
+
+    },
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
     },

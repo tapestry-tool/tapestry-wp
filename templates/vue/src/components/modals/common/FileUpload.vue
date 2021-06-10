@@ -110,14 +110,26 @@
     <b-alert v-if="error" show variant="danger">
       File upload failed: {{ error.message || error.data.message }}
     </b-alert>
-    <b-alert v-else-if="!confirmedUpload" show variant="success">
+    <b-alert v-else-if="!confirmedUploadToServer" show variant="success">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
           Upload completed successfully. Press the "Submit" button to save your
           changes.
         </b-col>
         <b-col cols="auto">
-          <b-button size="sm" variant="secondary" @click="confirmUpload">
+          <b-button size="sm" variant="secondary" @click="confirmUploadToServer">
+            OK
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-alert>
+    <b-alert v-else-if="!confirmedUploadToKaltura" show variant="success">
+      <b-row>
+        <b-col cols="auto" class="upload-label mr-auto text-muted">
+          File will now upload to Kaltura in the background! You can now publish the node and it will become available when the file is available.
+        </b-col>
+        <b-col cols="auto">
+          <b-button size="sm" variant="secondary" @click="confirmUploadToKaltura">
             OK
           </b-button>
         </b-col>
@@ -127,7 +139,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import axios from "axios"
 import { data as wpData } from "@/services/wp"
 import kclient from "@/services/KalturaAPI"
@@ -183,7 +195,8 @@ export default {
       uploadBarInterval: null,
       uploadSource: null,
       isUploading: false,
-      confirmedUpload: true,
+      confirmedUploadToServer: true,
+      confirmedUploadToKaltura:true,
       changeImage: false,
       imagePatternId: "",
       error: null,
@@ -199,7 +212,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["useKaltura"]),
+    ...mapState(["useKaltura","nodes"]),
   },
   methods: {
     handleFileUpload($event){
@@ -228,7 +241,7 @@ export default {
       formData.append("_wpnonce", wpData.file_upload_nonce)
 
       this.error = null
-      this.confirmedUpload = true
+      this.confirmedUploadToServer = true
 
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
@@ -274,7 +287,7 @@ export default {
         .finally(() => {
           if (this.isUploading) {
             this.isUploading = false
-            this.confirmedUpload = false
+            this.confirmedUploadToServer = false
             setTimeout(() => {this.$emit("isUploading", this.isUploading)}, 1200)
           }
           clearInterval(this.uploadBarInterval)
@@ -282,7 +295,7 @@ export default {
     },
     async uploadVideoFile(event) {
       this.error = null
-      this.confirmedUpload = true
+      this.confirmedUploadToKaltura = true
 
       let CancelToken = axios.CancelToken
       this.uploadSource = CancelToken.source()
@@ -303,32 +316,42 @@ export default {
         }, 1000)
       }
 
+
       kclient
         .uploadVideo(event, this.uploadSource.token, onUploadProgress)
         .then(response => {
-          setTimeout(() => {
-            if (response.status === 200) {
-              this.$emit("input", `${response.data.dataUrl}/flavorParamId/7`)
-              if (this.thumbnailType) {
-                const thumbnailSize = 420
-                this.$root.$emit("fileID", {
-                  thumbnailType: this.thumbnailType,
-                  data: response.data.id,
-                  thumbnailURL:
-                    response.data.thumbnailUrl +
-                    `/width/${thumbnailSize}/height/${thumbnailSize}/type/1`,
-                })
-              }
-            } else {
-              this.handleError(response.data)
-            }
-          }, 800)
-        })
+            this.$emit("kaltura-upload",response.data)
+          // kclient.uploadVideoToKaltura(response.data).then( response => {
+          //   console.log(response.data)
+          // // setTimeout(() => {
+          // //   if (response.status === 200) {
+          // //     this.$emit("input", `${response.data.dataUrl}/flavorParamId/7`)
+          // //     if (this.thumbnailType) {
+          // //       const thumbnailSize = 420
+          // //       this.$root.$emit("fileID", {
+          // //         thumbnailType: this.thumbnailType,
+          // //         data: response.data.id,
+          // //         thumbnailURL:
+          // //           response.data.thumbnailUrl +
+          // //           `/width/${thumbnailSize}/height/${thumbnailSize}/type/1`,
+          // //       })
+          // //     }
+          // //   } else {
+          // //     this.handleError(response.data)
+          // //   }
+          // // }, 800)
+          // }
+          // );
+
+          // this.$emit('input',"https://www.youtube.com/watch?v=MpGLUVbqoYQ&t=4476s");
+
+        }
+        )
         .catch(response => this.handleError(response))
         .finally(() => {
           if (this.isUploading) {
             this.isUploading = false
-            this.confirmedUpload = false
+            this.confirmedUploadToKaltura = false
             this.$emit("isUploading", this.isUploading)
           }
           clearInterval(this.uploadBarInterval)
@@ -340,11 +363,14 @@ export default {
       this.$emit("isUploading", false)
       if (this.uploadSource) {
         this.uploadSource.cancel()
-        this.confirmedUpload = true
+        this.confirmedUploadToServer = true
       }
     },
-    confirmUpload() {
-      this.confirmedUpload = true
+    confirmUploadToServer() {
+      this.confirmedUploadToServer = true
+    },
+    confirmUploadToKaltura(){
+      this.confirmedUploadToKaltura = true
     },
     removeImage(event) {
       event.preventDefault()

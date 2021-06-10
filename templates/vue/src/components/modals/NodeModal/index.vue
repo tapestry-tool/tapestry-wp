@@ -54,6 +54,7 @@
               @load="videoLoaded = true"
               @unload="videoLoaded = false"
               @type-changed="handleTypeChange"
+              @kaltura-upload="handleKalturaUpload"
             />
           </b-tab>
           <b-tab
@@ -267,6 +268,7 @@ import { sizes, nodeStatus } from "@/utils/constants"
 import { getLinkMetadata } from "@/services/LinkPreviewApi"
 import DragSelectModular from "@/utils/dragSelectModular"
 import * as wp from "@/services/wp"
+import kclient from "@/services/KalturaAPI"
 
 const shouldFetch = (url, selectedNode) => {
   if (!selectedNode.typeData.linkMetadata) {
@@ -306,6 +308,7 @@ export default {
       deleteWarningText: "",
       keepOpen: false,
       originalUrl: "",
+      kaltura_info: null,
     }
   },
   computed: {
@@ -316,7 +319,7 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError"]),
+    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError","useKaltura"]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -513,6 +516,9 @@ export default {
     setLoading(status) {
       this.loading = status
     },
+    handleKalturaUpload(data){
+      this.kaltura_info = data
+    },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId)
       if (!isNodeValid) {
@@ -622,7 +628,7 @@ export default {
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId)
+      const oldNode = this.getNode(this.nodeId) 
       if (
         (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
         (event.trigger == "backdrop" ||
@@ -703,7 +709,7 @@ export default {
           }
         }
 
-        if (this.shouldReloadDuration()) {
+        if (this.shouldReloadDuration() && this.kaltura_info === null) {
           this.loadDuration = true
         } else {
           return this.submitNode()
@@ -735,6 +741,10 @@ export default {
       this.handleSubmit()
     },
     async submitNode() {
+      if( this.useKaltura &&
+         this.kaltura_info !== null){
+        this.node.kalturaUpload = 'uploading'
+      }
       if (this.type === "add") {
         const id = await this.addNode(this.node)
         this.node.id = id
@@ -768,6 +778,11 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
+
+      if(this.useKaltura &&
+         this.kaltura_info !== null){
+        kclient.uploadVideoToKaltura(this.node.id,this.kaltura_info)
+      }
       if (!this.hasSubmissionError) {
         this.close()
       }
@@ -881,10 +896,11 @@ export default {
     },
     isValidVideo(typeData) {
       return (
-        typeData.mediaURL !== "" &&
+        this.kaltura_info !== null ||
+        (typeData.mediaURL !== "" &&
         (typeData.hasOwnProperty("youtubeID") ||
           typeData.mediaURL.endsWith(".mp4") ||
-          typeData.mediaURL.includes("playManifest"))
+          typeData.mediaURL.includes("playManifest")))
       )
     },
     validateQuiz(quiz) {

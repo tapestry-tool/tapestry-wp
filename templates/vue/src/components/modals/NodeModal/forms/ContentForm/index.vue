@@ -77,6 +77,7 @@
           :actionType="actionType"
           @load="$emit('load')"
           @unload="$emit('unload')"
+          @kaltura-upload="$emit('kaltura-upload',$event)"
         ></component>
       </b-card>
     </b-form-group>

@@ -47,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $license;
     private $references;
     private $mapCoordinates;
+    private $kalturaUpload;
 
     /**
      * Constructor.
@@ -99,6 +100,7 @@ class TapestryNode implements ITapestryNode
             'lat' => '',
             'lng' => '',
         ];
+        $this->kalturaUpload = '';
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -126,6 +128,9 @@ class TapestryNode implements ITapestryNode
      */
     public function set($node)
     {
+        if(isset($node->kalturaUpload) && is_string($node->kalturaUpload)) {
+            $this->kalturaUpload = $node->kalturaUpload;
+        }
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
         }
@@ -391,7 +396,14 @@ class TapestryNode implements ITapestryNode
 
         return $nodeMeta->author->id == $userId;
     }
-
+    public function getKalturaStatus()
+    {
+        $data = array(
+            "status" => $this->kalturaUpload,
+            "url" => $this->typeData
+        );
+        return $data;
+    }
     public function addReview($comments)
     {
         if (NodeStatus::PUBLISH === $this->status) {
@@ -587,6 +599,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
+            'kalturaUpload' => $this->kalturaUpload,
         ];
     }
 

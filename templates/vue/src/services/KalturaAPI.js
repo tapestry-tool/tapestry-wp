@@ -1,7 +1,7 @@
 import axios from "axios"
 import { data } from "./wp"
 
-const { apiUrl, nonce, postId } = data
+const { apiUrl, nonce, postId, nodeMetaId } = data
 
 class KalturaAPI {
   /**
@@ -16,6 +16,7 @@ class KalturaAPI {
       },
     })
     this.postId = postId
+    this.nodeMetaId = nodeMetaId
   }
 
   /**
@@ -51,9 +52,24 @@ class KalturaAPI {
       cancelToken: cancelToken,
       onUploadProgress: onUploadProgress,
     })
-
-    return response
+   return response
   }
+  
+  async uploadVideoToKaltura(nodeMetaId,data)
+  {
+    const url = `/tapestries/${this.postId}/kaltura/${nodeMetaId}`
+    const response = await this.kclient.post(url, data)
+    
+    return response;
+  }
+  async getKalturaStatus(nodeMetaId)
+  {
+    const url = `/tapestries/${this.postId}/kaltura/${nodeMetaId}`
+    const response = await this.kclient.get(url)
+    
+    return response;
+  }
+
 }
 
 export default new KalturaAPI(postId)

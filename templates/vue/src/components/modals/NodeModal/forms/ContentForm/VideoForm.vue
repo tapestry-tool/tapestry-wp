@@ -10,6 +10,7 @@
         required
         :isVideoUpload="true"
         @isUploading="handleUploadChange"
+        @kaltura-upload="$emit('kaltura-upload',$event)"
       />
     </b-form-group>
   </div>
