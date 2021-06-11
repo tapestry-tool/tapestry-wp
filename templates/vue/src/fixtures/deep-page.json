@@ -13,7 +13,8 @@
       "reviewStatus": "",
       "imageURL": "",
       "lockedImageURL": "",
-      "mediaType": "accordion",
+      "mediaType": "multi-content",
+      "presentationStyle": "page",
       "mediaFormat": "",
       "mediaDuration": 0,
       "description": "",
@@ -53,14 +54,11 @@
       "hideTitle": false,
       "hideProgress": false,
       "hideMedia": false,
-      "backgroundColor": "#8396a1",
-      "textColor": "white",
       "skippable": true,
       "quiz": [],
-      "fullscreen": false,
+      "fullscreen": true,
       "conditions": [],
       "childOrdering": [
-        2670,
         2670
       ],
       "fitWindow": true,
@@ -113,8 +111,6 @@
       "hideTitle": false,
       "hideProgress": false,
       "hideMedia": false,
-      "backgroundColor": "#8396a1",
-      "textColor": "white",
       "skippable": true,
       "fullscreen": false,
       "coordinates": {
@@ -124,7 +120,6 @@
         "fy": 2160.3608071648423
       },
       "childOrdering": [
-        2672,
         2672
       ],
       "quiz": [],
@@ -180,8 +175,6 @@
       "hideTitle": false,
       "hideProgress": false,
       "hideMedia": false,
-      "backgroundColor": "#8396a1",
-      "textColor": "white",
       "skippable": true,
       "fullscreen": false,
       "coordinates": {

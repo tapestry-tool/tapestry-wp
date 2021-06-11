@@ -21,7 +21,12 @@
       @mouseover="handleMouseover"
       @mouseleave="handleMouseleave"
     >
-      <circle ref="circle" :fill="fill"></circle>
+      <circle
+        ref="circle"
+        :data-qa="`node-circle-${node.id}`"
+        :fill="fill"
+        :stroke="progressBackgroundColor"
+      ></circle>
       <transition name="fade">
         <circle
           v-show="(!node.hideTitle && !isHovered) || !node.accessible || selected"
@@ -40,6 +45,7 @@
         :x="node.coordinates.x"
         :y="node.coordinates.y"
         :radius="radius"
+        :background-color="progressBackgroundColor"
         :data-qa="`node-progress-${node.id}`"
         :progress="progress"
         :locked="!node.accessible"
@@ -71,7 +77,7 @@
             :x="-(140 * 5) / 6"
             :y="-(140 * 5) / 6"
           >
-            <div class="meta">
+            <div class="meta" :style="{ color: node.textColor }">
               <p class="title">{{ node.title }}</p>
               <p v-if="node.mediaDuration" class="timecode">
                 {{ formatDuration() }}
@@ -84,6 +90,7 @@
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
+            :fill="buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
@@ -93,17 +100,19 @@
           <template v-if="isLoggedIn">
             <add-child-button
               v-if="
-                !isSubAccordionRow &&
-                  (hasPermission('add') || this.settings.draftNodesEnabled)
+                (node.mediaType === 'multi-content' || !hasTooManyLevels) &&
+                  (hasPermission('add') || settings.draftNodesEnabled)
               "
               :node="node"
+              :fill="buttonBackgroundColor"
               :x="canReview || hasPermission('edit') ? -35 : 0"
               :y="radius"
             ></add-child-button>
             <node-button
               v-if="hasPermission('edit')"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
+              :fill="buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
             >
@@ -111,8 +120,9 @@
             </node-button>
             <node-button
               v-else-if="canReview"
-              :x="isSubAccordionRow ? 0 : 35"
+              :x="hasTooManyLevels ? 0 : 35"
               :y="radius"
+              :fill="buttonBackgroundColor"
               :data-qa="`review-node-${node.id}`"
               @click="reviewNode"
             >
@@ -152,6 +162,7 @@ import AddChildButton from "./AddChildButton"
 import ProgressBar from "./ProgressBar"
 import StatusBar from "./StatusBar"
 import NodeButton from "./NodeButton"
+import TinyColor from "tinycolor2"
 
 export default {
   name: "tapestry-node",
@@ -180,13 +191,7 @@ export default {
   },
   computed: {
     ...mapState(["selection", "settings", "visibleNodes"]),
-    ...mapGetters([
-      "getNode",
-      "getDirectChildren",
-      "isVisible",
-      "getParent",
-      "isAccordionRow",
-    ]),
+    ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
         return false
@@ -202,10 +207,16 @@ export default {
     isLoggedIn() {
       return wp.isLoggedIn()
     },
-    isSubAccordionRow() {
+    hasTooManyLevels() {
       const parent = this.getParent(this.node.id)
-      if (parent) {
-        return this.isAccordionRow(parent)
+      const grandparent = this.getParent(parent)
+      if (parent && grandparent) {
+        const parentNode = this.getNode(parent)
+        const gpNode = this.getNode(grandparent)
+        return (
+          parentNode.mediaType !== "multi-content" &&
+          gpNode.mediaType === "multi-content"
+        )
       }
       return false
     },
@@ -255,15 +266,13 @@ export default {
       if (this.node.nodeType !== "grandchild") {
         if (showImages && this.thumbnailURL) {
           return `url(#node-image-${this.node.id})`
-        } else if (!this.node.accessible) {
-          return "#8a8a8c"
         } else {
-          return "#8396a1"
+          return this.node.backgroundColor
         }
       } else if (this.selected) {
         return "#11a6d8"
       } else {
-        return "#8396a1"
+        return TinyColor(this.node.backgroundColor)
       }
     },
     overlayFill() {
@@ -273,6 +282,39 @@ export default {
         return "#8a8a8cb3"
       }
       return this.thumbnailURL ? "#33333366" : "transparent"
+    },
+    // NOTE: This function is currently not used, but we may want to use it in the future for accessibility
+    /*
+    textColorReadable() {
+      let color = this.node.textColor
+      let tries = 0
+      while (!TinyColor.isReadable(this.node.backgroundColor, color, {level:"AA",size:"large"}) && tries++ < 2) {
+        if (TinyColor(this.node.backgroundColor).isDark()) {
+          color = TinyColor(color).lighten().toString()
+        }
+        else {
+          color = TinyColor(color).darken().toString()
+        }
+      }
+      return color
+    },
+    */
+    progressBackgroundColor() {
+      let color = TinyColor(this.node.backgroundColor)
+        .darken()
+        .toString()
+      while (!TinyColor(color).isDark()) {
+        color = TinyColor(color)
+          .darken()
+          .toString()
+      }
+      return color
+    },
+    buttonBackgroundColor() {
+      return TinyColor(this.progressBackgroundColor)
+        .darken()
+        .desaturate()
+        .toString()
     },
     thumbnailURL() {
       return !this.node.accessible && this.node.lockedImageURL
@@ -289,6 +331,8 @@ export default {
       const rows = this.getDirectChildren(this.node.id)
         .map(this.getNode)
         .filter(n => n.status !== "draft")
+
+      if (rows.length === 0) return 0
       return rows.filter(row => row.completed).length / rows.length
     },
     highlightNode() {
@@ -376,15 +420,15 @@ export default {
   },
   methods: {
     ...mapActions(["updateNodeCoordinates"]),
-    ...mapMutations(["select", "unselect", "updateSelectedNode"]),
+    ...mapMutations(["select", "unselect"]),
     updateRootNode() {
       if (!this.root) {
         this.$router.push({
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
+          path: `/nodes/${this.node.id}`
         })
-        this.updateSelectedNode(this.node.id)
       }
     },
     openNode(id) {
@@ -512,8 +556,19 @@ export default {
 }
 
 .meta {
+  color: white;
+  min-height: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  font-size: 30px;
   .title {
-    text-shadow: 0 0 5px #000;
+    padding-left: 0;
+    margin-top: 12px;
+    margin-bottom: 0;
     font-weight: bold;
   }
 }
