@@ -288,6 +288,7 @@ export default {
       })
       this.loading = false
       this.answers = this.getAnswers(this.node.id, this.question.id)
+      this.question.completed = true
       console.log("after sumitting", this.answers)
       console.log("after sumitting, state.userAnswers", this.userAnswers)
       // if (!this.answers.hasOwnProperty(this.question.id)) {
