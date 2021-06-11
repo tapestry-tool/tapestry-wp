@@ -124,6 +124,11 @@ export default {
       answers: {},
     }
   },
+  watch: {
+    question() {
+      this.answers = this.getAnswers(this.node.id, this.question.id)
+    },
+  },
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
     ...mapGetters(["getAnswers"]),
@@ -159,9 +164,7 @@ export default {
       if (this.formOpened && this.answers[this.formType] !== undefined) {
         return this.answers[this.formType]
       }
-      return {
-        text: "",
-      }
+      return ""
     },
     textFormCompleted() {
       /* return !!(
@@ -222,9 +225,8 @@ export default {
     },
   },
   created() {
-    console.log("created function")
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    console.log("answers are", this.answers)
+    console.log("in created function, answers are", this.answers)
     if (this.enabledAnswerTypes.length === 1) {
       this.formType = Object.keys(this.enabledAnswerTypes).pop()
       this.formOpened = true
@@ -287,9 +289,9 @@ export default {
         answer: submittedAnswer,
       })
       this.loading = false
-      this.answers = this.getAnswers(this.node.id, this.question.id)
-      console.log("after sumitting", this.answers)
-      console.log("after sumitting, state.userAnswers", this.userAnswers)
+      //this.answers = this.getAnswers(this.node.id, this.question.id)
+      //console.log("after sumitting", this.answers)
+      //console.log("after sumitting, state.userAnswers", this.userAnswers)
       // if (!this.answers.hasOwnProperty(this.question.id)) {
       //   this.answers[this.question.id] = {}
       // }

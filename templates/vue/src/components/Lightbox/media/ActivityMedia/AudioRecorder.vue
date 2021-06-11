@@ -8,6 +8,7 @@
   <div v-else class="recorder">
     <p>question is {{ question }}</p>
     <p>id is {{ id }}</p>
+    <!-- src should be the url -->
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
     <button
       v-else
@@ -97,6 +98,7 @@ export default {
       return `${hours}:${minutes}:${sec}`
     },
     hasPrevious() {
+      //TODO
       return (
         this.question.entries &&
         this.question.entries.audioId &&
@@ -115,6 +117,7 @@ export default {
     },
   },
   created() {
+    //TODO
     if (this.hasPrevious) {
       this.state = this.states.DONE
       this.audio =

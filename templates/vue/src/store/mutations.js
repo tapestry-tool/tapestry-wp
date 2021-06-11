@@ -120,11 +120,11 @@ export function deleteLink(state, { source, target }) {
 export function completeQuestion(state, { nodeId, questionId, answer, answerType }) {
   // OLD CODE
   const node = getters.getNode(state)(nodeId)
-  console.log("node is", node)
+  //console.log("node is", node)
   const question = node.typeData.activity.questions.find(
     question => question.id === questionId
   )
-  console.log("question is", question)
+  //console.log("question is", question)
   question.completed = true
   //fixed
   //console.log("node id is", nodeId)
