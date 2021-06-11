@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="!kalturaLoading" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -29,6 +29,7 @@ export default {
     return {
       loading: true,
       viewBox: "2200 2700 1600 1100",
+      kalturaLoading: true,
     }
   },
   computed: {
@@ -49,9 +50,9 @@ export default {
     },
   },
   mounted() {
-    
     client.kalturaExists().then(response => {
       this.updateKalturaUse(response.data)
+      this.kalturaLoading = false
     })
 
     this.$root.$on("open-node", id => {

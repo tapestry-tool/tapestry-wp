@@ -321,30 +321,6 @@ export default {
         .uploadVideo(event, this.uploadSource.token, onUploadProgress)
         .then(response => {
             this.$emit("kaltura-upload",response.data)
-          // kclient.uploadVideoToKaltura(response.data).then( response => {
-          //   console.log(response.data)
-          // // setTimeout(() => {
-          // //   if (response.status === 200) {
-          // //     this.$emit("input", `${response.data.dataUrl}/flavorParamId/7`)
-          // //     if (this.thumbnailType) {
-          // //       const thumbnailSize = 420
-          // //       this.$root.$emit("fileID", {
-          // //         thumbnailType: this.thumbnailType,
-          // //         data: response.data.id,
-          // //         thumbnailURL:
-          // //           response.data.thumbnailUrl +
-          // //           `/width/${thumbnailSize}/height/${thumbnailSize}/type/1`,
-          // //       })
-          // //     }
-          // //   } else {
-          // //     this.handleError(response.data)
-          // //   }
-          // // }, 800)
-          // }
-          // );
-
-          // this.$emit('input',"https://www.youtube.com/watch?v=MpGLUVbqoYQ&t=4476s");
-
         }
         )
         .catch(response => this.handleError(response))

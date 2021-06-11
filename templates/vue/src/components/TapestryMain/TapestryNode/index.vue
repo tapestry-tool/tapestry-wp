@@ -360,15 +360,13 @@ export default {
     },
   },
   mounted() {
-
     if( this.useKaltura &&
        (this.node.kalturaUpload !== 'undefined' &&
        this.node.kalturaUpload != '')){
-    this.uploadingKaltura = true
-    const inter = setInterval(async () => {
+      this.uploadingKaltura = true
+      const inter = setInterval(async () => {
       
       const res = await kclient.getKalturaStatus(this.node.id)
-      console.log(res.data.status)
         
       if(res.data.status == ""){
         clearInterval(inter)
