@@ -21,7 +21,6 @@ export default {
     TapestryIcon,
   },
   computed: {
- //   ...mapState(["settings", "nodes", "rootId"]),
     helpModalOpen: {
         get() {
             return this.$route.name === names.HELP
@@ -37,7 +36,6 @@ export default {
   },
   methods: {
     open() {
-        console.log("button working!");
         this.helpModalOpen = true;
         client.recordAnalyticsEvent("user", "open", "help")
 
