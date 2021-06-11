@@ -60,10 +60,10 @@
         />
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
-          <p>question is {{ question }}</p>
-          <p>answer is {{ answers }}</p>
-          <p>userAnswer is {{ userAnswers }}</p>
-          <p>state.userAnswers is {{ $store.state.userAnswers }}</p>
+          <small>question is {{ question }}</small>
+          <small>answers data is {{ answers }}</small>
+          <small>userAnswer is {{ userAnswers }}</small>
+          <!-- <p>state.userAnswers is {{ $store.state.userAnswers }}</p> -->
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
@@ -287,6 +287,17 @@ export default {
         answer: submittedAnswer,
       })
       this.loading = false
+      this.answers = this.getAnswers(this.node.id, this.question.id)
+      console.log("after sumitting", this.answers)
+      console.log("after sumitting, state.userAnswers", this.userAnswers)
+      // if (!this.answers.hasOwnProperty(this.question.id)) {
+      //   this.answers[this.question.id] = {}
+      // }
+      // if (!this.answers[this.question.id].hasOwnProperty("answers")) {
+      //   this.answers[this.question.id].answers = {}
+      // }
+      // this.answers[this.question.id].answers[this.formType] = submittedAnswer
+      // console.log("current answers are", this.answers)
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: this.formType,
       })

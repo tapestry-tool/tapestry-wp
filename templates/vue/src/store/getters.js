@@ -111,12 +111,18 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
-    console.log("state.userAnswers is", state.userAnswers)
-    if (state.userAnswers[nodeId] === undefined) {
-      return {}
-    } else {
-      // check if everything like nodeId, activity, question id exists
-      return state.userAnswers[nodeId].activity[questionId].answers
+    //console.log("state.userAnswers is", state.userAnswers)
+    console.log("does it come here after submitting?")
+    console.log("inside get Answer, user answer is", state.userAnswers)
+    if (state.userAnswers.hasOwnProperty(nodeId)) {
+      if (state.userAnswers[nodeId].hasOwnProperty("activity")) {
+        if (state.userAnswers[nodeId].activity.hasOwnProperty(questionId)) {
+          return state.userAnswers[nodeId].activity[questionId].answers
+        }
+      }
+    }
+    return {
+      text: "",
     }
   }
 }

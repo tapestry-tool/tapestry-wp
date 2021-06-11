@@ -289,14 +289,6 @@ class TapestryUserProgress implements ITapestryUserProgress
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $nodeMetadata1 = get_metadata_by_mid('post', $nodeId);
 
-            ob_start();                    // start buffer capture
-            var_dump($nodeMetadata1);           // dump the values
-            $contents = ob_get_contents(); // put the buffer into a variable
-            ob_end_clean();                // end capture
-            error_log("node meta data1 is");
-            error_log($contents);
-
-            $progress->$nodeId->quizAnswers = [];
             if ($node->accessible) {
                 $progress->$nodeId->content = [
                     'quiz' => $node->quiz,
@@ -304,6 +296,44 @@ class TapestryUserProgress implements ITapestryUserProgress
                 ];
             }
 
+            $isQuestionNode = property_exists($node->typeData, 'activity');
+            if($isQuestionNode) {
+            $questionIdArray = [];
+            // node->typedata->activity is object stdclass
+            $questionListLength = count($node->typeData->activity->questions);
+            for($x = 0; $x < $questionListLength; $x++) {
+               $questionId = $node->typeData->activity->questions[$x]->id;
+               array_push($questionIdArray, $questionId);
+            }
+
+            ob_start();                    // start buffer capture
+            var_dump($questionIdArray);           // dump the values
+            $contents = ob_get_contents(); // put the buffer into a variable
+            ob_end_clean();                // end capture
+            error_log("question id array are");
+            error_log($contents);
+
+            //$userActivityAnswer = new stdClass();
+            //array_push($progress->$nodeId->content, $userActivityAnswer);
+            $progress->$nodeId->content[userActivityAnswer] = new stdClass();
+            for ($i = 0; $i < $questionListLength; $i++) {
+               error_log("got here in questionListLength");
+               error_log($questionIdArray[$i]);
+               $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId.'_question_'.$questionIdArray[$i], true);
+               ob_start();                    // start buffer capture
+               var_dump($answer);           // dump the values
+               $contents = ob_get_contents(); // put the buffer into a variable
+               ob_end_clean();                // end capture
+               error_log("current answer is");
+               error_log($contents);
+               //$progress->$nodeId->content[userActivityAnswer] = new stdClass();
+               $progress->$nodeId->content['userActivityAnswer']->{$questionIdArray[$i]} = $answer;
+
+            }
+
+            }
+
+            //$progress->$nodeId->content->userQuestionAnswers
             // $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
@@ -318,15 +348,9 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
     {
         $quiz = [];
+        // OLD CODE
         // if key does not exist,it will return a empty string, completed values is empty string
         $completed_values = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId, true);
-
-        ob_start();                    // start buffer capture
-        var_dump($nodeMetadata);           // dump the values
-        $contents = ob_get_contents(); // put the buffer into a variable
-        ob_end_clean();                // end capture
-        error_log("node meta data is");
-        error_log($contents);
 
         // ob_start();                    // start buffer capture
         // var_dump($completed_values);           // dump the values

@@ -243,11 +243,6 @@ export async function completeQuestion(
 export async function saveAudio({ dispatch }, { audio, nodeId, questionId }) {
   try {
     const response = await client.saveAudio(audio, nodeId, questionId)
-    console.log("failure here instead?")
-    console.log("audio parameter is", audio)
-    console.log("node id parameter is", nodeId)
-    console.log("question id parameter is", questionId)
-    console.log("response in action saveAudio is", response)
     return response
     // OLD CODE
     // commit("updateEntry", {
