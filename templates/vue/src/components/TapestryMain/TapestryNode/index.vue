@@ -361,7 +361,7 @@ export default {
   },
   mounted() {
     if( this.useKaltura &&
-       (this.node.kalturaUpload !== 'undefined' &&
+       (typeof this.node.kalturaUpload !== 'undefined' &&
        this.node.kalturaUpload != '')){
       this.uploadingKaltura = true
       const inter = setInterval(async () => {
@@ -379,6 +379,8 @@ export default {
       }
           
     }, 10000);
+    } else {
+      this.uploadingKaltura = false
     }
 
     this.$emit("mounted")
