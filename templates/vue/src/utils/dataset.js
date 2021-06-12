@@ -116,15 +116,23 @@ function setDatasetProgress(dataset, progress) {
   if (!wp.isLoggedIn()) {
     localStorage.setItem("tapestry-progress", JSON.stringify(progress))
   }
+  console.log("dataset is", dataset)
+  console.log("progress is", progress)
+  dataset.userAnswers = {}
   for (const [id, nodeProgress] of Object.entries(progress)) {
     const node = dataset.nodes[id]
+    //dataset.userAnswers = { activity: {} }
     if (node) {
       const willLock = node.unlocked && !nodeProgress.unlocked
       if (willLock && !wp.canEditTapestry()) {
+        // node.quiz becomes node.userAnswers.activity[QuestionId]
+        // node.userAnswers = { }
+        // { activity: [QuestionID: answer{}, QuestionId: answer{} ]}
+        // node.userAnswers.
+        // this part is initializing node.userAnswers and creating the right structure like the one above
         node.quiz = []
         node.typeData = {}
       }
-
       node.unlocked = nodeProgress.unlocked
       node.accessible = nodeProgress.accessible
       node.conditions = nodeProgress.conditions
@@ -132,6 +140,15 @@ function setDatasetProgress(dataset, progress) {
 
       const { content } = nodeProgress
       if (content) {
+        // set the fields in content to node.userAnswers.activity here
+        if (content.userAnswers) {
+          console.log("content.userAnswers is", content.userAnswers)
+          // for (const [questionId, answer] of Object.entries(content.userAnswer)) {
+          //   dataset.userAnswers[node.id] ={}
+          //   dataset.userAnswers[node.id].activity[questionId].answers = answer
+          // }
+          dataset.userAnswers[node.id] = { activity: content.userAnswers }
+        }
         node.quiz = content.quiz
         node.typeData = content.typeData
       }

@@ -124,11 +124,6 @@ export default {
       answers: {},
     }
   },
-  watch: {
-    question() {
-      this.answers = this.getAnswers(this.node.id, this.question.id)
-    },
-  },
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
     ...mapGetters(["getAnswers"]),
@@ -224,9 +219,14 @@ export default {
       return false
     },
   },
+  watch: {
+    question() {
+      this.answers = this.getAnswers(this.node.id, this.question.id)
+    },
+  },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    console.log("in created function, answers are", this.answers)
+    //console.log("in created function, answers are", this.answers)
     if (this.enabledAnswerTypes.length === 1) {
       this.formType = Object.keys(this.enabledAnswerTypes).pop()
       this.formOpened = true

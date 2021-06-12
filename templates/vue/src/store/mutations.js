@@ -4,7 +4,12 @@ import { parse } from "@/utils/dataset"
 //import Helpers from "@/utils/Helpers"
 
 export function init(state, { dataset, progress = {} }) {
+  //console.log("inside init")
+  //console.log("dataset is ", dataset)
+  //console.log("progress is ", progress)
   const datasetWithProgress = parse(dataset, progress)
+  console.log("dataset with progress is ", datasetWithProgress)
+  //console.log("state is ", state)
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
