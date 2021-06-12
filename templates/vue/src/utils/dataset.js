@@ -142,12 +142,12 @@ function setDatasetProgress(dataset, progress) {
       if (content) {
         // set the fields in content to node.userAnswers.activity here
         if (content.userAnswers) {
-          console.log("content.userAnswers is", content.userAnswers)
+          console.log("content.userAnswers is", content.userAnswers.activity)
           // for (const [questionId, answer] of Object.entries(content.userAnswer)) {
           //   dataset.userAnswers[node.id] ={}
           //   dataset.userAnswers[node.id].activity[questionId].answers = answer
           // }
-          dataset.userAnswers[node.id] = { activity: content.userAnswers }
+          dataset.userAnswers[node.id] = { activity: content.userAnswers.activity }
         }
         node.quiz = content.quiz
         node.typeData = content.typeData

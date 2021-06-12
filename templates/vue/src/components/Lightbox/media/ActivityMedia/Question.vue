@@ -226,7 +226,6 @@ export default {
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    //console.log("in created function, answers are", this.answers)
     if (this.enabledAnswerTypes.length === 1) {
       this.formType = Object.keys(this.enabledAnswerTypes).pop()
       this.formOpened = true

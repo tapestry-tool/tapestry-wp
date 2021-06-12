@@ -149,8 +149,20 @@ export function completeQuestion(state, { nodeId, questionId, answer, answerType
     state.userAnswers[nodeId].activity[questionId] = {}
     state.userAnswers[nodeId].activity[questionId].answers = {}
   }
+  if (typeof state.userAnswers[nodeId].activity[questionId].answers === "string") {
+    state.userAnswers[nodeId].activity[questionId].answers = {}
+  }
   //state.progress[nodeId].activity[questionId].answers[answerType] = answer
+  console.log("got here before, state.userAnswers is", state.userAnswers)
+  console.log("inside mutation answer is", answer)
+  console.log("inside mutation type of answer is", typeof answer)
+  console.log("inside mutation answerType is", answerType)
+  console.log("inside mutation type of answerType is", typeof answerType)
   state.userAnswers[nodeId].activity[questionId].answers[answerType] = answer
+  console.log(
+    "got here after",
+    state.userAnswers[nodeId].activity[questionId].answers
+  )
 }
 
 export function updateEntry(state, { answerType, entry, nodeId, questionId }) {

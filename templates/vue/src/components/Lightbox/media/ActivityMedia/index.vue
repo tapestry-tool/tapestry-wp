@@ -34,7 +34,7 @@
 import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   name: "activity-media",
@@ -64,6 +64,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getAnswers"]),
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
     },
@@ -90,8 +91,28 @@ export default {
     })
     this.$emit("load")
   },
+  created() {
+    this.markQuestionsComplete()
+  },
   methods: {
     ...mapActions(["updateNodeProgress"]),
+    markQuestionsComplete() {
+      for (let i = 0; i < this.questions.length; i++) {
+        const currentQuestion = this.questions[i]
+        const currentQuestionAnswer = this.getAnswers(
+          this.node.id,
+          currentQuestion.id
+        )
+        if (
+          currentQuestionAnswer.text !== "" ||
+          (currentQuestionAnswer.hasOwnProperty("audio") &&
+            currentQuestionAnswer.audio.url !== "")
+        ) {
+          currentQuestion.completed = true
+        }
+        console.log("marking complete, current question status is", currentQuestion)
+      }
+    },
     handleSubmit() {
       this.showCompletionScreen = true
       const numberCompleted = this.questions.filter(question => question.completed)

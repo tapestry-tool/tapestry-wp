@@ -1,6 +1,6 @@
 <template>
   <b-form @submit="handleTextSubmit">
-    <p>answerte is {{ answer }}</p>
+    <p>answer is {{ answer }}</p>
     <p>text is {{ text }}</p>
     <p>multiLine is {{ multiLine }}</p>
     <p>this question is {{ question }}</p>
@@ -51,6 +51,9 @@ export default {
     text(newText) {
       this.answer.text = newText
       this.text = newText
+    },
+    question() {
+      this.text = this.answer.text
     },
   },
   methods: {
