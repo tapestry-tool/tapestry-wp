@@ -1,15 +1,15 @@
 <template>
   <cos-modal show @change="$emit('later')">
     <b-container class="confirm">
-      <b-row align-h="center">
+      <b-row align-h="center" class="py-2">
         <h2 class="ob-title">Great job! Here are all your communities.</h2>
       </b-row>
-      <b-row align-h="center">
+      <b-row align-h="center" class="py-2">
         <h4 class="ob-secondary">Would you like to add another community?</h4>
       </b-row>
       <b-row>
         <b-container>
-          <b-row class="controls">
+          <b-row class="controls py-2">
             <b-col>
               <b-button
                 pill
@@ -46,9 +46,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.row {
-  padding: 5px 0;
-}
-</style>

@@ -1,7 +1,7 @@
 <template>
   <cos-modal show>
-    <b-container class="modal-cont">
-      <b-row align-h="center">
+    <b-container class="modal-container">
+      <b-row align-h="center" class="py-2">
         <b-col
           v-for="connection in threeConnections()"
           :key="connection.id"
@@ -12,26 +12,27 @@
           <h1>{{ connection.avatar }}</h1>
         </b-col>
       </b-row>
-      <b-row align-h="center">
-        <h3>
+      <b-row align-h="center" class="py-2">
+        <h3 style="max-width:150px;">
           Great job! Here are some of
-          <br />
           your connections.
         </h3>
       </b-row>
-      <b-row align-h="center">
+      <b-row align-h="center" class="py-2">
         <h5 class="ob-secondary">
           You'll be able to edit and add more at any time.
         </h5>
       </b-row>
-      <b-row align-h="center">
-        <b-col v-show="visibleConnections.length >= 4" class="ob-connection-box">
+      <b-row align-h="center" class="py-2">
+        <b-col v-if="visibleConnections.length >= 4" class="ob-connection-box">
           <p class="ob-connection">
-            {{ (visibleConnections[3] && visibleConnections[3].name) || "" }}
+            {{  visibleConnections[3].name}}
           </p>
           <h1>
-            {{ (visibleConnections[3] && visibleConnections[3].avatar) || "" }}
+            {{ visibleConnections[3].avatar }}
           </h1>
+        </b-col>
+        <b-col v-else class="ob-connection-box">
         </b-col>
         <b-col align-self="center">
           <b-button
@@ -83,16 +84,9 @@ export default {
 </script>
 
 <style scoped>
-.modal-cont {
+.modal-container {
   width: 50vw;
   min-width: 300px;
   max-width: 750px;
-}
-
-.row {
-  padding: 10px 0;
-}
-
-p {
 }
 </style>

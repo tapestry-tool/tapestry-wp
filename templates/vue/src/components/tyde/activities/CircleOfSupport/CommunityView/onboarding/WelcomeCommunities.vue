@@ -32,6 +32,7 @@
         <b-container>
           <b-row>
             <b-col v-for="community in communities" :key="community.name">
+              <label :id="community.name">
               <input
                 v-model="communitiesToAdd"
                 type="checkbox"
@@ -39,6 +40,7 @@
               />
               <h3>{{ community.name }}</h3>
               <h1>{{ community.icon }}</h1>
+              </label>
             </b-col>
           </b-row>
         </b-container>
@@ -95,6 +97,10 @@ export default {
 * {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
+.btn:disabled {
+  opacity: 0.15;
+}
+
 button {
   letter-spacing: 1px;
   padding: 1px 25px;

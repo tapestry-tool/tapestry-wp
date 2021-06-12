@@ -7,6 +7,7 @@
       @edit-community="editCommunity"
     />
     <connections-tab
+      :disabled="isState('Communities.AddAnotherTooltip')"
       ref="connections"
       class="tab"
       :connections="connections"
@@ -46,7 +47,7 @@
       :connections="connections"
       @ob-finish="send(OnboardingEvents.Done)"
     />
-    <tooltip v-if="isState('Communities.AddLaterTooltip')" position="right">
+    <tooltip v-if="isState('Communities.AddLaterTooltip')" class="right">
       <h3>
         Remember - you can click this button whenever you'd like to add another
         community!
@@ -55,7 +56,7 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <tooltip v-if="isState('Communities.AddAnotherTooltip')" position="right">
+    <tooltip v-if="isState('Communities.AddAnotherTooltip')" class="right">
       <h3>
         Click here to add another community!
       </h3>
@@ -63,10 +64,9 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <tooltip v-if="isState('Connections.AddAnotherTooltip')" position="left">
-      <h3>
+    <tooltip v-if="isState('Connections.AddAnotherTooltip')" class="left">
+      <h3 style="max-width:300px;">
         Click here to add some
-        <br />
         of your connections!
       </h3>
       <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">
@@ -158,8 +158,11 @@ export default {
     this.initializeOnboarding()
   },
   methods: {
+
     send(event) {
+      
       this.onboarding.service.send(event)
+      console.log(this.onboarding.current)
     },
     isState(state) {
       return this.onboarding.current.matches(state)

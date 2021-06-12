@@ -32,31 +32,21 @@ export default {
   mounted() {
     // const container = document.getElementById("cos")
     // const target = container.querySelector(`#${this.refId}`)
-    const tooltip = this.$refs.tooltip
-
-    // Temporary fix of positioning
-    if (this.position === "right") {
-      tooltip.style.right = "22px"
-      tooltip.style.bottom = "95px"
-      tooltip.classList.add("tooltip-container-right")
-    } else if (this.position === "left") {
-      tooltip.style.left = "22px"
-      tooltip.style.bottom = "95px"
-      tooltip.classList.add("tooltip-container-left")
-    }
-
-    // const { x, y } = Helpers.positionTooltip(target, tooltip, container, {
-    //   dryRun: true,
-    // })
-    // tooltip.style.transform = `translate(${x}px, ${y -
-    //   tooltip.clientHeight -
-    //   target.clientHeight}px)`
     this.positioned = true
   },
 }
 </script>
 
 <style scoped lang="scss">
+.right{
+  right: 22px;
+  bottom: 95px;
+}
+
+.left {
+  left:22px;
+  bottom: 95px;
+}
 .tooltip-container {
   position: absolute;
   padding: 2rem;
@@ -90,13 +80,13 @@ export default {
   bottom: -24px;
 }
 
-.tooltip-container-right::before,
-.tooltip-container-right::after {
+.right::before,
+.right::after {
   right: 25px;
 }
 
-.tooltip-container-left::before,
-.tooltip-container-left::after {
+.left::before,
+.left::after {
   left: 25px;
 }
 </style>
