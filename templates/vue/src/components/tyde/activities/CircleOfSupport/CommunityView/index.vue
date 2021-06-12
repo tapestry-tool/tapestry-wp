@@ -7,7 +7,6 @@
       @edit-community="editCommunity"
     />
     <connections-tab
-      :disabled="isState('Communities.AddAnotherTooltip')"
       ref="connections"
       class="tab"
       :connections="connections"
@@ -83,7 +82,7 @@ import ConnectionsTab from "../ConnectionsTab"
 import CommunitiesList from "./CommunitiesList"
 import { MAX_COMMUNITIES } from "../cos.config"
 
-import onboardingMachine, { OnboardingEvents } from "./onboardingMachine"
+import onboardingMachine, { OnboardingEvents, OnboardingStates } from "./onboardingMachine"
 import WelcomeCommunities from "./onboarding/WelcomeCommunities"
 import AddConfirmation from "./onboarding/AddConfirmation"
 import WelcomeConnections from "./onboarding/WelcomeConnections"
@@ -187,11 +186,15 @@ export default {
       this.send(OnboardingEvents.Continue)
     },
     toggleCommunityTab() {
-      if (this.isCommunityTabOpen) {
-        this.state = States.Home
-      } else {
-        this.resetCommunity()
-        this.state = States.AddCommunity
+      if( !this.isState("Communities.AddMoreConfirmation") &&
+          !this.isState("Communities.AddLaterTooltip") &&
+          !this.isState("Connections.AddAnotherTooltip")) {
+        if (this.isCommunityTabOpen) {
+          this.state = States.Home
+        } else {
+          this.resetCommunity()
+          this.state = States.AddCommunity
+        }
       }
     },
     obHandleAdded($event) {

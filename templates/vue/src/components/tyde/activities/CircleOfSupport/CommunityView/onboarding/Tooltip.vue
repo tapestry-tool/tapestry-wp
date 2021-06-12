@@ -19,10 +19,6 @@ export default {
     //   type: String,
     //   required: false,
     // },
-    position: {
-      type: String,
-      required: true,
-    },
   },
   data() {
     return {
