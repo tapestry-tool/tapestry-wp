@@ -316,6 +316,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             //$userActivityAnswer = new stdClass();
             //array_push($progress->$nodeId->content, $userActivityAnswer);
             $progress->$nodeId->content['userAnswers'] = new stdClass();
+            $progress->$nodeId->content['userAnswers']->activity = new stdClass();
             for ($i = 0; $i < $questionListLength; $i++) {
                error_log("got here in questionListLength");
                error_log($questionIdArray[$i]);
@@ -327,7 +328,7 @@ class TapestryUserProgress implements ITapestryUserProgress
                error_log("current answer is");
                error_log($contents);
                //$progress->$nodeId->content[userActivityAnswer] = new stdClass();
-               $progress->$nodeId->content['userAnswers']->{$questionIdArray[$i]}->answers = $answer;
+               $progress->$nodeId->content['userAnswers']->activity->{$questionIdArray[$i]}->answers = $answer;
 
             }
                ob_start();                    // start buffer capture
