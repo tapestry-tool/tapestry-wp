@@ -1,11 +1,8 @@
 <template>
-     <button aria-label="get help" @click="open">
-        <tapestry-icon icon="question-circle" />
-        <help-modal
-            :show="helpModalOpen"
-            @close="close" 
-        ></help-modal>
-     </button>
+  <button aria-label="get help" @click="open">
+    <tapestry-icon icon="question-circle" />
+    <help-modal :show="helpModalOpen" @close="close"></help-modal>
+  </button>
 </template>
 
 <script>
@@ -14,7 +11,6 @@ import TapestryIcon from "@/components/common/TapestryIcon"
 import { names } from "@/config/routes"
 import client from "@/services/TapestryAPI"
 
-
 export default {
   components: {
     HelpModal,
@@ -22,30 +18,28 @@ export default {
   },
   computed: {
     helpModalOpen: {
-        get() {
-            return this.$route.name === names.HELP
-        },
-        set(open) {
-            this.$router.push({
-                name: open ? names.HELP : names.APP,
-                params: { nodeId: this.$route.params.nodeId },
-                query: this.$route.query,
-            })
-        },
+      get() {
+        return this.$route.name === names.HELP
+      },
+      set(open) {
+        this.$router.push({
+          name: open ? names.HELP : names.APP,
+          params: { nodeId: this.$route.params.nodeId },
+          query: this.$route.query,
+        })
+      },
     },
   },
   methods: {
     open() {
-        this.helpModalOpen = true;
-        client.recordAnalyticsEvent("user", "open", "help")
-
+      this.helpModalOpen = true
+      client.recordAnalyticsEvent("user", "open", "help")
     },
     close() {
-        this.helpModalOpen = false;
-        client.recordAnalyticsEvent("user", "close", "help")
-
-    }
-  }
+      this.helpModalOpen = false
+      client.recordAnalyticsEvent("user", "close", "help")
+    },
+  },
 }
 </script>
 
