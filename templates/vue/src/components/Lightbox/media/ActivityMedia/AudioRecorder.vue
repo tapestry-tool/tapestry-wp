@@ -6,8 +6,9 @@
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
+    <p>node id is {{ node.id }}</p>
     <p>question is {{ question }}</p>
-    <p>id is {{ id }}</p>
+    <p>audio url is {{ audio }}</p>
     <!-- src should be the url -->
     <audio v-if="state === states.DONE" controls :src="audio"></audio>
     <button
@@ -66,6 +67,10 @@ export default {
       type: String,
       required: true,
     },
+    node: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -78,7 +83,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getQuestion"]),
+    ...mapGetters(["getQuestion", "getAnswers"]),
     question() {
       return this.getQuestion(this.id)
     },
@@ -99,10 +104,13 @@ export default {
     },
     hasPrevious() {
       //TODO
+      // fetch the answer from state.userAnswers audio url from this question
+      let answers = this.getAnswers(this.node.id, this.question.id)
       return (
-        this.question.entries &&
-        this.question.entries.audioId &&
-        this.question.entries.audioId.length > 0
+        answers.audio && answers.audio.url && answers.audio.url.length > 0
+        // this.question.entries &&
+        // this.question.entries.audioId &&
+        // this.question.entries.audioId.length > 0
       )
     },
     states() {
@@ -119,13 +127,16 @@ export default {
   created() {
     //TODO
     if (this.hasPrevious) {
+      console.log("audio answer already exist got here")
       this.state = this.states.DONE
-      this.audio =
-        "data:audio/ogg; codecs=opus;base64," +
-        this.getQuestion(this.id).entries.audioId
+      let answersObject = this.getAnswers(this.node.id, this.question.id)
+      this.audio = answersObject.audio.url
+      console.log("already exist audio url is", this.audio)
     } else {
+      console.log("audio answer does not exist got here")
       this.state = this.states.WAIT
       this.initialize()
+      console.log("audio initial state is", this.audio)
     }
   },
   mounted() {

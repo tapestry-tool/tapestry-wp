@@ -56,6 +56,7 @@
         <audio-recorder
           v-else-if="formOpened && formType === 'audio'"
           :id="question.id"
+          :node="node"
           @submit="handleSubmit"
         />
         <div v-else class="question-answer-types">
