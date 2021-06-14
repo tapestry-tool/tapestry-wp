@@ -118,10 +118,6 @@ export function getAnswers(state) {
     if (state.userAnswers.hasOwnProperty(nodeId)) {
       if (state.userAnswers[nodeId].hasOwnProperty("activity")) {
         if (state.userAnswers[nodeId].activity.hasOwnProperty(questionId)) {
-          console.log(
-            "return value is this",
-            typeof state.userAnswers[nodeId].activity[questionId].answers
-          )
           if (
             typeof state.userAnswers[nodeId].activity[questionId].answers !==
             "string"

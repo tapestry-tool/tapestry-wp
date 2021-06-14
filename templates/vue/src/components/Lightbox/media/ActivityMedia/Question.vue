@@ -5,23 +5,20 @@
     </button>
     <loading v-if="loading" label="Submitting..." />
     <div v-else>
-      <div
-        v-if="question.followUp.nodeId && question.followUp.questionId"
-        class="follow-up"
-      >
+      <div v-if="question.isFollowUp && question.previousEntry" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
         >
           <h3 class="mb-4">
-            {{ question.followUp.text || "Previously, you said:" }}
+            {{ question.followUpText || "Previously, you said:" }}
           </h3>
-          <!-- TODO fix this later tapestry-activity
+          <tapestry-activity
             v-for="answer in previousQuestionAnswers"
             :key="answer.type"
             :type="answer.type"
             :entry="answer.entry"
-          ></tapestry-activity-->
+          ></tapestry-activity>
         </div>
         <div v-else>
           <p>You haven't done the previous activity yet.</p>
@@ -95,8 +92,9 @@ import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
 import Loading from "@/components/common/Loading"
-// import TapestryActivity from "./TapestryActivity"
+import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "question",
@@ -105,7 +103,7 @@ export default {
     AudioRecorder,
     TextQuestion,
     Loading,
-    // TapestryActivity,
+    TapestryActivity,
   },
   props: {
     question: {
@@ -127,28 +125,71 @@ export default {
   },
   computed: {
     // ...mapGetters(["getEntry", "getQuestion"]),
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
     },
     lastQuestion() {
       // TODO: fix this later
-      // if (this.question.followUp) {
-      //   return this.getQuestion(this.question.previousEntry)
-      // }
-      return null
+      //previous Entry is previous question.id
+      if (this.question.isFollowUp) {
+        return this.getQuestion(this.question.previousEntry)
+      }
+      return this.getQuestion(this.question.previousEntry)
     },
     previousQuestionAnswers() {
       // TODO: fix this later
-      // if (this.question.followUp) {
-      //   const answeredTypes = Object.entries(this.lastQuestion.answers)
-      //     .filter(entry => entry[1] && entry[1].length > 0)
-      //     .map(i => i[0])
-      //   return answeredTypes
-      //     .map(type => this.getEntry(this.question.previousEntry, type))
-      //     .filter(Boolean)
-      // }
+      // need to pass the right node id into this field
+      var previousQuestionNodeId = 0
+      for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
+        let tempNodeId = Object.keys(this.userAnswers)[i]
+        console.log("current temp node id is", tempNodeId)
+        console.log("current node id type is", typeof tempNodeId)
+        console.log(
+          "type of quesiton.previous entry",
+          typeof this.question.previousEntry
+        )
+        if (
+          this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
+          this.userAnswers[tempNodeId].activity.hasOwnProperty(
+            this.question.previousEntry
+          )
+        ) {
+          previousQuestionNodeId = tempNodeId
+        }
+      }
+      console.log("node id passed into get answers is", previousQuestionNodeId)
+      let answerObject = this.getAnswers(
+        previousQuestionNodeId,
+        this.question.previousEntry
+      )
+      let previousAnswers = []
+      console.log("question.previousEntry is", this.question.previousEntry)
+      console.log("initially answersObject is", answerObject)
+
+      if (this.question.isFollowUp) {
+        for (const [key, value] of Object.entries(answerObject)) {
+          if (key === "text") {
+            var tempObj = { type: key, entry: value }
+            previousAnswers.push(tempObj)
+          } else {
+            var tempAudioObj = {
+              type: key,
+              entry: wpData.uploadDirArray.baseurl + "/" + value,
+            }
+            previousAnswers.push(tempAudioObj)
+          }
+        }
+        console.log("previous answer is", previousAnswers)
+        return previousAnswers
+        // const answeredTypes = Object.entries(answerObject)
+        //   .filter(entry => entry[1] && entry[1].length > 0)
+        //   .map(i => i[0])
+        // return answeredTypes
+        //   .map(type => this.getEntry(this.question.previousEntry, type))
+        //   .filter(Boolean)
+      }
       return []
     },
     enabledAnswerTypes() {

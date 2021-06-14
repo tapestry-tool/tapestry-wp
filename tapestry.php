@@ -169,6 +169,7 @@ function tapestry_enqueue_vue_app()
                 'roles' => $wp_roles->get_names(),
                 'wpCanEditTapestry' => current_user_can('edit_post', get_the_ID()),
                 'currentUser' => wp_get_current_user(),
+                'uploadDirArray' => wp_upload_dir(),
             ]
         );
 

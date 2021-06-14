@@ -45,6 +45,8 @@ class TapestryAudio implements ITapestryAudio
         }
 
         $filename = $this->_getFileName();
+        error_log("file name is");
+        error_log($filename);
 
         $decodedAudio = base64_decode($audio);
 

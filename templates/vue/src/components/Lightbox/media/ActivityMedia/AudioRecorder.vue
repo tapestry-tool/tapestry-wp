@@ -54,6 +54,7 @@
 import AudioRecoder from "audio-recorder-polyfill"
 import client from "@/services/TapestryAPI"
 import { mapGetters } from "vuex"
+import { data as wpData } from "@/services/wp"
 
 // Polyfill for Safari and Edge
 if (!window.MediaRecorder) {
@@ -82,6 +83,23 @@ export default {
       state: null,
     }
   },
+  watch: {
+    id() {
+      let answersObject = this.getAnswers(this.node.id, this.question.id)
+      console.log("current answersObject is", answersObject)
+      console.log("switched question")
+      if (
+        answersObject.audio &&
+        answersObject.audio.url &&
+        answersObject.audio.url.length > 0
+      ) {
+        console.log("shouldn't get here")
+        this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
+      } else {
+        this.initialize()
+      }
+    },
+  },
   computed: {
     ...mapGetters(["getQuestion", "getAnswers"]),
     question() {
@@ -103,15 +121,8 @@ export default {
       return `${hours}:${minutes}:${sec}`
     },
     hasPrevious() {
-      //TODO
-      // fetch the answer from state.userAnswers audio url from this question
       let answers = this.getAnswers(this.node.id, this.question.id)
-      return (
-        answers.audio && answers.audio.url && answers.audio.url.length > 0
-        // this.question.entries &&
-        // this.question.entries.audioId &&
-        // this.question.entries.audioId.length > 0
-      )
+      return answers.audio && answers.audio.url && answers.audio.url.length > 0
     },
     states() {
       return {
@@ -125,12 +136,13 @@ export default {
     },
   },
   created() {
-    //TODO
     if (this.hasPrevious) {
       console.log("audio answer already exist got here")
       this.state = this.states.DONE
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      this.audio = answersObject.audio.url
+      console.log("wpdata.uploadDirArray is", wpData.uploadDirArray)
+      console.log("wpdata.uploadDirArray.baseurl is", wpData.uploadDirArray.baseurl)
+      this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       console.log("already exist audio url is", this.audio)
     } else {
       console.log("audio answer does not exist got here")
@@ -221,6 +233,7 @@ export default {
     },
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
+      console.log("new submitted audio should be", this.audio)
       this.$emit("submit", this.audio)
     },
   },

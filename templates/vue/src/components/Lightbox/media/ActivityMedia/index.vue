@@ -110,7 +110,6 @@ export default {
         ) {
           currentQuestion.completed = true
         }
-        console.log("marking complete, current question status is", currentQuestion)
       }
     },
     handleSubmit() {
