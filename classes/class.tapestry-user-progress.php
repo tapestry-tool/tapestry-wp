@@ -227,37 +227,14 @@ class TapestryUserProgress implements ITapestryUserProgress
         // save it to user meta
         // call wordpress function update_user_meta to save the information from frontend to the user meta
         // check in database in phpmyadmin
-        error_log("inside _complete question");
-        error_log($answerData);
-        error_log($answerType);
         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, true);
         if ($userAnswer === "") {
-          error_log("success creating new user meta object");
-          //$newUserAnswer = new stdClass();
           $newUserAnswer[$answerType] = $answerData;
-          error_log($newUserAnswer);
           update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $newUserAnswer);
         } else {
-          error_log("success using existing user meta object");
           $userAnswer[$answerType] = $answerData;
-          error_log($userAnswer);
           update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $userAnswer);
         }
-        //error_log(print_r($nodeMetadata, true));
-        //error_log(print_r($quiz, true));
-       /*  ob_start();                    // start buffer capture
-        var_dump($nodeMetadata);           // dump the values
-        $contents = ob_get_contents(); // put the buffer into a variable
-        ob_end_clean();
-        error_log("nodeMetadataa is");             // end capture
-        error_log($contents);
-        
-        ob_start();                    // start buffer capture
-        var_dump($quiz);           // dump the values
-        $contents = ob_get_contents(); // put the buffer into a variable
-        ob_end_clean();
-        error_log("quiz is");             // end capture
-        error_log($contents); */
 
         // treating $quiz as a two dimensional array, and non empty
         // $quiz[$questionId]['completed'] = true; // this line causes fatal error, old code
@@ -287,7 +264,6 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->unlocked = $node->unlocked;
             //new code here
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-            $nodeMetadata1 = get_metadata_by_mid('post', $nodeId);
 
             if ($node->accessible) {
                 $progress->$nodeId->content = [
@@ -299,44 +275,18 @@ class TapestryUserProgress implements ITapestryUserProgress
             $isQuestionNode = property_exists($node->typeData, 'activity');
             if($isQuestionNode) {
             $questionIdArray = [];
-            // node->typedata->activity is object stdclass
             $questionListLength = count($node->typeData->activity->questions);
             for($x = 0; $x < $questionListLength; $x++) {
                $questionId = $node->typeData->activity->questions[$x]->id;
                array_push($questionIdArray, $questionId);
             }
 
-            ob_start();                    // start buffer capture
-            var_dump($questionIdArray);           // dump the values
-            $contents = ob_get_contents(); // put the buffer into a variable
-            ob_end_clean();                // end capture
-            error_log("question id array are");
-            error_log($contents);
-
-            //$userActivityAnswer = new stdClass();
-            //array_push($progress->$nodeId->content, $userActivityAnswer);
             $progress->$nodeId->content['userAnswers'] = new stdClass();
             $progress->$nodeId->content['userAnswers']->activity = new stdClass();
             for ($i = 0; $i < $questionListLength; $i++) {
-               error_log("got here in questionListLength");
-               error_log($questionIdArray[$i]);
                $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId.'_question_'.$questionIdArray[$i], true);
-               ob_start();                    // start buffer capture
-               var_dump($answer);           // dump the values
-               $contents = ob_get_contents(); // put the buffer into a variable
-               ob_end_clean();                // end capture
-               error_log("current answer is");
-               error_log($contents);
-               //$progress->$nodeId->content[userActivityAnswer] = new stdClass();
                $progress->$nodeId->content['userAnswers']->activity->{$questionIdArray[$i]}->answers = $answer;
-
             }
-               ob_start();                    // start buffer capture
-               var_dump($progress);           // dump the values
-               $contents = ob_get_contents(); // put the buffer into a variable
-               ob_end_clean();                // end capture
-               error_log("current answer is");
-               error_log($contents);
 
             }
 

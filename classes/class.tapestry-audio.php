@@ -45,8 +45,6 @@ class TapestryAudio implements ITapestryAudio
         }
 
         $filename = $this->_getFileName();
-        error_log("file name is");
-        error_log($filename);
 
         $decodedAudio = base64_decode($audio);
 
@@ -69,8 +67,7 @@ class TapestryAudio implements ITapestryAudio
         if (false === $upload_dir['error']) {
             $audio = file_get_contents($upload_dir['basedir'].'/tapestry/'.$this->userId.'/'.$filename);
             $encodedAudio = base64_encode($audio);
-            error_log("getting audio in tapestry audio.php file");
-            error_log($audio);
+
             return $encodedAudio;
         } else {
             error_log('Error getting user audio for tapestry: '.$upload_dir['error']);
