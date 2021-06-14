@@ -61,7 +61,6 @@
           <small>question is {{ question }}</small>
           <small>answers data is {{ answers }}</small>
           <small>userAnswer is {{ userAnswers }}</small>
-          <!-- <p>state.userAnswers is {{ $store.state.userAnswers }}</p> -->
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
@@ -126,32 +125,21 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters(["getEntry", "getQuestion"]),
     ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
     },
     lastQuestion() {
-      // TODO: fix this later
-      //previous Entry is previous question.id
       if (this.question.isFollowUp) {
         return this.getQuestion(this.question.previousEntry)
       }
       return this.getQuestion(this.question.previousEntry)
     },
     previousQuestionAnswers() {
-      // TODO: fix this later
-      // need to pass the right node id into this field
       var previousQuestionNodeId = 0
       for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
         let tempNodeId = Object.keys(this.userAnswers)[i]
-        console.log("current temp node id is", tempNodeId)
-        console.log("current node id type is", typeof tempNodeId)
-        console.log(
-          "type of quesiton.previous entry",
-          typeof this.question.previousEntry
-        )
         if (
           this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
           this.userAnswers[tempNodeId].activity.hasOwnProperty(
@@ -161,14 +149,11 @@ export default {
           previousQuestionNodeId = tempNodeId
         }
       }
-      console.log("node id passed into get answers is", previousQuestionNodeId)
       let answerObject = this.getAnswers(
         previousQuestionNodeId,
         this.question.previousEntry
       )
       let previousAnswers = []
-      console.log("question.previousEntry is", this.question.previousEntry)
-      console.log("initially answersObject is", answerObject)
 
       if (this.question.isFollowUp) {
         for (const [key, value] of Object.entries(answerObject)) {
@@ -184,14 +169,7 @@ export default {
             previousAnswers.push(tempAudioObj)
           }
         }
-        console.log("previous answer is", previousAnswers)
         return previousAnswers
-        // const answeredTypes = Object.entries(answerObject)
-        //   .filter(entry => entry[1] && entry[1].length > 0)
-        //   .map(i => i[0])
-        // return answeredTypes
-        //   .map(type => this.getEntry(this.question.previousEntry, type))
-        //   .filter(Boolean)
       }
       return []
     },
@@ -207,14 +185,6 @@ export default {
       return ""
     },
     textFormCompleted() {
-      /* return !!(
-        this.userAnswers[this.node.id] &&
-        this.progress[this.node.id].activity &&
-        this.progress[this.node.id].activity[this.question.id] &&
-        this.progress[this.node.id].activity[this.question.id].answers &&
-        this.progress[this.node.id].activity[this.question.id].answers.text
-      ) */
-      //return !!this.progress[this.node.id].activity[this.question.id].answers.text
       if (this.userAnswers.hasOwnProperty(this.node.id)) {
         if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
           if (
@@ -239,7 +209,6 @@ export default {
       return false
     },
     audioFormCompleted() {
-      //return !!this.progress[this.node.id].activity[this.question.id].answers.audio
       if (this.userAnswers.hasOwnProperty(this.node.id)) {
         if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
           if (
@@ -308,17 +277,12 @@ export default {
       switch (this.formType) {
         case "audio": {
           const audioFile = formData
-          //console.log("ksdlfjsdl")
-          //console.log("audio file is", audioFile)
           const savedUrl = await this.saveAudio({
             audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
             nodeId: this.node.id,
             questionId: this.question.id,
           })
-          console.log("saved url file is", savedUrl)
-          // const userSavedUrl = JSON.parse(savedUrl.config.data).audio
           submittedAnswer = { url: savedUrl }
-          //submittedAnswer = { url: savedUrl }
           break
         }
         default: {
@@ -333,17 +297,7 @@ export default {
         answer: submittedAnswer,
       })
       this.loading = false
-      //this.answers = this.getAnswers(this.node.id, this.question.id)
-      //console.log("after sumitting", this.answers)
-      //console.log("after sumitting, state.userAnswers", this.userAnswers)
-      // if (!this.answers.hasOwnProperty(this.question.id)) {
-      //   this.answers[this.question.id] = {}
-      // }
-      // if (!this.answers[this.question.id].hasOwnProperty("answers")) {
-      //   this.answers[this.question.id].answers = {}
-      // }
-      // this.answers[this.question.id].answers[this.formType] = submittedAnswer
-      // console.log("current answers are", this.answers)
+
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: this.formType,
       })

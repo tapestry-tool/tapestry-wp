@@ -42,7 +42,7 @@ describe("Activity", () => {
       cy.contains(/done/i).click()
       cy.lightbox().within(() => {
         cy.get("audio").should("be.visible")
-        cy.contains(/submit/i).click()
+        cy.getByTestId("submit-button-audio").click()
         cy.contains(/submitting/i).should("be.visible")
 
         cy.contains("Thanks!").should("be.visible")

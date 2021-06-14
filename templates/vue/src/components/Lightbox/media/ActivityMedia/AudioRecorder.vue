@@ -50,6 +50,7 @@
       v-if="state === states.DONE"
       :disabled="disableSubmitFlag"
       class="my-3"
+      data-qa="submit-button-audio"
       @click="handleSubmit"
     >
       <i class="fas fa-check"></i>
