@@ -115,7 +115,7 @@ export default {
     UrlVideoMedia,
     PlayScreen,
     Loading,
-    MultiContentMedia : () => import("../MultiContentMedia/index") ,
+    MultiContentMedia: () => import("../MultiContentMedia/index"),
   },
   props: {
     nodeId: {
