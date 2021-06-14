@@ -10,7 +10,8 @@
     <p>question is {{ question }}</p>
     <p>audio url is {{ audio }}</p>
     <!-- src should be the url -->
-    <audio v-if="state === states.DONE" controls :src="getAudioUrl"></audio>
+    <audio v-if="doneButtonPressed" controls :src="audio"></audio>
+    <audio v-else-if="state === states.DONE" controls :src="getAudioUrl"></audio>
     <button
       v-else
       class="main-button my-2"
@@ -81,6 +82,7 @@ export default {
       durationInterval: null,
       recorder: null,
       state: null,
+      doneButtonPressed: false,
     }
   },
   computed: {
@@ -178,6 +180,8 @@ export default {
             const data = reader.result
             this.audio = data
             this.state = this.states.DONE
+            this.doneButtonPressed = true
+            console.log("this.audio after pressing done is", this.audio)
           }
         })
 
@@ -237,6 +241,7 @@ export default {
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
       console.log("new submitted audio should be", this.audio)
+      this.doneButtonPressed = false
       this.$emit("submit", this.audio)
     },
   },

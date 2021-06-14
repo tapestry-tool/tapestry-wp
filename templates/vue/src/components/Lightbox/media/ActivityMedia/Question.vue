@@ -66,6 +66,7 @@
             <answer-button
               v-if="question.answerTypes.text.enabled"
               :completed="textFormCompleted"
+              data-qa="answer-button-text"
               @click="openForm('text')"
             >
               text
@@ -74,6 +75,7 @@
               v-if="question.answerTypes.audio.enabled"
               :completed="audioFormCompleted"
               icon="microphone"
+              data-qa="answer-button-audio"
               @click="openForm('audio')"
             >
               audio

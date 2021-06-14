@@ -13,13 +13,13 @@ describe("Activity", () => {
 
       cy.contains(/question text/i).click()
       cy.focused().type(question)
-      cy.contains(/audio/i).click()
+      cy.getByTestId("question-answer-audio").click({ force: true })
 
       cy.submitModal()
       cy.openLightbox(node.id)
 
       cy.contains(/microphone access/i, { timeout: 10000 }).should("not.exist")
-
+      cy.getByTestId("answer-button-audio").click()
       cy.clock()
 
       cy.getByTestId("record").click()
@@ -44,9 +44,6 @@ describe("Activity", () => {
         cy.get("audio").should("be.visible")
         cy.contains(/submit/i).click()
         cy.contains(/submitting/i).should("be.visible")
-
-        cy.wait("@submit")
-        cy.wait("@entries")
 
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()

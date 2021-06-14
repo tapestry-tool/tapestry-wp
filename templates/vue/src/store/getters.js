@@ -111,10 +111,6 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
-    //console.log("state.userAnswers is", state.userAnswers)
-    //console.log("does it come here after submitting?")
-    // state.nodes[nodeId].userAnswers
-    console.log("inside get Answer, user answer is", state.userAnswers)
     if (state.userAnswers.hasOwnProperty(nodeId)) {
       if (state.userAnswers[nodeId].hasOwnProperty("activity")) {
         if (state.userAnswers[nodeId].activity.hasOwnProperty(questionId)) {
