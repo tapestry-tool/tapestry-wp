@@ -176,7 +176,7 @@ export default {
           } else {
             var tempAudioObj = {
               type: key,
-              entry: wpData.uploadDirArray.baseurl + "/" + value,
+              entry: wpData.uploadDirArray.baseurl + "/" + value.url,
             }
             previousAnswers.push(tempAudioObj)
           }

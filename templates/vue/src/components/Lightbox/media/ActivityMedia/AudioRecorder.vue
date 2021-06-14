@@ -83,23 +83,6 @@ export default {
       state: null,
     }
   },
-  watch: {
-    id() {
-      let answersObject = this.getAnswers(this.node.id, this.question.id)
-      console.log("current answersObject is", answersObject)
-      console.log("switched question")
-      if (
-        answersObject.audio &&
-        answersObject.audio.url &&
-        answersObject.audio.url.length > 0
-      ) {
-        console.log("shouldn't get here")
-        this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
-      } else {
-        this.initialize()
-      }
-    },
-  },
   computed: {
     ...mapGetters(["getQuestion", "getAnswers"]),
     question() {
@@ -132,6 +115,23 @@ export default {
         PAUSED: "paused",
         READY: "ready",
         RECORDING: "recording",
+      }
+    },
+  },
+  watch: {
+    id() {
+      let answersObject = this.getAnswers(this.node.id, this.question.id)
+      console.log("current answersObject is", answersObject)
+      console.log("switched question")
+      if (
+        answersObject.audio &&
+        answersObject.audio.url &&
+        answersObject.audio.url.length > 0
+      ) {
+        console.log("shouldn't get here")
+        this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
+      } else {
+        this.initialize()
       }
     },
   },
