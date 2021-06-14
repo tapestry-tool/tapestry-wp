@@ -148,8 +148,8 @@ class TapestryHelpers
     }
 
     /**
-     * Uploads the given image (by URL) as a Wordpress attachment and  returns the
-     * attachment ID for the new attachment. If the given URL is already an attachment
+     * Uploads the given image (by URL) as a Wordpress attachment and  returns the 
+     * attachment ID for the new attachment. If the given URL is already an attachment 
      * in WP, it returns its existing attachment ID instead of re-uploading it.
      *
      * @param string $imageURL
@@ -159,16 +159,16 @@ class TapestryHelpers
     public static function attachImageByURL($imageURL)
     {
         // is this already an image in our gallery?
-        $attachment_id = attachment_url_to_postid($imageURL);
+        $attachment_id = attachment_url_to_postid( $imageURL);
         if ($attachment_id) {
             return $attachment_id;
-        }
+        } 
 
         // not an image in our gallery. let's upload it.
-        include_once(ABSPATH . 'wp-admin/includes/image.php');
+        include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
         $imagetype = end(explode('/', getimagesize($imageURL)['mime']));
-        $uniq_name = date('dmY').''.(int) microtime(true);
+        $uniq_name = date('dmY').''.(int) microtime(true); 
         $filename = $uniq_name.'.'.$imagetype;
 
         $uploaddir = wp_upload_dir();
@@ -178,7 +178,7 @@ class TapestryHelpers
         fwrite($savefile, $contents);
         fclose($savefile);
 
-        $wp_filetype = wp_check_filetype(basename($filename), null);
+        $wp_filetype = wp_check_filetype(basename($filename), null );
         $attachment = array(
             'post_mime_type' => $wp_filetype['type'],
             'post_title' => $filename,
@@ -186,11 +186,11 @@ class TapestryHelpers
             'post_status' => 'inherit'
         );
 
-        $attachment_id = wp_insert_attachment($attachment, $uploadfile);
-        $imagenew = get_post($attachment_id);
-        $fullsizepath = get_attached_file($imagenew->ID);
-        $attach_data = wp_generate_attachment_metadata($attachment_id, $fullsizepath);
-        wp_update_attachment_metadata($attachment_id, $attach_data);
+        $attachment_id = wp_insert_attachment( $attachment, $uploadfile );
+        $imagenew = get_post( $attachment_id );
+        $fullsizepath = get_attached_file( $imagenew->ID );
+        $attach_data = wp_generate_attachment_metadata( $attachment_id, $fullsizepath );
+        wp_update_attachment_metadata( $attachment_id, $attach_data );
 
         return $attachment_id;
     }
@@ -227,9 +227,11 @@ class TapestryHelpers
 
         if ($user->canEdit($tapestryPostId) && $superuser_override) {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
+        }
+        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->status === "draft" && $node->getMeta()->reviewStatus !== "submitted") {
             return true;
-        } elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE') {
+        }
+        elseif ($user->isAuthorOfThePost($nodePostId) && $node->getMeta()->reviewStatus === "submitted" && $action === 'MOVE'){
             return true;
         } else {
             $nodePermissions = get_metadata_by_mid('post', $nodeMetaId)->meta_value->permissions;
@@ -301,7 +303,8 @@ class TapestryHelpers
         $tapestry = new Tapestry($tapestryPostId);
         foreach ($tapestry->getLinks() as $link) {
             if (($link->target == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->source, $tapestryPostId))||
-                ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId))) {
+                ($link->source == $nodeMetaId && !TapestryHelpers::nodeIsDraft($link->target, $tapestryPostId)))
+            {
                 return true;
             }
         }
