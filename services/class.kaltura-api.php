@@ -1,8 +1,7 @@
 <?php
 
-    (defined("LOAD_KALTURA") && LOAD_KALTURA) OR exit();
-    require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/autoload.php';
-
+    (defined("LOAD_KALTURA") && LOAD_KALTURA) or exit();
+    require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
 
     use Kaltura\Client\Client;
     use Kaltura\Client\Configuration;
@@ -17,17 +16,16 @@
 
     use Spatie\Async\Pool;
 
-    class KalturaApi {
-        
+    class KalturaApi
+    {
         private $thread_pool;
-
 
         /**
          * Creates Kaltura Client and starts Kaltura Session.
          *
          * @return object $response KalturaClient
          */
-        function getKClient($type = SessionType::USER) 
+        public function getKClient($type = SessionType::USER)
         {
             $this->thread_pool = POOL::create();
 
@@ -37,8 +35,7 @@
             $kclient = new Client($kconf);
             try {
                 $ksession = $kclient->session->start(KALTURA_ADMIN_SECRET, $user, $type, KALTURA_PARTNER_ID);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 error_log("Kaltura Client Error: " . $e);
             }
 
@@ -57,9 +54,8 @@
          *
          * @return object $response HTTP response
          */
-        function uploadKalturaVideo($file, $categoryName)
+        public function uploadKalturaVideo($file, $categoryName)
         {
-
             $filepath = $file->tmp_name;
             $filename = $file->name;
 
@@ -98,17 +94,16 @@
             $token = $kclient->uploadToken->add($uploadToken);
 
             
-           $this->thread_pool[] = async(function() use ($kclient,$token,$filepath){
+            $this->thread_pool[] = async(function () use ($kclient,$token,$filepath) {
                 $resume = false;
                 $finalChunk = true;
                 $resumeAt = -1;
                 error_log("Starting to upload");
                 $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
-            })->then(function ($output)
-            {
+            })->then(function ($output) {
                 error_log("finished upload");
             });
-            error_log("Out of upload");           
+            error_log("Out of upload");
             
     
             $mediaEntry = new MediaEntry();
@@ -124,10 +119,9 @@
 
             while ($status != FlavorAssetStatus::READY && $status != FlavorAssetStatus::ERROR) {
                 sleep(5);
-            $result = $kclient->media->get($entry->id);
-            $status = $result->status;
-        }
-        return $result;
-        
+                $result = $kclient->media->get($entry->id);
+                $status = $result->status;
+            }
+            return $result;
         }
     }

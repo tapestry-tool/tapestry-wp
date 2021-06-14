@@ -18,7 +18,6 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
     require_once __DIR__.'/services/class.kaltura-api.php';
 }
 
-
 $REST_API_NAMESPACE = 'tapestry-tool/v1';
 
 $REST_API_GET_METHOD = 'GET';
@@ -370,7 +369,8 @@ foreach ($REST_API_ENDPOINTS as $ENDPOINT) {
     );
 }
 
-function exportTapestry($request) {
+function exportTapestry($request)
+{
     $postId = $request['tapestryPostId'];
     try {
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
@@ -578,7 +578,6 @@ function importTapestry($postId, $tapestryData)
                 }
             }
 
-
             $tapestryNode->set($node);
             $tapestryNode->save();
         }
@@ -596,7 +595,6 @@ function importTapestry($postId, $tapestryData)
 
     return $tapestry->save();
 }
-
 
 function deleteTapestry($request)
 {
@@ -1110,13 +1108,13 @@ function optimizeTapestryNodeThumbnails($request)
             $protocol = is_ssl() ? "https:" : "http:";
     
             if ($nodeData->imageURL) {
-                $urlPrepend = substr( $nodeData->imageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->imageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->imageURL);
                 $node->set((object) ['thumbnailFileId' => $attachmentId]);
                 $node->save();
             }
             if ($nodeData->lockedImageURL) {
-                $urlPrepend = substr( $nodeData->lockedImageURL, 0, 4 ) === "http" ? "" : $protocol;
+                $urlPrepend = substr($nodeData->lockedImageURL, 0, 4) === "http" ? "" : $protocol;
                 $attachmentId = TapestryHelpers::attachImageByURL($urlPrepend . $nodeData->lockedImageURL);
                 $node->set((object) ['lockedThumbnailFileId' => $attachmentId]);
                 $node->save();
@@ -1143,7 +1141,6 @@ function updateTapestryNodeTypeData($request)
     // TODO: JSON validations should happen here
     // make sure the type data exists and not null
     try {
-
         if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
             throw new TapestryError('INVALID_POST_ID');
         }
@@ -1189,7 +1186,7 @@ function updateTapestryNodeCoordinates($request)
         if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
             throw new TapestryError('INVALID_NODE_META_ID');
         }
-        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) && 
+        if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId) &&
             !TapestryHelpers::userIsAllowed('MOVE', $nodeMetaId, $postId)) {
             throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
         }
@@ -1502,10 +1499,10 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
                 throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
             }
             // Moving the tmporary file to a non temporary location
-            $tmp_name = preg_replace("#tmp/#i","",$file["tmp_name"]);
+            $tmp_name = preg_replace("#tmp/#i", "", $file["tmp_name"]);
             $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
 
-            move_uploaded_file($file["tmp_name"],$dirpath."".$tmp_name);
+            move_uploaded_file($file["tmp_name"], $dirpath."".$tmp_name);
             
             $result = array(
                     "file" =>array(
@@ -1528,14 +1525,12 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
         $postId = $request["tapestryPostId"];
         $nodeMetaId = $request['nodeMetaId'];
 
-
         $params = json_decode($request->get_body());
         $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
 
         $file = $params->file;
         $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'), '/'));
         $title = get_the_title($postId);
-       
 
         $file->tmp_name = $dirpath."".$file->tmp_name;
         
@@ -1592,7 +1587,7 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
         }
     }
 
-    function getKalturaStatus($request) 
+    function getKalturaStatus($request)
     {
         $postId = $request['tapestryPostId'];
         $nodeMetaId = $request['nodeMetaId'];
@@ -1602,8 +1597,7 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
 
         return $node->getKalturaStatus();
     }
-}
-else {
+} else {
     function getKalturaExists()
     {
         return false;
