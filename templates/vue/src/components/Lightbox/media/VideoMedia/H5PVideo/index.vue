@@ -26,7 +26,7 @@ import client from "@/services/TapestryAPI"
 import H5PIframe from "./H5PIframe"
 
 export default {
-  name: "h5p-media",
+  name: "h5p-video-media",
   components: {
     "h5p-iframe": H5PIframe,
   },
