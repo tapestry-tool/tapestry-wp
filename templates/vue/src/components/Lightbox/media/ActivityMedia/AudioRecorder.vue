@@ -10,7 +10,11 @@
     <p>question is {{ question }}</p>
     <p>audio url is {{ audio }}</p>
     <!-- src should be the url -->
-    <audio v-if="doneButtonPressed" controls :src="audio"></audio>
+    <audio
+      v-if="doneButtonPressed && !reRecordButtonPressed"
+      controls
+      :src="audio"
+    ></audio>
     <audio v-else-if="state === states.DONE" controls :src="getAudioUrl"></audio>
     <button
       v-else
@@ -83,6 +87,7 @@ export default {
       recorder: null,
       state: null,
       doneButtonPressed: false,
+      reRecordButtonPressed: false,
     }
   },
   computed: {
@@ -219,11 +224,13 @@ export default {
       client.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
+      this.reRecordButtonPressed = false
     },
     resetRecording() {
       client.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
+      this.reRecordButtonPressed = true
     },
     toggleRecording() {
       switch (this.state) {
