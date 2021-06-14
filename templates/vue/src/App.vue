@@ -83,7 +83,6 @@ export default {
         })
       }
     })
-    
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)

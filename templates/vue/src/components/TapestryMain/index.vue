@@ -39,7 +39,7 @@
 
 <script>
 import DragSelectModular from "@/utils/dragSelectModular"
-import { mapActions, mapMutations, mapState } from "vuex"
+import { mapMutations, mapState } from "vuex"
 import TapestryNode from "./TapestryNode"
 import TapestryLink from "./TapestryLink"
 import RootNodeButton from "./RootNodeButton"
@@ -47,7 +47,6 @@ import LockedTooltip from "./LockedTooltip"
 import Helpers from "@/utils/Helpers"
 import { names } from "@/config/routes"
 import * as wp from "@/services/wp"
-import client from "@/services/TapestryAPI"
 
 export default {
   components: {
@@ -122,7 +121,7 @@ export default {
     addRootNode() {
       this.$root.$emit("add-node", null)
     },
-    
+
     updateSelectableNodes() {
       DragSelectModular.updateSelectableNodes()
     },

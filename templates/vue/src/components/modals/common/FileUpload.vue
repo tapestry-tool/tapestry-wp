@@ -126,7 +126,8 @@
     <b-alert v-else-if="!confirmedUploadToKaltura" show variant="success">
       <b-row>
         <b-col cols="auto" class="upload-label mr-auto text-muted">
-          File will now upload to Kaltura in the background! You can now publish the node and it will become available when the file is finish uploading.
+          File will now upload to Kaltura in the background! You can now publish the
+          node and it will become available when the file is finish uploading.
         </b-col>
         <b-col cols="auto">
           <b-button size="sm" variant="secondary" @click="confirmUploadToKaltura">
@@ -139,7 +140,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapState } from "vuex"
 import axios from "axios"
 import { data as wpData } from "@/services/wp"
 import kclient from "@/services/KalturaAPI"
@@ -196,11 +197,14 @@ export default {
       uploadSource: null,
       isUploading: false,
       confirmedUploadToServer: true,
-      confirmedUploadToKaltura:true,
+      confirmedUploadToKaltura: true,
       changeImage: false,
       imagePatternId: "",
       error: null,
     }
+  },
+  computed: {
+    ...mapState(["useKaltura", "nodes"]),
   },
   created() {
     if (this.showImagePreview) {
@@ -211,15 +215,11 @@ export default {
           .substring(9)
     }
   },
-  computed: {
-    ...mapState(["useKaltura","nodes"]),
-  },
   methods: {
-    handleFileUpload($event){
-      if(this.isVideoUpload && this.useKaltura) {
+    handleFileUpload($event) {
+      if (this.isVideoUpload && this.useKaltura) {
         this.uploadVideoFile($event)
-      } 
-      else{
+      } else {
         this.uploadFile($event)
       }
     },
@@ -288,7 +288,9 @@ export default {
           if (this.isUploading) {
             this.isUploading = false
             this.confirmedUploadToServer = false
-            setTimeout(() => {this.$emit("isUploading", this.isUploading)}, 1200)
+            setTimeout(() => {
+              this.$emit("isUploading", this.isUploading)
+            }, 1200)
           }
           clearInterval(this.uploadBarInterval)
         })
@@ -316,13 +318,11 @@ export default {
         }, 1000)
       }
 
-
       kclient
         .uploadVideo(event, this.uploadSource.token, onUploadProgress)
         .then(response => {
-            this.$emit("kaltura-upload",response.data)
-        }
-        )
+          this.$emit("kaltura-upload", response.data)
+        })
         .catch(response => this.handleError(response))
         .finally(() => {
           if (this.isUploading) {
@@ -345,7 +345,7 @@ export default {
     confirmUploadToServer() {
       this.confirmedUploadToServer = true
     },
-    confirmUploadToKaltura(){
+    confirmUploadToKaltura() {
       this.confirmedUploadToKaltura = true
     },
     removeImage(event) {

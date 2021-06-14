@@ -319,7 +319,14 @@ export default {
       "getNode",
       "getNeighbours",
     ]),
-    ...mapState(["nodes", "rootId", "settings", "visibleNodes", "apiError","useKaltura"]),
+    ...mapState([
+      "nodes",
+      "rootId",
+      "settings",
+      "visibleNodes",
+      "apiError",
+      "useKaltura",
+    ]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
@@ -475,7 +482,6 @@ export default {
     },
   },
   mounted() {
-
     this.$root.$on("node-modal::uploading", isUploading => {
       this.fileUploading = isUploading
     })
@@ -516,7 +522,7 @@ export default {
     setLoading(status) {
       this.loading = status
     },
-    handleKalturaUpload(data){
+    handleKalturaUpload(data) {
       this.kaltura_info = data
     },
     isValid() {
@@ -628,7 +634,7 @@ export default {
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId) 
+      const oldNode = this.getNode(this.nodeId)
       if (
         (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
         (event.trigger == "backdrop" ||
@@ -702,7 +708,10 @@ export default {
         this.updateNodeCoordinates()
 
         if (this.linkHasThumbnailData) {
-          if (this.node.typeData.thumbnailURL && (this.type === 'add' || this.originalUrl !== this.node.typeData.mediaURL)) {
+          if (
+            this.node.typeData.thumbnailURL &&
+            (this.type === "add" || this.originalUrl !== this.node.typeData.mediaURL)
+          ) {
             this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL)
           } else {
             await this.setLinkData()
@@ -741,9 +750,8 @@ export default {
       this.handleSubmit()
     },
     async submitNode() {
-      if( this.useKaltura &&
-         this.kaltura_info !== null){
-        this.node.kalturaUpload = 'uploading'
+      if (this.useKaltura && this.kaltura_info !== null) {
+        this.node.kalturaUpload = "uploading"
       }
       if (this.type === "add") {
         const id = await this.addNode(this.node)
@@ -779,9 +787,8 @@ export default {
       await this.updateLockedStatus()
       this.loading = false
 
-      if(this.useKaltura &&
-        this.kaltura_info !== null){
-        kclient.uploadVideoToKaltura(this.node.id,this.kaltura_info)
+      if (this.useKaltura && this.kaltura_info !== null) {
+        kclient.uploadVideoToKaltura(this.node.id, this.kaltura_info)
       }
       if (!this.hasSubmissionError) {
         this.close()
@@ -898,9 +905,9 @@ export default {
       return (
         this.kaltura_info !== null ||
         (typeData.mediaURL !== "" &&
-        (typeData.hasOwnProperty("youtubeID") ||
-          typeData.mediaURL.endsWith(".mp4") ||
-          typeData.mediaURL.includes("playManifest")))
+          (typeData.hasOwnProperty("youtubeID") ||
+            typeData.mediaURL.endsWith(".mp4") ||
+            typeData.mediaURL.includes("playManifest")))
       )
     },
     validateQuiz(quiz) {
@@ -920,14 +927,17 @@ export default {
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
-      if (this.kaltura_info === null && shouldFetch(this.node.typeData.mediaURL, this.node)) {
+      if (
+        this.kaltura_info === null &&
+        shouldFetch(this.node.typeData.mediaURL, this.node)
+      ) {
         const url = this.node.typeData.mediaURL
         const { data } = await getLinkMetadata(url)
 
         if (data) {
           this.node.typeData.linkMetadata = data
-          
-          if(this.type === 'add'){
+
+          if (this.type === "add") {
             this.confirmThumbnailsPopup(data.image)
           }
         }
