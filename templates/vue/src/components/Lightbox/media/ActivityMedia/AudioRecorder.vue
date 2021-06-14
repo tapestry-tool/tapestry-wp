@@ -10,7 +10,7 @@
     <p>question is {{ question }}</p>
     <p>audio url is {{ audio }}</p>
     <!-- src should be the url -->
-    <audio v-if="state === states.DONE" controls :src="audio"></audio>
+    <audio v-if="state === states.DONE" controls :src="getAudioUrl"></audio>
     <button
       v-else
       class="main-button my-2"
@@ -85,6 +85,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getQuestion", "getAnswers"]),
+    getAudioUrl() {
+      return this.audio + "?" + Date.now()
+    },
     question() {
       return this.getQuestion(this.id)
     },
@@ -128,7 +131,6 @@ export default {
         answersObject.audio.url &&
         answersObject.audio.url.length > 0
       ) {
-        console.log("shouldn't get here")
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {
         this.initialize()
@@ -140,6 +142,7 @@ export default {
       console.log("audio answer already exist got here")
       this.state = this.states.DONE
       let answersObject = this.getAnswers(this.node.id, this.question.id)
+      console.log("answersObject in created is", answersObject)
       console.log("wpdata.uploadDirArray is", wpData.uploadDirArray)
       console.log("wpdata.uploadDirArray.baseurl is", wpData.uploadDirArray.baseurl)
       this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
