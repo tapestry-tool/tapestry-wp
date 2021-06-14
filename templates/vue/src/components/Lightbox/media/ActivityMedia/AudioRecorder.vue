@@ -6,15 +6,13 @@
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
-    <p>node id is {{ node.id }}</p>
-    <p>question is {{ question }}</p>
-    <p>audio url is {{ audio }}</p>
+    <p>disableSubmitFlag is {{ disableSubmitFlag }}</p>
+    <!-- <p>question is {{ question }}</p> -->
+    <!-- <p>audio url is {{ audio }}</p>
+    <p>doneButtonPressed is {{ doneButtonPressed }}</p>
+    <p>getAudioUrl is {{ getAudioUrl }}</p> -->
     <!-- src should be the url -->
-    <audio
-      v-if="doneButtonPressed && !reRecordButtonPressed"
-      controls
-      :src="audio"
-    ></audio>
+    <audio v-if="doneButtonPressed" controls :src="audio"></audio>
     <audio v-else-if="state === states.DONE" controls :src="getAudioUrl"></audio>
     <button
       v-else
@@ -48,7 +46,12 @@
       <i class="fas fa-check"></i>
       Done
     </button>
-    <button v-if="state === states.DONE" class="my-3" @click="handleSubmit">
+    <button
+      v-if="state === states.DONE"
+      :disabled="disableSubmitFlag"
+      class="my-3"
+      @click="handleSubmit"
+    >
       <i class="fas fa-check"></i>
       Submit
     </button>
@@ -87,7 +90,7 @@ export default {
       recorder: null,
       state: null,
       doneButtonPressed: false,
-      reRecordButtonPressed: false,
+      disableSubmitFlag: this.audio !== null,
     }
   },
   computed: {
@@ -186,7 +189,6 @@ export default {
             this.audio = data
             this.state = this.states.DONE
             this.doneButtonPressed = true
-            console.log("this.audio after pressing done is", this.audio)
           }
         })
 
@@ -224,13 +226,13 @@ export default {
       client.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
-      this.reRecordButtonPressed = false
+      this.disableSubmitFlag = false
     },
     resetRecording() {
       client.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
-      this.reRecordButtonPressed = true
+      this.doneButtonPressed = false
     },
     toggleRecording() {
       switch (this.state) {
