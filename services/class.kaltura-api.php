@@ -93,7 +93,6 @@
             $uploadToken = new UploadToken();
             $token = $kclient->uploadToken->add($uploadToken);
 
-            
             $this->thread_pool[] = async(function () use ($kclient,$token,$filepath) {
                 $resume = false;
                 $finalChunk = true;

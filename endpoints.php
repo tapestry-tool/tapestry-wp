@@ -1459,13 +1459,12 @@ function getUserAudio($request)
     }
 }
 
-if (LOAD_KALTURA) {
     /**
      * Checks if the Kaltura API varaibles are defined
      */
     function getKalturaExists()
     {
-        if (empty(KALTURA_ADMIN_SECRET) || empty(KALTURA_PARTNER_ID) || empty(KALTURA_SERVICE_URL)) {
+        if (!LOAD_KALTURA) {
             return false;
         } else {
             // Use getKalturaClient to check working credentials
@@ -1488,21 +1487,22 @@ if (LOAD_KALTURA) {
      */
     function postKalturaVideo($request)
     {
-        $postId = $request['tapestryPostId'];
-        $file = $_FILES['async-upload'];
-        $user = new TapestryUser();
+        if (LOAD_KALTURA) {
+            $postId = $request['tapestryPostId'];
+            $file = $_FILES['async-upload'];
+            $user = new TapestryUser();
 
-        try {
-            if (!$user->canEdit($postId)) {
-                throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
-            }
-            // Moving the tmporary file to a non temporary location
-            $tmp_name = preg_replace("#tmp/#i", "", $file["tmp_name"]);
-            $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
+            try {
+                if (!$user->canEdit($postId)) {
+                    throw new TapestryError('TAPESTRY_PERMISSION_DENIED');
+                }
+                // Moving the tmporary file to a non temporary location
+                $tmp_name = preg_replace("#tmp/#i", "", $file["tmp_name"]);
+                $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
 
-            move_uploaded_file($file["tmp_name"], $dirpath."".$tmp_name);
+                move_uploaded_file($file["tmp_name"], $dirpath."".$tmp_name);
             
-            $result = array(
+                $result = array(
                     "file" =>array(
                     "name" => $file["name"],
                     "type" => $file["type"],
@@ -1512,55 +1512,57 @@ if (LOAD_KALTURA) {
                 ),
             );
 
-            return $result;
-        } catch (TapestryError $e) {
-            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+                return $result;
+            } catch (TapestryError $e) {
+                return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+            }
         }
     }
 
     function uploadKalturaVideo($request)
     {
-        $postId = $request["tapestryPostId"];
-        $nodeMetaId = $request['nodeMetaId'];
+        if (LOAD_KALTURA) {
+            $postId = $request["tapestryPostId"];
+            $nodeMetaId = $request['nodeMetaId'];
 
-        $params = json_decode($request->get_body());
-        $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
+            $params = json_decode($request->get_body());
+            $dirpath = wp_upload_dir()["basedir"]."/tapestry/tmp_images";
 
-        $file = $params->file;
-        $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'), '/'));
-        $title = get_the_title($postId);
+            $file = $params->file;
+            $url = preg_replace('#^https?://#', '', rtrim(get_bloginfo('url'), '/'));
+            $title = get_the_title($postId);
 
-        $file->tmp_name = $dirpath."".$file->tmp_name;
+            $file->tmp_name = $dirpath."".$file->tmp_name;
         
-        $kalturaApi = new KalturaApi();
+            $kalturaApi = new KalturaApi();
 
-        $category = $url.'/'.$title;
-        $result = $kalturaApi->uploadKalturaVideo($file, $category);
+            $category = $url.'/'.$title;
+            $result = $kalturaApi->uploadKalturaVideo($file, $category);
       
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
-
-        try {
-            if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
-                throw new TapestryError('INVALID_POST_ID');
-            }
-            if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
-                throw new TapestryError('INVALID_NODE_META_ID');
-            }
-            if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
-                throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
-            }
-            if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
-                throw new TapestryError('INVALID_CHILD_NODE');
-            }
-            if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
-                !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
-                throw new TapestryError('NODE_APPROVAL_DENIED');
-            }
-            
             $tapestry = new Tapestry($postId);
             $node = $tapestry->getNode($nodeMetaId);
-            $typeData = (object) array(
+
+            try {
+                if ($postId && !TapestryHelpers::isValidTapestry($postId)) {
+                    throw new TapestryError('INVALID_POST_ID');
+                }
+                if (!TapestryHelpers::isValidTapestryNode($nodeMetaId)) {
+                    throw new TapestryError('INVALID_NODE_META_ID');
+                }
+                if (!TapestryHelpers::userIsAllowed('EDIT', $nodeMetaId, $postId)) {
+                    throw new TapestryError('EDIT_NODE_PERMISSION_DENIED');
+                }
+                if (!TapestryHelpers::isChildNodeOfTapestry($nodeMetaId, $postId)) {
+                    throw new TapestryError('INVALID_CHILD_NODE');
+                }
+                if (TapestryHelpers::nodeIsDraft($nodeMetaId, $postId) &&
+                !TapestryHelpers::nodeNeighbourIsPublished($nodeMetaId, $postId)) {
+                    throw new TapestryError('NODE_APPROVAL_DENIED');
+                }
+            
+                $tapestry = new Tapestry($postId);
+                $node = $tapestry->getNode($nodeMetaId);
+                $typeData = (object) array(
                 "linkMetadata" => "",
                 "mediaURL" => $result->dataUrl."/flavorParamId/7",
                 "mediaWidth" => $result->width,
@@ -1569,38 +1571,35 @@ if (LOAD_KALTURA) {
                 "textContent" => ""
             );
     
-            $node->set((object) [
+                $node->set((object) [
                 "kalturaUploadStatus" => "finished",
                  "typeData" => $typeData,
                  "mediaDuration"=> $result->duration
                  ]);
             
-            $node = $node->save();
+                $node = $node->save();
 
-            unlink($file->tmp_name);
+                unlink($file->tmp_name);
     
-            return $node;
-        } catch (TapestryError $e) {
-            return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+                return $node;
+            } catch (TapestryError $e) {
+                return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+            }
         }
     }
 
     function getKalturaUploadStatus($request)
     {
-        $postId = $request['tapestryPostId'];
-        $nodeMetaId = $request['nodeMetaId'];
+        if (LOAD_KALTURA) {
+            $postId = $request['tapestryPostId'];
+            $nodeMetaId = $request['nodeMetaId'];
 
-        $tapestry = new Tapestry($postId);
-        $node = $tapestry->getNode($nodeMetaId);
+            $tapestry = new Tapestry($postId);
+            $node = $tapestry->getNode($nodeMetaId);
 
-        return $node->getKalturaUploadStatus();
+            return $node->getKalturaUploadStatus();
+        }
     }
-} else {
-    function getKalturaExists()
-    {
-        return false;
-    }
-}
 /**
  * Get user favourite nodes on a tapestry page by post id.
  * Example: /wp-json/tapestry-tool/v1/users/favourites?post_id=44.
