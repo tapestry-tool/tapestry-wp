@@ -282,7 +282,10 @@ export default {
           let hasDialogue = this.$refs.h5p.contentWindow.H5P.$body[0].querySelector(
             ".h5p-dialog-wrapper"
           )
-          if (hasDialogue.style.display === "none") {
+          if (
+            hasDialogue.style.display === "none" ||
+            hasDialogue.style.display === ""
+          ) {
             this.$emit("pause")
           }
         }
