@@ -13,11 +13,4 @@ interface ITapestryAudio
      * @return object $audio
      */
     public function save($audio);
-
-    /**
-     * Get the audio.
-     *
-     * @return $audio audio
-     */
-    public function get();
 }
