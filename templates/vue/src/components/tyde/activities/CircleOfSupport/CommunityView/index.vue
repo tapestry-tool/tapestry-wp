@@ -9,6 +9,7 @@
     <connections-tab
       ref="connections"
       class="tab"
+      :toolTipPositioned="this.toolTipPositioned"
       :connections="connections"
       :communities="communities"
       @back="handleBack"
@@ -19,53 +20,53 @@
       @connection-closed="$emit('connection-closed')"
     />
     <add-community-tab
-        v-model="community"
-        :show="isCommunityTabOpen"
-        :disabled="!canAddCommunity"
-        @back="state = lastState"
-        @add-community="$emit('add-community', $event)"
-        @toggle="toggleCommunityTab"
+      v-model="community"
+      :show="isCommunityTabOpen"
+      :disabled="!canAddCommunity"
+      @back="state = lastState"
+      @add-community="$emit('add-community', $event)"
+      @toggle="toggleCommunityTab"
     />
-    
-    <onboarding 
-    :communities="communities"
-    :connections="connections"/>
 
-    
+    <onboarding
+      :communities="communities"
+      :connections="connections"
+      @tooltip-positioned="handleToolTipPositioned"
+    />
   </div>
 </template>
 
 <script>
-import OnBoarding from "./onboarding/index.vue"
-import AddCommunityTab from "./AddCommunityTab"
-import ConnectionsTab from "../ConnectionsTab"
-import CommunitiesList from "./CommunitiesList"
-import { MAX_COMMUNITIES } from "../cos.config"
+import OnBoarding from "./onboarding/index.vue";
+import AddCommunityTab from "./AddCommunityTab";
+import ConnectionsTab from "../ConnectionsTab";
+import CommunitiesList from "./CommunitiesList";
+import { MAX_COMMUNITIES } from "../cos.config";
 
 const States = {
   Home: 0,
   AddCommunity: 1,
   EditCommunity: 2,
   EditConnection: 3,
-  AddConnection: 4,
-}
+  AddConnection: 4
+};
 
 export default {
   components: {
     AddCommunityTab,
     CommunitiesList,
     ConnectionsTab,
-    'onboarding':OnBoarding
+    onboarding: OnBoarding
   },
   props: {
     connections: {
       type: Object,
-      required: true,
+      required: true
     },
     communities: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
@@ -74,65 +75,70 @@ export default {
       community: {
         name: "",
         icon: "👨‍👩‍👦",
-        color: "",
+        color: ""
       },
-      
-    }
+      toolTipPositioned: false
+    };
   },
   computed: {
     states() {
-      return States
+      return States;
     },
     isCommunityTabOpen() {
-      return [States.EditCommunity, States.AddCommunity].includes(this.state)
+      return [States.EditCommunity, States.AddCommunity].includes(this.state);
     },
     canAddCommunity() {
-      return Object.keys(this.communities).length < MAX_COMMUNITIES
-    },
+      return Object.keys(this.communities).length < MAX_COMMUNITIES;
+    }
   },
   watch: {
     state(_, lastState) {
-      this.lastState = lastState
-    },
+      this.lastState = lastState;
+    }
   },
 
   methods: {
-
     toggleCommunityTab() {
+      // FIX : Disable attribute for community-list does not work as it is a self-made component
+      if (!this.toolTipPositioned) {
         if (this.isCommunityTabOpen) {
-          this.state = States.Home
+          this.state = States.Home;
         } else {
-          this.resetCommunity()
-          this.state = States.AddCommunity
+          this.resetCommunity();
+          this.state = States.AddCommunity;
         }
+      }
     },
     editCommunity(community) {
-      this.community = community
-      this.state = States.EditCommunity
+      this.community = community;
+      this.state = States.EditCommunity;
     },
     resetCommunity() {
       this.community = {
         name: "",
         icon: "👨‍👩‍👦",
-        color: "",
-      }
+        color: ""
+      };
     },
     editConnection(connection) {
-      this.state = States.EditConnection
-      this.$refs.connections.editConnection(connection)
+      this.state = States.EditConnection;
+      this.$refs.connections.editConnection(connection);
     },
     handleBack() {
       if (this.state === States.EditConnection) {
-        this.state = States.Home
-        this.$refs.connections.close()
+        this.state = States.Home;
+        this.$refs.connections.close();
       }
     },
     handleEditConnection(event) {
-      this.handleBack()
-      this.$emit("edit-connection", event)
+      this.handleBack();
+      this.$emit("edit-connection", event);
     },
-  },
-}
+    handleToolTipPositioned() {
+      this.toolTipPositioned = true;
+    }
+  }
+};
 </script>
 
 <style scoped>

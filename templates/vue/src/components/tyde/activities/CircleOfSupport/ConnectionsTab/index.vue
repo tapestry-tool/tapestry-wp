@@ -1,6 +1,7 @@
 <template>
   <div :class="['wrapper', { show: isOpen, hidden: isHidden }]">
     <cos-popup-button
+      :disabled="toolTipPositioned"
       id="connections-tab-popup-trigger"
       style="left: 2rem"
       aria-label="Connections"
@@ -38,40 +39,44 @@
 </template>
 
 <script>
-import TapestryIcon from "@/components/common/TapestryIcon"
-import client from "@/services/TapestryAPI"
+import TapestryIcon from "@/components/common/TapestryIcon";
+import client from "@/services/TapestryAPI";
 
-import CosPopupButton from "../CosPopupButton"
-import AddConnectionForm from "./AddConnectionForm"
-import ConnectionsList from "./ConnectionsList"
+import CosPopupButton from "../CosPopupButton";
+import AddConnectionForm from "./AddConnectionForm";
+import ConnectionsList from "./ConnectionsList";
 
 const States = {
   Home: 0,
   Add: 1,
-  Edit: 3, // Should match editing state in the community
-}
+  Edit: 3 // Should match editing state in the community
+};
 
 export default {
   components: {
     CosPopupButton,
     AddConnectionForm,
     ConnectionsList,
-    TapestryIcon,
+    TapestryIcon
   },
   props: {
     connections: {
       type: Object,
-      required: true,
+      required: true
     },
     communities: {
       type: Object,
-      required: true,
+      required: true
     },
     draggable: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
+    toolTipPositioned: {
+      type: Boolean,
+      required: true
+    }
   },
   data() {
     return {
@@ -83,88 +88,91 @@ export default {
         id: "",
         name: "",
         avatar: "😊",
-        communities: [],
-      },
-    }
+        communities: []
+      }
+    };
   },
   computed: {
     states() {
-      return States
-    },
+      return States;
+    }
   },
   methods: {
     toggle() {
-      this.$emit("toggle")
-      if (this.isOpen) {
-        this.state = States.Home
-        this.$emit("connection-closed")
+      // FIX : Disable attribute for community-list does not work as it is a self-made component
+      if (!this.toolTipPositioned) {
+        this.$emit("toggle");
+        if (this.isOpen) {
+          this.state = States.Home;
+          this.$emit("connection-closed");
+        }
+        this.isOpen = !this.isOpen;
       }
-      this.isOpen = !this.isOpen
     },
     hide() {
       if (this.isOpen) {
-        this.isHidden = true
+        this.isHidden = true;
       }
     },
     show() {
       if (this.isOpen) {
-        this.isHidden = false
+        this.isHidden = false;
       }
     },
     back() {
-      this.state = States.Home
-      this.$emit("back")
+      this.state = States.Home;
+      this.$emit("back");
     },
     open() {
-      this.isOpen = true
+      this.isOpen = true;
     },
     close() {
-      this.isOpen = false
+      this.isOpen = false;
     },
     openConnectionForm() {
-      this.resetConnection()
-      this.state = States.Add
+      this.resetConnection();
+      this.state = States.Add;
     },
     editConnection(connection) {
-      this.open()
+      this.open();
       this.connection = {
         ...connection,
-        communities: connection.communities.map(community => community.id),
-      }
-      this.state = States.Edit
+        communities: connection.communities.map(community => community.id)
+      };
+      this.state = States.Edit;
     },
     resetConnection() {
       this.connection = {
         id: "",
         name: "",
         avatar: "😊",
-        communities: [],
-      }
+        communities: []
+      };
     },
     async handleSubmit() {
-      this.isSubmitting = true
+      this.isSubmitting = true;
 
       switch (this.state) {
         case States.Add:
-          await this.addNewConnection()
-          this.$emit("connection-submitted")
-          break
+          await this.addNewConnection();
+          this.$emit("connection-submitted");
+          break;
         case States.Edit:
-          await this.updateConnection()
-          break
+          await this.updateConnection();
+          break;
         default:
-          break
+          break;
       }
 
-      this.isSubmitting = false
-      this.resetConnection()
-      this.state = States.Home
+      this.isSubmitting = false;
+      this.resetConnection();
+      this.state = States.Home;
     },
     async addNewConnection() {
       const connection = await client.cos.addConnection({
         name: this.connection.name,
-        avatar: this.connection.avatar,
-      })
+        avatar: this.connection.avatar
+      });
 
       if (this.connection.communities.length) {
         /**
@@ -172,49 +180,54 @@ export default {
          * only the last community is kept.
          */
         for (const communityId of this.connection.communities) {
-          await client.cos.addConnectionToCommunity(communityId, connection.id)
+          await client.cos.addConnectionToCommunity(communityId, connection.id);
         }
       }
       this.$emit("add-connection", {
         ...connection,
-        communities: this.connection.communities,
-      })
+        communities: this.connection.communities
+      });
     },
     async updateConnection() {
-      const currentCommunities = this.getCommunities(this.connection.id)
-      await client.cos.updateConnection(this.connection.id, { ...this.connection })
+      const currentCommunities = this.getCommunities(this.connection.id);
+      await client.cos.updateConnection(this.connection.id, {
+        ...this.connection
+      });
 
       const { additions, deletions } = this.getDifferences(
         currentCommunities.map(community => community.id),
         this.connection.communities
-      )
+      );
 
       for (const addition of additions) {
-        await client.cos.addConnectionToCommunity(addition, this.connection.id)
+        await client.cos.addConnectionToCommunity(addition, this.connection.id);
       }
 
       for (const deletion of deletions) {
-        await client.cos.removeConnectionFromCommunity(deletion, this.connection.id)
+        await client.cos.removeConnectionFromCommunity(
+          deletion,
+          this.connection.id
+        );
       }
 
       this.$emit("edit-connection", {
         ...this.connection,
         additions,
-        deletions,
-      })
+        deletions
+      });
     },
     getCommunities(connectionId) {
       return Object.values(this.communities).filter(community =>
         community.connections.includes(connectionId)
-      )
+      );
     },
     getDifferences(original, newVersion) {
-      const additions = newVersion.filter(item => !original.includes(item))
-      const deletions = original.filter(item => !newVersion.includes(item))
-      return { additions, deletions }
-    },
-  },
-}
+      const additions = newVersion.filter(item => !original.includes(item));
+      const deletions = original.filter(item => !newVersion.includes(item));
+      return { additions, deletions };
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

@@ -29,6 +29,7 @@ export default {
     // const container = document.getElementById("cos")
     // const target = container.querySelector(`#${this.refId}`)
     this.positioned = true
+    this.$emit('tooltip-positioned')
   },
 }
 </script>

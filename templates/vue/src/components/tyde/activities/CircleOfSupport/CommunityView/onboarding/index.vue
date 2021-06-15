@@ -25,7 +25,9 @@
       :connections="connections"
       @ob-finish="send(OnboardingEvents.Done)"
     />
-    <tooltip v-if="isState('Communities.AddLaterTooltip')" class="right">
+    <tooltip v-if="isState('Communities.AddLaterTooltip')" class="right" 
+              @tooltip-positioned="$emit('tooltip-positioned')"
+    >
       <h3>
         Remember - you can click this button whenever you'd like to add another
         community!
@@ -38,7 +40,8 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <tooltip v-if="isState('Communities.AddAnotherTooltip')" class="right">
+    <tooltip v-if="isState('Communities.AddAnotherTooltip')" class="right"
+      @tooltip-positioned="$emit('tooltip-positioned')">
       <h3>
         Click here to add another community!
       </h3>
@@ -46,7 +49,8 @@
         Got it &#8594;
       </b-button>
     </tooltip>
-    <tooltip v-if="isState('Connections.AddAnotherTooltip')" class="left">
+    <tooltip v-if="isState('Connections.AddAnotherTooltip')" class="left"
+     @tooltip-positioned="$emit('tooltip-positioned')">
       <h3 style="max-width:300px;">
         Click here to add some of your connections!
       </h3>
