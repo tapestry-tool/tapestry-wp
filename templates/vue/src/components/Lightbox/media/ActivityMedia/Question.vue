@@ -36,12 +36,6 @@
         Please login to have your answers saved.
       </b-alert>
       <div class="question-body">
-        <!--TODO remove this after also removing its requirements gravity-form
-          v-if="formOpened"
-          :id="formId"
-          class="answer"
-          @submit="handleFormSubmit"
-        ></gravity-form-->
         <text-question
           v-if="formOpened && formType === 'text'"
           :question="question"
