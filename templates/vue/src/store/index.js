@@ -22,7 +22,7 @@ export const store = {
     visibleNodes: [],
     apiError: null,
     displayErrors: false,
-    useKaltura: 'loading',
+    useKaltura: "loading",
   },
   getters,
   mutations,

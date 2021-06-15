@@ -41,7 +41,7 @@ export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }
 
-export function updateKalturaUse(state, newUse){
+export function updateKalturaUse(state, newUse) {
   state.useKaltura = newUse
 }
 

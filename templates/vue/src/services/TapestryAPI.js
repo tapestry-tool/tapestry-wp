@@ -296,7 +296,7 @@ class TapestryApi {
   }
 
   async kalturaExists() {
-    return this.client.get('/kaltura/exists')
+    return this.client.get("/kaltura/exists")
   }
 }
 

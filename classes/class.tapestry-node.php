@@ -128,7 +128,7 @@ class TapestryNode implements ITapestryNode
      */
     public function set($node)
     {
-        if(isset($node->kalturaUpload) && is_string($node->kalturaUpload)) {
+        if (isset($node->kalturaUpload) && is_string($node->kalturaUpload)) {
             $this->kalturaUpload = $node->kalturaUpload;
         }
         if (isset($node->type) && is_string($node->type)) {
@@ -396,14 +396,17 @@ class TapestryNode implements ITapestryNode
 
         return $nodeMeta->author->id == $userId;
     }
+
     public function getKalturaStatus()
     {
-        $data = array(
-            "status" => $this->kalturaUpload,
-            "url" => $this->typeData
-        );
+        $data = [
+            'status' => $this->kalturaUpload,
+            'url' => $this->typeData,
+        ];
+
         return $data;
     }
+
     public function addReview($comments)
     {
         if (NodeStatus::PUBLISH === $this->status) {

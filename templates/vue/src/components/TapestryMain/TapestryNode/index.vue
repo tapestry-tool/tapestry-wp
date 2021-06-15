@@ -188,11 +188,11 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
-      uploadingKaltura: false
+      uploadingKaltura: false,
     }
   },
   computed: {
-    ...mapState(["selection", "settings", "visibleNodes","useKaltura"]),
+    ...mapState(["selection", "settings", "visibleNodes", "useKaltura"]),
     ...mapGetters(["getNode", "getDirectChildren", "isVisible", "getParent"]),
     canReview() {
       if (!this.isLoggedIn) {
@@ -360,25 +360,23 @@ export default {
     },
   },
   mounted() {
-    if( this.useKaltura &&
-       (typeof this.node.kalturaUpload !== 'undefined' &&
-       this.node.kalturaUpload != '')){
+    if (
+      this.useKaltura &&
+      typeof this.node.kalturaUpload !== "undefined" &&
+      this.node.kalturaUpload != ""
+    ) {
       this.uploadingKaltura = true
       const inter = setInterval(async () => {
-      
-      const res = await kclient.getKalturaStatus(this.node.id)
-        
-      if(res.data.status == ""){
-        clearInterval(inter)
-      }
-      else if(res.data.status == "finished")
-      {
-        this.uploadingKaltura = false
-        clearInterval(inter)
-        this.handleKalturaFinished()
-      }
-          
-    }, 10000);
+        const res = await kclient.getKalturaStatus(this.node.id)
+
+        if (res.data.status == "") {
+          clearInterval(inter)
+        } else if (res.data.status == "finished") {
+          this.uploadingKaltura = false
+          clearInterval(inter)
+          this.handleKalturaFinished()
+        }
+      }, 10000)
     } else {
       this.uploadingKaltura = false
     }
@@ -444,26 +442,23 @@ export default {
     )
   },
   methods: {
-    ...mapActions(["updateNodeCoordinates","updateNode"]),
+    ...mapActions(["updateNodeCoordinates", "updateNode"]),
     ...mapMutations(["select", "unselect"]),
-    async handleKalturaFinished(){
+    async handleKalturaFinished() {
+      const newNode = await client.getNode(this.node.id)
 
-    const newNode = await client.getNode(this.node.id) 
-      
-     await this.$store.commit("updateNode",{
-          id: this.node.id,
-          newNode: newNode
+      await this.$store.commit("updateNode", {
+        id: this.node.id,
+        newNode: newNode,
       })
 
-      const finishedNode = await client.getNode(this.node.id) 
-      finishedNode.kalturaUpload = ''
-     
+      const finishedNode = await client.getNode(this.node.id)
+      finishedNode.kalturaUpload = ""
+
       this.updateNode({
         id: this.node.id,
-        newNode: finishedNode
+        newNode: finishedNode,
       })
-
-
     },
     updateRootNode() {
       if (!this.root) {
@@ -471,7 +466,7 @@ export default {
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
-          path: `/nodes/${this.node.id}`
+          path: `/nodes/${this.node.id}`,
         })
       }
     },
@@ -480,8 +475,7 @@ export default {
       client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
-      if(!this.uploadingKaltura)
-      {
+      if (!this.uploadingKaltura) {
         this.$root.$emit("edit-node", id)
         client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
       }
@@ -514,7 +508,10 @@ export default {
       return hours + ":" + minutes + ":" + sec
     },
     handleRequestOpen() {
-      if (!this.uploadingKaltura && (this.node.accessible || this.hasPermission("edit"))) {
+      if (
+        !this.uploadingKaltura &&
+        (this.node.accessible || this.hasPermission("edit"))
+      ) {
         this.openNode(this.node.id)
       }
       client.recordAnalyticsEvent("user", "click", "open-node-button", this.node.id)
