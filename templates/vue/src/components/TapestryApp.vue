@@ -7,6 +7,7 @@
       data-qa="tapestry-map"
     />
     <tapestry-main v-else ref="graph" :viewBox="viewBox" />
+    <circle-of-support v-if="!isTest" />
   </div>
 </template>
 
@@ -18,12 +19,14 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
+import CircleOfSupport from "./tyde/activities/CircleOfSupport"
 
 export default {
   components: {
     TapestryMap,
     Toolbar,
     TapestryMain,
+    CircleOfSupport,
   },
   data() {
     return {
@@ -38,6 +41,9 @@ export default {
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
+    },
+    isTest() {
+      return Boolean(window.Cypress)
     },
   },
   watch: {
