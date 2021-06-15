@@ -1282,15 +1282,9 @@ function completeQuestionById($request)
     $postId = $request['post_id'];
     $nodeMetaId = $request['node_id'];
     $questionId = $request['question_id'];
-    //$answerData = $request->get_body();
     $body = json_decode($request->get_body());
     $answerData = $body->answer;
     $answerType = $body->answerType;
-    error_log($postId);
-    error_log($nodeMetaId);
-    error_log($questionId);
-    error_log($answerData);
-    error_log($answerType);
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
