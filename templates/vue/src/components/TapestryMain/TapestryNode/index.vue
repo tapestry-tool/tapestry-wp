@@ -362,8 +362,8 @@ export default {
   mounted() {
     if (
       this.useKaltura &&
-      typeof this.node.kalturaUpload !== "undefined" &&
-      this.node.kalturaUpload != ""
+      typeof this.node.kalturaUploadStatus !== "undefined" &&
+      this.node.kalturaUploadStatus != ""
     ) {
       this.uploadingKaltura = true
       const inter = setInterval(async () => {
@@ -453,7 +453,7 @@ export default {
       })
 
       const finishedNode = await client.getNode(this.node.id)
-      finishedNode.kalturaUpload = ""
+      finishedNode.kalturaUploadStatus = ""
 
       this.updateNode({
         id: this.node.id,

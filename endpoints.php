@@ -1572,7 +1572,7 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
             );
     
             $node->set((object) [
-                "kalturaUpload" => "finished",
+                "kalturaUploadStatus" => "finished",
                  "typeData" => $typeData,
                  "mediaDuration"=> $result->duration
                  ]);

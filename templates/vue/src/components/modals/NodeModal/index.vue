@@ -751,7 +751,7 @@ export default {
     },
     async submitNode() {
       if (this.useKaltura && this.kaltura_info !== null) {
-        this.node.kalturaUpload = "uploading"
+        this.node.kalturaUploadStatus = "uploading"
       }
       if (this.type === "add") {
         const id = await this.addNode(this.node)

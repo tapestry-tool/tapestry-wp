@@ -47,7 +47,7 @@ class TapestryNode implements ITapestryNode
     private $license;
     private $references;
     private $mapCoordinates;
-    private $kalturaUpload;
+    private $kalturaUploadStatus;
 
     /**
      * Constructor.
@@ -100,7 +100,7 @@ class TapestryNode implements ITapestryNode
             'lat' => '',
             'lng' => '',
         ];
-        $this->kalturaUpload = '';
+        $this->kalturaUploadStatus = '';
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -128,9 +128,6 @@ class TapestryNode implements ITapestryNode
      */
     public function set($node)
     {
-        if (isset($node->kalturaUpload) && is_string($node->kalturaUpload)) {
-            $this->kalturaUpload = $node->kalturaUpload;
-        }
         if (isset($node->type) && is_string($node->type)) {
             $this->type = $node->type;
         }
@@ -252,6 +249,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->mapCoordinates) && is_object($node->mapCoordinates)) {
             $this->mapCoordinates = $node->mapCoordinates;
+        }
+        if (isset($node->kalturaUploadStatus) && is_string($node->kalturaUploadStatus)) {
+            $this->kalturaUploadStatus = $node->kalturaUploadStatus;
         }
     }
 
@@ -400,8 +400,7 @@ class TapestryNode implements ITapestryNode
     public function getKalturaStatus()
     {
         $data = [
-            'status' => $this->kalturaUpload,
-            'url' => $this->typeData,
+            'status' => $this->kalturaUploadStatus,
         ];
 
         return $data;
@@ -602,7 +601,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
-            'kalturaUpload' => $this->kalturaUpload,
+            'kalturaUploadStatus' => $this->kalturaUploadStatus,
         ];
     }
 
