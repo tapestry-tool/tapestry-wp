@@ -98,14 +98,9 @@
                 $resume = false;
                 $finalChunk = true;
                 $resumeAt = -1;
-                error_log("Starting to upload");
                 $upload = $kclient->uploadToken->upload($token->id, $filepath, $resume, $finalChunk, $resumeAt);
-            })->then(function ($output) {
-                error_log("finished upload");
-            });
-            error_log("Out of upload");
+            })->then(function ($output) {});
             
-    
             $mediaEntry = new MediaEntry();
             $mediaEntry->name = $filename;
             $mediaEntry->mediaType = MediaType::VIDEO;
