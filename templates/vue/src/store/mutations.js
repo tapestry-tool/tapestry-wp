@@ -4,12 +4,7 @@ import { parse } from "@/utils/dataset"
 //import Helpers from "@/utils/Helpers"
 
 export function init(state, { dataset, progress = {} }) {
-  //console.log("inside init")
-  //console.log("dataset is ", dataset)
-  //console.log("progress is ", progress)
   const datasetWithProgress = parse(dataset, progress)
-  console.log("dataset with progress is ", datasetWithProgress)
-  //console.log("state is ", state)
   Object.entries(datasetWithProgress).forEach(([key, value]) => {
     if (key === "nodes") {
       state.nodes = {}
@@ -125,23 +120,17 @@ export function deleteLink(state, { source, target }) {
 export function completeQuestion(state, { nodeId, questionId, answer, answerType }) {
   // OLD CODE
   const node = getters.getNode(state)(nodeId)
-  //console.log("node is", node)
+
   const question = node.typeData.activity.questions.find(
     question => question.id === questionId
   )
-  //console.log("question is", question)
+
   question.completed = true
-  //fixed
-  //console.log("node id is", nodeId)
-  //console.log("question id is", questionId)
-  //console.log("answer is", answer)
-  //console.log("answer type is", answerType)
-  //console.log("initially state.userAnswers is", Helpers.deepCopy(state.userAnswers))
+
   if (
     state.userAnswers[nodeId] === undefined ||
     state.userAnswers[nodeId].activity === undefined
   ) {
-    //console.log("if no activity property")
     state.userAnswers[nodeId] = {}
     state.userAnswers[nodeId].activity = {}
   }
@@ -152,17 +141,8 @@ export function completeQuestion(state, { nodeId, questionId, answer, answerType
   if (typeof state.userAnswers[nodeId].activity[questionId].answers === "string") {
     state.userAnswers[nodeId].activity[questionId].answers = {}
   }
-  //state.progress[nodeId].activity[questionId].answers[answerType] = answer
-  console.log("got here before, state.userAnswers is", state.userAnswers)
-  console.log("inside mutation answer is", answer)
-  console.log("inside mutation type of answer is", typeof answer)
-  console.log("inside mutation answerType is", answerType)
-  console.log("inside mutation type of answerType is", typeof answerType)
+
   state.userAnswers[nodeId].activity[questionId].answers[answerType] = answer
-  console.log(
-    "got here after",
-    state.userAnswers[nodeId].activity[questionId].answers
-  )
 }
 
 export function updateEntry(state, { answerType, entry, nodeId, questionId }) {

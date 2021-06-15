@@ -99,10 +99,6 @@ export function getQuestion(state) {
       .filter(node => node.typeData.activity)
       .find(node => node.typeData.activity.questions.find(q => q.id == id))
     if (node) {
-      console.log(
-        "success",
-        node.typeData.activity.questions.find(q => q.id == id)
-      )
       return node.typeData.activity.questions.find(q => q.id == id)
     }
     return null
