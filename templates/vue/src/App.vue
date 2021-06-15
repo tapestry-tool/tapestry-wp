@@ -49,7 +49,6 @@ export default {
   computed: {
     ...mapState(["nodes"]),
     isEmpty() {
-      console.log("Will erase later")
       return Object.keys(this.nodes).length === 0
     },
   },

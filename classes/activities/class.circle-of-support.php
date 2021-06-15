@@ -7,8 +7,8 @@ class CircleOfSupport
     private $versions;
     private $current;
 
-    const META_KEY = 'tyde_circle_of_support';
-    const MAX_COMMUNITIES = 10;
+    public const META_KEY = 'tyde_circle_of_support';
+    public const MAX_COMMUNITIES = 10;
 
     public function __construct($userId = 0)
     {
