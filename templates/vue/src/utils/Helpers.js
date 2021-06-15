@@ -343,6 +343,8 @@ export default class Helpers {
       hideTitle: false,
       hideProgress: false,
       hideMedia: false,
+      backgroundColor: "#8396a1",
+      textColor: "white",
       skippable: true,
       fullscreen: false,
       coordinates: {

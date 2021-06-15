@@ -485,10 +485,19 @@ export default {
       this.keepOpen = true
       this.handlePublish()
     })
+    this.$root.$on("remove-thumbnail", thumbnailType => {
+      if (thumbnailType == "thumbnail") {
+        this.node.imageURL = ""
+        this.node.thumbnailFileId = ""
+      } else {
+        this.node.lockedImageURL = ""
+        this.node.lockedThumbnailFileId = ""
+      }
+    })
     this.initialize()
   },
   methods: {
-    ...mapMutations(["updateSelectedNode", "updateRootNode"]),
+    ...mapMutations(["updateRootNode"]),
     ...mapActions([
       "addNode",
       "addLink",
@@ -738,9 +747,6 @@ export default {
               },
             })
           }
-          if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
-          }
         } else {
           this.updateRootNode(id)
         }
@@ -841,7 +847,10 @@ export default {
       if (this.node.title.length == 0) {
         errMsgs.push("Please enter a title")
       }
-      if (this.node.description.length > this.maxDescriptionLength) {
+      if (
+        this.node.description.replace(/<[^>]*>?/gm, "").length >
+        this.maxDescriptionLength
+      ) {
         errMsgs.push(
           "Please limit your description to under " +
             this.maxDescriptionLength +
@@ -1112,6 +1121,9 @@ table {
 }
 
 .error-wrapper {
+  position: sticky;
+  z-index: 2;
+  top: 0;
   background: #f8d7da;
   color: #721c24;
   padding: 1em 1em 1px 2em;
