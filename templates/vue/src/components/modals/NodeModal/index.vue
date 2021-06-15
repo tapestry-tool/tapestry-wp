@@ -249,34 +249,36 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex"
-import { SlickList, SlickItem } from "vue-slicksort"
-import ActivityForm from "./forms/ContentForm/ActivityForm"
-import AppearanceForm from "./forms/AppearanceForm"
-import BehaviourForm from "./forms/BehaviourForm"
-import ConditionsForm from "./forms/ConditionsForm"
-import CoordinatesForm from "./forms/CoordinatesForm"
-import ContentForm from "./forms/ContentForm"
-import CopyrightForm from "./forms/CopyrightForm"
-import ReferencesForm from "./forms/ReferencesForm"
-import PermissionsTable from "../common/PermissionsTable"
-import DeleteNodeButton from "./DeleteNodeButton"
-import { names } from "@/config/routes"
-import Helpers from "@/utils/Helpers"
-import * as Comment from "@/utils/comments"
-import { sizes, nodeStatus } from "@/utils/constants"
-import { getLinkMetadata } from "@/services/LinkPreviewApi"
-import DragSelectModular from "@/utils/dragSelectModular"
-import * as wp from "@/services/wp"
-import kclient from "@/services/KalturaAPI"
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import { SlickList, SlickItem } from "vue-slicksort";
+import ActivityForm from "./forms/ContentForm/ActivityForm";
+import AppearanceForm from "./forms/AppearanceForm";
+import BehaviourForm from "./forms/BehaviourForm";
+import ConditionsForm from "./forms/ConditionsForm";
+import CoordinatesForm from "./forms/CoordinatesForm";
+import ContentForm from "./forms/ContentForm";
+import CopyrightForm from "./forms/CopyrightForm";
+import ReferencesForm from "./forms/ReferencesForm";
+import PermissionsTable from "../common/PermissionsTable";
+import DeleteNodeButton from "./DeleteNodeButton";
+import { names } from "@/config/routes";
+import Helpers from "@/utils/Helpers";
+import * as Comment from "@/utils/comments";
+import { sizes, nodeStatus } from "@/utils/constants";
+import { getLinkMetadata } from "@/services/LinkPreviewApi";
+import DragSelectModular from "@/utils/dragSelectModular";
+import * as wp from "@/services/wp";
+import kclient from "@/services/KalturaAPI";
 
 const shouldFetch = (url, selectedNode) => {
-  if (!selectedNode.typeData.linkMetadata) {
-    return true
+  if (this.kaltura_info === null) {
+    if (!selectedNode.typeData.linkMetadata) {
+      return true;
+    }
+    const oldUrl = selectedNode.typeData.linkMetadata.url;
+    return oldUrl != Helpers.normalizeUrl(url);
   }
-  const oldUrl = selectedNode.typeData.linkMetadata.url
-  return oldUrl != Helpers.normalizeUrl(url)
-}
+};
 
 export default {
   name: "node-modal",
@@ -292,7 +294,7 @@ export default {
     SlickItem,
     SlickList,
     PermissionsTable,
-    DeleteNodeButton,
+    DeleteNodeButton
   },
   data() {
     return {
@@ -308,8 +310,8 @@ export default {
       deleteWarningText: "",
       keepOpen: false,
       originalUrl: "",
-      kaltura_info: null,
-    }
+      kaltura_info: null
+    };
   },
   computed: {
     ...mapGetters([
@@ -317,7 +319,7 @@ export default {
       "getDirectChildren",
       "getParent",
       "getNode",
-      "getNeighbours",
+      "getNeighbours"
     ]),
     ...mapState([
       "nodes",
@@ -325,80 +327,83 @@ export default {
       "settings",
       "visibleNodes",
       "apiError",
-      "useKaltura",
+      "useKaltura"
     ]),
     parent() {
       const parent = this.getNode(
         this.type === "add" ? this.nodeId : this.getParent(this.nodeId)
-      )
-      return parent ? parent : null
+      );
+      return parent ? parent : null;
     },
     title() {
       if (this.type === "add") {
         return this.parent
           ? `Add new sub-topic to ${this.parent.title}`
-          : "Add root node"
+          : "Add root node";
       } else if (this.type === "edit") {
-        return `Edit node: ${this.node.title}`
+        return `Edit node: ${this.node.title}`;
       }
-      return ""
+      return "";
     },
     wasRejected() {
-      return this.node.reviewStatus === nodeStatus.REJECT
+      return this.node.reviewStatus === nodeStatus.REJECT;
     },
     isAuthenticated() {
-      return wp.isLoggedIn()
+      return wp.isLoggedIn();
     },
     viewAccess() {
       return this.settings.showAccess === undefined
         ? true
         : this.settings.showAccess
         ? true
-        : wp.canEditTapestry()
+        : wp.canEditTapestry();
     },
     linkHasThumbnailData() {
       return (
-        (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") ||
+        (this.node.mediaType === "url-embed" &&
+          this.node.behaviour !== "embed") ||
         this.node.mediaType === "video"
-      )
+      );
     },
     canPublish() {
       if (this.type === "add") {
         return (
           Helpers.hasPermission(this.parent, this.type) &&
           (!this.parent || this.parent.status !== "draft")
-        )
+        );
       } else if (this.node.status === "draft" && this.type === "edit") {
         return this.getNeighbours(this.nodeId).some(neighbourId => {
-          let neighbour = this.getNode(neighbourId)
+          let neighbour = this.getNode(neighbourId);
           return (
-            neighbour.status !== "draft" && Helpers.hasPermission(neighbour, "add")
-          )
-        })
+            neighbour.status !== "draft" &&
+            Helpers.hasPermission(neighbour, "add")
+          );
+        });
       } else {
-        return Helpers.hasPermission(this.node, this.type)
+        return Helpers.hasPermission(this.node, this.type);
       }
     },
     authoredNode() {
       if (this.node.author) {
-        return wp.isCurrentUser(this.node.author.id)
+        return wp.isCurrentUser(this.node.author.id);
       }
-      return true
+      return true;
     },
     canMakeDraft() {
-      const { id } = wp.getCurrentUser()
+      const { id } = wp.getCurrentUser();
       if (this.node.status === "publish" && this.type === "edit") {
-        return false
+        return false;
       }
-      return this.hasDraftPermission(id)
+      return this.hasDraftPermission(id);
     },
     canEditTapestry() {
-      return wp.canEditTapestry()
+      return wp.canEditTapestry();
     },
     fieldsInvalid() {
       if (
         this.node.mapCoordinates &&
-        (this.node.mapCoordinates.lng !== "" || this.node.mapCoordinates.lat !== "")
+        (this.node.mapCoordinates.lng !== "" ||
+          this.node.mapCoordinates.lat !== "")
       ) {
         return (
           this.node.mapCoordinates.lat > 90 ||
@@ -407,32 +412,32 @@ export default {
           this.node.mapCoordinates.lng < -180 ||
           this.node.mapCoordinates.lng === "" ||
           this.node.mapCoordinates.lat === ""
-        )
+        );
       }
-      return false
+      return false;
     },
     nodeId() {
-      const nodeId = this.$route.params.nodeId
-      return nodeId || Number(nodeId)
+      const nodeId = this.$route.params.nodeId;
+      return nodeId || Number(nodeId);
     },
     show() {
-      return this.$route.name === names.MODAL
+      return this.$route.name === names.MODAL;
     },
     tab() {
-      return this.$route.params.tab || ""
+      return this.$route.params.tab || "";
     },
     type() {
-      return this.$route.params.type || ""
+      return this.$route.params.type || "";
     },
     hasSubmissionApiError() {
-      return this.apiError
+      return this.apiError;
     },
     hasSubmissionError() {
-      return this.errors.length
+      return this.errors.length;
     },
     isMultiContentNodeChild() {
-      return this.parent && this.parent.mediaType == "multi-content"
-    },
+      return this.parent && this.parent.mediaType == "multi-content";
+    }
   },
   watch: {
     nodeId: {
@@ -440,75 +445,75 @@ export default {
       handler() {
         if (this.show) {
           if (this.isValid()) {
-            this.initialize()
+            this.initialize();
           }
         }
-      },
+      }
     },
     show: {
       immediate: true,
       handler(show) {
         if (show) {
           if (this.isValid()) {
-            DragSelectModular.removeDragSelectListener()
-            this.loading = false
-            this.initialize()
+            DragSelectModular.removeDragSelectListener();
+            this.loading = false;
+            this.initialize();
           }
         } else {
-          DragSelectModular.addDragSelectListener()
+          DragSelectModular.addDragSelectListener();
         }
-      },
+      }
     },
     type() {
-      this.initialize()
+      this.initialize();
     },
     tab: {
       immediate: true,
       handler() {
         if (this.show) {
-          this.isValid()
+          this.isValid();
         }
-      },
+      }
     },
     hasSubmissionApiError() {
       if (this.apiError) {
-        this.errors.push(this.apiError.error)
+        this.errors.push(this.apiError.error);
       }
     },
     hasSubmissionError() {
       if (this.hasSubmissionError) {
-        this.loading = false
+        this.loading = false;
       }
-    },
+    }
   },
   mounted() {
     this.$root.$on("node-modal::uploading", isUploading => {
-      this.fileUploading = isUploading
-    })
+      this.fileUploading = isUploading;
+    });
     this.$root.$on("fileID", fileId => {
       if (fileId.thumbnailType == "locked") {
-        this.node.lockedThumbnailFileId = fileId.data
+        this.node.lockedThumbnailFileId = fileId.data;
       } else if (fileId.thumbnailType == "thumbnail") {
-        this.node.thumbnailFileId = fileId.data
+        this.node.thumbnailFileId = fileId.data;
       }
       if (fileId.thumbnailURL) {
-        this.node.typeData.thumbnailURL = fileId.thumbnailURL
+        this.node.typeData.thumbnailURL = fileId.thumbnailURL;
       }
-    })
+    });
     this.$root.$on("add-node", () => {
-      this.keepOpen = true
-      this.handlePublish()
-    })
+      this.keepOpen = true;
+      this.handlePublish();
+    });
     this.$root.$on("remove-thumbnail", thumbnailType => {
       if (thumbnailType == "thumbnail") {
-        this.node.imageURL = ""
-        this.node.thumbnailFileId = ""
+        this.node.imageURL = "";
+        this.node.thumbnailFileId = "";
       } else {
-        this.node.lockedImageURL = ""
-        this.node.lockedThumbnailFileId = ""
+        this.node.lockedImageURL = "";
+        this.node.lockedThumbnailFileId = "";
       }
-    })
-    this.initialize()
+    });
+    this.initialize();
   },
   methods: {
     ...mapMutations(["updateRootNode"]),
@@ -517,69 +522,69 @@ export default {
       "addLink",
       "updateNode",
       "updateLockedStatus",
-      "setTapestryErrorReporting",
+      "setTapestryErrorReporting"
     ]),
     setLoading(status) {
-      this.loading = status
+      this.loading = status;
     },
     handleKalturaUpload(data) {
-      this.kaltura_info = data
+      this.kaltura_info = data;
     },
     isValid() {
-      const isNodeValid = this.validateNodeRoute(this.nodeId)
+      const isNodeValid = this.validateNodeRoute(this.nodeId);
       if (!isNodeValid) {
         this.$router.replace({
           name: names.APP,
-          params: { nodeId: this.nodeId },
-        })
-        return false
+          params: { nodeId: this.nodeId }
+        });
+        return false;
       }
-      const isTabValid = this.validateTab(this.tab)
+      const isTabValid = this.validateTab(this.tab);
       if (!isTabValid) {
         this.$router.replace({
           name: names.MODAL,
           params: { nodeId: this.nodeId, type: this.type, tab: "content" },
-          query: this.$route.query,
-        })
+          query: this.$route.query
+        });
       }
-      return true
+      return true;
     },
     validateNodeRoute(nodeId) {
       if (this.type === "add") {
         if (Object.keys(this.nodes).length === 0 || this.isAuthenticated) {
-          return true
+          return true;
         }
       }
       if (!this.nodes.hasOwnProperty(nodeId)) {
-        return false
+        return false;
       }
-      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type)
+      const isAllowed = Helpers.hasPermission(this.getNode(nodeId), this.type);
       const messages = {
         edit: `You don't have permission to edit this node`,
-        add: `You don't have permission to add to this node`,
-      }
+        add: `You don't have permission to add to this node`
+      };
       if (!isAllowed && this.type in messages) {
-        alert(messages[this.type])
+        alert(messages[this.type]);
       }
-      return isAllowed
+      return isAllowed;
     },
     initialize() {
-      this.errors = []
-      let copy = this.createDefaultNode()
+      this.errors = [];
+      let copy = this.createDefaultNode();
       if (this.type === "edit") {
-        const node = this.getNode(this.nodeId)
-        copy = Helpers.deepCopy(node)
+        const node = this.getNode(this.nodeId);
+        copy = Helpers.deepCopy(node);
       }
-      copy.hasMultiContentChild = this.hasMultiContentChild(copy)
+      copy.hasMultiContentChild = this.hasMultiContentChild(copy);
       if (!copy.mapCoordinates) {
         copy.mapCoordinates = {
           lat: "",
-          lng: "",
-        }
+          lng: ""
+        };
       }
-      this.node = copy
-      this.setTapestryErrorReporting(false)
-      this.originalUrl = this.node.typeData.mediaURL
+      this.node = copy;
+      this.setTapestryErrorReporting(false);
+      this.originalUrl = this.node.typeData.mediaURL;
     },
     validateTab(requestedTab) {
       // Tabs that are valid for ALL node types and modal types
@@ -588,40 +593,44 @@ export default {
         "references",
         "appearance",
         "copyright",
-        "coordinates",
-      ]
+        "coordinates"
+      ];
       if (okTabs.includes(requestedTab)) {
-        return true
+        return true;
       }
 
       // If requested tab is access, check if the user can access it
       if (requestedTab === "access") {
-        return this.viewAccess
+        return this.viewAccess;
       }
 
       switch (requestedTab) {
         case "activity": {
-          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+          return (
+            this.node.mediaType === "h5p" || this.node.mediaType === "video"
+          );
         }
         case "behaviour": {
-          return this.node.mediaType === "h5p" || this.node.mediaType === "video"
+          return (
+            this.node.mediaType === "h5p" || this.node.mediaType === "video"
+          );
         }
         case "ordering": {
-          return this.node.hasMultiContentChild
+          return this.node.hasMultiContentChild;
         }
       }
 
-      return false
+      return false;
     },
     hasMultiContentChild(node) {
       if (this.parent) {
-        const children = this.getDirectChildren(node.id)
-        return children.length > 0
+        const children = this.getDirectChildren(node.id);
+        return children.length > 0;
       }
-      return node.mediaType === "multi-content"
+      return node.mediaType === "multi-content";
     },
     setDisabledMessage(msg) {
-      this.deleteWarningText = msg
+      this.deleteWarningText = msg;
     },
     changeTab(tab) {
       // Prevent multiple clicks
@@ -629,12 +638,12 @@ export default {
         this.$router.push({
           name: names.MODAL,
           params: { nodeId: this.nodeId, type: this.type, tab },
-          query: this.$route.query,
-        })
+          query: this.$route.query
+        });
       }
     },
     handleClose(event) {
-      const oldNode = this.getNode(this.nodeId)
+      const oldNode = this.getNode(this.nodeId);
       if (
         (this.type === "add" || !Helpers.nodeEqual(oldNode, this.node)) &&
         (event.trigger == "backdrop" ||
@@ -642,120 +651,124 @@ export default {
           event.trigger == "esc" ||
           event instanceof MouseEvent) // cancel triggered
       ) {
-        event.preventDefault()
+        event.preventDefault();
         this.$bvModal
           .msgBoxConfirm("All unsaved changes will be lost.", {
             modalClass: "node-modal-confirmation",
             title: "Are you sure you want to continue?",
-            okTitle: "Close",
+            okTitle: "Close"
           })
           .then(close => {
             if (close) {
-              this.close()
+              this.close();
             }
           })
-          .catch(err => console.log(err))
+          .catch(err => console.log(err));
       } else {
-        this.close(event)
+        this.close(event);
       }
     },
     close(event = null) {
       if (this.show) {
         if (Object.keys(this.nodes).length === 0) {
-          this.$router.push({ path: "/", query: this.$route.query })
+          this.$router.push({ path: "/", query: this.$route.query });
         } else if (this.keepOpen) {
           // Switch to edit mode if multi-content just added
           this.$router.push({
             name: names.MODAL,
             params: { nodeId: this.node.id, type: "edit", tab: "content" },
-            query: this.$route.query,
-          })
+            query: this.$route.query
+          });
         } else if (this.rootId && !this.nodeId) {
           // We just added a root node
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.rootId },
-            query: this.$route.query,
-          })
+            query: this.$route.query
+          });
         } else if (
           this.isMultiContentNodeChild &&
           this.$route.query.nav === "modal"
         ) {
           // Prevent NodeModal from closing
-          if (event) event.preventDefault()
+          if (event) event.preventDefault();
 
           // Return to modal of parent node
           this.$router.push({
             name: names.MODAL,
             params: { nodeId: this.parent.id, type: "edit", tab: "content" },
-            query: this.$route.query,
-          })
+            query: this.$route.query
+          });
         } else {
           this.$router.push({
             name: names.APP,
             params: { nodeId: this.nodeId },
-            query: { ...this.$route.query, nav: undefined },
-          })
+            query: { ...this.$route.query, nav: undefined }
+          });
         }
       }
-      this.keepOpen = false
-      this.setTapestryErrorReporting(true)
+      this.keepOpen = false;
+      this.setTapestryErrorReporting(true);
     },
     async handleSubmit() {
-      this.errors = this.validateNode()
+      this.errors = this.validateNode();
       if (!this.hasSubmissionError) {
-        this.loading = true
-        this.updateNodeCoordinates()
+        this.loading = true;
+        this.updateNodeCoordinates();
 
         if (this.linkHasThumbnailData) {
           if (
             this.node.typeData.thumbnailURL &&
-            (this.type === "add" || this.originalUrl !== this.node.typeData.mediaURL)
+            (this.type === "add" ||
+              this.originalUrl !== this.node.typeData.mediaURL)
           ) {
-            this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL)
+            this.confirmThumbnailsPopup(this.node.typeData.thumbnailURL);
           } else {
-            await this.setLinkData()
+            await this.setLinkData();
           }
         }
 
-        if (this.shouldReloadDuration() && this.kaltura_info === null) {
-          this.loadDuration = true
+        if (this.shouldReloadDuration()) {
+          this.loadDuration = true;
         } else {
-          return this.submitNode()
+          return this.submitNode();
         }
       }
     },
     handlePublish() {
-      this.node.status = nodeStatus.PUBLISH
-      this.handleSubmit()
+      this.node.status = nodeStatus.PUBLISH;
+      this.handleSubmit();
     },
     handleDraftSubmit() {
-      this.node.status = nodeStatus.DRAFT
-      this.handleSubmit()
+      this.node.status = nodeStatus.DRAFT;
+      this.handleSubmit();
     },
     handleSubmitForReview() {
-      if (!this.settings.draftNodesEnabled || !this.settings.submitNodesEnabled) {
-        return
+      if (
+        !this.settings.draftNodesEnabled ||
+        !this.settings.submitNodesEnabled
+      ) {
+        return;
       }
-      this.node.reviewStatus = nodeStatus.SUBMIT
-      this.node.status = nodeStatus.DRAFT
+      this.node.reviewStatus = nodeStatus.SUBMIT;
+      this.node.status = nodeStatus.DRAFT;
 
       this.node.reviewComments.push(
         Comment.createComment(Comment.types.STATUS_CHANGE, {
           from: null,
-          to: nodeStatus.SUBMIT,
+          to: nodeStatus.SUBMIT
         })
-      )
+      );
 
-      this.handleSubmit()
+      this.handleSubmit();
     },
     async submitNode() {
       if (this.useKaltura && this.kaltura_info !== null) {
-        this.node.kalturaUploadStatus = "uploading"
+        this.node.kalturaUploadStatus = "uploading";
       }
       if (this.type === "add") {
-        const id = await this.addNode(this.node)
-        this.node.id = id
+        const id = await this.addNode(this.node);
+        this.node.id = id;
         if (this.parent) {
           // Add link from parent node to this node
           const newLink = {
@@ -763,42 +776,42 @@ export default {
             target: id,
             value: 1,
             type: "",
-            addedOnNodeCreation: true,
-          }
-          await this.addLink(newLink)
+            addedOnNodeCreation: true
+          };
+          await this.addLink(newLink);
           // do not update parent's child ordering if the current node is a draft node since draft shouldn't appear in multi-content nodes
           if (this.node.status !== "draft") {
             this.$store.commit("updateNode", {
               id: this.parent.id,
               newNode: {
-                childOrdering: [...this.parent.childOrdering],
-              },
-            })
+                childOrdering: [...this.parent.childOrdering]
+              }
+            });
           }
         } else {
-          this.updateRootNode(id)
+          this.updateRootNode(id);
         }
       } else {
         await this.updateNode({
           id: this.node.id,
-          newNode: this.node,
-        })
+          newNode: this.node
+        });
       }
-      await this.updateLockedStatus()
-      this.loading = false
+      await this.updateLockedStatus();
+      this.loading = false;
 
       if (this.useKaltura && this.kaltura_info !== null) {
-        kclient.uploadVideoToKaltura(this.node.id, this.kaltura_info)
+        kclient.uploadVideoToKaltura(this.node.id, this.kaltura_info);
       }
       if (!this.hasSubmissionError) {
-        this.close()
+        this.close();
       }
     },
     getRandomNumber(min, max) {
-      return Math.random() * (max - min) + min
+      return Math.random() * (max - min) + min;
     },
     coinToss() {
-      return Math.floor(Math.random() * 2) == 0
+      return Math.floor(Math.random() * 2) == 0;
     },
     calculateX(yIsCalculated) {
       if (!yIsCalculated) {
@@ -808,21 +821,21 @@ export default {
               sizes.NODE_RADIUS_SELECTED +
               sizes.NODE_RADIUS,
             this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
-          )
+          );
         } else {
           this.node.coordinates.x = this.getRandomNumber(
             this.parent.coordinates.x -
               sizes.NODE_RADIUS_SELECTED -
               sizes.NODE_RADIUS,
             this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2
-          )
+          );
         }
-        this.calculateY(true)
+        this.calculateY(true);
       } else {
         this.node.coordinates.x = this.getRandomNumber(
           this.parent.coordinates.x - sizes.NODE_RADIUS_SELECTED * 2,
           this.parent.coordinates.x + sizes.NODE_RADIUS_SELECTED * 2
-        )
+        );
       }
     },
     calculateY(xIsCalculated) {
@@ -833,33 +846,33 @@ export default {
               sizes.NODE_RADIUS_SELECTED +
               sizes.NODE_RADIUS,
             this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
-          )
+          );
         } else {
           this.node.coordinates.y = this.getRandomNumber(
             this.parent.coordinates.y -
               sizes.NODE_RADIUS_SELECTED -
               sizes.NODE_RADIUS,
             this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2
-          )
+          );
         }
-        this.calculateX(true)
+        this.calculateX(true);
       } else {
         this.node.coordinates.y = this.getRandomNumber(
           this.parent.coordinates.y - sizes.NODE_RADIUS_SELECTED * 2,
           this.parent.coordinates.y + sizes.NODE_RADIUS_SELECTED * 2
-        )
+        );
       }
     },
     updateNodeCoordinates() {
       if (this.type === "add" && this.parent) {
-        this.coinToss() ? this.calculateX(false) : this.calculateY(false)
+        this.coinToss() ? this.calculateX(false) : this.calculateY(false);
       }
     },
     validateNode() {
-      const errMsgs = []
+      const errMsgs = [];
 
       if (this.node.title.length == 0) {
-        errMsgs.push("Please enter a title")
+        errMsgs.push("Please enter a title");
       }
       if (
         this.node.description.replace(/<[^>]*>?/gm, "").length >
@@ -869,37 +882,37 @@ export default {
           "Please limit your description to under " +
             this.maxDescriptionLength +
             " characters"
-        )
+        );
       }
 
-      const quiz = this.node.quiz
+      const quiz = this.node.quiz;
       if (!this.validateQuiz(quiz)) {
-        errMsgs.push("Please enter at least one answer ID for each question")
+        errMsgs.push("Please enter at least one answer ID for each question");
       }
 
       if (!this.node.mediaType) {
-        errMsgs.push("Please select a Content Type")
+        errMsgs.push("Please select a Content Type");
       } else if (this.node.mediaType === "video") {
         if (!this.isValidVideo(this.node.typeData)) {
-          errMsgs.push("Please enter a valid Video URL")
+          errMsgs.push("Please enter a valid Video URL");
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.node.mediaDuration = 0
+          this.node.mediaDuration = 0;
         }
       } else if (this.node.mediaType === "h5p") {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please select an H5P content for this node")
+          errMsgs.push("Please select an H5P content for this node");
         }
         if (!Helpers.onlyContainsDigits(this.node.mediaDuration)) {
-          this.node.mediaDuration = 0
+          this.node.mediaDuration = 0;
         }
       } else if (this.node.mediaType === "url-embed") {
         if (this.node.typeData.mediaURL === "") {
-          errMsgs.push("Please enter an Embed URL")
+          errMsgs.push("Please enter an Embed URL");
         }
       }
 
-      return errMsgs
+      return errMsgs;
     },
     isValidVideo(typeData) {
       return (
@@ -908,37 +921,34 @@ export default {
           (typeData.hasOwnProperty("youtubeID") ||
             typeData.mediaURL.endsWith(".mp4") ||
             typeData.mediaURL.includes("playManifest")))
-      )
+      );
     },
     validateQuiz(quiz) {
       return quiz.every(question => {
         return Object.values(question.answers).some(
           value => value && value.length > 0
-        )
-      })
+        );
+      });
     },
     updateOrderingArray(arr) {
-      this.node.childOrdering = arr
+      this.node.childOrdering = arr;
     },
     handleTypeChange(evt) {
       this.node.quiz = this.node.quiz.filter(q =>
         Object.values(q.answers).reduce((acc, { value }) => acc || value == "")
-      )
-      if (evt === "multi-content") this.node.presentationStyle = "accordion"
+      );
+      if (evt === "multi-content") this.node.presentationStyle = "accordion";
     },
     async setLinkData() {
-      if (
-        this.kaltura_info === null &&
-        shouldFetch(this.node.typeData.mediaURL, this.node)
-      ) {
-        const url = this.node.typeData.mediaURL
-        const { data } = await getLinkMetadata(url)
+      if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+        const url = this.node.typeData.mediaURL;
+        const { data } = await getLinkMetadata(url);
 
         if (data) {
-          this.node.typeData.linkMetadata = data
+          this.node.typeData.linkMetadata = data;
 
           if (this.type === "add") {
-            this.confirmThumbnailsPopup(data.image)
+            this.confirmThumbnailsPopup(data.image);
           }
         }
       }
@@ -949,83 +959,85 @@ export default {
           "Would you like to use the link preview image as the thumbnail image?"
         )
       ) {
-        this.node.imageURL = imageURL
+        this.node.imageURL = imageURL;
       }
       if (
         confirm(
           "Would you like to use the link preview image as the locked thumbnail image?"
         )
       ) {
-        this.node.lockedImageURL = imageURL
+        this.node.lockedImageURL = imageURL;
       }
     },
     setVideoDuration() {
-      this.node.mediaDuration = parseInt(this.$refs.video.duration)
-      this.loadDuration = false
-      return this.submitNode()
+      this.node.mediaDuration = parseInt(this.$refs.video.duration);
+      this.loadDuration = false;
+      return this.submitNode();
     },
     setYouTubeDuration(evt) {
-      this.node.mediaDuration = evt.target.getDuration()
-      this.loadDuration = false
-      return this.submitNode()
+      this.node.mediaDuration = evt.target.getDuration();
+      this.loadDuration = false;
+      return this.submitNode();
     },
     setH5pDuration() {
-      const frame = this.$refs.frame
-      const h5p = frame.contentWindow.H5P
+      const frame = this.$refs.frame;
+      const h5p = frame.contentWindow.H5P;
       if (h5p) {
-        const instance = h5p.instances[0]
-        const libraryName = instance.libraryInfo.machineName
+        const instance = h5p.instances[0];
+        const libraryName = instance.libraryInfo.machineName;
         if (libraryName === "H5P.InteractiveVideo") {
-          const h5pVideo = instance.video
+          const h5pVideo = instance.video;
           const handleH5PLoad = () => {
-            this.node.mediaDuration = parseInt(h5pVideo.getDuration())
-            this.loadDuration = false
-            return this.submitNode()
-          }
+            this.node.mediaDuration = parseInt(h5pVideo.getDuration());
+            this.loadDuration = false;
+            return this.submitNode();
+          };
           if (h5pVideo.getDuration() !== undefined) {
-            handleH5PLoad()
+            handleH5PLoad();
           } else {
-            h5pVideo.on("loaded", handleH5PLoad)
+            h5pVideo.on("loaded", handleH5PLoad);
           }
-          return
+          return;
         } else {
-          this.node.mediaDuration = 0
+          this.node.mediaDuration = 0;
         }
       }
-      this.loadDuration = false
-      return this.submitNode()
+      this.loadDuration = false;
+      return this.submitNode();
     },
     shouldReloadDuration() {
-      if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
-        return false
+      if (this.kaltura_info === null) {
+        if (this.node.mediaType !== "video" && this.node.mediaType !== "h5p") {
+          return false;
+        }
+        if (this.type === "add") {
+          return true;
+        }
+        const oldNode = this.getNode(this.nodeId);
+        const { youtubeID, mediaURL } = oldNode.typeData;
+        return this.node.mediaFormat === "youtube"
+          ? this.node.typeData.youtubeID !== youtubeID
+          : this.node.mediaURL !== mediaURL;
       }
-      if (this.type === "add") {
-        return true
-      }
-      const oldNode = this.getNode(this.nodeId)
-      const { youtubeID, mediaURL } = oldNode.typeData
-      return this.node.mediaFormat === "youtube"
-        ? this.node.typeData.youtubeID !== youtubeID
-        : this.node.mediaURL !== mediaURL
     },
     hasDraftPermission(ID) {
       if (!this.settings.draftNodesEnabled) {
-        return false
+        return false;
       }
       if (ID === 0) {
-        this.warningText = "You must be authenticated to create a draft node"
-        return false
+        this.warningText = "You must be authenticated to create a draft node";
+        return false;
       }
-      return true
+      return true;
     },
     handleVideoFrameError() {
       this.errors.push(
         "The video could not be found! Please re-upload or check the URL"
-      )
-      this.loadDuration = false
-    },
-  },
-}
+      );
+      this.loadDuration = false;
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

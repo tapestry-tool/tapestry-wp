@@ -83,8 +83,8 @@
               required
               data-qa="import-file-input"
               @dragover.prevent
-              @drop.prevent="handleFileUpload($event)"
-              @change="handleFileUpload($event)"
+              @drop.prevent="handleFileUpload"
+              @change="handleFileUpload"
             ></b-form-file>
           </b-col>
           <template v-if="showUrlUpload">

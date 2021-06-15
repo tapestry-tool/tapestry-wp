@@ -90,7 +90,7 @@
             v-if="!node.hideMedia"
             :x="0"
             :y="-radius"
-            :fill="uploadingKaltura ? 'red' : buttonBackgroundColor"
+            :fill="uploadingToKaltura ? 'red' : buttonBackgroundColor"
             :data-qa="`open-node-${node.id}`"
             :disabled="!node.accessible && !hasPermission('edit')"
             @click="handleRequestOpen"
@@ -112,7 +112,7 @@
               v-if="hasPermission('edit')"
               :x="hasTooManyLevels && node.mediaType !== 'multi-content' ? 0 : 35"
               :y="radius"
-              :fill="uploadingKaltura ? 'red' : buttonBackgroundColor"
+              :fill="uploadingToKaltura ? 'red' : buttonBackgroundColor"
               :data-qa="`edit-node-${node.id}`"
               @click="editNode(node.id)"
             >
@@ -188,7 +188,7 @@ export default {
     return {
       transitioning: false,
       isHovered: false,
-      uploadingKaltura: false,
+      uploadingToKaltura: false,
     }
   },
   computed: {
@@ -365,20 +365,20 @@ export default {
       typeof this.node.kalturaUploadStatus !== "undefined" &&
       this.node.kalturaUploadStatus != ""
     ) {
-      this.uploadingKaltura = true
+      this.uploadingToKaltura = true
       const inter = setInterval(async () => {
         const res = await kclient.getKalturaStatus(this.node.id)
 
         if (res.data.status == "") {
           clearInterval(inter)
         } else if (res.data.status == "finished") {
-          this.uploadingKaltura = false
+          this.uploadingToKaltura = false
           clearInterval(inter)
           this.handleKalturaFinished()
         }
       }, 10000)
     } else {
-      this.uploadingKaltura = false
+      this.uploadingToKaltura = false
     }
 
     this.$emit("mounted")
@@ -475,7 +475,7 @@ export default {
       client.recordAnalyticsEvent("app", "open", "lightbox", id)
     },
     editNode(id) {
-      if (!this.uploadingKaltura) {
+      if (!this.uploadingToKaltura) {
         this.$root.$emit("edit-node", id)
         client.recordAnalyticsEvent("user", "click", "edit-node-button", id)
       }
@@ -509,7 +509,7 @@ export default {
     },
     handleRequestOpen() {
       if (
-        !this.uploadingKaltura &&
+        !this.uploadingToKaltura &&
         (this.node.accessible || this.hasPermission("edit"))
       ) {
         this.openNode(this.node.id)
