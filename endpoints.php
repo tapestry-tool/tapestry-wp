@@ -14,7 +14,7 @@ require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
 
-if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
+if (LOAD_KALTURA) {
     require_once __DIR__.'/services/class.kaltura-api.php';
 }
 
@@ -259,7 +259,6 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'postKalturaVideo',
-            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
     'UPLOAD_KALTURA_VIDEO' => (object) [
@@ -267,14 +266,13 @@ $REST_API_ENDPOINTS = [
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'uploadKalturaVideo',
-            'permission_callback' => 'TapestryPermissions::putTapestrySettings',
         ],
     ],
-    'GET_KALTURA_STATUS' => (object) [
+    'GET_KALTURA_UPLOAD_STATUS' => (object) [
         'ROUTE' => '/tapestries/(?P<tapestryPostId>[\d]+)/kaltura/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getKalturaStatus',
+            'callback' => 'getKalturaUploadStatus',
         ],
     ],
     'GET_ALL_H5P' => (object) [
@@ -1461,7 +1459,7 @@ function getUserAudio($request)
     }
 }
 
-if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
+if (LOAD_KALTURA) {
     /**
      * Checks if the Kaltura API varaibles are defined
      */
@@ -1587,7 +1585,7 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
         }
     }
 
-    function getKalturaStatus($request)
+    function getKalturaUploadStatus($request)
     {
         $postId = $request['tapestryPostId'];
         $nodeMetaId = $request['nodeMetaId'];
@@ -1595,7 +1593,7 @@ if (defined("LOAD_KALTURA") && LOAD_KALTURA) {
         $tapestry = new Tapestry($postId);
         $node = $tapestry->getNode($nodeMetaId);
 
-        return $node->getKalturaStatus();
+        return $node->getKalturaUploadStatus();
     }
 } else {
     function getKalturaExists()

@@ -397,7 +397,7 @@ class TapestryNode implements ITapestryNode
         return $nodeMeta->author->id == $userId;
     }
 
-    public function getKalturaStatus()
+    public function getKalturaUploadStatus()
     {
         $data = [
             'status' => $this->kalturaUploadStatus,
