@@ -1,10 +1,5 @@
 <template>
   <b-form @submit="handleTextSubmit">
-    <p>answer is {{ answer }}</p>
-    <p>text is {{ text }}</p>
-    <p>multiLine is {{ multiLine }}</p>
-    <p>this question is {{ question }}</p>
-    <p>this question id is {{ question.id }}</p>
     <p>
       <b-form-textarea v-if="multiLine" v-model="text" rows="5"></b-form-textarea>
       <b-form-input v-else v-model="text" :placeholder="placeholder"></b-form-input>

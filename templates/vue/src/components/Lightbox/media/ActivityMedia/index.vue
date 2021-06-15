@@ -117,11 +117,8 @@ export default {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
-      //console.log("numberCompleted is", numberCompleted)
-      //console.log("got here progress is NAN", progress)
       this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
         if (progress === 1) {
-          console.log("got here inside updateNodeProgress")
           this.$emit("complete")
         }
       })

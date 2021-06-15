@@ -6,12 +6,6 @@
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
-    <p>disableSubmitFlag is {{ disableSubmitFlag }}</p>
-    <!-- <p>question is {{ question }}</p> -->
-    <!-- <p>audio url is {{ audio }}</p>
-    <p>doneButtonPressed is {{ doneButtonPressed }}</p>
-    <p>getAudioUrl is {{ getAudioUrl }}</p> -->
-    <!-- src should be the url -->
     <audio v-if="doneButtonPressed" controls :src="audio"></audio>
     <audio v-else-if="state === states.DONE" controls :src="getAudioUrl"></audio>
     <button
@@ -135,8 +129,6 @@ export default {
   watch: {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      console.log("current answersObject is", answersObject)
-      console.log("switched question")
       if (
         answersObject.audio &&
         answersObject.audio.url &&
@@ -150,19 +142,12 @@ export default {
   },
   created() {
     if (this.hasPrevious) {
-      console.log("audio answer already exist got here")
       this.state = this.states.DONE
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      console.log("answersObject in created is", answersObject)
-      console.log("wpdata.uploadDirArray is", wpData.uploadDirArray)
-      console.log("wpdata.uploadDirArray.baseurl is", wpData.uploadDirArray.baseurl)
       this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
-      console.log("already exist audio url is", this.audio)
     } else {
-      console.log("audio answer does not exist got here")
       this.state = this.states.WAIT
       this.initialize()
-      console.log("audio initial state is", this.audio)
     }
   },
   mounted() {
@@ -250,7 +235,6 @@ export default {
     },
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
-      console.log("new submitted audio should be", this.audio)
       this.doneButtonPressed = false
       this.$emit("submit", this.audio)
     },
