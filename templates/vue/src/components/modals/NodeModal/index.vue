@@ -270,16 +270,6 @@ import DragSelectModular from "@/utils/dragSelectModular";
 import * as wp from "@/services/wp";
 import kclient from "@/services/KalturaAPI";
 
-const shouldFetch = (url, selectedNode) => {
-  if (this.kaltura_info === null) {
-    if (!selectedNode.typeData.linkMetadata) {
-      return true;
-    }
-    const oldUrl = selectedNode.typeData.linkMetadata.url;
-    return oldUrl != Helpers.normalizeUrl(url);
-  }
-};
-
 export default {
   name: "node-modal",
   components: {
@@ -529,6 +519,15 @@ export default {
     },
     handleKalturaUpload(data) {
       this.kaltura_info = data;
+    },
+    shouldFetch(url, selectedNode) {
+      if (this.kaltura_info === null) {
+        if (!selectedNode.typeData.linkMetadata) {
+          return true;
+        }
+        const oldUrl = selectedNode.typeData.linkMetadata.url;
+        return oldUrl != Helpers.normalizeUrl(url);
+      }
     },
     isValid() {
       const isNodeValid = this.validateNodeRoute(this.nodeId);
@@ -940,7 +939,7 @@ export default {
       if (evt === "multi-content") this.node.presentationStyle = "accordion";
     },
     async setLinkData() {
-      if (shouldFetch(this.node.typeData.mediaURL, this.node)) {
+      if (this.shouldFetch(this.node.typeData.mediaURL, this.node)) {
         const url = this.node.typeData.mediaURL;
         const { data } = await getLinkMetadata(url);
 
