@@ -235,7 +235,6 @@ export async function completeQuestion(
     }
     commit("completeQuestion", { nodeId, questionId, answer, answerType })
   } catch (error) {
-    console.log(error)
     dispatch("addApiError", error)
   }
 }
