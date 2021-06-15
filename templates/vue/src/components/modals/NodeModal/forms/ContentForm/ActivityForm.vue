@@ -224,12 +224,10 @@ export default {
   },
   methods: {
     getPreviousQuestions(currentQuestion) {
-      // TODO: Fix this later
       const allQuestions = Object.values(this.nodes)
         .filter(node => Boolean(node.typeData.activity.questions))
         .flatMap(node => node.typeData.activity.questions)
-      console.log("allQuestions", allQuestions)
-      return allQuestions.filter(qn => qn !== currentQuestion)
+      return allQuestions.filter(qn => qn.id !== currentQuestion.id)
     },
     addQuestion() {
       this.questions = [
