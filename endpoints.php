@@ -186,13 +186,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getUserProgressByPostId',
         ],
     ],
-    'GET_TAPESTRY_USER_ENTRY' => (object) [
-        'ROUTE' => 'users/entries',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getUserEntry',
-        ],
-    ],
     'UPDATE_TAPESTRY_USER_PROGRESS' => (object) [
         'ROUTE' => 'users/progress',
         'ARGUMENTS' => [
@@ -1202,21 +1195,6 @@ function getTapestryNodeHasDraftChildren($request)
         }
 
         return $response;
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getUserEntry($request)
-{
-    $postId = $request['post_id'];
-    $nodeMetaId = $request['node_id'];
-    $formId = $request['form_id'];
-
-    try {
-        $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-
-        return $userProgress->getUserEntries($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

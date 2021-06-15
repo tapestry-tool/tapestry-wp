@@ -120,28 +120,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
-    /**
-     * Get all gravity form entries submitted by this user.
-     *
-     * @return string user entries in json format
-     */
-    public function getUserEntries($userId = 0, $formId = 0)
-    {
-        if (!class_exists('GFAPI')) {
-            return [];
-        }
-        if (!$userId) {
-            $userId = $this->_userId;
-        }
-        $search_criteria['field_filters'][] = [
-            'key' => 'created_by',
-            'value' => $userId,
-        ];
-        $entries = GFAPI::get_entries($formId, $search_criteria);
-
-        return $this->_formatEntries($entries);
-    }
-
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
@@ -221,12 +199,6 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _completeQuestion($questionId, $answerData, $answerType)
     {
-        // OLD CODE
-        /* $nodeMetadata = get_metadata_by_mid('post', $this->nodeMetaId)->meta_value;
-        $quiz = $this->_getQuizProgress($this->nodeMetaId, $nodeMetadata, $this->_userId);*/ 
-        // save it to user meta
-        // call wordpress function update_user_meta to save the information from frontend to the user meta
-        // check in database in phpmyadmin
         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, true);
         if ($userAnswer === "") {
           $newUserAnswer[$answerType] = $answerData;
@@ -236,8 +208,6 @@ class TapestryUserProgress implements ITapestryUserProgress
           update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $userAnswer);
         }
 
-        // treating $quiz as a two dimensional array, and non empty
-        // $quiz[$questionId]['completed'] = true; // this line causes fatal error, old code
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
@@ -262,7 +232,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->accessible = $node->accessible;
             $progress->$nodeId->conditions = $node->conditions;
             $progress->$nodeId->unlocked = $node->unlocked;
-            //new code here
+
             $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
 
             if ($node->accessible) {
@@ -290,72 +260,13 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             }
 
-            //$progress->$nodeId->content->userQuestionAnswers
-            // $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
-
-            $quiz = $this->_getQuizProgress($nodeId, $nodeMetadata, $userId);
-            $progress->$nodeId->quiz = $quiz;
+             
         }
-
         return $progress;
     }
 
-    private function _getQuizProgress($nodeId, $nodeMetadata, $userId)
-    {
-        $quiz = [];
-        // OLD CODE
-        // if key does not exist,it will return a empty string, completed values is empty string
-        $completed_values = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId, true);
-
-        // ob_start();                    // start buffer capture
-        // var_dump($completed_values);           // dump the values
-        // $contents = ob_get_contents(); // put the buffer into a variable
-        // ob_end_clean();                // end capture
-        // error_log("completed_values in _getQuizProgress");
-        // error_log($contents); 
-
-  
-
-        $entries = $this->getUserEntries($userId);
-
-        /* ob_start();                    // start buffer capture
-        var_dump($entries);           // dump the values
-        $contents = ob_get_contents(); // put the buffer into a variable
-        ob_end_clean();                // end capture
-        error_log("entries in _getQuizProgress");
-        error_log($contents); */
-        // nodeMetadata->quiz is an empty array
-        if (isset($nodeMetadata->quiz) && is_array($nodeMetadata->quiz)) {
-            foreach ($nodeMetadata->quiz as $question) {
-                $quiz[$question->id] = [
-                    'completed' => false,
-                ];
-
-                foreach ($question->answers as $type => $gfOrH5pId) {
-                    if ('' !== $gfOrH5pId) {
-                        if ('audioId' == $type) {
-                            $tapestryAudio = new TapestryAudio($this->postId, $nodeId, $question->id, $userId);
-                            if ($tapestryAudio->audioExists()) {
-                                $quiz[$question->id][$type] = $tapestryAudio->get();
-                            }
-                        } elseif (property_exists($entries, $gfOrH5pId)) {
-                            $quiz[$question->id][$type] = $entries->$gfOrH5pId;
-                        }
-                    }
-                }
-            }
-        }
-        // completed_values is a empty string
-        if (isset($completed_values) && is_array($completed_values)) {
-            foreach ($completed_values as $id => $info) {
-                $quiz[$id]['completed'] = $info['completed'];
-            }
-        }
-
-        return count($quiz) > 0 ? $quiz : (object) $quiz;
-    }
 
     private function _updateUserH5PSettings($h5pSettingsData)
     {

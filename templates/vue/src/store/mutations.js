@@ -118,7 +118,6 @@ export function deleteLink(state, { source, target }) {
 
 // quizzes
 export function completeQuestion(state, { nodeId, questionId, answer, answerType }) {
-  // OLD CODE
   const node = getters.getNode(state)(nodeId)
 
   const question = node.typeData.activity.questions.find(
@@ -143,14 +142,6 @@ export function completeQuestion(state, { nodeId, questionId, answer, answerType
   }
 
   state.userAnswers[nodeId].activity[questionId].answers[answerType] = answer
-}
-
-export function updateEntry(state, { answerType, entry, nodeId, questionId }) {
-  const node = getters.getNode(state)(nodeId)
-  const question = node.quiz.find(question => question.id === questionId)
-  const entries = question.entries || {}
-  entries[answerType] = Object.values(entry)[0]
-  question.entries = entries
 }
 
 // favourites

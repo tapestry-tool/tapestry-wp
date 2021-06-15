@@ -227,12 +227,6 @@ export async function completeQuestion(
 ) {
   try {
     await client.completeQuestion(nodeId, questionId, answer, answerType)
-    if (answerType !== "audioId") {
-      // remove here
-      // old code
-      //const entry = await client.getUserEntry(formId)
-      //commit("updateEntry", { answerType, entry, nodeId, questionId })
-    }
     commit("completeQuestion", { nodeId, questionId, answer, answerType })
   } catch (error) {
     dispatch("addApiError", error)
@@ -243,13 +237,6 @@ export async function saveAudio({ dispatch }, { audio, nodeId, questionId }) {
   try {
     const response = await client.saveAudio(audio, nodeId, questionId)
     return response
-    // OLD CODE
-    // commit("updateEntry", {
-    //   answerType: "audio",
-    //   entry: { audio },
-    //   nodeId,
-    //   questionId,
-    // })
   } catch (error) {
     dispatch("addApiError", error)
   }

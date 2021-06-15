@@ -161,17 +161,6 @@ class TapestryApi {
     return response
   }
 
-  async getUserEntry(formId = 0) {
-    const url = `/users/entries`
-    const response = await this.client.get(url, {
-      params: {
-        post_id: this.postId,
-        form_id: formId,
-      },
-    })
-    return response.data
-  }
-
   async getSettings() {
     const tapestry = await this.getTapestry()
     return tapestry.settings

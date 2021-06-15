@@ -57,16 +57,6 @@ interface ITapestryUserProgress
     public function getH5PSettings();
 
     /**
-     * Get all gravity form entries submitted by this user.
-     * If $formId is passed, returns entries for only that form.
-     *
-     * @param int $formId
-     *
-     * @return string user entries in json format
-     */
-    public function getUserEntries($formId);
-
-    /**
      * Get User's favourite nodes from a tapestry post.
      *
      * @return array $nodes  node ids which are favourites

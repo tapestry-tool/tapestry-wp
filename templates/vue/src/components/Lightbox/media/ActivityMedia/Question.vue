@@ -58,9 +58,6 @@
         />
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
-          <small>question is {{ question }}</small>
-          <small>answers data is {{ answers }}</small>
-          <small>userAnswer is {{ userAnswers }}</small>
           <div class="button-container">
             <answer-button
               v-if="question.answerTypes.text.enabled"
