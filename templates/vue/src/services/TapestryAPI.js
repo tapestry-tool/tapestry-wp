@@ -197,19 +197,6 @@ class TapestryApi {
     return response.data
   }
 
-  /**
-   * Get audio from server
-   *
-   * @param   {Number}    nodeId
-   *
-   * @return  {String}    audio       base64 data string
-   */
-  async getAudio(nodeId, questionId) {
-    const url = `/tapestries/${this.postId}/nodes/${nodeId}/audio/${questionId}`
-    const response = await this.client.get(url)
-    return response.data
-  }
-
   async completeNode(nodeId) {
     const url = `/users/completed?post_id=${this.postId}&node_id=${nodeId}`
     const response = await this.client.post(url)

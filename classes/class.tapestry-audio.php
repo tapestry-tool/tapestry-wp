@@ -55,27 +55,6 @@ class TapestryAudio implements ITapestryAudio
         }
     }
 
-    /**
-     * Get the audio based on userId, tapestryPostId and nodeMetaId.
-     *
-     * @return string $audio      base64 data string
-     */
-    public function get()
-    {
-        $filename = $this->_getFileName();
-        $upload_dir = wp_upload_dir();
-        if (false === $upload_dir['error']) {
-            $audio = file_get_contents($upload_dir['basedir'].'/tapestry/'.$this->userId.'/'.$filename);
-            $encodedAudio = base64_encode($audio);
-
-            return $encodedAudio;
-        } else {
-            error_log('Error getting user audio for tapestry: '.$upload_dir['error']);
-
-            return $upload_dir['error'];
-        }
-    }
-
     public function audioExists()
     {
         $filename = $this->_getFileName();
