@@ -47,6 +47,7 @@ class TapestryNode implements ITapestryNode
     private $license;
     private $references;
     private $mapCoordinates;
+    private $isDyad;
 
     /**
      * Constructor.
@@ -99,6 +100,7 @@ class TapestryNode implements ITapestryNode
             'lat' => '',
             'lng' => '',
         ];
+        $this->isDyad = false;
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -205,6 +207,9 @@ class TapestryNode implements ITapestryNode
         }
         if (isset($node->hideTitle) && is_bool($node->hideTitle)) {
             $this->hideTitle = $node->hideTitle;
+        }
+        if (isset($node->isDyad) && is_bool($node->isDyad)) {
+            $this->isDyad = $node->isDyad;
         }
         if (isset($node->hideProgress) && is_bool($node->hideProgress)) {
             $this->hideProgress = $node->hideProgress;
@@ -587,6 +592,7 @@ class TapestryNode implements ITapestryNode
             'license' => $this->license,
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
+            'isDyad' => $this->isDyad
         ];
     }
 
