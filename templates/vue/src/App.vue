@@ -118,13 +118,6 @@ export default {
       })
     },
   },
-  // openTyde() {
-  //   this.$router.push({
-  //     name: names.TYDEAPP,
-  //     params: { nodeId: this.$route.params.nodeId },
-  //     query: this.$route.query,
-  //   })
-  // },
 }
 </script>
 
