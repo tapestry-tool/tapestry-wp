@@ -33,6 +33,7 @@
       :connections="connections"
       @tooltip-positioned="handleToolTipPositioned"
       @tooltip-removed="handleTooltipRemoved"
+      @add-community="$emit('add-community',$event)"
 
     />
   </div>

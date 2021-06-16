@@ -326,7 +326,6 @@ class TapestryApi {
           .then(res => res.data)
       },
       addCommunity(community) {
-        console.log(community)
         return client.post(`${baseUrl}/communities`, community).then(res => res.data)
       },
       updateCommunity(id, community) {

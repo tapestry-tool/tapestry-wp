@@ -18,6 +18,7 @@
       </b-row>
 
       <b-row align-h="center" class="mt-2 mb-2">
+        <b-overlay :show="loading" rounded="sm">
         <b-button
           pill
           variant="secondary"
@@ -26,6 +27,7 @@
         >
           CONTINUE &#8594;
         </b-button>
+        </b-overlay>
       </b-row>
 
       <b-row>
@@ -57,6 +59,7 @@ export default {
   data() {
     return {
       communitiesToAdd: [],
+      loading: false,
     }
   },
   computed: {
@@ -77,6 +80,7 @@ export default {
       return this.communitiesToAdd.length === 0 ? true : false
     },
     async addCommunities() {
+      this.loading = true
       const results = []
       if (this.communitiesToAdd.length > 0) {
         for (const communityName of this.communitiesToAdd) {
@@ -87,6 +91,7 @@ export default {
           )
         }
       }
+      this.loading = false
       this.$emit("continue", results)
     },
   },
