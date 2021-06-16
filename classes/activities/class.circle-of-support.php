@@ -105,7 +105,6 @@ class CircleOfSupport
         if ($this->_isEmpty()) {
             return $this->_getDefaultCos();
         }
-        error_log("here");
         return $this->versions[count($this->versions) - 1];
     }
 
