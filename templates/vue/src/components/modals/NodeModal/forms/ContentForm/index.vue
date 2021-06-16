@@ -88,7 +88,6 @@
 
 <script>
 import { mapGetters } from "vuex"
-import GravityFormsApi from "@/services/GravityFormsApi"
 import ActivityForm from "./ActivityForm"
 import MultiContentForm from "./MultiContentForm"
 import H5pForm from "./H5pForm"
@@ -184,20 +183,6 @@ export default {
     shouldShowTitle(shouldShowTitle) {
       this.node.typeData.showTitle = shouldShowTitle
     },
-  },
-  mounted() {
-    GravityFormsApi.exists().then(exists => {
-      const i = this.mediaTypes.findIndex(
-        mediaType => mediaType.value == "gravity-form"
-      )
-      if (exists) {
-        if (this.mediaTypes[i] !== undefined) {
-          this.mediaTypes[i].disabled = false
-        }
-      } else {
-        this.mediaTypes[i].text += " (plugin unavailable)"
-      }
-    })
   },
   methods: {
     handleTypeChange(evt) {

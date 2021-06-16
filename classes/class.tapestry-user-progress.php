@@ -131,62 +131,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         }
     }
 
-    private function _formatEntries($entries)
-    {
-        $formEntryMap = new stdClass();
-
-        foreach ($entries as $entry) {
-            $formId = $entry['form_id'];
-
-            if (property_exists($formEntryMap, $formId)) {
-                $latestEntry = $formEntryMap->$formId;
-                if ($entry['date_updated'] > $latestEntry['date_updated']) {
-                    $formEntryMap->$formId = $entry;
-                }
-            } else {
-                $formEntryMap->$formId = $entry;
-            }
-        }
-
-        foreach ((array) $formEntryMap as $formId => $entry) {
-            $formEntryMap->$formId = $this->_getImageChoices($formId, $entry);
-        }
-
-        return $formEntryMap;
-    }
-
-    private function _getImageChoices($formId, &$entry)
-    {
-        $field_types = ['checkbox', 'radio'];
-        $form = GFAPI::get_form($formId);
-        $fields = GFAPI::get_fields_by_type($form, $field_types);
-        $image_choices_fields = [];
-        foreach ($fields as &$field) {
-            if (is_object($field) && property_exists($field, 'imageChoices_enableImages') && !empty($field->imageChoices_enableImages)) {
-                $image_choices_fields[$field->id] = $field;
-            }
-        }
-        foreach ($image_choices_fields as $id => $field) {
-            foreach ($field->inputs as $input) {
-                $label = $input['label'];
-                $correspondingChoice = array_values(array_filter(
-                    $field['choices'],
-                    function ($e) use ($label) {
-                        return $e['value'] == $label;
-                    }
-                ))[0];
-                if ('' != $entry[$input['id']]) {
-                    $inputMap = new stdClass();
-                    $inputMap->choiceText = $label;
-                    $inputMap->imageUrl = $correspondingChoice['imageChoices_image'];
-                    $entry[$input['id']] = $inputMap;
-                }
-            }
-        }
-
-        return $entry;
-    }
-
     private function _updateUserProgress($progressValue)
     {
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_progress_node_'.$this->nodeMetaId, $progressValue);

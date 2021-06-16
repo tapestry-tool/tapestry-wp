@@ -9,7 +9,6 @@ require_once __DIR__.'/classes/class.tapestry-node.php';
 require_once __DIR__.'/classes/class.tapestry-group.php';
 require_once __DIR__.'/classes/class.tapestry-user-progress.php';
 require_once __DIR__.'/classes/class.tapestry-audio.php';
-require_once __DIR__.'/classes/class.tapestry-form.php';
 require_once __DIR__.'/classes/class.tapestry-h5p.php';
 require_once __DIR__.'/classes/class.constants.php';
 require_once __DIR__.'/utilities/class.tapestry-user.php';
@@ -71,20 +70,6 @@ $REST_API_ENDPOINTS = [
             'methods' => $REST_API_PUT_METHOD,
             'callback' => 'updateTapestrySettings',
             'permission_callback' => 'TapestryPermissions::putTapestrySettings',
-        ],
-    ],
-    'GET_GF_EXISTS' => (object) [
-        'ROUTE' => '/gf/exists',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfExists',
-        ],
-    ],
-    'GET_GF_FORMS' => (object) [
-        'ROUTE' => '/gf/forms',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfForms',
         ],
     ],
     'POST_TAPESTRY_GROUP' => (object) [
@@ -235,13 +220,6 @@ $REST_API_ENDPOINTS = [
             'callback' => 'getAllH5P',
         ],
     ],
-    'GET_FORM_ENTRY' => (object) [
-        'ROUTE' => '/gf/entries',
-        'ARGUMENTS' => [
-            'methods' => $REST_API_GET_METHOD,
-            'callback' => 'getGfEntry',
-        ],
-    ],
     'GET_TAPESTRY_USER_FAVOURITES' => (object) [
         'ROUTE' => 'users/favourites',
         'ARGUMENTS' => [
@@ -367,40 +345,6 @@ function getAllH5P()
         $controller = new TapestryH5P();
 
         return $controller->get();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfExists()
-{
-    try {
-        $tapestryForms = new TapestryForm();
-
-        return TapestryForm::exists();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfForms()
-{
-    try {
-        $tapestryForms = new TapestryForm();
-
-        return $tapestryForms->getAll();
-    } catch (TapestryError $e) {
-        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
-    }
-}
-
-function getGfEntry($request)
-{
-    $formId = $request['form_id'];
-    try {
-        $controller = new TapestryForm();
-
-        return $controller->getEntry($formId);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }
