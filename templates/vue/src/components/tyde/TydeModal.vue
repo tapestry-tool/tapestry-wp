@@ -3,23 +3,6 @@
     <div v-if="allowClose" class="overlay" @click="$emit('close')"></div>
     <transition name="modal">
       <div v-if="load" class="content" :style="contentContainerStyle">
-        <div class="buttons-container">
-          <modal-button
-            v-if="allowClose"
-            data-qa="close-lightbox"
-            icon="times"
-            @clicked="$emit('close')"
-          />
-          <modal-button
-            icon="heart"
-            icon-size="sm"
-            :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
-            :icon-color="isFavourite ? 'red' : ''"
-            :bg-color="isFavourite ? '#fff' : ''"
-            :bg-hover-color="isFavourite ? '#fff' : 'red'"
-            @clicked="toggleFavourite(nodeId)"
-          />
-        </div>
         <slot></slot>
       </div>
     </transition>
@@ -27,15 +10,12 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
-import ModalButton from "@/components/Lightbox/TapestryModal/ModalButton"
-
 const defaultStyles = {
-  top: "150px",
-  left: "50%",
+  top: "1000px",
+  // left: "50%",
   transform: "translateX(-50%)",
-  width: "600px",
-  height: "400px",
+  width: "1000px",
+  height: "1000px",
   color: "#fff",
   display: "flex",
   flexDirection: "column",
@@ -44,10 +24,7 @@ const defaultStyles = {
 }
 
 export default {
-  name: "tapestry-modal",
-  components: {
-    ModalButton,
-  },
+  name: "tyde-modal",
   props: {
     nodeId: {
       type: [String, Number],
@@ -64,29 +41,17 @@ export default {
       required: false,
       default: true,
     },
-    showFav: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   data() {
     return {
       load: false,
     }
   },
-  computed: {
-    ...mapState(["favourites"]),
-    isFavourite() {
-      return this.favourites.find(id => id == this.nodeId)
-    },
-  },
+  computed: {},
   mounted() {
     this.load = true
   },
-  methods: {
-    ...mapActions(["toggleFavourite"]),
-  },
+  methods: {},
 }
 </script>
 
@@ -114,15 +79,6 @@ export default {
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
     height: 100%;
-
-    .buttons-container {
-      position: absolute;
-      display: flex;
-      flex-direction: row-reverse;
-      top: -20px;
-      right: -20px;
-      z-index: 1000;
-    }
   }
 
   &.full-screen {

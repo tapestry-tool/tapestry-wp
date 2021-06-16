@@ -1,7 +1,6 @@
 <template>
   <div id="app-container" :class="{ 'sidebar-open': isSidebarOpen }">
     <toolbar />
-    <tyde-app></tyde-app>
     <tapestry-map
       v-if="settings.renderMap && isUser"
       :is-sidebar-open="isSidebarOpen"
@@ -18,16 +17,13 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
-import TydeApp from "@/components/tyde"
 import Helpers from "@/utils/Helpers"
-import { data as wpData } from "@/services/wp"
 
 export default {
   components: {
     TapestryMap,
     Toolbar,
     TapestryMain,
-    TydeApp,
   },
   data() {
     return {
@@ -42,10 +38,6 @@ export default {
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
-    },
-    isUser() {
-      console.log(wpData.wpCanEditTapestry)
-      return wpData.wpCanEditTapestry
     },
   },
   watch: {

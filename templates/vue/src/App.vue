@@ -1,7 +1,8 @@
 <template>
   <loading v-if="loading" data-qa="tapestry-loading" style="height: 75vh;"></loading>
   <div v-else id="app">
-    <tapestry-app></tapestry-app>
+    <router-view name="tydeapp"></router-view>
+    <tapestry-app v-show="isUser"></tapestry-app>
     <router-view name="lightbox"></router-view>
     <node-modal></node-modal>
     <sidebar v-if="!isEmpty"></sidebar>
@@ -25,11 +26,14 @@
 import { mapState, mapMutations } from "vuex"
 import NodeModal from "@/components/modals/NodeModal"
 import TapestryApp from "@/components/TapestryApp"
+// import TydeApp from "@/components/tyde"
 import Sidebar from "@/components/Sidebar"
 import TapestryError from "@/components/TapestryError"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
 import { isLoggedIn } from "./services/wp"
+import { data as wpData } from "@/services/wp"
+import { names } from "@/config/routes"
 
 export default {
   name: "app",
@@ -39,6 +43,7 @@ export default {
     TapestryApp,
     Sidebar,
     TapestryError,
+    // TydeApp,
   },
   data() {
     return {
@@ -50,6 +55,9 @@ export default {
     ...mapState(["nodes"]),
     isEmpty() {
       return Object.keys(this.nodes).length === 0
+    },
+    isUser() {
+      return wpData.wpCanEditTapestry === "1"
     },
   },
   watch: {
@@ -83,6 +91,12 @@ export default {
         })
       }
     })
+    console.log("pushing TYDEAPP")
+    this.$router.push({
+      name: names.TYDEAPP,
+      params: { nodeId: this.$route.params.nodeId },
+      query: this.$route.query,
+    })
   },
   beforeDestroy() {
     window.removeEventListener("click", this.recordAnalytics)
@@ -104,6 +118,13 @@ export default {
       })
     },
   },
+  // openTyde() {
+  //   this.$router.push({
+  //     name: names.TYDEAPP,
+  //     params: { nodeId: this.$route.params.nodeId },
+  //     query: this.$route.query,
+  //   })
+  // },
 }
 </script>
 

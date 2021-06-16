@@ -25,7 +25,7 @@
       :rowRefs="rowRefs"
       :dimensions="dimensions"
     />
-    <tapestry-media
+    <!-- <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
       :node-id="nodeId"
       :dimensions="dimensions"
@@ -34,7 +34,7 @@
       @close="handleAutoClose"
       @complete="complete"
       @change:dimensions="updateDimensions"
-    />
+    /> -->
   </tyde-modal>
 </template>
 
@@ -43,7 +43,7 @@ import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import TydeModal from "./TydeModal"
 import MultiContentMedia from "@/components/Lightbox/media/MultiContentMedia"
-import TapestryMedia from "@/components/Lightbox/media/TapestryMedia"
+// import TapestryMedia from "@/components/Lightbox/media/TapestryMedia"
 import PageMenu from "@/components/Lightbox/media/MultiContentMedia/PageMenu"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
@@ -51,10 +51,10 @@ import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
 
 export default {
-  name: "lightbox",
+  name: "tyde-app",
   components: {
     MultiContentMedia,
-    TapestryMedia,
+    // TapestryMedia,
     TydeModal,
     PageMenu,
   },

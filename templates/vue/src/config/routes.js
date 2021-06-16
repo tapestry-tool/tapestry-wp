@@ -1,4 +1,5 @@
 import Lightbox from "@/components/Lightbox"
+import TydeApp from "@/components/tyde"
 
 const ROOT_PATH = `/nodes/:nodeId`
 
@@ -27,6 +28,17 @@ const lightbox = {
   },
 }
 
+const tydeapp = {
+  path: `${ROOT_PATH}/tyde/:tab`,
+  name: "tydeapp",
+  components: {
+    tydeapp: TydeApp,
+  },
+  props: {
+    tydeapp: parseParams,
+  },
+}
+
 const multiContent = {
   path: `${ROOT_PATH}/view/:rowId`,
   name: "multiContent",
@@ -46,6 +58,28 @@ const nestedMultiContent = {
   },
   props: {
     lightbox: parseParams,
+  },
+}
+
+const multiContent2 = {
+  path: `${ROOT_PATH}/tyde/multicontent/:rowId`,
+  name: "multiContent2",
+  components: {
+    tydeapp: TydeApp,
+  },
+  props: {
+    tydeapp: parseParams,
+  },
+}
+
+const nestedMultiContent2 = {
+  path: `${ROOT_PATH}/tyde/multicontent/:rowId/rows/:subRowId`,
+  name: "nested_multi_content2",
+  components: {
+    tydeapp: TydeApp,
+  },
+  props: {
+    tydeapp: parseParams,
   },
 }
 
@@ -72,6 +106,10 @@ const redirects = [
     path: `${ROOT_PATH}/edit`,
     redirect: `${ROOT_PATH}/edit/content`,
   },
+  {
+    path: `${ROOT_PATH}/tyde`,
+    redirect: `${ROOT_PATH}/tyde/multicontent`,
+  },
 ]
 
 const routes = {
@@ -82,10 +120,13 @@ const routes = {
   settings,
   nestedMultiContent,
   redirects,
+  tydeapp,
+  multiContent2,
+  nestedMultiContent2,
 }
 
 export const names = Object.fromEntries(
   Object.entries(routes).map(([name, route]) => [name.toUpperCase(), route.name])
 )
-
+console.log(names)
 export default routes
