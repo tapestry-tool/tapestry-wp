@@ -35,7 +35,7 @@
       <b-button
         pill
         variant="secondary"
-        @click="send(OnboardingEvents.Continue)"
+        @click="handleClick(OnboardingEvents.Continue)"
       >
         Got it &#8594;
       </b-button>
@@ -45,7 +45,7 @@
       <h3>
         Click here to add another community!
       </h3>
-      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">
+      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
         Got it &#8594;
       </b-button>
     </tooltip>
@@ -54,7 +54,7 @@
       <h3 style="max-width:300px;">
         Click here to add some of your connections!
       </h3>
-      <b-button pill variant="secondary" @click="send(OnboardingEvents.Add)">
+      <b-button pill variant="secondary" @click="handleClick(OnboardingEvents.Add)">
         Got it &#8594;
       </b-button>
     </tooltip>
@@ -159,7 +159,11 @@ export default {
     },
     isState(state) {
       return this.onboarding.current.matches(state);
-    }
+    },
+    handleClick(event) {
+        this.send(event)
+        this.$emit("tooltip-removed")
+    },
   }
 };
 </script>

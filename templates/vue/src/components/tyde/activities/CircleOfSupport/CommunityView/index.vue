@@ -32,6 +32,8 @@
       :communities="communities"
       :connections="connections"
       @tooltip-positioned="handleToolTipPositioned"
+      @tooltip-removed="handleTooltipRemoved"
+
     />
   </div>
 </template>
@@ -136,7 +138,10 @@ export default {
     },
     handleToolTipPositioned() {
       this.toolTipPositioned = true;
-    }
+    },
+    handleTooltipRemoved() {
+      this.toolTipPositioned = false
+    },
   }
 };
 </script>
