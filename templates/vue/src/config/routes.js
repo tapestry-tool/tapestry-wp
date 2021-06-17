@@ -61,28 +61,6 @@ const nestedMultiContent = {
   },
 }
 
-const multiContent2 = {
-  path: `${ROOT_PATH}/tyde/multicontent/:rowId`,
-  name: "multiContent2",
-  components: {
-    tydeapp: TydeApp,
-  },
-  props: {
-    tydeapp: parseParams,
-  },
-}
-
-const nestedMultiContent2 = {
-  path: `${ROOT_PATH}/tyde/multicontent/:rowId/rows/:subRowId`,
-  name: "nested_multi_content2",
-  components: {
-    tydeapp: TydeApp,
-  },
-  props: {
-    tydeapp: parseParams,
-  },
-}
-
 const settings = {
   path: `${ROOT_PATH}/settings/:tab`,
   name: "settings",
@@ -117,8 +95,6 @@ const routes = {
   nestedMultiContent,
   redirects,
   tydeapp,
-  multiContent2,
-  nestedMultiContent2,
 }
 
 export const names = Object.fromEntries(

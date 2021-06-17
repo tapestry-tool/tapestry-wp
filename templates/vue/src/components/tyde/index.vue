@@ -121,18 +121,6 @@ export default {
       }
       return styles
     },
-    tydeModalOpen: {
-      get() {
-        return this.$route.name === names.SETTINGS
-      },
-      set(open) {
-        this.$router.push({
-          name: open ? names.SETTINGS : names.APP,
-          params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
-          query: this.$route.query,
-        })
-      },
-    },
     tab() {
       return this.$route.params.tab
     },
@@ -163,7 +151,7 @@ export default {
     DragSelectModular.addDragSelectListener()
     this.$router.push({
       ...this.$route,
-      query: { ...this.$route.query, row: undefined },
+      // query: { ...this.$route.query, row: undefined },
     })
   },
   methods: {
@@ -183,7 +171,6 @@ export default {
       this.$router.push({
         name: names.TYDEAPP,
         params: { nodeId: this.$route.params.nodeId, tab },
-        query: this.$route.query,
       })
     },
     close() {
