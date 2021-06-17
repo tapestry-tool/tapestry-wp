@@ -75,9 +75,10 @@
 import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
-import H5PMedia from "./H5PMedia"
+import H5PVideo from "./H5PVideo"
 import YouTubeMedia from "./YouTubeMedia"
-import PlayScreen from "./PlayScreen"
+import EndScreen from "../common/EndScreen"
+import PlayScreen from "../common/PlayScreen"
 import { COMPLETION_THRESHOLD } from "./video.config"
 import Loading from "@/components/common/Loading"
 import client from "@/services/TapestryAPI"
@@ -111,8 +112,9 @@ export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
     "youtube-media": YouTubeMedia,
-    "h5p-media": H5PMedia,
+    "h5p-video-media": H5PVideo,
     UrlVideoMedia,
+    EndScreen,
     PlayScreen,
     Loading,
     MultiContentMedia: () => import("../MultiContentMedia/index"),
@@ -165,7 +167,7 @@ export default {
         case "youtube":
           return "youtube-media"
         case "h5p":
-          return "h5p-media"
+          return "h5p-video-media"
         default:
           throw new Error(`Unknown video type: ${this.node.mediaFormat}`)
       }
