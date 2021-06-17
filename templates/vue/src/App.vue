@@ -94,7 +94,7 @@ export default {
     console.log("pushing TYDEAPP")
     this.$router.push({
       name: names.TYDEAPP,
-      params: { nodeId: this.$route.params.nodeId },
+      params: { nodeId: this.$route.params.nodeId, tab: "multicontent" },
       query: this.$route.query,
     })
   },

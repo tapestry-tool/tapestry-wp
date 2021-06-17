@@ -29,7 +29,7 @@ const lightbox = {
 }
 
 const tydeapp = {
-  path: `${ROOT_PATH}/multicontent`,
+  path: `${ROOT_PATH}/tyde/:tab`,
   name: "tydeapp",
   components: {
     tydeapp: TydeApp,
@@ -62,7 +62,7 @@ const nestedMultiContent = {
 }
 
 const multiContent2 = {
-  path: `${ROOT_PATH}/multicontent/:rowId`,
+  path: `${ROOT_PATH}/tyde/multicontent/:rowId`,
   name: "multiContent2",
   components: {
     tydeapp: TydeApp,
@@ -73,7 +73,7 @@ const multiContent2 = {
 }
 
 const nestedMultiContent2 = {
-  path: `${ROOT_PATH}/multicontent/:rowId/rows/:subRowId`,
+  path: `${ROOT_PATH}/tyde/multicontent/:rowId/rows/:subRowId`,
   name: "nested_multi_content2",
   components: {
     tydeapp: TydeApp,
@@ -108,7 +108,7 @@ const redirects = [
   },
   {
     path: `${ROOT_PATH}/tyde`,
-    redirect: `${ROOT_PATH}/tyde/multicontent`,
+    redirect: `${ROOT_PATH}/tyde/multicontent/:rowId`,
   },
 ]
 

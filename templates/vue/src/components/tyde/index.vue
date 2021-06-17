@@ -6,35 +6,19 @@
       'full-screen': node.fullscreen,
       'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
     }"
-    :node-id="nodeId"
     :content-container-style="tydeContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
   >
-    <multi-content-media
+    <multi-content-tab
       v-if="node.mediaType === 'multi-content'"
-      :node="node"
+      :nodeId="nodeId"
       :row-id="rowId"
       :sub-row-id="subRowId"
+      :dimensions="dimensions"
       @close="handleAutoClose"
       @complete="complete"
     />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :rowRefs="rowRefs"
-      :dimensions="dimensions"
-    />
-    <!-- <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    /> -->
   </tyde-modal>
 </template>
 
@@ -42,9 +26,7 @@
 import { mapActions, mapGetters, mapState } from "vuex"
 import client from "@/services/TapestryAPI"
 import TydeModal from "./TydeModal"
-import MultiContentMedia from "@/components/Lightbox/media/MultiContentMedia"
-// import TapestryMedia from "@/components/Lightbox/media/TapestryMedia"
-import PageMenu from "@/components/Lightbox/media/MultiContentMedia/PageMenu"
+import MultiContentTab from "./MultiContentTab"
 import { names } from "@/config/routes"
 import Helpers from "@/utils/Helpers"
 import DragSelectModular from "@/utils/dragSelectModular"
@@ -52,10 +34,8 @@ import DragSelectModular from "@/utils/dragSelectModular"
 export default {
   name: "tyde-app",
   components: {
-    MultiContentMedia,
-    // TapestryMedia,
+    MultiContentTab,
     TydeModal,
-    PageMenu,
   },
   props: {
     nodeId: {
@@ -79,8 +59,6 @@ export default {
         top: 100,
         left: 50,
       },
-      showCompletionScreen: false,
-      rowRefs: [],
     }
   },
   computed: {
@@ -125,6 +103,21 @@ export default {
       }
       return styles
     },
+    tydeModalOpen: {
+      get() {
+        return this.$route.name === names.SETTINGS
+      },
+      set(open) {
+        this.$router.push({
+          name: open ? names.SETTINGS : names.APP,
+          params: { nodeId: this.$route.params.nodeId, tab: "appearance" },
+          query: this.$route.query,
+        })
+      },
+    },
+    tab() {
+      return this.$route.params.tab
+    },
   },
   watch: {
     nodeId: {
@@ -139,40 +132,6 @@ export default {
           })
         } else {
           this.applyDimensions()
-        }
-      },
-    },
-    rowId: {
-      immediate: true,
-      handler(rowId) {
-        if (rowId) {
-          if (
-            !this.isMultiContent(this.nodeId) ||
-            !this.isMultiContentRow(rowId, this.nodeId)
-          ) {
-            this.$router.replace({
-              name: names.TYDEAPP,
-              params: { nodeId: this.nodeId },
-              query: this.$route.query,
-            })
-          }
-        }
-      },
-    },
-    subRowId: {
-      immediate: true,
-      handler(subRowId) {
-        if (subRowId) {
-          if (!this.isMultiContentRow(subRowId, this.rowId)) {
-            this.$router.replace({
-              name: names.ACCORDION,
-              params: {
-                nodeId: this.nodeId,
-                rowId: this.rowId,
-              },
-              query: this.$route.query,
-            })
-          }
         }
       },
     },
@@ -206,6 +165,13 @@ export default {
     handleAutoClose() {
       client.recordAnalyticsEvent("app", "close", "tydebox", this.nodeId)
       this.close()
+    },
+    changeTab(tab) {
+      this.$router.push({
+        name: names.TYDEAPP,
+        params: { nodeId: this.$route.params.nodeId, tab },
+        query: this.$route.query,
+      })
     },
     close() {
       this.$router.push({
@@ -255,12 +221,6 @@ body.tydebox {
 #tydebox {
   &.full-screen {
     background: #000;
-
-    .close-btn {
-      position: fixed;
-      top: 50px;
-      right: 50px;
-    }
   }
   height: 100%;
 }
