@@ -3,7 +3,7 @@
     <button v-if="formOpened" class="button-nav" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <loading v-if="loading" label="Submitting..." />
+    <loading v-if="submitting" label="Submitting..." />
     <div v-else>
       <div v-if="question.isFollowUp && question.previousEntry" class="follow-up">
         <div
@@ -109,7 +109,7 @@ export default {
   },
   data() {
     return {
-      loading: false,
+      submitting: false,
       formOpened: false,
       formType: "",
       answers: {},
@@ -257,7 +257,7 @@ export default {
     },
     async handleSubmit(formData) {
       this.formOpened = false
-      this.loading = true
+      this.submitting = true
 
       if (!this.isLoggedIn) {
         return this.$emit("submit")
@@ -287,7 +287,7 @@ export default {
         answerType: this.formType,
         answer: submittedAnswer,
       })
-      this.loading = false
+      this.submitting = false
 
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {
         type: this.formType,
