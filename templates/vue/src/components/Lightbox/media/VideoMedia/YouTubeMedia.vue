@@ -123,12 +123,8 @@ export default {
           setTimeout(() => this.$emit("play"), 200)
         } else {
           var currentTimeInt = parseInt(currentTime, 10)
-          console.log("current time int is", currentTimeInt)
           var isFiveSeconds = currentTimeInt % 5 === 0 && currentTimeInt !== 0
-          console.log("is five seconds yet?", isFiveSeconds)
           if (isFiveSeconds) {
-            console.log("got here every 5 seconds")
-            //this.$emit("timeupdate", { amountViewed, currentTime })
             this.$emit("timeupdate", {
               amountViewed: ended ? 1 : currentTime / duration,
               currentTime: ended ? duration : currentTime,
