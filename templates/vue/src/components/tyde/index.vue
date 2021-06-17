@@ -5,15 +5,46 @@
     :allow-close="canSkip"
     @close="handleUserClose"
   >
-    <multi-content-tab
-      v-if="node.mediaType === 'multi-content'"
-      :nodeId="nodeId"
-      :row-id="rowId"
-      :sub-row-id="subRowId"
-      :dimensions="dimensions"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
+    <b-container fluid class="px-0">
+      <b-tabs card fill>
+        <b-tab
+          title="Multicontent"
+          :active="tab === 'multicontent'"
+          @click="$emit('change:tab', 'multicontent')"
+        >
+          <multi-content-tab
+            v-if="node.mediaType === 'multi-content'"
+            :nodeId="nodeId"
+            :row-id="rowId"
+            :sub-row-id="subRowId"
+            :dimensions="dimensions"
+            @close="handleAutoClose"
+            @complete="complete"
+          />
+        </b-tab>
+        <b-tab
+          title="Tab2"
+          :active="tab === 'tab2'"
+          @click="$emit('change:tab', 'tab2')"
+        >
+          Tab 2 stuffs
+        </b-tab>
+        <b-tab
+          title="Tab3"
+          :active="tab === 'tab3'"
+          @click="$emit('change:tab', 'tab3')"
+        >
+          Tab 3 stuffs
+        </b-tab>
+        <b-tab
+          title="Circle of Support"
+          :active="tab === 'cos'"
+          @click="$emit('change:tab', 'cos')"
+        >
+          Circle of Support
+        </b-tab>
+      </b-tabs>
+    </b-container>
   </tyde-modal>
 </template>
 
