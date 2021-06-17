@@ -14,6 +14,7 @@
 <script>
 import { mapActions } from "vuex"
 import ActivityScreen from "./common/ActivityScreen"
+import * as wp from "@/services/wp"
 
 export default {
   name: "activity-media",
@@ -45,11 +46,16 @@ export default {
       const numberCompleted = this.node.quiz.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.quiz.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        if (progress === 1) {
-          this.$emit("complete")
-        }
-      })
+      if (this.performDyadNodeCheck()) {
+        this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
+      }
+    },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad;
     },
   },
 }
