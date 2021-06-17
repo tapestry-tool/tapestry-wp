@@ -1,6 +1,6 @@
 <template>
   <div class="question">
-    <button v-if="formOpened" class="button-nav" @click="back">
+    <button v-if="formOpened" class="button-nav m-auto" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
@@ -36,18 +36,20 @@
         Please login to have your answers saved.
       </b-alert>
       <div class="question-body">
-        <text-question
-          v-if="formOpened && formType === 'text'"
-          :question="question"
-          :answer="answers"
-          @submit="handleSubmit"
-        ></text-question>
-        <audio-recorder
-          v-else-if="formOpened && formType === 'audio'"
-          :id="question.id"
-          :node="node"
-          @submit="handleSubmit"
-        />
+        <div v-if="formOpened">
+          <text-question
+            v-if="formType === 'text'"
+            :question="question"
+            :answer="answers"
+            @submit="handleSubmit"
+          ></text-question>
+          <audio-recorder
+            v-else-if="formType === 'audio'"
+            :id="question.id"
+            :node="node"
+            @submit="handleSubmit"
+          />
+        </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
           <div class="button-container">
@@ -297,10 +299,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button {
-  margin: auto;
-}
-
 .answer-container {
   width: 75%;
 }
