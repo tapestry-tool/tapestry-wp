@@ -31,6 +31,16 @@
       @complete="complete"
       @close="$emit('close')"
     />
+    <h5p-media
+      v-if="node.mediaType === 'h5p' && !isVideoNode"
+      :dimensions="dimensions"
+      :context="context"
+      :node="node"
+      @change:dimensions="$emit('change:dimensions', $event)"
+      @load="handleLoad"
+      @complete="complete"
+      @close="$emit('close')"
+    />
     <external-media
       v-if="node.mediaType === 'url-embed'"
       :dimensions="dimensions"
@@ -63,6 +73,7 @@
 import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
+import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
@@ -72,6 +83,7 @@ export default {
   components: {
     TextMedia,
     VideoMedia,
+    "h5p-media": H5PMedia,
     ExternalMedia,
     WpPostMedia,
     ActivityMedia,
@@ -108,7 +120,12 @@ export default {
       return this.getNode(this.nodeId)
     },
     isVideoNode() {
-      return ["mp4", "youtube", "h5p"].includes(this.node.mediaFormat)
+      if (this.node.mediaType === "h5p") {
+        if (this.node.typeData.isH5PVideo) {
+          return true
+        }
+      }
+      return ["mp4", "youtube"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {

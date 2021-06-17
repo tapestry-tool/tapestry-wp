@@ -38,10 +38,6 @@ export function updateH5pSettings(state, newSettings) {
   state.h5pSettings = newSettings
 }
 
-export function updateSelectedNode(state, newNodeId) {
-  state.selectedNodeId = newNodeId
-}
-
 export function updateRootNode(state, newNodeId) {
   state.rootId = newNodeId
 }

@@ -115,10 +115,9 @@ export default {
       /**
        * Adjust the lightbox height to fit the video
        */
-      const aspectRatio = video.videoHeight / video.videoWidth
       this.$emit("load", {
         width: this.dimensions.width,
-        height: aspectRatio * this.dimensions.width,
+        height: this.dimensions.height,
         type: "html5-video",
         currentTime,
       })
@@ -146,6 +145,7 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+  display: flex;
 
   &.fullscreen {
     display: flex;

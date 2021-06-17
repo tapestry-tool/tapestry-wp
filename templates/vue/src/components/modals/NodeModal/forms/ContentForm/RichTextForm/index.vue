@@ -203,7 +203,7 @@ export default {
         new BulletList(),
         new CodeBlock(),
         new HardBreak(),
-        new Heading({ levels: [1, 2, 3] }),
+        new Heading({ levels: [2, 3, 4] }),
         new HorizontalRule(),
         new ListItem(),
         new OrderedList(),
@@ -270,7 +270,7 @@ export default {
 
       if (mark && mark.attrs.href) {
         const presetURL = mark.attrs.href
-        prompt("Please update url:", presetURL) // let a user see the previously set URL
+        urlSetting = prompt("Please update url:", presetURL) // let a user see the previously set URL
       } else {
         urlSetting = prompt("Please add url:", "") // a clean prompt, has had no anchor
       }

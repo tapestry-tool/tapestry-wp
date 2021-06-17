@@ -279,7 +279,15 @@ export default {
           client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
             time: progress * mediaDuration,
           })
-          this.$emit("pause")
+          let hasDialogue = this.$refs.h5p.contentWindow.H5P.$body[0].querySelector(
+            ".h5p-dialog-wrapper"
+          )
+          if (
+            hasDialogue.style.display === "none" ||
+            hasDialogue.style.display === ""
+          ) {
+            this.$emit("pause")
+          }
         }
       }
     },
