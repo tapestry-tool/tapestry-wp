@@ -227,11 +227,12 @@ export default {
       }
     },
     applyDimensions() {
+      const browserWidth = Helpers.getBrowserWidth()
+      const browserHeight = Helpers.getBrowserHeight()
       this.dimensions = {
         ...this.dimensions,
-        left: (Helpers.getBrowserWidth() - this.lightboxDimensions.width) / 2,
-        width: this.lightboxDimensions.width,
-        height: this.lightboxDimensions.height,
+        width: browserWidth,
+        height: browserHeight,
       }
     },
   },
