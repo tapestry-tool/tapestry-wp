@@ -6,8 +6,11 @@
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
-    <audio v-if="doneButtonPressed" controls :src="audio"></audio>
-    <audio v-else-if="state === states.DONE" controls :src="getAudioUrl"></audio>
+    <audio
+      v-if="showAudio"
+      controls
+      :src="state === states.DONE ? getAudioUrl : audio"
+    ></audio>
     <button
       v-else
       class="main-button my-2"
@@ -32,7 +35,7 @@
       Re-record
     </button>
     <button
-      v-if="state !== states.DONE"
+      v-if="state === states.PAUSED || state === states.RECORDING"
       :disabled="duration === 0"
       class="my-3"
       @click="stopRecording"
@@ -41,8 +44,7 @@
       Done
     </button>
     <button
-      v-if="state === states.DONE"
-      :disabled="disableSubmitFlag"
+      v-if="state === states.WAITING_TO_BE_SENT"
       class="my-3"
       data-qa="submit-button-audio"
       @click="handleSubmit"
@@ -84,12 +86,16 @@ export default {
       durationInterval: null,
       recorder: null,
       state: null,
-      doneButtonPressed: false,
-      disableSubmitFlag: this.audio !== null,
     }
   },
   computed: {
     ...mapGetters(["getQuestion", "getAnswers"]),
+    showAudio() {
+      return (
+        this.state === this.states.DONE ||
+        this.state === this.states.WAITING_TO_BE_SENT
+      )
+    },
     getAudioUrl() {
       return this.audio + "?" + Date.now()
     },
@@ -116,6 +122,7 @@ export default {
       return answers.audio && answers.audio.url && answers.audio.url.length > 0
     },
     states() {
+      // NOTE: DONE state is used to determine if the audio already exists in the backend
       return {
         WAIT: "wait",
         DONE: "done",
@@ -123,6 +130,7 @@ export default {
         PAUSED: "paused",
         READY: "ready",
         RECORDING: "recording",
+        WAITING_TO_BE_SENT: "waiting-to-be-sent",
       }
     },
   },
@@ -173,8 +181,7 @@ export default {
           reader.onload = () => {
             const data = reader.result
             this.audio = data
-            this.state = this.states.DONE
-            this.doneButtonPressed = true
+            this.state = this.states.WAITING_TO_BE_SENT
           }
         })
 
@@ -212,13 +219,11 @@ export default {
       client.recordAnalyticsEvent("user", "stop", "audio-recorder", this.id)
       this.recorder.stop()
       this.stopDurationCount()
-      this.disableSubmitFlag = false
     },
     resetRecording() {
       client.recordAnalyticsEvent("user", "reset", "audio-recorder", this.id)
       this.initialize()
       this.state = null
-      this.doneButtonPressed = false
     },
     toggleRecording() {
       switch (this.state) {
@@ -235,7 +240,7 @@ export default {
     },
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
-      this.doneButtonPressed = false
+      this.state = this.states.DONE
       this.$emit("submit", this.audio)
     },
   },
