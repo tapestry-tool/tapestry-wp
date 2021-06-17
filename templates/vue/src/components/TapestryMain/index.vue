@@ -55,19 +55,17 @@ export default {
     RootNodeButton,
     LockedTooltip,
   },
-  props: ["viewBox"],
+  props: {
+    viewBox: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       dragSelectReady: false,
       activeNode: null,
     }
-  },
-  mounted() {
-    if (this.dragSelectEnabled) {
-      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
-    }
-    this.updateViewBox()
-    this.dragSelectReady = true
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
@@ -115,6 +113,13 @@ export default {
         }
       },
     },
+  },
+  mounted() {
+    if (this.dragSelectEnabled) {
+      DragSelectModular.initializeDragSelect(this.$refs.app, this, this.nodes)
+    }
+    this.updateViewBox()
+    this.dragSelectReady = true
   },
   methods: {
     ...mapMutations(["select", "unselect", "clearSelection"]),
