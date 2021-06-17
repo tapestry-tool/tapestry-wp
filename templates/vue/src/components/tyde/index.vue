@@ -139,11 +139,6 @@ export default {
   mounted() {
     document.querySelector("body").classList.add("tydebox-open")
     DragSelectModular.removeDragSelectListener()
-    if (this.node.mediaType === "multi-content") {
-      this.$root.$on("observe-rows", refs => {
-        this.rowRefs = this.rowRefs.concat(refs)
-      })
-    }
   },
   beforeDestroy() {
     document.querySelector("body").classList.remove("tydebox-open")
