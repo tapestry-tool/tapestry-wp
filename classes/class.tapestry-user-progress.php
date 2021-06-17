@@ -143,15 +143,14 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _completeQuestion($questionId, $answerType, $answerData)
     {
-        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, true);
+        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
         if ($userAnswer === "") {
-          $newUserAnswer[$answerType] = $answerData;
-          update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $newUserAnswer);
+            $newUserAnswer[$answerType] = $answerData;
+            update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $newUserAnswer);
         } else {
-          $userAnswer[$answerType] = $answerData;
-          update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, $userAnswer);
+            $userAnswer[$answerType] = $answerData;
+            update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
         }
-
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
@@ -187,26 +186,24 @@ class TapestryUserProgress implements ITapestryUserProgress
             }
 
             $isQuestionNode = property_exists($node->typeData, 'activity');
-            if($isQuestionNode) {
-            $questionIdArray = [];
-            $questionListLength = count($node->typeData->activity->questions);
-            for($x = 0; $x < $questionListLength; $x++) {
-               $questionId = $node->typeData->activity->questions[$x]->id;
-               array_push($questionIdArray, $questionId);
-            }
+            if ($isQuestionNode) {
+                $questionIdArray = [];
+                $questionListLength = count($node->typeData->activity->questions);
+                for ($x = 0; $x < $questionListLength; $x++) {
+                    $questionId = $node->typeData->activity->questions[$x]->id;
+                    array_push($questionIdArray, $questionId);
+                }
 
-            $progress->$nodeId->content['userAnswers'] = new stdClass();
-            $progress->$nodeId->content['userAnswers']->activity = new stdClass();
-            for ($i = 0; $i < $questionListLength; $i++) {
-               $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_node_quiz_'.$nodeId.'_question_'.$questionIdArray[$i], true);
-               $progress->$nodeId->content['userAnswers']->activity->{$questionIdArray[$i]}->answers = $answer;
-            }
-
+                $progress->$nodeId->content['userAnswers'] = new stdClass();
+                $progress->$nodeId->content['userAnswers']->activity = new stdClass();
+                for ($i = 0; $i < $questionListLength; $i++) {
+                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionIdArray[$i].'_answers', true);
+                    $progress->$nodeId->content['userAnswers']->activity->{$questionIdArray[$i]}->answers = $answer;
+                }
             }
 
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
-             
         }
         return $progress;
     }

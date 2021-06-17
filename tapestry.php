@@ -111,9 +111,10 @@ add_action('pre_get_posts', 'add_tapestry_post_types_to_query');
 /*
  * Add custom tapestry_thumb size
  */
-add_action( 'after_setup_theme', 'tapestry_theme_setup' );
-function tapestry_theme_setup() {
-    add_image_size( 'tapestry_thumb', 420, 420, true );
+add_action('after_setup_theme', 'tapestry_theme_setup');
+function tapestry_theme_setup()
+{
+    add_image_size('tapestry_thumb', 420, 420, true);
 }
 
 /*
@@ -181,7 +182,6 @@ function tapestry_enqueue_libraries()
     global $post;
     global $TAPESTRY_VERSION_NUMBER;
     if ('tapestry' == get_post_type($post) && !post_password_required($post)) {
-
         $LIBS_FOLDER_URL = plugin_dir_url(__FILE__).'templates/libs/';
 
         // CSS
@@ -189,9 +189,8 @@ function tapestry_enqueue_libraries()
         wp_enqueue_style('tapestry-css', plugin_dir_url(__FILE__).'templates/tapestry.css', [], $TAPESTRY_VERSION_NUMBER);
 
         // JS
-        wp_enqueue_script( 'heartbeat' );
+        wp_enqueue_script('heartbeat');
         wp_enqueue_script('es2015-test', $LIBS_FOLDER_URL.'es2015-test.js');
-
     }
 }
 
@@ -301,7 +300,7 @@ function prefix_title_entity_decode($response)
 
 // Analytics
 
-register_activation_hook( __FILE__, 'create_tapestry_analytics_schema' );
+register_activation_hook(__FILE__, 'create_tapestry_analytics_schema');
 function create_tapestry_analytics_schema()
 {
     $analytics = new TapestryAnalytics();
@@ -310,8 +309,8 @@ function create_tapestry_analytics_schema()
 
 add_action('wp_ajax_nopriv_tapestry_tool_log_event', 'tapestry_tool_log_event');
 add_action('wp_ajax_tapestry_tool_log_event', 'tapestry_tool_log_event');
-function tapestry_tool_log_event() {
-
+function tapestry_tool_log_event()
+{
     $analytics = new TapestryAnalytics();
     $analytics->log($_POST);
 
