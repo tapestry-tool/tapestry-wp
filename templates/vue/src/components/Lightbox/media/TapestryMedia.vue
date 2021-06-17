@@ -89,16 +89,17 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
-import TextMedia from "./TextMedia"
-import VideoMedia from "./VideoMedia"
-import ExternalMedia from "./ExternalMedia"
-import H5PMedia from "./H5PMedia"
-import ActivityMedia from "./ActivityMedia"
-import YouTubeMedia from "./YouTubeMedia"
-import WpPostMedia from "./WpPostMedia"
-import GravityForm from "./common/GravityForm"
-import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
+import { mapActions, mapGetters } from "vuex";
+import TextMedia from "./TextMedia";
+import VideoMedia from "./VideoMedia";
+import ExternalMedia from "./ExternalMedia";
+import H5PMedia from "./H5PMedia";
+import ActivityMedia from "./ActivityMedia";
+import YouTubeMedia from "./YouTubeMedia";
+import WpPostMedia from "./WpPostMedia";
+import GravityForm from "./common/GravityForm";
+import CompletionScreen from "./common/ActivityScreen/CompletionScreen";
+import * as wp from "./../../../services/wp";
 
 export default {
   name: "tapestry-media",
@@ -137,19 +138,21 @@ export default {
     return {
       showCompletionScreen: false,
       timeSinceLastSaved: new Date(),
-    }
+    };
   },
   computed: {
     ...mapGetters(["getNode"]),
     node() {
-      return this.getNode(this.nodeId)
+      return this.getNode(this.nodeId);
     },
   },
   beforeDestroy() {
-    this.updateNodeProgress({
-      id: this.nodeId,
-      progress: this.node && this.node.progress,
-    })
+    if (this.performDyadNodeCheck()) {
+      this.updateNodeProgress({
+        id: this.nodeId,
+        progress: this.node && this.node.progress,
+      });
+    }
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
@@ -160,23 +163,30 @@ export default {
           ...this.$route.query,
           row: this.nodeId,
         },
-      })
+      });
     },
     handleFormSubmit() {
-      this.showCompletionScreen = true
-      this.complete()
+      this.showCompletionScreen = true;
+      this.complete();
     },
     handleLoad(args) {
-      this.$emit("load", args)
+      this.$emit("load", args);
     },
     updateProgress(amountViewed) {
-      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
+      if (this.performDyadNodeCheck()) {
+        this.updateNodeProgress({ id: this.nodeId, progress: amountViewed });
+      }
     },
     complete() {
-      this.$emit("complete")
+      if (this.performDyadNodeCheck()) {
+        this.$emit("complete");
+      }
+    },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("copilot") || !this.node.isDyad;
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
