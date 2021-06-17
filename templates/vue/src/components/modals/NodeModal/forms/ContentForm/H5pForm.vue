@@ -78,16 +78,6 @@ export default {
     mediaUrl(val) {
       this.node.typeData.mediaURL = val
     },
-    selectedId(id) {
-      const selectedH5p = this.options.find(content => {
-        return content.id == id
-      })
-      if (selectedH5p.library === "H5P.InteractiveVideo") {
-        this.node.typeData.isH5PVideo = true
-      } else {
-        this.node.typeData.isH5PVideo = false
-      }
-    },
   },
   mounted() {
     H5PApi.getAllContent().then(options => {

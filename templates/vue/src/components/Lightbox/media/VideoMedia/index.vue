@@ -55,7 +55,7 @@
         Continue
       </button>
       <play-screen
-        v-if="state === states.Paused"
+        v-if="state === states.Paused && showPlayScreen"
         class="screen"
         :hide-video="hideVideo"
         @play="transition(events.Play)"
@@ -77,7 +77,7 @@
 import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
-import H5PVideo from "./H5PVideo"
+import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "./EndScreen"
 import PlayScreen from "./PlayScreen"
@@ -114,7 +114,7 @@ export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
     "youtube-media": YouTubeMedia,
-    "h5p-video-media": H5PVideo,
+    "h5p-video-media": H5PVideoMedia,
     UrlVideoMedia,
     EndScreen,
     PlayScreen,
@@ -193,6 +193,9 @@ export default {
       return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
         this.state
       )
+    },
+    showPlayScreen() {
+      return this.node.mediaType !== "h5p"
     },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
