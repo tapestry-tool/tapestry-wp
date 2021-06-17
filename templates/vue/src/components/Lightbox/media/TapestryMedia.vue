@@ -120,8 +120,8 @@ export default {
       return this.getNode(this.nodeId)
     },
     isVideoNode() {
-      if (this.node.mediaType === "h5p") {
-        if (this.node.typeData.isH5PVideo) {
+      if (this.node.mediaType === "h5p" || this.node.mediaFormat === "h5p") {
+        if (this.node.typeData.h5pMeta.library === "H5P.InteractiveVideo") {
           return true
         }
       }
