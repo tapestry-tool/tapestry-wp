@@ -130,7 +130,13 @@ export default {
         if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
         } else {
-          this.$emit("timeupdate", { amountViewed, currentTime })
+          var currentTimeInt = parseInt(currentTime, 10)
+          console.log("current time int is", currentTimeInt)
+          var isFiveSeconds = currentTimeInt % 5 === 0 && currentTimeInt !== 0
+          console.log("is five seconds yet?", isFiveSeconds)
+          if (isFiveSeconds) {
+            this.$emit("timeupdate", { amountViewed, currentTime })
+          }
         }
         this.lastTime = currentTime
       }

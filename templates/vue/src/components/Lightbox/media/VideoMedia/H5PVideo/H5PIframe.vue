@@ -101,7 +101,7 @@ export default {
   methods: {
     startTimeupdateHandler() {
       this.stopTimeupdateHandler()
-      this.interval = setInterval(() => this.updateVideoProgress(), 200)
+      this.interval = setInterval(() => this.updateVideoProgress(), 990)
     },
     stopTimeupdateHandler() {
       if (this.interval) {
@@ -122,10 +122,16 @@ export default {
         if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
           this.$emit("seeked", { currentTime })
         } else {
-          this.$emit("timeupdate", {
-            amountViewed: currentTime / duration,
-            currentTime,
-          })
+          var currentTimeInt = parseInt(currentTime, 10)
+          console.log("current time int is", currentTimeInt)
+          var isFiveSeconds = currentTimeInt % 5 === 0 && currentTimeInt !== 0
+          console.log("is five seconds yet?", isFiveSeconds)
+          if (isFiveSeconds) {
+            this.$emit("timeupdate", {
+              amountViewed: currentTime / duration,
+              currentTime,
+            })
+          }
         }
 
         this.lastTime = currentTime
