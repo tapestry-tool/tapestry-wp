@@ -2,11 +2,6 @@
   <tyde-modal
     id="tydebox"
     data-qa="tydebox"
-    :class="{
-      'full-screen': node.fullscreen,
-      'content-text': node.mediaType === 'text' || node.mediaType === 'wp-post',
-    }"
-    :content-container-style="tydeContentStyles"
     :allow-close="canSkip"
     @close="handleUserClose"
   >
