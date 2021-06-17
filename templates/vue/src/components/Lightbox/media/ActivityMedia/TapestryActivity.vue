@@ -1,16 +1,8 @@
 <template>
   <div class="tapestry-activity">
     <div class="icon"><tapestry-icon :icon="type" /></div>
-    <div v-if="type === 'text'" class="text">{{ entry }}</div>
-    <ul v-if="type === 'checklist'" class="checklist">
-      <li v-for="(choice, index) in entry" :key="index">
-        <div class="img-wrapper">
-          <img :src="choice.imageUrl" />
-        </div>
-        {{ choice.choiceText }}
-      </li>
-    </ul>
-    <audio v-if="type === 'audio'" controls :src="entry"></audio>
+    <div v-if="type === 'text'" class="text">{{ answerData }}</div>
+    <audio v-if="type === 'audio'" controls :src="answerData"></audio>
   </div>
 </template>
 
@@ -26,9 +18,9 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "checklist", "audio"].includes(val),
+      validator: val => ["text", "audio"].includes(val),
     },
-    entry: {
+    answerData: {
       type: [String, Array],
       required: true,
     },
@@ -56,30 +48,6 @@ export default {
     width: 24px;
     position: absolute;
     left: 8px;
-  }
-
-  .checklist {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-
-    li {
-      display: flex;
-      flex: 0 0 33%;
-      text-align: left;
-      margin-bottom: 0.5em;
-
-      &:nth-last-child(-n + 2):first-child,
-      &:nth-last-child(-n + 2):first-child ~ li {
-        flex-grow: 1;
-      }
-
-      > .img-wrapper {
-        width: 20%;
-        min-width: 40px;
-        margin-right: 10px;
-      }
-    }
   }
 
   * {

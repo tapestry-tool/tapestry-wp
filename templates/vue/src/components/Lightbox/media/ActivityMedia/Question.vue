@@ -17,7 +17,7 @@
             v-for="answer in previousQuestionAnswers"
             :key="answer.type"
             :type="answer.type"
-            :entry="answer.entry"
+            :answerData="answer.answerData"
           ></tapestry-activity>
         </div>
         <div v-else>
@@ -149,12 +149,12 @@ export default {
       if (this.question.isFollowUp) {
         for (const [key, value] of Object.entries(answerObject)) {
           if (key === "text") {
-            var tempObj = { type: key, entry: value }
+            var tempObj = { type: key, answerData: value }
             previousAnswers.push(tempObj)
           } else {
             var tempAudioObj = {
               type: key,
-              entry:
+              answerData:
                 wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
             }
             previousAnswers.push(tempAudioObj)
