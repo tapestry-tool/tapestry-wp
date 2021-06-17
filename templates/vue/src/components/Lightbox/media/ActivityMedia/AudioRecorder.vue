@@ -119,7 +119,7 @@ export default {
     },
     hasPrevious() {
       let answers = this.getAnswers(this.node.id, this.question.id)
-      return answers.audio && answers.audio.url && answers.audio.url.length > 0
+      return answers.audio && answers.audio.url
     },
     states() {
       // NOTE: DONE state is used to determine if the audio already exists in the backend
@@ -137,11 +137,7 @@ export default {
   watch: {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      if (
-        answersObject.audio &&
-        answersObject.audio.url &&
-        answersObject.audio.url.length > 0
-      ) {
+      if (answersObject.audio && answersObject.audio.url) {
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {
         this.initialize()
