@@ -207,7 +207,7 @@ $REST_API_ENDPOINTS = [
         ],
     ],
     'POST_USER_AUDIO' => (object) [
-        'ROUTE' => '/user/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)/audio',
+        'ROUTE' => '/users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
             'callback' => 'postUserAudio',

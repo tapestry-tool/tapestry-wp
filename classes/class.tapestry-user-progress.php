@@ -143,14 +143,12 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _completeQuestion($questionId, $answerType, $answerData)
     {
-        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
-        if ($userAnswer === "") {
-            $newUserAnswer[$answerType] = $answerData;
-            update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $newUserAnswer);
-        } else {
-            $userAnswer[$answerType] = $answerData;
-            update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
-        }
+         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+         if ($userAnswer === "") {
+             $userAnswer= array();
+         }
+        $userAnswer[$answerType] = $answerData;
+        update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
 
     private function _getUserProgress($nodeIdArr, $userId)
