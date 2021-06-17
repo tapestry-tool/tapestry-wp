@@ -1,9 +1,11 @@
 <template>
-  <activity-screen
+  <activity-media
     v-if="showActivityScreen"
-    :id="node.id"
-    @back="showActivityScreen = false"
-    @close="$emit('close')"
+    :dimensions="dimensions"
+    :node="node"
+    @change:dimensions="$emit('change:dimensions', $event)"
+    @complete="$emit('close')"
+    @close="showActivityScreen = false"
   />
   <div v-else data-qa="end-screen" class="end-screen">
     <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
@@ -23,15 +25,19 @@
 
 <script>
 import client from "@/services/TapestryAPI"
-import ActivityScreen from "./ActivityScreen"
+import ActivityMedia from "../ActivityMedia"
 
 export default {
   name: "end-screen",
   components: {
-    ActivityScreen,
+    ActivityMedia,
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    dimensions: {
       type: Object,
       required: true,
     },
