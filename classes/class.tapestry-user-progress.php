@@ -87,10 +87,10 @@ class TapestryUserProgress implements ITapestryUserProgress
      *
      * @return null
      */
-    public function completeQuestion($questionId, $answerData, $answerType)
+    public function completeQuestion($questionId, $answerType, $answerData)
     {
         $this->_checkPostId();
-        $this->_completeQuestion($questionId, $answerData, $answerType);
+        $this->_completeQuestion($questionId, $answerType, $answerData);
     }
 
     /**
@@ -141,7 +141,7 @@ class TapestryUserProgress implements ITapestryUserProgress
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_completed_'.$this->nodeMetaId, true);
     }
 
-    private function _completeQuestion($questionId, $answerData, $answerType)
+    private function _completeQuestion($questionId, $answerType, $answerData)
     {
         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_node_quiz_'.$this->nodeMetaId.'_question_'.$questionId, true);
         if ($userAnswer === "") {

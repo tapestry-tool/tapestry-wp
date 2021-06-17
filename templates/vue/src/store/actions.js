@@ -220,14 +220,13 @@ export async function getTapestryExport({ dispatch }) {
   }
 }
 
-//{ answerType, answer, nodeId, questionId }
 export async function completeQuestion(
   { commit, dispatch },
   { answerType, answer, nodeId, questionId }
 ) {
   try {
-    await client.completeQuestion(nodeId, questionId, answer, answerType)
-    commit("completeQuestion", { nodeId, questionId, answer, answerType })
+    await client.completeQuestion(nodeId, questionId, answerType, answer)
+    commit("completeQuestion", { nodeId, questionId, answerType, answer })
   } catch (error) {
     dispatch("addApiError", error)
   }

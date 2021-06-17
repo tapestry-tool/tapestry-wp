@@ -1203,7 +1203,7 @@ function completeQuestionById($request)
 
     try {
         $userProgress = new TapestryUserProgress($postId, $nodeMetaId);
-        $userProgress->completeQuestion($questionId, $answerData, $answerType);
+        $userProgress->completeQuestion($questionId, $answerType, $answerData);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

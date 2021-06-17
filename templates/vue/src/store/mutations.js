@@ -117,7 +117,7 @@ export function deleteLink(state, { source, target }) {
 }
 
 // quizzes
-export function completeQuestion(state, { nodeId, questionId, answer, answerType }) {
+export function completeQuestion(state, { nodeId, questionId, answerType, answer }) {
   const node = getters.getNode(state)(nodeId)
 
   const question = node.typeData.activity.questions.find(
