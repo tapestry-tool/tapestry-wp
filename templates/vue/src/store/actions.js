@@ -222,7 +222,7 @@ export async function getTapestryExport({ dispatch }) {
 
 export async function completeQuestion(
   { commit, dispatch },
-  { answerType, answer, nodeId, questionId }
+  { nodeId, questionId, answerType, answer }
 ) {
   try {
     await client.completeQuestion(nodeId, questionId, answerType, answer)
@@ -232,9 +232,9 @@ export async function completeQuestion(
   }
 }
 
-export async function saveAudio({ dispatch }, { audio, nodeId, questionId }) {
+export async function saveAudio({ dispatch }, { nodeId, questionId, audio }) {
   try {
-    const response = await client.saveAudio(audio, nodeId, questionId)
+    const response = await client.saveAudio(nodeId, questionId, audio)
     return response
   } catch (error) {
     dispatch("addApiError", error)

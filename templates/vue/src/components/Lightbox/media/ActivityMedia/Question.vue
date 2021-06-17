@@ -269,9 +269,9 @@ export default {
         case "audio": {
           const audioFile = formData
           const savedUrl = await this.saveAudio({
-            audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
             nodeId: this.node.id,
             questionId: this.question.id,
+            audio: audioFile.replace("data:audio/ogg; codecs=opus;base64,", ""),
           })
           submittedAnswer = { url: savedUrl }
           break
