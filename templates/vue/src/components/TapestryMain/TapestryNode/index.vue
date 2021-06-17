@@ -427,7 +427,7 @@ export default {
           name: names.APP,
           params: { nodeId: this.node.id },
           query: this.$route.query,
-          path: `/nodes/${this.node.id}`
+          path: `/nodes/${this.node.id}`,
         })
       }
     },

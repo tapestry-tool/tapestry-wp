@@ -58,11 +58,7 @@ export default {
       return !(!this.avatar || Object.keys(this.avatar).length === 0)
     },
     avatarPopup() {
-      if (
-        process.env.VUE_APP_AVATAR_POPUP === "true" ||
-        process.env.VUE_APP_AVATAR_POPUP === "TRUE" ||
-        process.env.VUE_APP_AVATAR_POPUP === 1
-      ) {
+      if (process.env.VUE_APP_AVATAR_POPUP) {
         return true
       }
       return false

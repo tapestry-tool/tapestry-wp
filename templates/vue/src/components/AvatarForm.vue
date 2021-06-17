@@ -2,26 +2,28 @@
   <div>
     <b-overlay variant="white">
       <div class="title-and-avatar">
-        <h2>Avatar Customizer</h2>
-        <avataaars
-          class="avatar"
-          style="max-width: 300px;"
-          :isCircle="isCircle"
-          :circleColor="circleColor"
-          :accessoriesType="accessoriesType"
-          :clotheType="clotheType"
-          :clotheColor="clotheColor"
-          :eyebrowType="eyebrowType"
-          :eyeType="eyeType"
-          :facialHairColor="facialHairColor"
-          :facialHairType="facialHairType"
-          :graphicType="graphicType"
-          :hairColor="hairColor"
-          :mouthType="mouthType"
-          :skinColor="skinColor"
-          :topType="topType"
-          :topColor="topColor"
-        ></avataaars>
+        <div class="title">
+          <h2>Avatar Customizer</h2>
+        </div>
+        <div class="avatar">
+          <avataaars
+            :isCircle="isCircle"
+            :circleColor="circleColor"
+            :accessoriesType="accessoriesType"
+            :clotheType="clotheType"
+            :clotheColor="clotheColor"
+            :eyebrowType="eyebrowType"
+            :eyeType="eyeType"
+            :facialHairColor="facialHairColor"
+            :facialHairType="facialHairType"
+            :graphicType="graphicType"
+            :hairColor="hairColor"
+            :mouthType="mouthType"
+            :skinColor="skinColor"
+            :topType="topType"
+            :topColor="topColor"
+          ></avataaars>
+        </div>
       </div>
       <div class="customizer">
         <b-card no-body>
@@ -389,6 +391,7 @@ export default {
   },
   mounted() {
     this.setExistingAvatar()
+    console.log(this.avatar)
   },
   methods: {
     ...mapActions(["updateAvatar"]),
@@ -434,8 +437,15 @@ export default {
 </script>
 
 <style scoped>
-.title-and-avatar {
+.title {
   text-align: center;
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .customizer {
