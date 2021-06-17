@@ -206,7 +206,6 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $progress;
     }
 
-
     private function _updateUserH5PSettings($h5pSettingsData)
     {
         update_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, $h5pSettingsData);
