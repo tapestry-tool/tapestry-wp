@@ -911,9 +911,6 @@ export default {
       this.node.childOrdering = arr
     },
     handleTypeChange(evt) {
-      // this.node.activity.questions = this.node.activity.questions.filter(q =>
-      //   Object.values(q.answerTypes).reduce((acc, { value }) => acc || value == "")
-      // )
       if (evt === "multi-content") this.node.presentationStyle = "accordion"
     },
     async setLinkData() {
