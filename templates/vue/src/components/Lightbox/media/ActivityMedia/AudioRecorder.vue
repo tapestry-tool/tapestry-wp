@@ -9,7 +9,7 @@
     <audio
       v-if="showAudio"
       controls
-      :src="state === states.DONE ? getAudioUrl : audio"
+      :src="state === states.DONE ? uncachedAudioUrl : audio"
     ></audio>
     <button
       v-else
@@ -96,7 +96,7 @@ export default {
         this.state === this.states.WAITING_TO_BE_SENT
       )
     },
-    getAudioUrl() {
+    uncachedAudioUrl() {
       return this.audio + "?" + Date.now()
     },
     question() {
