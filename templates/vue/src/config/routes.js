@@ -106,10 +106,6 @@ const redirects = [
     path: `${ROOT_PATH}/edit`,
     redirect: `${ROOT_PATH}/edit/content`,
   },
-  {
-    path: `${ROOT_PATH}/tyde`,
-    redirect: `${ROOT_PATH}/tyde/multicontent/:rowId`,
-  },
 ]
 
 const routes = {

@@ -6,11 +6,11 @@
     @close="handleUserClose"
   >
     <b-container fluid class="px-0">
-      <b-tabs card fill>
+      <b-tabs card justified>
         <b-tab
           title="Multicontent"
           :active="tab === 'multicontent'"
-          @click="$emit('change:tab', 'multicontent')"
+          @click="changeTab('multicontent')"
         >
           <multi-content-tab
             v-if="node.mediaType === 'multi-content'"
@@ -22,24 +22,16 @@
             @complete="complete"
           />
         </b-tab>
-        <b-tab
-          title="Tab2"
-          :active="tab === 'tab2'"
-          @click="$emit('change:tab', 'tab2')"
-        >
+        <b-tab title="Tab2" :active="tab === 'tab2'" @click="changeTab('tab2')">
           Tab 2 stuffs
         </b-tab>
-        <b-tab
-          title="Tab3"
-          :active="tab === 'tab3'"
-          @click="$emit('change:tab', 'tab3')"
-        >
+        <b-tab title="Tab3" :active="tab === 'tab3'" @click="changeTab('tab3')">
           Tab 3 stuffs
         </b-tab>
         <b-tab
           title="Circle of Support"
           :active="tab === 'cos'"
-          @click="$emit('change:tab', 'cos')"
+          @click="changeTab('cos')"
         >
           Circle of Support
         </b-tab>
