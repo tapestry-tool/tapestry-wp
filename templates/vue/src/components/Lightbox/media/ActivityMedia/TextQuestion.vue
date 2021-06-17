@@ -1,8 +1,16 @@
 <template>
   <b-form @submit="handleTextSubmit">
     <p>
-      <b-form-textarea v-if="multiLine" v-model="text" rows="5"></b-form-textarea>
-      <b-form-input v-else v-model="text" :placeholder="placeholder"></b-form-input>
+      <b-form-textarea
+        v-if="question.answerTypes.text.isMultiLine"
+        v-model="text"
+        rows="5"
+      ></b-form-textarea>
+      <b-form-input
+        v-else
+        v-model="text"
+        :placeholder="question.answerTypes.text.placeholder"
+      ></b-form-input>
       <b-form-invalid-feedback :state="isAnswerValid">
         Please enter a response.
       </b-form-invalid-feedback>
@@ -20,16 +28,6 @@ export default {
     question: {
       type: Object,
       required: true,
-    },
-    multiLine: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: "",
     },
     answer: {
       type: Object,
