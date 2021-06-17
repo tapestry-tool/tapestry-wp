@@ -143,10 +143,10 @@ class TapestryUserProgress implements ITapestryUserProgress
 
     private function _completeQuestion($questionId, $answerType, $answerData)
     {
-         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
-         if ($userAnswer === "") {
-             $userAnswer= array();
-         }
+        $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
+        if ($userAnswer === "") {
+            $userAnswer= array();
+        }
         $userAnswer[$answerType] = $answerData;
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
     }
@@ -185,18 +185,18 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             $isQuestionNode = property_exists($node->typeData, 'activity');
             if ($isQuestionNode) {
-                $questionIdArray = [];
-                $questionListLength = count($node->typeData->activity->questions);
-                for ($x = 0; $x < $questionListLength; $x++) {
-                    $questionId = $node->typeData->activity->questions[$x]->id;
-                    array_push($questionIdArray, $questionId);
-                }
+                $questionIdArray = array_map(
+                    function ($question) {
+                    return $question->id;
+                },
+                    $node->typeData->activity->questions
+                );
 
                 $progress->$nodeId->content['userAnswers'] = new stdClass();
                 $progress->$nodeId->content['userAnswers']->activity = new stdClass();
-                for ($i = 0; $i < $questionListLength; $i++) {
-                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionIdArray[$i].'_answers', true);
-                    $progress->$nodeId->content['userAnswers']->activity->{$questionIdArray[$i]}->answers = $answer;
+                foreach ($questionIdArray as $questionId) {
+                    $answer = get_user_meta($userId, 'tapestry_'.$this->postId.'_'.$nodeId.'_question_'.$questionId.'_answers', true);
+                    $progress->$nodeId->content['userAnswers']->activity->{$questionId}->answers = $answer;
                 }
             }
 
