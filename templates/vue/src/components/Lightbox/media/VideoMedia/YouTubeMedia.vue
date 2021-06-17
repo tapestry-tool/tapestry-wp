@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="embed-responsive embed-responsive-16by9"
-    
-  >
+  <div class="embed-responsive embed-responsive-16by9">
     <youtube
       class="embed-responsive-item"
       :video-id="node.typeData.youtubeID"
