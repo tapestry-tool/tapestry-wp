@@ -4,7 +4,7 @@
     data-qa="help-modal"
     :visible="show"
     :hide-footer="true"
-    size="lg"
+    size="xl"
     title="Authoring Guide"
     body-class="p-0"
     @hidden="$emit('close')"
@@ -25,8 +25,8 @@
 <script>
 import Loading from "@/components/common/Loading"
 
-// This determines how long the loading icon shows before the iframe is revealed. 
-// Note: The loading icon will automatically disappear if the iframe is fully 
+// This determines how long the loading icon shows before the iframe is revealed.
+// Note: The loading icon will automatically disappear if the iframe is fully
 // loaded before this time is reached.
 const loadingLimit = 5000
 
@@ -74,5 +74,6 @@ export default {
 <style>
 iframe {
   border: none;
+  min-height: 70vh;
 }
 </style>
