@@ -51,7 +51,7 @@
               label="Then show user answer to the following activity:"
             >
               <combobox
-                v-model="question.previousEntry"
+                v-model="question.previousQuestionId"
                 class="mb-0"
                 :options="getPreviousQuestions(question)"
                 item-text="text"

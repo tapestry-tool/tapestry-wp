@@ -5,7 +5,10 @@
     </button>
     <loading v-if="submitting" label="Submitting..." />
     <div v-else>
-      <div v-if="question.isFollowUp && question.previousEntry" class="follow-up">
+      <div
+        v-if="question.isFollowUp && question.previousQuestionId"
+        class="follow-up"
+      >
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
@@ -123,9 +126,9 @@ export default {
     },
     lastQuestion() {
       if (this.question.isFollowUp) {
-        return this.getQuestion(this.question.previousEntry)
+        return this.getQuestion(this.question.previousQuestionId)
       }
-      return this.getQuestion(this.question.previousEntry)
+      return this.getQuestion(this.question.previousQuestionId)
     },
     previousQuestionAnswers() {
       var previousQuestionNodeId = 0
@@ -134,7 +137,7 @@ export default {
         if (
           this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
           this.userAnswers[tempNodeId].activity.hasOwnProperty(
-            this.question.previousEntry
+            this.question.previousQuestionId
           )
         ) {
           previousQuestionNodeId = tempNodeId
@@ -142,7 +145,7 @@ export default {
       }
       let answerObject = this.getAnswers(
         previousQuestionNodeId,
-        this.question.previousEntry
+        this.question.previousQuestionId
       )
       let previousAnswers = []
 
