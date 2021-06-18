@@ -1,7 +1,6 @@
 import Vue from "vue"
 import * as getters from "./getters"
 import { parse } from "@/utils/dataset"
-//import Helpers from "@/utils/Helpers"
 
 export function init(state, { dataset, progress = {} }) {
   const datasetWithProgress = parse(dataset, progress)
@@ -126,12 +125,10 @@ export function completeQuestion(state, { nodeId, questionId, answerType, answer
     state.userAnswers[nodeId] === undefined ||
     state.userAnswers[nodeId].activity === undefined
   ) {
-    state.userAnswers[nodeId] = {}
-    state.userAnswers[nodeId].activity = {}
+    state.userAnswers[nodeId] = { activity: {} }
   }
   if (state.userAnswers[nodeId].activity[questionId] === undefined) {
-    state.userAnswers[nodeId].activity[questionId] = {}
-    state.userAnswers[nodeId].activity[questionId].answers = {}
+    state.userAnswers[nodeId].activity[questionId] = { answers: {} }
   }
   if (typeof state.userAnswers[nodeId].activity[questionId].answers === "string") {
     state.userAnswers[nodeId].activity[questionId].answers = {}
