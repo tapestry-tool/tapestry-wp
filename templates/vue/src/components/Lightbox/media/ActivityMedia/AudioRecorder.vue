@@ -2,14 +2,14 @@
   <div v-if="state === states.NOT_SUPPORTED">
     Oops, your browser doesn't support audio recording.
   </div>
-  <div v-else-if="state === states.WAIT">
+  <div v-else-if="state === states.LOADING">
     Please provide microphone access to record your answer.
   </div>
   <div v-else class="recorder">
     <audio
-      v-if="showAudio"
+      v-if="state === states.SAVED || state === states.UNSAVED"
       controls
-      :src="state === states.DONE ? uncachedAudioUrl : audio"
+      :src="state === states.SAVED ? uncachedAudioUrl : audio"
     ></audio>
     <button
       v-else
@@ -22,12 +22,12 @@
       ></i>
     </button>
     <div class="w-100">
-      <code v-if="state !== states.DONE" style="color: white;">
+      <code v-if="state !== states.SAVED" style="color: white;">
         {{ durationText }}
       </code>
     </div>
     <button
-      :disabled="duration === 0 && state !== states.DONE"
+      :disabled="duration === 0 && state !== states.SAVED"
       class="my-3"
       @click="resetRecording"
     >
@@ -44,7 +44,7 @@
       Done
     </button>
     <button
-      v-if="state === states.WAITING_TO_BE_SENT"
+      v-if="state === states.UNSAVED"
       class="my-3"
       data-qa="submit-button-audio"
       @click="handleSubmit"
@@ -90,12 +90,6 @@ export default {
   },
   computed: {
     ...mapGetters(["getQuestion", "getAnswers"]),
-    showAudio() {
-      return (
-        this.state === this.states.DONE ||
-        this.state === this.states.WAITING_TO_BE_SENT
-      )
-    },
     uncachedAudioUrl() {
       return this.audio + "?" + Date.now()
     },
@@ -122,15 +116,15 @@ export default {
       return answers.audio && answers.audio.url
     },
     states() {
-      // NOTE: DONE state is used to determine if the audio already exists in the backend
+      // NOTE: SAVED state is used to determine if the audio already exists in the backend
       return {
-        WAIT: "wait",
-        DONE: "done",
         NOT_SUPPORTED: "not-supported",
-        PAUSED: "paused",
+        LOADING: "loading",
         READY: "ready",
         RECORDING: "recording",
-        WAITING_TO_BE_SENT: "waiting-to-be-sent",
+        PAUSED: "paused",
+        UNSAVED: "unsaved",
+        SAVED: "saved",
       }
     },
   },
@@ -138,7 +132,7 @@ export default {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
       if (answersObject.audio && answersObject.audio.url) {
-        this.state = this.states.DONE
+        this.state = this.states.SAVED
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {
         this.initialize()
@@ -147,11 +141,11 @@ export default {
   },
   created() {
     if (this.hasPrevious) {
-      this.state = this.states.DONE
+      this.state = this.states.SAVED
       let answersObject = this.getAnswers(this.node.id, this.question.id)
       this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
     } else {
-      this.state = this.states.WAIT
+      this.state = this.states.LOADING
       this.initialize()
     }
   },
@@ -178,7 +172,7 @@ export default {
           reader.onload = () => {
             const data = reader.result
             this.audio = data
-            this.state = this.states.WAITING_TO_BE_SENT
+            this.state = this.states.UNSAVED
           }
         })
 
@@ -237,7 +231,7 @@ export default {
     },
     handleSubmit() {
       client.recordAnalyticsEvent("user", "submit", "audio-recorder", this.id)
-      this.state = this.states.DONE
+      this.state = this.states.SAVED
       this.$emit("submit", this.audio)
     },
   },
