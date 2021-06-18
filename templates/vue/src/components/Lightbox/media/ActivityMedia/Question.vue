@@ -40,7 +40,7 @@
           <text-question
             v-if="formType === 'text'"
             :question="question"
-            :answer="answers"
+            :answer="answer"
             @submit="handleSubmit"
           ></text-question>
           <audio-recorder

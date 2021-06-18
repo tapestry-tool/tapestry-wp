@@ -30,31 +30,30 @@ export default {
       required: true,
     },
     answer: {
-      type: Object,
+      type: String,
       required: true,
     },
   },
   data() {
     return {
       isAnswerValid: true,
-      text: this.answer.text,
+      text: this.answer,
     }
   },
   watch: {
     text(newText) {
-      this.answer.text = newText
       this.text = newText
     },
     question() {
-      this.text = this.answer.text
+      this.text = this.answer
     },
   },
   methods: {
     handleTextSubmit(event) {
       event.preventDefault()
-      this.isAnswerValid = this.answer.text !== ""
+      this.isAnswerValid = this.text !== ""
       if (this.isAnswerValid) {
-        this.$emit("submit", this.answer.text)
+        this.$emit("submit", this.text)
       }
     },
   },

@@ -118,9 +118,6 @@ export function getAnswers(state) {
         }
       }
     }
-    return {
-      text: "",
-    }
   }
 }
 
