@@ -230,25 +230,20 @@ export default {
       return false
     },
   },
-  mounted() {
-    const enabledAnswerTypes = Object.entries(this.question.answerTypes).filter(
-      ([, value]) => { return value.enabled}
-    ).map(item => item[0])
-    
-    if(enabledAnswerTypes.length === 1) {
-      this.formType = enabledAnswerTypes[0]
-      this.formOpened = true
-    }
-  },
   watch: {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
     },
   },
-  created() {
-    this.answers = this.getAnswers(this.node.id, this.question.id)
-    if (this.enabledAnswerTypes.length === 1) {
-      this.formType = Object.keys(this.enabledAnswerTypes).pop()
+  mounted() {
+    const enabledAnswerTypes = Object.entries(this.question.answerTypes)
+      .filter(([, value]) => {
+        return value.enabled
+      })
+      .map(item => item[0])
+
+    if (enabledAnswerTypes.length === 1) {
+      this.formType = enabledAnswerTypes[0]
       this.formOpened = true
     }
   },
