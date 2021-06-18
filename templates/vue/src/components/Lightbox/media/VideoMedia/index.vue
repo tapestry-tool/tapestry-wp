@@ -283,7 +283,8 @@ export default {
               }
 
               this.lastTime = currentTime
-              this.$emit("timeupdate", { amountViewed, currentTime })
+              // this line below sends a extra progress request when the video is playing
+              // this.$emit("timeupdate", { amountViewed, currentTime })
               break
             }
           }

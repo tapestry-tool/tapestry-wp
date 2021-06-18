@@ -122,10 +122,14 @@ export default {
           this.$emit("seeked", { currentTime })
           setTimeout(() => this.$emit("play"), 200)
         } else {
-          this.$emit("timeupdate", {
-            amountViewed: ended ? 1 : currentTime / duration,
-            currentTime: ended ? duration : currentTime,
-          })
+          var currentTimeInt = parseInt(currentTime, 10)
+          var isFiveSeconds = currentTimeInt % 5 === 0 && currentTimeInt !== 0
+          if (isFiveSeconds) {
+            this.$emit("timeupdate", {
+              amountViewed: ended ? 1 : currentTime / duration,
+              currentTime: ended ? duration : currentTime,
+            })
+          }
         }
         this.lastTime = currentTime
       }
@@ -154,7 +158,7 @@ export default {
       if (this.interval) {
         clearInterval(this.interval)
       }
-      this.interval = setInterval(() => this.updateVideoProgress(), 200)
+      this.interval = setInterval(() => this.updateVideoProgress(), 990)
     },
     stopInterval() {
       if (this.interval) {
