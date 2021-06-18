@@ -25,6 +25,7 @@ export default {
     question: {
       type: Object,
       required: false,
+      default: () => {},
     },
   },
 }
