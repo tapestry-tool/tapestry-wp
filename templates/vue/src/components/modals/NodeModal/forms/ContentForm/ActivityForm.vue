@@ -78,7 +78,6 @@
                 :data-testid="`question-title-${index}`"
               />
             </b-form-group>
-            <p>Question data is {{ question }}</p>
             <b-card-sub-title class="mt-2 mb-2">Answer Options</b-card-sub-title>
             <b-form-group class="mt-3">
               <b-form-checkbox
