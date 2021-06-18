@@ -145,7 +145,7 @@
                 <b-form-input
                   id="placeholder"
                   v-model="question.answerTypes.list.placeholder"
-                  data-qa="question-answer-text-single-placeholder"
+                  data-qa="question-answer-list-placeholder"
                 ></b-form-input>
               </div>
             </b-form-group>

@@ -30,7 +30,12 @@
           "
           @keydown.enter.prevent="addAnswer()"
         ></b-form-input>
-        <b-button class="btn" variant="primary" @click="addAnswer">
+        <b-button
+          class="btn"
+          variant="primary"
+          data-qa="list-add-button"
+          @click="addAnswer"
+        >
           Add
         </b-button>
       </div>
@@ -74,9 +79,6 @@ export default {
   watch: {
     userInput(newAnswer) {
       this.userInput = newAnswer
-    },
-    question() {
-      this.userInput = this.answers
     },
   },
   methods: {
