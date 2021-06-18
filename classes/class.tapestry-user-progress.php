@@ -174,8 +174,6 @@ class TapestryUserProgress implements ITapestryUserProgress
             $progress->$nodeId->conditions = $node->conditions;
             $progress->$nodeId->unlocked = $node->unlocked;
 
-            $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
-
             if ($node->accessible) {
                 $progress->$nodeId->content = [
                     'quiz' => $node->quiz,
