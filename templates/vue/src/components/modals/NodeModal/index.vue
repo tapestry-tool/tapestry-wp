@@ -888,14 +888,30 @@ export default {
           errMsgs.push("Please enter an Embed URL")
         }
       } else if (this.node.mediaType === "activity") {
-        const validActivity = this.node.typeData.activity.questions.every(
+        const validActivityOptions = this.node.typeData.activity.questions.every(
           question => {
             const answerTypes = Object.values(question.answerTypes)
             return answerTypes.some(answerType => answerType.enabled)
           }
         )
-        if (!validActivity) {
+        if (!validActivityOptions) {
           errMsgs.push("Please enable at least one answer type for each question")
+        }
+
+        const questionsWithPreviousActivity = this.node.typeData.activity.questions.filter(
+          question =>{
+            return question.isFollowUp
+          }
+        )
+        const validPreviousAnswers = questionsWithPreviousActivity.every(
+          question => {
+            const previousAnswer = question.followUp.questionId
+            return previousAnswer
+          }
+        )
+        if(!validPreviousAnswers) {
+          errMsgs.push("Please select a previous activity to display")
+
         }
       }
 
