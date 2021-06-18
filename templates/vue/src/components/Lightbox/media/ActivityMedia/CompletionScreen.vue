@@ -2,14 +2,14 @@
   <div class="completion-screen">
     <header>
       <h1>
-        {{ question.confirmationTitle ? question.confirmationTitle : "Thanks!" }}
+        {{ question.confirmation.title ? question.confirmation.title : "Thanks!" }}
       </h1>
-      <p>
-        {{
-          question.confirmationMessage
-            ? question.confirmationMessage
-            : "Your response has been recorded."
-        }}
+      <p
+        v-if="question.confirmation.message"
+        v-html="question.confirmation.message"
+      />
+      <p v-else>
+        Your response has been recorded.
       </p>
     </header>
     <div>
