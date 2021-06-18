@@ -147,22 +147,23 @@ export default {
         this.question.followUp.questionId
       )
       let previousAnswers = []
-
-      if (this.question.followUp.questionId !== null) {
-        for (const [key, value] of Object.entries(answerObject)) {
-          if (key === "text") {
-            var tempObj = { type: key, answerData: value }
-            previousAnswers.push(tempObj)
-          } else {
-            var tempAudioObj = {
-              type: key,
-              answerData:
-                wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
+      if (answerObject !== undefined) {
+        if (this.question.followUp.questionId !== null) {
+          for (const [key, value] of Object.entries(answerObject)) {
+            if (key === "text") {
+              var tempObj = { type: key, answerData: value }
+              previousAnswers.push(tempObj)
+            } else {
+              var tempAudioObj = {
+                type: key,
+                answerData:
+                  wpData.uploadDirArray.baseurl + "/" + value.url + "?" + Date.now(),
+              }
+              previousAnswers.push(tempAudioObj)
             }
-            previousAnswers.push(tempAudioObj)
           }
+          return previousAnswers
         }
-        return previousAnswers
       }
       return []
     },
@@ -234,6 +235,9 @@ export default {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
     },
+  },
+  created() {
+    this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
     const enabledAnswerTypes = Object.entries(this.question.answerTypes)

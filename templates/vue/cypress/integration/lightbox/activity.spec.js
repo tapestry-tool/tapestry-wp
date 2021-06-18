@@ -19,7 +19,6 @@ describe("Activity", () => {
       cy.openLightbox(node.id)
 
       cy.contains(/microphone access/i, { timeout: 10000 }).should("not.exist")
-      cy.getByTestId("answer-button-audio").click()
       cy.clock()
 
       cy.getByTestId("record").click()
