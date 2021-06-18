@@ -7,8 +7,7 @@
     <template v-slot="{ isVisible, hasNext, next, toggle }">
       <div data-qa="accordion-rows">
         <div
-          v-for="(row, index) in rows"
-          v-if="row.node.popup === null"
+          v-for="(row, index) in nonPopupRows"
           :key="row.node.id"
           ref="rowRefs"
           class="accordion-row"
@@ -150,9 +149,6 @@ export default {
       showCompletion: false,
     }
   },
-  mounted() {
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
-  },
   computed: {
     ...mapGetters([
       "getDirectChildren",
@@ -171,7 +167,9 @@ export default {
         return { node, children }
       })
     },
-
+    nonPopupRows() {
+      return this.rows.filter(row => row.node.popup === null)
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -197,6 +195,9 @@ export default {
         return null
       }
     },
+  },
+  mounted() {
+    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   methods: {
     ...mapMutations(["updateNode"]),

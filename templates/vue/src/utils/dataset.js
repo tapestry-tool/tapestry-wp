@@ -138,7 +138,7 @@ function setDatasetProgress(dataset, progress) {
           dataset.userAnswers[node.id] = { activity: content.userAnswers.activity }
         }
         node.quiz = content.quiz
-        node.typeData = {...node.typeData, ...content.typeData}
+        node.typeData = { ...node.typeData, ...content.typeData }
       }
 
       if (node.mediaType !== "multi-content") {
