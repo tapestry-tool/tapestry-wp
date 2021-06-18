@@ -65,7 +65,6 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      "quiz":[],
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[
@@ -160,7 +159,7 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      "quiz":[],
+      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[],
@@ -237,7 +236,7 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      "quiz":[],
+      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[
@@ -327,7 +326,7 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      "quiz":[],
+      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[],

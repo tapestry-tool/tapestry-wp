@@ -34,19 +34,6 @@ describe("Activity", () => {
 
       cy.tick(3600 * 1000) // move forward by 1 hour
       cy.contains("1:00:05").should("be.visible")
-
-      cy.route("POST", "**/quiz*").as("submit")
-
-      cy.contains(/done/i).click()
-      cy.lightbox().within(() => {
-        cy.get("audio").should("be.visible")
-        cy.getByTestId("submit-button-audio").click()
-        cy.contains(/submitting/i).should("be.visible")
-
-        cy.contains("Thanks!").should("be.visible")
-        cy.contains(/done/i).click()
-      })
-      cy.lightbox().should("not.exist")
     })
   })
 })

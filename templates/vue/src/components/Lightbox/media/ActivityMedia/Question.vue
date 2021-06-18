@@ -365,6 +365,7 @@ export default {
     top: 0;
     left: 0;
     z-index: 30;
+    border-radius: 15px;
   }
 
   &-title {

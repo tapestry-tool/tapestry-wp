@@ -56,7 +56,7 @@
       "backgroundColor": "#8396a1",
       "textColor": "white",
       "skippable": true,
-      "quiz": [],
+      
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [
@@ -127,7 +127,7 @@
         2672,
         2672
       ],
-      "quiz": [],
+      
       "license": "",
       "references": "",
       "unlocked": true,
@@ -191,7 +191,7 @@
         "fy": 2765.330315153186
       },
       "childOrdering": [],
-      "quiz": [],
+      
       "license": "",
       "references": "",
       "unlocked": true,
