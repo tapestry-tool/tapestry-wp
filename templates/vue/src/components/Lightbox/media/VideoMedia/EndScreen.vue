@@ -8,10 +8,6 @@
     @close="showActivityScreen = false"
   />
   <div v-else data-qa="end-screen" class="end-screen">
-    <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
-      <i class="fas fa-question-circle fa-4x"></i>
-      <p>{{ buttonText }}</p>
-    </button>
     <button @click="handleClick($event, 'rewatch')">
       <i class="fas fa-redo fa-4x"></i>
       <p>Rewatch</p>
@@ -47,27 +43,13 @@ export default {
       showActivityScreen: false,
     }
   },
-  computed: {
-    showQuizButton() {
-      return Boolean(this.node.quiz && this.node.quiz.length)
-    },
-    buttonText() {
-      const allDone = this.node.quiz.every(question => question.completed)
-      return allDone ? "Reanswer Question" : "Answer Question"
-    },
-  },
   methods: {
     handleClick(evt, type) {
       client.recordAnalyticsEvent("user", "click", "end-screen", this.node.id, {
         x: evt.clientX,
         y: evt.clientY,
       })
-
-      if (type === "show-quiz") {
-        this.showActivityScreen = true
-      } else {
-        this.$emit(type)
-      }
+      this.$emit(type)
     },
   },
 }

@@ -221,11 +221,6 @@ export function tapestryJson(state) {
   const exportedTapestry = {
     nodes: Object.values(state.nodes).map(node => {
       const newNode = { ...node }
-      if (newNode.quiz) {
-        newNode.quiz = newNode.quiz.map(question => {
-          return { ...question, completed: false, entries: null }
-        })
-      }
       return newNode
     }),
     links: state.links,

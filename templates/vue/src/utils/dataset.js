@@ -21,11 +21,9 @@ export function makeMockProgress(dataset) {
       conditions: [],
       unlocked: true,
       content: {
-        quiz: [...node.quiz],
         typeData: { ...node.typeData },
       },
       completed: false,
-      quiz: {},
     }
   }
 
@@ -123,7 +121,6 @@ function setDatasetProgress(dataset, progress) {
     if (node) {
       const willLock = node.unlocked && !nodeProgress.unlocked
       if (willLock && !wp.canEditTapestry()) {
-        node.quiz = []
         node.typeData = {}
       }
       node.unlocked = nodeProgress.unlocked
@@ -137,29 +134,11 @@ function setDatasetProgress(dataset, progress) {
         if (content.userAnswers) {
           dataset.userAnswers[node.id] = { activity: content.userAnswers.activity }
         }
-        node.quiz = content.quiz
         node.typeData = { ...node.typeData, ...content.typeData }
       }
 
       if (node.mediaType !== "multi-content") {
         node.progress = nodeProgress.progress
-        const questions = node.quiz
-        if (nodeProgress.quiz) {
-          Object.entries(nodeProgress.quiz).forEach(
-            ([questionId, completionInfo]) => {
-              const question = questions.find(question => question.id === questionId)
-              if (question) {
-                question.completed = completionInfo.completed
-                question.entries = {}
-                Object.entries(completionInfo).forEach(([key, value]) => {
-                  if (key !== "completed") {
-                    question.entries[key] = value
-                  }
-                })
-              }
-            }
-          )
-        }
       }
     }
   }

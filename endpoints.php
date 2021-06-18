@@ -185,7 +185,7 @@ $REST_API_ENDPOINTS = [
             'callback' => 'completeByNodeId',
         ],
     ],
-    'UPDATE_TAPESTRY_USER_QUIZ_PROGRESS' => (object) [
+    'UPDATE_TAPESTRY_USER_ACTIVITY_PROGRESS' => (object) [
         'ROUTE' => 'users/activity',
         'ARGUMENTS' => [
             'methods' => $REST_API_POST_METHOD,
@@ -604,7 +604,6 @@ function addTapestryGroup($request)
             throw new TapestryError('INVALID_POST_ID');
         }
         $tapestry = new Tapestry($postId);
-
         return $tapestry->addGroup($group);
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
@@ -1185,8 +1184,8 @@ function completeByNodeId($request)
 }
 
 /**
- * Set quiz as completed for the current user
- * Example: /wp-json/tapestry-tool/v1/users/quiz?post_id=44&node_id=1&question_id=abcd.
+ * Set activity as completed for the current user
+ * Example: /wp-json/tapestry-tool/v1/users/activity?post_id=44&node_id=1&question_id=abcd.
  *
  * @param object $request HTTP request
  *

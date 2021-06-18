@@ -176,7 +176,6 @@ class TapestryUserProgress implements ITapestryUserProgress
 
             if ($node->accessible) {
                 $progress->$nodeId->content = [
-                    'quiz' => $node->quiz,
                     'typeData' => $node->typeData,
                 ];
             }
