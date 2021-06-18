@@ -30,7 +30,7 @@ import Toolbar from "./Toolbar"
 import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
-import AvatarForm from "./AvatarForm"
+import AvatarForm from "@/components/modals/UserSettingsModal/AvatarForm.vue"
 import Helpers from "@/utils/Helpers"
 
 export default {

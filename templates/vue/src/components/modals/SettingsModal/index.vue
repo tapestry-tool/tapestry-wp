@@ -283,26 +283,9 @@
             </b-form-checkbox>
           </b-form-group>
         </b-tab>
-        <b-tab
-          title="Avatar"
-          :active="tab === 'avatar'"
-          @click="$emit('change:tab', 'avatar')"
-        >
-          <b-form-group>
-            <avatar-form ref="AvatarForm" />
-          </b-form-group>
-        </b-tab>
       </b-tabs>
     </b-container>
-    <template v-if="tab === 'avatar'" slot="modal-footer">
-      <b-button size="sm" variant="secondary" @click="closeModal">
-        Cancel
-      </b-button>
-      <b-button size="sm" variant="primary" @click="saveAvatar">
-        Save Avatar
-      </b-button>
-    </template>
-    <template v-else slot="modal-footer">
+    <template slot="modal-footer">
       <b-button size="sm" variant="secondary" @click="closeModal">
         Cancel
       </b-button>
@@ -329,7 +312,6 @@ import PermissionsTable from "../common/PermissionsTable"
 import DragSelectModular from "@/utils/dragSelectModular"
 import { data as wpData } from "@/services/wp"
 import client from "@/services/TapestryAPI"
-import AvatarForm from "@/components/AvatarForm.vue"
 
 const defaultPermissions = Object.fromEntries(
   [
@@ -347,7 +329,6 @@ export default {
     FileUpload,
     DuplicateTapestryButton,
     PermissionsTable,
-    AvatarForm,
   },
   props: {
     show: {
@@ -553,10 +534,6 @@ export default {
     },
     handleSubmitNodesEnabled(event) {
       this.submitNodesEnabled = event
-    },
-    saveAvatar() {
-      this.$refs.AvatarForm.saveAvatar()
-      this.closeModal()
     },
   },
 }

@@ -12,6 +12,7 @@
         @change="updateViewBox"
         @change:max-depth="maxDepth = $event"
       ></tapestry-depth-slider>
+      <user-settings-button></user-settings-button>
     </div>
   </div>
 </template>
@@ -20,6 +21,7 @@
 import { mapMutations, mapState } from "vuex"
 import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
+import UserSettingsButton from "./UserSettingsButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
 import * as wp from "@/services/wp"
@@ -30,6 +32,7 @@ export default {
     TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
+    UserSettingsButton,
   },
   data() {
     return {
