@@ -275,14 +275,10 @@ export default {
   watch: {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
-      console.log("this.answers in Question.question()")
-      console.log(this.answers)
     },
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    console.log("this.answers in Question.created()")
-    console.log(this.answers)
   },
   mounted() {
     const enabledAnswerTypes = Object.entries(this.question.answerTypes)
@@ -291,7 +287,6 @@ export default {
       })
       .map(item => item[0])
 
-    console.log(enabledAnswerTypes)
     if (enabledAnswerTypes.length === 1) {
       this.formType = enabledAnswerTypes[0]
       this.formOpened = true
