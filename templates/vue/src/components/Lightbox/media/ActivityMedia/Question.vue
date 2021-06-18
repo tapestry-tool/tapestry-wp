@@ -172,7 +172,11 @@ export default {
       )
     },
     answer() {
-      if (this.formOpened && this.answers[this.formType] !== undefined) {
+      if (
+        this.formOpened &&
+        this.answers !== undefined &&
+        this.answers[this.formType] !== undefined
+      ) {
         return this.answers[this.formType]
       }
       return ""
