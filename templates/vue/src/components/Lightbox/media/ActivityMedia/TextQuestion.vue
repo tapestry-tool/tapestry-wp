@@ -63,10 +63,12 @@ export default {
 <style lang="scss" scoped>
 .grid-container {
   display: grid;
-  height: 230px;
+  align-content: center;
+  height: 250px;
 }
 .form-input {
-  margin: auto;
   width: 80%;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
