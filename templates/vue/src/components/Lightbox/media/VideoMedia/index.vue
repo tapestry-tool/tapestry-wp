@@ -27,7 +27,7 @@
       />
       <div v-if="state === states.Popup" class="popup">
         <tapestry-media
-          v-if="getNode(this.activePopupId).mediaType !== 'multi-content'"
+          v-if="getNode(activePopupId).mediaType !== 'multi-content'"
           :dimensions="dimensions"
           :node-id="activePopupId"
           :context="context"
@@ -36,10 +36,10 @@
           @close="transition(events.Continue)"
         />
         <multi-content-media
-          v-if="getNode(this.activePopupId).mediaType === 'multi-content'"
+          v-if="getNode(activePopupId).mediaType === 'multi-content'"
           :dimensions="dimensions"
           :context="context"
-          :node="getNode(this.activePopupId)"
+          :node="getNode(activePopupId)"
           @complete="handlePopupComplete"
           @close="transition(events.Continue)"
         />
@@ -55,7 +55,7 @@
         Continue
       </button>
       <play-screen
-        v-if="state === states.Paused"
+        v-if="state === states.Paused && showPlayScreen"
         class="screen"
         :hide-video="hideVideo"
         @play="transition(events.Play)"
@@ -75,7 +75,7 @@
 import { mapGetters } from "vuex"
 
 import UrlVideoMedia from "./UrlVideoMedia"
-import H5PVideo from "./H5PVideo"
+import H5PVideoMedia from "./H5PVideoMedia"
 import YouTubeMedia from "./YouTubeMedia"
 import EndScreen from "../common/EndScreen"
 import PlayScreen from "../common/PlayScreen"
@@ -112,7 +112,7 @@ export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
     "youtube-media": YouTubeMedia,
-    "h5p-video-media": H5PVideo,
+    "h5p-video-media": H5PVideoMedia,
     UrlVideoMedia,
     EndScreen,
     PlayScreen,
@@ -191,6 +191,9 @@ export default {
       return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
         this.state
       )
+    },
+    showPlayScreen() {
+      return this.node.mediaType !== "h5p"
     },
     showTitle() {
       return this.context === "page" && this.node.typeData.showTitle !== false
