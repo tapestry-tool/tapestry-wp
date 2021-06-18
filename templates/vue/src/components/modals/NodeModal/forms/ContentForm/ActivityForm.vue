@@ -44,14 +44,14 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="question.isFollowUp" label="Show this text first:">
-              <b-form-input v-model="question.followUpText"></b-form-input>
+              <b-form-input v-model="question.followUp.text"></b-form-input>
             </b-form-group>
             <b-form-group
               v-if="question.isFollowUp"
               label="Then show user answer to the following activity:"
             >
               <combobox
-                v-model="question.previousQuestionId"
+                v-model="question.followUp.questionId"
                 class="mb-0"
                 :options="getPreviousQuestions(question)"
                 item-text="text"

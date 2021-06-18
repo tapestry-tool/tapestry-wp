@@ -5,16 +5,13 @@
     </button>
     <loading v-if="submitting" label="Submitting..." />
     <div v-else>
-      <div
-        v-if="question.isFollowUp && question.previousQuestionId"
-        class="follow-up"
-      >
+      <div v-if="question.followUp.questionId !== null" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
         >
           <h3 class="mb-4">
-            {{ question.followUpText || "Previously, you said:" }}
+            {{ question.followUp.text || "Previously, you said:" }}
           </h3>
           <tapestry-activity
             v-for="answer in previousQuestionAnswers"
@@ -125,31 +122,33 @@ export default {
       return wp.isLoggedIn()
     },
     lastQuestion() {
-      if (this.question.isFollowUp) {
-        return this.getQuestion(this.question.previousQuestionId)
+      if (this.question.followUp.questionId !== null) {
+        return this.getQuestion(this.question.followUp.questionId)
       }
-      return this.getQuestion(this.question.previousQuestionId)
+      return this.getQuestion(this.question.followUp.questionId)
     },
     previousQuestionAnswers() {
-      var previousQuestionNodeId = 0
-      for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
-        let tempNodeId = Object.keys(this.userAnswers)[i]
-        if (
-          this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
-          this.userAnswers[tempNodeId].activity.hasOwnProperty(
-            this.question.previousQuestionId
-          )
-        ) {
-          previousQuestionNodeId = tempNodeId
+      if (this.question.followUp.questionId !== null) {
+        for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
+          let tempNodeId = Object.keys(this.userAnswers)[i]
+          if (
+            this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
+            this.userAnswers[tempNodeId].activity.hasOwnProperty(
+              this.question.followUp.questionId
+            )
+          ) {
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.question.followUp.nodeId = tempNodeId
+          }
         }
       }
       let answerObject = this.getAnswers(
-        previousQuestionNodeId,
-        this.question.previousQuestionId
+        this.question.followUp.nodeId,
+        this.question.followUp.questionId
       )
       let previousAnswers = []
 
-      if (this.question.isFollowUp) {
+      if (this.question.followUp.questionId !== null) {
         for (const [key, value] of Object.entries(answerObject)) {
           if (key === "text") {
             var tempObj = { type: key, answerData: value }
