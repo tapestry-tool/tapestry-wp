@@ -82,7 +82,7 @@ class TapestryUserProgress implements ITapestryUserProgress
     /**
      * Set the question with the given id to be marked as 'completed'.
      *
-     * @param int $questionId the question to mark
+     * @param int    $questionId the question to mark
      * @param string $answerData the user answer
      *
      * @return null
@@ -144,8 +144,8 @@ class TapestryUserProgress implements ITapestryUserProgress
     private function _completeQuestion($questionId, $answerType, $answerData)
     {
         $userAnswer = get_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', true);
-        if ($userAnswer === "") {
-            $userAnswer= array();
+        if ('' === $userAnswer) {
+            $userAnswer = [];
         }
         $userAnswer[$answerType] = $answerData;
         update_user_meta($this->_userId, 'tapestry_'.$this->postId.'_'.$this->nodeMetaId.'_question_'.$questionId.'_answers', $userAnswer);
@@ -187,8 +187,8 @@ class TapestryUserProgress implements ITapestryUserProgress
             if ($isQuestionNode) {
                 $questionIdArray = array_map(
                     function ($question) {
-                    return $question->id;
-                },
+                        return $question->id;
+                    },
                     $node->typeData->activity->questions
                 );
 
@@ -203,6 +203,7 @@ class TapestryUserProgress implements ITapestryUserProgress
             $completed_value = $this->isCompleted($nodeId, $userId);
             $progress->$nodeId->completed = $completed_value;
         }
+
         return $progress;
     }
 
