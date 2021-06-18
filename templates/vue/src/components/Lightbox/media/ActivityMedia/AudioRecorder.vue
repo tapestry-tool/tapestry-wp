@@ -138,6 +138,7 @@ export default {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
       if (answersObject.audio && answersObject.audio.url) {
+        this.state = this.states.DONE
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {
         this.initialize()
