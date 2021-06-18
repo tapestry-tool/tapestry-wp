@@ -49,6 +49,12 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <list-question
+            v-else-if="formType === 'list'"
+            :question="question"
+            :answers="answer"
+            @submit="handleSubmit"
+          ></list-question>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
@@ -70,6 +76,15 @@
             >
               audio
             </answer-button>
+            <answer-button
+              v-if="question.answerTypes.list.enabled"
+              :completed="listFormCompleted"
+              icon="list"
+              data-qa="answer-button-list"
+              @click="openForm('list')"
+            >
+              list
+            </answer-button>
           </div>
         </div>
       </div>
@@ -83,6 +98,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import ListQuestion from "./ListQuestion"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -96,6 +112,7 @@ export default {
     TextQuestion,
     Loading,
     TapestryActivity,
+    ListQuestion,
   },
   props: {
     question: {
@@ -230,14 +247,42 @@ export default {
       }
       return false
     },
+    listFormCompleted() {
+      if (this.userAnswers.hasOwnProperty(this.node.id)) {
+        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+          if (
+            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+          ) {
+            if (
+              this.userAnswers[this.node.id].activity[
+                this.question.id
+              ].hasOwnProperty("answers")
+            ) {
+              if (
+                this.userAnswers[this.node.id].activity[
+                  this.question.id
+                ].answers.hasOwnProperty("list")
+              ) {
+                return true
+              }
+            }
+          }
+        }
+      }
+      return false
+    },
   },
   watch: {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
+      console.log("this.answers in Question.question()")
+      console.log(this.answers)
     },
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
+    console.log("this.answers in Question.created()")
+    console.log(this.answers)
   },
   mounted() {
     const enabledAnswerTypes = Object.entries(this.question.answerTypes)
@@ -246,6 +291,7 @@ export default {
       })
       .map(item => item[0])
 
+    console.log(enabledAnswerTypes)
     if (enabledAnswerTypes.length === 1) {
       this.formType = enabledAnswerTypes[0]
       this.formOpened = true

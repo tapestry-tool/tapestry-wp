@@ -132,6 +132,23 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="question.answerTypes.list.enabled"
+                data-qa="question-answer-list"
+                switch
+              >
+                List Answer
+              </b-form-checkbox>
+              <div v-if="question.answerTypes.list.enabled" class="mt-2 pl-4">
+                <label for="placeholder">Placeholder (optional):</label>
+                <b-form-input
+                  id="placeholder"
+                  v-model="question.answerTypes.list.placeholder"
+                  data-qa="question-answer-text-single-placeholder"
+                ></b-form-input>
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -184,6 +201,10 @@ const defaultQuestion = {
     },
     audio: {
       enabled: false,
+    },
+    list: {
+      enabled: false,
+      placeholder: "",
     },
   },
   confirmation: {
