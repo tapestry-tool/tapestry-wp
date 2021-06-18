@@ -20,10 +20,20 @@
     ></question>
     <footer v-if="!showCompletionScreen" class="question-footer">
       <p class="question-step">{{ currentQuestionText }}</p>
-      <button class="button-nav" :disabled="!hasPrev" @click="prev">
+      <button
+        v-if="questions.length > 1"
+        class="button-nav"
+        :disabled="!hasPrev"
+        @click="prev"
+      >
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button class="button-nav" :disabled="!hasNext" @click="next">
+      <button
+        v-if="questions.length > 1"
+        class="button-nav"
+        :disabled="!hasNext"
+        @click="next"
+      >
         <i class="fas fa-arrow-right"></i>
       </button>
     </footer>
