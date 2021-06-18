@@ -1,6 +1,6 @@
 <template>
   <b-form @submit="handleTextSubmit">
-    <p>
+    <p class="form-input">
       <b-form-textarea
         v-if="question.answerTypes.text.isMultiLine"
         v-model="text"
@@ -59,3 +59,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.form-input {
+  margin: auto;
+  max-width: 600px;
+}
+</style>
