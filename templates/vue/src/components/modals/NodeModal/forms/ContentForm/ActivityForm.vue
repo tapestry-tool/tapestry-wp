@@ -44,7 +44,7 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="question.isFollowUp" label="Show this text first:">
-              <b-form-input v-model="question.followUp.text"></b-form-input>
+              <b-form-input v-model="question.followUp.text" placeholder="Previously, you said:"></b-form-input>
             </b-form-group>
             <b-form-group
               v-if="question.isFollowUp"
