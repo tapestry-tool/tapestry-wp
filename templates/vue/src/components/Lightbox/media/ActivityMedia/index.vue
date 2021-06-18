@@ -103,12 +103,14 @@ export default {
           this.node.id,
           currentQuestion.id
         )
-        if (
-          currentQuestionAnswer.text !== "" ||
-          (currentQuestionAnswer.hasOwnProperty("audio") &&
-            currentQuestionAnswer.audio.url !== "")
-        ) {
-          currentQuestion.completed = true
+        if (currentQuestionAnswer !== undefined) {
+          if (
+            currentQuestionAnswer.text !== "" ||
+            (currentQuestionAnswer.hasOwnProperty("audio") &&
+              currentQuestionAnswer.audio.url !== "")
+          ) {
+            currentQuestion.completed = true
+          }
         }
       }
     },
