@@ -27,7 +27,7 @@
       />
       <div v-if="state === states.Popup" class="popup">
         <tapestry-media
-          v-if="getNode(this.activePopupId).mediaType !== 'multi-content'"
+          v-if="getNode(activePopupId).mediaType !== 'multi-content'"
           :dimensions="dimensions"
           :node-id="activePopupId"
           :context="context"
@@ -36,10 +36,10 @@
           @close="transition(events.Continue)"
         />
         <multi-content-media
-          v-if="getNode(this.activePopupId).mediaType === 'multi-content'"
+          v-if="getNode(activePopupId).mediaType === 'multi-content'"
           :dimensions="dimensions"
           :context="context"
-          :node="getNode(this.activePopupId)"
+          :node="getNode(activePopupId)"
           @complete="handlePopupComplete"
           @close="transition(events.Continue)"
         />
