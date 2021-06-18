@@ -88,7 +88,7 @@ export default class Helpers {
   }
 
   /**
-   * Shallowly checks if two objects are different from one another
+   * Checks if two objects are different from one another
    * @param {Object} src
    * @param {Object} other
    */
@@ -108,6 +108,15 @@ export default class Helpers {
 
     // Check 3: If the key values are equal
     for (const key of Object.keys(src)) {
+      // Check 3a: Type check
+      if (typeof src[key] != typeof other[key]) {
+        return true
+      }
+      // Check 3b: Deep compare if property is an object
+      if (typeof src[key] === "object") {
+        return this.isDifferent(src[key], other[key])
+      }
+      // Check 3c: Simple value check
       if (src[key] !== other[key]) {
         return true
       }
