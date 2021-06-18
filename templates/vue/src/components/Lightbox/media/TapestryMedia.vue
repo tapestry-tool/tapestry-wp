@@ -27,7 +27,7 @@
       :node-id="nodeId"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
-      @timeupdate="updateProgress"
+      @update-progress="updateProgress"
       @complete="complete"
       @close="$emit('close')"
     />

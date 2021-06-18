@@ -110,6 +110,9 @@ const VideoEvents = {
   Close: "close",
 }
 
+// How often to send progress updates (in seconds)
+const updateProgressInterval = 4
+
 export default {
   components: {
     TapestryMedia: () => import("../TapestryMedia"),
@@ -144,6 +147,7 @@ export default {
       state: VideoStates.Loading,
       hideVideo: false,
       activePopupId: null,
+      progressLastUpdated: 0,
       /**
        * Completing a node is done asynchronously, and we want to show a small
        * spinner on the bottom right of the node when this is currently in progress.
@@ -283,8 +287,15 @@ export default {
               }
 
               this.lastTime = currentTime
-              // this line below sends a extra progress request when the video is playing
-              // this.$emit("timeupdate", { amountViewed, currentTime })
+
+              let currTimestamp = Date.now()
+              if (
+                (currTimestamp - this.progressLastUpdated) / 1000 >
+                updateProgressInterval
+              ) {
+                this.$emit("update-progress", { amountViewed })
+                this.progressLastUpdated = currTimestamp
+              }
               break
             }
           }
