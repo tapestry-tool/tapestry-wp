@@ -888,6 +888,15 @@ export default {
           errMsgs.push("Please enter an Embed URL")
         }
       } else if (this.node.mediaType === "activity") {
+        const validActivityTitles = this.node.typeData.activity.questions.every(
+          question => {
+            return question.text
+          }
+        )
+        if (!validActivityTitles) {
+          errMsgs.push("Please enter a question text for all questions")
+        }
+
         const validActivityOptions = this.node.typeData.activity.questions.every(
           question => {
             const answerTypes = Object.values(question.answerTypes)
@@ -899,7 +908,7 @@ export default {
         }
 
         const questionsWithPreviousActivity = this.node.typeData.activity.questions.filter(
-          question =>{
+          question => {
             return question.isFollowUp
           }
         )
@@ -909,9 +918,8 @@ export default {
             return previousAnswer
           }
         )
-        if(!validPreviousAnswers) {
+        if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
-
         }
       }
 
