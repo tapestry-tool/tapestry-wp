@@ -120,7 +120,6 @@ export default {
       }
     },
     states() {
-      // NOTE: SAVED state is used to determine if the audio already exists in the backend
       return {
         NOT_SUPPORTED: "not-supported",
         LOADING: "loading",

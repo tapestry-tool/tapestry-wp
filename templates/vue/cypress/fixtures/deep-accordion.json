@@ -56,7 +56,6 @@
       "backgroundColor": "#8396a1",
       "textColor": "white",
       "skippable": true,
-      
       "fullscreen": false,
       "conditions": [],
       "childOrdering": [
