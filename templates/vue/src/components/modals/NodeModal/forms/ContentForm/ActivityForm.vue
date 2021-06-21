@@ -141,7 +141,11 @@
                 Drag and drop
               </b-form-checkbox>
               <div class="mt-2 pl-4 ml-2">
-                <drag-drop-form :node="node" :question="question" />
+                <drag-drop-form
+                  v-if="question.answerTypes.dragDrop.enabled"
+                  :node="node"
+                  :question="question"
+                />
               </div>
             </b-form-group>
           </b-card>

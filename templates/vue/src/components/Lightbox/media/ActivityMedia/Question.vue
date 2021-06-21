@@ -261,7 +261,7 @@ export default {
     },
   },
   created() {
-    console.log(this.question.answerTypes)
+    console.log(this.question.formType)
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {

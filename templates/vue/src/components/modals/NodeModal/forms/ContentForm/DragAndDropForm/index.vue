@@ -128,7 +128,6 @@ export default {
     },
   },
   created() {
-    console.log(this.node.typeData)
     if (
       !this.question.answerTypes.dragDrop.hasOwnProperty("fromBucketArray") ||
       !this.question.answerTypes.dragDrop.hasOwnProperty("toBucketArray")
