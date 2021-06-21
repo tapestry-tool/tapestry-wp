@@ -123,28 +123,6 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      checkBoxValue: "",
-      radioValue: "",
-    }
-  },
-  watch: {
-    checkBoxValue: function(newCheckBoxValue) {
-      this.$emit("newCheckBoxValue", {
-        newValue: newCheckBoxValue,
-        choiceIndex: this.index,
-        choiceRowItem: this.item,
-      })
-    },
-    radioValue: function(newRadioValue) {
-      this.$emit("newRadioValue", {
-        newValue: newRadioValue,
-        choiceIndex: this.index,
-        choiceRowItem: this.item,
-      })
-    },
-  },
   methods: {
     handleUploadChange(state) {
       this.$root.$emit("node-modal::uploading", state)

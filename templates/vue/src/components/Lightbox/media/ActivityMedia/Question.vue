@@ -1,5 +1,6 @@
 <template>
   <div class="question">
+    <p>question is {{ question }}</p>
     <button v-if="formOpened" class="button-nav m-auto" @click="back">
       <i class="fas fa-arrow-left"></i>
     </button>
@@ -69,6 +70,15 @@
               @click="openForm('audio')"
             >
               audio
+            </answer-button>
+            <answer-button
+              v-if="question.answerTypes.multipleChoice.enabled"
+              :completed="multipleChoiceFormCompleted"
+              data-qa="answer-button-multiplechoice"
+              icon="tasks"
+              @click="openForm('multipleChoice')"
+            >
+              {{ multipleChoiceLabel }}
             </answer-button>
           </div>
         </div>
@@ -230,6 +240,40 @@ export default {
       }
       return false
     },
+    multipleChoiceFormCompleted() {
+      if (this.userAnswers.hasOwnProperty(this.node.id)) {
+        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+          if (
+            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+          ) {
+            if (
+              this.userAnswers[this.node.id].activity[
+                this.question.id
+              ].hasOwnProperty("answers")
+            ) {
+              if (
+                this.userAnswers[this.node.id].activity[
+                  this.question.id
+                ].answers.hasOwnProperty("multipleChoice")
+              ) {
+                return true
+              }
+            }
+          }
+        }
+      }
+      return false
+    },
+    multipleChoiceLabel() {
+      if (
+        this.question.answerTypes.multipleChoice.enabled &&
+        this.question.answerTypes.multipleChoice.hasMultipleAnswers
+      ) {
+        return "Checkbox"
+      } else {
+        return "Radio"
+      }
+    },
   },
   watch: {
     question() {
@@ -238,6 +282,7 @@ export default {
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
+    console.log("this.answer is", this.answers)
   },
   mounted() {
     const enabledAnswerTypes = Object.entries(this.question.answerTypes)
@@ -296,6 +341,7 @@ export default {
           break
         }
       }
+      console.log("submitted answer is", submittedAnswer)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,

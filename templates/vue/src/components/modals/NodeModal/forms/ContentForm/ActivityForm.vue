@@ -230,7 +230,6 @@ const defaultQuestion = {
     },
     multipleChoice: {
       enabled: false,
-      placeholder: "",
       hasMultipleAnswers: false,
     },
   },

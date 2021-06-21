@@ -26,8 +26,7 @@
               :multipleAnswerSelected="multipleAnswerSelected"
               :useImages="useImages"
               :removeButtonDisabled="isRemoveButtonDisabled"
-              @remove="choiceRows.splice(index, 1)"
-              @newCheckBoxValue="handleNewCheckBoxValue"
+              @remove="removeChoiceRowCheckbox(index, choiceRow)"
             ></choice-row>
           </b-form-checkbox-group>
         </sortable-list>
@@ -61,8 +60,7 @@
               :isDisabled="preSelectedRadioOptions.length > 0"
               :selectedRadioChoice="preSelectedRadioOptions[0]"
               :removeButtonDisabled="isRemoveButtonDisabled"
-              @remove="choiceRowsRadio.splice(index, 1)"
-              @newRadioValue="handleNewRadioValue"
+              @remove="removeChoiceRowRadio(index, choiceRow)"
             >
               >
             </choice-row>
@@ -121,45 +119,37 @@ export default {
           id: 1,
           imageurl: "",
           value: "",
-          title: "1st Choice",
         },
         {
           id: 2,
           imageurl: "",
           value: "",
-          title: "2nd Choice",
         },
         {
           id: 3,
           imageurl: "",
           value: "",
-          title: "3rd Choice",
         },
       ],
       nextChoiceRowId: 4,
-      newChoiceRowTitle: "",
       choiceRowsRadio: [
         {
           id: 50,
           imageurl: "",
           value: "",
-          title: "1st Choice",
         },
         {
           id: 51,
           imageurl: "",
           value: "",
-          title: "2nd Choice",
         },
         {
           id: 52,
           imageurl: "",
           value: "",
-          title: "3rd Choice",
         },
       ],
       nextChoiceRowRadioId: 53,
-      newChoiceRowRadioTitle: "",
     }
   },
   computed: {
@@ -223,32 +213,36 @@ export default {
         id: this.nextChoiceRowId++,
         imageurl: "",
         value: "",
-        title: this.newChoiceRowTitle,
       })
-      this.newChoiceRowTitle = ""
     },
     addNewChoiceRadio: function() {
       this.choiceRowsRadio.push({
         id: this.nextChoiceRowRadioId++,
         imageurl: "",
         value: "",
-        title: this.newChoiceRowRadioTitle,
       })
-      this.newChoiceRowRadioTitle = ""
+    },
+    removeChoiceRowCheckbox: function(index, item) {
+      this.question.answerTypes.multipleChoice.checkboxArray.splice(index, 1)
+      for (let i = 0; i < this.preSelectedCheckBoxOptions.length; i++) {
+        if (item.id === this.preSelectedCheckBoxOptions[i]) {
+          this.preSelectedCheckBoxOptions.splice(i, 1)
+        }
+      }
+    },
+    removeChoiceRowRadio: function(index, item) {
+      this.question.answerTypes.multipleChoice.radioArray.splice(index, 1)
+      for (let i = 0; i < this.preSelectedRadioOptions.length; i++) {
+        if (item.id === this.preSelectedRadioOptions[i]) {
+          this.preSelectedRadioOptions.splice(i, 1)
+        }
+      }
     },
     updateOrderingCheckBoxArray(arr) {
       this.question.answerTypes.multipleChoice.checkboxArray = arr
     },
     updateOrderingRadioArray(arr) {
       this.question.answerTypes.multipleChoice.radioArray = arr
-    },
-    handleNewCheckBoxValue({ newValue, choiceIndex, choiceRowItem }) {
-      this.choiceRows[choiceIndex].value = newValue
-      choiceRowItem.value = newValue
-    },
-    handleNewRadioValue({ newValue, choiceIndex, choiceRowItem }) {
-      this.choiceRowsRadio[choiceIndex].value = newValue
-      choiceRowItem.value = newValue
     },
   },
 }
