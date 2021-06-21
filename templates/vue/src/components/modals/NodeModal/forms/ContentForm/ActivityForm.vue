@@ -132,6 +132,19 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="hasDragDropOption"
+                data-qa="question-answer-dragdrop"
+                switch
+                @input="setId($event, 'dragdropId')"
+              >
+                Drag and drop
+              </b-form-checkbox>
+              <div v-if="node.typeData.options.dragDrop" class="mt-2 pl-4 ml-2">
+                <drag-drop-form :node="node" />
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -168,6 +181,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
+import DragDropForm from "./DragAndDropForm"
 
 const defaultQuestion = {
   text: "",
@@ -175,6 +189,7 @@ const defaultQuestion = {
     text: "",
     nodeId: null,
     questionId: null,
+    dragdropId: "",
   },
   answerTypes: {
     text: {
@@ -197,6 +212,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    DragDropForm,
   },
   props: {
     node: {
@@ -207,6 +223,7 @@ export default {
   data() {
     return {
       questions: this.node.typeData.activity?.questions || [],
+      hasDragDropOption: Boolean(this.node.typeData.options?.dragDrop),
     }
   },
   computed: {
@@ -215,6 +232,15 @@ export default {
   watch: {
     questions(newQuestions) {
       this.$set(this.node.typeData.activity, "questions", newQuestions)
+    },
+    hasDragDropOption(dragDropSelected) {
+      if (dragDropSelected) {
+        this.question.answers.dragdropId = Helpers.createUUID()
+        this.node.typeData.options.dragDrop = {}
+      } else {
+        this.question.answers.dragdropId = ""
+        delete this.node.typeData.options.dragDrop
+      }
     },
   },
   created() {
