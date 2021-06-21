@@ -25,7 +25,7 @@
         @timeupdate="transition(events.Timeupdate, $event)"
         @seeked="handleSeek"
       />
-      <div v-if="state === states.Popup" class="popup">
+      <div v-if="state === states.Popup" class="popup" :style="popupStyle">
         <tapestry-media
           v-if="getNode(activePopupId).mediaType !== 'multi-content'"
           :dimensions="dimensions"
@@ -186,6 +186,9 @@ export default {
         return popup.completed
       }
       return false
+    },
+    popupStyle() {
+      return this.isPopupComplete ? "height: calc(100% - 80px)" : ""
     },
     showVideo() {
       return [VideoStates.H5P, VideoStates.Paused, VideoStates.Playing].includes(
@@ -377,5 +380,6 @@ button {
   left: 0;
   bottom: 0;
   right: 0;
+  transition: height 0.5s;
 }
 </style>
