@@ -39,7 +39,11 @@
             class="mb-3"
           >
             <b-form-group>
-              <b-form-checkbox v-model="question.followUp.enabled" switch>
+              <b-form-checkbox
+                v-model="question.followUp.enabled"
+                switch
+                @change="togglingFollowUp(question)"
+              >
                 {{ question.followUp.enabled ? "Yes" : "No" }}
               </b-form-checkbox>
             </b-form-group>
@@ -246,6 +250,11 @@ export default {
     },
     getGroupTitle(question, index) {
       return `Question #${index + 1}: ${question.text || "Untitled"}`
+    },
+    togglingFollowUp(question) {
+      question.followUp.text = ""
+      question.followUp.questionId = ""
+      question.followUp.nodeId = ""
     },
   },
 }

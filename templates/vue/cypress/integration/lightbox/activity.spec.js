@@ -23,7 +23,6 @@ describe("Activity", () => {
         cy.get(`[placeholder="${placeholder}"]`).should("be.visible")
         cy.get("input").type(answer)
         cy.contains(/submit/i).click()
-        cy.contains(/submitting/i).should("be.visible")
         cy.contains("Thanks!").should("be.visible")
         cy.contains(/done/i).click()
       })
