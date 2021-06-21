@@ -136,10 +136,9 @@ export default {
         for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
           let tempNodeId = Object.keys(this.userAnswers)[i]
           if (
-            this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
-            this.userAnswers[tempNodeId].activity.hasOwnProperty(
+            this.userAnswers[tempNodeId].activity?.[
               this.question.followUp.questionId
-            )
+            ]
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
@@ -177,11 +176,7 @@ export default {
       })
     },
     textAnswer() {
-      if (
-        this.formOpened &&
-        this.answers !== undefined &&
-        this.answers[this.formType] !== undefined
-      ) {
+      if (this.formOpened && this.answers?.[this.formType]) {
         if (this.answers === {}) {
           return ""
         } else {
@@ -191,48 +186,36 @@ export default {
       return ""
     },
     textFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
           if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("text")
           ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("text")
-              ) {
-                return true
-              }
-            }
+            return true
           }
         }
       }
       return false
     },
     audioFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
           if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("audio")
           ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("audio")
-              ) {
-                return true
-              }
-            }
+            return true
           }
         }
       }

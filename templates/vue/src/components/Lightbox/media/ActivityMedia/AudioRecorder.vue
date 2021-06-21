@@ -134,11 +134,7 @@ export default {
   watch: {
     id() {
       let answersObject = this.getAnswers(this.node.id, this.question.id)
-      if (
-        answersObject !== undefined &&
-        answersObject.audio &&
-        answersObject.audio.url
-      ) {
+      if (answersObject?.audio?.url) {
         this.state = this.states.SAVED
         this.audio = wpData.uploadDirArray.baseurl + "/" + answersObject.audio.url
       } else {
