@@ -47,7 +47,7 @@ class TapestryNode implements ITapestryNode
     private $references;
     private $mapCoordinates;
     private $popup;
-    private $answer;
+    private $answers;
 
     /**
      * Constructor.
@@ -100,7 +100,7 @@ class TapestryNode implements ITapestryNode
             'lng' => '',
         ];
         $this->popup = null;
-        $this->answer = (object) [];
+        $this->answers = (object) [];
 
         if (TapestryHelpers::isValidTapestryNode($this->nodeMetaId)) {
             $node = $this->_loadFromDatabase();
@@ -250,8 +250,8 @@ class TapestryNode implements ITapestryNode
         if (property_exists($node, 'popup')) {
             $this->popup = $node->popup;
         }
-        if (isset($node->answer) && is_object($node->answer)) {
-            $this->answer = $node->answer;
+        if (isset($node->answers) && is_object($node->answers)) {
+            $this->answers = $node->answers;
         }
     }
 
@@ -590,7 +590,7 @@ class TapestryNode implements ITapestryNode
             'references' => $this->references,
             'mapCoordinates' => $this->mapCoordinates,
             'popup' => $this->popup,
-            'answer' => $this->answer,
+            'answers' => $this->answers,
         ];
     }
 
