@@ -80,6 +80,7 @@ export default {
     },
     selectedH5p(selectedH5p) {
       this.node.typeData.h5pMeta = selectedH5p
+      this.node.progress = 0
     },
   },
   mounted() {
