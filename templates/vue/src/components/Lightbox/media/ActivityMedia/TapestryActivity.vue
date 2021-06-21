@@ -3,10 +3,10 @@
     <div class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
     <audio v-if="type === 'audio'" controls :src="answerData"></audio>
-    <div v-if="type === 'drag drop'" class="dragdropicon">
+    <div v-if="type === 'dragDrop'" class="dragdropicon">
       <img :src="dragDropIcon" />
     </div>
-    <div v-if="type === 'drag drop'" class="text">
+    <div v-if="type === 'dragDrop'" class="text">
       {{ entry }}
     </div>
   </div>
@@ -26,7 +26,7 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio", "drag drop"].includes(val),
+      validator: val => ["text", "audio", "dragDrop"].includes(val),
     },
     answerData: {
       type: [String, Array],

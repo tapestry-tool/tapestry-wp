@@ -50,7 +50,7 @@
             @submit="handleSubmit"
           />
           <user-drag-drop-form
-            v-else-if="formType === 'drag drop'"
+            v-else-if="formType === 'dragDrop'"
             :question="question"
             :node="node"
             @submit="handleDragDropSubmit"
@@ -261,7 +261,7 @@ export default {
     },
   },
   created() {
-    console.log(this.question.formType)
+    console.log(this.formType)
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
@@ -271,6 +271,7 @@ export default {
       })
       .map(item => item[0])
 
+    console.log(enabledAnswerTypes)
     if (enabledAnswerTypes.length === 1) {
       this.formType = enabledAnswerTypes[0]
       this.formOpened = true

@@ -137,7 +137,7 @@ export function getEntry(_, { getQuestion }) {
     }
     if (mediaType === "activity" && answerType === "dragdropId") {
       return {
-        type: "drag drop",
+        type: "dragDrop",
         entry: Object.values(entry)[0],
       }
     }

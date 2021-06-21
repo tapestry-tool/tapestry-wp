@@ -50,6 +50,10 @@ export default {
     UserDragDropBucketItem,
   },
   props: {
+    question: {
+      type: Object,
+      required: true,
+    },
     node: {
       type: Object,
       required: true,
@@ -85,14 +89,14 @@ export default {
   },
   created() {
     if (
-      !this.node.typeData.options.dragDrop.hasOwnProperty("fromBucketArray") ||
-      !this.node.typeData.options.dragDrop.hasOwnProperty("toBucketArray")
+      !this.question.answerTypes.dragDrop.hasOwnProperty("fromBucketArray") ||
+      !this.question.answerTypes.dragDrop.hasOwnProperty("toBucketArray")
     ) {
-      this.node.typeData.options.dragDrop.fromBucketArray = this.fromBucketArray
-      this.node.typeData.options.dragDrop.toBucketArray = this.toBucketArray
+      this.question.answerTypes.dragDrop.fromBucketArray = this.fromBucketArray
+      this.question.answerTypes.dragDrop.toBucketArray = this.toBucketArray
     } else {
-      this.fromBucketArray = this.node.typeData.options.dragDrop.fromBucketArray
-      this.toBucketArray = this.node.typeData.options.dragDrop.toBucketArray
+      this.fromBucketArray = this.question.answerTypes.dragDrop.fromBucketArray
+      this.toBucketArray = this.question.answerTypes.dragDrop.toBucketArray
     }
   },
   methods: {
