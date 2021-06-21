@@ -5,7 +5,7 @@
     </button>
     <loading v-if="submitting" label="Submitting..." />
     <div v-else>
-      <div v-if="question.followUp.questionId !== null" class="follow-up">
+      <div v-if="question.followUp.enabled" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
