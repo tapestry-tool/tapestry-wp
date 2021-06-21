@@ -4,13 +4,12 @@
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
     <audio v-if="type === 'audio'" controls :src="answerData"></audio>
     <div v-if="type === 'list'">
-    <ul>
-      <li v-for="answer in answerData">
-        {{answer}}
-      </li>
-    </ul>
+      <ul>
+        <li v-for="answer in answerData" :key="answer.index">
+          {{ answer }}
+        </li>
+      </ul>
     </div>
-    
   </div>
 </template>
 
@@ -26,7 +25,7 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio","list"].includes(val),
+      validator: val => ["text", "audio", "list"].includes(val),
     },
     answerData: {
       type: [String, Array],
