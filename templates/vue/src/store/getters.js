@@ -122,7 +122,7 @@ export function getAnswers(state) {
 }
 
 export function getEntry(_, { getQuestion }) {
-  return (questionId, answerType) => {
+  return (questionId, answerType, mediaType = "") => {
     const question = getQuestion(questionId)
     if (!question) {
       return null
@@ -134,6 +134,12 @@ export function getEntry(_, { getQuestion }) {
     /* If the answer is an audio, then entry is the audio file in base64. */
     if (answerType === "audioId") {
       return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
+    }
+    if (mediaType === "activity" && answerType === "dragdropId") {
+      return {
+        type: "drag drop",
+        entry: Object.values(entry)[0],
+      }
     }
     const answers = getAnswersFromEntry(entry)
     return formatEntry(answers, answerType)
