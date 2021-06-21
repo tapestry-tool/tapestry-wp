@@ -167,10 +167,10 @@ export default {
       if (answerObject !== undefined) {
         if (this.question.followUp.questionId !== null) {
           for (const [key, value] of Object.entries(answerObject)) {
-            if (key === "text") {
+            if (key === "text" || key === 'list') {
               var tempObj = { type: key, answerData: value }
               previousAnswers.push(tempObj)
-            } else {
+            } else if (key === "audio"){
               var tempAudioObj = {
                 type: key,
                 answerData:
