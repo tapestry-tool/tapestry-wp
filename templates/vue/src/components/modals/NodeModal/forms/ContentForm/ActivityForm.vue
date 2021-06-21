@@ -7,6 +7,7 @@
       text-variant="light"
       class="mb-3"
     >
+      <p>question is {{ question }}</p>
       <b-form-group class="mb-0">
         <b-row align-v="center" class="mb-2 mx-0">
           <p
@@ -132,6 +133,47 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group class="mt-3">
+              <b-form-checkbox
+                v-model="question.answerTypes.multipleChoice.enabled"
+                data-qa="question-answer-multipleChoice"
+                switch
+              >
+                Multiple choice
+              </b-form-checkbox>
+              <div
+                v-if="question.answerTypes.multipleChoice.enabled"
+                class="mt-2 pl-4 ml-2"
+              >
+                <b-form-radio-group
+                  v-model="question.answerTypes.multipleChoice.hasMultipleAnswers"
+                >
+                  <b-form-radio
+                    data-qa="question-answer-multipleChoice-multipleAnswer"
+                    name="multiple-answer"
+                    :value="true"
+                  >
+                    Select Multiple Answers(Checkbox)
+                  </b-form-radio>
+                  <b-form-radio
+                    data-qa="question-answer-multipleChoice-singleAnswer"
+                    name="single-answer"
+                    :value="false"
+                  >
+                    Select Single Answer(Radio Button)
+                  </b-form-radio>
+                </b-form-radio-group>
+                <div v-if="question.answerTypes.multipleChoice.enabled" label="">
+                  <multiple-choice-form
+                    :question="question"
+                    data-qa="authoring-multiplechoice-form"
+                    :multipleAnswerSelected="
+                      question.answerTypes.multipleChoice.hasMultipleAnswers
+                    "
+                  />
+                </div>
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -168,6 +210,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
+import MultipleChoiceForm from "./MultipleChoiceForm.vue"
 
 const defaultQuestion = {
   text: "",
@@ -185,6 +228,11 @@ const defaultQuestion = {
     audio: {
       enabled: false,
     },
+    multipleChoice: {
+      enabled: false,
+      placeholder: "",
+      hasMultipleAnswers: false,
+    },
   },
   confirmation: {
     title: "",
@@ -197,6 +245,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    MultipleChoiceForm,
   },
   props: {
     node: {
