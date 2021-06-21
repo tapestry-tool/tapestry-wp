@@ -15,7 +15,7 @@
       </h4>
       <b-tabs>
         <b-tab
-          v-for="questionAnswer in getAnswers"
+          v-for="questionAnswer in answers"
           :key="questionAnswer.type"
           :active="questionAnswer.type === lastAnswerType"
         >
@@ -72,11 +72,12 @@ export default {
     followUpText() {
       return this.answer.followUpText !== ""
     },
-    getAnswers() {
+    answers() {
       // use userAnswers to get the Answers; this.getAnswers
       // exceeds max call stacks error
-      console.log(this.answer.questionID)
-      return null
+      console.log(`NodeId: ${this.answer.activityID}, questionID: ${this.answer.questionID}`)
+      
+      return this.getAnswers(this.answer.activityID, this.answer.questionID)
       // return this.getAnswers(this.answer.activityID, this.answer.questionID)
     },
     hasAnswer() {
