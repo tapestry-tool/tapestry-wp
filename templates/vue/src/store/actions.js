@@ -27,7 +27,7 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
     const response = await client.addNode(JSON.stringify(newNode))
-
+    
     const nodeToAdd = { ...newNode }
     const id = response.data.id
     nodeToAdd.id = id

@@ -18,7 +18,6 @@
           v-for="questionAnswer in answers"
           :key="questionAnswer.type"
         >
-        {{questionAnswer}}
           <template #title>
             <div class="icon">
               <tapestry-icon :icon="questionAnswer[0]" />
@@ -67,7 +66,7 @@ export default {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getEntry", "getQuestion", "getAnswers"]),
     answer() {
-      return this.node.answers[0]
+      return this.node.answers
     },
     question() {
       return this.getQuestion(this.answer.questionID)
@@ -76,17 +75,11 @@ export default {
       return this.answer.followUpText !== ""
     },
     answers() {
-      // use userAnswers to get the Answers; this.getAnswers
-      // exceeds max call stacks error
-      console.log(`NodeId: ${this.answer.activityID}, questionID: ${this.answer.questionID}`)
       const answers = this.getAnswers(this.answer.activityID, this.answer.questionID)
-
-      console.log(answers)
-      return Object.entries(answers)
-      // return this.getAnswers(this.answer.activityID, this.answer.questionID)
+      return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return true
+      return this.answers ? true : false
     },
   },
   mounted() {

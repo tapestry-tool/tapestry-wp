@@ -82,17 +82,21 @@ export default {
   },
   watch: {
     activityNodeId(activityID) {
-      const questions = Object.values(this.currentActivityNodes)
-        .filter(node => node.id == activityID)
-        .flatMap(node => node.quiz)
-      this.currentQuestions = questions
+      if(activityID) {
+        const questions = Object.values(this.currentActivityNodes)
+          .filter(node => node.id == activityID)
+          .flatMap(node => node.quiz)
+        this.currentQuestions = questions
+      }
     },
     currentQuestion(id) {
-      let selectedQuestion = []
-      selectedQuestion = this.getCurrentQuestions.filter(
-        question => question.id == id
-      )
-      this.currentQuestion = selectedQuestion[0].id
+      if(id) {
+        let selectedQuestion = []
+        selectedQuestion = this.getCurrentQuestions.filter(
+          question => question.id == id
+        )
+        this.currentQuestion = selectedQuestion[0].id
+      }
     },
     followUpText(text) {
       this.followUpText = text
@@ -101,9 +105,9 @@ export default {
   mounted() {
     const prevAnswers = this.node.answers
     if (prevAnswers) {
-      this.activityNodeId = prevAnswers[0].activityID
-      this.currentQuestion = prevAnswers[0].questionID
-      this.followUpText = prevAnswers[0].followUpText
+      this.activityNodeId = prevAnswers.activityID
+      this.currentQuestion = prevAnswers.questionID
+      this.followUpText = prevAnswers.followUpText
     }
   },
   updated() {
@@ -112,7 +116,7 @@ export default {
       questionID: this.currentQuestion,
       followUpText: this.followUpText,
     }
-    this.node.answers = [answerObject]
+    this.node.answers = answerObject
   },
 }
 </script>
