@@ -6,6 +6,7 @@
         v-for="(bucket, bucketIndex) in fromBuckets"
         :key="bucket.id"
         :node="node"
+        :question="question"
         :index="bucketIndex"
         :bucket="bucket"
         :isFromBucket="true"
@@ -31,6 +32,7 @@
         v-for="(bucket, index) in toBuckets"
         :key="bucket.id"
         :node="node"
+        :question="question"
         :index="index"
         :bucket="bucket"
         :isFromBucket="false"
@@ -60,6 +62,10 @@ export default {
   },
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    question: {
       type: Object,
       required: true,
     },
@@ -106,37 +112,38 @@ export default {
   },
   watch: {
     fromBuckets(newFromBuckets) {
-      this.node.typeData.options.dragDrop.fromBucketArray = newFromBuckets
+      this.question.answerTypes.dragDrop.fromBucketArray = newFromBuckets
     },
     toBuckets(newToBuckets) {
-      this.node.typeData.options.dragDrop.toBucketArray = newToBuckets
+      this.question.answerTypes.dragDrop.toBucketArray = newToBuckets
     },
     nextFromBucketItemId(newNextFromBucketItemId) {
-      this.node.typeData.options.dragDrop.nextFromBucketItemId = newNextFromBucketItemId
+      this.question.answerTypes.dragDrop.nextFromBucketItemId = newNextFromBucketItemId
     },
     nextFromBucketId(newNextFromBucketId) {
-      this.node.typeData.options.dragDrop.nextFromBucketId = newNextFromBucketId
+      this.question.answerTypes.dragDrop.nextFromBucketId = newNextFromBucketId
     },
     nextToBucketId(newNextToBucketId) {
-      this.node.typeData.options.dragDrop.nextToBucketId = newNextToBucketId
+      this.question.answerTypes.dragDrop.nextToBucketId = newNextToBucketId
     },
   },
   created() {
+    console.log(this.node.typeData)
     if (
-      !this.node.typeData.options.dragDrop.hasOwnProperty("fromBucketArray") ||
-      !this.node.typeData.options.dragDrop.hasOwnProperty("toBucketArray")
+      !this.question.answerTypes.dragDrop.hasOwnProperty("fromBucketArray") ||
+      !this.question.answerTypes.dragDrop.hasOwnProperty("toBucketArray")
     ) {
-      this.node.typeData.options.dragDrop.fromBucketArray = this.fromBuckets
-      this.node.typeData.options.dragDrop.toBucketArray = this.toBuckets
-      this.node.typeData.options.dragDrop.nextFromBucketItemId = this.nextFromBucketItemId
-      this.node.typeData.options.dragDrop.nextFromBucketId = this.nextFromBucketId
-      this.node.typeData.options.dragDrop.nextToBucketId = this.nextToBucketId
+      this.question.answerTypes.dragDrop.fromBucketArray = this.fromBuckets
+      this.question.answerTypes.dragDrop.toBucketArray = this.toBuckets
+      this.question.answerTypes.dragDrop.nextFromBucketItemId = this.nextFromBucketItemId
+      this.question.answerTypes.dragDrop.nextFromBucketId = this.nextFromBucketId
+      this.question.answerTypes.dragDrop.nextToBucketId = this.nextToBucketId
     } else {
-      this.fromBuckets = this.node.typeData.options.dragDrop.fromBucketArray
-      this.toBuckets = this.node.typeData.options.dragDrop.toBucketArray
-      this.nextFromBucketItemId = this.node.typeData.options.dragDrop.nextFromBucketItemId
-      this.nextFromBucketId = this.node.typeData.options.dragDrop.nextFromBucketId
-      this.nextToBucketId = this.node.typeData.options.dragDrop.nextToBucketId
+      this.fromBuckets = this.question.answerTypes.dragDrop.fromBucketArray
+      this.toBuckets = this.question.answerTypes.dragDrop.toBucketArray
+      this.nextFromBucketItemId = this.question.answerTypes.dragDrop.nextFromBucketItemId
+      this.nextFromBucketId = this.question.answerTypes.dragDrop.nextFromBucketId
+      this.nextToBucketId = this.question.answerTypes.dragDrop.nextToBucketId
     }
   },
   methods: {

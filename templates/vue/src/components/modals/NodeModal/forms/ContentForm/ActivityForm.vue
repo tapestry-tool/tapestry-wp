@@ -134,15 +134,14 @@
             </b-form-group>
             <b-form-group>
               <b-form-checkbox
-                v-model="hasDragDropOption"
+                v-model="question.answerTypes.dragDrop.enabled"
                 data-qa="question-answer-dragdrop"
                 switch
-                @input="setId($event, 'dragdropId')"
               >
                 Drag and drop
               </b-form-checkbox>
-              <div v-if="node.typeData.options.dragDrop" class="mt-2 pl-4 ml-2">
-                <drag-drop-form :node="node" />
+              <div class="mt-2 pl-4 ml-2">
+                <drag-drop-form :node="node" :question="question" />
               </div>
             </b-form-group>
           </b-card>
@@ -189,7 +188,6 @@ const defaultQuestion = {
     text: "",
     nodeId: null,
     questionId: null,
-    dragdropId: "",
   },
   answerTypes: {
     text: {
@@ -198,6 +196,9 @@ const defaultQuestion = {
       isMultiLine: false,
     },
     audio: {
+      enabled: false,
+    },
+    dragDrop: {
       enabled: false,
     },
   },
@@ -223,7 +224,6 @@ export default {
   data() {
     return {
       questions: this.node.typeData.activity?.questions || [],
-      hasDragDropOption: Boolean(this.node.typeData.options?.dragDrop),
     }
   },
   computed: {
@@ -232,15 +232,6 @@ export default {
   watch: {
     questions(newQuestions) {
       this.$set(this.node.typeData.activity, "questions", newQuestions)
-    },
-    hasDragDropOption(dragDropSelected) {
-      if (dragDropSelected) {
-        this.question.answers.dragdropId = Helpers.createUUID()
-        this.node.typeData.options.dragDrop = {}
-      } else {
-        this.question.answers.dragdropId = ""
-        delete this.node.typeData.options.dragDrop
-      }
     },
   },
   created() {

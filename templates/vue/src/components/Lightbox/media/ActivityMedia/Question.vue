@@ -49,6 +49,12 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <user-drag-drop-form
+            v-else-if="formType === 'drag drop'"
+            :question="question"
+            :node="node"
+            @submit="handleDragDropSubmit"
+          />
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
@@ -70,6 +76,14 @@
             >
               audio
             </answer-button>
+            <answer-button
+              v-if="question.answerTypes.dragDrop.enabled"
+              :completed="dragDropFormCompleted"
+              icon="drag and drop"
+              @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
+            >
+              drag/drop
+            </answer-button>
           </div>
         </div>
       </div>
@@ -83,6 +97,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import UserDragDropForm from "../common/UserDragDropForm.vue"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -96,6 +111,7 @@ export default {
     TextQuestion,
     Loading,
     TapestryActivity,
+    UserDragDropForm,
   },
   props: {
     question: {
@@ -230,6 +246,14 @@ export default {
       }
       return false
     },
+    showDragDrop() {
+      return (
+        this.hasId("dragdropId") || Boolean(this.node.typeData.options?.dragDrop)
+      )
+    },
+    dragDropFormCompleted() {
+      return !!(this.question.entries && this.question.entries.dragdropId)
+    },
   },
   watch: {
     question() {
@@ -237,6 +261,7 @@ export default {
     },
   },
   created() {
+    console.log(this.question.answerTypes)
     this.answers = this.getAnswers(this.node.id, this.question.id)
   },
   mounted() {
@@ -257,6 +282,20 @@ export default {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       this.formOpened = false
     },
+    openDragDrop(id, answerType) {
+      // FIX: implement this inside openForm
+      client.recordAnalyticsEvent(
+        "user",
+        "click",
+        "answer-button",
+        this.question.id,
+        {
+          type: answerType,
+          id,
+        }
+      )
+      this.userDragDropFormOpened = true
+    },
     openForm(answerType) {
       client.recordAnalyticsEvent(
         "user",
@@ -269,6 +308,24 @@ export default {
       )
       this.formType = answerType
       this.formOpened = true
+    },
+    async handleDragDropSubmit(event) {
+      // FIX: move functionality to handleSubmit
+      const question = this.node.typeData.activity.questions[0]
+      if (!question.entries) {
+        question.entries = {}
+      }
+      question.entries.dragdropId = {
+        [this.question.answers.dragdropId]: event,
+      }
+      this.handleSubmit(
+        "dragDrop",
+        async () =>
+          await this.updateNode({
+            id: this.node.id,
+            newNode: this.node,
+          })
+      )
     },
     async handleSubmit(formData) {
       this.formOpened = false

@@ -7,6 +7,7 @@
           v-for="(item, index) in bucket.itemArray"
           :key="item.id"
           :node="node"
+          :question="question"
           :bucketItem="item"
           :data-qa="`bucket-item-${bucket.id}-${item.id}`"
           :removeItemPresent="removeButtonItemPresent"
@@ -27,14 +28,14 @@
     <b-form-group>
       <b-form-group v-if="isFromBucket">
         <b-form-input
-          v-model="node.typeData.options.dragDrop.fromBucketArray[index].value"
+          v-model="question.answerTypes.dragDrop.fromBucketArray[index].value"
           placeholder="Enter from bucket label"
           :data-qa="`from-bucket-label-${bucket.id}`"
         ></b-form-input>
       </b-form-group>
       <b-form-group v-else>
         <b-form-input
-          v-model="node.typeData.options.dragDrop.toBucketArray[index].value"
+          v-model="question.answerTypes.dragDrop.toBucketArray[index].value"
           placeholder="Enter to bucket label"
           :data-qa="`to-bucket-label-${bucket.id}`"
         ></b-form-input>
@@ -70,6 +71,10 @@ export default {
     DragDropBucketItem,
   },
   props: {
+    question: {
+      type: Object,
+      required: true,
+    },
     node: {
       type: Object,
       required: true,

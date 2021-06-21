@@ -4,24 +4,26 @@
       <b-col cols="3">
         <b style="color: #009688">From buckets</b>
         <user-drag-drop-bucket
-          v-for="bucket in node.typeData.options.dragDrop.fromBucketArray"
+          v-for="bucket in question.answerTypes.dragDrop.fromBucketArray"
           :key="bucket.id"
           :node="node"
+          :question="question"
           :bucket="bucket"
-          :fromBucketArray="node.typeData.options.dragDrop.fromBucketArray"
-          :toBucketArray="node.typeData.options.dragDrop.toBucketArray"
+          :fromBucketArray="question.answerTypes.dragDrop.fromBucketArray"
+          :toBucketArray="question.answerTypes.dragDrop.toBucketArray"
           :isFromBucket="true"
         />
       </b-col>
       <b-col cols="3">
         <b style="color: #3f51b5">To buckets</b>
         <user-drag-drop-bucket
-          v-for="bucket in node.typeData.options.dragDrop.toBucketArray"
+          v-for="bucket in question.answerTypes.dragDrop.toBucketArray"
           :key="bucket.id"
           :node="node"
+          :question="question"
           :bucket="bucket"
-          :fromBucketArray="node.typeData.options.dragDrop.fromBucketArray"
-          :toBucketArray="node.typeData.options.dragDrop.toBucketArray"
+          :fromBucketArray="question.answerTypes.dragDrop.fromBucketArray"
+          :toBucketArray="question.answerTypes.dragDrop.toBucketArray"
           :isFromBucket="false"
         />
       </b-col>
@@ -32,7 +34,7 @@
     </b-form-invalid-feedback>
     <p>
       <b-button
-        v-if="node.mediaType === 'question'"
+        v-if="node.mediaType === 'activity'"
         class="submit-btn mt-3"
         variant="primary"
         type="submit"
@@ -50,6 +52,10 @@ export default {
     UserDragDropBucket,
   },
   props: {
+    question: {
+      type: Object,
+      required: true,
+    },
     node: {
       type: Object,
       required: true,
@@ -58,8 +64,8 @@ export default {
   data() {
     return {
       isAnswerValid: true,
-      toBucketArray: this.node.typeData.options.dragDrop.toBucketArray,
-      fromBucketArray: this.node.typeData.options.dragDrop.fromBucketArray,
+      toBucketArray: this.question.answerTypes.dragDrop.toBucketArray,
+      fromBucketArray: this.question.answerTypes.dragDrop.fromBucketArray,
       toBucketAnswer: "",
     }
   },
@@ -76,11 +82,11 @@ export default {
   watch: {
     toBucketArray(newToBucketArray) {
       this.toBucketArray = newToBucketArray
-      this.node.typeData.options.dragDrop.toBucketArray = this.toBucketArray
+      this.question.answerTypes.dragDrop.toBucketArray = this.toBucketArray
     },
     fromBucketArray(newFromBucketArray) {
       this.fromBucketArray = newFromBucketArray
-      this.node.typeData.options.dragDrop.fromBucketArray = this.fromBucketArray
+      this.question.answerTypes.dragDrop.fromBucketArray = this.fromBucketArray
     },
   },
   created() {},
@@ -102,7 +108,6 @@ export default {
     },
     getItemArray(bucket) {
       var itemArray = []
-<style scoped></style>
       for (let i = 0; i < bucket.itemArray.length; i++) {
         itemArray.push(bucket.itemArray[i].text)
       }
@@ -129,5 +134,7 @@ export default {
       if (this.isAnswerValid) {
         this.$emit("submit", this.toBucketAnswer)
       }
-<style scoped></style>
+    },
+  },
+}
 </script>
