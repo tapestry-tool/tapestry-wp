@@ -3,11 +3,19 @@
     <div class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
     <audio v-if="type === 'audio'" controls :src="answerData"></audio>
+    <div v-if="type === 'drag drop'" class="dragdropicon">
+      <img :src="dragDropIcon" />
+    </div>
+    <div v-if="type === 'drag drop'" class="text">
+      {{ entry }}
+    </div>
   </div>
 </template>
 
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
+import DragDropIcon from "@/assets/icons/drag_drop.svg"
+import { data } from "@/services/wp"
 
 export default {
   name: "tapestry-activity",
@@ -18,11 +26,16 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio"].includes(val),
+      validator: val => ["text", "audio", "drag drop"].includes(val),
     },
     answerData: {
       type: [String, Array],
       required: true,
+    },
+  },
+  computed: {
+    dragDropIcon() {
+      return `${data.vue_uri}/${DragDropIcon.split("dist")[1]}`
     },
   },
 }
@@ -58,5 +71,12 @@ export default {
 
 .text {
   white-space: pre-wrap;
+}
+
+.dragdropicon {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  left: 8px;
 }
 </style>
