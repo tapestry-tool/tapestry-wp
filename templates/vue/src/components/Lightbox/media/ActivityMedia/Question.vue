@@ -50,6 +50,12 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <user-multiple-choice-form
+            v-else-if="formType === 'multipleChoice'"
+            :node="node"
+            :question="question"
+            @submit="handleSubmit"
+          ></user-multiple-choice-form>
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
@@ -93,6 +99,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import UserMultipleChoiceForm from "./UserMultipleChoiceForm.vue"
 import Loading from "@/components/common/Loading"
 import TapestryActivity from "./TapestryActivity"
 import * as wp from "@/services/wp"
@@ -104,6 +111,7 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
+    UserMultipleChoiceForm,
     Loading,
     TapestryActivity,
   },
