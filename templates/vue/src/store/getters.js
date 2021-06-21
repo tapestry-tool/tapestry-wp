@@ -113,6 +113,8 @@ export function getAnswers(state) {
       ) {
         return state.userAnswers[nodeId].activity[questionId].answers
       }
+    } else {
+      return {}
     }
   }
 }

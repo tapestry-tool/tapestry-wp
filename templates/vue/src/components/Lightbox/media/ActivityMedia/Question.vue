@@ -44,7 +44,7 @@
           <text-question
             v-if="formType === 'text'"
             :question="question"
-            :answer="answer"
+            :answer="textAnswer"
             @submit="handleSubmit"
           ></text-question>
           <audio-recorder
@@ -176,13 +176,17 @@ export default {
         return value.enabled
       })
     },
-    answer() {
+    textAnswer() {
       if (
         this.formOpened &&
         this.answers !== undefined &&
         this.answers[this.formType] !== undefined
       ) {
-        return this.answers[this.formType]
+        if (this.answers === {}) {
+          return ""
+        } else {
+          return this.answers[this.formType]
+        }
       }
       return ""
     },
