@@ -42,9 +42,8 @@ describe("Answers", () => {
         })
       })
 
-      cy.pause()
-
       cy.getNodeByTitle(answerNode.title).then(answer => {
+        cy.getNodeById(answer.id).click()
         cy.openLightbox(answer.id).within(() => {
           cy.contains(answerNode.title).should("exist")
           cy.contains(`What is the meaning of life?`).should("be.visible")
