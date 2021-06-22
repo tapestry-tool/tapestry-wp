@@ -173,13 +173,6 @@ export default {
       }
       return null
     },
-    reset() {
-      const h5pVideo = this.getInstance()
-      h5pVideo.seek(0)
-    },
-    close() {
-      this.pause()
-    },
     updateSettings(h5pVideo) {
       let newSettings = {}
 
@@ -220,7 +213,6 @@ export default {
       }
 
       if (Helpers.isDifferent(newSettings, this.h5pSettings)) {
-        // this.$emit("update-settings", newSettings)
         client.recordAnalyticsEvent(
           "user",
           "update-settings",
