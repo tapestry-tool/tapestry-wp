@@ -17,7 +17,6 @@
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="scrollingValue"
       @load="handleLoad"
     ></iframe>
   </div>
@@ -60,12 +59,6 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
-    scrollingValue() {
-      const noscroll = ["H5P.InteractiveVideo", "H5P.ThreeImage"]
-      if (noscroll.includes(this.library)) {
-        return "no"
-      } else return "auto"
-    },
     hasMultiContentContext() {
       return this.context === "multi-content" || this.context === "page"
     },
@@ -172,9 +165,6 @@ export default {
     reset() {
       const h5pVideo = this.getInstance()
       h5pVideo.seek(0)
-    },
-    close() {
-      this.pause()
     },
     updateSettings(h5pVideo) {
       let newSettings = {}
@@ -310,93 +300,67 @@ export default {
       const mediaProgress = this.node.progress
       this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
       this.$emit("change:dimensions", { height: this.frameHeight })
-      switch (this.library) {
-        case "H5P.InteractiveVideo":
-          {
-            const h5pVideo = h5pInstance.video
-            const h5pIframeComponent = this
-            const handleH5pAfterLoad = () => {
-              h5pIframeComponent.instance = h5pVideo
-              window.addEventListener(
-                "resize",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "fullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "webkitfullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
-              document.addEventListener(
-                "mozfullscreenchange",
-                h5pIframeComponent.setFrameDimensions
-              )
-              const videoDuration = h5pVideo.getDuration()
-              h5pVideo.seek(mediaProgress * videoDuration)
-              this.lastTime = mediaProgress * videoDuration
-              h5pIframeComponent.applySettings(h5pVideo)
-              /**
-               * When a regular H5PInteractiveVideo (i.e. not created using a
-               * YouTube link) loads, it goes through two state changes —
-               * Playing, then Paused. If we emit a load event before these
-               * state changes occur, a race condition can occur where the
-               * node won't play even if autoplay is true.
-               *
-               * To work around this, we delay the load by some time to make room
-               * for the pause event to occur.
-               */
-              setTimeout(() => {
-                this.handleVideoLoad(mediaProgress * videoDuration)
-              }, 500)
-              h5pVideo.on("stateChange", event => {
-                switch (event.data) {
-                  case h5pObj.Video.PLAYING: {
-                    this.handlePlay()
-                    break
-                  }
-                  case h5pObj.Video.PAUSED: {
-                    this.handlePause()
-                    break
-                  }
-                }
-              })
+      const h5pVideo = h5pInstance.video
+      const h5pIframeComponent = this
+      const handleH5pAfterLoad = () => {
+        h5pIframeComponent.instance = h5pVideo
+        window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
+        document.addEventListener(
+          "fullscreenchange",
+          h5pIframeComponent.setFrameDimensions
+        )
+        document.addEventListener(
+          "webkitfullscreenchange",
+          h5pIframeComponent.setFrameDimensions
+        )
+        document.addEventListener(
+          "mozfullscreenchange",
+          h5pIframeComponent.setFrameDimensions
+        )
+        const videoDuration = h5pVideo.getDuration()
+        h5pVideo.seek(mediaProgress * videoDuration)
+        this.lastTime = mediaProgress * videoDuration
+        h5pIframeComponent.applySettings(h5pVideo)
+        /**
+         * When a regular H5PInteractiveVideo (i.e. not created using a
+         * YouTube link) loads, it goes through two state changes —
+         * Playing, then Paused. If we emit a load event before these
+         * state changes occur, a race condition can occur where the
+         * node won't play even if autoplay is true.
+         *
+         * To work around this, we delay the load by some time to make room
+         * for the pause event to occur.
+         */
+        setTimeout(() => {
+          this.handleVideoLoad(mediaProgress * videoDuration)
+        }, 500)
+        h5pVideo.on("stateChange", event => {
+          switch (event.data) {
+            case h5pObj.Video.PLAYING: {
+              this.handlePlay()
+              break
             }
-            if (h5pVideo.getDuration() !== undefined) {
-              /**
-               * When an H5P video appears in an accordion, it can sometimes appear
-               * cut off. To work around this, we refresh the h5p content window and
-               * wait for that to load.
-               */
-              if (this.context === "accordion" && !this.refreshed) {
-                this.$refs.h5p.contentWindow.location.reload()
-                this.refreshed = true
-              } else {
-                handleH5pAfterLoad()
-              }
-            } else {
-              h5pVideo.on("loaded", handleH5pAfterLoad)
+            case h5pObj.Video.PAUSED: {
+              this.handlePause()
+              break
             }
           }
-          break
-        case "H5P.ThreeImage":
-          {
-            let threeSixtyLoadInterval = setInterval(() => {
-              if (typeof h5pInstance.reDraw !== "undefined") {
-                clearInterval(threeSixtyLoadInterval)
-                if (this.node.typeData && this.node.typeData.scene) {
-                  h5pInstance.currentScene = this.node.typeData.scene
-                  h5pInstance.reDraw()
-                }
-              }
-              this.$emit("load")
-            }, 500)
-          }
-          break
-        default:
-          this.$emit("load")
-          break
+        })
+      }
+      if (h5pVideo.getDuration() !== undefined) {
+        /**
+         * When an H5P video appears in an accordion, it can sometimes appear
+         * cut off. To work around this, we refresh the h5p content window and
+         * wait for that to load.
+         */
+        if (this.context === "accordion" && !this.refreshed) {
+          this.$refs.h5p.contentWindow.location.reload()
+          this.refreshed = true
+        } else {
+          handleH5pAfterLoad()
+        }
+      } else {
+        h5pVideo.on("loaded", handleH5pAfterLoad)
       }
     },
     toggleMuteIcon() {
