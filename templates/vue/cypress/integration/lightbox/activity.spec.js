@@ -79,7 +79,6 @@ describe("Activity", () => {
         cy.contains(/manitoba/i).should("be.visible")
 
         cy.contains(/submit/i).click()
-        cy.contains(/submitting/i).should("be.visible")
 
         cy.contains(/thanks/i).should("be.visible")
         cy.contains(/done/i).click()
