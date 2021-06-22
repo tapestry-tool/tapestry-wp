@@ -174,6 +174,9 @@ export default {
             if (key === "text") {
               var tempObj = { type: key, answerData: value }
               previousAnswers.push(tempObj)
+            } else if (key === "multipleChoice") {
+              var multiObj = { type: "tasks", answerData: value }
+              previousAnswers.push(multiObj)
             } else {
               var tempAudioObj = {
                 type: key,

@@ -3,6 +3,7 @@
     <div class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
     <audio v-if="type === 'audio'" controls :src="answerData"></audio>
+    <div v-if="type === 'tasks'">{{ answerData }}</div>
   </div>
 </template>
 
@@ -18,7 +19,7 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: val => ["text", "audio"].includes(val),
+      validator: val => ["text", "audio", "tasks"].includes(val),
     },
     answerData: {
       type: [String, Array],
