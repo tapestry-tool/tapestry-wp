@@ -3,11 +3,11 @@
     ref="h5pIframeContainer"
     class="h5p-iframe-container"
     :class="{
-      'context-multi-content': hasMultiContentContext
+      'context-multi-content': hasMultiContentContext,
     }"
     :style="{
       height: `${dimensions.height}px`,
-      width: '100%'
+      width: '100%',
     }"
   >
     <iframe
@@ -23,34 +23,34 @@
 </template>
 
 <script>
-import Helpers from "@/utils/Helpers";
-import client from "@/services/TapestryAPI";
-import { SEEK_THRESHOLD } from "../video.config";
+import Helpers from "@/utils/Helpers"
+import client from "@/services/TapestryAPI"
+import { SEEK_THRESHOLD } from "../video.config"
 
 export default {
   name: "h5p-iframe",
   props: {
     node: {
       type: Object,
-      required: true
+      required: true,
     },
     dimensions: {
       type: Object,
-      required: true
+      required: true,
     },
     context: {
       type: String,
-      required: true
+      required: true,
     },
     settings: {
       type: Object,
       required: false,
-      default: () => ({})
+      default: () => ({}),
     },
     playing: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -58,162 +58,156 @@ export default {
       library: null,
       frameHeight: null,
       frameWidth: null,
-      refreshed: false
-    };
+      refreshed: false,
+    }
   },
   computed: {
     hasMultiContentContext() {
-      return this.context === "multi-content" || this.context === "page";
-    }
+      return this.context === "multi-content" || this.context === "page"
+    },
   },
   watch: {
     node(newNode, oldNode) {
       if (newNode.id !== oldNode.id) {
-        this.handlePause(oldNode);
+        this.handlePause(oldNode)
       }
     },
     playing(isPlaying) {
-      const video = this.getInstance();
+      const video = this.getInstance()
       if (isPlaying) {
-        this.startTimeupdateHandler();
-        video.play();
+        this.startTimeupdateHandler()
+        video.play()
       } else {
-        this.stopTimeupdateHandler();
-        video.pause();
+        this.stopTimeupdateHandler()
+        video.pause()
       }
-    }
+    },
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.setFrameDimensions);
-    document.removeEventListener("fullscreenchange", this.setFrameDimensions);
-    document.removeEventListener(
-      "webkitfullscreenchange",
-      this.setFrameDimensions
-    );
-    document.removeEventListener(
-      "mozfullscreenchange",
-      this.setFrameDimensions
-    );
+    window.removeEventListener("resize", this.setFrameDimensions)
+    document.removeEventListener("fullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("webkitfullscreenchange", this.setFrameDimensions)
+    document.removeEventListener("mozfullscreenchange", this.setFrameDimensions)
   },
   methods: {
     startTimeupdateHandler() {
-      this.stopTimeupdateHandler();
-      this.interval = setInterval(() => this.updateVideoProgress(), 200);
+      this.stopTimeupdateHandler()
+      this.interval = setInterval(() => this.updateVideoProgress(), 200)
     },
     stopTimeupdateHandler() {
       if (this.interval) {
-        clearInterval(this.interval);
+        clearInterval(this.interval)
       }
     },
     updateVideoProgress() {
-      const video = this.getInstance();
+      const video = this.getInstance()
 
       /**
        * An H5P video is just one of the many types H5Ps can be, so we only want to
        * trigger this if the H5P is in fact a video.
        */
       if (video) {
-        const currentTime = video.getCurrentTime();
-        const duration = video.getDuration();
+        const currentTime = video.getCurrentTime()
+        const duration = video.getDuration()
 
         if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
-          this.$emit("seeked", { currentTime });
+          this.$emit("seeked", { currentTime })
         } else {
           this.$emit("timeupdate", {
             amountViewed: currentTime / duration,
-            currentTime
-          });
+            currentTime,
+          })
         }
 
-        this.lastTime = currentTime;
-        this.updateSettings(video);
+        this.lastTime = currentTime
+        this.updateSettings(video)
       } else {
-        this.stopTimeupdateHandler();
+        this.stopTimeupdateHandler()
       }
     },
     setFrameDimensions() {
-      const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect();
+      const h5pDimensions = this.instance.parent.$container[0].getBoundingClientRect()
 
       // default
-      this.frameHeight = h5pDimensions.height;
-      this.frameWidth = 0;
+      this.frameHeight = h5pDimensions.height
+      this.frameWidth = 0
 
       if (this.node.fitWindow || this.hasMultiContentContext) {
         // Video should fit within the smaller of the viewport or the container it's in
-        let fitHeight = window.innerHeight;
+        let fitHeight = window.innerHeight
         if (this.hasMultiContentContext) {
           // Count for the header
           // TODO: Find a better way of doing this without hardcoding the heigh value
-          fitHeight -= 100;
+          fitHeight -= 100
         }
         // Proportionally make the frame smaller
-        let scaleFactor = fitHeight / h5pDimensions.height;
-        this.frameHeight = h5pDimensions.height * scaleFactor;
-        this.frameWidth = h5pDimensions.width * scaleFactor;
+        let scaleFactor = fitHeight / h5pDimensions.height
+        this.frameHeight = h5pDimensions.height * scaleFactor
+        this.frameWidth = h5pDimensions.width * scaleFactor
 
         // if the width is bigger than the available space, we need to scale based on the width
-        let fitWidth = this.$refs.h5pIframeContainer.clientWidth;
+        let fitWidth = this.$refs.h5pIframeContainer.clientWidth
         if (this.frameWidth > fitWidth) {
-          scaleFactor = fitWidth / h5pDimensions.width;
-          this.frameWidth = h5pDimensions.width * scaleFactor;
-          this.frameHeight = h5pDimensions.height * scaleFactor;
+          scaleFactor = fitWidth / h5pDimensions.width
+          this.frameWidth = h5pDimensions.width * scaleFactor
+          this.frameHeight = h5pDimensions.height * scaleFactor
         }
       }
 
       // Fix for unknown issue where H5P height is just a bit short
       if (this.frameHeight) {
-        this.frameHeight += 2;
+        this.frameHeight += 2
       }
 
-      let updatedDimensions = { height: this.frameHeight };
+      let updatedDimensions = { height: this.frameHeight }
       if (this.frameWidth) {
-        updatedDimensions.width = this.frameWidth;
+        updatedDimensions.width = this.frameWidth
       }
-      this.$emit("change:dimensions", updatedDimensions);
+      this.$emit("change:dimensions", updatedDimensions)
     },
     getInstance() {
       if (this.$refs.h5p) {
-        const h5pObj = this.$refs.h5p.contentWindow.H5P;
-        return h5pObj.instances[0].video;
+        const h5pObj = this.$refs.h5p.contentWindow.H5P
+        return h5pObj.instances[0].video
       }
-      return null;
+      return null
     },
     reset() {
-      const h5pVideo = this.getInstance();
-      h5pVideo.seek(0);
+      const h5pVideo = this.getInstance()
+      h5pVideo.seek(0)
     },
     close() {
-      this.pause();
+      this.pause()
     },
     updateSettings(h5pVideo) {
-      let newSettings = {};
+      let newSettings = {}
 
       try {
-        newSettings.volume = h5pVideo.getVolume();
+        newSettings.volume = h5pVideo.getVolume()
       } catch (Error) {
-        console.error("H5P volume not saved", Error);
+        console.error("H5P volume not saved", Error)
       }
 
       try {
-        newSettings.muted = h5pVideo.isMuted();
+        newSettings.muted = h5pVideo.isMuted()
       } catch (Error) {
-        console.error("H5P mute status not saved", Error);
+        console.error("H5P mute status not saved", Error)
       }
 
       try {
-        newSettings.playbackRate = h5pVideo.getPlaybackRate();
+        newSettings.playbackRate = h5pVideo.getPlaybackRate()
       } catch (Error) {
-        console.error("H5P playback rate not saved", Error);
+        console.error("H5P playback rate not saved", Error)
       }
 
       try {
-        newSettings.quality = h5pVideo.getQuality();
+        newSettings.quality = h5pVideo.getQuality()
       } catch (Error) {
-        console.error("H5P quality settings not saved", Error);
+        console.error("H5P quality settings not saved", Error)
       }
 
       try {
-        newSettings.caption = h5pVideo.getCaptionsTrack();
+        newSettings.caption = h5pVideo.getCaptionsTrack()
       } catch (Error) {
         /**
          * In H5P YouTube videos, the caption track can be undefined which leads to
@@ -221,45 +215,45 @@ export default {
          * can get bloated quite quickly. Instead, if we fail to set a caption we're
          * going to default it to an empty object.
          */
-        newSettings.caption = {};
+        newSettings.caption = {}
       }
 
       if (Helpers.isDifferent(newSettings, this.settings)) {
-        this.$emit("update-settings", newSettings);
+        this.$emit("update-settings", newSettings)
       }
     },
     applySettings(h5pVideo) {
-      const settings = this.settings;
+      const settings = this.settings
       if (settings.volume !== undefined) {
-        h5pVideo.setVolume(settings.volume);
+        h5pVideo.setVolume(settings.volume)
       }
       if (settings.muted !== undefined) {
         if (settings.muted) {
-          h5pVideo.mute();
-          this.toggleMuteIcon();
+          h5pVideo.mute()
+          this.toggleMuteIcon()
         } else {
-          h5pVideo.unMute();
+          h5pVideo.unMute()
         }
       }
       if (settings.playbackRate !== undefined) {
-        h5pVideo.setPlaybackRate(settings.playbackRate);
+        h5pVideo.setPlaybackRate(settings.playbackRate)
       }
       if (settings.quality !== undefined) {
-        h5pVideo.setQuality(settings.quality);
+        h5pVideo.setQuality(settings.quality)
       }
       if (settings.caption !== undefined) {
-        h5pVideo.setCaptionsTrack(settings.caption);
+        h5pVideo.setCaptionsTrack(settings.caption)
       }
     },
     handlePlay() {
-      const { id, progress, mediaDuration } = this.node;
+      const { id, progress, mediaDuration } = this.node
       client.recordAnalyticsEvent("user", "play", "h5p-video", id, {
-        time: progress * mediaDuration
-      });
-      this.$emit("play");
+        time: progress * mediaDuration,
+      })
+      this.$emit("play")
     },
     handlePause() {
-      const video = this.getInstance();
+      const video = this.getInstance()
       /**
        * When an H5PInteractiveVideo ends, it emits a Pause event BEFORE an Ended
        * event. This breaks our state machine since our machine doesn't allow
@@ -270,81 +264,78 @@ export default {
       if (video.getCurrentTime() === video.getDuration()) {
         this.$emit("timeupdate", {
           amountViewed: 1,
-          currentTime: video.getDuration()
-        });
+          currentTime: video.getDuration(),
+        })
       } else {
-        const { id, progress, mediaDuration } = this.node;
+        const { id, progress, mediaDuration } = this.node
         client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-          time: progress * mediaDuration
-        });
+          time: progress * mediaDuration,
+        })
         let hasDialogue = this.$refs.h5p.contentWindow.H5P.$body[0].querySelector(
           ".h5p-dialog-wrapper"
-        );
+        )
         if (
           hasDialogue.style.display === "none" ||
           hasDialogue.style.display === ""
         ) {
-          this.$emit("pause");
+          this.$emit("pause")
         }
       }
     },
     handleVideoLoad(currentTime) {
       this.$emit("load", {
         type: "h5p-video",
-        currentTime
-      });
+        currentTime,
+      })
       this.$nextTick(() => {
-        this.setFrameDimensions();
-      });
+        this.setFrameDimensions()
+      })
     },
     handleLoad() {
-      const h5pObj = this.$refs.h5p.contentWindow.H5P;
-      const h5pInstance = h5pObj.instances[0];
-      const loadedH5PId = h5pInstance.contentId;
+      const h5pObj = this.$refs.h5p.contentWindow.H5P
+      const h5pInstance = h5pObj.instances[0]
+      const loadedH5PId = h5pInstance.contentId
 
-      this.library = h5pInstance.libraryInfo.machineName;
+      this.library = h5pInstance.libraryInfo.machineName
 
       // Check to see whether this is an H5P recorder
       // If it is, we can emit an event to load the recorded audio (if exists)
       // and terminate
       if (h5pInstance.recorder && loadedH5PId) {
-        this.loadedH5PRecorderId = loadedH5PId;
-        this.h5pRecorderSaverIsLoaded();
-        return;
+        this.loadedH5PRecorderId = loadedH5PId
+        this.h5pRecorderSaverIsLoaded()
+        return
       }
 
-      const mediaProgress = this.node.progress;
+      const mediaProgress = this.node.progress
 
-      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight;
-      this.$emit("change:dimensions", { height: this.frameHeight });
+      this.frameHeight = this.$refs.h5p.contentWindow.document.activeElement.children[0].clientHeight
+      this.$emit("change:dimensions", { height: this.frameHeight })
 
-      const h5pVideo = h5pInstance.video;
-      const h5pIframeComponent = this;
+      const h5pVideo = h5pInstance.video
+      const h5pIframeComponent = this
 
       const handleH5pAfterLoad = () => {
-        h5pIframeComponent.instance = h5pVideo;
-        window.addEventListener(
-          "resize",
-          h5pIframeComponent.setFrameDimensions
-        );
+        h5pIframeComponent.instance = h5pVideo
+        window.addEventListener("resize", h5pIframeComponent.setFrameDimensions)
         document.addEventListener(
           "fullscreenchange",
           h5pIframeComponent.setFrameDimensions
-        );
+        )
         document.addEventListener(
           "webkitfullscreenchange",
           h5pIframeComponent.setFrameDimensions
-        );
+        )
         document.addEventListener(
           "mozfullscreenchange",
           h5pIframeComponent.setFrameDimensions
-        );
+        )
 
-        const videoDuration = h5pVideo.getDuration();
-        h5pVideo.seek(mediaProgress * videoDuration);
-        this.lastTime = mediaProgress * videoDuration;
+        const videoDuration = h5pVideo.getDuration()
+        h5pVideo.seek(mediaProgress * videoDuration)
+        this.lastTime = mediaProgress * videoDuration
 
-        h5pIframeComponent.applySettings(h5pVideo);
+        h5pIframeComponent.applySettings(h5pVideo)
 
         /**
          * When a regular H5PInteractiveVideo (i.e. not created using a
@@ -357,23 +348,23 @@ export default {
          * for the pause event to occur.
          */
         setTimeout(() => {
-          this.handleVideoLoad(mediaProgress * videoDuration);
-        }, 500);
+          this.handleVideoLoad(mediaProgress * videoDuration)
+        }, 500)
 
         h5pVideo.on("stateChange", event => {
           switch (event.data) {
             case h5pObj.Video.PLAYING: {
-              this.handlePlay();
-              break;
+              this.handlePlay()
+              break
             }
 
             case h5pObj.Video.PAUSED: {
-              this.handlePause();
-              break;
+              this.handlePause()
+              break
             }
           }
-        });
-      };
+        })
+      }
 
       if (h5pVideo.getDuration() !== undefined) {
         /**
@@ -382,24 +373,24 @@ export default {
          * wait for that to load.
          */
         if (this.context === "accordion" && !this.refreshed) {
-          this.$refs.h5p.contentWindow.location.reload();
-          this.refreshed = true;
+          this.$refs.h5p.contentWindow.location.reload()
+          this.refreshed = true
         } else {
-          handleH5pAfterLoad();
+          handleH5pAfterLoad()
         }
       } else {
-        h5pVideo.on("loaded", handleH5pAfterLoad);
+        h5pVideo.on("loaded", handleH5pAfterLoad)
       }
 
-      this.$emit("load");
+      this.$emit("load")
     },
     toggleMuteIcon() {
-      const body = this.$refs.h5p.contentWindow.H5P.$body[0];
-      const btn = body.querySelector(".h5p-mute");
-      btn.classList.toggle("h5p-muted");
-    }
-  }
-};
+      const body = this.$refs.h5p.contentWindow.H5P.$body[0]
+      const btn = body.querySelector(".h5p-mute")
+      btn.classList.toggle("h5p-muted")
+    },
+  },
+}
 </script>
 <style lang="scss">
 .h5p-iframe-container {
