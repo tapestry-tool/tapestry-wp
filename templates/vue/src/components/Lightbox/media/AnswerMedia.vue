@@ -14,20 +14,22 @@
         {{ question.followUpText }}
       </h4>
       <b-tabs>
-        <b-tab
-          v-for="questionAnswer in answers"
-          :key="questionAnswer.type"
-          :active="questionAnswer.type === lastAnswerType"
-        >
+        <b-tab v-for="questionAnswer in answers" :key="questionAnswer.type">
           <template #title>
             <div class="icon">
-              <tapestry-icon :icon="questionAnswer.type" />
-              | {{ questionAnswer.type }}
+              <tapestry-icon :icon="questionAnswer[0]" />
+              {{ questionAnswer[0] }}
             </div>
           </template>
           <tapestry-activity
-            :type="questionAnswer.type"
-            :entry="questionAnswer.entry"
+            v-if="questionAnswer[0] === 'audio'"
+            :type="questionAnswer[0]"
+            :answerData="questionAnswer[1].url"
+          ></tapestry-activity>
+          <tapestry-activity
+            v-else
+            :type="questionAnswer[0]"
+            :answerData="questionAnswer[1]"
           ></tapestry-activity>
         </b-tab>
       </b-tabs>
@@ -61,29 +63,20 @@ export default {
     ...mapState(["userAnswers"]),
     ...mapGetters(["getEntry", "getQuestion", "getAnswers"]),
     answer() {
-      return this.node.answers[0]
+      return this.node.answers
     },
     question() {
       return this.getQuestion(this.answer.questionID)
     },
-    // lastAnswerType() {
-    //   return this.question.lastAnswerType
-    // },
     followUpText() {
       return this.answer.followUpText !== ""
     },
     answers() {
-      // use userAnswers to get the Answers; this.getAnswers
-      // exceeds max call stacks error
-      console.log(
-        `NodeId: ${this.answer.activityID}, questionID: ${this.answer.questionID}`
-      )
-
-      return this.getAnswers(this.answer.activityID, this.answer.questionID)
-      // return this.getAnswers(this.answer.activityID, this.answer.questionID)
+      const answers = this.getAnswers(this.answer.activityID, this.answer.questionID)
+      return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return true
+      return this.answers ? true : false
     },
   },
   mounted() {

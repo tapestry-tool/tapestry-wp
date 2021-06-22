@@ -2,12 +2,13 @@
   <div class="tapestry-activity">
     <div class="icon"><tapestry-icon :icon="type" /></div>
     <div v-if="type === 'text'" class="text">{{ answerData }}</div>
-    <audio v-if="type === 'audio'" controls :src="answerData"></audio>
+    <audio v-if="type === 'audio'" controls :src="audioUrl"></audio>
   </div>
 </template>
 
 <script>
 import TapestryIcon from "@/components/common/TapestryIcon"
+import { data as wpData } from "@/services/wp"
 
 export default {
   name: "tapestry-activity",
@@ -23,6 +24,11 @@ export default {
     answerData: {
       type: [String, Array],
       required: true,
+    },
+  },
+  computed: {
+    audioUrl() {
+      return wpData.uploadDirArray.baseurl + "/" + this.answerData
     },
   },
 }
