@@ -194,11 +194,7 @@ export default {
     },
     answer() {
       if (this.formOpened && this.answers?.[this.formType]) {
-        if (this.answers === {}) {
-          return ""
-        } else {
-          return this.answers[this.formType]
-        }
+        return this.answers[this.formType]
       }
       return ""
     },
