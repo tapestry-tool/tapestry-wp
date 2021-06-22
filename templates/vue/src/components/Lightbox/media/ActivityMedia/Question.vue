@@ -58,6 +58,7 @@
             v-else-if="formType === 'dragDrop'"
             :question="question"
             :node="node"
+            :answer="answer"
             @submit="handleSubmit"
           />
         </div>

@@ -1,6 +1,8 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
     <p>dragDropAnswer is {{ dragDropAnswer }}</p>
+    <p>toBucketArray is {{ toBucketArray }}</p>
+    <p>fromBucketArray is {{ fromBucketArray }}</p>
     <b-row align-h="between">
       <b-col cols="3">
         <b style="color: #009688">From buckets</b>
@@ -61,6 +63,10 @@ export default {
       type: Object,
       required: true,
     },
+    answer: {
+      type: [String, Object],
+      required: true,
+    },
   },
   data() {
     return {
@@ -90,14 +96,68 @@ export default {
       this.question.answerTypes.dragDrop.fromBucketArray = this.fromBucketArray
     },
   },
-  created() {},
+  created() {
+    //console.log(this.answer)
+    //console.log("type of this.answer is", typeof this.answer)
+    if (this.answer !== "") {
+      //console.log("initialize backend answer here")
+      this.dragDropAnswer = this.answer
+      this.initialize()
+    }
+  },
   methods: {
-    updatedragDropAnswer() {
+    initialize() {
+      for (const key of Object.keys(this.answer)) {
+        for (
+          let i = 0;
+          i < this.question.answerTypes.dragDrop.toBucketArray.length;
+          i++
+        ) {
+          if (
+            this.question.answerTypes.dragDrop.toBucketArray[i].id ===
+            this.answer[key].bucketId
+          ) {
+            this.question.answerTypes.dragDrop.toBucketArray[
+              i
+            ].itemArray = this.answer[key].itemArray
+          }
+        }
+      }
+
+      for (
+        let j = 0;
+        j < this.question.answerTypes.dragDrop.fromBucketArray.length;
+        j++
+      ) {
+        for (
+          let k = 0;
+          k < this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray.length;
+          k++
+        ) {
+          console.log(
+            "got here",
+            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
+          )
+          this.findIfExistInToBucket(
+            this.question.answerTypes.dragDrop.fromBucketArray[j].itemArray[k]
+          )
+          // TODO FINISH HERE for cleaning up fromBucketArray
+        }
+      }
+    },
+    findIfExistInToBucket(item) {
+      console.log("item is", item)
+    },
+    updateDragDropAnswer() {
       for (let i = 0; i < this.toBucketArray.length; i++) {
         if (this.toBucketArray[i].itemArray.length > 0) {
           let bucketValue = this.toBucketArray[i].value
           console.log("bucketValue is", bucketValue)
-          this.dragDropAnswer[bucketValue] = this.toBucketArray[i].itemArray
+          console.log(this.toBucketArray[i].itemArray)
+          this.dragDropAnswer[bucketValue] = {
+            bucketId: this.toBucketArray[i].id,
+            itemArray: this.toBucketArray[i].itemArray,
+          }
         }
       }
     },
@@ -105,7 +165,7 @@ export default {
       event.preventDefault()
       this.isAnswerValid = this.toBucketValidAnswerState
       if (this.isAnswerValid) {
-        this.updatedragDropAnswer()
+        this.updateDragDropAnswer()
         console.log("submitted result", this.dragDropAnswer)
         this.$emit("submit", this.dragDropAnswer)
       }
