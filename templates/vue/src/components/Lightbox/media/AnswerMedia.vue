@@ -75,8 +75,10 @@ export default {
     answers() {
       // use userAnswers to get the Answers; this.getAnswers
       // exceeds max call stacks error
-      console.log(`NodeId: ${this.answer.activityID}, questionID: ${this.answer.questionID}`)
-      
+      console.log(
+        `NodeId: ${this.answer.activityID}, questionID: ${this.answer.questionID}`
+      )
+
       return this.getAnswers(this.answer.activityID, this.answer.questionID)
       // return this.getAnswers(this.answer.activityID, this.answer.questionID)
     },
