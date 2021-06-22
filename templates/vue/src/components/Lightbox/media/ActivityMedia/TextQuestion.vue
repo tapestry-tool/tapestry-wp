@@ -66,9 +66,4 @@ export default {
   align-content: center;
   height: 250px;
 }
-.form-input {
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-}
 </style>
