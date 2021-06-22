@@ -159,7 +159,6 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[],
@@ -236,7 +235,6 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[
@@ -326,7 +324,6 @@
       "hideProgress":false,
       "hideMedia":false,
       "skippable":true,
-      
       "fullscreen":false,
       "conditions":[],
       "childOrdering":[],

@@ -1,12 +1,20 @@
 <template>
   <div class="question">
+<<<<<<< HEAD
     <p>question is {{ question }}</p>
     <button v-if="formOpened" class="button-nav m-auto" @click="back">
+=======
+    <button
+      v-if="formOpened && enabledAnswerTypes.length > 1"
+      class="button-nav m-auto"
+      @click="back"
+    >
+>>>>>>> 1043-activity-built-in-forms
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
     <div v-else>
-      <div v-if="question.followUp.questionId !== null" class="follow-up">
+      <div v-if="question.followUp.enabled" class="follow-up">
         <div
           v-if="previousQuestionAnswers.length"
           class="answer-container mx-auto mb-3"
@@ -150,10 +158,9 @@ export default {
         for (let i = 0; i < Object.keys(this.userAnswers).length; i++) {
           let tempNodeId = Object.keys(this.userAnswers)[i]
           if (
-            this.userAnswers[tempNodeId].hasOwnProperty("activity") &&
-            this.userAnswers[tempNodeId].activity.hasOwnProperty(
+            this.userAnswers[tempNodeId].activity?.[
               this.question.followUp.questionId
-            )
+            ]
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
@@ -186,63 +193,51 @@ export default {
       return []
     },
     enabledAnswerTypes() {
-      return Object.entries(this.question.answerTypes).filter(
-        answerType => answerType.enabled
-      )
+      return Object.entries(this.question.answerTypes).filter(([, value]) => {
+        return value.enabled
+      })
     },
     answer() {
-      if (
-        this.formOpened &&
-        this.answers !== undefined &&
-        this.answers[this.formType] !== undefined
-      ) {
-        return this.answers[this.formType]
+      if (this.formOpened && this.answers?.[this.formType]) {
+        if (this.answers === {}) {
+          return ""
+        } else {
+          return this.answers[this.formType]
+        }
       }
       return ""
     },
     textFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
           if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("text")
           ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("text")
-              ) {
-                return true
-              }
-            }
+            return true
           }
         }
       }
       return false
     },
     audioFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
           if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("audio")
           ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("audio")
-              ) {
-                return true
-              }
-            }
+            return true
           }
         }
       }
@@ -286,6 +281,7 @@ export default {
   watch: {
     question() {
       this.answers = this.getAnswers(this.node.id, this.question.id)
+      this.openFormIfSingle()
     },
   },
   created() {
@@ -293,22 +289,21 @@ export default {
     console.log("this.answer is", this.answers)
   },
   mounted() {
-    const enabledAnswerTypes = Object.entries(this.question.answerTypes)
-      .filter(([, value]) => {
-        return value.enabled
-      })
-      .map(item => item[0])
-
-    if (enabledAnswerTypes.length === 1) {
-      this.formType = enabledAnswerTypes[0]
-      this.formOpened = true
-    }
+    this.openFormIfSingle()
   },
   methods: {
     ...mapActions(["completeQuestion", "saveAudio"]),
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       this.formOpened = false
+    },
+    openFormIfSingle() {
+      if (this.enabledAnswerTypes.length === 1) {
+        this.formType = this.enabledAnswerTypes.map(item => item[0])[0]
+        this.formOpened = true
+      } else {
+        this.formOpened = false
+      }
     },
     openForm(answerType) {
       client.recordAnalyticsEvent(
@@ -378,6 +373,8 @@ export default {
   justify-content: center;
   height: 100%;
   width: 100%;
+  max-width: 600px;
+  margin: auto;
 
   .button-nav {
     border-radius: 50%;
