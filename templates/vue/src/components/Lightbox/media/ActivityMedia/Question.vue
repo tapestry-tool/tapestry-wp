@@ -58,7 +58,7 @@
             v-else-if="formType === 'dragDrop'"
             :question="question"
             :node="node"
-            @submit="handleDragDropSubmit"
+            @submit="handleSubmit"
           />
         </div>
         <div v-else class="question-answer-types">
@@ -234,13 +234,23 @@ export default {
       }
       return false
     },
-    showDragDrop() {
-      return (
-        this.hasId("dragdropId") || Boolean(this.node.typeData.options?.dragDrop)
-      )
-    },
     dragDropFormCompleted() {
-      return !!(this.question.entries && this.question.entries.dragdropId)
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
+          if (
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("dragDrop")
+          ) {
+            return true
+          }
+        }
+      }
+      return false
     },
   },
   watch: {
@@ -250,8 +260,8 @@ export default {
     },
   },
   created() {
-    console.log(this.formType)
     this.answers = this.getAnswers(this.node.id, this.question.id)
+    console.log("this.answers is", this.answers)
   },
   mounted() {
     this.openFormIfSingle()
@@ -283,24 +293,6 @@ export default {
       this.formType = answerType
       this.formOpened = true
     },
-    async handleDragDropSubmit(event) {
-      // FIX: move functionality to handleSubmit
-      const question = this.node.typeData.activity.questions[0]
-      if (!question.entries) {
-        question.entries = {}
-      }
-      question.entries.dragdropId = {
-        [this.question.answers.dragdropId]: event,
-      }
-      this.handleSubmit(
-        "dragDrop",
-        async () =>
-          await this.updateNode({
-            id: this.node.id,
-            newNode: this.node,
-          })
-      )
-    },
     async handleSubmit(formData) {
       this.formOpened = false
       this.submitting = true
@@ -327,6 +319,10 @@ export default {
           break
         }
       }
+      console.log("submitted answer is", submittedAnswer)
+      console.log("answer type is", this.formType)
+      console.log("node id is", this.node.id)
+      console.log("question id is", this.question.id)
       await this.completeQuestion({
         nodeId: this.node.id,
         questionId: this.question.id,

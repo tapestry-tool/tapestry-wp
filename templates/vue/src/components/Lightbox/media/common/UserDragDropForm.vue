@@ -1,6 +1,6 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
-    <p>toBucketAnswer is {{ toBucketAnswer }}</p>
+    <p>dragDropAnswer is {{ dragDropAnswer }}</p>
     <b-row align-h="between">
       <b-col cols="3">
         <b style="color: #009688">From buckets</b>
@@ -67,7 +67,7 @@ export default {
       isAnswerValid: true,
       toBucketArray: this.question.answerTypes.dragDrop.toBucketArray,
       fromBucketArray: this.question.answerTypes.dragDrop.fromBucketArray,
-      toBucketAnswer: "",
+      dragDropAnswer: {},
     }
   },
   computed: {
@@ -92,44 +92,22 @@ export default {
   },
   created() {},
   methods: {
-    updateToBucketAnswer() {
+    updatedragDropAnswer() {
       for (let i = 0; i < this.toBucketArray.length; i++) {
         if (this.toBucketArray[i].itemArray.length > 0) {
           let bucketValue = this.toBucketArray[i].value
-          let itemValueArray = this.getItemArray(this.toBucketArray[i])
-          this.toBucketAnswer = this.toBucketAnswer + String(bucketValue) + ": "
-          let itemValueArrayString = String(itemValueArray)
-          if (this.determineToFromBucketAnswerQuantity()) {
-            this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString
-          } else {
-            this.toBucketAnswer = this.toBucketAnswer + itemValueArrayString + "\n"
-          }
+          console.log("bucketValue is", bucketValue)
+          this.dragDropAnswer[bucketValue] = this.toBucketArray[i].itemArray
         }
       }
-    },
-    getItemArray(bucket) {
-      var itemArray = []
-      for (let i = 0; i < bucket.itemArray.length; i++) {
-        itemArray.push(bucket.itemArray[i].text)
-      }
-      return itemArray
-    },
-    determineToFromBucketAnswerQuantity() {
-      var num = 0
-      for (let i = 0; i < this.toBucketArray.length; i++) {
-        if (this.toBucketArray[i].itemArray.length > 0) {
-          num++
-        }
-      }
-      return Boolean(num === 1)
     },
     handleDragDropSubmit(event) {
       event.preventDefault()
       this.isAnswerValid = this.toBucketValidAnswerState
-      this.updateToBucketAnswer()
-      console.log("submitted result", this.toBucketAnswer)
       if (this.isAnswerValid) {
-        this.$emit("submit", this.toBucketAnswer)
+        this.updatedragDropAnswer()
+        console.log("submitted result", this.dragDropAnswer)
+        this.$emit("submit", this.dragDropAnswer)
       }
     },
   },
