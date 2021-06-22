@@ -76,7 +76,7 @@ export default {
       return answers ? Object.entries(answers) : null
     },
     hasAnswer() {
-      return this.answers ? true : false
+      return this.answers.length ? true : false
     },
   },
   mounted() {
