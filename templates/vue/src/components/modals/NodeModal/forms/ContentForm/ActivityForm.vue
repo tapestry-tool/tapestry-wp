@@ -7,7 +7,6 @@
       text-variant="light"
       class="mb-3"
     >
-      <p>question is {{ question }}</p>
       <b-form-group class="mb-0">
         <b-row align-v="center" class="mb-2 mx-0">
           <p

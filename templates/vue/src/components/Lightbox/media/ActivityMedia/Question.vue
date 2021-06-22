@@ -275,7 +275,6 @@ export default {
   },
   created() {
     this.answers = this.getAnswers(this.node.id, this.question.id)
-    console.log("this.answer is", this.answers)
   },
   mounted() {
     this.openFormIfSingle()

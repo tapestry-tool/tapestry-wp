@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>question is {{ question }}</p>
     <b-form-group :label="multipleAnswerSelected ? 'Checkbox Form' : 'Radio Form'">
       <b-form-group>
         <b-form-checkbox v-model="useImages" data-qa="multiplechoice-thumbnail">
@@ -36,7 +35,6 @@
         <p class="message">
           Tick any options that should be selected by default in the question
         </p>
-        <!-- <div class="mt-3">preSelectedCheckBoxOptions: <strong>{{ preSelectedCheckBoxOptions }}</strong></div> -->
       </b-form-group>
 
       <b-form-group v-else-if="!multipleAnswerSelected">
@@ -77,7 +75,6 @@
         <p class="message">
           Tick any options that should be selected by default in the question
         </p>
-        <!-- <div class="mt-3">preSelectedRadioOptions: <strong>{{ preSelectedRadioOptions }}</strong></div> -->
       </b-form-group>
     </b-form-group>
   </div>

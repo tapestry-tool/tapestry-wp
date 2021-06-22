@@ -12,7 +12,6 @@
           input-test-id="node-choiceRow-thumbnail-url"
           :data-qa="`choicerow-checkbox-thumbnail-${item.id}`"
           :show-url-upload="false"
-          thumbnail-type="thumbnail"
           :show-image-preview="true"
           file-types="image/*"
           @isUploading="handleUploadChange"
@@ -47,13 +46,11 @@
           input-test-id="node-choiceRow-thumbnail-url"
           :data-qa="`choicerow-radio-thumbnail-${item.id}`"
           :show-url-upload="false"
-          thumbnail-type="thumbnail"
           :show-image-preview="true"
           file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-      <!-- <div>SelectedRadiochoice: <strong>{{ selectedRadioChoice}}</strong></div> -->
     </b-form-checkbox>
     <b-form-input
       v-model="item.value"
