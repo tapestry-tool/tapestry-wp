@@ -72,14 +72,13 @@ export default {
     },
     playing(isPlaying) {
       const video = this.getInstance()
-        if (isPlaying) {
-          this.startTimeupdateHandler()
-          video.play()
-        } else {
-          this.stopTimeupdateHandler()
-          video.pause()
-        }
-      
+      if (isPlaying) {
+        this.startTimeupdateHandler()
+        video.play()
+      } else {
+        this.stopTimeupdateHandler()
+        video.pause()
+      }
     },
   },
   beforeDestroy() {
@@ -104,19 +103,18 @@ export default {
     },
     updateVideoProgress() {
       const video = this.getInstance()
-        const currentTime = video.getCurrentTime()
-        const duration = video.getDuration()
-        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
-          this.$emit("seeked", { currentTime })
-        } else {
-          this.$emit("timeupdate", {
-            amountViewed: currentTime / duration,
-            currentTime,
-          })
-        }
-        this.lastTime = currentTime
-        this.updateSettings(video)
-      
+      const currentTime = video.getCurrentTime()
+      const duration = video.getDuration()
+      if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
+        this.$emit("seeked", { currentTime })
+      } else {
+        this.$emit("timeupdate", {
+          amountViewed: currentTime / duration,
+          currentTime,
+        })
+      }
+      this.lastTime = currentTime
+      this.updateSettings(video)
     },
 
     setFrameDimensions() {
@@ -244,34 +242,33 @@ export default {
     },
     handlePause() {
       const video = this.getInstance()
-        /**
-         * When an H5PInteractiveVideo ends, it emits a Pause event BEFORE an Ended
-         * event. This breaks our state machine since our machine doesn't allow
-         * transitioning from a Paused state to a Finished state. As a work around,
-         * we listen to the Pause event and manually check if the video is done at
-         * this point. If it is, we emit the corresponding `timeupdate` event.
-         */
-        if (video.getCurrentTime() === video.getDuration()) {
-          this.$emit("timeupdate", {
-            amountViewed: 1,
-            currentTime: video.getDuration(),
-          })
-        } else {
-          const { id, progress, mediaDuration } = this.node
-          client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
-            time: progress * mediaDuration,
-          })
-          let hasDialogue = this.$refs.h5p.contentWindow.H5P.$body[0].querySelector(
-            ".h5p-dialog-wrapper"
-          )
-          if (
-            hasDialogue.style.display === "none" ||
-            hasDialogue.style.display === ""
-          ) {
-            this.$emit("pause")
-          }
+      /**
+       * When an H5PInteractiveVideo ends, it emits a Pause event BEFORE an Ended
+       * event. This breaks our state machine since our machine doesn't allow
+       * transitioning from a Paused state to a Finished state. As a work around,
+       * we listen to the Pause event and manually check if the video is done at
+       * this point. If it is, we emit the corresponding `timeupdate` event.
+       */
+      if (video.getCurrentTime() === video.getDuration()) {
+        this.$emit("timeupdate", {
+          amountViewed: 1,
+          currentTime: video.getDuration(),
+        })
+      } else {
+        const { id, progress, mediaDuration } = this.node
+        client.recordAnalyticsEvent("user", "pause", "h5p-video", id, {
+          time: progress * mediaDuration,
+        })
+        let hasDialogue = this.$refs.h5p.contentWindow.H5P.$body[0].querySelector(
+          ".h5p-dialog-wrapper"
+        )
+        if (
+          hasDialogue.style.display === "none" ||
+          hasDialogue.style.display === ""
+        ) {
+          this.$emit("pause")
         }
-      
+      }
     },
     handleVideoLoad(currentTime) {
       this.$emit("load", {
