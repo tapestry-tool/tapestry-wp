@@ -11,7 +11,7 @@
         'background-color': bucketItem.color,
       }"
     ></div>
-    <b style="">{{ bucketItem.text }}</b>
+    <b v-if="!question.answerTypes.dragDrop.hideText">{{ bucketItem.text }}</b>
   </div>
 </template>
 
@@ -20,6 +20,10 @@ export default {
   components: {},
   props: {
     node: {
+      type: Object,
+      required: true,
+    },
+    question: {
       type: Object,
       required: true,
     },
