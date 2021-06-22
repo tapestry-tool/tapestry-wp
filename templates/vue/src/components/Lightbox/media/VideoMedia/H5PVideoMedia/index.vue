@@ -106,19 +106,6 @@ export default {
         clearInterval(this.interval)
       }
     },
-    // reset() {
-    //   this.$refs.h5pIframe.reset()
-    // },
-    // updateSettings(settings) {
-    //   client.recordAnalyticsEvent(
-    //     "user",
-    //     "update-settings",
-    //     "h5p-video",
-    //     this.node.id,
-    //     { from: this.h5pSettings, to: settings }
-    //   )
-    //   this.updateH5pSettings(settings)
-    // },
     updateVideoProgress() {
       const video = this.getInstance()
       /**
