@@ -130,7 +130,6 @@ function setDatasetProgress(dataset, progress) {
 
       const { content } = nodeProgress
       if (content) {
-        // set the fields in content to node.userAnswers.activity here
         if (content.userAnswers) {
           dataset.userAnswers[node.id] = { activity: content.userAnswers.activity }
         }
