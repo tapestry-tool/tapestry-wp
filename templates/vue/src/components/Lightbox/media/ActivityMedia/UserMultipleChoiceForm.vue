@@ -56,6 +56,10 @@ export default {
       type: Object,
       required: true,
     },
+    answer: {
+      type: [String, Array],
+      required: true,
+    },
   },
   data() {
     return {
@@ -73,21 +77,31 @@ export default {
       return this.question.answers.multipleChoiceId
     },
   },
-  mounted() {
-    if (this.question.hasOwnProperty("entries")) {
-      if (
-        this.question.entries.hasOwnProperty("multipleChoiceId") &&
-        this.question.entries.multipleChoiceId !== null
-      ) {
-        this.multipleChoiceAnswer = this.question.entries.multipleChoiceId[
-          this.multipleChoiceId
-        ]
+  watch: {
+    question() {
+      if (this.answer === "") {
+        this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
+        this.userSelectedRadio = this.getPreSelectedRadioValue()
+      } else {
+        if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
+          this.userSelectedCheckbox = this.answer
+        } else {
+          this.userSelectedRadio = this.answer
+        }
       }
+    },
+  },
+  created() {
+    if (this.answer === "") {
+      this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
+      this.userSelectedRadio = this.getPreSelectedRadioValue()
     } else {
-      this.multipleChoiceAnswer = ""
+      if (this.question.answerTypes.multipleChoice.hasMultipleAnswers) {
+        this.userSelectedCheckbox = this.answer
+      } else {
+        this.userSelectedRadio = this.answer
+      }
     }
-    this.userSelectedCheckbox = this.getPreSelectedCheckBoxValue()
-    this.userSelectedRadio = this.getPreSelectedRadioValue()
   },
   methods: {
     handleMultipleChoiceSubmit(event) {

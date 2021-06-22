@@ -57,6 +57,7 @@
             v-else-if="formType === 'multipleChoice'"
             :node="node"
             :question="question"
+            :answer="answer"
             @submit="handleSubmit"
           ></user-multiple-choice-form>
         </div>
