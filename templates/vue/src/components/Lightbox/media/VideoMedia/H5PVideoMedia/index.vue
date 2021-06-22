@@ -219,7 +219,7 @@ export default {
         newSettings.caption = {}
       }
 
-      if (Helpers.isDifferent(newSettings, this.settings)) {
+      if (Helpers.isDifferent(newSettings, this.h5pSettings)) {
         // this.$emit("update-settings", newSettings)
         client.recordAnalyticsEvent(
           "user",
@@ -232,7 +232,7 @@ export default {
       }
     },
     applySettings(h5pVideo) {
-      const settings = this.settings
+      const settings = this.h5pSettings
       if (settings.volume !== undefined) {
         h5pVideo.setVolume(settings.volume)
       }
