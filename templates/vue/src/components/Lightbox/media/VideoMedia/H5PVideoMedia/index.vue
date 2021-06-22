@@ -17,7 +17,7 @@
       width="100%"
       frameborder="0"
       :src="node.typeData && node.typeData.mediaURL"
-      :scrolling="scrollingValue"
+      scrolling="no"
       @load="handleLoad"
     ></iframe>
   </div>
@@ -60,12 +60,6 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
-    scrollingValue() {
-      const noscroll = ["H5P.InteractiveVideo", "H5P.ThreeImage"]
-      if (noscroll.includes(this.library)) {
-        return "no"
-      } else return "auto"
-    },
     hasMultiContentContext() {
       return this.context === "multi-content" || this.context === "page"
     },
@@ -108,19 +102,6 @@ export default {
         clearInterval(this.interval)
       }
     },
-    // reset() {
-    //   this.$refs.h5pIframe.reset()
-    // },
-    // updateSettings(settings) {
-    //   client.recordAnalyticsEvent(
-    //     "user",
-    //     "update-settings",
-    //     "h5p-video",
-    //     this.node.id,
-    //     { from: this.h5pSettings, to: settings }
-    //   )
-    //   this.updateH5pSettings(settings)
-    // },
     updateVideoProgress() {
       const video = this.getInstance()
         const currentTime = video.getCurrentTime()
