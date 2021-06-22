@@ -118,14 +118,10 @@ export default {
           this.node.id,
           currentQuestion.id
         )
-        if (currentQuestionAnswer !== undefined) {
-          if (
-            currentQuestionAnswer.text !== "" ||
-            (currentQuestionAnswer.hasOwnProperty("audio") &&
-              currentQuestionAnswer.audio.url !== "")
-          ) {
-            currentQuestion.completed = true
-          }
+        if (Object.keys(currentQuestionAnswer).length === 0) {
+          currentQuestion.completed = false
+        } else {
+          currentQuestion.completed = true
         }
       }
     },
