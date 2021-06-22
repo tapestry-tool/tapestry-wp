@@ -115,31 +115,6 @@ export function getAnswers(state) {
   }
 }
 
-export function getEntry(_, { getQuestion }) {
-  return (questionId, answerType, mediaType = "") => {
-    const question = getQuestion(questionId)
-    if (!question) {
-      return null
-    }
-    const entry = question.entries[answerType]
-    if (!entry) {
-      return null
-    }
-    /* If the answer is an audio, then entry is the audio file in base64. */
-    if (answerType === "audioId") {
-      return { type: "audio", entry: "data:audio/ogg; codecs=opus;base64," + entry }
-    }
-    if (mediaType === "activity" && answerType === "dragdropId") {
-      return {
-        type: "dragDrop",
-        entry: Object.values(entry)[0],
-      }
-    }
-    const answers = getAnswersFromEntry(entry)
-    return formatEntry(answers, answerType)
-  }
-}
-
 export function hasPath(state) {
   return (from, to, options = {}) => {
     const { exclude = [] } = options
@@ -184,25 +159,6 @@ export function favourites(state) {
 
 export function isFavourite(_, { favourites }) {
   return id => favourites.findIndex(fid => fid == id) > -1
-}
-
-/* An answer is a value where its key is numeric */
-function getAnswersFromEntry(entry) {
-  return Object.entries(entry)
-    .filter(obj => !isNaN(parseInt(obj[0], 10)))
-    .map(i => i[1])
-}
-
-function formatEntry(answers, answerType) {
-  if (answerType === "textId") {
-    return {
-      type: "text",
-      entry: answers[0],
-    }
-  }
-  if (answerType === "checklistId") {
-    return { type: "checklist", entry: answers.filter(answer => answer !== "") }
-  }
 }
 
 export function xOrFx({ settings }) {
