@@ -1,5 +1,6 @@
 <template>
   <b-form @submit="handleDragDropSubmit">
+    <p>toBucketAnswer is {{ toBucketAnswer }}</p>
     <b-row align-h="between">
       <b-col cols="3">
         <b style="color: #009688">From buckets</b>
@@ -29,7 +30,7 @@
       </b-col>
     </b-row>
 
-    <b-form-invalid-feedback :state="toBucketValidAnswerState">
+    <b-form-invalid-feedback :state="isAnswerValid">
       Please drag a item to a "to bucket"
     </b-form-invalid-feedback>
     <p>
@@ -124,11 +125,7 @@ export default {
     },
     handleDragDropSubmit(event) {
       event.preventDefault()
-      if (this.toBucketValidAnswerState) {
-        this.isAnswerValid = true
-      } else {
-        this.isAnswerValid = false
-      }
+      this.isAnswerValid = this.toBucketValidAnswerState
       this.updateToBucketAnswer()
       console.log("submitted result", this.toBucketAnswer)
       if (this.isAnswerValid) {

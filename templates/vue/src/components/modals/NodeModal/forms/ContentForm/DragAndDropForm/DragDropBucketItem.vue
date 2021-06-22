@@ -20,21 +20,19 @@
           input-test-id="node-bucketitem-thumbnail-url"
           :data-qa="`bucket-item-thumbnail-${bucketItem.id}`"
           :show-url-upload="false"
-          thumbnail-type="thumbnail"
           :show-image-preview="true"
           file-types="image/*"
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-      <b-form-checkbox
+      <!-- <b-form-checkbox
         v-if="addBackgroundImage"
         v-model="addText"
         :data-qa="`bucket-item-usetext-${bucketItem.id}`"
       >
         Text
-      </b-form-checkbox>
+      </b-form-checkbox> -->
       <b-form-input
-        v-if="addText"
         v-model="bucketItem.text"
         placeholder="Enter Item Text"
         :data-qa="`bucket-item-text-${bucketItem.id}`"

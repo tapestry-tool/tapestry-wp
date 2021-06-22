@@ -1,5 +1,6 @@
 <template>
   <div class="question">
+    <p>question data is {{ question }}</p>
     <button
       v-if="formOpened && enabledAnswerTypes.length > 1"
       class="button-nav m-auto"
@@ -84,7 +85,7 @@
               v-if="question.answerTypes.dragDrop.enabled"
               :completed="dragDropFormCompleted"
               icon="drag and drop"
-              @click="openDragDrop(question.answers.dragdropId, 'dragdropId')"
+              @click="openForm('dragDrop')"
             >
               drag/drop
             </answer-button>
@@ -260,20 +261,6 @@ export default {
     back() {
       client.recordAnalyticsEvent("user", "back", "question", this.question.id)
       this.formOpened = false
-    },
-    openDragDrop(id, answerType) {
-      // FIX: implement this inside openForm
-      client.recordAnalyticsEvent(
-        "user",
-        "click",
-        "answer-button",
-        this.question.id,
-        {
-          type: answerType,
-          id,
-        }
-      )
-      this.userDragDropFormOpened = true
     },
     openFormIfSingle() {
       if (this.enabledAnswerTypes.length === 1) {
