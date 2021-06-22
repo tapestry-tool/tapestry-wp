@@ -107,16 +107,10 @@ export function getQuestion(state) {
 
 export function getAnswers(state) {
   return (nodeId, questionId) => {
-    if (state.userAnswers.hasOwnProperty(nodeId)) {
-      if (state.userAnswers[nodeId].hasOwnProperty("activity")) {
-        if (state.userAnswers[nodeId].activity.hasOwnProperty(questionId)) {
-          if (
-            typeof state.userAnswers[nodeId].activity[questionId].answers !==
-            "string"
-          )
-            return state.userAnswers[nodeId].activity[questionId].answers
-        }
-      }
+    if (state?.userAnswers?.[nodeId]?.activity?.[questionId]?.answers) {
+      return state.userAnswers[nodeId].activity[questionId].answers
+    } else {
+      return {}
     }
   }
 }

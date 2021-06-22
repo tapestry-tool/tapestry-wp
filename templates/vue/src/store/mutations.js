@@ -111,7 +111,7 @@ export function deleteLink(state, { source, target }) {
   )
 }
 
-// Activities
+// activities
 export function completeQuestion(state, { nodeId, questionId, answerType, answer }) {
   const node = getters.getNode(state)(nodeId)
 
