@@ -71,11 +71,11 @@ export default {
     DragDropBucketItem,
   },
   props: {
-    question: {
+    node: {
       type: Object,
       required: true,
     },
-    node: {
+    question: {
       type: Object,
       required: true,
     },

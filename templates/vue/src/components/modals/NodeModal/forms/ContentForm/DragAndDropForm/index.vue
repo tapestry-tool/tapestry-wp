@@ -1,7 +1,18 @@
 <template>
   <div>
+    <p>question data is {{ question }}</p>
     <b-form-group>
       <b>From buckets</b>
+      <b-form-checkbox v-model="useImages" data-qa="dragdrop-useImages">
+        Use Images
+      </b-form-checkbox>
+      <b-form-checkbox
+        v-if="useImages"
+        v-model="hideText"
+        data-qa="dragdrop-useImages"
+      >
+        Hide Text
+      </b-form-checkbox>
       <drag-drop-bucket
         v-for="(bucket, bucketIndex) in fromBuckets"
         :key="bucket.id"
@@ -82,12 +93,12 @@ export default {
               color: "#808080",
               imageurl: "",
               text: "",
-              useImage: false,
-              useText: false,
             },
           ],
         },
       ],
+      useImages: false,
+      hideText: false,
       nextFromBucketId: 2,
       nextFromBucketItemId: 2,
       nextFromBucketValue: "",
@@ -126,6 +137,12 @@ export default {
     nextToBucketId(newNextToBucketId) {
       this.question.answerTypes.dragDrop.nextToBucketId = newNextToBucketId
     },
+    useImages(newUseImages) {
+      this.question.answerTypes.dragDrop.useImages = newUseImages
+    },
+    hideText(newHideText) {
+      this.question.answerTypes.dragDrop.hideText = newHideText
+    },
   },
   created() {
     if (
@@ -137,12 +154,16 @@ export default {
       this.question.answerTypes.dragDrop.nextFromBucketItemId = this.nextFromBucketItemId
       this.question.answerTypes.dragDrop.nextFromBucketId = this.nextFromBucketId
       this.question.answerTypes.dragDrop.nextToBucketId = this.nextToBucketId
+      this.question.answerTypes.dragDrop.useImages = this.useImages
+      this.question.answerTypes.dragDrop.hideText = this.hideText
     } else {
       this.fromBuckets = this.question.answerTypes.dragDrop.fromBucketArray
       this.toBuckets = this.question.answerTypes.dragDrop.toBucketArray
       this.nextFromBucketItemId = this.question.answerTypes.dragDrop.nextFromBucketItemId
       this.nextFromBucketId = this.question.answerTypes.dragDrop.nextFromBucketId
       this.nextToBucketId = this.question.answerTypes.dragDrop.nextToBucketId
+      this.useImages = this.question.answerTypes.dragDrop.useImages
+      this.hideText = this.question.answerTypes.dragDrop.hideText
     }
   },
   methods: {
@@ -160,8 +181,6 @@ export default {
         color: "#808080",
         imageurl: "",
         text: "",
-        useImage: false,
-        useText: false,
       })
     },
     addNewToBucket: function() {

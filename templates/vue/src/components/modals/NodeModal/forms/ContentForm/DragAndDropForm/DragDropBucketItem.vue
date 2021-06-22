@@ -8,13 +8,7 @@
         :data-qa="`bucket-item-backgroundcolor-${bucketItem.id}`"
         @change="handleItemColorChange"
       />
-      <b-form-checkbox
-        v-model="addBackgroundImage"
-        :data-qa="`bucket-item-useimage-${bucketItem.id}`"
-      >
-        Background image
-      </b-form-checkbox>
-      <b-form-group v-if="addBackgroundImage">
+      <b-form-group v-if="question.answerTypes.dragDrop.useImages">
         <file-upload
           v-model="bucketItem.imageurl"
           input-test-id="node-bucketitem-thumbnail-url"
@@ -25,13 +19,6 @@
           @isUploading="handleUploadChange"
         />
       </b-form-group>
-      <!-- <b-form-checkbox
-        v-if="addBackgroundImage"
-        v-model="addText"
-        :data-qa="`bucket-item-usetext-${bucketItem.id}`"
-      >
-        Text
-      </b-form-checkbox> -->
       <b-form-input
         v-model="bucketItem.text"
         placeholder="Enter Item Text"
@@ -62,6 +49,10 @@ export default {
       type: Object,
       required: true,
     },
+    question: {
+      type: Object,
+      required: true,
+    },
     bucketItem: {
       type: Object,
       required: true,
@@ -82,8 +73,6 @@ export default {
         },
       ],
       nextFromBucketId: 2,
-      addBackgroundImage: false,
-      addText: false,
     }
   },
   computed: {
@@ -94,21 +83,6 @@ export default {
         return "toBucketContainer"
       }
     },
-  },
-  watch: {
-    addBackgroundImage(newAddBackgroundImage) {
-      this.bucketItem.useImage = newAddBackgroundImage
-    },
-    addText(newAddText) {
-      this.bucketItem.useText = newAddText
-    },
-  },
-  created() {
-    if (this.bucketItem.useText && this.bucketItem.text.length > 0) {
-      this.addText = true
-    }
-    this.addBackgroundImage =
-      this.bucketItem.imageurl !== null && this.bucketItem.imageurl !== ""
   },
   methods: {
     handleUploadChange(state) {
