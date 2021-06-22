@@ -2,7 +2,12 @@
   <div ref="activity" class="activity-media">
     <h1 v-if="showTitle" class="media-title">{{ node.title }}</h1>
     <completion-screen v-if="showCompletionScreen" :question="activeQuestion">
-      <button v-if="hasNext" class="button-completion" @click="next">
+      <button
+        v-if="hasNext"
+        class="button-completion"
+        data-qa="completion-next-button"
+        @click="next"
+      >
         <i class="fas fa-arrow-circle-right fa-4x"></i>
         <p>Next question</p>
       </button>
