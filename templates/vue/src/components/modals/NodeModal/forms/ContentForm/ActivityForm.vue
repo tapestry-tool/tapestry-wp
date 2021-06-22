@@ -144,7 +144,7 @@
             <b-form-group class="mt-3">
               <b-form-checkbox
                 v-model="question.answerTypes.multipleChoice.enabled"
-                data-qa="question-answer-multipleChoice"
+                :data-qa="`question-answer-multipleChoice-${index}`"
                 switch
               >
                 Multiple choice

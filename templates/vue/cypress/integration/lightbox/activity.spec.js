@@ -1,4 +1,102 @@
 describe("Activity", () => {
+  it("should be able to complete with a checkbox answer", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("activity")
+      cy.contains(/add question/i).click()
+      const question = `Select all numbers less than 3?`
+
+      cy.contains(/question text/i).click()
+      cy.focused().type(question)
+      cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
+      cy.getByTestId("question-answer-multipleChoice-multipleAnswer").click({
+        force: true,
+      })
+
+      cy.getByTestId(`choicerow-checkbox-1`)
+        .getByTestId(`choicerow-checkbox-input-1`)
+        .click()
+        .type("1")
+      cy.getByTestId(`choicerow-checkbox-2`)
+        .getByTestId(`choicerow-checkbox-input-2`)
+        .click()
+        .type("2")
+      cy.getByTestId(`choicerow-checkbox-3`)
+        .getByTestId(`choicerow-checkbox-input-3`)
+        .click()
+        .type("3")
+
+      cy.submitModal()
+      cy.openLightbox(node.id)
+
+      cy.route("POST", "**/quiz*").as("submit")
+
+      cy.lightbox().within(() => {
+        cy.getByTestId(`user-choicerow-checkbox-1`)
+          .getByTestId(`user-choicerow-checkbox-checked-1`)
+          .click({ force: true })
+        cy.getByTestId(`user-choicerow-checkbox-2`)
+          .getByTestId(`user-choicerow-checkbox-checked-2`)
+          .click({ force: true })
+
+        cy.contains(/submit/i).click()
+        cy.contains("Thanks!").should("be.visible")
+        cy.contains(/done/i).click()
+      })
+      cy.lightbox().should("not.exist")
+    })
+  })
+
+  it("should be able to complete with a radio answer", () => {
+    cy.fixture("one-node.json").as("oneNode")
+    cy.setup("@oneNode")
+
+    cy.getSelectedNode().then(node => {
+      cy.openModal("edit", node.id)
+      cy.changeMediaType("activity")
+      cy.contains(/add question/i).click()
+      const question = `What is 5 + 5?`
+
+      cy.contains(/question text/i).click()
+      cy.focused().type(question)
+      cy.getByTestId("question-answer-multipleChoice-0").click({ force: true })
+      cy.getByTestId("question-answer-multipleChoice-singleAnswer").click({
+        force: true,
+      })
+      cy.getByTestId(`choicerow-radio-50`)
+        .getByTestId(`choicerow-radio-input-50`)
+        .click()
+        .type("100")
+      cy.getByTestId(`choicerow-radio-51`)
+        .getByTestId(`choicerow-radio-input-51`)
+        .click()
+        .type("90")
+      cy.getByTestId(`choicerow-radio-52`)
+        .getByTestId(`choicerow-radio-input-52`)
+        .click()
+        .type("10")
+
+      cy.submitModal()
+      cy.openLightbox(node.id)
+
+      cy.route("POST", "**/quiz*").as("submit")
+
+      cy.lightbox().within(() => {
+        cy.getByTestId(`user-choicerow-radio-52`)
+          .getByTestId(`user-choicerow-radio-checked-52`)
+          .click({ force: true })
+
+        cy.contains(/submit/i).click()
+        cy.contains("Thanks!").should("be.visible")
+        cy.contains(/done/i).click()
+      })
+      cy.lightbox().should("not.exist")
+    })
+  })
+
   it("should be able to switch between questions in a activity", () => {
     cy.fixture("one-node.json").as("oneNode")
     cy.setup("@oneNode")
