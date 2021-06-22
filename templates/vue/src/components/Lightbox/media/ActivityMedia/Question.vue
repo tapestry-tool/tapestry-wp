@@ -1,15 +1,10 @@
 <template>
   <div class="question">
-<<<<<<< HEAD
-    <p>question is {{ question }}</p>
-    <button v-if="formOpened" class="button-nav m-auto" @click="back">
-=======
     <button
       v-if="formOpened && enabledAnswerTypes.length > 1"
       class="button-nav m-auto"
       @click="back"
     >
->>>>>>> 1043-activity-built-in-forms
       <i class="fas fa-arrow-left"></i>
     </button>
     <loading v-if="submitting" label="Submitting..." />
@@ -244,24 +239,18 @@ export default {
       return false
     },
     multipleChoiceFormCompleted() {
-      if (this.userAnswers.hasOwnProperty(this.node.id)) {
-        if (this.userAnswers[this.node.id].hasOwnProperty("activity")) {
+      if (this.userAnswers?.[this.node.id]?.activity?.[this.question.id]) {
+        if (
+          this.userAnswers[this.node.id].activity[this.question.id].hasOwnProperty(
+            "answers"
+          )
+        ) {
           if (
-            this.userAnswers[this.node.id].activity.hasOwnProperty(this.question.id)
+            this.userAnswers[this.node.id].activity[
+              this.question.id
+            ].answers.hasOwnProperty("multipleChoice")
           ) {
-            if (
-              this.userAnswers[this.node.id].activity[
-                this.question.id
-              ].hasOwnProperty("answers")
-            ) {
-              if (
-                this.userAnswers[this.node.id].activity[
-                  this.question.id
-                ].answers.hasOwnProperty("multipleChoice")
-              ) {
-                return true
-              }
-            }
+            return true
           }
         }
       }
