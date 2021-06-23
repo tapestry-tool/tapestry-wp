@@ -921,6 +921,37 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
+        // validate against multiple choice form
+        const questionsWithMultipleChoiceEnabled = this.node.typeData.activity.questions.filter(
+          question => {
+            return question.answerTypes.multipleChoice.enabled
+          }
+        )
+        console.log("multiple choice questions", questionsWithMultipleChoiceEnabled)
+
+        const validMultipleChoiceValues = questionsWithMultipleChoiceEnabled.every(
+          question => {
+            const hasMultipleAnswer =
+              question.answerTypes.multipleChoice.hasMultipleAnswers
+            console.log("hasMultipleAnswer is", hasMultipleAnswer)
+            if (hasMultipleAnswer) {
+              /// loop through checkboxArray
+              return question.answerTypes.multipleChoice.checkboxArray.every(
+                option => {
+                  return option.value != ""
+                }
+              )
+            } else {
+              /// loop through radioArray
+              return question.answerTypes.multipleChoice.radioArray.every(option => {
+                return option.value != ""
+              })
+            }
+          }
+        )
+        if (!validMultipleChoiceValues) {
+          errMsgs.push("Please enter a text for all multiple choice options")
+        }
       }
 
       return errMsgs
